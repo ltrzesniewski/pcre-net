@@ -1,0 +1,13 @@
+
+bin/
+obj/
+Debug/
+Release/
+ipch/
+
+*.suo
+*.user
+*.sdf
+*.opensdf
+*.aps
+Thumbs.db
