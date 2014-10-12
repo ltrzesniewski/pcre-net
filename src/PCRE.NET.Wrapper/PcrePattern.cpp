@@ -44,5 +44,16 @@ namespace PCRE {
 			}
 		}
 
+		bool PcrePattern::IsMatch(String^ subject)
+		{
+			pin_ptr<const wchar_t> pinnedSubject = PtrToStringChars(subject);
+			auto result = pcre16_exec(_re, nullptr, pinnedSubject, subject->Length, 0, 0, nullptr, 0);
+
+			if (result < -1)
+				throw gcnew InvalidOperationException();
+
+			return result != -1;
+		}
+
 	}
 }

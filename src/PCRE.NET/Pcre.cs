@@ -12,5 +12,10 @@ namespace PCRE
         {
             _re = new PcrePattern(pattern, 0);
         }
+
+        public bool IsMatch(string subject)
+        {
+            return _re.IsMatch(subject);
+        }
     }
 }

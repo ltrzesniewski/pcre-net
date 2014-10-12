@@ -36,5 +36,22 @@ namespace PCRE.Tests
 
             Assert.Fail();
         }
+
+        [Test]
+        [TestCase(@"^A.*Z$", "AfooZ")]
+        [TestCase(@"^A(.*)Z$", "AfooZ")]
+        [TestCase(@"^\p{L}+$", "Abçdë")]
+        public void should_match_pattern(string pattern, string subject)
+        {
+            Assert.IsTrue(new Pcre(pattern).IsMatch(subject));
+        }
+
+        [Test]
+        [TestCase(@"^A.*Z$", "Afoo")]
+        [TestCase(@"^\p{L}+$", "Abc123abc")]
+        public void should_not_match_pattern(string pattern, string subject)
+        {
+            Assert.IsFalse(new Pcre(pattern).IsMatch(subject));
+        }
     }
 }

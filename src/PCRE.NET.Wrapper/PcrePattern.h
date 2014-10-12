@@ -13,6 +13,8 @@ namespace PCRE {
 			~PcrePattern();
 			!PcrePattern();
 
+			bool IsMatch(String^ subject);
+
 		private:
 			pcre16* _re;
 		};
