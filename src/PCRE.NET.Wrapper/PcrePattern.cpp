@@ -12,7 +12,12 @@ namespace PCRE {
 
 			{
 				pin_ptr<const wchar_t> pinnedPattern = PtrToStringChars(pattern);
-				_re = pcre16_compile((unsigned short*)(wchar_t*)pinnedPattern, options, &errorMessage, &errorOffset, nullptr);
+				_re = pcre16_compile(
+					safe_cast<const wchar_t*>(pinnedPattern),
+					options,
+					&errorMessage,
+					&errorOffset,
+					nullptr);
 			}
 
 			if (_re == nullptr)
@@ -23,6 +28,20 @@ namespace PCRE {
 				throw gcnew ArgumentException(String::Format("Invalid pattern '{0}': {1} at offset {2}", pattern, gcnew String(errorMessage), errorOffset));
 			}
 
+		}
+
+		PcrePattern::~PcrePattern()
+		{
+			this->!PcrePattern();
+		}
+
+		PcrePattern::!PcrePattern()
+		{
+			if (_re)
+			{
+				pcre16_free(_re);
+				_re = nullptr;
+			}
 		}
 
 	}

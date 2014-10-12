@@ -372,3 +372,5 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 /* #undef size_t */
+
+#define PCRE_UCHAR16 wchar_t

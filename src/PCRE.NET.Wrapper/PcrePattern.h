@@ -10,6 +10,8 @@ namespace PCRE {
 		{
 		public:
 			PcrePattern(String^ pattern, int options);
+			~PcrePattern();
+			!PcrePattern();
 
 		private:
 			pcre16* _re;
