@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace PCRE.Tests
 {
     [TestFixture]
-    public class PcreInformationTests
+    public class PcreBuildInfoTests
     {
         [Test]
         public void should_report_version()

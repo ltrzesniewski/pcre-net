@@ -146,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\PCRE\pcre.h" />
+    <ClInclude Include="PatternInfoKey.h" />
     <ClInclude Include="PcreConfigKey.h" />
     <ClInclude Include="PcreBuild.h" />
     <ClInclude Include="PcrePattern.h" />

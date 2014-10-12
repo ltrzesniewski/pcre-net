@@ -80,8 +80,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Pcre.cs" />
-    <Compile Include="PcreInformation.cs" />
+    <Compile Include="PcreBuildInfo.cs" />
     <Compile Include="PcreNewLine.cs" />
+    <Compile Include="PcreOptions.cs" />
+    <Compile Include="PcrePatternInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

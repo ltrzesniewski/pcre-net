@@ -6,11 +6,14 @@ namespace PCRE
     {
         private readonly PcrePattern _re;
 
-        public static PcreInformation BuildInfo { get { return PcreInformation.Instance; } }
+        public static PcreBuildInfo BuildInfo { get { return PcreBuildInfo.Instance; } }
 
-        public Pcre(string pattern)
+        public PcrePatternInfo PaternInfo { get; private set; }
+
+        public Pcre(string pattern, PcreOptions options = PcreOptions.None)
         {
-            _re = new PcrePattern(pattern, 0);
+            _re = new PcrePattern(pattern, (int)options);
+            PaternInfo = new PcrePatternInfo(_re);
         }
 
         public bool IsMatch(string subject)

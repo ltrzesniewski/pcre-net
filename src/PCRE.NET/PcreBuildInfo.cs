@@ -3,11 +3,11 @@ using PCRE.Wrapper;
 
 namespace PCRE
 {
-    public sealed class PcreInformation
+    public sealed class PcreBuildInfo
     {
-        internal static readonly PcreInformation Instance = new PcreInformation();
+        internal static readonly PcreBuildInfo Instance = new PcreBuildInfo();
 
-        private PcreInformation()
+        private PcreBuildInfo()
         {
         }
 
@@ -56,12 +56,10 @@ namespace PCRE
             get { return GetConfigInt(PcreConfigKey.Bsr) == 0; }
         }
 
-
         public int LinkSize
         {
             get { return GetConfigInt(PcreConfigKey.LinkSize); }
         }
-
 
         public long ParensLimit
         {
