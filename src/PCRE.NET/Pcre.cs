@@ -1,12 +1,7 @@
-﻿using PCRE.Wrapper;
-
-namespace PCRE
+﻿namespace PCRE
 {
-    public class Pcre
+    public sealed class Pcre
     {
-        public static string VersionString
-        {
-            get { return PcreWrapper.GetVersionString(); }
-        }
+        public static PcreInformation BuildInfo { get { return PcreInformation.Instance; } }
     }
 }

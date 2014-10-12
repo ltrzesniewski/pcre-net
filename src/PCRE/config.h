@@ -230,6 +230,7 @@ sure both macros are undefined; an emulation function will then be used. */
    0x25) that are used as the NL line terminator that is equivalent to ASCII
    LF. In both ASCII and EBCDIC environments the value can also be -1 (ANY),
    or -2 (ANYCRLF). */
+#define NEWLINE -2
 #ifndef NEWLINE
 #define NEWLINE 10
 #endif
@@ -316,6 +317,7 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to any value to enable support for Just-In-Time compiling. */
 /* #undef SUPPORT_JIT */
+#define SUPPORT_JIT 1
 
 /* Define to any value to allow pcregrep to be linked with libbz2, so that it
    is able to handle .bz2 files. */

@@ -142,12 +142,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\PCRE\pcre.h" />
-    <ClInclude Include="PCRE.NET.Wrapper.h" />
+    <ClInclude Include="PcreConfigKey.h" />
+    <ClInclude Include="PcreBuild.h" />
     <ClInclude Include="Stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
-    <ClCompile Include="PCRE.NET.Wrapper.cpp" />
+    <ClCompile Include="PcreBuild.cpp" />
     <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
