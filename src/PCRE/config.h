@@ -53,6 +53,7 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to 1 if you have the `bcopy' function. */
 /* #undef HAVE_BCOPY */
+#define HAVE_BCOPY 1
 
 /* Define to 1 if you have the <bits/type_traits.h> header file. */
 /* #undef HAVE_BITS_TYPE_TRAITS_H */
@@ -74,18 +75,23 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 /* #undef HAVE_INTTYPES_H */
+#define HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the <limits.h> header file. */
 /* #undef HAVE_LIMITS_H */
+#define HAVE_LIMITS_H 1
 
 /* Define to 1 if the system has the type `long long'. */
 /* #undef HAVE_LONG_LONG */
+#define HAVE_LONG_LONG 1
 
 /* Define to 1 if you have the `memmove' function. */
 /* #undef HAVE_MEMMOVE */
+#define HAVE_MEMMOVE 1
 
 /* Define to 1 if you have the <memory.h> header file. */
 /* #undef HAVE_MEMORY_H */
+#define HAVE_MEMORY_H 1
 
 /* Define if you have POSIX threads libraries and header files. */
 /* #undef HAVE_PTHREAD */
@@ -101,30 +107,38 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to 1 if you have the <stdint.h> header file. */
 /* #undef HAVE_STDINT_H */
+#define HAVE_STDINT_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 /* #undef HAVE_STDLIB_H */
+#define HAVE_STDLIB_H 1
 
 /* Define to 1 if you have the `strerror' function. */
 /* #undef HAVE_STRERROR */
 
 /* Define to 1 if you have the <string> header file. */
 /* #undef HAVE_STRING */
+#define HAVE_STRING 1
 
 /* Define to 1 if you have the <strings.h> header file. */
 /* #undef HAVE_STRINGS_H */
+#define HAVE_STRINGS_H 1
 
 /* Define to 1 if you have the <string.h> header file. */
 /* #undef HAVE_STRING_H */
+#define HAVE_STRING_H 1
 
 /* Define to 1 if you have `strtoimax'. */
 /* #undef HAVE_STRTOIMAX */
+#define HAVE_STRTOIMAX 1
 
 /* Define to 1 if you have `strtoll'. */
 /* #undef HAVE_STRTOLL */
+#define HAVE_STRTOLL 1
 
 /* Define to 1 if you have `strtoq'. */
 /* #undef HAVE_STRTOQ */
+#define HAVE_STRTOQ 1
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 /* #undef HAVE_SYS_STAT_H */
@@ -140,18 +154,21 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to 1 if the system has the type `unsigned long long'. */
 /* #undef HAVE_UNSIGNED_LONG_LONG */
+#define HAVE_UNSIGNED_LONG_LONG 1
 
 /* Define to 1 if the compiler supports simple visibility declarations. */
 /* #undef HAVE_VISIBILITY */
 
 /* Define to 1 if you have the <windows.h> header file. */
 /* #undef HAVE_WINDOWS_H */
+#define HAVE_WINDOWS_H 1
 
 /* Define to 1 if you have the <zlib.h> header file. */
 /* #undef HAVE_ZLIB_H */
 
 /* Define to 1 if you have `_strtoi64'. */
 /* #undef HAVE__STRTOI64 */
+#define HAVE__STRTOI64 1
 
 /* The value of LINK_SIZE determines the number of bytes used to store links
    as offsets within the compiled regex. The default is 2, which allows for
@@ -276,6 +293,7 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to any value if linking statically (TODO: make nice with Libtool) */
 /* #undef PCRE_STATIC */
+#define PCRE_STATIC
 
 /* When calling PCRE via the POSIX interface, additional working storage is
    required for holding the pointers to capturing substrings because PCRE
@@ -294,6 +312,7 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to 1 if you have the ANSI C header files. */
 /* #undef STDC_HEADERS */
+#define STDC_HEADERS 1
 
 /* Define to any value to enable support for Just-In-Time compiling. */
 /* #undef SUPPORT_JIT */
@@ -314,6 +333,7 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to any value to enable the 16 bit PCRE library. */
 /* #undef SUPPORT_PCRE16 */
+#define SUPPORT_PCRE16
 
 /* Define to any value to enable the 32 bit PCRE library. */
 /* #undef SUPPORT_PCRE32 */
@@ -326,12 +346,14 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to any value to enable support for Unicode properties. */
 /* #undef SUPPORT_UCP */
+#define SUPPORT_UCP
 
 /* Define to any value to enable support for the UTF-8/16/32 Unicode encoding.
    This will work even in an EBCDIC environment, but it is incompatible with
    the EBCDIC macro. That is, PCRE can support *either* EBCDIC code *or*
    ASCII/UTF-8/16/32, but not both at once. */
 /* #undef SUPPORT_UTF */
+#define SUPPORT_UTF
 
 /* Define to any value for valgrind support to find invalid memory reads. */
 /* #undef SUPPORT_VALGRIND */

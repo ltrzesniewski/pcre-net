@@ -8,7 +8,8 @@ namespace PCRE {
 
 		public ref class PcreWrapper
 		{
-			
+		public:
+			static String^ GetVersionString();
 		};
 
 	}
