@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="PCRE">
+      <UniqueIdentifier>{e8c87699-79f9-4fbf-8757-3e23c5d9f739}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PCRE\8bit">
+      <UniqueIdentifier>{0abbb172-94b2-42fe-93fd-f34f02aa5c23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PCRE\16bit">
+      <UniqueIdentifier>{ba9b1e54-83fe-4adf-b875-fe5ff58c106f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PCRE\Headers">
+      <UniqueIdentifier>{4c7c7c1d-5189-4e9c-ba41-ee6d6bef33a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PCRE.NET.Wrapper.h">
@@ -20,6 +32,18 @@
     </ClInclude>
     <ClInclude Include="Stdafx.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\PCRE\config.h">
+      <Filter>PCRE\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\PCRE\pcre.h">
+      <Filter>PCRE\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\PCRE\pcre_internal.h">
+      <Filter>PCRE\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\PCRE\ucp.h">
+      <Filter>PCRE\Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -31,6 +55,135 @@
     </ClCompile>
     <ClCompile Include="Stdafx.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre_byte_order.c">
+      <Filter>PCRE\8bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre_chartables.c">
+      <Filter>PCRE\8bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre_compile.c">
+      <Filter>PCRE\8bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre_config.c">
+      <Filter>PCRE\8bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre_dfa_exec.c">
+      <Filter>PCRE\8bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre_exec.c">
+      <Filter>PCRE\8bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre_fullinfo.c">
+      <Filter>PCRE\8bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre_get.c">
+      <Filter>PCRE\8bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre_globals.c">
+      <Filter>PCRE\8bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre_jit_compile.c">
+      <Filter>PCRE\8bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre_maketables.c">
+      <Filter>PCRE\8bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre_newline.c">
+      <Filter>PCRE\8bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre_ord2utf8.c">
+      <Filter>PCRE\8bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre_refcount.c">
+      <Filter>PCRE\8bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre_string_utils.c">
+      <Filter>PCRE\8bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre_study.c">
+      <Filter>PCRE\8bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre_tables.c">
+      <Filter>PCRE\8bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre_ucd.c">
+      <Filter>PCRE\8bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre_valid_utf8.c">
+      <Filter>PCRE\8bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre_version.c">
+      <Filter>PCRE\8bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre_xclass.c">
+      <Filter>PCRE\8bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_byte_order.c">
+      <Filter>PCRE\16bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_chartables.c">
+      <Filter>PCRE\16bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_compile.c">
+      <Filter>PCRE\16bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_config.c">
+      <Filter>PCRE\16bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_dfa_exec.c">
+      <Filter>PCRE\16bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_exec.c">
+      <Filter>PCRE\16bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_fullinfo.c">
+      <Filter>PCRE\16bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_get.c">
+      <Filter>PCRE\16bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_globals.c">
+      <Filter>PCRE\16bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_jit_compile.c">
+      <Filter>PCRE\16bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_maketables.c">
+      <Filter>PCRE\16bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_newline.c">
+      <Filter>PCRE\16bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_ord2utf16.c">
+      <Filter>PCRE\16bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_refcount.c">
+      <Filter>PCRE\16bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_string_utils.c">
+      <Filter>PCRE\16bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_study.c">
+      <Filter>PCRE\16bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_tables.c">
+      <Filter>PCRE\16bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_ucd.c">
+      <Filter>PCRE\16bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_utf16_utils.c">
+      <Filter>PCRE\16bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_valid_utf16.c">
+      <Filter>PCRE\16bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_version.c">
+      <Filter>PCRE\16bit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\pcre16_xclass.c">
+      <Filter>PCRE\16bit</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
