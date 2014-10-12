@@ -5,6 +5,8 @@ Debug/
 Release/
 ipch/
 
+/src/packages/*/
+
 *.suo
 *.user
 *.sdf
