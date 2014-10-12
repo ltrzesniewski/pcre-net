@@ -27,6 +27,9 @@
     <ClInclude Include="PcreConfigKey.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PcrePattern.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">
@@ -36,6 +39,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PcreBuild.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PcrePattern.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,6 +1,5 @@
 
 #include "stdafx.h"
-
 #include "PcreBuild.h"
 
 namespace PCRE {
