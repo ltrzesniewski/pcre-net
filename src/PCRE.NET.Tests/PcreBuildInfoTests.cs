@@ -11,7 +11,7 @@ namespace PCRE.Tests
         [Test]
         public void should_report_version()
         {
-            var value = Pcre.BuildInfo.VersionString;
+            var value = PcreRegex.BuildInfo.VersionString;
             Console.WriteLine(value);
             Assert.IsNotNullOrEmpty(value);
         }
@@ -19,7 +19,7 @@ namespace PCRE.Tests
         [Test]
         public void should_report_jit_target()
         {
-            var value = Pcre.BuildInfo.JitTarget;
+            var value = PcreRegex.BuildInfo.JitTarget;
             Console.WriteLine(value);
             Assert.IsNotNullOrEmpty(value);
         }
@@ -27,7 +27,7 @@ namespace PCRE.Tests
         [Test]
         public void should_report_all_config_info()
         {
-            var info = Pcre.BuildInfo;
+            var info = PcreRegex.BuildInfo;
 
             var properties = info.GetType()
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance)

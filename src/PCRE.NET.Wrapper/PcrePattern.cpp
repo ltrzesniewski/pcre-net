@@ -5,35 +5,7 @@
 namespace PCRE {
 	namespace Wrapper {
 
-		static int TranslateOptions(int patternOptions)
-		{
-			int result = PCRE_NO_UTF16_CHECK | PCRE_UCP;
-
-			if (patternOptions & 1)
-				result |= PCRE_CASELESS;
-
-			if (patternOptions & 2)
-				result |= PCRE_MULTILINE;
-
-			if (patternOptions & 4)
-				result |= PCRE_NO_AUTO_CAPTURE;
-
-			if (patternOptions & 16)
-				result |= PCRE_DOTALL;
-
-			if (patternOptions & 32)
-				result |= PCRE_EXTENDED;
-
-			if (patternOptions & 256)
-			{
-				result |= PCRE_JAVASCRIPT_COMPAT;
-				result &= ~PCRE_UCP;
-			}
-
-			return result;
-		}
-
-		PcrePattern::PcrePattern(String^ pattern, int options)
+		PcrePattern::PcrePattern(String^ pattern, PcrePatternOptions options, Nullable<PcreStudyOptions> studyOptions)
 		{
 			const char *errorMessage;
 			int errorOffset;
@@ -42,7 +14,7 @@ namespace PCRE {
 				pin_ptr<const wchar_t> pinnedPattern = PtrToStringChars(pattern);
 				_re = pcre16_compile(
 					safe_cast<const wchar_t*>(pinnedPattern),
-					TranslateOptions(options),
+					static_cast<int>(options),
 					&errorMessage,
 					&errorOffset,
 					nullptr);
@@ -56,16 +28,9 @@ namespace PCRE {
 				throw gcnew ArgumentException(String::Format("Invalid pattern '{0}': {1} at offset {2}", pattern, gcnew String(errorMessage), errorOffset));
 			}
 
-			// Study
-
-			if (options & (8 | 4096))
+			if (studyOptions.HasValue)
 			{
-				int studyOptions = 0;
-
-				if (options & 8)
-					studyOptions |= PCRE_STUDY_JIT_COMPILE | PCRE_STUDY_JIT_PARTIAL_HARD_COMPILE | PCRE_STUDY_JIT_PARTIAL_SOFT_COMPILE;
-
-				_extra = pcre16_study(_re, studyOptions, &errorMessage);
+				_extra = pcre16_study(_re, static_cast<int>(studyOptions.Value), &errorMessage);
 
 				if (errorMessage)
 					throw gcnew InvalidOperationException(String::Format("Could not study pattern '{0}': {1}", pattern, gcnew String(errorMessage)));
@@ -99,7 +64,7 @@ namespace PCRE {
 		bool PcrePattern::IsMatch(String^ subject)
 		{
 			pin_ptr<const wchar_t> pinnedSubject = PtrToStringChars(subject);
-			auto result = pcre16_exec(_re, _extra, pinnedSubject, subject->Length, 0, PCRE_NO_UTF16_CHECK, nullptr, 0);
+			auto result = pcre16_exec(_re, _extra, pinnedSubject, subject->Length, 0, 0, nullptr, 0);
 
 			if (result < -1)
 				throw gcnew InvalidOperationException();

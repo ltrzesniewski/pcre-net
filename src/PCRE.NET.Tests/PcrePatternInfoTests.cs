@@ -11,7 +11,7 @@ namespace PCRE.Tests
         [TestCase(@"(a)(b(c))", 3)]
         public void should_return_capture_count(string pattern, int expected)
         {
-            var re = new Pcre(pattern);
+            var re = new PcreRegex(pattern);
             Assert.That(re.PaternInfo.CaptureCount, Is.EqualTo(expected));
         }
 
@@ -21,7 +21,7 @@ namespace PCRE.Tests
         [TestCase(@"a{3,5}b", 4)]
         public void should_detect_min_subject_length(string pattern, int expected)
         {
-            var re = new Pcre(pattern, PcreOptions.Study);
+            var re = new PcreRegex(pattern, PcreOptions.Study);
             Assert.That(re.PaternInfo.MinSubjectLength, Is.EqualTo(expected));
         }
 
@@ -30,7 +30,7 @@ namespace PCRE.Tests
         [TestCase(@"ab?ac?")]
         public void should_compile_pattern(string pattern)
         {
-            var re = new Pcre(pattern, PcreOptions.Compiled);
+            var re = new PcreRegex(pattern, PcreOptions.Compiled);
             Assert.That(re.PaternInfo.IsCompiled, Is.True);
         }
     }

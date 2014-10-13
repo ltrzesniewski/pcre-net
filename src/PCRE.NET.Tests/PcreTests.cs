@@ -12,7 +12,7 @@ namespace PCRE.Tests
         public void should_compile_correct_pattern(string pattern)
         {
             // ReSharper disable once ObjectCreationAsStatement
-            new Pcre(pattern);
+            new PcreRegex(pattern);
             Assert.Pass();
         }
 
@@ -26,7 +26,7 @@ namespace PCRE.Tests
             try
             {
                 // ReSharper disable once ObjectCreationAsStatement
-                new Pcre(pattern);
+                new PcreRegex(pattern);
             }
             catch (ArgumentException ex)
             {
@@ -43,8 +43,8 @@ namespace PCRE.Tests
         [TestCase(@"^\p{L}+$", "Abçdë")]
         public void should_match_pattern(string pattern, string subject)
         {
-            Assert.That(new Pcre(pattern).IsMatch(subject), Is.True);
-            Assert.That(new Pcre(pattern, PcreOptions.Compiled).IsMatch(subject), Is.True);
+            Assert.That(new PcreRegex(pattern).IsMatch(subject), Is.True);
+            Assert.That(new PcreRegex(pattern, PcreOptions.Compiled).IsMatch(subject), Is.True);
         }
 
         [Test]
@@ -52,57 +52,57 @@ namespace PCRE.Tests
         [TestCase(@"^\p{L}+$", "Abc123abc")]
         public void should_not_match_pattern(string pattern, string subject)
         {
-            Assert.That(new Pcre(pattern).IsMatch(subject), Is.False);
-            Assert.That(new Pcre(pattern, PcreOptions.Compiled).IsMatch(subject), Is.False);
+            Assert.That(new PcreRegex(pattern).IsMatch(subject), Is.False);
+            Assert.That(new PcreRegex(pattern, PcreOptions.Compiled).IsMatch(subject), Is.False);
         }
 
         [Test]
         public void should_handle_ignore_case()
         {
-            var re = new Pcre("aBc");
+            var re = new PcreRegex("aBc");
             Assert.That(re.IsMatch("Abc"), Is.False);
 
-            re = new Pcre("aBc", PcreOptions.IgnoreCase);
+            re = new PcreRegex("aBc", PcreOptions.IgnoreCase);
             Assert.That(re.IsMatch("Abc"), Is.True);
         }
 
         [Test]
         public void should_handle_ignore_whitespace()
         {
-            var re = new Pcre("^a b$");
+            var re = new PcreRegex("^a b$");
             Assert.That(re.IsMatch("ab"), Is.False);
 
-            re = new Pcre("^a b$", PcreOptions.IgnorePatternWhitespace);
+            re = new PcreRegex("^a b$", PcreOptions.IgnorePatternWhitespace);
             Assert.That(re.IsMatch("ab"), Is.True);
         }
 
         [Test]
         public void should_handle_singleline()
         {
-            var re = new Pcre("^a.*b$");
+            var re = new PcreRegex("^a.*b$");
             Assert.That(re.IsMatch("a\r\nb"), Is.False);
 
-            re = new Pcre("^a.*b$", PcreOptions.Singleline);
+            re = new PcreRegex("^a.*b$", PcreOptions.Singleline);
             Assert.That(re.IsMatch("a\r\nb"), Is.True);
         }
 
         [Test]
         public void should_handle_multiline()
         {
-            var re = new Pcre("^aaa$");
+            var re = new PcreRegex("^aaa$");
             Assert.That(re.IsMatch("aaa\r\nbbb"), Is.False);
 
-            re = new Pcre("^aaa$", PcreOptions.MultiLine);
+            re = new PcreRegex("^aaa$", PcreOptions.MultiLine);
             Assert.That(re.IsMatch("aaa\r\nbbb"), Is.True);
         }
 
         [Test]
         public void should_handle_ecmascript()
         {
-            var re = new Pcre(@"^\w$");
+            var re = new PcreRegex(@"^\w$");
             Assert.That(re.IsMatch("à"), Is.True);
 
-            re = new Pcre(@"^\w$", PcreOptions.ECMAScript);
+            re = new PcreRegex(@"^\w$", PcreOptions.ECMAScript);
             Assert.That(re.IsMatch("à"), Is.False);
         }
     }

@@ -2,6 +2,8 @@
 #pragma once
 
 #include "PatternInfoKey.h"
+#include "PcrePatternOptions.h"
+#include "PcreStudyOptions.h"
 
 using namespace System;
 
@@ -11,7 +13,7 @@ namespace PCRE {
 		public ref class PcrePattern sealed
 		{
 		public:
-			PcrePattern(String^ pattern, int options);
+			PcrePattern(String^ pattern, PcrePatternOptions options, Nullable<PcreStudyOptions> studyOptions);
 			~PcrePattern();
 			!PcrePattern();
 

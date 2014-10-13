@@ -150,6 +150,8 @@
     <ClInclude Include="PcreConfigKey.h" />
     <ClInclude Include="PcreBuild.h" />
     <ClInclude Include="PcrePattern.h" />
+    <ClInclude Include="PcrePatternOptions.h" />
+    <ClInclude Include="PcreStudyOptions.h" />
     <ClInclude Include="Stdafx.h" />
   </ItemGroup>
   <ItemGroup>
