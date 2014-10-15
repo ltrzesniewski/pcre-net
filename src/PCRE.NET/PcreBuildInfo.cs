@@ -3,80 +3,74 @@ using PCRE.Wrapper;
 
 namespace PCRE
 {
-    public sealed class PcreBuildInfo
+    public static class PcreBuildInfo
     {
-        internal static readonly PcreBuildInfo Instance = new PcreBuildInfo();
-
-        private PcreBuildInfo()
-        {
-        }
-
-        public string VersionString
+        public static string VersionString
         {
             get { return PcreBuild.VersionString; }
         }
 
-        public bool Utf8
+        public static bool Utf8
         {
             get { return GetConfigBool(PcreConfigKey.Utf8); }
         }
 
-        public bool Utf16
+        public static bool Utf16
         {
             get { return GetConfigBool(PcreConfigKey.Utf16); }
         }
 
-        public bool Utf32
+        public static bool Utf32
         {
             get { return GetConfigBool(PcreConfigKey.Utf32); }
         }
 
-        public bool UnicodeProperties
+        public static bool UnicodeProperties
         {
             get { return GetConfigBool(PcreConfigKey.UnicodeProperties); }
         }
 
-        public bool Jit
+        public static bool Jit
         {
             get { return GetConfigBool(PcreConfigKey.Jit); }
         }
 
-        public string JitTarget
+        public static string JitTarget
         {
             get { return PcreBuild.GetConfigString(PcreConfigKey.JitTarget); }
         }
 
-        public PcreNewLine NewLine
+        public static PcreNewLine NewLine
         {
             get { return (PcreNewLine)GetConfigInt(PcreConfigKey.NewLine); }
         }
 
-        public bool BackSlashRMatchesUnicode
+        public static bool BackSlashRMatchesUnicode
         {
             get { return GetConfigInt(PcreConfigKey.Bsr) == 0; }
         }
 
-        public int LinkSize
+        public static int LinkSize
         {
             get { return GetConfigInt(PcreConfigKey.LinkSize); }
         }
 
-        public long ParensLimit
+        public static long ParensLimit
         {
             get { return GetConfigLong(PcreConfigKey.ParensLimit); }
         }
 
-        public long MatchLimit
+        public static long MatchLimit
         {
             get { return GetConfigLong(PcreConfigKey.MatchLimit); }
         }
 
-        public long MatchLimitRecursion
+        public static long MatchLimitRecursion
         {
             get { return GetConfigLong(PcreConfigKey.MatchLimitRecursion); }
         }
 
-        public bool StackRecurse
+        public static bool StackRecurse
         {
             get { return GetConfigBool(PcreConfigKey.StackRecurse); }
         }

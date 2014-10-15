@@ -18,7 +18,7 @@ namespace PCRE
 
         public int CaptureCount
         {
-            get { return _re.GetInfoInt32(PatternInfoKey.CaptureCount); }
+            get { return _re.CaptureCount; }
         }
 
         public bool IsCompiled

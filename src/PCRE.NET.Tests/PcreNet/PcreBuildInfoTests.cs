@@ -11,7 +11,7 @@ namespace PCRE.Tests.PcreNet
         [Test]
         public void should_report_version()
         {
-            var value = PcreRegex.BuildInfo.VersionString;
+            var value = PcreBuildInfo.VersionString;
             Console.WriteLine(value);
             Assert.IsNotNullOrEmpty(value);
         }
@@ -19,7 +19,7 @@ namespace PCRE.Tests.PcreNet
         [Test]
         public void should_report_jit_target()
         {
-            var value = PcreRegex.BuildInfo.JitTarget;
+            var value = PcreBuildInfo.JitTarget;
             Console.WriteLine(value);
             Assert.IsNotNullOrEmpty(value);
         }
@@ -27,15 +27,13 @@ namespace PCRE.Tests.PcreNet
         [Test]
         public void should_report_all_config_info()
         {
-            var info = PcreRegex.BuildInfo;
-
-            var properties = info.GetType()
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            var properties = typeof(PcreBuildInfo)
+                .GetProperties(BindingFlags.Public | BindingFlags.Static)
                 .Where(prop => prop.CanRead);
 
             foreach (var propertyInfo in properties)
             {
-                var value = propertyInfo.GetValue(info);
+                var value = propertyInfo.GetValue(null);
                 Console.WriteLine("{0} = {1}", propertyInfo.Name, value);
             }
         }
