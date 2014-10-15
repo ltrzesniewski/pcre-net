@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using PCRE.Wrapper;
 
 namespace PCRE
 {
-    public sealed class PcreMatch
+    public sealed class PcreMatch : IEnumerable<PcreGroup>
     {
         private readonly PcreRegex _regex;
         private readonly string _subject;
@@ -67,9 +69,25 @@ namespace PCRE
             get { return this[0]; }
         }
 
+        public IEnumerator<PcreGroup> GetEnumerator()
+        {
+            return EnumerageAllGroups().GetEnumerator();
+        }
+
+        private IEnumerable<PcreGroup> EnumerageAllGroups()
+        {
+            for (var i = 0; i < CaptureCount; ++i)
+                yield return this[i];
+        }
+
         public override string ToString()
         {
             return Value;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

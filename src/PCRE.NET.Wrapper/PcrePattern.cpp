@@ -79,12 +79,25 @@ namespace PCRE {
 
 		MatchOffsets PcrePattern::FirstMatch(String^ subject)
 		{
+			return DoMatch(subject, 0, 0);
+		}
+
+		MatchOffsets PcrePattern::NextMatch(String^ subject, int startOffset)
+		{
+			if (startOffset == subject->Length)
+				return MatchOffsets();
+
+			return DoMatch(subject, startOffset, PCRE_NOTEMPTY_ATSTART);
+		}
+
+		MatchOffsets PcrePattern::DoMatch(String^ subject, int startOffset, int options)
+		{
 			auto match = MatchOffsets(_captureCount);
 
 			pin_ptr<int> offsets = &match._offsets[0];
 			pin_ptr<const wchar_t> pinnedSubject = PtrToStringChars(subject);
 
-			auto result = pcre16_exec(_re, _extra, pinnedSubject, subject->Length, 0, 0, offsets, match._offsets->Length);
+			auto result = pcre16_exec(_re, _extra, pinnedSubject, subject->Length, startOffset, options, offsets, match._offsets->Length);
 
 			if (result < -1)
 				throw gcnew InvalidOperationException();

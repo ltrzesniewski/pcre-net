@@ -20,6 +20,7 @@ namespace PCRE {
 
 			bool IsMatch(String^ subject);
 			MatchOffsets FirstMatch(String^ subject);
+			MatchOffsets NextMatch(String^ subject, int startOffset);
 
 			int GetInfoInt32(PatternInfoKey key);
 
@@ -31,6 +32,8 @@ namespace PCRE {
 			pcre16* _re;
 			pcre16_extra* _extra;
 			int _captureCount;
+
+			MatchOffsets DoMatch(String^ subject, int startOffset, int options);
 		};
 	}
 }
