@@ -150,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\PCRE\pcre.h" />
+    <ClInclude Include="MatchOffsets.h" />
     <ClInclude Include="PatternInfoKey.h" />
     <ClInclude Include="PcreConfigKey.h" />
     <ClInclude Include="PcreBuild.h" />
@@ -160,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="MatchOffsets.cpp" />
     <ClCompile Include="PcreBuild.cpp" />
     <ClCompile Include="PcrePattern.cpp" />
     <ClCompile Include="Stdafx.cpp">

@@ -84,9 +84,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PcreBuildInfoTests.cs" />
-    <Compile Include="PcrePatternInfoTests.cs" />
-    <Compile Include="PcreTests.cs" />
+    <Compile Include="PcreNet\MatchTests.cs" />
+    <Compile Include="PcreNet\PcreBuildInfoTests.cs" />
+    <Compile Include="PcreNet\PcrePatternInfoTests.cs" />
+    <Compile Include="PcreNet\IsMatchTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

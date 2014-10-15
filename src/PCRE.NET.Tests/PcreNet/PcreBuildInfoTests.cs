@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 
-namespace PCRE.Tests
+namespace PCRE.Tests.PcreNet
 {
     [TestFixture]
     public class PcreBuildInfoTests

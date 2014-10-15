@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-namespace PCRE.Tests
+namespace PCRE.Tests.PcreNet
 {
     [TestFixture]
     public class PcrePatternInfoTests

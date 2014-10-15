@@ -39,6 +39,8 @@ namespace PCRE {
 			{
 				_extra = nullptr;
 			}
+
+			_captureCount = GetInfoInt32(PatternInfoKey::CaptureCount);
 		}
 
 		PcrePattern::~PcrePattern()
@@ -66,10 +68,38 @@ namespace PCRE {
 			pin_ptr<const wchar_t> pinnedSubject = PtrToStringChars(subject);
 			auto result = pcre16_exec(_re, _extra, pinnedSubject, subject->Length, 0, 0, nullptr, 0);
 
+			if (result == PCRE_ERROR_NOMATCH)
+				return false;
+
+			if (result < 0)
+				throw gcnew InvalidOperationException();
+
+			return true;
+		}
+
+		MatchOffsets PcrePattern::FirstMatch(String^ subject)
+		{
+			auto match = MatchOffsets(_captureCount);
+
+			pin_ptr<int> offsets = &match._offsets[0];
+			pin_ptr<const wchar_t> pinnedSubject = PtrToStringChars(subject);
+
+			auto result = pcre16_exec(_re, _extra, pinnedSubject, subject->Length, 0, 0, offsets, match._offsets->Length);
+
 			if (result < -1)
 				throw gcnew InvalidOperationException();
 
-			return result != -1;
+			if (result == PCRE_ERROR_NOMATCH)
+			{
+				match.IsMatch = false;
+				return match;
+			}
+
+			if (result < 0)
+				throw gcnew InvalidOperationException();
+
+			match.IsMatch = true;
+			return match;
 		}
 
 		int PcrePattern::GetInfoInt32(PatternInfoKey key)

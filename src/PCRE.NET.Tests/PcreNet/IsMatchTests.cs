@@ -1,10 +1,10 @@
 ﻿using System;
 using NUnit.Framework;
 
-namespace PCRE.Tests
+namespace PCRE.Tests.PcreNet
 {
     [TestFixture]
-    public class PcreTests
+    public class IsMatchTests
     {
         [Test]
         [TestCase(@"^A.*Z$")]
