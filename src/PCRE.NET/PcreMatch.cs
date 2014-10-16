@@ -56,6 +56,22 @@ namespace PCRE
             }
         }
 
+        public PcreGroup this[string name]
+        {
+            get
+            {
+                var map = _regex.CaptureNameMap;
+                if (map == null)
+                    throw new ArgumentException("The regex has no named groups");
+
+                int index;
+                if (!map.TryGetValue(name, out index))
+                    throw new ArgumentException(String.Format("The named group '{0}' does not exist", name));
+
+                return this[index];
+            }
+        }
+
         public int Index
         {
             get { return this[0].Index; }

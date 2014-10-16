@@ -20,6 +20,11 @@ namespace PCRE
             get { return _re.CaptureCount; }
         }
 
+        internal Dictionary<string, int> CaptureNameMap
+        {
+            get { return _re.CaptureNames; }
+        }
+
         public PcreRegex(string pattern, PcreOptions options = PcreOptions.None)
         {
             if (pattern == null)

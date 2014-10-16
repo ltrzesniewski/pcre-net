@@ -41,6 +41,28 @@ namespace PCRE {
 			}
 
 			_captureCount = GetInfoInt32(PatternInfoKey::CaptureCount);
+
+			int nameCount = GetInfoInt32(PatternInfoKey::NameCount);
+			if (nameCount)
+			{
+				int nameEntrySize = GetInfoInt32(PatternInfoKey::NameEntrySize);
+
+				_captureNames = gcnew Dictionary<String^, int>(nameCount);
+
+				wchar_t *nameEntryTable;
+				int errorCode = pcre16_fullinfo(_re, _extra, PCRE_INFO_NAMETABLE, &nameEntryTable);
+				if (errorCode || !nameEntryTable)
+					throw gcnew InvalidOperationException(String::Format("Could not get name table, code: {0}", errorCode));
+
+				wchar_t *item = nameEntryTable;
+				for (int i = 0; i < nameCount; ++i)
+				{
+					int groupIndex = static_cast<int>(static_cast<short>(*item));
+					String^ groupName = gcnew String(item + 1);
+					_captureNames->Add(groupName, groupIndex);
+					item += nameEntrySize;
+				}
+			}
 		}
 
 		PcrePattern::~PcrePattern()
@@ -118,7 +140,7 @@ namespace PCRE {
 		int PcrePattern::GetInfoInt32(PatternInfoKey key)
 		{
 			int result;
-			auto errorCode = pcre16_fullinfo(_re, _extra, static_cast<int>(key), &result);
+			int errorCode = pcre16_fullinfo(_re, _extra, static_cast<int>(key), &result);
 
 			if (errorCode)
 				throw gcnew InvalidOperationException(String::Format("Error in pcre16_fullinfo, code: {0}", errorCode));
