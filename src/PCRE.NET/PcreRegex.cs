@@ -31,7 +31,7 @@ namespace PCRE
                 throw new ArgumentNullException("pattern");
 
             _re = new PcrePattern(pattern, options.ToPatternOptions(), options.ToStudyOptions());
-            PaternInfo = new PcrePatternInfo(_re);
+            PaternInfo = new PcrePatternInfo(_re, pattern, options);
         }
 
         [Pure]

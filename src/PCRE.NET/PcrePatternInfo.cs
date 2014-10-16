@@ -6,10 +6,15 @@ namespace PCRE
     {
         private readonly PcrePattern _re;
 
-        internal PcrePatternInfo(PcrePattern re)
+        internal PcrePatternInfo(PcrePattern re, string pattern, PcreOptions options)
         {
             _re = re;
+            PatternString = pattern;
+            Options = options;
         }
+
+        public string PatternString { get; private set; }
+        public PcreOptions Options { get; private set; }
 
         public int MaxBackReference
         {

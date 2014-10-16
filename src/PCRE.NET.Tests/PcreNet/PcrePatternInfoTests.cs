@@ -6,6 +6,15 @@ namespace PCRE.Tests.PcreNet
     public class PcrePatternInfoTests
     {
         [Test]
+        public void should_return_pattern_and_options()
+        {
+            var re = new PcreRegex(@"foo\s+bar", PcreOptions.IgnoreCase | PcreOptions.Study);
+
+            Assert.That(re.PaternInfo.PatternString, Is.EqualTo(@"foo\s+bar"));
+            Assert.That(re.PaternInfo.Options, Is.EqualTo(PcreOptions.IgnoreCase | PcreOptions.Study));
+        }
+
+        [Test]
         [TestCase(@"a", 0)]
         [TestCase(@"(a)(b)", 2)]
         [TestCase(@"(a)(b(c))", 3)]
