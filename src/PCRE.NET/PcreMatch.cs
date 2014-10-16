@@ -35,10 +35,12 @@ namespace PCRE
                 var group = _groups[index];
                 if (group == null)
                 {
+                    // ReSharper disable once ImpureMethodCallOnReadonlyValueField
                     var startOffset = _offsets.GetStartOffset(index);
 
                     if (startOffset >= 0)
                     {
+                        // ReSharper disable once ImpureMethodCallOnReadonlyValueField
                         var endOffset = _offsets.GetEndOffset(index);
                         group = new PcreGroup(_subject, startOffset, endOffset);
                     }

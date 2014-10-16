@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Text;
 using PCRE.Support;
 using PCRE.Wrapper;
@@ -28,11 +29,13 @@ namespace PCRE
             PaternInfo = new PcrePatternInfo(_re);
         }
 
+        [Pure]
         public bool IsMatch(string subject)
         {
             return IsMatch(subject, 0);
         }
 
+        [Pure]
         public bool IsMatch(string subject, int startIndex)
         {
             if (subject == null)
@@ -44,11 +47,13 @@ namespace PCRE
             return _re.IsMatch(subject, startIndex);
         }
 
+        [Pure]
         public PcreMatch Match(string subject)
         {
             return Match(subject, 0);
         }
 
+        [Pure]
         public PcreMatch Match(string subject, int startIndex)
         {
             if (subject == null)
@@ -63,11 +68,13 @@ namespace PCRE
                 : null;
         }
 
+        [Pure]
         public IEnumerable<PcreMatch> Matches(string subject)
         {
             return Matches(subject, 0);
         }
 
+        [Pure]
         public IEnumerable<PcreMatch> Matches(string subject, int startIndex)
         {
             if (subject == null)
@@ -78,6 +85,7 @@ namespace PCRE
 
             return MatchesIterator(subject, startIndex);
         }
+
 
         private IEnumerable<PcreMatch> MatchesIterator(string subject, int startIndex)
         {
@@ -102,16 +110,19 @@ namespace PCRE
             }
         }
 
+        [Pure]
         public string Replace(string subject, string replacement)
         {
             return Replace(subject, replacement, -1, 0);
         }
 
+        [Pure]
         public string Replace(string subject, string replacement, int count)
         {
             return Replace(subject, replacement, count, 0);
         }
 
+        [Pure]
         public string Replace(string subject, string replacement, int count, int startIndex)
         {
             if (replacement == null)
