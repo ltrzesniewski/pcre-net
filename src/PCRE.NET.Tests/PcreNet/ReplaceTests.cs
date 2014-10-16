@@ -23,5 +23,14 @@ namespace PCRE.Tests.PcreNet
 
             Assert.That(result, Is.EqualTo("foo <aabb><bb> bar <aaabb><bb><ab><b> baz"));
         }
+
+        [Test]
+        public void should_not_throw_on_invalid_replacement_patterns()
+        {
+            var re = new PcreRegex(@"a+(b+)", PcreOptions.IgnoreCase);
+            var result = re.Replace("foo aabb bar aaabbab baz", "<$2$$1$>");
+
+            Assert.That(result, Is.EqualTo("foo <$2$bb$> bar <$2$bb$><$2$b$> baz"));
+        }
     }
 }

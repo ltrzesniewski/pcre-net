@@ -116,8 +116,10 @@ namespace PCRE
             return sb.ToString();
         }
 
-        private static Func<PcreMatch, string> BuildReplacementFunc(string replacementPattern)
+        private Func<PcreMatch, string> BuildReplacementFunc(string replacementPattern)
         {
+            // TODO : Refactor & improve
+
             var placeholderIndex = replacementPattern.IndexOf('$');
 
             if (placeholderIndex < 0)
@@ -149,7 +151,12 @@ namespace PCRE
                 else
                 {
                     var groupIndex = Int32.Parse(replacementPattern.Substring(currentIndex, endIntIndex - currentIndex));
-                    replacementParts.Add(groupIndex);
+
+                    if (groupIndex <= CaptureCount)
+                        replacementParts.Add(groupIndex);
+                    else
+                        replacementParts.Add(replacementPattern.Substring(currentIndex - 1, endIntIndex - currentIndex + 1));
+
                     currentIndex = endIntIndex;
                 }
 

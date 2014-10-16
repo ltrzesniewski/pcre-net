@@ -71,10 +71,10 @@ namespace PCRE
 
         public IEnumerator<PcreGroup> GetEnumerator()
         {
-            return EnumerageAllGroups().GetEnumerator();
+            return EnumerateAllGroups().GetEnumerator();
         }
 
-        private IEnumerable<PcreGroup> EnumerageAllGroups()
+        private IEnumerable<PcreGroup> EnumerateAllGroups()
         {
             for (var i = 0; i < CaptureCount; ++i)
                 yield return this[i];
