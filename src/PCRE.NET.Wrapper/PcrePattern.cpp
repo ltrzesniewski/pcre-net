@@ -63,10 +63,10 @@ namespace PCRE {
 			}
 		}
 
-		bool PcrePattern::IsMatch(String^ subject)
+		bool PcrePattern::IsMatch(String^ subject, int startOffset)
 		{
 			pin_ptr<const wchar_t> pinnedSubject = PtrToStringChars(subject);
-			auto result = pcre16_exec(_re, _extra, pinnedSubject, subject->Length, 0, 0, nullptr, 0);
+			auto result = pcre16_exec(_re, _extra, pinnedSubject, subject->Length, startOffset, 0, nullptr, 0);
 
 			if (result == PCRE_ERROR_NOMATCH)
 				return false;
@@ -77,9 +77,9 @@ namespace PCRE {
 			return true;
 		}
 
-		MatchOffsets PcrePattern::FirstMatch(String^ subject)
+		MatchOffsets PcrePattern::FirstMatch(String^ subject, int startOffset)
 		{
-			return DoMatch(subject, 0, 0);
+			return DoMatch(subject, startOffset, 0);
 		}
 
 		MatchOffsets PcrePattern::NextMatch(String^ subject, int startOffset)

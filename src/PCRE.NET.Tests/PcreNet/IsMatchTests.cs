@@ -105,5 +105,19 @@ namespace PCRE.Tests.PcreNet
             re = new PcreRegex(@"^\w$", PcreOptions.ECMAScript);
             Assert.That(re.IsMatch("à"), Is.False);
         }
+
+        [Test]
+        public void should_match_from_index()
+        {
+            var re = new PcreRegex(@"a");
+            Assert.That(re.IsMatch("foobar", 5), Is.False);
+        }
+
+        [Test]
+        public void should_match_starting_at_end_of_string()
+        {
+            var re = new PcreRegex(@"(?<=a)");
+            Assert.That(re.IsMatch("xxa", 3), Is.True);
+        }
     }
 }

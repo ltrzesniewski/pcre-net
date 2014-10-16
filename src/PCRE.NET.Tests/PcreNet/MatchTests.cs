@@ -50,7 +50,15 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match[3].Value, Is.EqualTo("dd"));
             Assert.That(match[3].Index, Is.EqualTo(8));
             Assert.That(match[3].Length, Is.EqualTo(2));
+        }
 
+        [Test]
+        public void should_match_starting_at_end_of_string()
+        {
+            var re = new PcreRegex(@"(?<=a)");
+            var match = re.Match("xxa", 3);
+
+            Assert.That(match, Is.Not.Null);
         }
     }
 }

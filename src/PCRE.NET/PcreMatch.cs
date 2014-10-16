@@ -35,11 +35,11 @@ namespace PCRE
                 var group = _groups[index];
                 if (group == null)
                 {
-                    var startOffset = _offsets._offsets[2*index];
+                    var startOffset = _offsets.GetStartOffset(index);
 
                     if (startOffset >= 0)
                     {
-                        var endOffset = _offsets._offsets[2*index + 1];
+                        var endOffset = _offsets.GetEndOffset(index);
                         group = new PcreGroup(_subject, startOffset, endOffset);
                     }
                     else

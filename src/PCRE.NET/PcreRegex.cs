@@ -8,6 +8,8 @@ namespace PCRE
 {
     public sealed class PcreRegex
     {
+        // ReSharper disable IntroduceOptionalParameters.Global, MemberCanBePrivate.Global, UnusedMember.Global
+
         private readonly PcrePattern _re;
 
         public PcrePatternInfo PaternInfo { get; private set; }
@@ -28,18 +30,34 @@ namespace PCRE
 
         public bool IsMatch(string subject)
         {
-            if (subject == null)
-                throw new ArgumentNullException("subject");
-
-            return _re.IsMatch(subject);
+            return IsMatch(subject, 0);
         }
 
-        public PcreMatch Match(string subject)
+        public bool IsMatch(string subject, int startIndex)
         {
             if (subject == null)
                 throw new ArgumentNullException("subject");
 
-            var offsets = _re.FirstMatch(subject);
+            if (startIndex < 0 || startIndex > subject.Length)
+                throw new ArgumentOutOfRangeException("startIndex");
+
+            return _re.IsMatch(subject, startIndex);
+        }
+
+        public PcreMatch Match(string subject)
+        {
+            return Match(subject, 0);
+        }
+
+        public PcreMatch Match(string subject, int startIndex)
+        {
+            if (subject == null)
+                throw new ArgumentNullException("subject");
+
+            if (startIndex < 0 || startIndex > subject.Length)
+                throw new ArgumentOutOfRangeException("startIndex");
+
+            var offsets = _re.FirstMatch(subject, startIndex);
             return offsets.IsMatch
                 ? new PcreMatch(this, subject, offsets)
                 : null;
@@ -47,15 +65,23 @@ namespace PCRE
 
         public IEnumerable<PcreMatch> Matches(string subject)
         {
+            return Matches(subject, 0);
+        }
+
+        public IEnumerable<PcreMatch> Matches(string subject, int startIndex)
+        {
             if (subject == null)
                 throw new ArgumentNullException("subject");
 
-            return MatchesIterator(subject);
+            if (startIndex < 0 || startIndex > subject.Length)
+                throw new ArgumentOutOfRangeException("startIndex");
+
+            return MatchesIterator(subject, startIndex);
         }
 
-        private IEnumerable<PcreMatch> MatchesIterator(string subject)
+        private IEnumerable<PcreMatch> MatchesIterator(string subject, int startIndex)
         {
-            var offsets = _re.FirstMatch(subject);
+            var offsets = _re.FirstMatch(subject, startIndex);
 
             if (!offsets.IsMatch)
                 yield break;
@@ -78,18 +104,33 @@ namespace PCRE
 
         public string Replace(string subject, string replacement)
         {
+            return Replace(subject, replacement, -1, 0);
+        }
+
+        public string Replace(string subject, string replacement, int count)
+        {
+            return Replace(subject, replacement, count, 0);
+        }
+
+        public string Replace(string subject, string replacement, int count, int startIndex)
+        {
             if (replacement == null)
                 throw new ArgumentNullException("replacement");
 
-            return Replace(subject, BuildReplacementFunc(replacement));
+            return Replace(subject, BuildReplacementFunc(replacement), count, startIndex);
         }
 
         public string Replace(string subject, Func<PcreMatch, string> replacementFunc)
         {
-            return Replace(subject, replacementFunc, -1);
+            return Replace(subject, replacementFunc, -1, 0);
         }
 
         public string Replace(string subject, Func<PcreMatch, string> replacementFunc, int count)
+        {
+            return Replace(subject, replacementFunc, count, 0);
+        }
+
+        public string Replace(string subject, Func<PcreMatch, string> replacementFunc, int count, int startIndex)
         {
             if (subject == null)
                 throw new ArgumentNullException("subject");
@@ -102,7 +143,7 @@ namespace PCRE
             var sb = new StringBuilder((int)(subject.Length * 1.2));
             var position = 0;
 
-            foreach (var match in Matches(subject))
+            foreach (var match in Matches(subject, startIndex))
             {
                 sb.Append(subject, position, match.Index - position);
                 sb.Append(replacementFunc(match));

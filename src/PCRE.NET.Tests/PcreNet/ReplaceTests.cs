@@ -32,5 +32,32 @@ namespace PCRE.Tests.PcreNet
 
             Assert.That(result, Is.EqualTo("foo <$2$bb$> bar <$2$bb$><$2$b$> baz"));
         }
+
+        [Test]
+        public void should_only_replace_given_count()
+        {
+            var re = new PcreRegex(@"a+", PcreOptions.IgnoreCase);
+            var result = re.Replace("foo aabb bar aaabbab baz", "X", 2);
+
+            Assert.That(result, Is.EqualTo("foo Xbb bXr aaabbab baz"));
+        }
+
+        [Test]
+        public void should_start_at_given_index()
+        {
+            var re = new PcreRegex(@"a+", PcreOptions.IgnoreCase);
+            var result = re.Replace("foo aabb bar aaabbab baz", "X", -1, 12);
+
+            Assert.That(result, Is.EqualTo("foo aabb bar XbbXb bXz"));
+        }
+
+        [Test]
+        public void should_start_at_given_index_and_replace_count()
+        {
+            var re = new PcreRegex(@"a+", PcreOptions.IgnoreCase);
+            var result = re.Replace("foo aabb bar aaabbab baz", "X", 2, 8);
+
+            Assert.That(result, Is.EqualTo("foo aabb bXr Xbbab baz"));
+        }
     }
 }

@@ -18,8 +18,8 @@ namespace PCRE {
 			~PcrePattern();
 			!PcrePattern();
 
-			bool IsMatch(String^ subject);
-			MatchOffsets FirstMatch(String^ subject);
+			bool IsMatch(String^ subject, int startOffset);
+			MatchOffsets FirstMatch(String^ subject, int startOffset);
 			MatchOffsets NextMatch(String^ subject, int startOffset);
 
 			int GetInfoInt32(PatternInfoKey key);
