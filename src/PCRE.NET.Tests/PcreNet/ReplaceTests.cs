@@ -43,6 +43,15 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_not_replace_when_count_is_zero()
+        {
+            var re = new PcreRegex(@"a+", PcreOptions.IgnoreCase);
+            var result = re.Replace("foo aabb bar aaabbab baz", "X", 0);
+
+            Assert.That(result, Is.EqualTo("foo aabb bar aaabbab baz"));
+        }
+
+        [Test]
         public void should_start_at_given_index()
         {
             var re = new PcreRegex(@"a+", PcreOptions.IgnoreCase);
