@@ -52,7 +52,6 @@ namespace PCRE {
 			PartialHard                = PCRE_PARTIAL_HARD,  
 			NotEmptyAtStart            = PCRE_NOTEMPTY_ATSTART,  
 			Ucp                        = PCRE_UCP
-
 		};
 
 	}

@@ -47,7 +47,7 @@ namespace PCRE {
 			{
 				int nameEntrySize = GetInfoInt32(PatternInfoKey::NameEntrySize);
 
-				_captureNames = gcnew Dictionary<String^, int>(nameCount);
+				_captureNames = gcnew Dictionary<String^, int>(nameCount, StringComparer::Ordinal);
 
 				wchar_t *nameEntryTable;
 				int errorCode = pcre16_fullinfo(_re, _extra, PCRE_INFO_NAMETABLE, &nameEntryTable);
