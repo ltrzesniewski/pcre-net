@@ -89,6 +89,7 @@
     <Compile Include="PcreNet\PcreBuildInfoTests.cs" />
     <Compile Include="PcreNet\PcrePatternInfoTests.cs" />
     <Compile Include="PcreNet\IsMatchTests.cs" />
+    <Compile Include="PcreNet\ReplaceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
