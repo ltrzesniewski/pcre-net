@@ -9,6 +9,8 @@ PCRE.NET is a .NET wrapper for the [PCRE library](http://www.pcre.org/). The goa
 **Status:** In development, but the most important features are available.  
 As it is still at version 0, the API may change anytime.
 
+The currently wrapped PCRE version is **8.36**.
+
 ## Features ##
 
 The base regex operations are supported:
@@ -19,7 +21,7 @@ The base regex operations are supported:
 
 Library highlights:
 
-- No string marshaling - uses a mixed mode assembly to maximize performance
+- No marshaling - uses a mixed mode assembly to maximize performance
 - Support for studied patterns
 - Support for compiled patterns (x86/x64 JIT)
 - Lazy evaluation whenever possible (for instance `PcreRegex.Matches` returns `IEnumerable<PcreMatch>`)
