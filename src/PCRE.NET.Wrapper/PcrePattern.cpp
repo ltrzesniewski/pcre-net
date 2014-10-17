@@ -57,7 +57,7 @@ namespace PCRE {
 				wchar_t *item = nameEntryTable;
 				for (int i = 0; i < nameCount; ++i)
 				{
-					int groupIndex = static_cast<int>(static_cast<short>(*item));
+					int groupIndex = static_cast<short>(*item);
 					String^ groupName = gcnew String(item + 1);
 					_captureNames->Add(groupName, groupIndex);
 					item += nameEntrySize;
@@ -94,7 +94,7 @@ namespace PCRE {
 				return false;
 
 			if (result < 0)
-				throw gcnew InvalidOperationException();
+				throw gcnew InvalidOperationException(String::Format("Match error, code: {0}", result));
 
 			return true;
 		}
@@ -121,19 +121,12 @@ namespace PCRE {
 
 			auto result = pcre16_exec(_re, _extra, pinnedSubject, subject->Length, startOffset, options, offsets, match._offsets->Length);
 
-			if (result < -1)
-				throw gcnew InvalidOperationException();
-
 			if (result == PCRE_ERROR_NOMATCH)
-			{
-				match.IsMatch = false;
-				return match;
-			}
+				return MatchOffsets::NoMatch;
 
 			if (result < 0)
-				throw gcnew InvalidOperationException();
+				throw gcnew InvalidOperationException(String::Format("Match error, code: {0}", result));
 
-			match.IsMatch = true;
 			return match;
 		}
 

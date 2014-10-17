@@ -12,9 +12,10 @@ namespace PCRE {
 		public:
 			MatchOffsets(int captureCount);
 
+			static MatchOffsets NoMatch;
+
 			property bool IsMatch {
-				public: bool get() { return _isMatch; }
-				internal: void set(bool value) { _isMatch = value; }
+				public: bool get() { return _offsets != nullptr; }
 			}
 
 			[Pure]
@@ -25,9 +26,6 @@ namespace PCRE {
 
 		internal:
 			array<int>^ _offsets;
-
-		private:
-			bool _isMatch;
 		};
 	}
 }

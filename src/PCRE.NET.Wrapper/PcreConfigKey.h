@@ -24,7 +24,6 @@ namespace PCRE {
 			JitTarget                  = PCRE_CONFIG_JITTARGET,
 			Utf32                      = PCRE_CONFIG_UTF32,
 			ParensLimit                = PCRE_CONFIG_PARENS_LIMIT
-
 		};
 
 	}
