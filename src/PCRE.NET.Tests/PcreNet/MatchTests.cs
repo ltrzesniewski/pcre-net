@@ -27,7 +27,7 @@ namespace PCRE.Tests.PcreNet
         [Test]
         public void should_support_multiple_groups()
         {
-            var re = new PcreRegex(@"a+(b+)(c+)?(d+)e+", PcreOptions.Study);
+            var re = new PcreRegex(@"a+(b+)(c+)?(d+)e+", PcreOptions.Studied);
             var match = re.Match("xxxaaabbddeeezzz");
 
             Assert.That(match, Is.Not.Null);

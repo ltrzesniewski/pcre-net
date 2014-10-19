@@ -4,31 +4,13 @@ namespace PCRE.Support
 {
     internal static class PcreOptionsExtensions
     {
+        private const PcrePatternOptions FlippedOptions = PcrePatternOptions.Utf16
+                                                          | PcrePatternOptions.NoUtf16Check
+                                                          | PcrePatternOptions.Ucp;
+
         public static PcrePatternOptions ToPatternOptions(this PcreOptions options)
         {
-            var result = PcrePatternOptions.Utf16
-                         | PcrePatternOptions.NoUtf16Check
-                         | PcrePatternOptions.Ucp;
-
-            if ((options & PcreOptions.IgnoreCase) != 0)
-                result |= PcrePatternOptions.CaseLess;
-
-            if ((options & PcreOptions.MultiLine) != 0)
-                result |= PcrePatternOptions.MultiLine;
-
-            if ((options & PcreOptions.ExplicitCapture) != 0)
-                result |= PcrePatternOptions.NoAutoCapture;
-
-            if ((options & PcreOptions.Singleline) != 0)
-                result |= PcrePatternOptions.DotAll;
-
-            if ((options & PcreOptions.IgnorePatternWhitespace) != 0)
-                result |= PcrePatternOptions.Extended;
-
-            if ((options & PcreOptions.ECMAScript) != 0)
-                result = (result | PcrePatternOptions.JavaScriptCompat) & ~PcrePatternOptions.Ucp;
-
-            return result;
+            return ((PcrePatternOptions)((long)options & 0xFFFFFFFF) ^ FlippedOptions) | PcrePatternOptions.Utf16;
         }
 
         public static PcreStudyOptions? ToStudyOptions(this PcreOptions options)
@@ -36,7 +18,7 @@ namespace PCRE.Support
             if ((options & PcreOptions.Compiled) != 0)
                 return PcreStudyOptions.JitCompile;
 
-            if ((options & PcreOptions.Study) != 0)
+            if ((options & PcreOptions.Studied) != 0)
                 return PcreStudyOptions.None;
 
             return null;

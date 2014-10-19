@@ -1,23 +1,45 @@
 ﻿using System;
-using System.Text.RegularExpressions;
+using PCRE.Wrapper;
 
 namespace PCRE
 {
     [Flags]
-    public enum PcreOptions
+    public enum PcreOptions : long
     {
         None = 0,
 
-        // Use the same values as in RegexOptions where possible
-        IgnoreCase = RegexOptions.IgnoreCase,
-        MultiLine = RegexOptions.Multiline,
-        ExplicitCapture = RegexOptions.ExplicitCapture,
-        Compiled = RegexOptions.Compiled,
-        Singleline = RegexOptions.Singleline,
-        IgnorePatternWhitespace = RegexOptions.IgnorePatternWhitespace,
-        ECMAScript = RegexOptions.ECMAScript,
+        // Normal options
+        IgnoreCase = PcrePatternOptions.CaseLess,
+        MultiLine = PcrePatternOptions.MultiLine,
+        Singleline = PcrePatternOptions.DotAll,
+        ExplicitCapture = PcrePatternOptions.NoAutoCapture,
+        IgnorePatternWhitespace = PcrePatternOptions.Extended,
+        JavaScript = PcrePatternOptions.JavaScriptCompat | ASCII,
 
-        // PCRE-specific
-        Study = 4096
+        Anchored = PcrePatternOptions.Anchored,
+        Ungreedy = PcrePatternOptions.Ungreedy,
+        NotBeginningOfLine = PcrePatternOptions.NotBol,
+        NotEndOfLine = PcrePatternOptions.NotEol,
+        NotEmpty = PcrePatternOptions.NotEmpty,
+        NotEmptyAtStart = PcrePatternOptions.NotEmptyAtStart,
+        OnlyFirstLine = PcrePatternOptions.FirstLine,
+        AllowDuplicateNames = PcrePatternOptions.DupNames,
+
+        NewLineCr = PcrePatternOptions.NewLineCr,
+        NewLineLf = PcrePatternOptions.NewLineLf,
+        NewLineCrLf = PcrePatternOptions.NewLineCrLf,
+        NewLineAny = PcrePatternOptions.NewLineAny,
+        NewLineAnyCrLf = PcrePatternOptions.NewLineAnyCrLf,
+
+        BackslashRAnyCrLf = PcrePatternOptions.BsrAnyCrLf,
+        BackslashRUnicode = PcrePatternOptions.BsrUnicode,
+
+        // Flipped options
+        ASCII = PcrePatternOptions.Ucp,
+        CheckUnicodeValidity = PcrePatternOptions.NoUtf16Check,
+
+        // Extra options
+        Studied = 1L << 32,
+        Compiled = 1L << 33
     }
 }

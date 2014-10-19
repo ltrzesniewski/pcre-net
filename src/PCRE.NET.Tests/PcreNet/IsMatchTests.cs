@@ -102,7 +102,7 @@ namespace PCRE.Tests.PcreNet
             var re = new PcreRegex(@"^\w$");
             Assert.That(re.IsMatch("à"), Is.True);
 
-            re = new PcreRegex(@"^\w$", PcreOptions.ECMAScript);
+            re = new PcreRegex(@"^\w$", PcreOptions.JavaScript);
             Assert.That(re.IsMatch("à"), Is.False);
         }
 
