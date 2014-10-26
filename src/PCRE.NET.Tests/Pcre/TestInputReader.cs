@@ -27,10 +27,6 @@ namespace PCRE.Tests.Pcre
 
                 try
                 {
-                    // TODO : DUPNAMES is broken
-                    if ((pattern.PatternOptions & PcreOptions.AllowDuplicateNames) != 0)
-                        testCase.Skip = true;
-
                     testCase.Regex = new PcreRegex(pattern.Pattern, pattern.PatternOptions);
                 }
                 catch (ArgumentException ex)

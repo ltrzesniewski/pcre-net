@@ -20,7 +20,7 @@ namespace PCRE
             get { return _re.CaptureCount; }
         }
 
-        internal Dictionary<string, int> CaptureNameMap
+        internal Dictionary<string, int[]> CaptureNameMap
         {
             get { return _re.CaptureNames; }
         }

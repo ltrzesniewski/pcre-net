@@ -64,11 +64,21 @@ namespace PCRE
                 if (map == null)
                     throw new ArgumentException("The regex has no named groups");
 
-                int index;
-                if (!map.TryGetValue(name, out index))
+                int[] indexes;
+                if (!map.TryGetValue(name, out indexes))
                     throw new ArgumentException(String.Format("The named group '{0}' does not exist", name));
 
-                return this[index];
+                if (indexes.Length == 1)
+                    return this[indexes[0]];
+
+                foreach (var index in indexes)
+                {
+                    var group = this[index];
+                    if (group.IsMatch)
+                        return group;
+                }
+
+                return PcreGroup.Empty;
             }
         }
 

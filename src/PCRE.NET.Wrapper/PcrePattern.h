@@ -28,15 +28,15 @@ namespace PCRE {
 				int get() { return _captureCount; }
 			}
 
-			property Dictionary<String^, int>^ CaptureNames {
-				Dictionary<String^, int>^ get() { return _captureNames; }
+			property Dictionary<String^, array<int>^>^ CaptureNames {
+				Dictionary<String^, array<int>^>^ get() { return _captureNames; }
 			}
 
 		private:
 			pcre16* _re;
 			pcre16_extra* _extra;
 			int _captureCount;
-			Dictionary<String^, int>^ _captureNames;
+			Dictionary<String^, array<int>^>^ _captureNames;
 		};
 	}
 }

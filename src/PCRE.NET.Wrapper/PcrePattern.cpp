@@ -48,7 +48,7 @@ namespace PCRE {
 			{
 				int nameEntrySize = GetInfoInt32(PatternInfoKey::NameEntrySize);
 
-				_captureNames = gcnew Dictionary<String^, int>(nameCount, StringComparer::Ordinal);
+				_captureNames = gcnew Dictionary<String^, array<int>^>(nameCount, StringComparer::Ordinal);
 
 				wchar_t *nameEntryTable;
 				int errorCode = pcre16_fullinfo(_re, _extra, PCRE_INFO_NAMETABLE, &nameEntryTable);
@@ -60,7 +60,20 @@ namespace PCRE {
 				{
 					int groupIndex = static_cast<short>(*item);
 					String^ groupName = gcnew String(item + 1);
-					_captureNames->Add(groupName, groupIndex);
+					array<int>^ indexes = nullptr;
+
+					if ((static_cast<int>(options) & PCRE_DUPNAMES) && _captureNames->TryGetValue(groupName, indexes))
+					{
+						array<int>^ newIndexes = gcnew array<int>(indexes->Length + 1);
+						indexes->CopyTo(newIndexes, 0);
+						newIndexes[newIndexes->Length - 1] = groupIndex;
+						_captureNames[groupName] = newIndexes;
+					}
+					else
+					{
+						_captureNames->Add(groupName, gcnew array<int> { groupIndex });
+					}
+					
 					item += nameEntrySize;
 				}
 			}
