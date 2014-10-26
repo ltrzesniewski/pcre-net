@@ -49,7 +49,9 @@ namespace PCRE.Tests.Pcre
                     if (string.IsNullOrWhiteSpace(line))
                         break;
 
-                    testCase.SubjectLines.Add(line.TrimStart());
+                    line = line.Trim();
+                    testCase.RawSubjectLines.Add(line);
+                    testCase.SubjectLines.Add(Unescape(line));
                 }
 
                 yield return testCase;

@@ -20,8 +20,7 @@ namespace PCRE {
 			!PcrePattern();
 
 			bool IsMatch(String^ subject, int startOffset);
-			MatchOffsets FirstMatch(String^ subject, int startOffset);
-			MatchOffsets NextMatch(String^ subject, int startOffset);
+			MatchOffsets Match(String^ subject, int startOffset, PcrePatternOptions additionalOptions);
 
 			int GetInfoInt32(PatternInfoKey key);
 
@@ -38,8 +37,6 @@ namespace PCRE {
 			pcre16_extra* _extra;
 			int _captureCount;
 			Dictionary<String^, int>^ _captureNames;
-
-			MatchOffsets DoMatch(String^ subject, int startOffset, int options);
 		};
 	}
 }

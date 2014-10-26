@@ -93,6 +93,7 @@
     <Compile Include="PcreNet\SplitTests.cs" />
     <Compile Include="Pcre\ExpectedMatch.cs" />
     <Compile Include="Pcre\ExpectedResult.cs" />
+    <Compile Include="Pcre\RunnerTests.cs" />
     <Compile Include="Pcre\TestPattern.cs" />
     <Compile Include="Pcre\PcreTests.cs" />
     <Compile Include="Pcre\TestCase.cs" />

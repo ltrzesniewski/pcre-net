@@ -92,7 +92,7 @@ namespace PCRE.Tests.Pcre
 
                     currentResult = new ExpectedResult
                     {
-                        SubjectLine = line.TrimStart()
+                        SubjectLine = Unescape(line.Trim())
                     };
 
                     currentMatch = null;

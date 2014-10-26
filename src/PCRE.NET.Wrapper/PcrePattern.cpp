@@ -9,16 +9,17 @@ namespace PCRE {
 		{
 			const char *errorMessage;
 			int errorOffset;
+	
+			pin_ptr<const wchar_t> pinnedPattern = PtrToStringChars(pattern);
 
-			{
-				pin_ptr<const wchar_t> pinnedPattern = PtrToStringChars(pattern);
-				_re = pcre16_compile(
-					safe_cast<const wchar_t*>(pinnedPattern),
-					static_cast<int>(options),
-					&errorMessage,
-					&errorOffset,
-					nullptr);
-			}
+			_re = pcre16_compile(
+				safe_cast<const wchar_t*>(pinnedPattern),
+				static_cast<int>(options),
+				&errorMessage,
+				&errorOffset,
+				nullptr);
+
+			pinnedPattern = nullptr;
 
 			if (_re == nullptr)
 			{
@@ -99,27 +100,14 @@ namespace PCRE {
 			return true;
 		}
 
-		MatchOffsets PcrePattern::FirstMatch(String^ subject, int startOffset)
-		{
-			return DoMatch(subject, startOffset, 0);
-		}
-
-		MatchOffsets PcrePattern::NextMatch(String^ subject, int startOffset)
-		{
-			if (startOffset == subject->Length)
-				return MatchOffsets();
-
-			return DoMatch(subject, startOffset, PCRE_NOTEMPTY_ATSTART);
-		}
-
-		MatchOffsets PcrePattern::DoMatch(String^ subject, int startOffset, int options)
+		MatchOffsets PcrePattern::Match(String^ subject, int startOffset, PcrePatternOptions additionalOptions)
 		{
 			auto match = MatchOffsets(_captureCount);
 
 			pin_ptr<int> offsets = &match._offsets[0];
 			pin_ptr<const wchar_t> pinnedSubject = PtrToStringChars(subject);
 
-			auto result = pcre16_exec(_re, _extra, pinnedSubject, subject->Length, startOffset, options, offsets, match._offsets->Length);
+			auto result = pcre16_exec(_re, _extra, pinnedSubject, subject->Length, startOffset, (int)additionalOptions, offsets, match._offsets->Length);
 
 			if (result == PCRE_ERROR_NOMATCH)
 				return MatchOffsets::NoMatch;

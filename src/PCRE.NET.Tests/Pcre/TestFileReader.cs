@@ -95,7 +95,7 @@ namespace PCRE.Tests.Pcre
                         }
                     }
 
-                    pattern.AppendLine();
+                    pattern.Append('\n');
 
                     line = ReadLine();
 
@@ -162,6 +162,106 @@ namespace PCRE.Tests.Pcre
             }
 
             pattern.PatternOptions = options;
+        }
+
+        public static string Unescape(string str)
+        {
+            var sb = new StringBuilder();
+
+            for (var i = 0; i < str.Length; ++i)
+            {
+                if (str[i] == '\\')
+                {
+                    ++i;
+                    if (i >= str.Length)
+                    {
+                        sb.Append('\n');
+                        break;
+                    }
+
+                    switch (str[i])
+                    {
+                        case 't':
+                            sb.Append('\t');
+                            break;
+                        case 'n':
+                            sb.Append('\n');
+                            break;
+                        case 'r':
+                            sb.Append('\r');
+                            break;
+                        case 'f':
+                            sb.Append('\f');
+                            break;
+                        case 'a':
+                            sb.Append('\a');
+                            break;
+                        case 'e': // TODO handle escape codes
+                            sb.Append('\x1B');
+                            break;
+
+                        case 'x':
+                        {
+                            if (i + 1 >= str.Length)
+                                throw new InvalidOperationException("Invalid hex escape: " + str);
+
+                            if (str[i + 1] == '{')
+                            {
+                                var endIndex = i;
+                                while (endIndex < str.Length && str[endIndex] != '}')
+                                    ++endIndex;
+
+                                sb.Append((char)Convert.ToUInt16(str.Substring(i + 2, endIndex - i - 2), 16));
+                                i = endIndex;
+                                break;
+                            }
+
+                            if (i + 2 < str.Length)
+                            {
+                                var c = str[i + 2];
+
+                                if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
+                                {
+                                    sb.Append((char)Convert.ToUInt16(str.Substring(i + 1, 2), 16));
+                                    i += 2;
+                                    break;
+                                }
+                            }
+                            sb.Append((char)Convert.ToUInt16(str.Substring(i + 1, 1), 16));
+                            ++i;
+                            break;
+                        }
+
+                        case '0':
+                        case '1':
+                        case '2':
+                        case '3':
+                        case '4':
+                        case '5':
+                        case '6':
+                        case '7':
+                        {
+                            var endIndex = i;
+                            while (endIndex < str.Length && endIndex - i < 3 && str[endIndex] >= '0' && str[endIndex] <= '7')
+                                ++endIndex;
+
+                            sb.Append((char)Convert.ToUInt16(str.Substring(i, endIndex - i), 8));
+                            i += endIndex - i - 1;
+                            break;
+                        }
+
+                        default:
+                            sb.Append(str[i]);
+                            break;
+                    }
+                }
+                else
+                {
+                    sb.Append(str[i]);
+                }
+            }
+
+            return sb.ToString();
         }
 
         protected InvalidOperationException InvalidInputException(string message, Exception innerException = null)

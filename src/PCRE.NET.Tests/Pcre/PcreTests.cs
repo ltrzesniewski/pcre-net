@@ -22,8 +22,21 @@ namespace PCRE.Tests.Pcre
 
             Assert.That(expectedResult.Pattern, Is.EqualTo(testCase.Pattern));
 
-            if (!testCase.Pattern.AllMatches)
-                Assert.That(expectedResult.ExpectedResults.Count, Is.EqualTo(testCase.SubjectLines.Count));
+            for (var line = 0; line < testCase.SubjectLines.Count; ++line)
+            {
+                Console.WriteLine("Subject #{0}: {1}", line + 1, testCase.RawSubjectLines[line]);
+
+                var subject = testCase.SubjectLines[line];
+                var expected = expectedResult.ExpectedResults[line];
+
+                var matches = testCase.Regex.Matches(subject);
+
+                if (!testCase.Pattern.AllMatches)
+                    matches = matches.Take(1);
+
+                var matchesList = matches.ToList();
+                Assert.That(matchesList.Count, Is.EqualTo(expected.Matches.Count));
+            }
         }
 
         private class PcreTestsSource : IEnumerable<ITestCaseData>
