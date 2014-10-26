@@ -23,9 +23,23 @@ namespace PCRE.Tests.Pcre
         [TestCase(@"\x{0A}z", Result = "\nz")]
         [TestCase(@"\x{00A}z", Result = "\nz")]
         [TestCase(@"\x{000A}z", Result = "\nz")]
-        public string should_unescape_string(string input)
+        [TestCase(@"a\\z", Result = "a\\z")]
+        public string should_unescape_subject(string input)
         {
-            return TestFileReader.Unescape(input);
+            return input.UnescapeSubject();
+        }
+
+        [Test]
+        [TestCase(@"$\?", Result = @"$\?")]
+        [TestCase(@"\xA", Result = "\n")]
+        [TestCase(@"\xAz", Result = "\nz")]
+        [TestCase(@"\x{A}z", Result = "\nz")]
+        [TestCase(@"\x{0A}z", Result = "\nz")]
+        [TestCase(@"\x{00A}z", Result = "\nz")]
+        [TestCase(@"\x{000A}z", Result = "\nz")]
+        public string should_unescape_group(string input)
+        {
+            return input.UnescapeGroup();
         }
     }
 }

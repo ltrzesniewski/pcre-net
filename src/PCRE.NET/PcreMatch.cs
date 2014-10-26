@@ -94,7 +94,7 @@ namespace PCRE
 
         private IEnumerable<PcreGroup> EnumerateAllGroups()
         {
-            for (var i = 0; i < CaptureCount; ++i)
+            for (var i = 0; i <= CaptureCount; ++i)
                 yield return this[i];
         }
 

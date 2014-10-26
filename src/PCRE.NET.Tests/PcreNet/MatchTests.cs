@@ -37,16 +37,19 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match.Length, Is.EqualTo(10));
 
             Assert.That(match[1], Is.Not.Null);
+            Assert.That(match[1].IsMatch, Is.True);
             Assert.That(match[1].Value, Is.EqualTo("bb"));
             Assert.That(match[1].Index, Is.EqualTo(6));
             Assert.That(match[1].Length, Is.EqualTo(2));
 
             Assert.That(match[2], Is.Not.Null);
+            Assert.That(match[2].IsMatch, Is.False);
             Assert.That(match[2].Value, Is.SameAs(String.Empty));
-            Assert.That(match[2].Index, Is.EqualTo(0));
+            Assert.That(match[2].Index, Is.EqualTo(-1));
             Assert.That(match[2].Length, Is.EqualTo(0));
 
             Assert.That(match[3], Is.Not.Null);
+            Assert.That(match[3].IsMatch, Is.True);
             Assert.That(match[3].Value, Is.EqualTo("dd"));
             Assert.That(match[3].Index, Is.EqualTo(8));
             Assert.That(match[3].Length, Is.EqualTo(2));

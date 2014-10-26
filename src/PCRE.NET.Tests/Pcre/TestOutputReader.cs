@@ -45,7 +45,7 @@ namespace PCRE.Tests.Pcre
                         }
 
                         // Capture
-                        var match = Regex.Match(line, @"^\s*(\d+):\s*(.*)$");
+                        var match = Regex.Match(line, @"^\s*(\d+): (.*)$");
                         if (match.Success)
                         {
                             var groupIndex = int.Parse(match.Groups[1].Value);
@@ -59,17 +59,20 @@ namespace PCRE.Tests.Pcre
                             if (currentMatch == null)
                                 throw InvalidInputException("Group outside of match");
 
-                            if (groupIndex != currentMatch.Captures.Count)
+                            if (groupIndex != currentMatch.Groups.Count)
                                 throw InvalidInputException("Invalid group index");
 
-                            currentMatch.Captures.Add(match.Groups[2].Value);
+                            currentMatch.Groups.Add(match.Groups[2].Value == "<unset>"
+                                ? ExpectedGroup.Unset
+                                : new ExpectedGroup(match.Groups[2].Value));
+
                             continue;
                         }
 
                         // Remaining string
                         if (pattern.GetRemainingString)
                         {
-                            match = Regex.Match(line, @"^\s*(\d+)\+\s*(.*)$");
+                            match = Regex.Match(line, @"^\s*(\d+)\+ (.*)$");
                             if (match.Success && currentMatch != null)
                             {
                                 // TODO
@@ -80,7 +83,7 @@ namespace PCRE.Tests.Pcre
 
                         if (pattern.ExtractMarks)
                         {
-                            match = Regex.Match(line, @"^\s*MK:+\s*(.*)$");
+                            match = Regex.Match(line, @"^\s*MK: (.*)$");
                             if (match.Success && currentMatch != null)
                             {
                                 // TODO
@@ -92,7 +95,7 @@ namespace PCRE.Tests.Pcre
 
                     currentResult = new ExpectedResult
                     {
-                        SubjectLine = Unescape(line.Trim())
+                        SubjectLine = line.Trim()
                     };
 
                     currentMatch = null;

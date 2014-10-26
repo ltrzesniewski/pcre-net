@@ -24,18 +24,42 @@ namespace PCRE.Tests.Pcre
 
             for (var line = 0; line < testCase.SubjectLines.Count; ++line)
             {
-                Console.WriteLine("Subject #{0}: {1}", line + 1, testCase.RawSubjectLines[line]);
+                Console.WriteLine("Subject #{0}: {1}", line, testCase.SubjectLines[line]);
 
                 var subject = testCase.SubjectLines[line];
                 var expected = expectedResult.ExpectedResults[line];
 
-                var matches = testCase.Regex.Matches(subject);
+                Assert.That(expected.SubjectLine, Is.EqualTo(subject));
 
-                if (!testCase.Pattern.AllMatches)
-                    matches = matches.Take(1);
+                var matches = testCase.Regex
+                    .Matches(subject.UnescapeSubject())
+                    .Take(testCase.Pattern.AllMatches ? int.MaxValue : 1)
+                    .ToList();
 
-                var matchesList = matches.ToList();
-                Assert.That(matchesList.Count, Is.EqualTo(expected.Matches.Count));
+                Assert.That(matches.Count, Is.EqualTo(expected.Matches.Count));
+
+                for (var matchIndex = 0; matchIndex < matches.Count; ++matchIndex)
+                {
+                    var actualGroups = matches[matchIndex].ToList();
+                    var expectedGroups = expected.Matches[matchIndex].Groups.ToList();
+
+                    Assert.That(actualGroups.Count, Is.GreaterThanOrEqualTo(expectedGroups.Count));
+
+                    for (var groupIndex = 0; groupIndex < actualGroups.Count; ++groupIndex)
+                    {
+                        var actualGroup = actualGroups[groupIndex];
+                        var expectedGroup = groupIndex < expectedGroups.Count
+                            ? expectedGroups[groupIndex]
+                            : ExpectedGroup.Unset;
+
+                        Console.WriteLine("  Group #{0}: {1}", groupIndex, expectedGroup.Value);
+
+                        Assert.That(actualGroup.IsMatch, Is.EqualTo(expectedGroup.IsMatch));
+
+                        if (expectedGroup.IsMatch)
+                            Assert.That(actualGroup.Value, Is.EqualTo(expectedGroup.Value.UnescapeGroup()));
+                    }
+                }
             }
         }
 

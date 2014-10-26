@@ -7,12 +7,7 @@ namespace PCRE
         private string _subject;
         private string _value;
 
-        internal static readonly PcreGroup Empty = new PcreGroup();
-
-        private PcreGroup()
-        {
-            _value = String.Empty;
-        }
+        internal static readonly PcreGroup Empty = new PcreGroup(String.Empty, -1, -1);
 
         internal PcreGroup(string subject, int startOffset, int endOffset)
         {
@@ -40,6 +35,11 @@ namespace PCRE
 
                 return _value;
             }
+        }
+
+        public bool IsMatch
+        {
+            get { return Index >= 0; }
         }
 
         public static implicit operator string(PcreGroup group)

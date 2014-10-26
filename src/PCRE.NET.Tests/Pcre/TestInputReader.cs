@@ -50,8 +50,7 @@ namespace PCRE.Tests.Pcre
                         break;
 
                     line = line.Trim();
-                    testCase.RawSubjectLines.Add(line);
-                    testCase.SubjectLines.Add(Unescape(line));
+                    testCase.SubjectLines.Add(line);
                 }
 
                 yield return testCase;
