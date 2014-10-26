@@ -91,9 +91,26 @@
     <Compile Include="PcreNet\IsMatchTests.cs" />
     <Compile Include="PcreNet\ReplaceTests.cs" />
     <Compile Include="PcreNet\SplitTests.cs" />
+    <Compile Include="Pcre\ExpectedMatch.cs" />
+    <Compile Include="Pcre\ExpectedResult.cs" />
+    <Compile Include="Pcre\TestPattern.cs" />
+    <Compile Include="Pcre\PcreTests.cs" />
+    <Compile Include="Pcre\TestCase.cs" />
+    <Compile Include="Pcre\TestFileReader.cs" />
+    <Compile Include="Pcre\TestInputReader.cs" />
+    <Compile Include="Pcre\TestOutput.cs" />
+    <Compile Include="Pcre\TestOutputReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\PCRE\testdata\testinput1">
+      <Link>Pcre\TestCases\testinput1</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\PCRE\testdata\testoutput1">
+      <Link>Pcre\TestCases\testoutput1</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
