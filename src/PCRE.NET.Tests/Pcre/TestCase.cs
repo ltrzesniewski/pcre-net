@@ -13,5 +13,10 @@ namespace PCRE.Tests.Pcre
         {
             SubjectLines = new List<string>();
         }
+
+        public override string ToString()
+        {
+            return Pattern != null ? Pattern.ToString() : "???";
+        }
     }
 }

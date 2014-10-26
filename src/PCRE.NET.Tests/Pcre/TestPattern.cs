@@ -40,5 +40,10 @@ namespace PCRE.Tests.Pcre
         {
             return !Equals(left, right);
         }
+
+        public override string ToString()
+        {
+            return FullString ?? "???";
+        }
     }
 }

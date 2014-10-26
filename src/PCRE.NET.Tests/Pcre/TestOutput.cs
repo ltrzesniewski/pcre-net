@@ -11,5 +11,10 @@ namespace PCRE.Tests.Pcre
         {
             ExpectedResults = new List<ExpectedResult>();
         }
+
+        public override string ToString()
+        {
+            return Pattern != null ? Pattern.ToString() : "???";
+        }
     }
 }
