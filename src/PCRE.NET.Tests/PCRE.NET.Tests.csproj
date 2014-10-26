@@ -110,8 +110,16 @@
       <Link>Pcre\TestCases\testinput1</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\PCRE\testdata\testinput2">
+      <Link>Pcre\TestCases\testinput2</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="..\PCRE\testdata\testoutput1">
       <Link>Pcre\TestCases\testoutput1</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\PCRE\testdata\testoutput2">
+      <Link>Pcre\TestCases\testoutput2</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />

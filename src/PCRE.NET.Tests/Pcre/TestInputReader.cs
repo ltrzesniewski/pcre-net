@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 
 namespace PCRE.Tests.Pcre
@@ -24,19 +23,6 @@ namespace PCRE.Tests.Pcre
                 {
                     Pattern = pattern,
                 };
-
-                try
-                {
-                    testCase.Regex = new PcreRegex(pattern.Pattern, pattern.PatternOptions);
-                }
-                catch (ArgumentException ex)
-                {
-                    if (ex.Message.Contains(@"\C not allowed in lookbehind assertion")) // Not supported
-                        testCase.Skip = true;
-
-                    if (!testCase.Skip)
-                        throw InvalidInputException("Invalid pattern", ex);
-                }
 
                 while (true)
                 {

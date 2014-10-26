@@ -15,23 +15,45 @@ namespace PCRE.Tests.Pcre
         public void should_pass_pcre_test_suite(TestCase testCase, TestOutput expectedResult)
         {
             Console.WriteLine("TEST CASE: Input line {0}, output line {1}", testCase.Pattern.LineNumber, expectedResult.Pattern.LineNumber);
-            Console.WriteLine(testCase.Pattern.FullString);
-
-            if (testCase.Skip)
-                Assert.Inconclusive();
+            Console.WriteLine(testCase.Pattern.FullString.Trim());
+            Console.WriteLine();
 
             Assert.That(expectedResult.Pattern, Is.EqualTo(testCase.Pattern));
 
+            RunTest(testCase, expectedResult, PcreOptions.None);
+            RunTest(testCase, expectedResult, PcreOptions.Studied);
+            RunTest(testCase, expectedResult, PcreOptions.Compiled);
+        }
+
+        private static void RunTest(TestCase testCase, TestOutput expectedResult, PcreOptions options)
+        {
+            options |= testCase.Pattern.PatternOptions;
+
+            Console.WriteLine("Options: {0}", options);
+
+            PcreRegex regex;
+            try
+            {
+                regex = new PcreRegex(testCase.Pattern.Pattern, options);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.Contains(@"\C not allowed in lookbehind assertion")) // Not supported
+                    Assert.Inconclusive("Not supported: " + ex.Message);
+
+                throw;
+            }
+
             for (var line = 0; line < testCase.SubjectLines.Count; ++line)
             {
-                Console.WriteLine("Subject #{0}: {1}", line, testCase.SubjectLines[line]);
+                Console.WriteLine("  Subject #{0}: {1}", line, testCase.SubjectLines[line]);
 
                 var subject = testCase.SubjectLines[line];
                 var expected = expectedResult.ExpectedResults[line];
 
                 Assert.That(expected.SubjectLine, Is.EqualTo(subject));
 
-                var matches = testCase.Regex
+                var matches = regex
                     .Matches(subject.UnescapeSubject())
                     .Take(testCase.Pattern.AllMatches ? int.MaxValue : 1)
                     .ToList();
@@ -52,7 +74,7 @@ namespace PCRE.Tests.Pcre
                             ? expectedGroups[groupIndex]
                             : ExpectedGroup.Unset;
 
-                        Console.WriteLine("  Group #{0}: {1}", groupIndex, expectedGroup.Value);
+                        Console.WriteLine("    Group #{0}: {1}", groupIndex, expectedGroup.Value);
 
                         Assert.That(actualGroup.IsMatch, Is.EqualTo(expectedGroup.IsMatch));
 
@@ -61,6 +83,9 @@ namespace PCRE.Tests.Pcre
                     }
                 }
             }
+
+            Console.WriteLine("OK");
+            Console.WriteLine();
         }
 
         private class PcreTestsSource : IEnumerable<ITestCaseData>
@@ -68,9 +93,10 @@ namespace PCRE.Tests.Pcre
             private static readonly string[,] InputFiles =
             {
                 { "testinput1", "testoutput1" }
+                //{ "testinput2", "testoutput2" }
             };
 
-            private IEnumerable<ITestCaseData> GetTestCases()
+            private static IEnumerable<ITestCaseData> GetTestCases()
             {
                 const string testCasesDir = @"Pcre\TestCases";
 

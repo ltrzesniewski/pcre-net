@@ -119,7 +119,7 @@ namespace PCRE.Tests.PcreNet
         [Test]
         public void should_allow_duplicate_names()
         {
-            var re = new PcreRegex(@"(?<g>a)?(?<g>b)?(?<g>c)?", PcreOptions.AllowDuplicateNames);
+            var re = new PcreRegex(@"(?<g>a)?(?<g>b)?(?<g>c)?", PcreOptions.DuplicateNames);
             var match = re.Match("b");
 
             Assert.That(match, Is.Not.Null);

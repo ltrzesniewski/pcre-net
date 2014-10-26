@@ -22,8 +22,8 @@ namespace PCRE
         NotEndOfLine = PcrePatternOptions.NotEol,
         NotEmpty = PcrePatternOptions.NotEmpty,
         NotEmptyAtStart = PcrePatternOptions.NotEmptyAtStart,
-        OnlyFirstLine = PcrePatternOptions.FirstLine,
-        AllowDuplicateNames = PcrePatternOptions.DupNames,
+        FirstLineOnly = PcrePatternOptions.FirstLine,
+        DuplicateNames = PcrePatternOptions.DupNames,
 
         NewLineCr = PcrePatternOptions.NewLineCr,
         NewLineLf = PcrePatternOptions.NewLineLf,
@@ -33,6 +33,11 @@ namespace PCRE
 
         BackslashRAnyCrLf = PcrePatternOptions.BsrAnyCrLf,
         BackslashRUnicode = PcrePatternOptions.BsrUnicode,
+
+        NoStartOptimize = PcrePatternOptions.NoStartOptimize,
+        NoAutoPossess = PcrePatternOptions.NoAutoPossess,
+        DollarEndOnly = PcrePatternOptions.DollarEndOnly,
+        ExtraPcreFunctionality = PcrePatternOptions.Extra,
 
         // Flipped options
         ASCII = PcrePatternOptions.Ucp,

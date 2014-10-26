@@ -130,7 +130,7 @@ namespace PCRE.Tests.Pcre
                         break;
 
                     case 'J':
-                        options |= PcreOptions.AllowDuplicateNames;
+                        options |= PcreOptions.DuplicateNames;
                         break;
 
                     case 'g':
@@ -150,7 +150,7 @@ namespace PCRE.Tests.Pcre
                         break;
 
                     case 'Y':
-                        options |= (PcreOptions)0x04000000; // PCRE_NO_START_OPTIMIZE
+                        options |= PcreOptions.NoStartOptimize;
                         break;
 
                     case ' ':
