@@ -115,5 +115,19 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match["GrP"].Index, Is.EqualTo(11));
             Assert.That(match["GrP"].Length, Is.EqualTo(2));
         }
+
+        [Test]
+        public void should_allow_duplicate_names()
+        {
+            var re = new PcreRegex(@"(?<g>a)?(?<g>b)?(?<g>c)?", PcreOptions.AllowDuplicateNames);
+            var match = re.Match("b");
+
+            Assert.That(match, Is.Not.Null);
+            Assert.That(match["g"].Value, Is.EqualTo("b"));
+
+            match = re.Match("bc");
+            Assert.That(match, Is.Not.Null);
+            Assert.That(match["g"].Value, Is.EqualTo("b"));
+        }
     }
 }

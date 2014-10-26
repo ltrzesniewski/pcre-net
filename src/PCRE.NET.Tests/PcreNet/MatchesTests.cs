@@ -40,11 +40,11 @@ namespace PCRE.Tests.PcreNet
 
             Assert.That(matches, Has.Count.EqualTo(5));
 
-            Assert.That(matches.Select(m => m.Index), Is.EqualTo(new[] {0, 1, 2, 5, 6}));
+            Assert.That(matches.Select(m => m.Index), Is.EqualTo(new[] { 0, 1, 2, 5, 6 }));
             Assert.That(matches.Select(m => m.Length), Is.All.EqualTo(0));
             Assert.That(matches.Select(m => m.Value), Is.All.EqualTo(String.Empty));
 
-            Assert.That(matches.Select(m => m[1].Index), Is.EqualTo(new[] {0, 1, 2, 5, 6}));
+            Assert.That(matches.Select(m => m[1].Index), Is.EqualTo(new[] { 0, 1, 2, 5, 6 }));
             Assert.That(matches.Select(m => m[1].Length), Is.All.EqualTo(1));
             Assert.That(matches.Select(m => m[1].Value), Is.All.EqualTo("a"));
         }

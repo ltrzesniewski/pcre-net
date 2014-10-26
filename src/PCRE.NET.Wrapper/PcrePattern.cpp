@@ -47,6 +47,7 @@ namespace PCRE {
 			if (nameCount)
 			{
 				int nameEntrySize = GetInfoInt32(PatternInfoKey::NameEntrySize);
+				bool allowDuplicateNames = (options & PcrePatternOptions::DupNames) != PcrePatternOptions::None;
 
 				_captureNames = gcnew Dictionary<String^, array<int>^>(nameCount, StringComparer::Ordinal);
 
@@ -62,12 +63,11 @@ namespace PCRE {
 					String^ groupName = gcnew String(item + 1);
 					array<int>^ indexes = nullptr;
 
-					if ((static_cast<int>(options) & PCRE_DUPNAMES) && _captureNames->TryGetValue(groupName, indexes))
+					if (allowDuplicateNames && _captureNames->TryGetValue(groupName, indexes))
 					{
-						array<int>^ newIndexes = gcnew array<int>(indexes->Length + 1);
-						indexes->CopyTo(newIndexes, 0);
-						newIndexes[newIndexes->Length - 1] = groupIndex;
-						_captureNames[groupName] = newIndexes;
+						Array::Resize(indexes, indexes->Length + 1);
+						indexes[indexes->Length - 1] = groupIndex;
+						_captureNames[groupName] = indexes;
 					}
 					else
 					{
