@@ -85,6 +85,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PcreRegex.Split.cs" />
+    <Compile Include="PcreRegex.Replace.cs" />
+    <Compile Include="PcreRegex.Match.cs" />
     <Compile Include="PcreGroup.cs" />
     <Compile Include="PcreMatch.cs" />
     <Compile Include="PcreRegex.cs" />
