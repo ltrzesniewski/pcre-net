@@ -151,19 +151,19 @@
   <ItemGroup>
     <ClInclude Include="..\PCRE\pcre.h" />
     <ClInclude Include="MatchOffsets.h" />
-    <ClInclude Include="PatternInfoKey.h" />
-    <ClInclude Include="PcreConfigKey.h" />
+    <ClInclude Include="InfoKey.h" />
+    <ClInclude Include="ConfigKey.h" />
     <ClInclude Include="PcreBuild.h" />
-    <ClInclude Include="PcrePattern.h" />
-    <ClInclude Include="PcrePatternOptions.h" />
-    <ClInclude Include="PcreStudyOptions.h" />
+    <ClInclude Include="InternalRegex.h" />
+    <ClInclude Include="PatternOptions.h" />
+    <ClInclude Include="StudyOptions.h" />
     <ClInclude Include="Stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="MatchOffsets.cpp" />
     <ClCompile Include="PcreBuild.cpp" />
-    <ClCompile Include="PcrePattern.cpp" />
+    <ClCompile Include="InternalRegex.cpp" />
     <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

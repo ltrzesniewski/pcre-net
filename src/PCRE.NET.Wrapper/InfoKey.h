@@ -8,7 +8,7 @@ using namespace System;
 namespace PCRE {
 	namespace Wrapper {
 
-		public enum class PatternInfoKey
+		public enum class InfoKey
 		{
 			Options                    = PCRE_INFO_OPTIONS,
 			Size                       = PCRE_INFO_SIZE,

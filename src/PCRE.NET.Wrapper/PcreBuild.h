@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "PcreConfigKey.h"
+#include "ConfigKey.h"
 
 using namespace System;
 
@@ -13,9 +13,9 @@ namespace PCRE {
 		public:
 			static property String^ VersionString { String^ get(); };
 
-			static String^ PcreBuild::GetConfigString(PcreConfigKey key);
-			static Nullable<Int32> PcreBuild::GetConfigInt32(PcreConfigKey key);
-			static Nullable<Int64> PcreBuild::GetConfigInt64(PcreConfigKey key);
+			static String^ PcreBuild::GetConfigString(ConfigKey key);
+			static Nullable<Int32> PcreBuild::GetConfigInt32(ConfigKey key);
+			static Nullable<Int64> PcreBuild::GetConfigInt64(ConfigKey key);
 		};
 	}
 }

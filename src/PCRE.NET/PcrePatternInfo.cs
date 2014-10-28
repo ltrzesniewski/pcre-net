@@ -4,9 +4,9 @@ namespace PCRE
 {
     public sealed class PcrePatternInfo
     {
-        private readonly PcrePattern _re;
+        private readonly InternalRegex _re;
 
-        internal PcrePatternInfo(PcrePattern re, string pattern, PcreOptions options)
+        internal PcrePatternInfo(InternalRegex re, string pattern, PcreOptions options)
         {
             _re = re;
             PatternString = pattern;
@@ -18,7 +18,7 @@ namespace PCRE
 
         public int MaxBackReference
         {
-            get { return _re.GetInfoInt32(PatternInfoKey.BackRefMax); }
+            get { return _re.GetInfoInt32(InfoKey.BackRefMax); }
         }
 
         public int CaptureCount
@@ -28,32 +28,32 @@ namespace PCRE
 
         public bool IsCompiled
         {
-            get { return _re.GetInfoInt32(PatternInfoKey.Jit) != 0; }
+            get { return _re.GetInfoInt32(InfoKey.Jit) != 0; }
         }
 
         public bool CanMatchEmptyString
         {
-            get { return _re.GetInfoInt32(PatternInfoKey.MatchEmpty) != 0; }
+            get { return _re.GetInfoInt32(InfoKey.MatchEmpty) != 0; }
         }
 
         public int MaxLookBehind
         {
-            get { return _re.GetInfoInt32(PatternInfoKey.MaxLookBehind); }
+            get { return _re.GetInfoInt32(InfoKey.MaxLookBehind); }
         }
 
         public int MinSubjectLength
         {
-            get { return _re.GetInfoInt32(PatternInfoKey.MinLength); }
+            get { return _re.GetInfoInt32(InfoKey.MinLength); }
         }
 
         public int NamedGroupsCount
         {
-            get { return _re.GetInfoInt32(PatternInfoKey.NameCount); }
+            get { return _re.GetInfoInt32(InfoKey.NameCount); }
         }
 
         public int RecursionLimit
         {
-            get { return _re.GetInfoInt32(PatternInfoKey.RecursionLimit); }
+            get { return _re.GetInfoInt32(InfoKey.RecursionLimit); }
         }
     }
 }

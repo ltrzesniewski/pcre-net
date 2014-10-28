@@ -12,75 +12,75 @@ namespace PCRE
 
         public static bool Utf8
         {
-            get { return GetConfigBool(PcreConfigKey.Utf8); }
+            get { return GetConfigBool(ConfigKey.Utf8); }
         }
 
         public static bool Utf16
         {
-            get { return GetConfigBool(PcreConfigKey.Utf16); }
+            get { return GetConfigBool(ConfigKey.Utf16); }
         }
 
         public static bool Utf32
         {
-            get { return GetConfigBool(PcreConfigKey.Utf32); }
+            get { return GetConfigBool(ConfigKey.Utf32); }
         }
 
         public static bool UnicodeProperties
         {
-            get { return GetConfigBool(PcreConfigKey.UnicodeProperties); }
+            get { return GetConfigBool(ConfigKey.UnicodeProperties); }
         }
 
         public static bool Jit
         {
-            get { return GetConfigBool(PcreConfigKey.Jit); }
+            get { return GetConfigBool(ConfigKey.Jit); }
         }
 
         public static string JitTarget
         {
-            get { return PcreBuild.GetConfigString(PcreConfigKey.JitTarget); }
+            get { return PcreBuild.GetConfigString(ConfigKey.JitTarget); }
         }
 
         public static PcreNewLine NewLine
         {
-            get { return (PcreNewLine)GetConfigInt(PcreConfigKey.NewLine); }
+            get { return (PcreNewLine)GetConfigInt(ConfigKey.NewLine); }
         }
 
         public static bool BackSlashRMatchesUnicode
         {
-            get { return GetConfigInt(PcreConfigKey.Bsr) == 0; }
+            get { return GetConfigInt(ConfigKey.Bsr) == 0; }
         }
 
         public static int LinkSize
         {
-            get { return GetConfigInt(PcreConfigKey.LinkSize); }
+            get { return GetConfigInt(ConfigKey.LinkSize); }
         }
 
         public static long ParensLimit
         {
-            get { return GetConfigLong(PcreConfigKey.ParensLimit); }
+            get { return GetConfigLong(ConfigKey.ParensLimit); }
         }
 
         public static long MatchLimit
         {
-            get { return GetConfigLong(PcreConfigKey.MatchLimit); }
+            get { return GetConfigLong(ConfigKey.MatchLimit); }
         }
 
         public static long MatchLimitRecursion
         {
-            get { return GetConfigLong(PcreConfigKey.MatchLimitRecursion); }
+            get { return GetConfigLong(ConfigKey.MatchLimitRecursion); }
         }
 
         public static bool StackRecurse
         {
-            get { return GetConfigBool(PcreConfigKey.StackRecurse); }
+            get { return GetConfigBool(ConfigKey.StackRecurse); }
         }
 
-        private static bool GetConfigBool(PcreConfigKey key)
+        private static bool GetConfigBool(ConfigKey key)
         {
             return PcreBuild.GetConfigInt32(key).GetValueOrDefault() != 0;
         }
 
-        private static int GetConfigInt(PcreConfigKey key)
+        private static int GetConfigInt(ConfigKey key)
         {
             var value = PcreBuild.GetConfigInt32(key);
             if (value == null)
@@ -88,7 +88,7 @@ namespace PCRE
             return value.Value;
         }
 
-        private static long GetConfigLong(PcreConfigKey key)
+        private static long GetConfigLong(ConfigKey key)
         {
             var value = PcreBuild.GetConfigInt64(key);
             if (value == null)

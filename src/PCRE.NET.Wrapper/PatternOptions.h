@@ -9,7 +9,7 @@ namespace PCRE {
 	namespace Wrapper {
 
 		[Flags]
-		public enum class PcrePatternOptions
+		public enum class PatternOptions
 		{
 			None                       = 0,
 			CaseLess                   = PCRE_CASELESS,  

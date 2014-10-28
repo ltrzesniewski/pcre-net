@@ -11,7 +11,7 @@ namespace PCRE
     {
         // ReSharper disable IntroduceOptionalParameters.Global, MemberCanBePrivate.Global, UnusedMember.Global
 
-        private readonly PcrePattern _re;
+        private readonly InternalRegex _re;
 
         public PcrePatternInfo PaternInfo { get; private set; }
 
@@ -30,7 +30,7 @@ namespace PCRE
             if (pattern == null)
                 throw new ArgumentNullException("pattern");
 
-            _re = new PcrePattern(pattern, options.ToPatternOptions(), options.ToStudyOptions());
+            _re = new InternalRegex(pattern, options.ToPatternOptions(), options.ToStudyOptions());
             PaternInfo = new PcrePatternInfo(_re, pattern, options);
         }
 
@@ -67,7 +67,7 @@ namespace PCRE
             if (startIndex < 0 || startIndex > subject.Length)
                 throw new ArgumentOutOfRangeException("startIndex");
 
-            var offsets = _re.Match(subject, startIndex, PcrePatternOptions.None);
+            var offsets = _re.Match(subject, startIndex, PatternOptions.None);
             return offsets.IsMatch
                 ? new PcreMatch(this, subject, offsets)
                 : null;
@@ -93,7 +93,7 @@ namespace PCRE
 
         private IEnumerable<PcreMatch> MatchesIterator(string subject, int startIndex)
         {
-            var offsets = _re.Match(subject, startIndex, PcrePatternOptions.None);
+            var offsets = _re.Match(subject, startIndex, PatternOptions.None);
 
             if (!offsets.IsMatch)
                 yield break;
@@ -104,7 +104,7 @@ namespace PCRE
             while (true)
             {
                 var nextOffset = match.Index + match.Length;
-                offsets = _re.Match(subject, nextOffset, match.Length == 0 ? PcrePatternOptions.NotEmptyAtStart : PcrePatternOptions.None);
+                offsets = _re.Match(subject, nextOffset, match.Length == 0 ? PatternOptions.NotEmptyAtStart : PatternOptions.None);
 
                 if (!offsets.IsMatch)
                     yield break;

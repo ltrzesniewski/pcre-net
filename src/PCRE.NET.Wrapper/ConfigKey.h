@@ -8,7 +8,7 @@ using namespace System;
 namespace PCRE {
 	namespace Wrapper {
 
-		public enum class PcreConfigKey
+		public enum class ConfigKey
 		{
 			Utf8                       = PCRE_CONFIG_UTF8,
 			NewLine                    = PCRE_CONFIG_NEWLINE,

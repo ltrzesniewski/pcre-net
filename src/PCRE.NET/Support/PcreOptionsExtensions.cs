@@ -4,22 +4,22 @@ namespace PCRE.Support
 {
     internal static class PcreOptionsExtensions
     {
-        private const PcrePatternOptions FlippedOptions = PcrePatternOptions.Utf16
-                                                          | PcrePatternOptions.NoUtf16Check
-                                                          | PcrePatternOptions.Ucp;
+        private const PatternOptions FlippedOptions = PatternOptions.Utf16
+                                                      | PatternOptions.NoUtf16Check
+                                                      | PatternOptions.Ucp;
 
-        public static PcrePatternOptions ToPatternOptions(this PcreOptions options)
+        public static PatternOptions ToPatternOptions(this PcreOptions options)
         {
-            return ((PcrePatternOptions)((long)options & 0xFFFFFFFF) ^ FlippedOptions) | PcrePatternOptions.Utf16;
+            return ((PatternOptions)((long)options & 0xFFFFFFFF) ^ FlippedOptions) | PatternOptions.Utf16;
         }
 
-        public static PcreStudyOptions? ToStudyOptions(this PcreOptions options)
+        public static StudyOptions? ToStudyOptions(this PcreOptions options)
         {
             if ((options & PcreOptions.Compiled) != 0)
-                return PcreStudyOptions.JitCompile;
+                return StudyOptions.JitCompile;
 
             if ((options & PcreOptions.Studied) != 0)
-                return PcreStudyOptions.None;
+                return StudyOptions.None;
 
             return null;
         }

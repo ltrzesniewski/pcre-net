@@ -1,11 +1,11 @@
 
 #include "stdafx.h"
-#include "PcrePattern.h"
+#include "InternalRegex.h"
 
 namespace PCRE {
 	namespace Wrapper {
 
-		PcrePattern::PcrePattern(String^ pattern, PcrePatternOptions options, Nullable<PcreStudyOptions> studyOptions)
+		InternalRegex::InternalRegex(String^ pattern, PatternOptions options, Nullable<StudyOptions> studyOptions)
 		{
 			const char *errorMessage;
 			int errorOffset;
@@ -41,13 +41,13 @@ namespace PCRE {
 				_extra = nullptr;
 			}
 
-			_captureCount = GetInfoInt32(PatternInfoKey::CaptureCount);
+			_captureCount = GetInfoInt32(InfoKey::CaptureCount);
 
-			int nameCount = GetInfoInt32(PatternInfoKey::NameCount);
+			int nameCount = GetInfoInt32(InfoKey::NameCount);
 			if (nameCount)
 			{
-				int nameEntrySize = GetInfoInt32(PatternInfoKey::NameEntrySize);
-				bool allowDuplicateNames = (options & PcrePatternOptions::DupNames) != PcrePatternOptions::None;
+				int nameEntrySize = GetInfoInt32(InfoKey::NameEntrySize);
+				bool allowDuplicateNames = (options & PatternOptions::DupNames) != PatternOptions::None;
 
 				_captureNames = gcnew Dictionary<String^, array<int>^>(nameCount, StringComparer::Ordinal);
 
@@ -79,12 +79,12 @@ namespace PCRE {
 			}
 		}
 
-		PcrePattern::~PcrePattern()
+		InternalRegex::~InternalRegex()
 		{
-			this->!PcrePattern();
+			this->!InternalRegex();
 		}
 
-		PcrePattern::!PcrePattern()
+		InternalRegex::!InternalRegex()
 		{
 			if (_extra)
 			{
@@ -99,7 +99,7 @@ namespace PCRE {
 			}
 		}
 
-		bool PcrePattern::IsMatch(String^ subject, int startOffset)
+		bool InternalRegex::IsMatch(String^ subject, int startOffset)
 		{
 			pin_ptr<const wchar_t> pinnedSubject = PtrToStringChars(subject);
 			auto result = pcre16_exec(_re, _extra, pinnedSubject, subject->Length, startOffset, 0, nullptr, 0);
@@ -113,7 +113,7 @@ namespace PCRE {
 			return true;
 		}
 
-		MatchOffsets PcrePattern::Match(String^ subject, int startOffset, PcrePatternOptions additionalOptions)
+		MatchOffsets InternalRegex::Match(String^ subject, int startOffset, PatternOptions additionalOptions)
 		{
 			auto match = MatchOffsets(_captureCount);
 
@@ -131,7 +131,7 @@ namespace PCRE {
 			return match;
 		}
 
-		int PcrePattern::GetInfoInt32(PatternInfoKey key)
+		int InternalRegex::GetInfoInt32(InfoKey key)
 		{
 			int result;
 			int errorCode = pcre16_fullinfo(_re, _extra, static_cast<int>(key), &result);

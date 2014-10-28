@@ -21,25 +21,25 @@
     <ClInclude Include="..\PCRE\pcre.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MatchOffsets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StudyOptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigKey.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PatternOptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="PcreBuild.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PcreConfigKey.h">
+    <ClInclude Include="InfoKey.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PcrePattern.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PatternInfoKey.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PcrePatternOptions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PcreStudyOptions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MatchOffsets.h">
+    <ClInclude Include="InternalRegex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -53,10 +53,10 @@
     <ClCompile Include="PcreBuild.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PcrePattern.cpp">
+    <ClCompile Include="MatchOffsets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MatchOffsets.cpp">
+    <ClCompile Include="InternalRegex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
