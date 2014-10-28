@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using PCRE.Wrapper;
 
 namespace PCRE
 {
-    public sealed class PcreMatch : IEnumerable<PcreGroup>
+    public sealed class PcreMatch : IReadOnlyCollection<PcreGroup>
     {
         private readonly PcreRegex _regex;
         private readonly string _subject;
@@ -27,28 +26,12 @@ namespace PCRE
 
         public PcreGroup this[int index]
         {
-            get
-            {
-                var group = TryGetGroup(index);
-
-                if (group == null)
-                    throw new ArgumentOutOfRangeException("index", "Group index out of range");
-
-                return group;
-            }
+            get { return GetGroup(index); }
         }
 
         public PcreGroup this[string name]
         {
-            get
-            {
-                var group = TryGetGroup(name);
-
-                if (group == null)
-                    throw new ArgumentException(String.Format("The named group '{0}' does not exist", name));
-
-                return group;
-            }
+            get { return GetGroup(name); }
         }
 
         internal string Subject
@@ -73,16 +56,16 @@ namespace PCRE
 
         public IEnumerator<PcreGroup> GetEnumerator()
         {
-            return EnumerateAllGroups().GetEnumerator();
+            return GetAllGroups().GetEnumerator();
         }
 
-        private IEnumerable<PcreGroup> EnumerateAllGroups()
+        private IEnumerable<PcreGroup> GetAllGroups()
         {
             for (var i = 0; i <= CaptureCount; ++i)
                 yield return this[i];
         }
 
-        public PcreGroup TryGetGroup(int index)
+        public PcreGroup GetGroup(int index)
         {
             if (index < 0 || index > CaptureCount)
                 return null;
@@ -110,7 +93,7 @@ namespace PCRE
             return group;
         }
 
-        public PcreGroup TryGetGroup(string name)
+        public PcreGroup GetGroup(string name)
         {
             var map = _regex.CaptureNameMap;
             if (map == null)
@@ -121,16 +104,34 @@ namespace PCRE
                 return null;
 
             if (indexes.Length == 1)
-                return TryGetGroup(indexes[0]);
+                return GetGroup(indexes[0]);
 
             foreach (var index in indexes)
             {
-                var group = TryGetGroup(index);
+                var group = GetGroup(index);
                 if (group != null && group.IsMatch)
                     return group;
             }
 
             return PcreGroup.Empty;
+        }
+
+        public IEnumerable<PcreGroup> GetGroups(string name)
+        {
+            var map = _regex.CaptureNameMap;
+            if (map == null)
+                yield break;
+
+            int[] indexes;
+            if (!map.TryGetValue(name, out indexes))
+                yield break;
+
+            foreach (var index in indexes)
+            {
+                var group = GetGroup(index);
+                if (group != null)
+                    yield return group;
+            }
         }
 
         public override string ToString()
@@ -141,6 +142,11 @@ namespace PCRE
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        int IReadOnlyCollection<PcreGroup>.Count
+        {
+            get { return CaptureCount; }
         }
     }
 }

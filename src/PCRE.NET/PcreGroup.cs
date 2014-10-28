@@ -4,7 +4,7 @@ namespace PCRE
 {
     public sealed class PcreGroup
     {
-        private string _subject;
+        private readonly string _subject;
         private string _value;
 
         internal static readonly PcreGroup Empty = new PcreGroup(String.Empty, -1, -1);
@@ -25,16 +25,7 @@ namespace PCRE
 
         public string Value
         {
-            get
-            {
-                if (_value == null)
-                {
-                    _value = _subject.Substring(Index, Length);
-                    _subject = null;
-                }
-
-                return _value;
-            }
+            get { return _value ?? (_value = _subject.Substring(Index, Length)); }
         }
 
         public bool IsMatch

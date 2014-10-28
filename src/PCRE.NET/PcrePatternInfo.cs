@@ -1,4 +1,5 @@
-﻿using PCRE.Wrapper;
+﻿using System.Collections.Generic;
+using PCRE.Wrapper;
 
 namespace PCRE
 {
@@ -54,6 +55,20 @@ namespace PCRE
         public int RecursionLimit
         {
             get { return _re.GetInfoInt32(InfoKey.RecursionLimit); }
+        }
+
+        public IEnumerable<int> GetGroupIndexesByName(string name)
+        {
+            var map = _re.CaptureNames;
+            if (map == null)
+                yield break;
+
+            int[] indexes;
+            if (!map.TryGetValue(name, out indexes))
+                yield break;
+
+            foreach (var index in indexes)
+                yield return index;
         }
     }
 }

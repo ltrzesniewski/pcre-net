@@ -200,7 +200,7 @@ namespace PCRE.Support
 
             public override void Append(PcreMatch match, StringBuilder sb)
             {
-                var group = match.TryGetGroup(_index);
+                var group = match.GetGroup(_index);
 
                 if (group == null)
                 {
@@ -239,8 +239,8 @@ namespace PCRE.Support
 
             public override void Append(PcreMatch match, StringBuilder sb)
             {
-                var group = match.TryGetGroup(_name)
-                            ?? match.TryGetGroup(_index);
+                var group = match.GetGroup(_name)
+                            ?? match.GetGroup(_index);
 
                 if (group == null)
                 {
@@ -314,7 +314,7 @@ namespace PCRE.Support
             {
                 for (var i = match.CaptureCount; i > 0; --i)
                 {
-                    var group = match.TryGetGroup(i);
+                    var group = match.GetGroup(i);
                     if (group != null && group.IsMatch)
                     {
                         sb.Append(match.Subject, group.Index, group.Length);
