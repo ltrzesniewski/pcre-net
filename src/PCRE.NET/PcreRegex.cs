@@ -132,7 +132,7 @@ namespace PCRE
             if (replacement == null)
                 throw new ArgumentNullException("replacement");
 
-            return Replace(subject, ReplacementPattern.Parse(this, replacement), count, startIndex);
+            return Replace(subject, ReplacementPattern.Parse(replacement), count, startIndex);
         }
 
         public string Replace(string subject, Func<PcreMatch, string> replacementFunc)

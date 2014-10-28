@@ -15,9 +15,14 @@ The currently wrapped PCRE version is **8.36**.
 
 The base regex operations are supported:
 
-- NFA matching and substring extraction (`PcreRegex.Matches`, `PcreRegex.Match`, `PcreRegex.IsMatch`)
-- Matched string replacement (`PcreRegex.Replace`)
-- String splitting on matches (`PcreRegex.Split`)
+- NFA matching and substring extraction
+  - `PcreRegex.Matches`
+  - `PcreRegex.Match`
+  - `PcreRegex.IsMatch`
+- Matched string replacement: `PcreRegex.Replace`
+  - Callbacks: `Func<PcreMatch, string>`
+  - Replacement strings with placeholders: ``$n ${name} $& $_ $` $' $+``
+- String splitting on matches: `PcreRegex.Split`
 
 Library highlights:
 
@@ -30,7 +35,6 @@ Library highlights:
 
 - AnyCPU (x86/x64) build
 - NuGet
-- Extend the replacement pattern syntax
 - Expose more PCRE features
 - Static regex cache
 - DFA matching

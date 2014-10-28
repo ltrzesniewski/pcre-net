@@ -29,28 +29,10 @@ namespace PCRE
         {
             get
             {
-                if (index < 0 || index > CaptureCount)
-                    throw new ArgumentOutOfRangeException("index", "Group index out of range");
+                var group = TryGetGroup(index);
 
-                var group = _groups[index];
                 if (group == null)
-                {
-                    // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-                    var startOffset = _offsets.GetStartOffset(index);
-
-                    if (startOffset >= 0)
-                    {
-                        // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-                        var endOffset = _offsets.GetEndOffset(index);
-                        group = new PcreGroup(_subject, startOffset, endOffset);
-                    }
-                    else
-                    {
-                        group = PcreGroup.Empty;
-                    }
-
-                    _groups[index] = group;
-                }
+                    throw new ArgumentOutOfRangeException("index", "Group index out of range");
 
                 return group;
             }
@@ -60,26 +42,18 @@ namespace PCRE
         {
             get
             {
-                var map = _regex.CaptureNameMap;
-                if (map == null)
-                    throw new ArgumentException("The regex has no named groups");
+                var group = TryGetGroup(name);
 
-                int[] indexes;
-                if (!map.TryGetValue(name, out indexes))
+                if (group == null)
                     throw new ArgumentException(String.Format("The named group '{0}' does not exist", name));
 
-                if (indexes.Length == 1)
-                    return this[indexes[0]];
-
-                foreach (var index in indexes)
-                {
-                    var group = this[index];
-                    if (group.IsMatch)
-                        return group;
-                }
-
-                return PcreGroup.Empty;
+                return group;
             }
+        }
+
+        internal string Subject
+        {
+            get { return _subject; }
         }
 
         public int Index
@@ -94,7 +68,7 @@ namespace PCRE
 
         public string Value
         {
-            get { return this[0]; }
+            get { return this[0].Value; }
         }
 
         public IEnumerator<PcreGroup> GetEnumerator()
@@ -106,6 +80,57 @@ namespace PCRE
         {
             for (var i = 0; i <= CaptureCount; ++i)
                 yield return this[i];
+        }
+
+        public PcreGroup TryGetGroup(int index)
+        {
+            if (index < 0 || index > CaptureCount)
+                return null;
+
+            var group = _groups[index];
+            if (group == null)
+            {
+                // ReSharper disable once ImpureMethodCallOnReadonlyValueField
+                var startOffset = _offsets.GetStartOffset(index);
+
+                if (startOffset >= 0)
+                {
+                    // ReSharper disable once ImpureMethodCallOnReadonlyValueField
+                    var endOffset = _offsets.GetEndOffset(index);
+                    group = new PcreGroup(_subject, startOffset, endOffset);
+                }
+                else
+                {
+                    group = PcreGroup.Empty;
+                }
+
+                _groups[index] = group;
+            }
+
+            return group;
+        }
+
+        public PcreGroup TryGetGroup(string name)
+        {
+            var map = _regex.CaptureNameMap;
+            if (map == null)
+                return null;
+
+            int[] indexes;
+            if (!map.TryGetValue(name, out indexes))
+                return null;
+
+            if (indexes.Length == 1)
+                return TryGetGroup(indexes[0]);
+
+            foreach (var index in indexes)
+            {
+                var group = TryGetGroup(index);
+                if (group != null && group.IsMatch)
+                    return group;
+            }
+
+            return PcreGroup.Empty;
         }
 
         public override string ToString()

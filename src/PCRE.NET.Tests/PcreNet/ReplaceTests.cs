@@ -19,18 +19,79 @@ namespace PCRE.Tests.PcreNet
         public void should_replace_matches_with_pattern()
         {
             var re = new PcreRegex(@"a+(b+)", PcreOptions.IgnoreCase);
-            var result = re.Replace("foo aabb bar aaabbab baz", "<$0><$1>");
+            var result = re.Replace("foo aabb bar aaabbab baz", "<$0><$1><$&>");
 
-            Assert.That(result, Is.EqualTo("foo <aabb><bb> bar <aaabb><bb><ab><b> baz"));
+            Assert.That(result, Is.EqualTo("foo <aabb><bb><aabb> bar <aaabb><bb><aaabb><ab><b><ab> baz"));
         }
 
         [Test]
-        public void should_not_throw_on_invalid_replacement_patterns()
+        public void should_replace_named_groups()
+        {
+            var re = new PcreRegex(@"a+(?<grp>b+)", PcreOptions.IgnoreCase);
+            var result = re.Replace("foo aabb bar aaabbab baz", "<${grp}>");
+
+            Assert.That(result, Is.EqualTo("foo <bb> bar <bb><b> baz"));
+        }
+
+        [Test]
+        public void should_insert_dollar()
         {
             var re = new PcreRegex(@"a+(b+)", PcreOptions.IgnoreCase);
-            var result = re.Replace("foo aabb bar aaabbab baz", "<$2$$1$>");
+            var result = re.Replace("foo aabb bar aaabbab baz", "$$-$");
 
-            Assert.That(result, Is.EqualTo("foo <$2$bb$> bar <$2$bb$><$2$b$> baz"));
+            Assert.That(result, Is.EqualTo("foo $-$ bar $-$$-$ baz"));
+        }
+
+        [Test]
+        public void should_insert_pre_match()
+        {
+            var re = new PcreRegex(@"a+(b+)", PcreOptions.IgnoreCase);
+            var result = re.Replace("foo aabb bar aaabbab baz", "<$`>");
+
+            Assert.That(result, Is.EqualTo("foo <foo > bar <foo aabb bar ><foo aabb bar aaabb> baz"));
+        }
+
+        [Test]
+        public void should_insert_post_match()
+        {
+            var re = new PcreRegex(@"a+(b+)", PcreOptions.IgnoreCase);
+            var result = re.Replace("foo aabb bar aaabbab baz", "<$'>");
+
+            Assert.That(result, Is.EqualTo("foo < bar aaabbab baz> bar <ab baz>< baz> baz"));
+        }
+
+        [Test]
+        public void should_insert_subject()
+        {
+            var re = new PcreRegex(@"a+(b+)", PcreOptions.IgnoreCase);
+            var result = re.Replace("foo aabb bar aaabbab baz", "<$_>");
+
+            Assert.That(result, Is.EqualTo("foo <foo aabb bar aaabbab baz> bar <foo aabb bar aaabbab baz><foo aabb bar aaabbab baz> baz"));
+        }
+
+        [Test]
+        public void should_insert_last_matched_group()
+        {
+            var re = new PcreRegex(@"a+(b+)(c+)?", PcreOptions.IgnoreCase);
+            var result = re.Replace("foo aabb bar aaabbabcc baz", "<$+>");
+
+            Assert.That(result, Is.EqualTo("foo <bb> bar <bb><cc> baz"));
+        }
+
+        [Test]
+        [TestCase("<$2$$$1$>", Result = "foo <$2$bb$> bar <$2$bb$><$2$b$> baz")]
+        [TestCase("<>${2", Result = "foo <>${2 bar <>${2<>${2 baz")]
+        [TestCase("<$42>", Result = "foo <$42> bar <$42><$42> baz")]
+        [TestCase("<$99999999999999999999>", Result = "foo <$99999999999999999999> bar <$99999999999999999999><$99999999999999999999> baz")]
+        [TestCase("<${x}>", Result = "foo <${x}> bar <${x}><${x}> baz")]
+        [TestCase("$42", Result = "foo $42 bar $42$42 baz")]
+        [TestCase("${x}", Result = "foo ${x} bar ${x}${x} baz")]
+        [TestCase("${x", Result = "foo ${x bar ${x${x baz")]
+        [TestCase("$", Result = "foo $ bar $$ baz")]
+        public string should_not_throw_on_invalid_replacement_patterns(string replacement)
+        {
+            var re = new PcreRegex(@"a+(?<n>b+)", PcreOptions.IgnoreCase);
+            return re.Replace("foo aabb bar aaabbab baz", replacement);
         }
 
         [Test]
