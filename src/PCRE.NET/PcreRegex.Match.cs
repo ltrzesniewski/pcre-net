@@ -88,5 +88,59 @@ namespace PCRE
                 yield return match;
             }
         }
+
+        [Pure]
+        public static bool IsMatch(string subject, string pattern)
+        {
+            return IsMatch(subject, pattern, PcreOptions.None, 0);
+        }
+
+        [Pure]
+        public static bool IsMatch(string subject, string pattern, PcreOptions options)
+        {
+            return IsMatch(subject, pattern, options, 0);
+        }
+
+        [Pure]
+        public static bool IsMatch(string subject, string pattern, PcreOptions options, int startIndex)
+        {
+            return new PcreRegex(pattern, options).IsMatch(subject, startIndex);
+        }
+
+        [Pure]
+        public static PcreMatch Match(string subject, string pattern)
+        {
+            return Match(subject, pattern, PcreOptions.None, 0);
+        }
+
+        [Pure]
+        public static PcreMatch Match(string subject, string pattern, PcreOptions options)
+        {
+            return Match(subject, pattern, options, 0);
+        }
+
+        [Pure]
+        public static PcreMatch Match(string subject, string pattern, PcreOptions options, int startIndex)
+        {
+            return new PcreRegex(pattern, options).Match(subject, startIndex);
+        }
+
+        [Pure]
+        public static IEnumerable<PcreMatch> Matches(string subject, string pattern)
+        {
+            return Matches(subject, pattern, PcreOptions.None, 0);
+        }
+
+        [Pure]
+        public static IEnumerable<PcreMatch> Matches(string subject, string pattern, PcreOptions options)
+        {
+            return Matches(subject, pattern, options, 0);
+        }
+
+        [Pure]
+        public static IEnumerable<PcreMatch> Matches(string subject, string pattern, PcreOptions options, int startIndex)
+        {
+            return new PcreRegex(pattern, options).Matches(subject, startIndex);
+        }
     }
 }

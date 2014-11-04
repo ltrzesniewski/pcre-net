@@ -36,7 +36,6 @@ Library highlights:
 - AnyCPU (x86/x64) build
 - NuGet
 - Expose more PCRE features
-- Static regex cache
 - DFA matching
 - Partial matching
 - Run the PCRE test suite

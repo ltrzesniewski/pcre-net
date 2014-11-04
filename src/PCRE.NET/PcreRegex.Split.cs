@@ -52,5 +52,29 @@ namespace PCRE
 
             yield return subject.Substring(index);
         }
+
+        [Pure]
+        public static IEnumerable<string> Split(string subject, string pattern)
+        {
+            return Split(subject, pattern, PcreOptions.None, -1, 0);
+        }
+
+        [Pure]
+        public static IEnumerable<string> Split(string subject, string pattern, PcreOptions options)
+        {
+            return Split(subject, pattern, options, -1, 0);
+        }
+
+        [Pure]
+        public static IEnumerable<string> Split(string subject, string pattern, PcreOptions options, int count)
+        {
+            return Split(subject, pattern, options, count, 0);
+        }
+
+        [Pure]
+        public static IEnumerable<string> Split(string subject, string pattern, PcreOptions options, int count, int startIndex)
+        {
+            return new PcreRegex(pattern, options).Split(subject, count, startIndex);
+        }
     }
 }

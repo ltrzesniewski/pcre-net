@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using PCRE.Support;
 using PCRE.Wrapper;
 
 namespace PCRE
@@ -7,11 +8,11 @@ namespace PCRE
     {
         private readonly InternalRegex _re;
 
-        internal PcrePatternInfo(InternalRegex re, string pattern, PcreOptions options)
+        internal PcrePatternInfo(InternalRegex re, RegexKey key)
         {
             _re = re;
-            PatternString = pattern;
-            Options = options;
+            PatternString = key.Pattern;
+            Options = key.Options;
         }
 
         public string PatternString { get; private set; }
