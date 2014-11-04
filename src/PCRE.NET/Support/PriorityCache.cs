@@ -31,13 +31,13 @@ namespace PCRE.Support
 
                 lock (_cache)
                 {
-                    if (value != _cacheSize)
-                    {
-                        _cache.Clear();
+                    while (_cache.Count > value)
+                        _cache.RemoveLast();
+
+                    if (value == 0)
                         _head = null;
 
-                        _cacheSize = value;
-                    }
+                    _cacheSize = value;
                 }
             }
         }
