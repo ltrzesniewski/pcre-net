@@ -46,6 +46,13 @@ namespace PCRE
                 yield return subject.Substring(index, match.Index - index);
                 index = match.Index + match.Length;
 
+                for (var groupIdx = 1; groupIdx <= CaptureCount; ++groupIdx)
+                {
+                    var group = match[groupIdx];
+                    if (group.IsMatch)
+                        yield return group.Value;
+                }
+
                 if (--count == 0)
                     break;
             }

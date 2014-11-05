@@ -66,5 +66,14 @@ namespace PCRE.Tests.PcreNet
 
             Assert.That(matches, Has.Count.EqualTo(1));
         }
+
+        [Test]
+        public void should_support_backtracking_verbs()
+        {
+            var re = new PcreRegex(@"\(\w+\)(*SKIP)(*FAIL)|\w+");
+            var matches = re.Matches("(foo) bar (baz) 42").ToList();
+
+            Assert.That(matches.Select(m => m.Value), Is.EqualTo(new[] { "bar", "42" }));
+        }
     }
 }

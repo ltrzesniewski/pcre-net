@@ -59,5 +59,32 @@ namespace PCRE.Tests.PcreNet
 
             Assert.That(result, Is.EqualTo(new[] { "foo bar baz" }));
         }
+
+        [Test]
+        public void should_include_captured_groups_in_result()
+        {
+            var re = new PcreRegex(@"<(\d)?(.+?)>");
+            var result = re.Split("foo<bar>baz<42>a").ToList();
+
+            Assert.That(result, Is.EqualTo(new[] { "foo", "bar", "baz", "4", "2", "a" }));
+        }
+
+        [Test]
+        public void should_include_empty_groups_in_result()
+        {
+            var re = new PcreRegex(@"<(\d?)(.+?)>");
+            var result = re.Split("foo<bar>baz<42>a").ToList();
+
+            Assert.That(result, Is.EqualTo(new[] { "foo", "", "bar", "baz", "4", "2", "a" }));
+        }
+
+        [Test]
+        public void should_split_on_empty_pattern()
+        {
+            var re = new PcreRegex(@"");
+            var result = re.Split("foo").ToList();
+
+            Assert.That(result, Is.EqualTo(new[] { "", "f", "o", "o", "" }));
+        }
     }
 }
