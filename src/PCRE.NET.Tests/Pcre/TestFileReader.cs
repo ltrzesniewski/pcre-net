@@ -107,7 +107,7 @@ namespace PCRE.Tests.Pcre
 
         private void ParseOptions(TestPattern pattern)
         {
-            var options = PcreOptions.ASCII;
+            var options = PcreOptions.None;
 
             foreach (var c in pattern.OptionsString)
             {

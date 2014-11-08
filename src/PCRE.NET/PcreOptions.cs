@@ -14,7 +14,8 @@ namespace PCRE
         Singleline = PatternOptions.DotAll,
         ExplicitCapture = PatternOptions.NoAutoCapture,
         IgnorePatternWhitespace = PatternOptions.Extended,
-        JavaScript = PatternOptions.JavaScriptCompat | ASCII,
+        JavaScript = PatternOptions.JavaScriptCompat,
+        Unicode = PatternOptions.Ucp,
 
         Anchored = PatternOptions.Anchored,
         Ungreedy = PatternOptions.Ungreedy,
@@ -40,7 +41,6 @@ namespace PCRE
         ExtraPcreFunctionality = PatternOptions.Extra,
 
         // Flipped options
-        ASCII = PatternOptions.Ucp,
         CheckUnicodeValidity = PatternOptions.NoUtf16Check,
 
         // Extra options

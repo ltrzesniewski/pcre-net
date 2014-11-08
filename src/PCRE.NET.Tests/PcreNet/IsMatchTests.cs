@@ -97,13 +97,22 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
-        public void should_handle_ecmascript()
+        public void should_handle_javascript()
+        {
+            var re = new PcreRegex(@"^\U$", PcreOptions.JavaScript);
+            Assert.That(re.IsMatch("U"), Is.True);
+
+            Assert.Throws<ArgumentException>(() => new PcreRegex(@"^\U$"));
+        }
+
+        [Test]
+        public void should_handle_unicode_character_properties()
         {
             var re = new PcreRegex(@"^\w$");
-            Assert.That(re.IsMatch("à"), Is.True);
-
-            re = new PcreRegex(@"^\w$", PcreOptions.JavaScript);
             Assert.That(re.IsMatch("à"), Is.False);
+
+            re = new PcreRegex(@"^\w$", PcreOptions.Unicode);
+            Assert.That(re.IsMatch("à"), Is.True);
         }
 
         [Test]

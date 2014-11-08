@@ -5,8 +5,7 @@ namespace PCRE.Support
     internal static class PcreOptionsExtensions
     {
         private const PatternOptions FlippedOptions = PatternOptions.Utf16
-                                                      | PatternOptions.NoUtf16Check
-                                                      | PatternOptions.Ucp;
+                                                      | PatternOptions.NoUtf16Check;
 
         public static PatternOptions ToPatternOptions(this PcreOptions options)
         {
