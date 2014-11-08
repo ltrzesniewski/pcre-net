@@ -53,7 +53,6 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to 1 if you have the `bcopy' function. */
 /* #undef HAVE_BCOPY */
-#define HAVE_BCOPY 1
 
 /* Define to 1 if you have the <bits/type_traits.h> header file. */
 /* #undef HAVE_BITS_TYPE_TRAITS_H */
@@ -122,7 +121,6 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to 1 if you have the <strings.h> header file. */
 /* #undef HAVE_STRINGS_H */
-#define HAVE_STRINGS_H 1
 
 /* Define to 1 if you have the <string.h> header file. */
 /* #undef HAVE_STRING_H */
@@ -138,13 +136,14 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to 1 if you have `strtoq'. */
 /* #undef HAVE_STRTOQ */
-#define HAVE_STRTOQ 1
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 /* #undef HAVE_SYS_STAT_H */
+#define HAVE_SYS_STAT_H 1
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 /* #undef HAVE_SYS_TYPES_H */
+#define HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have the <type_traits.h> header file. */
 /* #undef HAVE_TYPE_TRAITS_H */
@@ -294,7 +293,7 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to any value if linking statically (TODO: make nice with Libtool) */
 /* #undef PCRE_STATIC */
-#define PCRE_STATIC
+#define PCRE_STATIC 1
 
 /* When calling PCRE via the POSIX interface, additional working storage is
    required for holding the pointers to capturing substrings because PCRE
@@ -335,7 +334,7 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to any value to enable the 16 bit PCRE library. */
 /* #undef SUPPORT_PCRE16 */
-#define SUPPORT_PCRE16
+#define SUPPORT_PCRE16 1
 
 /* Define to any value to enable the 32 bit PCRE library. */
 /* #undef SUPPORT_PCRE32 */
@@ -348,14 +347,14 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to any value to enable support for Unicode properties. */
 /* #undef SUPPORT_UCP */
-#define SUPPORT_UCP
+#define SUPPORT_UCP 1
 
 /* Define to any value to enable support for the UTF-8/16/32 Unicode encoding.
    This will work even in an EBCDIC environment, but it is incompatible with
    the EBCDIC macro. That is, PCRE can support *either* EBCDIC code *or*
    ASCII/UTF-8/16/32, but not both at once. */
 /* #undef SUPPORT_UTF */
-#define SUPPORT_UTF
+#define SUPPORT_UTF 1
 
 /* Define to any value for valgrind support to find invalid memory reads. */
 /* #undef SUPPORT_VALGRIND */
