@@ -14,6 +14,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PCRE.NET.Wrapper", "PCRE.NE
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PCRE.NET.Native", "PCRE.NET.Native\PCRE.NET.Native.vcxproj", "{CB0EC78A-B7FB-423F-8ABB-0984A9D7B3BA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2183A203-01D0-4EC2-BE5A-AC3FA372B447}"
+	ProjectSection(SolutionItems) = preProject
+		..\build\tools\Build.ps1 = ..\build\tools\Build.ps1
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

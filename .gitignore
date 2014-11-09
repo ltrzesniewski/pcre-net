@@ -6,6 +6,7 @@ Release/
 ipch/
 
 /src/packages/*/
+/build/output
 
 *.suo
 *.user
