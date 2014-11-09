@@ -33,7 +33,6 @@ Library highlights:
 
 ## To do ##
 
-- AnyCPU (x86/x64) build
 - NuGet
 - Expose more PCRE features
 - DFA matching
