@@ -24,7 +24,7 @@ namespace PCRE
             if (startIndex < 0 || startIndex > subject.Length)
                 throw new ArgumentOutOfRangeException("startIndex");
 
-            return _re.IsMatch(subject, startIndex);
+            return InternalRegex.IsMatch(subject, startIndex);
         }
 
         [Pure]
@@ -42,7 +42,7 @@ namespace PCRE
             if (startIndex < 0 || startIndex > subject.Length)
                 throw new ArgumentOutOfRangeException("startIndex");
 
-            var offsets = _re.Match(subject, startIndex, PatternOptions.None);
+            var offsets = InternalRegex.Match(subject, startIndex, PatternOptions.None);
             return offsets.IsMatch
                 ? new PcreMatch(this, subject, offsets)
                 : null;
@@ -68,7 +68,7 @@ namespace PCRE
 
         private IEnumerable<PcreMatch> MatchesIterator(string subject, int startIndex)
         {
-            var offsets = _re.Match(subject, startIndex, PatternOptions.None);
+            var offsets = InternalRegex.Match(subject, startIndex, PatternOptions.None);
 
             if (!offsets.IsMatch)
                 yield break;
@@ -79,7 +79,7 @@ namespace PCRE
             while (true)
             {
                 var nextOffset = match.Index + match.Length;
-                offsets = _re.Match(subject, nextOffset, match.Length == 0 ? PatternOptions.NotEmptyAtStart : PatternOptions.None);
+                offsets = InternalRegex.Match(subject, nextOffset, match.Length == 0 ? PatternOptions.NotEmptyAtStart : PatternOptions.None);
 
                 if (!offsets.IsMatch)
                     yield break;

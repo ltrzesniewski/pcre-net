@@ -65,6 +65,5 @@ Copy-Item -Path (Join-Path $rootDir "src\PCRE.NET.Tests\bin\Release\Pcre") -Dest
 
 $testDll = (Join-Path $testDir "PCRE.NET.Tests.dll")
 
-# For some reason, NUnit fails in AnyCPU when using TestCaseSource and LibZ assembly loading, so run only a subset of the tests
-Run { & (Join-Path $nunitDir "nunit-console.exe") @($testDll, "/framework:net-4.5", "/out:Test-x64.txt", "/err:Test-x64-err.txt", "/noshadow", "/stoponerror", "/run:PCRE.Tests.PcreNet") }
+Run { & (Join-Path $nunitDir "nunit-console.exe") @( $testDll, "/framework:net-4.5", "/out:Test-x64.txt", "/err:Test-x64-err.txt", "/noshadow", "/stoponerror") }
 Run { & (Join-Path $nunitDir "nunit-console-x86.exe") @($testDll, "/framework:net-4.5", "/out:Test-x86.txt", "/err:Test-x86-err.txt", "/noshadow", "/stoponerror") }

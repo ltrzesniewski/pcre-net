@@ -8,7 +8,7 @@ namespace PCRE
     {
         private readonly PcreRegex _regex;
         private readonly string _subject;
-        private readonly MatchOffsets _offsets;
+        private readonly object _offsets; // See remark about JIT in PcreRegex
         private readonly PcreGroup[] _groups;
 
         internal PcreMatch(PcreRegex regex, string subject, MatchOffsets offsets)
@@ -73,13 +73,12 @@ namespace PCRE
             var group = _groups[index];
             if (group == null)
             {
-                // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-                var startOffset = _offsets.GetStartOffset(index);
+                var offsets = (MatchOffsets)_offsets;
+                var startOffset = offsets.GetStartOffset(index);
 
                 if (startOffset >= 0)
                 {
-                    // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-                    var endOffset = _offsets.GetEndOffset(index);
+                    var endOffset = offsets.GetEndOffset(index);
                     group = new PcreGroup(_subject, startOffset, endOffset);
                 }
                 else
@@ -146,7 +145,7 @@ namespace PCRE
 
         int IReadOnlyCollection<PcreGroup>.Count
         {
-            get { return CaptureCount; }
+            get { return CaptureCount + 1; }
         }
     }
 }

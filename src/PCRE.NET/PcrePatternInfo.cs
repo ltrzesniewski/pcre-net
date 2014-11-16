@@ -1,66 +1,70 @@
 ﻿using System.Collections.Generic;
-using PCRE.Support;
 using PCRE.Wrapper;
 
 namespace PCRE
 {
     public sealed class PcrePatternInfo
     {
-        private readonly InternalRegex _re;
+        private readonly PcreRegex _re;
 
-        internal PcrePatternInfo(InternalRegex re, RegexKey key)
+        internal PcrePatternInfo(PcreRegex re)
         {
             _re = re;
-            PatternString = key.Pattern;
-            Options = key.Options;
         }
 
-        public string PatternString { get; private set; }
-        public PcreOptions Options { get; private set; }
+        public string PatternString
+        {
+            get { return _re.Key.Pattern; }
+        }
+
+        public PcreOptions Options
+        {
+            get { return _re.Key.Options; }
+        }
 
         public int MaxBackReference
         {
-            get { return _re.GetInfoInt32(InfoKey.BackRefMax); }
+            get { return _re.InternalRegex.GetInfoInt32(InfoKey.BackRefMax); }
         }
 
         public int CaptureCount
         {
-            get { return _re.CaptureCount; }
+            get { return _re.InternalRegex.CaptureCount; }
         }
 
         public bool IsCompiled
         {
-            get { return _re.GetInfoInt32(InfoKey.Jit) != 0; }
+            get { return _re.InternalRegex.GetInfoInt32(InfoKey.Jit) != 0; }
         }
 
         public bool CanMatchEmptyString
         {
-            get { return _re.GetInfoInt32(InfoKey.MatchEmpty) != 0; }
+            get { return _re.InternalRegex.GetInfoInt32(InfoKey.MatchEmpty) != 0; }
         }
 
         public int MaxLookBehind
         {
-            get { return _re.GetInfoInt32(InfoKey.MaxLookBehind); }
+            get { return _re.InternalRegex.GetInfoInt32(InfoKey.MaxLookBehind); }
         }
 
         public int MinSubjectLength
         {
-            get { return _re.GetInfoInt32(InfoKey.MinLength); }
+            get { return _re.InternalRegex.GetInfoInt32(InfoKey.MinLength); }
         }
 
         public int NamedGroupsCount
         {
-            get { return _re.GetInfoInt32(InfoKey.NameCount); }
+            get { return _re.InternalRegex.GetInfoInt32(InfoKey.NameCount); }
         }
 
         public int RecursionLimit
         {
-            get { return _re.GetInfoInt32(InfoKey.RecursionLimit); }
+            get { return _re.InternalRegex.GetInfoInt32(InfoKey.RecursionLimit); }
         }
 
         public IEnumerable<int> GetGroupIndexesByName(string name)
         {
-            var map = _re.CaptureNames;
+            var map = _re.InternalRegex.CaptureNames;
             if (map == null)
                 yield break;
 
