@@ -4,7 +4,7 @@ Properties {
 	$buildDir = (Get-Item $PSScriptRoot).Parent.FullName
 	$slnFile = (Join-Path $rootDir "src\PCRE.NET.sln")
 	$outputDir = (Join-Path $buildDir "output")
-
+	
 	Add-Type -AssemblyName "Microsoft.Build.Utilities.v12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
 	$msbuild = ([Microsoft.Build.Utilities.ToolLocationHelper]::GetPathToBuildToolsFile("msbuild.exe", "12.0"))
 
@@ -13,30 +13,52 @@ Properties {
 	
 	$outDll = (Join-Path $outputDir "PCRE.NET.dll")
 	$testDir = (Join-Path $outputDir "test")
+	$testDll = (Join-Path $testDir "PCRE.NET.Tests.dll")
+	
+	$config = "Release"
 }
 
 FormatTaskName ("`n`n" + ("-"*50) + "`n    {0}`n" +  ("-"*50) + "`n")
 
 Task default -Depends All
 
-Task All -Depends Rebuild,LibZ,Test
+Task All -Depends Clean, Build, Merge, Test
+
+##### Clean #####
 
 Task Clean {
+	Write-Host "Output directory: $outputDir"
 	New-Item -ItemType Directory -Force -Path $outputDir > $null
 	Get-ChildItem $outputDir | Remove-Item -Recurse
 	Set-Location $outputDir
 }
 
-Task Rebuild -Depends Clean {
-	Exec { & $msbuild @( $slnFile, "/t:Rebuild", "/p:Configuration=Release", "/p:Platform=Any CPU", "/m" ) }
-	Exec { & $msbuild @( $slnFile, "/t:Rebuild", "/p:Configuration=Release", "/p:Platform=x86", "/m" ) }
-	Exec { & $msbuild @( $slnFile, "/t:Rebuild", "/p:Configuration=Release", "/p:Platform=x64", "/m" ) }
+##### Build #####
+
+Function Run-Build([string]$platform) {
+	Exec { & $msbuild @( $slnFile, "/t:Rebuild", "/p:Configuration=$config", "/p:Platform=$platform", "/m" ) }
 }
 
-Task LibZ -Depends Clean {
-	Copy-Item -Path (Join-Path $rootDir "src\PCRE.NET\bin\Release\PCRE.NET.dll") -Destination $outputDir
-	Copy-Item -Path (Join-Path $rootDir "src\PCRE.NET.Wrapper\bin\Win32\Release\PCRE.NET.Wrapper.dll") -Destination (Join-Path $outputDir "PCRE.NET.Wrapper.x86.dll")
-	Copy-Item -Path (Join-Path $rootDir "src\PCRE.NET.Wrapper\bin\x64\Release\PCRE.NET.Wrapper.dll") -Destination (Join-Path $outputDir "PCRE.NET.Wrapper.x64.dll")
+Task Build -Depends Build-AnyCPU, Build-x86, Build-x64
+
+Task Build-AnyCPU {
+	Run-Build "Any CPU"
+}
+
+Task Build-x86 {
+	Run-Build "x86"
+}
+
+Task Build-x64 {
+	Run-Build "x64"
+}
+
+##### Merge #####
+
+Task Merge -Depends Clean {
+	Copy-Item -Path (Join-Path $rootDir "src\PCRE.NET\bin\$config\PCRE.NET.dll") -Destination $outputDir
+	Copy-Item -Path (Join-Path $rootDir "src\PCRE.NET.Wrapper\bin\Win32\$config\PCRE.NET.Wrapper.dll") -Destination (Join-Path $outputDir "PCRE.NET.Wrapper.x86.dll")
+	Copy-Item -Path (Join-Path $rootDir "src\PCRE.NET.Wrapper\bin\x64\$config\PCRE.NET.Wrapper.dll") -Destination (Join-Path $outputDir "PCRE.NET.Wrapper.x64.dll")
 	Copy-Item -Path (Join-Path $outputDir "PCRE.NET.Wrapper.x64.dll") -Destination (Join-Path $outputDir "PCRE.NET.Wrapper.dll")
 
 	Exec { & $libz @(
@@ -51,17 +73,36 @@ Task LibZ -Depends Clean {
 	Remove-Item (Join-Path $outputDir "PCRE.NET.Wrapper.dll")
 }
 
-Task Test -Depends LibZ {
+##### Test #####
+
+Function Run-Test([string]$runner, [string]$platform) {
+	Exec { & (Join-Path $nunitDir $runner) @(
+		$testDll,
+		"/framework:net-4.5",
+		"/noshadow",
+		"/work:$testDir",
+		"/result:Test-$platform.xml",
+		"/out:Test-$platform-out.txt",
+		"/err:Test-$platform-err.txt"
+	) }
+}
+
+Task Test -Depends Test-AnyCPU, Test-x86
+
+Task Test-Init -Depends Merge {
 	New-Item -ItemType Directory -Path $testDir > $null
-	Set-Location $testDir
 
 	Copy-Item -Path $outDll -Destination $testDir
-	Copy-Item -Path (Join-Path $rootDir "src\PCRE.NET.Tests\bin\Release\PCRE.NET.Tests.dll") -Destination $testDir
-	Copy-Item -Path (Join-Path $rootDir "src\PCRE.NET.Tests\bin\Release\NUnit.Framework.dll") -Destination $testDir
-	Copy-Item -Path (Join-Path $rootDir "src\PCRE.NET.Tests\bin\Release\Pcre") -Destination $testDir -Recurse
+	Copy-Item -Path (Join-Path $rootDir "src\PCRE.NET.Tests\bin\$config\PCRE.NET.Tests.dll") -Destination $testDir
+	Copy-Item -Path (Join-Path $rootDir "src\PCRE.NET.Tests\bin\$config\NUnit.Framework.dll") -Destination $testDir
+	Copy-Item -Path (Join-Path $rootDir "src\PCRE.NET.Tests\bin\$config\Pcre") -Destination $testDir -Recurse
+}
 
-	$testDll = (Join-Path $testDir "PCRE.NET.Tests.dll")
 
-	Exec { & (Join-Path $nunitDir "nunit-console.exe") @( $testDll, "/framework:net-4.5", "/out:Test-x64.txt", "/err:Test-x64-err.txt", "/noshadow", "/stoponerror") }
-	Exec { & (Join-Path $nunitDir "nunit-console-x86.exe") @($testDll, "/framework:net-4.5", "/out:Test-x86.txt", "/err:Test-x86-err.txt", "/noshadow", "/stoponerror") }
+Task Test-AnyCPU -Depends Test-Init {
+	Run-Test "nunit-console.exe" "AnyCPU"
+}
+
+Task Test-x86 -Depends Test-Init {
+	Run-Test "nunit-console-x86.exe" "x86"
 }
