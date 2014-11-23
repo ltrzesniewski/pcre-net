@@ -10,11 +10,13 @@ Properties {
 
 	$libz = (Join-Path $rootDir "src\packages\LibZ.Bootstrap.1.1.0.2\tools\libz.exe")
 	$nunitDir = (Join-Path $rootDir "src\packages\NUnit.Runners.2.6.3\tools")
+	$nuget = (Join-Path $rootDir "build\tools\nuget.exe")
 	
 	$outDll = (Join-Path $outputDir "PCRE.NET.dll")
 	$testDir = (Join-Path $outputDir "test")
 	$testDll = (Join-Path $testDir "PCRE.NET.Tests.dll")
-	
+	$nuspec = (Join-Path $rootDir "build\tools\PCRE.NET.nuspec")
+
 	$config = "Release"
 }
 
@@ -22,7 +24,7 @@ FormatTaskName ("`n`n" + ("-"*50) + "`n    {0}`n" +  ("-"*50) + "`n")
 
 Task default -Depends All
 
-Task All -Depends Clean, Build, Merge, Test
+Task All -Depends Clean, Build, Merge, Test, NuGet
 
 ##### Clean #####
 
@@ -105,4 +107,20 @@ Task Test-AnyCPU -Depends Test-Init {
 
 Task Test-x86 -Depends Test-Init {
 	Run-Test "nunit-console-x86.exe" "x86"
+}
+
+##### NuGet #####
+
+Task NuGet -Depends Merge {
+
+	$version = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($outDll).FileVersion
+	$version = $version.Substring(0, $version.LastIndexOf("."))
+
+	Exec { & $nuget @(
+		"Pack", $nuspec,
+		"-OutputDirectory", $outputDir,
+		"-BasePath", $rootDir,
+		"-Version", $version
+		"-NonInteractive"
+	) }
 }
