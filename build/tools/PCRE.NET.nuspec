@@ -2,13 +2,13 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>PCRE.NET</id>
-    <title>PCRE.NET</title>
+    <title>PCRE.NET - Perl Compatible Regular Expressions for .NET</title>
     <version>$version$</version>
     <authors>Philip Hazel, Zoltan Herczeg, Lucas Trzesniewski</authors>
     <owners>Lucas Trzesniewski</owners>
     <licenseUrl>https://raw.githubusercontent.com/ltrzesniewski/pcre-net/master/LICENCE</licenseUrl>
     <projectUrl>https://github.com/ltrzesniewski/pcre-net</projectUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <summary>Perl Compatible Regular Expressions for .NET</summary>
     <description>PCRE.NET is a .NET wrapper for the PCRE library. The goal of this project is to bring most of PCRE's features for use from .NET applications with as little overhead as possible.</description>
     <tags>PCRE.NET PCRE Perl Regex Regexp Regular-Expressions Text</tags>
