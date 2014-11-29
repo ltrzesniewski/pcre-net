@@ -134,5 +134,19 @@ namespace PCRE.Tests.PcreNet
 
             Assert.That(match.GetGroups("g").Select(g => g.IsMatch), Is.EqualTo(new[] { false, true, true }));
         }
+
+        [Test]
+        public void should_return_marks()
+        {
+            var re = new PcreRegex(@"a(?:(*MARK:foo)b(*MARK:bar)|c)", PcreOptions.DuplicateNames);
+            var match = re.Match("ab");
+
+            Assert.That(match, Is.Not.Null);
+            Assert.That(match.Mark, Is.EqualTo("bar"));
+
+            match = re.Match("ac");
+            Assert.That(match, Is.Not.Null);
+            Assert.That(match.Mark, Is.Null);
+        }
     }
 }

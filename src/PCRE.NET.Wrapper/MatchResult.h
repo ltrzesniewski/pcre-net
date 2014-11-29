@@ -7,15 +7,19 @@ using namespace System::Diagnostics::Contracts;
 namespace PCRE {
 	namespace Wrapper {
 
-		public ref class MatchResult
+		ref class InternalRegex;
+
+		public ref class MatchResult sealed
 		{
 		public:
-			MatchResult(int captureCount);
+			MatchResult(InternalRegex^ const re);
 
 			property bool IsMatch {
 				public: bool get() { return _isMatch; }
 				internal: void set(bool value) { _isMatch = value; }
 			}
+
+			property String^ Mark { String^ get(); }
 
 			[Pure]
 			int GetStartOffset(int index);
@@ -24,8 +28,15 @@ namespace PCRE {
 			int GetEndOffset(int index);
 
 		internal:
+			void SetMark(PCRE_UCHAR16 *mark);
+
+			array<int>^ _offsets;			
+
+		private:
+			initonly InternalRegex^ _re;
 			bool _isMatch;
-			array<int>^ _offsets;
+			String^ _mark;
+			PCRE_UCHAR16 *_markPtr;
 		};
 	}
 }

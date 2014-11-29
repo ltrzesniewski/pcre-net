@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using PCRE.Wrapper;
 
 namespace PCRE
@@ -17,6 +18,11 @@ namespace PCRE
             _subject = subject;
             _result = result;
             _groups = new PcreGroup[_regex.CaptureCount + 1];
+        }
+
+        private MatchResult InternalResult
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)] get { return (MatchResult)_result; }
         }
 
         public int CaptureCount
@@ -54,6 +60,11 @@ namespace PCRE
             get { return this[0].Value; }
         }
 
+        public string Mark
+        {
+            get { return InternalResult.Mark; }
+        }
+
         public IEnumerator<PcreGroup> GetEnumerator()
         {
             return GetAllGroups().GetEnumerator();
@@ -73,12 +84,12 @@ namespace PCRE
             var group = _groups[index];
             if (group == null)
             {
-                var offsets = (MatchResult)_result;
-                var startOffset = offsets.GetStartOffset(index);
+                var result = InternalResult;
+                var startOffset = result.GetStartOffset(index);
 
                 if (startOffset >= 0)
                 {
-                    var endOffset = offsets.GetEndOffset(index);
+                    var endOffset = result.GetEndOffset(index);
                     group = new PcreGroup(_subject, startOffset, endOffset);
                 }
                 else

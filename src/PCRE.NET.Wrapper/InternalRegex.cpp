@@ -1,6 +1,9 @@
 
 #include "stdafx.h"
 #include "InternalRegex.h"
+#include "MatchResult.h"
+#include "InfoKey.h"
+#include "PatternOptions.h"
 
 namespace PCRE {
 	namespace Wrapper {
@@ -31,14 +34,15 @@ namespace PCRE {
 
 			if (studyOptions.HasValue)
 			{
-				_extra = pcre16_study(_re, static_cast<int>(studyOptions.Value), &errorMessage);
+				_extra = pcre16_study(_re, static_cast<int>(studyOptions.Value) | PCRE_STUDY_EXTRA_NEEDED, &errorMessage);
 
 				if (errorMessage)
 					throw gcnew InvalidOperationException(String::Format("Could not study pattern '{0}': {1}", pattern, gcnew String(errorMessage)));
 			}
 			else
 			{
-				_extra = nullptr;
+				_extra = (pcre16_extra*)pcre16_malloc(sizeof(pcre16_extra));
+				_extra->flags = 0;
 			}
 
 			_captureCount = GetInfoInt32(InfoKey::CaptureCount);
@@ -115,20 +119,24 @@ namespace PCRE {
 
 		MatchResult^ InternalRegex::Match(String^ subject, int startOffset, PatternOptions additionalOptions)
 		{
-			auto match = gcnew MatchResult(_captureCount);
+			auto match = gcnew MatchResult(this);
 
 			pin_ptr<int> offsets = &match->_offsets[0];
 			pin_ptr<const wchar_t> pinnedSubject = PtrToStringChars(subject);
 
-			auto result = pcre16_exec(_re, _extra, pinnedSubject, subject->Length, startOffset, (int)additionalOptions, offsets, match->_offsets->Length);
+			auto extra = *_extra;
+			PCRE_UCHAR16 *mark;
+			extra.mark = &mark;
+			extra.flags |= PCRE_EXTRA_MARK;
 
-			if (result == PCRE_ERROR_NOMATCH)
-				return match;
+			auto result = pcre16_exec(_re, &extra, pinnedSubject, subject->Length, startOffset, (int)additionalOptions, offsets, match->_offsets->Length);
 
-			if (result < 0)
+			if (result < 0 && result != PCRE_ERROR_NOMATCH)
 				throw gcnew InvalidOperationException(String::Format("Match error, code: {0}", result));
 
-			match->IsMatch = true;
+			match->IsMatch = result != PCRE_ERROR_NOMATCH;
+			match->SetMark(mark);
+
 			return match;
 		}
 

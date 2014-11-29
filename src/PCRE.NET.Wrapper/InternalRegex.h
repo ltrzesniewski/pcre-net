@@ -1,16 +1,17 @@
 
 #pragma once
 
-#include "InfoKey.h"
-#include "PatternOptions.h"
 #include "StudyOptions.h"
-#include "MatchResult.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
 
 namespace PCRE {
 	namespace Wrapper {
+
+		ref class MatchResult;
+		enum struct PatternOptions;
+		enum struct InfoKey;
 
 		public ref class InternalRegex sealed
 		{
@@ -35,8 +36,8 @@ namespace PCRE {
 		private:
 			pcre16* _re;
 			pcre16_extra* _extra;
-			int _captureCount;
-			Dictionary<String^, array<int>^>^ _captureNames;
+			initonly int _captureCount;
+			initonly Dictionary<String^, array<int>^>^ _captureNames;
 		};
 	}
 }

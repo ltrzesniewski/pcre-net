@@ -9,7 +9,7 @@ namespace PCRE {
 	namespace Wrapper {
 
 		[Flags]
-		public enum class StudyOptions
+		public enum struct StudyOptions
 		{
 			None                                = 0,
 			JitCompile                          = PCRE_STUDY_JIT_COMPILE,
