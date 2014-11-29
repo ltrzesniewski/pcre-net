@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "CalloutData.h"
+
 using namespace System;
 using namespace System::Diagnostics::Contracts;
 
@@ -28,6 +30,7 @@ namespace PCRE {
 			int GetEndOffset(int index);
 
 		internal:
+			property Func<CalloutData^, CalloutResult>^ OnCallout;
 			void SetMark(PCRE_UCHAR16 *mark);
 
 			array<int>^ _offsets;			

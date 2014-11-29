@@ -30,11 +30,21 @@ namespace PCRE
         [Pure]
         public PcreMatch Match(string subject)
         {
-            return Match(subject, 0);
+            return Match(subject, 0, null);
         }
 
         [Pure]
         public PcreMatch Match(string subject, int startIndex)
+        {
+            return Match(subject, startIndex, null);
+        }
+
+        public PcreMatch Match(string subject, Func<PcreCallout, PcreCalloutResult> onCallout)
+        {
+            return Match(subject, 0, onCallout);
+        }
+
+        public PcreMatch Match(string subject, int startIndex, Func<PcreCallout, PcreCalloutResult> onCallout)
         {
             if (subject == null)
                 throw new ArgumentNullException("subject");
@@ -42,7 +52,7 @@ namespace PCRE
             if (startIndex < 0 || startIndex > subject.Length)
                 throw new ArgumentOutOfRangeException("startIndex");
 
-            var offsets = InternalRegex.Match(subject, startIndex, PatternOptions.None);
+            var offsets = InternalRegex.Match(subject, startIndex, PatternOptions.None, WrapCallout(onCallout));
             return offsets.IsMatch
                 ? new PcreMatch(this, subject, offsets)
                 : null;
@@ -51,11 +61,17 @@ namespace PCRE
         [Pure]
         public IEnumerable<PcreMatch> Matches(string subject)
         {
-            return Matches(subject, 0);
+            return Matches(subject, 0, null);
         }
 
         [Pure]
         public IEnumerable<PcreMatch> Matches(string subject, int startIndex)
+        {
+            return Matches(subject, startIndex, null);
+        }
+
+        [Pure]
+        public IEnumerable<PcreMatch> Matches(string subject, int startIndex, Func<PcreCallout, PcreCalloutResult> onCallout)
         {
             if (subject == null)
                 throw new ArgumentNullException("subject");
@@ -63,12 +79,12 @@ namespace PCRE
             if (startIndex < 0 || startIndex > subject.Length)
                 throw new ArgumentOutOfRangeException("startIndex");
 
-            return MatchesIterator(subject, startIndex);
+            return MatchesIterator(subject, startIndex, WrapCallout(onCallout));
         }
 
-        private IEnumerable<PcreMatch> MatchesIterator(string subject, int startIndex)
+        private IEnumerable<PcreMatch> MatchesIterator(string subject, int startIndex, Func<CalloutData, CalloutResult> onCallout)
         {
-            var offsets = InternalRegex.Match(subject, startIndex, PatternOptions.None);
+            var offsets = InternalRegex.Match(subject, startIndex, PatternOptions.None, onCallout);
 
             if (!offsets.IsMatch)
                 yield break;
@@ -79,7 +95,7 @@ namespace PCRE
             while (true)
             {
                 var nextOffset = match.Index + match.Length;
-                offsets = InternalRegex.Match(subject, nextOffset, match.Length == 0 ? PatternOptions.NotEmptyAtStart : PatternOptions.None);
+                offsets = InternalRegex.Match(subject, nextOffset, match.Length == 0 ? PatternOptions.NotEmptyAtStart : PatternOptions.None, onCallout);
 
                 if (!offsets.IsMatch)
                     yield break;
@@ -141,6 +157,14 @@ namespace PCRE
         public static IEnumerable<PcreMatch> Matches(string subject, string pattern, PcreOptions options, int startIndex)
         {
             return new PcreRegex(pattern, options).Matches(subject, startIndex);
+        }
+
+        private static Func<CalloutData, CalloutResult> WrapCallout(Func<PcreCallout, PcreCalloutResult> callout)
+        {
+            if (callout == null)
+                return null;
+
+            return data => (CalloutResult)callout(new PcreCallout(data));
         }
     }
 }

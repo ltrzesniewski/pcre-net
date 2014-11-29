@@ -4,9 +4,17 @@
 #include "MatchResult.h"
 #include "InfoKey.h"
 #include "PatternOptions.h"
+#include "CalloutData.h"
 
 namespace PCRE {
 	namespace Wrapper {
+
+		int GlobalCalloutCallback(pcre16_callout_block *block);
+
+		static InternalRegex::InternalRegex()
+		{
+			pcre16_callout = &GlobalCalloutCallback;
+		}
 
 		InternalRegex::InternalRegex(String^ pattern, PatternOptions options, Nullable<StudyOptions> studyOptions)
 		{
@@ -24,7 +32,7 @@ namespace PCRE {
 
 			pinnedPattern = nullptr;
 
-			if (_re == nullptr)
+			if (!_re)
 			{
 				if (!errorMessage)
 					errorMessage = "Invalid pattern";
@@ -117,9 +125,10 @@ namespace PCRE {
 			return true;
 		}
 
-		MatchResult^ InternalRegex::Match(String^ subject, int startOffset, PatternOptions additionalOptions)
+		MatchResult^ InternalRegex::Match(String^ subject, int startOffset, PatternOptions additionalOptions, Func<CalloutData^, CalloutResult>^ calloutCallback)
 		{
 			auto match = gcnew MatchResult(this);
+			pin_ptr<MatchResult^> pinnedMatch;
 
 			pin_ptr<int> offsets = &match->_offsets[0];
 			pin_ptr<const wchar_t> pinnedSubject = PtrToStringChars(subject);
@@ -129,10 +138,31 @@ namespace PCRE {
 			extra.mark = &mark;
 			extra.flags |= PCRE_EXTRA_MARK;
 
+			if (calloutCallback)
+			{
+				pinnedMatch = &match;
+				match->OnCallout = calloutCallback;
+				extra.callout_data = pinnedMatch;
+				extra.flags |= PCRE_EXTRA_CALLOUT_DATA;
+			}
+
 			auto result = pcre16_exec(_re, &extra, pinnedSubject, subject->Length, startOffset, (int)additionalOptions, offsets, match->_offsets->Length);
 
-			if (result < 0 && result != PCRE_ERROR_NOMATCH)
-				throw gcnew InvalidOperationException(String::Format("Match error, code: {0}", result));
+			if (result < 0)
+			{
+				switch (result)
+				{
+				case PCRE_ERROR_NOMATCH:
+					break;
+
+				case PCRE_ERROR_CALLOUT:
+					throw gcnew InvalidOperationException("Callout failed");
+					break;
+
+				default:
+					throw gcnew InvalidOperationException(String::Format("Match error, code: {0}", result));
+				}
+			}
 
 			match->IsMatch = result != PCRE_ERROR_NOMATCH;
 			match->SetMark(mark);
@@ -151,5 +181,23 @@ namespace PCRE {
 			return result;
 		}
 
+		static int GlobalCalloutCallback(pcre16_callout_block *block)
+		{
+			if (!block->callout_data)
+				return 0;
+
+			auto match = *static_cast<interior_ptr<MatchResult^>>(block->callout_data);
+			if (!match->OnCallout)
+				return 0;
+
+			try
+			{
+				return static_cast<int>(match->OnCallout(gcnew CalloutData(match, block)));
+			}
+			catch (...)
+			{
+				return PCRE_ERROR_CALLOUT;
+			}
+		}
 	}
 }

@@ -2,6 +2,7 @@
 #pragma once
 
 #include "StudyOptions.h"
+#include "CalloutData.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
@@ -21,7 +22,7 @@ namespace PCRE {
 			!InternalRegex();
 
 			bool IsMatch(String^ subject, int startOffset);
-			MatchResult^ Match(String^ subject, int startOffset, PatternOptions additionalOptions);
+			MatchResult^ Match(String^ subject, int startOffset, PatternOptions additionalOptions, Func<CalloutData^, CalloutResult>^ calloutCallback);
 
 			int GetInfoInt32(InfoKey key);
 
@@ -34,6 +35,8 @@ namespace PCRE {
 			}
 
 		private:
+			static InternalRegex();
+
 			pcre16* _re;
 			pcre16_extra* _extra;
 			initonly int _captureCount;

@@ -177,6 +177,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\PCRE\pcre.h" />
+    <ClInclude Include="CalloutData.h" />
     <ClInclude Include="MatchResult.h" />
     <ClInclude Include="InfoKey.h" />
     <ClInclude Include="ConfigKey.h" />
@@ -188,6 +189,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="CalloutData.cpp" />
     <ClCompile Include="MatchResult.cpp" />
     <ClCompile Include="PcreBuild.cpp" />
     <ClCompile Include="InternalRegex.cpp" />

@@ -138,7 +138,7 @@ namespace PCRE.Tests.PcreNet
         [Test]
         public void should_return_marks()
         {
-            var re = new PcreRegex(@"a(?:(*MARK:foo)b(*MARK:bar)|c)", PcreOptions.DuplicateNames);
+            var re = new PcreRegex(@"a(?:(*MARK:foo)b(*MARK:bar)|c)");
             var match = re.Match("ab");
 
             Assert.That(match, Is.Not.Null);
@@ -147,6 +147,60 @@ namespace PCRE.Tests.PcreNet
             match = re.Match("ac");
             Assert.That(match, Is.Not.Null);
             Assert.That(match.Mark, Is.Null);
+        }
+
+        [Test]
+        public void should_execute_passing_callout()
+        {
+            var re = new PcreRegex(@"a(?C42)b");
+
+            var calls = 0;
+
+            var match = re.Match("ab", data =>
+            {
+                Assert.That(data.Number, Is.EqualTo(42));
+                ++calls;
+                return PcreCalloutResult.Pass;
+            });
+
+            Assert.That(match, Is.Not.Null);
+            Assert.That(calls, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void should_execute_failing_callout()
+        {
+            var re = new PcreRegex(@".(?C42)");
+
+            var first = true;
+
+            var match = re.Match("ab", data =>
+            {
+                Assert.That(data.Number, Is.EqualTo(42));
+                if (first)
+                {
+                    first = false;
+                    return PcreCalloutResult.Fail;
+                }
+                return PcreCalloutResult.Pass;
+            });
+
+            Assert.That(match, Is.Not.Null);
+            Assert.That(match.Value, Is.EqualTo("b"));
+        }
+
+        [Test]
+        public void should_execute_aborting_callout()
+        {
+            var re = new PcreRegex(@".(?C42)");
+
+            var match = re.Match("ab", data =>
+            {
+                Assert.That(data.Number, Is.EqualTo(42));
+                return PcreCalloutResult.Abort;
+            });
+
+            Assert.That(match, Is.Null);
         }
     }
 }
