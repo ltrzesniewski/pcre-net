@@ -202,5 +202,23 @@ namespace PCRE.Tests.PcreNet
 
             Assert.That(match, Is.Null);
         }
+
+        [Test]
+        public void should_auto_callout()
+        {
+            var re = new PcreRegex(@"a.c", PcreOptions.AutoCallout);
+
+            var count = 0;
+
+            var match = re.Match("abc", data =>
+            {
+                Assert.That(data.Number, Is.EqualTo(255));
+                ++count;
+                return PcreCalloutResult.Pass;
+            });
+
+            Assert.That(match, Is.Not.Null);
+            Assert.That(count, Is.EqualTo(4));
+        }
     }
 }

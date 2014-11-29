@@ -25,6 +25,7 @@ namespace PCRE
         NotEmptyAtStart = PatternOptions.NotEmptyAtStart,
         FirstLineOnly = PatternOptions.FirstLine,
         DuplicateNames = PatternOptions.DupNames,
+        AutoCallout = PatternOptions.AutoCallout,
 
         NewLineCr = PatternOptions.NewLineCr,
         NewLineLf = PatternOptions.NewLineLf,
