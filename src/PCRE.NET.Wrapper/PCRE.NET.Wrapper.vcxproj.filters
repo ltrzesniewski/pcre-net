@@ -21,9 +21,6 @@
     <ClInclude Include="..\PCRE\pcre.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MatchOffsets.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="StudyOptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -42,6 +39,9 @@
     <ClInclude Include="InternalRegex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MatchResult.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">
@@ -53,10 +53,10 @@
     <ClCompile Include="PcreBuild.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MatchOffsets.cpp">
+    <ClCompile Include="InternalRegex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="InternalRegex.cpp">
+    <ClCompile Include="MatchResult.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

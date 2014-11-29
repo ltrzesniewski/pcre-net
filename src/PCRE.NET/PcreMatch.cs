@@ -8,14 +8,14 @@ namespace PCRE
     {
         private readonly PcreRegex _regex;
         private readonly string _subject;
-        private readonly object _offsets; // See remark about JIT in PcreRegex
+        private readonly object _result; // See remark about JIT in PcreRegex
         private readonly PcreGroup[] _groups;
 
-        internal PcreMatch(PcreRegex regex, string subject, MatchOffsets offsets)
+        internal PcreMatch(PcreRegex regex, string subject, MatchResult result)
         {
             _regex = regex;
             _subject = subject;
-            _offsets = offsets;
+            _result = result;
             _groups = new PcreGroup[_regex.CaptureCount + 1];
         }
 
@@ -73,7 +73,7 @@ namespace PCRE
             var group = _groups[index];
             if (group == null)
             {
-                var offsets = (MatchOffsets)_offsets;
+                var offsets = (MatchResult)_result;
                 var startOffset = offsets.GetStartOffset(index);
 
                 if (startOffset >= 0)

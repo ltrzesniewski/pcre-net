@@ -7,15 +7,14 @@ using namespace System::Diagnostics::Contracts;
 namespace PCRE {
 	namespace Wrapper {
 
-		public value struct MatchOffsets
+		public ref class MatchResult
 		{
 		public:
-			MatchOffsets(int captureCount);
-
-			static MatchOffsets NoMatch;
+			MatchResult(int captureCount);
 
 			property bool IsMatch {
-				public: bool get() { return _offsets != nullptr; }
+				public: bool get() { return _isMatch; }
+				internal: void set(bool value) { _isMatch = value; }
 			}
 
 			[Pure]
@@ -25,6 +24,7 @@ namespace PCRE {
 			int GetEndOffset(int index);
 
 		internal:
+			bool _isMatch;
 			array<int>^ _offsets;
 		};
 	}

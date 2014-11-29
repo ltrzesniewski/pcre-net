@@ -113,21 +113,22 @@ namespace PCRE {
 			return true;
 		}
 
-		MatchOffsets InternalRegex::Match(String^ subject, int startOffset, PatternOptions additionalOptions)
+		MatchResult^ InternalRegex::Match(String^ subject, int startOffset, PatternOptions additionalOptions)
 		{
-			auto match = MatchOffsets(_captureCount);
+			auto match = gcnew MatchResult(_captureCount);
 
-			pin_ptr<int> offsets = &match._offsets[0];
+			pin_ptr<int> offsets = &match->_offsets[0];
 			pin_ptr<const wchar_t> pinnedSubject = PtrToStringChars(subject);
 
-			auto result = pcre16_exec(_re, _extra, pinnedSubject, subject->Length, startOffset, (int)additionalOptions, offsets, match._offsets->Length);
+			auto result = pcre16_exec(_re, _extra, pinnedSubject, subject->Length, startOffset, (int)additionalOptions, offsets, match->_offsets->Length);
 
 			if (result == PCRE_ERROR_NOMATCH)
-				return MatchOffsets::NoMatch;
+				return match;
 
 			if (result < 0)
 				throw gcnew InvalidOperationException(String::Format("Match error, code: {0}", result));
 
+			match->IsMatch = true;
 			return match;
 		}
 

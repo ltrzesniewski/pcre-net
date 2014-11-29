@@ -4,7 +4,7 @@
 #include "InfoKey.h"
 #include "PatternOptions.h"
 #include "StudyOptions.h"
-#include "MatchOffsets.h"
+#include "MatchResult.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
@@ -20,7 +20,7 @@ namespace PCRE {
 			!InternalRegex();
 
 			bool IsMatch(String^ subject, int startOffset);
-			MatchOffsets Match(String^ subject, int startOffset, PatternOptions additionalOptions);
+			MatchResult^ Match(String^ subject, int startOffset, PatternOptions additionalOptions);
 
 			int GetInfoInt32(InfoKey key);
 

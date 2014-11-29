@@ -1,21 +1,21 @@
 
 #include "stdafx.h"
-#include "MatchOffsets.h"
+#include "MatchResult.h"
 
 namespace PCRE {
 	namespace Wrapper {
 
-		MatchOffsets::MatchOffsets(int captureCount)
+		MatchResult::MatchResult(int captureCount)
 		{
 			_offsets = gcnew array<int>((captureCount + 1) * 3);
 		}
 
-		int MatchOffsets::GetStartOffset(int index)
+		int MatchResult::GetStartOffset(int index)
 		{
 			return _offsets[2 * index];
 		}
 
-		int MatchOffsets::GetEndOffset(int index)
+		int MatchResult::GetEndOffset(int index)
 		{
 			return _offsets[2 * index + 1];
 		}
