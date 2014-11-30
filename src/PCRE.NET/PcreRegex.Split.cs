@@ -40,13 +40,14 @@ namespace PCRE
             }
 
             var index = 0;
+            var captureCount = CaptureCount;
 
             foreach (var match in Matches(subject, startIndex))
             {
                 yield return subject.Substring(index, match.Index - index);
                 index = match.Index + match.Length;
 
-                for (var groupIdx = 1; groupIdx <= CaptureCount; ++groupIdx)
+                for (var groupIdx = 1; groupIdx <= captureCount; ++groupIdx)
                 {
                     var group = match[groupIdx];
                     if (group.IsMatch)

@@ -35,11 +35,6 @@ namespace PCRE
             get { return InternalRegex.CaptureCount; }
         }
 
-        internal Dictionary<string, int[]> CaptureNameMap
-        {
-            get { return InternalRegex.CaptureNames; }
-        }
-
         public static int CacheSize
         {
             get { return RegexCache.CacheSize; }

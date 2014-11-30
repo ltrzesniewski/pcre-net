@@ -14,13 +14,16 @@ namespace PCRE {
 		public ref class MatchResult sealed
 		{
 		public:
-			MatchResult(InternalRegex^ const re);
+			MatchResult(InternalRegex^ const re, String^ subject);
+			MatchResult(MatchResult^ result);
 
 			property bool IsMatch {
 				public: bool get() { return _isMatch; }
 				internal: void set(bool value) { _isMatch = value; }
 			}
 
+			property InternalRegex^ Regex { InternalRegex^ get() { return _re; } }
+			property String^ Subject { String^ get() { return _subject; } }
 			property String^ Mark { String^ get(); }
 
 			[Pure]
@@ -31,15 +34,17 @@ namespace PCRE {
 
 		internal:
 			property Func<CalloutData^, CalloutResult>^ OnCallout;
-			void SetMark(PCRE_UCHAR16 *mark);
-
+			property Exception^ CalloutException;
+			void SetMark(const PCRE_UCHAR16 *mark);
+			
 			array<int>^ _offsets;			
 
 		private:
 			initonly InternalRegex^ _re;
+			initonly String^ _subject;
 			bool _isMatch;
 			String^ _mark;
-			PCRE_UCHAR16 *_markPtr;
+			const PCRE_UCHAR16 *_markPtr;
 		};
 	}
 }

@@ -152,13 +152,24 @@ namespace PCRE.Tests.PcreNet
         [Test]
         public void should_execute_passing_callout()
         {
-            var re = new PcreRegex(@"a(?C42)b");
+            var re = new PcreRegex(@"(a)(x)?(?C42)(b)");
 
             var calls = 0;
 
             var match = re.Match("ab", data =>
             {
                 Assert.That(data.Number, Is.EqualTo(42));
+                Assert.That(data.CurrentOffset, Is.EqualTo(1));
+                Assert.That(data.PatternPosition, Is.EqualTo(13));
+                Assert.That(data.StartOffset, Is.EqualTo(0));
+
+                Assert.That(data.Match.Value, Is.EqualTo("a"));
+                Assert.That(data.Match[1].Value, Is.EqualTo("a"));
+                Assert.That(data.Match[2].IsMatch, Is.False);
+                Assert.That(data.Match[2].Value, Is.SameAs(String.Empty));
+                Assert.That(data.Match[3].IsMatch, Is.False);
+                Assert.That(data.Match[3].Value, Is.SameAs(String.Empty));
+
                 ++calls;
                 return PcreCalloutResult.Pass;
             });
@@ -201,6 +212,16 @@ namespace PCRE.Tests.PcreNet
             });
 
             Assert.That(match, Is.Null);
+        }
+
+        [Test]
+        public void should_throw_when_callout_throws()
+        {
+            var re = new PcreRegex(@".(?C42)");
+
+            var ex = Assert.Throws<InvalidOperationException>(() => re.Match("ab", data => { throw new DivideByZeroException("test"); }));
+
+            Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
         }
 
         [Test]

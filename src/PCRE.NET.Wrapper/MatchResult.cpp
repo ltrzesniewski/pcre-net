@@ -6,10 +6,22 @@
 namespace PCRE {
 	namespace Wrapper {
 
-		MatchResult::MatchResult(InternalRegex^ const re)
+		MatchResult::MatchResult(InternalRegex^ re, String^ subject)
+			: _re(re),
+			_subject(subject),
+			_offsets(gcnew array<int>((re->CaptureCount + 1) * 3))
 		{
-			_re = re;
-			_offsets = gcnew array<int>((re->CaptureCount + 1) * 3);
+		}
+
+		MatchResult::MatchResult(MatchResult^ result)
+			: _re(result->_re),
+			_subject(result->_subject),
+			_mark(result->_mark),
+			_isMatch(result->_isMatch),
+			_markPtr(result->_markPtr),
+			_offsets(gcnew array<int>(result->_offsets->Length))
+		{
+			result->_offsets->CopyTo(_offsets, 0);
 		}
 
 		int MatchResult::GetStartOffset(int index)
@@ -35,11 +47,10 @@ namespace PCRE {
 			return _mark;
 		}
 
-		void MatchResult::SetMark(PCRE_UCHAR16 *mark)
+		void MatchResult::SetMark(const PCRE_UCHAR16 *mark)
 		{
 			_markPtr = mark;
 			_mark = nullptr;
 		}
-
 	}
 }

@@ -7,17 +7,13 @@ namespace PCRE
 {
     public sealed class PcreMatch : IReadOnlyCollection<PcreGroup>
     {
-        private readonly PcreRegex _regex;
-        private readonly string _subject;
         private readonly object _result; // See remark about JIT in PcreRegex
         private readonly PcreGroup[] _groups;
 
-        internal PcreMatch(PcreRegex regex, string subject, MatchResult result)
+        internal PcreMatch(MatchResult result)
         {
-            _regex = regex;
-            _subject = subject;
             _result = result;
-            _groups = new PcreGroup[_regex.CaptureCount + 1];
+            _groups = new PcreGroup[result.Regex.CaptureCount + 1];
         }
 
         private MatchResult InternalResult
@@ -27,7 +23,7 @@ namespace PCRE
 
         public int CaptureCount
         {
-            get { return _regex.CaptureCount; }
+            get { return InternalResult.Regex.CaptureCount; }
         }
 
         public PcreGroup this[int index]
@@ -42,7 +38,7 @@ namespace PCRE
 
         internal string Subject
         {
-            get { return _subject; }
+            get { return InternalResult.Subject; }
         }
 
         public int Index
@@ -90,7 +86,7 @@ namespace PCRE
                 if (startOffset >= 0)
                 {
                     var endOffset = result.GetEndOffset(index);
-                    group = new PcreGroup(_subject, startOffset, endOffset);
+                    group = new PcreGroup(result.Subject, startOffset, endOffset);
                 }
                 else
                 {
@@ -105,7 +101,7 @@ namespace PCRE
 
         public PcreGroup GetGroup(string name)
         {
-            var map = _regex.CaptureNameMap;
+            var map = InternalResult.Regex.CaptureNames;
             if (map == null)
                 return null;
 
@@ -128,7 +124,7 @@ namespace PCRE
 
         public IEnumerable<PcreGroup> GetGroups(string name)
         {
-            var map = _regex.CaptureNameMap;
+            var map = InternalResult.Regex.CaptureNames;
             if (map == null)
                 yield break;
 

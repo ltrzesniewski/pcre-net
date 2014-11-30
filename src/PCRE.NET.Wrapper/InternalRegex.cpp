@@ -1,5 +1,6 @@
 
 #include "stdafx.h"
+#include <memory.h>
 #include "InternalRegex.h"
 #include "MatchResult.h"
 #include "InfoKey.h"
@@ -127,7 +128,7 @@ namespace PCRE {
 
 		MatchResult^ InternalRegex::Match(String^ subject, int startOffset, PatternOptions additionalOptions, Func<CalloutData^, CalloutResult>^ calloutCallback)
 		{
-			auto match = gcnew MatchResult(this);
+			auto match = gcnew MatchResult(this, subject);
 			pin_ptr<MatchResult^> pinnedMatch;
 
 			pin_ptr<int> offsets = &match->_offsets[0];
@@ -144,6 +145,9 @@ namespace PCRE {
 				match->OnCallout = calloutCallback;
 				extra.callout_data = pinnedMatch;
 				extra.flags |= PCRE_EXTRA_CALLOUT_DATA;
+
+				// Initialize all offsets to -1 so we can tell which groups didn't match when in a callout
+				memset(offsets, -1, sizeof(int) * 2 * (CaptureCount + 1));
 			}
 
 			auto result = pcre16_exec(_re, &extra, pinnedSubject, subject->Length, startOffset, (int)additionalOptions, offsets, match->_offsets->Length);
@@ -156,7 +160,7 @@ namespace PCRE {
 					break;
 
 				case PCRE_ERROR_CALLOUT:
-					throw gcnew InvalidOperationException("Callout failed");
+					throw gcnew InvalidOperationException(String::Format("An exception was thrown by the callout: {0}", match->CalloutException ? match->CalloutException->Message : nullptr), match->CalloutException);
 					break;
 
 				default:
@@ -192,10 +196,12 @@ namespace PCRE {
 
 			try
 			{
+				match->CalloutException = nullptr;
 				return static_cast<int>(match->OnCallout(gcnew CalloutData(match, block)));
 			}
-			catch (...)
+			catch (Exception^ ex)
 			{
+				match->CalloutException = ex;
 				return PCRE_ERROR_CALLOUT;
 			}
 		}

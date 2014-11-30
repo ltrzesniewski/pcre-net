@@ -52,9 +52,9 @@ namespace PCRE
             if (startIndex < 0 || startIndex > subject.Length)
                 throw new ArgumentOutOfRangeException("startIndex");
 
-            var offsets = InternalRegex.Match(subject, startIndex, PatternOptions.None, WrapCallout(onCallout));
-            return offsets.IsMatch
-                ? new PcreMatch(this, subject, offsets)
+            var result = InternalRegex.Match(subject, startIndex, PatternOptions.None, WrapCallout(onCallout));
+            return result.IsMatch
+                ? new PcreMatch(result)
                 : null;
         }
 
@@ -84,23 +84,23 @@ namespace PCRE
 
         private IEnumerable<PcreMatch> MatchesIterator(string subject, int startIndex, Func<CalloutData, CalloutResult> onCallout)
         {
-            var offsets = InternalRegex.Match(subject, startIndex, PatternOptions.None, onCallout);
+            var result = InternalRegex.Match(subject, startIndex, PatternOptions.None, onCallout);
 
-            if (!offsets.IsMatch)
+            if (!result.IsMatch)
                 yield break;
 
-            var match = new PcreMatch(this, subject, offsets);
+            var match = new PcreMatch(result);
             yield return match;
 
             while (true)
             {
                 var nextOffset = match.Index + match.Length;
-                offsets = InternalRegex.Match(subject, nextOffset, match.Length == 0 ? PatternOptions.NotEmptyAtStart : PatternOptions.None, onCallout);
+                result = InternalRegex.Match(subject, nextOffset, match.Length == 0 ? PatternOptions.NotEmptyAtStart : PatternOptions.None, onCallout);
 
-                if (!offsets.IsMatch)
+                if (!result.IsMatch)
                     yield break;
 
-                match = new PcreMatch(this, subject, offsets);
+                match = new PcreMatch(result);
                 yield return match;
             }
         }
