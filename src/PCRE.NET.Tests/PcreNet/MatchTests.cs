@@ -152,16 +152,20 @@ namespace PCRE.Tests.PcreNet
         [Test]
         public void should_execute_passing_callout()
         {
-            var re = new PcreRegex(@"(a)(x)?(?C42)(b)");
+            const string pattern = @"(a)(*MARK:foo)(x)?(?C42)(bc)";
+            var re = new PcreRegex(pattern);
 
             var calls = 0;
 
-            var match = re.Match("ab", data =>
+            var match = re.Match("abc", data =>
             {
                 Assert.That(data.Number, Is.EqualTo(42));
                 Assert.That(data.CurrentOffset, Is.EqualTo(1));
-                Assert.That(data.PatternPosition, Is.EqualTo(13));
+                Assert.That(data.PatternPosition, Is.EqualTo(pattern.IndexOf("(?C42)", StringComparison.Ordinal) + 6));
                 Assert.That(data.StartOffset, Is.EqualTo(0));
+                Assert.That(data.LastCapture, Is.EqualTo(1));
+                Assert.That(data.MaxCapture, Is.EqualTo(2));
+                Assert.That(data.NextPatternItemLength, Is.EqualTo(4));
 
                 Assert.That(data.Match.Value, Is.EqualTo("a"));
                 Assert.That(data.Match[1].Value, Is.EqualTo("a"));
@@ -169,6 +173,8 @@ namespace PCRE.Tests.PcreNet
                 Assert.That(data.Match[2].Value, Is.SameAs(String.Empty));
                 Assert.That(data.Match[3].IsMatch, Is.False);
                 Assert.That(data.Match[3].Value, Is.SameAs(String.Empty));
+
+                Assert.That(data.Match.Mark, Is.EqualTo("foo"));
 
                 ++calls;
                 return PcreCalloutResult.Pass;

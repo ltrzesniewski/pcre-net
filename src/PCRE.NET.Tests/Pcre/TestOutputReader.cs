@@ -69,13 +69,11 @@ namespace PCRE.Tests.Pcre
                             continue;
                         }
 
-                        // Remaining string
                         if (pattern.GetRemainingString)
                         {
                             match = Regex.Match(line, @"^\s*(\d+)\+ (.*)$");
                             if (match.Success && currentMatch != null)
                             {
-                                // TODO
                                 currentMatch.RemainingString = match.Groups[2].Value;
                                 continue;
                             }
@@ -86,8 +84,7 @@ namespace PCRE.Tests.Pcre
                             match = Regex.Match(line, @"^\s*MK: (.*)$");
                             if (match.Success && currentMatch != null)
                             {
-                                // TODO
-                                currentMatch.MarkName = match.Groups[2].Value;
+                                currentMatch.Mark = match.Groups[1].Value;
                                 continue;
                             }
                         }

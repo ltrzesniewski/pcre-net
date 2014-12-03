@@ -6,7 +6,7 @@ namespace PCRE.Tests.Pcre
     {
         public IList<ExpectedGroup> Groups { get; set; }
         public string RemainingString { get; set; }
-        public string MarkName { get; set; }
+        public string Mark { get; set; }
 
         public ExpectedMatch()
         {

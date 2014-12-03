@@ -27,7 +27,7 @@ namespace PCRE.Tests.Pcre
 
         private static void RunTest(TestCase testCase, TestOutput expectedResult, PcreOptions options)
         {
-            options |= testCase.Pattern.PatternOptions;
+            options = (options | testCase.Pattern.PatternOptions) & ~testCase.Pattern.ResetOptionBits;
 
             Console.WriteLine("Options: {0}", options);
 
@@ -62,30 +62,54 @@ namespace PCRE.Tests.Pcre
 
                 for (var matchIndex = 0; matchIndex < matches.Count; ++matchIndex)
                 {
-                    var actualGroups = matches[matchIndex].ToList();
-                    var expectedGroups = expected.Matches[matchIndex].Groups.ToList();
+                    var actualMatch = matches[matchIndex];
+                    var expectedMatch = expected.Matches[matchIndex];
 
-                    Assert.That(actualGroups.Count, Is.GreaterThanOrEqualTo(expectedGroups.Count));
+                    CompareGroups(actualMatch, expectedMatch);
 
-                    for (var groupIndex = 0; groupIndex < actualGroups.Count; ++groupIndex)
-                    {
-                        var actualGroup = actualGroups[groupIndex];
-                        var expectedGroup = groupIndex < expectedGroups.Count
-                            ? expectedGroups[groupIndex]
-                            : ExpectedGroup.Unset;
+                    if (testCase.Pattern.ExtractMarks)
+                        CompareMark(actualMatch, expectedMatch);
 
-                        Console.WriteLine("    Group #{0}: {1}", groupIndex, expectedGroup.Value);
-
-                        Assert.That(actualGroup.IsMatch, Is.EqualTo(expectedGroup.IsMatch));
-
-                        if (expectedGroup.IsMatch)
-                            Assert.That(actualGroup.Value, Is.EqualTo(expectedGroup.Value.UnescapeGroup()));
-                    }
+                    if (testCase.Pattern.GetRemainingString)
+                        CompareRemainingString(actualMatch, expectedMatch);
                 }
             }
 
             Console.WriteLine("OK");
             Console.WriteLine();
+        }
+
+        private static void CompareGroups(PcreMatch actualMatch, ExpectedMatch expectedMatch)
+        {
+            var actualGroups = actualMatch.ToList();
+            var expectedGroups = expectedMatch.Groups.ToList();
+
+            Assert.That(actualGroups.Count, Is.GreaterThanOrEqualTo(expectedGroups.Count));
+
+            for (var groupIndex = 0; groupIndex < actualGroups.Count; ++groupIndex)
+            {
+                var actualGroup = actualGroups[groupIndex];
+                var expectedGroup = groupIndex < expectedGroups.Count
+                    ? expectedGroups[groupIndex]
+                    : ExpectedGroup.Unset;
+
+                Console.WriteLine("    Group #{0}: {1}", groupIndex, expectedGroup.Value);
+
+                Assert.That(actualGroup.IsMatch, Is.EqualTo(expectedGroup.IsMatch));
+
+                if (expectedGroup.IsMatch)
+                    Assert.That(actualGroup.Value, Is.EqualTo(expectedGroup.Value.UnescapeGroup()));
+            }
+        }
+
+        private static void CompareMark(PcreMatch actualMatch, ExpectedMatch expectedMatch)
+        {
+            Assert.That(actualMatch.Mark, Is.EqualTo(expectedMatch.Mark.UnescapeGroup()));
+        }
+
+        private static void CompareRemainingString(PcreMatch actualMatch, ExpectedMatch expectedMatch)
+        {
+            Assert.That(actualMatch.Subject.Substring(actualMatch.Index + actualMatch.Length), Is.EqualTo(expectedMatch.RemainingString.UnescapeGroup()));
         }
 
         private class PcreTestsSource : IEnumerable<ITestCaseData>

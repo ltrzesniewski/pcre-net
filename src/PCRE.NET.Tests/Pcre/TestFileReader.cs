@@ -108,6 +108,7 @@ namespace PCRE.Tests.Pcre
         private void ParseOptions(TestPattern pattern)
         {
             var options = PcreOptions.None;
+            var resetOptions = PcreOptions.None;
 
             foreach (var c in pattern.OptionsString)
             {
@@ -146,6 +147,9 @@ namespace PCRE.Tests.Pcre
                         break;
 
                     case 'S':
+                        if ((options & PcreOptions.Studied) != 0)
+                            resetOptions |= PcreOptions.Studied;
+
                         options |= PcreOptions.Studied;
                         break;
 
@@ -162,9 +166,8 @@ namespace PCRE.Tests.Pcre
             }
 
             pattern.PatternOptions = options;
+            pattern.ResetOptionBits = resetOptions;
         }
-
-        
 
         protected InvalidOperationException InvalidInputException(string message, Exception innerException = null)
         {

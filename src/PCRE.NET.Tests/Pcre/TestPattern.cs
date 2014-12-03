@@ -9,6 +9,7 @@ namespace PCRE.Tests.Pcre
         public string Pattern { get; set; }
         public string OptionsString { get; set; }
         public PcreOptions PatternOptions { get; set; }
+        public PcreOptions ResetOptionBits { get; set; }
 
         public int LineNumber { get; set; }
 
