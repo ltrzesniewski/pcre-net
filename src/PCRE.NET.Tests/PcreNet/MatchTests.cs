@@ -150,6 +150,21 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_use_callout_result()
+        {
+            var regex = new PcreRegex(@"(\d+)(*SKIP)(?C1):\s*(\w+)");
+
+            var match = regex.Match(
+                "1542: not_this, 1764: hello",
+                data => data.Number == 1
+                        && int.Parse(data.Match[1].Value) % 42 == 0
+                    ? PcreCalloutResult.Pass
+                    : PcreCalloutResult.Fail);
+
+            Assert.That(match[2].Value, Is.EqualTo("hello"));
+        }
+
+        [Test]
         public void should_execute_passing_callout()
         {
             const string pattern = @"(a)(*MARK:foo)(x)?(?C42)(bc)";
@@ -246,6 +261,65 @@ namespace PCRE.Tests.PcreNet
 
             Assert.That(match, Is.Not.Null);
             Assert.That(count, Is.EqualTo(4));
+        }
+
+        [Test]
+        public void readme_json_example()
+        {
+            const string jsonPattern = @"
+                (?(DEFINE)
+                    # An object is an unordered set of name/value pairs.
+                    (?<object> \{
+                        (?: (?&keyvalue) (?: , (?&keyvalue) )* )?
+                    (?&ws) \} )
+                    (?<keyvalue>
+                        (?&ws) (?&string) (?&ws) : (?&value)
+                    )
+
+                    # An array is an ordered collection of values.
+                    (?<array> \[
+                        (?: (?&value) (?: , (?&value) )* )?
+                    (?&ws) \] )
+
+                    # A value can be a string in double quotes, or a number,
+                    # or true or false or null, or an object or an array.
+                    (?<value> (?&ws)
+                        (?: (?&string) | (?&number) | (?&object) | (?&array) | true | false | null )
+                    )
+
+                    # A string is a sequence of zero or more Unicode characters,
+                    # wrapped in double quotes, using backslash escapes.
+                    (?<string>
+                        "" (?: [^""\\\p{Cc}]++ | \\u[0-9A-Fa-f]{4} | \\ [""\\/bfnrt] )* ""
+                        # \p{Cc} matches control characters
+                    )
+
+                    # A number is very much like a C or Java number, except that the octal
+                    # and hexadecimal formats are not used.
+                    (?<number>
+                        -? (?: 0 | [1-9][0-9]* ) (?: \. [0-9]+ )? (?: [Ee] [-+]? [0-9]+ )?
+                    )
+
+                    # Whitespace
+                    (?<ws> \s*+ )
+                )
+
+                \A (?&ws) (?&object) (?&ws) \z
+            ";
+
+            var regex = new PcreRegex(jsonPattern, PcreOptions.IgnorePatternWhitespace | PcreOptions.Compiled);
+
+            const string subject = @"{
+                ""hello"": ""world"",
+                ""numbers"": [4, 8, 15, 16, 23, 42],
+                ""foo"": null,
+                ""bar"": -2.42e+17,
+                ""baz"": true
+            }";
+
+            var isValidJson = regex.IsMatch(subject);
+
+            Assert.That(isValidJson, Is.True);
         }
     }
 }

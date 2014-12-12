@@ -129,5 +129,12 @@ namespace PCRE.Tests.PcreNet
 
             Assert.That(result, Is.EqualTo("foo aabb bXr Xbbab baz"));
         }
+
+        [Test]
+        public void readme_replace_example()
+        {
+            var result = PcreRegex.Replace("hello, world!!!", @"\p{P}+", "<$&>");
+            Assert.That(result, Is.EqualTo("hello<,> world<!!!>"));
+        }
     }
 }

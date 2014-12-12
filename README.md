@@ -37,6 +37,82 @@ Library highlights:
 - Callout support
 - Mark retrieval support
 
+## Example usage ##
+
+- Extract all words except those within parentheses:
+
+```C#
+var matches = PcreRegex.Matches("(foo) bar (baz) 42", @"\(\w+\)(*SKIP)(*FAIL)|\w+")
+                       .Select(m => m.Value)
+                       .ToList();
+// result: "bar", "42"
+```
+
+- Enclose a series of punctuation characters within angle brackets:
+
+```C#
+var result = PcreRegex.Replace("hello, world!!!", @"\p{P}+", "<$&>");
+// result: "hello<,> world<!!!>"
+```
+
+- Validate a JSON string:
+
+```C#
+const string jsonPattern = @"
+    (?(DEFINE)
+        # An object is an unordered set of name/value pairs.
+        (?<object> \{
+            (?: (?&keyvalue) (?: , (?&keyvalue) )* )?
+        (?&ws) \} )
+        (?<keyvalue>
+            (?&ws) (?&string) (?&ws) : (?&value)
+        )
+
+        # An array is an ordered collection of values.
+        (?<array> \[
+            (?: (?&value) (?: , (?&value) )* )?
+        (?&ws) \] )
+
+        # A value can be a string in double quotes, or a number,
+        # or true or false or null, or an object or an array.
+        (?<value> (?&ws)
+            (?: (?&string) | (?&number) | (?&object) | (?&array) | true | false | null )
+        )
+
+        # A string is a sequence of zero or more Unicode characters,
+        # wrapped in double quotes, using backslash escapes.
+        (?<string>
+            "" (?: [^""\\\p{Cc}]++ | \\u[0-9A-Fa-f]{4} | \\ [""\\/bfnrt] )* ""
+            # \p{Cc} matches control characters
+        )
+
+        # A number is very much like a C or Java number, except that the octal
+        # and hexadecimal formats are not used.
+        (?<number>
+            -? (?: 0 | [1-9][0-9]* ) (?: \. [0-9]+ )? (?: [Ee] [-+]? [0-9]+ )?
+        )
+
+        # Whitespace
+        (?<ws> \s*+ )
+    )
+
+    \A (?&ws) (?&object) (?&ws) \z
+";
+
+var regex = new PcreRegex(jsonPattern, PcreOptions.IgnorePatternWhitespace);
+
+const string subject = @"{
+    ""hello"": ""world"",
+    ""numbers"": [4, 8, 15, 16, 23, 42],
+    ""foo"": null,
+    ""bar"": -2.42e+17,
+    ""baz"": true
+}";
+
+var isValidJson = regex.IsMatch(subject);
+// result: true
+```
+
 ## To do ##
 
 - Expose more PCRE features:
