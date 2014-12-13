@@ -45,7 +45,7 @@ namespace PCRE
             foreach (var match in Matches(subject, startIndex))
             {
                 yield return subject.Substring(index, match.Index - index);
-                index = match.Index + match.Length;
+                index = match.GetStartOfNextMatchIndex();
 
                 for (var groupIdx = 1; groupIdx <= captureCount; ++groupIdx)
                 {

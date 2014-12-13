@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using PCRE.Wrapper;
@@ -44,6 +45,11 @@ namespace PCRE
         public int Index
         {
             get { return this[0].Index; }
+        }
+
+        public int EndIndex
+        {
+            get { return this[0].EndIndex; }
         }
 
         public int Length
@@ -138,6 +144,13 @@ namespace PCRE
                 if (group != null)
                     yield return group;
             }
+        }
+
+        internal int GetStartOfNextMatchIndex()
+        {
+            // It's possible to have EndIndex < Index
+            // when the pattern contains \K in a lookahead
+            return Math.Max(Index, EndIndex);
         }
 
         public override string ToString()

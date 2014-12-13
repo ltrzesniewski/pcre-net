@@ -68,11 +68,32 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_handle_end_before_start()
+        {
+            var re = new PcreRegex(@"(?=a+b\K)");
+            var matches = re.Matches("aaabab").ToList();
+
+            Assert.That(matches, Has.Count.EqualTo(2));
+
+            Assert.That(matches[0], Is.Not.Null);
+            Assert.That(matches[0].Index, Is.EqualTo(4));
+            Assert.That(matches[0].EndIndex, Is.EqualTo(0));
+            Assert.That(matches[0].Length, Is.EqualTo(0));
+            Assert.That(matches[0].Value, Is.EqualTo(string.Empty));
+
+            Assert.That(matches[1], Is.Not.Null);
+            Assert.That(matches[1].Index, Is.EqualTo(6));
+            Assert.That(matches[1].EndIndex, Is.EqualTo(4));
+            Assert.That(matches[1].Length, Is.EqualTo(0));
+            Assert.That(matches[1].Value, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
         public void readme_backtracking_verbs_example()
         {
             var matches = PcreRegex.Matches("(foo) bar (baz) 42", @"\(\w+\)(*SKIP)(*FAIL)|\w+")
-                                   .Select(m => m.Value)
-                                   .ToList();
+                .Select(m => m.Value)
+                .ToList();
 
             Assert.That(matches, Is.EqualTo(new[] { "bar", "42" }));
         }

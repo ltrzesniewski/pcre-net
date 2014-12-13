@@ -264,6 +264,20 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_handle_end_before_start()
+        {
+            var re = new PcreRegex(@"(?=a+\K)");
+
+            var match = re.Match("aaa");
+
+            Assert.That(match, Is.Not.Null);
+            Assert.That(match.Index, Is.EqualTo(3));
+            Assert.That(match.EndIndex, Is.EqualTo(0));
+            Assert.That(match.Length, Is.EqualTo(0));
+            Assert.That(match.Value, Is.EqualTo(string.Empty));
+        }
+
+        [Test]
         public void readme_json_example()
         {
             const string jsonPattern = @"

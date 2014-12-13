@@ -12,16 +12,21 @@ namespace PCRE
         internal PcreGroup(string subject, int startOffset, int endOffset)
         {
             Index = startOffset;
-            Length = endOffset - startOffset;
+            EndIndex = endOffset;
 
-            if (Length == 0)
+            if (Length <= 0)
                 _value = String.Empty;
             else
                 _subject = subject;
         }
 
         public int Index { get; private set; }
-        public int Length { get; private set; }
+        public int EndIndex { get; private set; }
+
+        public int Length
+        {
+            get { return EndIndex > Index ? EndIndex - Index : 0; }
+        }
 
         public string Value
         {

@@ -56,7 +56,7 @@ namespace PCRE
             {
                 sb.Append(subject, position, match.Index - position);
                 sb.Append(replacementFunc(match));
-                position = match.Index + match.Length;
+                position = match.GetStartOfNextMatchIndex();
 
                 if (--count == 0)
                     break;

@@ -79,6 +79,24 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_insert_nothing_if_no_group_matched()
+        {
+            var re = new PcreRegex(@"a+(b+)?");
+            var result = re.Replace("foo aabb bar baz", "<$+>");
+
+            Assert.That(result, Is.EqualTo("foo <bb> b<>r b<>z"));
+        }
+
+        [Test]
+        public void should_insert_nothing_if_there_are_no_groups()
+        {
+            var re = new PcreRegex(@"a+");
+            var result = re.Replace("foo bar", "<$+>");
+
+            Assert.That(result, Is.EqualTo("foo b<>r"));
+        }
+
+        [Test]
         [TestCase("<$2$$$1$>", Result = "foo <$2$bb$> bar <$2$bb$><$2$b$> baz")]
         [TestCase("<>${2", Result = "foo <>${2 bar <>${2<>${2 baz")]
         [TestCase("<$42>", Result = "foo <$42> bar <$42><$42> baz")]
@@ -128,6 +146,19 @@ namespace PCRE.Tests.PcreNet
             var result = re.Replace("foo aabb bar aaabbab baz", "X", 2, 8);
 
             Assert.That(result, Is.EqualTo("foo aabb bXr Xbbab baz"));
+        }
+
+        [Test]
+        [TestCase("#", Result = "aab#ab#")]
+        [TestCase("$_", Result = "aabaabababaabab")]
+        [TestCase("$`", Result = "aabaababaabab")]
+        [TestCase("$'", Result = "aabaabababab")]
+        [TestCase("$+", Result = "aabab")]
+        [TestCase("$&", Result = "aabab")]
+        public string should_handle_backslash_k_in_lookahead(string replacement)
+        {
+            var re = new PcreRegex(@"(?=a+b\K)");
+            return re.Replace("aabab", replacement);
         }
 
         [Test]

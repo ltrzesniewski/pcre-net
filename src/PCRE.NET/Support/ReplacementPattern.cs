@@ -281,8 +281,8 @@ namespace PCRE.Support
 
             public override void Append(PcreMatch match, StringBuilder sb)
             {
-                var startIndex = match.Index + match.Length;
-                sb.Append(match.Subject, startIndex, match.Subject.Length - startIndex);
+                var endOfMatch = match.EndIndex;
+                sb.Append(match.Subject, endOfMatch, match.Subject.Length - endOfMatch);
             }
 
             public override string ToString()

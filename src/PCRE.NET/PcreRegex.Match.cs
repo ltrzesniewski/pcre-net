@@ -94,7 +94,7 @@ namespace PCRE
 
             while (true)
             {
-                var nextOffset = match.Index + match.Length;
+                var nextOffset = match.GetStartOfNextMatchIndex();
                 result = InternalRegex.Match(subject, nextOffset, match.Length == 0 ? PatternOptions.NotEmptyAtStart : PatternOptions.None, onCallout);
 
                 if (!result.IsMatch)
