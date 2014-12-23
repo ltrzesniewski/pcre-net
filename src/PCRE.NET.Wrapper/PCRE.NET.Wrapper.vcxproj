@@ -147,6 +147,7 @@
       <AssemblyDebug>false</AssemblyDebug>
       <CLRUnmanagedCodeCheck>false</CLRUnmanagedCodeCheck>
       <CLRSupportLastError>SystemDlls</CLRSupportLastError>
+      <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -168,6 +169,7 @@
       <AssemblyDebug>false</AssemblyDebug>
       <CLRUnmanagedCodeCheck>false</CLRUnmanagedCodeCheck>
       <CLRSupportLastError>SystemDlls</CLRSupportLastError>
+      <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

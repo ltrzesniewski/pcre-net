@@ -37,6 +37,11 @@ Library highlights:
 - Callout support
 - Mark retrieval support
 
+## Dependencies ##
+
+PCRE.NET depends on the [Visual C++ 2013 Redistributable](http://www.microsoft.com/en-us/download/details.aspx?id=40784) package.
+Specifically, it requires `msvcr120.dll` to be available.
+
 ## Example usage ##
 
 - Extract all words except those within parentheses:
