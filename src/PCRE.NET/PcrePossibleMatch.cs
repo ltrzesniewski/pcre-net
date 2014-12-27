@@ -24,5 +24,10 @@ namespace PCRE
         {
             get { return Result == PcreMatchResult.Partial; }
         }
+
+        public int PartialInspectionStartIndex
+        {
+            get { return IsPartialMatch ? InternalResult.GetPartialScanStartOffset() : -1; }
+        }
     }
 }

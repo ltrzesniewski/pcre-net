@@ -33,6 +33,15 @@ namespace PCRE {
 			[Pure]
 			int GetEndOffset(int index);
 
+			[Pure]
+			int GetPartialStartOffset();
+
+			[Pure]
+			int GetPartialEndOffset();
+
+			[Pure]
+			int GetPartialScanStartOffset();
+
 		internal:
 			property Func<CalloutData^, CalloutResult>^ OnCallout;
 			property Exception^ CalloutException;

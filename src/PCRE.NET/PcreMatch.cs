@@ -85,24 +85,28 @@ namespace PCRE
 
             var group = _groups[index];
             if (group == null)
-            {
-                var result = InternalResult;
-                var startOffset = result.GetStartOffset(index);
-
-                if (startOffset >= 0)
-                {
-                    var endOffset = result.GetEndOffset(index);
-                    group = new PcreGroup(result.Subject, startOffset, endOffset);
-                }
-                else
-                {
-                    group = PcreGroup.Empty;
-                }
-
-                _groups[index] = group;
-            }
+                _groups[index] = group = CreateGroup(index);
 
             return group;
+        }
+
+        private PcreGroup CreateGroup(int index)
+        {
+            var result = InternalResult;
+
+            if (result.ResultCode == MatchResultCode.Partial)
+            {
+                if (index == 0)
+                    return new PcreGroup(result.Subject, result.GetPartialStartOffset(), result.GetPartialEndOffset());
+
+                return PcreGroup.Empty;
+            }
+
+            var startOffset = result.GetStartOffset(index);
+            if (startOffset >= 0)
+                return new PcreGroup(result.Subject, startOffset, result.GetEndOffset(index));
+
+            return PcreGroup.Empty;
         }
 
         public PcreGroup GetGroup(string name)

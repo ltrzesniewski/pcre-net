@@ -34,6 +34,21 @@ namespace PCRE {
 			return _offsets[2 * index + 1];
 		}
 
+		int MatchResult::GetPartialStartOffset()
+		{
+			return _offsets[2];
+		}
+
+		int MatchResult::GetPartialEndOffset()
+		{
+			return _offsets[1];
+		}
+
+		int MatchResult::GetPartialScanStartOffset()
+		{
+			return _offsets[0];
+		}
+
 		String^ MatchResult::Mark::get()
 		{
 			if (_mark == nullptr)
