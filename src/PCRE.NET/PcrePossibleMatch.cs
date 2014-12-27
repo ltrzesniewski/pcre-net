@@ -19,5 +19,10 @@ namespace PCRE
         {
             get { return ((IPcreGroup)this).IsMatch; }
         }
+
+        public bool IsPartialMatch
+        {
+            get { return Result == PcreMatchResult.Partial; }
+        }
     }
 }

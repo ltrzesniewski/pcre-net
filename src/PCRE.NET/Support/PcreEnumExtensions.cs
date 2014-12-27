@@ -19,7 +19,7 @@ namespace PCRE.Support
         public static StudyOptions? ToStudyOptions(this PcreOptions options)
         {
             if ((options & PcreOptions.Compiled) != 0)
-                return StudyOptions.JitCompile;
+                return StudyOptions.JitCompile | StudyOptions.JitPartialSoftCompile | StudyOptions.JitPartialHardCompile;
 
             if ((options & PcreOptions.Studied) != 0)
                 return StudyOptions.None;

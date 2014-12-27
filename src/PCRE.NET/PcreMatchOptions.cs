@@ -21,6 +21,9 @@ namespace PCRE
         NewLineAny = PatternOptions.NewLineAny,
         NewLineAnyCrLf = PatternOptions.NewLineAnyCrLf,
 
-        NoStartOptimize = PatternOptions.NoStartOptimize
+        NoStartOptimize = PatternOptions.NoStartOptimize,
+
+        PartialSoft = PatternOptions.PartialSoft,
+        PartialHard = PatternOptions.PartialHard
     }
 }

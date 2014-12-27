@@ -60,6 +60,14 @@ var result = PcreRegex.Replace("hello, world!!!", @"\p{P}+", "<$&>");
 // result: "hello<,> world<!!!>"
 ```
 
+- Partial matching:
+
+```C#
+var regex = new PcreRegex(@"(?<=abc)123");
+var match = regex.Match("xyzabc12", PcreMatchOptions.PartialSoft);
+// result: match.IsPartialMatch == true
+```
+
 - Validate a JSON string:
 
 ```C#
@@ -122,7 +130,6 @@ var isValidJson = regex.IsMatch(subject);
 
 - Expose more PCRE features:
   - DFA matching
-  - Partial matching
 - Include more tests from the PCRE test suite
 - Documentation
 - XML doc comments

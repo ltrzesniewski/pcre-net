@@ -305,6 +305,38 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        [TestCase(PcreMatchOptions.PartialSoft)]
+        [TestCase(PcreMatchOptions.PartialHard)]
+        public void should_match_partially(PcreMatchOptions options)
+        {
+            var re = new PcreRegex(@"(?<=abc)123");
+
+            var match = re.Match("xyzabc12", options);
+
+            Assert.That(match.IsMatch, Is.False);
+            Assert.That(match.IsPartialMatch, Is.True);
+            Assert.That(match.Index, Is.EqualTo(3));
+            Assert.That(match.EndIndex, Is.EqualTo(8));
+            Assert.That(match.Length, Is.EqualTo(5));
+            Assert.That(match.Value, Is.EqualTo("abc12"));
+        }
+
+        [Test]
+        public void should_differentiate_soft_and_hard_partial_matching()
+        {
+            var re = new PcreRegex(@"dog(sbody)?");
+
+            var softMatch = re.Match("dog", PcreMatchOptions.PartialSoft);
+            var hardMatch = re.Match("dog", PcreMatchOptions.PartialHard);
+
+            Assert.That(softMatch.IsMatch, Is.True);
+            Assert.That(softMatch.IsPartialMatch, Is.False);
+
+            Assert.That(hardMatch.IsMatch, Is.False);
+            Assert.That(hardMatch.IsPartialMatch, Is.True);
+        }
+
+        [Test]
         public void readme_json_example()
         {
             const string jsonPattern = @"
