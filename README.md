@@ -8,7 +8,7 @@ PCRE.NET
 
 PCRE.NET is a .NET wrapper for the [PCRE library](http://www.pcre.org/). The goal of this project is to bring most of PCRE's features for use from .NET applications with as little overhead as possible.
 
-**Status:** Version **0.2** is released, the most important features are available. Feedback is welcome.  
+**Status:** Version **0.3** is released, the most important features are available. Feedback is welcome.  
 As it is still at major version 0, the API may change anytime.
 
 The currently wrapped PCRE version is **8.36**.
@@ -26,6 +26,7 @@ The following regex operations are supported:
   - Replacement strings with placeholders: ``$n ${name} $& $_ $` $' $+``
 - String splitting on matches: `PcreRegex.Split`
   - Captured groups are included in the result
+- Partial matching (when the subject is too short to match the pattern)
 
 Library highlights:
 
