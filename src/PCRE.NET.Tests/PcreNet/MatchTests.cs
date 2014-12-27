@@ -278,6 +278,20 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_handle_additional_options()
+        {
+            var re = new PcreRegex(@"bar");
+
+            var match = re.Match("foobar", PcreMatchOptions.None);
+
+            Assert.That(match, Is.Not.Null);
+
+            match = re.Match("foobar", PcreMatchOptions.Anchored);
+
+            Assert.That(match, Is.Null);
+        }
+
+        [Test]
         public void readme_json_example()
         {
             const string jsonPattern = @"

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using PCRE.Support;
 using PCRE.Wrapper;
 
 namespace PCRE
@@ -30,21 +31,43 @@ namespace PCRE
         [Pure]
         public PcreMatch Match(string subject)
         {
-            return Match(subject, 0, null);
+            return Match(subject, 0, PcreMatchOptions.None, null);
+        }
+
+        [Pure]
+        public PcreMatch Match(string subject, PcreMatchOptions options)
+        {
+            return Match(subject, 0, options, null);
         }
 
         [Pure]
         public PcreMatch Match(string subject, int startIndex)
         {
-            return Match(subject, startIndex, null);
+            return Match(subject, startIndex, PcreMatchOptions.None, null);
+        }
+
+        [Pure]
+        public PcreMatch Match(string subject, int startIndex, PcreMatchOptions options)
+        {
+            return Match(subject, startIndex, options, null);
         }
 
         public PcreMatch Match(string subject, Func<PcreCallout, PcreCalloutResult> onCallout)
         {
-            return Match(subject, 0, onCallout);
+            return Match(subject, 0, PcreMatchOptions.None, onCallout);
+        }
+
+        public PcreMatch Match(string subject, PcreMatchOptions options, Func<PcreCallout, PcreCalloutResult> onCallout)
+        {
+            return Match(subject, 0, options, onCallout);
         }
 
         public PcreMatch Match(string subject, int startIndex, Func<PcreCallout, PcreCalloutResult> onCallout)
+        {
+            return Match(subject, startIndex, PcreMatchOptions.None, onCallout);
+        }
+
+        public PcreMatch Match(string subject, int startIndex, PcreMatchOptions options, Func<PcreCallout, PcreCalloutResult> onCallout)
         {
             if (subject == null)
                 throw new ArgumentNullException("subject");
@@ -52,7 +75,7 @@ namespace PCRE
             if (startIndex < 0 || startIndex > subject.Length)
                 throw new ArgumentOutOfRangeException("startIndex");
 
-            var result = InternalRegex.Match(subject, startIndex, PatternOptions.None, WrapCallout(onCallout));
+            var result = InternalRegex.Match(subject, startIndex, options.ToPatternOptions(), WrapCallout(onCallout));
             return result.IsMatch
                 ? new PcreMatch(result)
                 : null;
