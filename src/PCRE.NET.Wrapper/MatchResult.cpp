@@ -17,7 +17,7 @@ namespace PCRE {
 			: _re(result->_re),
 			_subject(result->_subject),
 			_mark(result->_mark),
-			_isMatch(result->_isMatch),
+			_resultCode(result->_resultCode),
 			_markPtr(result->_markPtr),
 			_offsets(gcnew array<int>(result->_offsets->Length))
 		{

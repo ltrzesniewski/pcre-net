@@ -29,45 +29,45 @@ namespace PCRE
         }
 
         [Pure]
-        public PcreMatch Match(string subject)
+        public PcrePossibleMatch Match(string subject)
         {
             return Match(subject, 0, PcreMatchOptions.None, null);
         }
 
         [Pure]
-        public PcreMatch Match(string subject, PcreMatchOptions options)
+        public PcrePossibleMatch Match(string subject, PcreMatchOptions options)
         {
             return Match(subject, 0, options, null);
         }
 
         [Pure]
-        public PcreMatch Match(string subject, int startIndex)
+        public PcrePossibleMatch Match(string subject, int startIndex)
         {
             return Match(subject, startIndex, PcreMatchOptions.None, null);
         }
 
         [Pure]
-        public PcreMatch Match(string subject, int startIndex, PcreMatchOptions options)
+        public PcrePossibleMatch Match(string subject, int startIndex, PcreMatchOptions options)
         {
             return Match(subject, startIndex, options, null);
         }
 
-        public PcreMatch Match(string subject, Func<PcreCallout, PcreCalloutResult> onCallout)
+        public PcrePossibleMatch Match(string subject, Func<PcreCallout, PcreCalloutResult> onCallout)
         {
             return Match(subject, 0, PcreMatchOptions.None, onCallout);
         }
 
-        public PcreMatch Match(string subject, PcreMatchOptions options, Func<PcreCallout, PcreCalloutResult> onCallout)
+        public PcrePossibleMatch Match(string subject, PcreMatchOptions options, Func<PcreCallout, PcreCalloutResult> onCallout)
         {
             return Match(subject, 0, options, onCallout);
         }
 
-        public PcreMatch Match(string subject, int startIndex, Func<PcreCallout, PcreCalloutResult> onCallout)
+        public PcrePossibleMatch Match(string subject, int startIndex, Func<PcreCallout, PcreCalloutResult> onCallout)
         {
             return Match(subject, startIndex, PcreMatchOptions.None, onCallout);
         }
 
-        public PcreMatch Match(string subject, int startIndex, PcreMatchOptions options, Func<PcreCallout, PcreCalloutResult> onCallout)
+        public PcrePossibleMatch Match(string subject, int startIndex, PcreMatchOptions options, Func<PcreCallout, PcreCalloutResult> onCallout)
         {
             if (subject == null)
                 throw new ArgumentNullException("subject");
@@ -76,9 +76,7 @@ namespace PCRE
                 throw new ArgumentOutOfRangeException("startIndex");
 
             var result = InternalRegex.Match(subject, startIndex, options.ToPatternOptions(), WrapCallout(onCallout));
-            return result.IsMatch
-                ? new PcreMatch(result)
-                : null;
+            return new PcrePossibleMatch(result);
         }
 
         [Pure]
@@ -109,7 +107,7 @@ namespace PCRE
         {
             var result = InternalRegex.Match(subject, startIndex, PatternOptions.None, onCallout);
 
-            if (!result.IsMatch)
+            if (result.ResultCode != MatchResultCode.Success)
                 yield break;
 
             var match = new PcreMatch(result);
@@ -120,7 +118,7 @@ namespace PCRE
                 var nextOffset = match.GetStartOfNextMatchIndex();
                 result = InternalRegex.Match(subject, nextOffset, match.Length == 0 ? PatternOptions.NotEmptyAtStart : PatternOptions.None, onCallout);
 
-                if (!result.IsMatch)
+                if (result.ResultCode != MatchResultCode.Success)
                     yield break;
 
                 match = new PcreMatch(result);

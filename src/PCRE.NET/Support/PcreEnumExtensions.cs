@@ -2,7 +2,7 @@
 
 namespace PCRE.Support
 {
-    internal static class PcreOptionsExtensions
+    internal static class PcreEnumExtensions
     {
         private const PatternOptions FlippedOptions = PatternOptions.NoUtf16Check;
 
@@ -25,6 +25,21 @@ namespace PCRE.Support
                 return StudyOptions.None;
 
             return null;
+        }
+
+        public static PcreMatchResult ToMatchResult(this MatchResultCode code)
+        {
+            switch (code)
+            {
+                case MatchResultCode.Success:
+                    return PcreMatchResult.Success;
+
+                case MatchResultCode.Partial:
+                    return PcreMatchResult.Partial;
+
+                default:
+                    return PcreMatchResult.NoMatch;
+            }
         }
     }
 }

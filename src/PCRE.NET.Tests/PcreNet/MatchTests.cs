@@ -14,6 +14,7 @@ namespace PCRE.Tests.PcreNet
             var match = re.Match("xxxaaabbccczzz");
 
             Assert.That(match, Is.Not.Null);
+            Assert.That(match.IsMatch, Is.True);
             Assert.That(match.CaptureCount, Is.EqualTo(1));
             Assert.That(match.Value, Is.EqualTo("aaabbccc"));
             Assert.That(match.Index, Is.EqualTo(3));
@@ -32,6 +33,7 @@ namespace PCRE.Tests.PcreNet
             var match = re.Match("xxxaaabbddeeezzz");
 
             Assert.That(match, Is.Not.Null);
+            Assert.That(match.IsMatch, Is.True);
             Assert.That(match.CaptureCount, Is.EqualTo(3));
             Assert.That(match.Value, Is.EqualTo("aaabbddeee"));
             Assert.That(match.Index, Is.EqualTo(3));
@@ -63,6 +65,7 @@ namespace PCRE.Tests.PcreNet
             var match = re.Match("xxa", 3);
 
             Assert.That(match, Is.Not.Null);
+            Assert.That(match.IsMatch, Is.True);
         }
 
         [Test]
@@ -73,6 +76,7 @@ namespace PCRE.Tests.PcreNet
             var match = re.Match("xxxaaabbcccddeeezzz");
 
             Assert.That(match, Is.Not.Null);
+            Assert.That(match.IsMatch, Is.True);
             Assert.That(match.CaptureCount, Is.EqualTo(3));
             Assert.That(match.Value, Is.EqualTo("aaabbcccddeee"));
             Assert.That(match.Index, Is.EqualTo(3));
@@ -124,12 +128,14 @@ namespace PCRE.Tests.PcreNet
             var match = re.Match("b");
 
             Assert.That(match, Is.Not.Null);
+            Assert.That(match.IsMatch, Is.True);
             Assert.That(match["g"].Value, Is.EqualTo("b"));
 
             Assert.That(match.GetGroups("g").Select(g => g.IsMatch), Is.EqualTo(new[] { false, true, false }));
 
             match = re.Match("bc");
             Assert.That(match, Is.Not.Null);
+            Assert.That(match.IsMatch, Is.True);
             Assert.That(match["g"].Value, Is.EqualTo("b"));
 
             Assert.That(match.GetGroups("g").Select(g => g.IsMatch), Is.EqualTo(new[] { false, true, true }));
@@ -142,10 +148,12 @@ namespace PCRE.Tests.PcreNet
             var match = re.Match("ab");
 
             Assert.That(match, Is.Not.Null);
+            Assert.That(match.IsMatch, Is.True);
             Assert.That(match.Mark, Is.EqualTo("bar"));
 
             match = re.Match("ac");
             Assert.That(match, Is.Not.Null);
+            Assert.That(match.IsMatch, Is.True);
             Assert.That(match.Mark, Is.Null);
         }
 
@@ -196,6 +204,7 @@ namespace PCRE.Tests.PcreNet
             });
 
             Assert.That(match, Is.Not.Null);
+            Assert.That(match.IsMatch, Is.True);
             Assert.That(calls, Is.EqualTo(1));
         }
 
@@ -218,6 +227,7 @@ namespace PCRE.Tests.PcreNet
             });
 
             Assert.That(match, Is.Not.Null);
+            Assert.That(match.IsMatch, Is.True);
             Assert.That(match.Value, Is.EqualTo("b"));
         }
 
@@ -232,7 +242,8 @@ namespace PCRE.Tests.PcreNet
                 return PcreCalloutResult.Abort;
             });
 
-            Assert.That(match, Is.Null);
+            Assert.That(match, Is.Not.Null);
+            Assert.That(match.IsMatch, Is.False);
         }
 
         [Test]
@@ -260,6 +271,7 @@ namespace PCRE.Tests.PcreNet
             });
 
             Assert.That(match, Is.Not.Null);
+            Assert.That(match.IsMatch, Is.True);
             Assert.That(count, Is.EqualTo(4));
         }
 
@@ -271,6 +283,7 @@ namespace PCRE.Tests.PcreNet
             var match = re.Match("aaa");
 
             Assert.That(match, Is.Not.Null);
+            Assert.That(match.IsMatch, Is.True);
             Assert.That(match.Index, Is.EqualTo(3));
             Assert.That(match.EndIndex, Is.EqualTo(0));
             Assert.That(match.Length, Is.EqualTo(0));
@@ -284,11 +297,11 @@ namespace PCRE.Tests.PcreNet
 
             var match = re.Match("foobar", PcreMatchOptions.None);
 
-            Assert.That(match, Is.Not.Null);
+            Assert.That(match.IsMatch, Is.True);
 
             match = re.Match("foobar", PcreMatchOptions.Anchored);
 
-            Assert.That(match, Is.Null);
+            Assert.That(match.IsMatch, Is.False);
         }
 
         [Test]

@@ -6,7 +6,7 @@ using PCRE.Wrapper;
 
 namespace PCRE
 {
-    public sealed class PcreMatch : IReadOnlyCollection<PcreGroup>
+    public class PcreMatch : IReadOnlyCollection<PcreGroup>
     {
         private readonly object _result; // See remark about JIT in PcreRegex
         private readonly PcreGroup[] _groups;

@@ -2,6 +2,7 @@
 #pragma once
 
 #include "CalloutData.h"
+#include "MatchResultCode.h"
 
 using namespace System;
 using namespace System::Diagnostics::Contracts;
@@ -17,9 +18,9 @@ namespace PCRE {
 			MatchResult(InternalRegex^ const re, String^ subject);
 			MatchResult(MatchResult^ result);
 
-			property bool IsMatch {
-				public: bool get() { return _isMatch; }
-				internal: void set(bool value) { _isMatch = value; }
+			property MatchResultCode ResultCode {
+				public: MatchResultCode get() { return _resultCode; }
+				internal: void set(MatchResultCode value) { _resultCode = value; }
 			}
 
 			property InternalRegex^ Regex { InternalRegex^ get() { return _re; } }
@@ -42,7 +43,7 @@ namespace PCRE {
 		private:
 			initonly InternalRegex^ _re;
 			initonly String^ _subject;
-			bool _isMatch;
+			MatchResultCode _resultCode;
 			String^ _mark;
 			const PCRE_UCHAR16 *_markPtr;
 		};

@@ -88,6 +88,8 @@
     <Compile Include="PcreCallout.cs" />
     <Compile Include="PcreCalloutResult.cs" />
     <Compile Include="PcreMatchOptions.cs" />
+    <Compile Include="PcreMatchResult.cs" />
+    <Compile Include="PcrePossibleMatch.cs" />
     <Compile Include="PcreRegex.Split.cs" />
     <Compile Include="PcreRegex.Replace.cs" />
     <Compile Include="PcreRegex.Match.cs" />
@@ -100,7 +102,7 @@
     <Compile Include="PcrePatternInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Support\PriorityCache.cs" />
-    <Compile Include="Support\PcreOptionsExtensions.cs" />
+    <Compile Include="Support\PcreEnumExtensions.cs" />
     <Compile Include="Support\RegexKey.cs" />
     <Compile Include="Support\ReplacementPattern.cs" />
   </ItemGroup>

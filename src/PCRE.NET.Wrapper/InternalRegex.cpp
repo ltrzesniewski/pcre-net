@@ -151,12 +151,20 @@ namespace PCRE {
 			}
 
 			auto result = pcre16_exec(_re, &extra, pinnedSubject, subject->Length, startOffset, (int)additionalOptions, offsets, match->_offsets->Length);
+			match->SetMark(mark);
 
-			if (result < 0)
+			if (result >= 0)
 			{
+				match->ResultCode = MatchResultCode::Success;	
+			}
+			else
+			{
+				match->ResultCode = static_cast<MatchResultCode>(result);
+
 				switch (result)
 				{
 				case PCRE_ERROR_NOMATCH:
+				case PCRE_ERROR_PARTIAL:
 					break;
 
 				case PCRE_ERROR_CALLOUT:
@@ -164,12 +172,9 @@ namespace PCRE {
 					break;
 
 				default:
-					throw gcnew InvalidOperationException(String::Format("Match error, code: {0}", result));
+					throw gcnew InvalidOperationException(String::Format("Match error: {0}", match->ResultCode));
 				}
 			}
-
-			match->IsMatch = result != PCRE_ERROR_NOMATCH;
-			match->SetMark(mark);
 
 			return match;
 		}
