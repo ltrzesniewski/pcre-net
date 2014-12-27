@@ -6,7 +6,7 @@ using PCRE.Wrapper;
 
 namespace PCRE
 {
-    public class PcreMatch : IReadOnlyCollection<PcreGroup>
+    public class PcreMatch : IPcreGroup, IReadOnlyCollection<PcreGroup>
     {
         private readonly object _result; // See remark about JIT in PcreRegex
         private readonly PcreGroup[] _groups;
@@ -17,7 +17,7 @@ namespace PCRE
             _groups = new PcreGroup[result.Regex.CaptureCount + 1];
         }
 
-        private MatchResult InternalResult
+        protected MatchResult InternalResult
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)] get { return (MatchResult)_result; }
         }
@@ -161,6 +161,11 @@ namespace PCRE
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        bool IPcreGroup.IsMatch
+        {
+            get { return InternalResult.ResultCode == MatchResultCode.Success; }
         }
 
         int IReadOnlyCollection<PcreGroup>.Count

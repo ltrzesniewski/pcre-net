@@ -2,7 +2,7 @@
 
 namespace PCRE
 {
-    public sealed class PcreGroup
+    public sealed class PcreGroup : IPcreGroup
     {
         private readonly string _subject;
         private string _value;

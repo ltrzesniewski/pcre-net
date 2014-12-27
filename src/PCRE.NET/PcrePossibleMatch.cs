@@ -8,14 +8,16 @@ namespace PCRE
         internal PcrePossibleMatch(MatchResult result)
             : base(result)
         {
-            Result = result.ResultCode.ToMatchResult();
         }
 
-        public PcreMatchResult Result { get; private set; }
+        public PcreMatchResult Result
+        {
+            get { return InternalResult.ResultCode.ToMatchResult(); }
+        }
 
         public bool IsMatch
         {
-            get { return Result == PcreMatchResult.Success; }
+            get { return ((IPcreGroup)this).IsMatch; }
         }
     }
 }
