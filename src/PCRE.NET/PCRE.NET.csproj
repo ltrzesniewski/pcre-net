@@ -85,6 +85,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dfa\PcreDfaMatchOptions.cs" />
     <Compile Include="IPcreGroup.cs" />
     <Compile Include="PcreCallout.cs" />
     <Compile Include="PcreCalloutResult.cs" />
