@@ -64,16 +64,25 @@ namespace PCRE.Tests.PcreNet
         public void should_include_captured_groups_in_result()
         {
             var re = new PcreRegex(@"<(\d)?(.+?)>");
-            var result = re.Split("foo<bar>baz<42>a").ToList();
+            var result = re.Split("foo<bar>baz<42>a", PcreSplitOptions.IncludeGroupValues).ToList();
 
             Assert.That(result, Is.EqualTo(new[] { "foo", "bar", "baz", "4", "2", "a" }));
+        }
+
+        [Test]
+        public void should_not_include_captured_groups_in_result_if_not_specified()
+        {
+            var re = new PcreRegex(@"<(\d)?(.+?)>");
+            var result = re.Split("foo<bar>baz<42>a").ToList();
+
+            Assert.That(result, Is.EqualTo(new[] { "foo", "baz", "a" }));
         }
 
         [Test]
         public void should_include_empty_groups_in_result()
         {
             var re = new PcreRegex(@"<(\d?)(.+?)>");
-            var result = re.Split("foo<bar>baz<42>a").ToList();
+            var result = re.Split("foo<bar>baz<42>a", PcreSplitOptions.IncludeGroupValues).ToList();
 
             Assert.That(result, Is.EqualTo(new[] { "foo", "", "bar", "baz", "4", "2", "a" }));
         }
