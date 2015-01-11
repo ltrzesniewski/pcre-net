@@ -137,14 +137,14 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match.Success, Is.True);
             Assert.That(match["g"].Value, Is.EqualTo("b"));
 
-            Assert.That(match.GetGroups("g").Select(g => g.Success), Is.EqualTo(new[] { false, true, false }));
+            Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo(new[] { false, true, false }));
 
             match = re.Match("bc");
             Assert.That(match, Is.Not.Null);
             Assert.That(match.Success, Is.True);
             Assert.That(match["g"].Value, Is.EqualTo("b"));
 
-            Assert.That(match.GetGroups("g").Select(g => g.Success), Is.EqualTo(new[] { false, true, true }));
+            Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo(new[] { false, true, true }));
         }
 
         [Test]

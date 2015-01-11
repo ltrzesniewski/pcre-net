@@ -98,7 +98,7 @@ namespace PCRE
                 yield return this[i];
         }
 
-        internal PcreGroup GetGroup(int index)
+        private PcreGroup GetGroup(int index)
         {
             if (index < 0 || index > CaptureCount)
                 return null;
@@ -129,7 +129,7 @@ namespace PCRE
             return PcreGroup.Empty;
         }
 
-        internal PcreGroup GetGroup(string name)
+        private PcreGroup GetGroup(string name)
         {
             var map = InternalResult.Regex.CaptureNames;
             if (map == null)
@@ -152,7 +152,7 @@ namespace PCRE
             return PcreGroup.Empty;
         }
 
-        public IEnumerable<PcreGroup> GetGroups(string name)
+        public IEnumerable<PcreGroup> GetDuplicateNamedGroups(string name)
         {
             var map = InternalResult.Regex.CaptureNames;
             if (map == null)

@@ -26,20 +26,5 @@ namespace PCRE.Support
 
             return null;
         }
-
-        public static PcreMatchResult ToMatchResult(this MatchResultCode code)
-        {
-            switch (code)
-            {
-                case MatchResultCode.Success:
-                    return PcreMatchResult.Success;
-
-                case MatchResultCode.Partial:
-                    return PcreMatchResult.Partial;
-
-                default:
-                    return PcreMatchResult.NoMatch;
-            }
-        }
     }
 }
