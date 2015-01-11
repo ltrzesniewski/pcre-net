@@ -6,6 +6,6 @@
         int EndIndex { get; }
         int Length { get; }
         string Value { get; }
-        bool IsMatch { get; }
+        bool Success { get; }
     }
 }

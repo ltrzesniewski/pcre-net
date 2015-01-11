@@ -50,7 +50,7 @@ namespace PCRE
                 for (var groupIdx = 1; groupIdx <= captureCount; ++groupIdx)
                 {
                     var group = match[groupIdx];
-                    if (group.IsMatch)
+                    if (group.Success)
                         yield return group.Value;
                 }
 

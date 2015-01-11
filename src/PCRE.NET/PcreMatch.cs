@@ -6,7 +6,7 @@ using PCRE.Wrapper;
 
 namespace PCRE
 {
-    public class PcreMatch : IPcreGroup, IReadOnlyCollection<PcreGroup>
+    public sealed class PcreMatch : IPcreGroup, IPcreGroupCollection
     {
         private readonly object _result; // See remark about JIT in PcreRegex
         private readonly PcreGroup[] _groups;
@@ -17,7 +17,7 @@ namespace PCRE
             _groups = new PcreGroup[result.Regex.CaptureCount + 1];
         }
 
-        protected MatchResult InternalResult
+        private MatchResult InternalResult
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)] get { return (MatchResult)_result; }
         }
@@ -62,9 +62,29 @@ namespace PCRE
             get { return this[0].Value; }
         }
 
+        public bool Success
+        {
+            get { return InternalResult.ResultCode == MatchResultCode.Success; }
+        }
+
         public string Mark
         {
             get { return InternalResult.Mark; }
+        }
+
+        public IPcreGroupCollection Groups
+        {
+            get { return this; }
+        }
+
+        public bool IsPartialMatch
+        {
+            get { return InternalResult.ResultCode == MatchResultCode.Partial; }
+        }
+
+        public int PartialInspectionStartIndex
+        {
+            get { return IsPartialMatch ? InternalResult.GetPartialScanStartOffset() : -1; }
         }
 
         public IEnumerator<PcreGroup> GetEnumerator()
@@ -78,7 +98,7 @@ namespace PCRE
                 yield return this[i];
         }
 
-        public PcreGroup GetGroup(int index)
+        internal PcreGroup GetGroup(int index)
         {
             if (index < 0 || index > CaptureCount)
                 return null;
@@ -109,7 +129,7 @@ namespace PCRE
             return PcreGroup.Empty;
         }
 
-        public PcreGroup GetGroup(string name)
+        internal PcreGroup GetGroup(string name)
         {
             var map = InternalResult.Regex.CaptureNames;
             if (map == null)
@@ -125,7 +145,7 @@ namespace PCRE
             foreach (var index in indexes)
             {
                 var group = GetGroup(index);
-                if (group != null && group.IsMatch)
+                if (group != null && group.Success)
                     return group;
             }
 
@@ -165,11 +185,6 @@ namespace PCRE
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
-        }
-
-        bool IPcreGroup.IsMatch
-        {
-            get { return InternalResult.ResultCode == MatchResultCode.Success; }
         }
 
         int IReadOnlyCollection<PcreGroup>.Count

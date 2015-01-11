@@ -95,7 +95,7 @@ namespace PCRE.Tests.Pcre
 
                 Console.WriteLine("    Group #{0}: {1}", groupIndex, expectedGroup.Value);
 
-                Assert.That(actualGroup.IsMatch, Is.EqualTo(expectedGroup.IsMatch));
+                Assert.That(actualGroup.Success, Is.EqualTo(expectedGroup.IsMatch));
 
                 if (expectedGroup.IsMatch)
                     Assert.That(actualGroup.Value, Is.EqualTo(expectedGroup.Value.UnescapeGroup()));

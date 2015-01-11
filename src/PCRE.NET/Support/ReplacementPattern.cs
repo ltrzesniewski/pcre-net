@@ -210,7 +210,7 @@ namespace PCRE.Support
                     return;
                 }
 
-                if (group.IsMatch)
+                if (group.Success)
                     sb.Append(match.Subject, group.Index, group.Length);
             }
 
@@ -250,7 +250,7 @@ namespace PCRE.Support
                     return;
                 }
 
-                if (group.IsMatch)
+                if (group.Success)
                     sb.Append(match.Subject, group.Index, group.Length);
             }
 
@@ -315,7 +315,7 @@ namespace PCRE.Support
                 for (var i = match.CaptureCount; i > 0; --i)
                 {
                     var group = match.GetGroup(i);
-                    if (group != null && group.IsMatch)
+                    if (group != null && group.Success)
                     {
                         sb.Append(match.Subject, group.Index, group.Length);
                         return;

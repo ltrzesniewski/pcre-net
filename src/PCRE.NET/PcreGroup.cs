@@ -33,7 +33,7 @@ namespace PCRE
             get { return _value ?? (_value = _subject.Substring(Index, Length)); }
         }
 
-        public bool IsMatch
+        public bool Success
         {
             get { return Index >= 0; }
         }
