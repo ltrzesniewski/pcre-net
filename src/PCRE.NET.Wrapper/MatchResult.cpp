@@ -6,10 +6,15 @@
 namespace PCRE {
 	namespace Wrapper {
 
-		MatchResult::MatchResult(InternalRegex^ re, String^ subject)
+		MatchResult::MatchResult(InternalRegex^ re, String^ subject, int offsetsSize)
 			: _re(re),
 			_subject(subject),
-			_offsets(gcnew array<int>((re->CaptureCount + 1) * 3))
+			_offsets(gcnew array<int>(offsetsSize))
+		{
+		}
+
+		MatchResult::MatchResult(InternalRegex^ re, String^ subject)
+			: MatchResult(re, subject, (re->CaptureCount + 1) * 3)
 		{
 		}
 

@@ -23,6 +23,7 @@ namespace PCRE {
 
 			bool IsMatch(String^ subject, int startOffset);
 			MatchResult^ Match(String^ subject, int startOffset, PatternOptions additionalOptions, Func<CalloutData^, CalloutResult>^ calloutCallback);
+			MatchResult^ DfaMatch(String^ subject, int startOffset, int maxMatches, PatternOptions additionalOptions, Func<CalloutData^, CalloutResult>^ calloutCallback);
 
 			int GetInfoInt32(InfoKey key);
 

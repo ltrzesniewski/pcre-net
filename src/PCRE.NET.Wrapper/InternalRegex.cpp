@@ -156,6 +156,66 @@ namespace PCRE {
 			if (result >= 0)
 			{
 				match->ResultCode = MatchResultCode::Success;	
+				match->ResultCount = result;
+			}
+			else
+			{
+				match->ResultCode = static_cast<MatchResultCode>(result);
+
+				switch (result)
+				{
+				case PCRE_ERROR_NOMATCH:
+				case PCRE_ERROR_PARTIAL:
+					break;
+
+				case PCRE_ERROR_CALLOUT:
+					throw gcnew InvalidOperationException(String::Format("An exception was thrown by the callout: {0}", match->CalloutException ? match->CalloutException->Message : nullptr), match->CalloutException);
+					break;
+
+				default:
+					throw gcnew InvalidOperationException(String::Format("Match error: {0}", match->ResultCode));
+				}
+			}
+
+			return match;
+		}
+
+		MatchResult^ InternalRegex::DfaMatch(String^ subject, int startOffset, int maxMatches, PatternOptions additionalOptions, Func<CalloutData^, CalloutResult>^ calloutCallback)
+		{
+			// TODO : For now this is mostly copy/pasted to make experimenting easier. Refactor it.
+
+			auto match = gcnew MatchResult(this, subject, maxMatches * 2);
+			pin_ptr<MatchResult^> pinnedMatch;
+
+			pin_ptr<int> offsets = &match->_offsets[0];
+			pin_ptr<const wchar_t> pinnedSubject = PtrToStringChars(subject);
+
+			auto extra = *_extra;
+			PCRE_UCHAR16 *mark;
+			extra.mark = &mark;
+			extra.flags |= PCRE_EXTRA_MARK;
+
+			if (calloutCallback)
+			{
+				pinnedMatch = &match;
+				match->OnCallout = calloutCallback;
+				extra.callout_data = pinnedMatch;
+				extra.flags |= PCRE_EXTRA_CALLOUT_DATA;
+
+				// Initialize all offsets to -1 so we can tell which groups didn't match when in a callout
+				memset(offsets, -1, sizeof(int) * 2 * (CaptureCount + 1));
+			}
+
+			const int wspaceSize = 256;
+			int wspace[wspaceSize];
+
+			auto result = pcre16_dfa_exec(_re, &extra, pinnedSubject, subject->Length, startOffset, (int)additionalOptions, offsets, match->_offsets->Length, wspace, wspaceSize);
+			match->SetMark(mark);
+
+			if (result >= 0)
+			{
+				match->ResultCode = MatchResultCode::Success;
+				match->ResultCount = result;
 			}
 			else
 			{

@@ -85,7 +85,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dfa\PcreDfaMatch.cs" />
     <Compile Include="Dfa\PcreDfaMatchOptions.cs" />
+    <Compile Include="Dfa\PcreDfaMatchSet.cs" />
     <Compile Include="Dfa\PcreDfaRegex.cs" />
     <Compile Include="IInternalRegexWrapper.cs" />
     <Compile Include="IPcreGroup.cs" />
@@ -118,6 +120,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dfa\PcreDfaRegex.Match.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
