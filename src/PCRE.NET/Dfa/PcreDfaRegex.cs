@@ -3,14 +3,12 @@ using System.Runtime.CompilerServices;
 using PCRE.Support;
 using PCRE.Wrapper;
 
-namespace PCRE
+namespace PCRE.Dfa
 {
-    public sealed partial class PcreRegex : IInternalRegexWrapper
+    public sealed partial class PcreDfaRegex : IInternalRegexWrapper
     {
         // ReSharper disable IntroduceOptionalParameters.Global, MemberCanBePrivate.Global, UnusedMember.Global
 
-        // Cannot store an InternalRegex field, because the x64 JIT may try to load this type before executing the module initializer in certain cases.
-        // This type should always be loadable before the module initializer is executed.
         private readonly object _re;
         private PcrePatternInfo _info;
 
@@ -26,23 +24,12 @@ namespace PCRE
             [MethodImpl(MethodImplOptions.AggressiveInlining)] get { return (InternalRegex)_re; }
         }
 
-        internal int CaptureCount
-        {
-            get { return InternalRegex.CaptureCount; }
-        }
-
-        public static int CacheSize
-        {
-            get { return Caches.CacheSize; }
-            set { Caches.CacheSize = value; }
-        }
-
-        public PcreRegex(string pattern)
+        public PcreDfaRegex(string pattern)
             : this(pattern, PcreOptions.None)
         {
         }
 
-        public PcreRegex(string pattern, PcreOptions options)
+        public PcreDfaRegex(string pattern, PcreOptions options)
         {
             if (pattern == null)
                 throw new ArgumentNullException("pattern");

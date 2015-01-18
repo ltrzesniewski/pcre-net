@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
 using System.Text;
+using PCRE.Support;
 
 namespace PCRE
 {
@@ -26,7 +27,7 @@ namespace PCRE
             if (replacement == null)
                 throw new ArgumentNullException("replacement");
 
-            return Replace(subject, ReplacementCache.GetOrAdd(replacement), count, startIndex);
+            return Replace(subject, Caches.ReplacementCache.GetOrAdd(replacement), count, startIndex);
         }
 
         public string Replace(string subject, Func<PcreMatch, string> replacementFunc)

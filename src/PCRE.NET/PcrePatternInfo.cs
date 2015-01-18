@@ -5,9 +5,9 @@ namespace PCRE
 {
     public sealed class PcrePatternInfo
     {
-        private readonly PcreRegex _re;
+        private readonly IInternalRegexWrapper _re;
 
-        internal PcrePatternInfo(PcreRegex re)
+        internal PcrePatternInfo(IInternalRegexWrapper re)
         {
             _re = re;
         }
