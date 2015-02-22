@@ -146,13 +146,6 @@ namespace PCRE.Tests.Pcre
                         pattern.ExtractMarks = true;
                         break;
 
-                    case 'S':
-                        if ((options & PcreOptions.Studied) != 0)
-                            resetOptions |= PcreOptions.Studied;
-
-                        options |= PcreOptions.Studied;
-                        break;
-
                     case 'Y':
                         options |= PcreOptions.NoStartOptimize;
                         break;

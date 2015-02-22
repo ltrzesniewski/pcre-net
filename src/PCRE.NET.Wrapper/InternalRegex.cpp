@@ -18,9 +18,9 @@ namespace PCRE {
 		//	pcre16_callout = &GlobalCalloutCallback;
 		//}
 
-		interior_ptr<const PCRE2_SPTR> GetPtrToString(String^ string)
+		interior_ptr<const PCRE2_UCHAR> GetPtrToString(String^ string)
 		{
-			return reinterpret_cast<interior_ptr<const PCRE2_SPTR>>(PtrToStringChars(string));
+			return reinterpret_cast<interior_ptr<const PCRE2_UCHAR>>(PtrToStringChars(string));
 		}
 
 		InternalRegex::InternalRegex(String^ pattern, PatternOptions options, JitCompileOptions jitCompileOptions)
@@ -28,10 +28,10 @@ namespace PCRE {
 			int errorCode;
 			PCRE2_SIZE errorOffset;
 	
-			pin_ptr<const PCRE2_SPTR> pinnedPattern = GetPtrToString(pattern);
+			pin_ptr<const PCRE2_UCHAR> pinnedPattern = GetPtrToString(pattern);
 
 			_re = pcre2_compile(
-				*pinnedPattern,
+				pinnedPattern,
 				pattern->Length,
 				static_cast<int>(options),
 				&errorCode,
@@ -52,18 +52,8 @@ namespace PCRE {
 				throw gcnew ArgumentException(String::Format("Invalid pattern '{0}': {1} at offset {2}", pattern, errorMessage, errorOffset));
 			}
 
-			//if (studyOptions.HasValue)
-			//{
-			//	_extra = pcre16_study(_re, static_cast<int>(studyOptions.Value) | PCRE_STUDY_EXTRA_NEEDED, &errorMessage);
-			//
-			//	if (errorMessage)
-			//		throw gcnew InvalidOperationException(String::Format("Could not study pattern '{0}': {1}", pattern, gcnew String(errorMessage)));
-			//}
-			//else
-			//{
-			//	_extra = (pcre16_extra*)pcre16_malloc(sizeof(pcre16_extra));
-			//	_extra->flags = 0;
-			//}
+			if (jitCompileOptions != JitCompileOptions::None)
+				pcre2_jit_compile(_re, static_cast<uint32_t>(jitCompileOptions));
 
 			_captureCount = GetInfoInt32(InfoKey::CaptureCount);
 
@@ -117,27 +107,13 @@ namespace PCRE {
 			}
 		}
 
-		//bool InternalRegex::IsMatch(String^ subject, int startOffset)
-		//{
-		//	pin_ptr<const wchar_t> pinnedSubject = PtrToStringChars(subject);
-		//	auto result = pcre16_exec(_re, _extra, pinnedSubject, subject->Length, startOffset, 0, nullptr, 0);
-		//	
-		//	if (result == PCRE_ERROR_NOMATCH)
-		//		return false;
-		//	
-		//	if (result < 0)
-		//		throw gcnew InvalidOperationException(String::Format("Match error, code: {0}", result));
-		//	
-		//	return true;
-		//}
-
 		MatchData^ InternalRegex::Match(String^ subject, int startOffset, PatternOptions additionalOptions, Func<CalloutData^, CalloutResult>^ calloutCallback)
 		{
 			auto matchData = gcnew MatchData(this, subject);
 			auto matchContext = gcnew MatchContext();
 			//pin_ptr<MatchResult^> pinnedMatch;
 
-			pin_ptr<const PCRE2_SPTR> pinnedSubject = GetPtrToString(subject);
+			pin_ptr<const PCRE2_UCHAR> pinnedSubject = GetPtrToString(subject);
 
 			//auto extra = *_extra;
 			//PCRE_UCHAR16 *mark;
@@ -155,7 +131,7 @@ namespace PCRE {
 			//	memset(offsets, -1, sizeof(int) * 2 * (CaptureCount + 1));
 			//}
 
-			auto result = pcre2_match(_re, *pinnedSubject, subject->Length, startOffset, (int)additionalOptions, matchData->Block, matchContext->Context);
+			auto result = pcre2_match(_re, pinnedSubject, subject->Length, startOffset, (int)additionalOptions, matchData->Block, matchContext->Context);
 			//match->SetMark(mark);
 
 			if (result >= 0)

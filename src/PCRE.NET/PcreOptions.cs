@@ -45,7 +45,6 @@ namespace PCRE
         CheckUnicodeValidity = PatternOptions.NoUtfCheck,
 
         // Extra options
-        Studied = 1L << 32,
-        Compiled = 1L << 33
+        Compiled = 1L << 32
     }
 }

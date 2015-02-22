@@ -21,7 +21,6 @@ namespace PCRE {
 			~InternalRegex();
 			!InternalRegex();
 
-			//bool IsMatch(String^ subject, int startOffset);
 			MatchData^ Match(String^ subject, int startOffset, PatternOptions additionalOptions, Func<CalloutData^, CalloutResult>^ calloutCallback);
 
 			int GetInfoInt32(InfoKey key);
