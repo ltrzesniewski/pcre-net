@@ -9,7 +9,7 @@ namespace PCRE {
 	namespace Wrapper {
 
 		[Flags]
-		public enum struct PatternOptions
+		public enum struct PatternOptions : unsigned int
 		{
 			None                       = 0,
 			Anchored                   = PCRE2_ANCHORED,

@@ -12,11 +12,13 @@ namespace PCRE {
 
 		ref class InternalRegex;
 
-		public ref class MatchResult sealed
+		public ref class MatchData sealed
 		{
 		public:
-			MatchResult(InternalRegex^ const re, String^ subject);
-			MatchResult(MatchResult^ result);
+			MatchData(InternalRegex^ const re, String^ subject);
+			MatchData(MatchData^ result);
+			~MatchData();
+			!MatchData();
 
 			property MatchResultCode ResultCode {
 				public: MatchResultCode get() { return _resultCode; }
@@ -45,16 +47,20 @@ namespace PCRE {
 		internal:
 			property Func<CalloutData^, CalloutResult>^ OnCallout;
 			property Exception^ CalloutException;
-			void SetMark(const PCRE_UCHAR16 *mark);
-			
-			array<int>^ _offsets;			
+			void SetMark(const PCRE2_SPTR mark);
+			PCRE2_SIZE* _oVector;
+
+			property pcre2_match_data* Block {
+				pcre2_match_data* get() { return _matchData; }
+			}
 
 		private:
 			initonly InternalRegex^ _re;
 			initonly String^ _subject;
 			MatchResultCode _resultCode;
 			String^ _mark;
-			const PCRE_UCHAR16 *_markPtr;
+			pcre2_match_data* _matchData;
+			PCRE2_SPTR _markPtr;
 		};
 	}
 }

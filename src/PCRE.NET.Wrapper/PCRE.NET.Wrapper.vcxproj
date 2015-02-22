@@ -183,14 +183,14 @@
     <ClInclude Include="CompileContext.h" />
     <ClInclude Include="CompileContextOptions.h" />
     <ClInclude Include="MatchContext.h" />
-    <ClInclude Include="MatchResult.h" />
+    <ClInclude Include="MatchData.h" />
     <ClInclude Include="InfoKey.h" />
     <ClInclude Include="ConfigKey.h" />
     <ClInclude Include="MatchResultCode.h" />
     <ClInclude Include="PcreBuild.h" />
     <ClInclude Include="InternalRegex.h" />
     <ClInclude Include="PatternOptions.h" />
-    <ClInclude Include="StudyOptions.h" />
+    <ClInclude Include="JitCompileOptions.h" />
     <ClInclude Include="Stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -198,7 +198,7 @@
     <ClCompile Include="CalloutData.cpp" />
     <ClCompile Include="CompileContext.cpp" />
     <ClCompile Include="MatchContext.cpp" />
-    <ClCompile Include="MatchResult.cpp" />
+    <ClCompile Include="MatchData.cpp" />
     <ClCompile Include="PcreBuild.cpp" />
     <ClCompile Include="InternalRegex.cpp" />
     <ClCompile Include="Stdafx.cpp">
