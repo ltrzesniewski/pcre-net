@@ -48,6 +48,9 @@
     <ClInclude Include="..\PCRE\src\pcre2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CompileContextOptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">
