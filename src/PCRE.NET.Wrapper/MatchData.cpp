@@ -67,19 +67,14 @@ namespace PCRE {
 		{
 			if (_mark == nullptr)
 			{
-				if (_markPtr == nullptr)
+				auto markPtr = pcre2_get_mark(_matchData);
+				if (!markPtr)
 					return nullptr;
 
-				_mark = gcnew String(reinterpret_cast<const wchar_t*>(_markPtr));
+				_mark = gcnew String(reinterpret_cast<const wchar_t*>(markPtr));
 			}
 
 			return _mark;
-		}
-
-		void MatchData::SetMark(const PCRE2_SPTR mark)
-		{
-			_markPtr = mark;
-			_mark = nullptr;
 		}
 	}
 }

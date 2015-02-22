@@ -47,7 +47,6 @@ namespace PCRE {
 		internal:
 			property Func<CalloutData^, CalloutResult>^ OnCallout;
 			property Exception^ CalloutException;
-			void SetMark(const PCRE2_SPTR mark);
 			PCRE2_SIZE* _oVector;
 
 			property pcre2_match_data* Block {
@@ -60,7 +59,6 @@ namespace PCRE {
 			MatchResultCode _resultCode;
 			String^ _mark;
 			pcre2_match_data* _matchData;
-			PCRE2_SPTR _markPtr;
 		};
 	}
 }
