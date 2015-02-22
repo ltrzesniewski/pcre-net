@@ -49,7 +49,7 @@ namespace PCRE
 
         public static string UnicodeVersion
         {
-            get { return GetConfigString(ConfigKey.Unicode); }
+            get { return GetConfigString(ConfigKey.UnicodeVersion); }
         }
 
         public static bool Unicode
@@ -71,7 +71,7 @@ namespace PCRE
         {
             var value = PcreBuild.GetConfigInt32(key);
             if (value == null)
-                throw new InvalidOperationException("Could not retrieve the configuration property");
+                throw new InvalidOperationException("Could not retrieve the configuration property: " + key);
             return value.Value;
         }
 
@@ -79,7 +79,7 @@ namespace PCRE
         {
             var value = PcreBuild.GetConfigInt64(key);
             if (value == null)
-                throw new InvalidOperationException("Could not retrieve the configuration property");
+                throw new InvalidOperationException("Could not retrieve the configuration property: " + key);
             return value.Value;
         }
 
@@ -87,7 +87,7 @@ namespace PCRE
         {
             var value = PcreBuild.GetConfigString(key);
             if (value == null)
-                throw new InvalidOperationException("Could not retrieve the configuration property");
+                throw new InvalidOperationException("Could not retrieve the configuration property: " + key);
             return value;
         }
     }
