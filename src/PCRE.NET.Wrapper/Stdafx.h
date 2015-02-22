@@ -3,5 +3,5 @@
 
 #include <vcclr.h>
 
-#include "../PCRE/config.h"
-#include "../PCRE/pcre.h"
+#include "../PCRE/src/config.h"
+#include "../PCRE/src/pcre2.h"
