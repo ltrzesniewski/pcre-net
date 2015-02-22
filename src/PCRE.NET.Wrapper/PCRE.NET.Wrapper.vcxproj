@@ -180,7 +180,9 @@
   <ItemGroup>
     <ClInclude Include="..\PCRE\src\pcre2.h" />
     <ClInclude Include="CalloutData.h" />
+    <ClInclude Include="CompileContext.h" />
     <ClInclude Include="CompileContextOptions.h" />
+    <ClInclude Include="MatchContext.h" />
     <ClInclude Include="MatchResult.h" />
     <ClInclude Include="InfoKey.h" />
     <ClInclude Include="ConfigKey.h" />
@@ -194,6 +196,8 @@
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="CalloutData.cpp" />
+    <ClCompile Include="CompileContext.cpp" />
+    <ClCompile Include="MatchContext.cpp" />
     <ClCompile Include="MatchResult.cpp" />
     <ClCompile Include="PcreBuild.cpp" />
     <ClCompile Include="InternalRegex.cpp" />
