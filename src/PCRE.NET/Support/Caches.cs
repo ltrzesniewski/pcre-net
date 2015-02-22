@@ -20,7 +20,7 @@ namespace PCRE.Support
 
         private static object CreateRegex(RegexKey key)
         {
-            return new InternalRegex(key.Pattern, key.Options.ToPatternOptions(), key.Options.ToStudyOptions());
+            return new InternalRegex(key.Pattern, key.Options.ToPatternOptions(), key.Options.ToJitCompileOptions());
         }
     }
 }

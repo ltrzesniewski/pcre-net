@@ -7,8 +7,8 @@ namespace PCRE {
 
 		String^ PcreBuild::GetConfigString(ConfigKey key)
 		{
-			const char *result;
-			return pcre2_config(static_cast<int>(key), &result) && result ? nullptr : gcnew String(result);
+			PCRE2_UCHAR result[256];
+			return pcre2_config(static_cast<int>(key), &result) && result ? nullptr : gcnew String(reinterpret_cast<const wchar_t*>(result));
 		}
 
 		Nullable<Int32> PcreBuild::GetConfigInt32(ConfigKey key)

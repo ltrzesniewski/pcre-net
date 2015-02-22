@@ -4,11 +4,11 @@ namespace PCRE.Support
 {
     internal static class PcreEnumExtensions
     {
-        private const PatternOptions FlippedOptions = PatternOptions.NoUtf16Check;
+        private const PatternOptions FlippedOptions = PatternOptions.NoUtfCheck;
 
         public static PatternOptions ToPatternOptions(this PcreOptions options)
         {
-            return ((PatternOptions)((long)options & 0xFFFFFFFF) ^ FlippedOptions) | PatternOptions.Utf16;
+            return ((PatternOptions)((long)options & 0xFFFFFFFF) ^ FlippedOptions) | PatternOptions.Utf;
         }
 
         public static PatternOptions ToPatternOptions(this PcreMatchOptions options)
@@ -16,15 +16,12 @@ namespace PCRE.Support
             return (PatternOptions)((long)options & 0xFFFFFFFF);
         }
 
-        public static StudyOptions? ToStudyOptions(this PcreOptions options)
+        public static JitCompileOptions ToJitCompileOptions(this PcreOptions options)
         {
             if ((options & PcreOptions.Compiled) != 0)
-                return StudyOptions.JitCompile | StudyOptions.JitPartialSoftCompile | StudyOptions.JitPartialHardCompile;
+                return JitCompileOptions.Complete | JitCompileOptions.PartialSoft | JitCompileOptions.PartialHard;
 
-            if ((options & PcreOptions.Studied) != 0)
-                return StudyOptions.None;
-
-            return null;
+            return JitCompileOptions.None;
         }
     }
 }

@@ -1,12 +1,14 @@
-﻿namespace PCRE
+﻿using PCRE.Wrapper;
+
+namespace PCRE
 {
     public enum PcreNewLine
     {
         Unknown = 0,
-        Lf = 10,
-        Cr = 13,
-        CrLf = 3338,
-        AnyCrLf = -2,
-        Any = -1
+        Cr = NewLine.Cr,
+        Lf = NewLine.Lf,
+        CrLf = NewLine.CrLf,
+        Any = NewLine.Any,
+        AnyCrLf = NewLine.AnyCrLf
     }
 }

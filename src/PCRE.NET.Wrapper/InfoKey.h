@@ -35,5 +35,14 @@ namespace PCRE {
 			Size                       = PCRE2_INFO_SIZE
 		};
 
+		public enum struct NewLine
+		{
+			Cr                         = PCRE2_NEWLINE_CR,
+			Lf                         = PCRE2_NEWLINE_LF,
+			CrLf                       = PCRE2_NEWLINE_CRLF,
+			Any                        = PCRE2_NEWLINE_ANY,
+			AnyCrLf                    = PCRE2_NEWLINE_ANYCRLF
+		};
+
 	}
 }

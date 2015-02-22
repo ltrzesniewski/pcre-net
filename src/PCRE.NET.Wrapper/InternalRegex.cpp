@@ -18,9 +18,9 @@ namespace PCRE {
 		//	pcre16_callout = &GlobalCalloutCallback;
 		//}
 
-		interior_ptr<const PCRE2_SPTR16> GetPtrToString(String^ string)
+		interior_ptr<const PCRE2_SPTR> GetPtrToString(String^ string)
 		{
-			return reinterpret_cast<interior_ptr<const PCRE2_SPTR16>>(PtrToStringChars(string));
+			return reinterpret_cast<interior_ptr<const PCRE2_SPTR>>(PtrToStringChars(string));
 		}
 
 		InternalRegex::InternalRegex(String^ pattern, PatternOptions options, JitCompileOptions jitCompileOptions)
@@ -28,7 +28,7 @@ namespace PCRE {
 			int errorCode;
 			PCRE2_SIZE errorOffset;
 	
-			pin_ptr<const PCRE2_SPTR16> pinnedPattern = GetPtrToString(pattern);
+			pin_ptr<const PCRE2_SPTR> pinnedPattern = GetPtrToString(pattern);
 
 			_re = pcre2_compile(
 				*pinnedPattern,
@@ -137,7 +137,7 @@ namespace PCRE {
 			auto matchContext = gcnew MatchContext();
 			//pin_ptr<MatchResult^> pinnedMatch;
 
-			pin_ptr<const PCRE2_SPTR16> pinnedSubject = GetPtrToString(subject);
+			pin_ptr<const PCRE2_SPTR> pinnedSubject = GetPtrToString(subject);
 
 			//auto extra = *_extra;
 			//PCRE_UCHAR16 *mark;
