@@ -1,141 +1,325 @@
-/-- This set of tests is run only with the 8-bit library when Unicode property 
-    support is available. It starts with tests of the POSIX interface, because
-    that is supported only with the 8-bit library. --/
+# This test is run only when JIT support is available. It checks JIT complete
+# and partial modes, and things that are different with JIT.
 
-/\w/P
-    +++\x{c2}
-No match: POSIX code 17: match failed
+#pattern jitverify
 
-/\w/WP
-    +++\x{c2}
- 0: \xc2
+# JIT does not support this pattern (callout at start of condition).
+
+/(?(?C1)(?=a)a)/I
+Capturing subpattern count = 0
+May match empty string
+Subject length lower bound = 0
+JIT compilation was not successful
+
+# Check that an infinite recursion loop is caught.
+
+/(?(R)a*(?1)|((?R))b)/
+    aaaabcde
+Failed: error -46: JIT stack limit reached
+
+/abcd/I
+Capturing subpattern count = 0
+First code unit = 'a'
+Last code unit = 'd'
+Subject length lower bound = 4
+JIT compilation was successful
+    abcd
+ 0: abcd (JIT)
+    xyz
+No match (JIT)
+
+/abcd/
+    abcd
+ 0: abcd (JIT)
+    ab\=ps
+Partial match: ab (JIT)
+    ab\=ph
+Partial match: ab (JIT)
+    xyz
+No match (JIT)
+
+/abcd/jitfast
+    abcd
+ 0: abcd (JIT)
+    ab\=ps
+Partial match: ab (JIT)
+    ab\=ph
+Partial match: ab (JIT)
+    xyz
+No match (JIT)
+
+/abcd/jit=1
+    abcd
+ 0: abcd (JIT)
+    ab\=ps
+Partial match: ab
+    ab\=ph
+Partial match: ab
+    xyz
+No match (JIT)
+    xyz\=ps
+No match
+
+/abcd/jit=1,jitfast
+    abcd
+ 0: abcd (JIT)
+    ab\=ps
+Failed: error -45: bad JIT option
+    ab\=ph
+Failed: error -45: bad JIT option
+    xyz
+No match (JIT)
+    xyz\=ps
+Failed: error -45: bad JIT option
+
+/abcd/jit=2
+    abcd
+ 0: abcd
+    ab\=ps
+Partial match: ab (JIT)
+    ab\=ph
+Partial match: ab
+    xyz
+No match
+
+/abcd/jit=2,jitfast
+    abcd
+Failed: error -45: bad JIT option
+    ab\=ps
+Partial match: ab (JIT)
+    ab\=ph
+Failed: error -45: bad JIT option
+    xyz
+Failed: error -45: bad JIT option
+
+/abcd/jit=3
+    abcd
+ 0: abcd (JIT)
+    ab\=ps
+Partial match: ab (JIT)
+    ab\=ph
+Partial match: ab
+    xyz
+No match (JIT)
+
+/abcd/jit=4
+    abcd
+ 0: abcd
+    ab\=ps
+Partial match: ab
+    ab\=ph
+Partial match: ab (JIT)
+    xyz
+No match
+
+/abcd/jit=5
+    abcd
+ 0: abcd (JIT)
+    ab\=ps
+Partial match: ab
+    ab\=ph
+Partial match: ab (JIT)
+    xyz
+No match (JIT)
+
+/abcd/jit=6
+    abcd
+ 0: abcd
+    ab\=ps
+Partial match: ab (JIT)
+    ab\=ph
+Partial match: ab (JIT)
+    xyz
+No match
+
+/abcd/jit=7
+    abcd
+ 0: abcd (JIT)
+    ab\=ps
+Partial match: ab (JIT)
+    ab\=ph
+Partial match: ab (JIT)
+    xyz
+No match (JIT)
+
+/abcd/I,jit=2
+Capturing subpattern count = 0
+First code unit = 'a'
+Last code unit = 'd'
+Subject length lower bound = 4
+JIT compilation was successful
+
+/(*NO_START_OPT)a(*:m)b/mark
+    a
+No match, mark = m (JIT)
+
+/^12345678abcd/m
+    12345678abcd
+ 0: 12345678abcd (JIT)
     
-/A\x{391}\x{10427}\x{ff3a}\x{1fb0}/8iDZ
-------------------------------------------------------------------
-        Bra
-     /i A\x{391}\x{10427}\x{ff3a}\x{1fb0}
-        Ket
-        End
-------------------------------------------------------------------
-Capturing subpattern count = 0
-Options: caseless utf
-First char = 'A' (caseless)
-No need char
+# Limits tests that give different output with JIT. 
 
-/A\x{391}\x{10427}\x{ff3a}\x{1fb0}/8DZ
-------------------------------------------------------------------
-        Bra
-        A\x{391}\x{10427}\x{ff3a}\x{1fb0}
-        Ket
-        End
-------------------------------------------------------------------
-Capturing subpattern count = 0
-Options: utf
-First char = 'A'
-Need char = \x{b0}
+/(a+)*zz/I
+Capturing subpattern count = 1
+Starting code units: a z 
+Last code unit = 'z'
+Subject length lower bound = 2
+JIT compilation was successful
+  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaazzbbbbbb\=find_limits
+Minimum match limit = 3
+ 0: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaazz (JIT)
+ 1: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  aaaaaaaaaaaaaz\=find_limits
+Minimum match limit = 16384
+No match (JIT)
 
-/AB\x{1fb0}/8DZ
-------------------------------------------------------------------
-        Bra
-        AB\x{1fb0}
-        Ket
-        End
-------------------------------------------------------------------
-Capturing subpattern count = 0
-Options: utf
-First char = 'A'
-Need char = \x{b0}
+!((?:\s|//.*\\n|/[*](?:\\n|.)*?[*]/)*)!I
+Capturing subpattern count = 1
+May match empty string
+Subject length lower bound = 0
+JIT compilation was successful
+   /* this is a C style comment */\=find_limits
+Minimum match limit = 2
+ 0: /* this is a C style comment */ (JIT)
+ 1: /* this is a C style comment */
 
-/AB\x{1fb0}/8DZi
-------------------------------------------------------------------
-        Bra
-     /i AB\x{1fb0}
-        Ket
-        End
-------------------------------------------------------------------
-Capturing subpattern count = 0
-Options: caseless utf
-First char = 'A' (caseless)
-Need char = 'B' (caseless)
+/^(?>a)++/
+    aa\=find_limits
+Minimum match limit = 2
+ 0: aa (JIT)
+    aaaaaaaaa\=find_limits
+Minimum match limit = 2
+ 0: aaaaaaaaa (JIT)
+    
+/(a)(?1)++/
+    aa\=find_limits
+Minimum match limit = 2
+ 0: aa (JIT)
+ 1: a
+    aaaaaaaaa\=find_limits
+Minimum match limit = 2
+ 0: aaaaaaaaa (JIT)
+ 1: a
 
-/\x{401}\x{420}\x{421}\x{422}\x{423}\x{424}\x{425}\x{426}\x{427}\x{428}\x{429}\x{42a}\x{42b}\x{42c}\x{42d}\x{42e}\x{42f}/8iSI
-Capturing subpattern count = 0
-Options: caseless utf
-No first char
-No need char
-Subject length lower bound = 17
-Starting chars: \xd0 \xd1 
-    \x{401}\x{420}\x{421}\x{422}\x{423}\x{424}\x{425}\x{426}\x{427}\x{428}\x{429}\x{42a}\x{42b}\x{42c}\x{42d}\x{42e}\x{42f}
- 0: \x{401}\x{420}\x{421}\x{422}\x{423}\x{424}\x{425}\x{426}\x{427}\x{428}\x{429}\x{42a}\x{42b}\x{42c}\x{42d}\x{42e}\x{42f}
-    \x{451}\x{440}\x{441}\x{442}\x{443}\x{444}\x{445}\x{446}\x{447}\x{448}\x{449}\x{44a}\x{44b}\x{44c}\x{44d}\x{44e}\x{44f}
- 0: \x{451}\x{440}\x{441}\x{442}\x{443}\x{444}\x{445}\x{446}\x{447}\x{448}\x{449}\x{44a}\x{44b}\x{44c}\x{44d}\x{44e}\x{44f}
+/a(?:.)*?a/ims
+    abbbbbbbbbbbbbbbbbbbbba\=find_limits
+Minimum match limit = 1
+ 0: abbbbbbbbbbbbbbbbbbbbba (JIT)
+    
+/a(?:.(*THEN))*?a/ims
+    abbbbbbbbbbbbbbbbbbbbba\=find_limits
+Minimum match limit = 1
+ 0: abbbbbbbbbbbbbbbbbbbbba (JIT)
 
-/[ⱥ]/8iBZ
-------------------------------------------------------------------
-        Bra
-     /i \x{2c65}
-        Ket
-        End
-------------------------------------------------------------------
+/a(?:.(*THEN:ABC))*?a/ims
+    abbbbbbbbbbbbbbbbbbbbba\=find_limits
+Minimum match limit = 1
+ 0: abbbbbbbbbbbbbbbbbbbbba (JIT)
 
-/[^ⱥ]/8iBZ
-------------------------------------------------------------------
-        Bra
-     /i [^\x{2c65}]
-        Ket
-        End
-------------------------------------------------------------------
+/^(?>a+)(?>b+)(?>c+)(?>d+)(?>e+)/
+     aabbccddee\=find_limits
+Minimum match limit = 6
+ 0: aabbccddee (JIT)
 
-/\h/SI
-Capturing subpattern count = 0
-No options
-No first char
-No need char
-Subject length lower bound = 1
-Starting chars: \x09 \x20 \xa0 
+/^(?>(a+))(?>(b+))(?>(c+))(?>(d+))(?>(e+))/
+     aabbccddee\=find_limits
+Minimum match limit = 6
+ 0: aabbccddee (JIT)
+ 1: aa
+ 2: bb
+ 3: cc
+ 4: dd
+ 5: ee
 
-/\v/SI
-Capturing subpattern count = 0
-No options
-No first char
-No need char
-Subject length lower bound = 1
-Starting chars: \x0a \x0b \x0c \x0d \x85 
+/^(?>(a+))(?>b+)(?>(c+))(?>d+)(?>(e+))/
+     aabbccddee\=find_limits
+Minimum match limit = 6
+ 0: aabbccddee (JIT)
+ 1: aa
+ 2: cc
+ 3: ee
 
-/\R/SI
-Capturing subpattern count = 0
-No options
-No first char
-No need char
-Subject length lower bound = 1
-Starting chars: \x0a \x0b \x0c \x0d \x85 
+/^(?>(a+))(?>b+)(?>(c+))(?>d+)(?>(e+))/jitfast
+     aabbccddee\=find_limits
+Minimum match limit = 6
+ 0: aabbccddee (JIT)
+ 1: aa
+ 2: cc
+ 3: ee
+     aabbccddee\=jitstack=1
+ 0: aabbccddee (JIT)
+ 1: aa
+ 2: cc
+ 3: ee
 
-/[[:blank:]]/WBZ
-------------------------------------------------------------------
-        Bra
-        [\x09 \xa0]
-        Ket
-        End
-------------------------------------------------------------------
+/(a+)*zz/
+    aaaaaaaaaaaaaz
+No match (JIT)
+    aaaaaaaaaaaaaz\=match_limit=3000
+Failed: error -47: match limit exceeded
 
-/\x{212a}+/i8SI
-Capturing subpattern count = 0
-Options: caseless utf
-No first char
-No need char
-Subject length lower bound = 1
-Starting chars: K k \xe2 
-    KKkk\x{212a}
- 0: KKkk\x{212a}
+/(*LIMIT_MATCH=3000)(a+)*zz/I
+Capturing subpattern count = 1
+Match limit = 3000
+Starting code units: a z 
+Last code unit = 'z'
+Subject length lower bound = 2
+JIT compilation was successful
+    aaaaaaaaaaaaaz
+Failed: error -47: match limit exceeded
+    aaaaaaaaaaaaaz\=match_limit=60000
+Failed: error -47: match limit exceeded
 
-/s+/i8SI
-Capturing subpattern count = 0
-Options: caseless utf
-No first char
-No need char
-Subject length lower bound = 1
-Starting chars: S s \xc5 
-    SSss\x{17f}
- 0: SSss\x{17f}
+/(*LIMIT_MATCH=60000)(*LIMIT_MATCH=3000)(a+)*zz/I
+Capturing subpattern count = 1
+Match limit = 3000
+Starting code units: a z 
+Last code unit = 'z'
+Subject length lower bound = 2
+JIT compilation was successful
+    aaaaaaaaaaaaaz
+Failed: error -47: match limit exceeded
 
-/-- End of testinput16 --/
+/(*LIMIT_MATCH=60000)(a+)*zz/I
+Capturing subpattern count = 1
+Match limit = 60000
+Starting code units: a z 
+Last code unit = 'z'
+Subject length lower bound = 2
+JIT compilation was successful
+    aaaaaaaaaaaaaz
+No match (JIT)
+    aaaaaaaaaaaaaz\=match_limit=3000
+Failed: error -47: match limit exceeded
+
+# These three have infinitely nested recursions. 
+    
+/((?2))((?1))/
+    abc
+Failed: error -46: JIT stack limit reached
+
+/((?(R2)a+|(?1)b))/
+    aaaabcde
+Failed: error -46: JIT stack limit reached
+
+/(?(R)a*(?1)|((?R))b)/
+    aaaabcde
+Failed: error -46: JIT stack limit reached
+    
+# Invalid options disable JIT when called via pcre2_match(), causing the
+# match to happen via the interpreter, but for fast JIT invalid options are
+# ignored, so an unanchored match happens.
+
+/abcd/jit
+    abcd\=anchored
+ 0: abcd
+    fail abcd\=anchored 
+No match
+    
+/abcd/jitfast
+    abcd\=anchored 
+ 0: abcd (JIT)
+    succeed abcd\=anchored 
+ 0: abcd (JIT)
+    
+# End of testinput16

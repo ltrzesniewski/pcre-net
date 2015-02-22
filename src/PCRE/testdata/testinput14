@@ -1,343 +1,112 @@
-/-- This set of tests is run only with the 8-bit library. They do not require 
-    UTF-8 or Unicode property support. The file starts with all the tests of
-    the POSIX interface, because that is supported only with the 8-bit library.
-    --/
+# These are:
+#
+# (1) Tests of the match-limiting features. The results are different for
+# interpretive or JIT matching, so this test should not be run with JIT. The
+# same tests are run using JIT in test 16.
+
+# (2) Other tests that must not be run with JIT.
+
+/(a+)*zz/I
+  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaazzbbbbbb\=find_limits
+  aaaaaaaaaaaaaz\=find_limits
+
+!((?:\s|//.*\\n|/[*](?:\\n|.)*?[*]/)*)!I
+   /* this is a C style comment */\=find_limits
+
+/^(?>a)++/
+    aa\=find_limits
+    aaaaaaaaa\=find_limits
     
-< forbid 8W 
+/(a)(?1)++/
+    aa\=find_limits
+    aaaaaaaaa\=find_limits
 
-/abc/P
+/a(?:.)*?a/ims
+    abbbbbbbbbbbbbbbbbbbbba\=find_limits
+    
+/a(?:.(*THEN))*?a/ims
+    abbbbbbbbbbbbbbbbbbbbba\=find_limits
+
+/a(?:.(*THEN:ABC))*?a/ims
+    abbbbbbbbbbbbbbbbbbbbba\=find_limits
+
+/^(?>a+)(?>b+)(?>c+)(?>d+)(?>e+)/
+     aabbccddee\=find_limits
+
+/^(?>(a+))(?>(b+))(?>(c+))(?>(d+))(?>(e+))/
+     aabbccddee\=find_limits
+
+/^(?>(a+))(?>b+)(?>(c+))(?>d+)(?>(e+))/
+     aabbccddee\=find_limits
+
+/(*LIMIT_MATCH=12bc)abc/
+
+/(*LIMIT_MATCH=4294967290)abc/
+
+/(*LIMIT_RECURSION=4294967280)abc/I
+
+/(a+)*zz/
+    aaaaaaaaaaaaaz
+    aaaaaaaaaaaaaz\=match_limit=3000
+
+/(a+)*zz/
+    aaaaaaaaaaaaaz\=recursion_limit=10
+
+/(*LIMIT_MATCH=3000)(a+)*zz/I
+    aaaaaaaaaaaaaz
+    aaaaaaaaaaaaaz\=match_limit=60000
+
+/(*LIMIT_MATCH=60000)(*LIMIT_MATCH=3000)(a+)*zz/I
+    aaaaaaaaaaaaaz
+
+/(*LIMIT_MATCH=60000)(a+)*zz/I
+    aaaaaaaaaaaaaz
+    aaaaaaaaaaaaaz\=match_limit=3000
+
+/(*LIMIT_RECURSION=10)(a+)*zz/I
+    aaaaaaaaaaaaaz
+    aaaaaaaaaaaaaz\=recursion_limit=1000
+
+/(*LIMIT_RECURSION=10)(*LIMIT_RECURSION=1000)(a+)*zz/I
+    aaaaaaaaaaaaaz
+
+/(*LIMIT_RECURSION=1000)(a+)*zz/I
+    aaaaaaaaaaaaaz
+    aaaaaaaaaaaaaz\=recursion_limit=10
+    
+# These three have infinitely nested recursions. 
+    
+/((?2))((?1))/
     abc
-    *** Failers
 
-/^abc|def/P
-    abcdef
-    abcdef\B
+/((?(R2)a+|(?1)b))/
+    aaaabcde
 
-/.*((abc)$|(def))/P
-    defabc
-    \Zdefabc
+/(?(R)a*(?1)|((?R))b)/
+    aaaabcde
+    
+# The allusedtext modifier does not work with JIT, which does not maintain
+# the leftchar/rightchar data.
 
-/the quick brown fox/P
-    the quick brown fox
-    *** Failers
-    The Quick Brown Fox
+/abc(?=xyz)/allusedtext
+    abcxyzpqr
+    abcxyzpqr\=aftertext
+    
+/(?<=pqr)abc(?=xyz)/allusedtext
+    xyzpqrabcxyzpqr
+    xyzpqrabcxyzpqr\=aftertext
+    
+/a\b/
+    a.\=allusedtext
+    a\=allusedtext  
 
-/the quick brown fox/Pi
-    the quick brown fox
-    The Quick Brown Fox
+/abc\Kxyz/
+    abcxyz\=allusedtext
 
-/abc.def/P
-    *** Failers
-    abc\ndef
+/abc(?=xyz(*ACCEPT))/
+    abcxyz\=allusedtext
 
-/abc$/P
-    abc
-    abc\n
+/abc(?=abcde)(?=ab)/allusedtext
+    abcabcdefg
 
-/(abc)\2/P
-
-/(abc\1)/P
-    abc
-
-/a*(b+)(z)(z)/P
-    aaaabbbbzzzz
-    aaaabbbbzzzz\O0
-    aaaabbbbzzzz\O1
-    aaaabbbbzzzz\O2
-    aaaabbbbzzzz\O3
-    aaaabbbbzzzz\O4
-    aaaabbbbzzzz\O5
-
-/ab.cd/P
-    ab-cd
-    ab=cd
-    ** Failers
-    ab\ncd
-
-/ab.cd/Ps
-    ab-cd
-    ab=cd
-    ab\ncd
-
-/a(b)c/PN
-    abc
-
-/a(?P<name>b)c/PN
-    abc
-
-/a?|b?/P
-    abc
-    ** Failers
-    ddd\N   
-
-/\w+A/P
-   CDAAAAB 
-
-/\w+A/PU
-   CDAAAAB 
-   
-/\Biss\B/I+P
-    Mississippi
-
-/abc/\P
-
-/-- End of POSIX tests --/ 
-
-/a\Cb/
-    aXb
-    a\nb
-    ** Failers (too big char) 
-    A\x{123}B 
-    A\o{443}B 
-  
-/\x{100}/I
-
-/\o{400}/I
-
-/  (?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*                          # optional leading comment
-(?:    (?:
-[^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]+    # some number of atom characters...
-(?![^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]) # ..not followed by something that could be part of an atom
-|
-" (?:                      # opening quote...
-[^\\\x80-\xff\n\015"]                #   Anything except backslash and quote
-|                     #    or
-\\ [^\x80-\xff]           #   Escaped something (something != CR)
-)* "  # closing quote
-)                    # initial word
-(?:  (?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*  \.  (?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*   (?:
-[^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]+    # some number of atom characters...
-(?![^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]) # ..not followed by something that could be part of an atom
-|
-" (?:                      # opening quote...
-[^\\\x80-\xff\n\015"]                #   Anything except backslash and quote
-|                     #    or
-\\ [^\x80-\xff]           #   Escaped something (something != CR)
-)* "  # closing quote
-)  )* # further okay, if led by a period
-(?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*  @  (?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*    (?:
-[^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]+    # some number of atom characters...
-(?![^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]) # ..not followed by something that could be part of an atom
-|   \[                         # [
-(?: [^\\\x80-\xff\n\015\[\]] |  \\ [^\x80-\xff]  )*    #    stuff
-\]                        #           ]
-)                           # initial subdomain
-(?:                                  #
-(?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*  \.                        # if led by a period...
-(?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*   (?:
-[^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]+    # some number of atom characters...
-(?![^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]) # ..not followed by something that could be part of an atom
-|   \[                         # [
-(?: [^\\\x80-\xff\n\015\[\]] |  \\ [^\x80-\xff]  )*    #    stuff
-\]                        #           ]
-)                     #   ...further okay
-)*
-# address
-|                     #  or
-(?:
-[^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]+    # some number of atom characters...
-(?![^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]) # ..not followed by something that could be part of an atom
-|
-" (?:                      # opening quote...
-[^\\\x80-\xff\n\015"]                #   Anything except backslash and quote
-|                     #    or
-\\ [^\x80-\xff]           #   Escaped something (something != CR)
-)* "  # closing quote
-)             # one word, optionally followed by....
-(?:
-[^()<>@,;:".\\\[\]\x80-\xff\000-\010\012-\037]  |  # atom and space parts, or...
-\(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)       |  # comments, or...
-
-" (?:                      # opening quote...
-[^\\\x80-\xff\n\015"]                #   Anything except backslash and quote
-|                     #    or
-\\ [^\x80-\xff]           #   Escaped something (something != CR)
-)* "  # closing quote
-# quoted strings
-)*
-<  (?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*                     # leading <
-(?:  @  (?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*    (?:
-[^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]+    # some number of atom characters...
-(?![^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]) # ..not followed by something that could be part of an atom
-|   \[                         # [
-(?: [^\\\x80-\xff\n\015\[\]] |  \\ [^\x80-\xff]  )*    #    stuff
-\]                        #           ]
-)                           # initial subdomain
-(?:                                  #
-(?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*  \.                        # if led by a period...
-(?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*   (?:
-[^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]+    # some number of atom characters...
-(?![^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]) # ..not followed by something that could be part of an atom
-|   \[                         # [
-(?: [^\\\x80-\xff\n\015\[\]] |  \\ [^\x80-\xff]  )*    #    stuff
-\]                        #           ]
-)                     #   ...further okay
-)*
-
-(?:  (?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*  ,  (?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*  @  (?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*    (?:
-[^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]+    # some number of atom characters...
-(?![^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]) # ..not followed by something that could be part of an atom
-|   \[                         # [
-(?: [^\\\x80-\xff\n\015\[\]] |  \\ [^\x80-\xff]  )*    #    stuff
-\]                        #           ]
-)                           # initial subdomain
-(?:                                  #
-(?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*  \.                        # if led by a period...
-(?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*   (?:
-[^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]+    # some number of atom characters...
-(?![^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]) # ..not followed by something that could be part of an atom
-|   \[                         # [
-(?: [^\\\x80-\xff\n\015\[\]] |  \\ [^\x80-\xff]  )*    #    stuff
-\]                        #           ]
-)                     #   ...further okay
-)*
-)* # further okay, if led by comma
-:                                # closing colon
-(?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*  )? #       optional route
-(?:
-[^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]+    # some number of atom characters...
-(?![^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]) # ..not followed by something that could be part of an atom
-|
-" (?:                      # opening quote...
-[^\\\x80-\xff\n\015"]                #   Anything except backslash and quote
-|                     #    or
-\\ [^\x80-\xff]           #   Escaped something (something != CR)
-)* "  # closing quote
-)                    # initial word
-(?:  (?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*  \.  (?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*   (?:
-[^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]+    # some number of atom characters...
-(?![^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]) # ..not followed by something that could be part of an atom
-|
-" (?:                      # opening quote...
-[^\\\x80-\xff\n\015"]                #   Anything except backslash and quote
-|                     #    or
-\\ [^\x80-\xff]           #   Escaped something (something != CR)
-)* "  # closing quote
-)  )* # further okay, if led by a period
-(?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*  @  (?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*    (?:
-[^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]+    # some number of atom characters...
-(?![^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]) # ..not followed by something that could be part of an atom
-|   \[                         # [
-(?: [^\\\x80-\xff\n\015\[\]] |  \\ [^\x80-\xff]  )*    #    stuff
-\]                        #           ]
-)                           # initial subdomain
-(?:                                  #
-(?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*  \.                        # if led by a period...
-(?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*   (?:
-[^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]+    # some number of atom characters...
-(?![^(\040)<>@,;:".\\\[\]\000-\037\x80-\xff]) # ..not followed by something that could be part of an atom
-|   \[                         # [
-(?: [^\\\x80-\xff\n\015\[\]] |  \\ [^\x80-\xff]  )*    #    stuff
-\]                        #           ]
-)                     #   ...further okay
-)*
-#       address spec
-(?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*  > #                  trailing >
-# name and address
-)  (?: [\040\t] |  \(
-(?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  |  \( (?:  [^\\\x80-\xff\n\015()]  |  \\ [^\x80-\xff]  )* \)  )*
-\)  )*                       # optional trailing comment
-/xSI
-
-/-- Although this saved pattern was compiled with link-size=2, it does no harm
-to run this test with other link sizes because it is going to generated a
-"compiled in wrong mode" error as soon as it is loaded, so the link size does 
-not matter. --/
-
-<!testsaved16
-
-<!testsaved32
-
-/\h/SI
-
-/\H/SI
-
-/\v/SI
-
-/\V/SI
-
-/\R/SI
-
-/[\h]/BZ
-    >\x09<
-
-/[\h]+/BZ
-    >\x09\x20\xa0<
-
-/[\v]/BZ
-
-/[\H]/BZ
-
-/[^\h]/BZ
-
-/[\V]/BZ
-
-/[\x0a\V]/BZ
-
-/\777/I
-
-/(*:0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF)XX/K
-    XX
-     
-/(*:0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDE)XX/K
-    XX
-
-/\u0100/<JS>
-
-/[\u0100-\u0200]/<JS>
-
-/[^\x00-a]{12,}[^b-\xff]*/BZ
-
-/[^\s]*\s* [^\W]+\W+ [^\d]*?\d0 [^\d\w]{4,6}?\w*A/BZ
-
-/-- End of testinput14 --/
+# End of testinput14

@@ -100,10 +100,10 @@ RC=0
 ./testdata/grepinputx:To pat or not to pat, that is the question.
 RC=0
 ---------------------------- Test 15 -----------------------------
-pcregrep: Error in command-line regex at offset 4: nothing to repeat
+pcre2grep: Error in command-line regex at offset 4: nothing to repeat
 RC=2
 ---------------------------- Test 16 -----------------------------
-pcregrep: Failed to open ./testdata/nonexistfile: No such file or directory
+pcre2grep: Failed to open ./testdata/nonexistfile: No such file or directory
 RC=2
 ---------------------------- Test 17 -----------------------------
 features should be added at the end, because some of the tests involve the
@@ -366,7 +366,7 @@ RC=0
 ./testdata/grepinputx
 RC=0
 ---------------------------- Test 33 -----------------------------
-pcregrep: Failed to open ./testdata/grepnonexist: No such file or directory
+pcre2grep: Failed to open ./testdata/grepnonexist: No such file or directory
 RC=2
 ---------------------------- Test 34 -----------------------------
 RC=2
@@ -384,16 +384,16 @@ aaaaa2
 010203040506
 RC=0
 ======== STDERR ========
-pcregrep: pcre_exec() gave error -8 while matching this text:
+pcre2grep: pcre2_match() gave error -47 while matching this text:
 
 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
-pcregrep: pcre_exec() gave error -8 while matching this text:
+pcre2grep: pcre2_match() gave error -47 while matching this text:
 
 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
-pcregrep: Error -8, -21 or -27 means that a resource limit was exceeded.
-pcregrep: Check your regex for nested unlimited loops.
+pcre2grep: Error -46, -47 or -53 means that a resource limit was exceeded.
+pcre2grep: Check your regex for nested unlimited loops.
 ---------------------------- Test 38 ------------------------------
 This line contains a binary zero here > < for testing.
 RC=0
@@ -433,7 +433,7 @@ RC=0
 597:binary
 RC=0
 ---------------------------- Test 46 ------------------------------
-pcregrep: Error in 2nd command-line regex at offset 9: missing )
+pcre2grep: Error in 2nd command-line regex at offset 9: missing closing parenthesis
 RC=2
 ---------------------------- Test 47 ------------------------------
 AB.VE
@@ -510,24 +510,24 @@ In the middle of a line, PATTERN appears.
 Check up on PATTERN near the end.
 RC=0
 ---------------------------- Test 62 -----------------------------
-pcregrep: pcre_exec() gave error -8 while matching text that starts:
+pcre2grep: pcre2_match() gave error -47 while matching text that starts:
 
 This is a file of miscellaneous text that is used as test data for checking
 that the pcregrep command is working correctly. The file must be more than 24K
 long so that it needs more than a single read
 
-pcregrep: Error -8, -21 or -27 means that a resource limit was exceeded.
-pcregrep: Check your regex for nested unlimited loops.
+pcre2grep: Error -46, -47 or -53 means that a resource limit was exceeded.
+pcre2grep: Check your regex for nested unlimited loops.
 RC=1
 ---------------------------- Test 63 -----------------------------
-pcregrep: pcre_exec() gave error -21 while matching text that starts:
+pcre2grep: pcre2_match() gave error -53 while matching text that starts:
 
 This is a file of miscellaneous text that is used as test data for checking
 that the pcregrep command is working correctly. The file must be more than 24K
 long so that it needs more than a single read
 
-pcregrep: Error -8, -21 or -27 means that a resource limit was exceeded.
-pcregrep: Check your regex for nested unlimited loops.
+pcre2grep: Error -46, -47 or -53 means that a resource limit was exceeded.
+pcre2grep: Check your regex for nested unlimited loops.
 RC=1
 ---------------------------- Test 64 ------------------------------
 appears
@@ -636,8 +636,8 @@ RC=0
 [1;31m01[00m
 RC=0
 ---------------------------- Test 83 -----------------------------
-pcregrep: line 4 of file ./testdata/grepinput3 is too long for the internal buffer
-pcregrep: check the --buffer-size option
+pcre2grep: line 4 of file ./testdata/grepinput3 is too long for the internal buffer
+pcre2grep: check the --buffer-size option
 RC=2
 ---------------------------- Test 84 -----------------------------
 testdata/grepinputv:fox jumps
