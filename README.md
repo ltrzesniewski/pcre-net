@@ -13,6 +13,8 @@ As it is still at major version 0, the API may change anytime.
 
 The currently wrapped PCRE version is **8.36**.
 
+Version **0.4** based on PCRE **v10.0** is on its way - it contains breaking API changes.
+
 ## Features ##
 
 The following regex operations are supported:

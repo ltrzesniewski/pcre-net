@@ -1,11 +1,6 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using PCRE.Support;
-using PCRE.Wrapper;
-
-namespace PCRE.Dfa
+﻿namespace PCRE.Dfa
 {
-    public partial class PcreDfaRegex
+    internal partial class PcreDfaRegex
     {
     }
 }

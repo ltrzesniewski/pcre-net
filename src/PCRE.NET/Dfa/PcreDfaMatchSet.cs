@@ -5,20 +5,20 @@ using PCRE.Wrapper;
 
 namespace PCRE.Dfa
 {
-    public class PcreDfaMatchSet : IReadOnlyCollection<PcreDfaMatch>
+    internal class PcreDfaMatchSet : IReadOnlyCollection<PcreDfaMatch>
     {
         private readonly object _result; // See remark about JIT in PcreRegex
         private readonly PcreDfaMatch[] _matches;
 
-        internal PcreDfaMatchSet(MatchResult result)
+        internal PcreDfaMatchSet(MatchData result)
         {
             _result = result;
-            _matches = result.ResultCount > 0 ? new PcreDfaMatch[result.ResultCount] : PcreDfaMatch.EmptyMatches;
+            _matches = PcreDfaMatch.EmptyMatches;
         }
 
-        private MatchResult InternalResult
+        private MatchData InternalResult
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)] get { return (MatchResult)_result; }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)] get { return (MatchData)_result; }
         }
 
         private PcreDfaMatch GetMatch(int index)

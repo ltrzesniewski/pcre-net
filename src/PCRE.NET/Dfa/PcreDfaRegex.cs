@@ -5,7 +5,7 @@ using PCRE.Wrapper;
 
 namespace PCRE.Dfa
 {
-    public sealed partial class PcreDfaRegex : IInternalRegexWrapper
+    internal sealed partial class PcreDfaRegex : IInternalRegexWrapper
     {
         // ReSharper disable IntroduceOptionalParameters.Global, MemberCanBePrivate.Global, UnusedMember.Global
 
