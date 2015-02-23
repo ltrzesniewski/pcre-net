@@ -1,6 +1,6 @@
 #! /usr/bin/perl -w
 
-# Script to turn PCRE man pages into HTML
+# Script to turn PCRE2 man pages into HTML
 
 
 # Subroutine to handle font changes and other escapes
@@ -63,12 +63,12 @@ print <<End ;
 <body bgcolor="#FFFFFF" text="#00005A" link="#0066FF" alink="#3399FF" vlink="#2222BB">
 <h1>$ARGV[0] man page</h1>
 <p>
-Return to the <a href="index.html">PCRE index page</a>.
+Return to the <a href="index.html">PCRE2 index page</a>.
 </p>
 <p>
-This page is part of the PCRE HTML documentation. It was generated automatically
-from the original man page. If there is any nonsense in it, please consult the
-man page, in case the conversion went wrong.
+This page is part of the PCRE2 HTML documentation. It was generated
+automatically from the original man page. If there is any nonsense in it,
+please consult the man page, in case the conversion went wrong.
 <br>
 End
 
@@ -82,7 +82,7 @@ while (<STDIN>)
 
   if (/^\./)
     {
-    # Some of the PCRE man pages used to contain instances of .br. However,
+    # Some of the PCRE2 man pages used to contain instances of .br. However,
     # they should have all been removed because they cause trouble in some
     # (other) automated systems that translate man pages to HTML. Complain if
     # we find .br or .in (another macro that is deprecated).
@@ -232,7 +232,7 @@ while (<STDIN>)
       redo;            # Process the joined lines
       }
 
-    # .EX/.EE are used in the pcredemo page to bracket the entire program,
+    # .EX/.EE are used in the pcre2demo page to bracket the entire program,
     # which is unmodified except for turning backslash into "\e".
 
     elsif (/^\.EX\s*$/)
@@ -303,7 +303,7 @@ print while (<TEMP>);
 
 print <<End ;
 <p>
-Return to the <a href="index.html">PCRE index page</a>.
+Return to the <a href="index.html">PCRE2 index page</a>.
 </p>
 End
 

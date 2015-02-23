@@ -5,30 +5,7 @@ namespace PCRE
 {
     public static class PcreBuildInfo
     {
-        public static string VersionString
-        {
-            get { return PcreBuild.VersionString; }
-        }
-
-        public static bool Utf8
-        {
-            get { return GetConfigBool(ConfigKey.Utf8); }
-        }
-
-        public static bool Utf16
-        {
-            get { return GetConfigBool(ConfigKey.Utf16); }
-        }
-
-        public static bool Utf32
-        {
-            get { return GetConfigBool(ConfigKey.Utf32); }
-        }
-
-        public static bool UnicodeProperties
-        {
-            get { return GetConfigBool(ConfigKey.UnicodeProperties); }
-        }
+        // TODO : Bsr
 
         public static bool Jit
         {
@@ -40,39 +17,49 @@ namespace PCRE
             get { return PcreBuild.GetConfigString(ConfigKey.JitTarget); }
         }
 
-        public static PcreNewLine NewLine
-        {
-            get { return (PcreNewLine)GetConfigInt(ConfigKey.NewLine); }
-        }
-
-        public static bool BackSlashRMatchesUnicode
-        {
-            get { return GetConfigInt(ConfigKey.Bsr) == 0; }
-        }
-
         public static int LinkSize
         {
             get { return GetConfigInt(ConfigKey.LinkSize); }
         }
 
-        public static long ParensLimit
-        {
-            get { return GetConfigLong(ConfigKey.ParensLimit); }
-        }
-
         public static long MatchLimit
         {
-            get { return GetConfigLong(ConfigKey.MatchLimit); }
+            get { return GetConfigInt(ConfigKey.MatchLimit); }
         }
 
-        public static long MatchLimitRecursion
+        public static PcreNewLine NewLine
         {
-            get { return GetConfigLong(ConfigKey.MatchLimitRecursion); }
+            get { return (PcreNewLine)GetConfigInt(ConfigKey.NewLine); }
+        }
+
+        public static long ParensLimit
+        {
+            get { return GetConfigInt(ConfigKey.ParensLimit); }
+        }
+
+        public static long RecursionLimit
+        {
+            get { return GetConfigInt(ConfigKey.RecursionLimit); }
         }
 
         public static bool StackRecurse
         {
             get { return GetConfigBool(ConfigKey.StackRecurse); }
+        }
+
+        public static string UnicodeVersion
+        {
+            get { return GetConfigString(ConfigKey.UnicodeVersion); }
+        }
+
+        public static bool Unicode
+        {
+            get { return GetConfigBool(ConfigKey.Unicode); }
+        }
+
+        public static string VersionString
+        {
+            get { return GetConfigString(ConfigKey.Version); }
         }
 
         private static bool GetConfigBool(ConfigKey key)
@@ -84,7 +71,7 @@ namespace PCRE
         {
             var value = PcreBuild.GetConfigInt32(key);
             if (value == null)
-                throw new InvalidOperationException("Could not retrieve the configuration property");
+                throw new InvalidOperationException("Could not retrieve the configuration property: " + key);
             return value.Value;
         }
 
@@ -92,8 +79,16 @@ namespace PCRE
         {
             var value = PcreBuild.GetConfigInt64(key);
             if (value == null)
-                throw new InvalidOperationException("Could not retrieve the configuration property");
+                throw new InvalidOperationException("Could not retrieve the configuration property: " + key);
             return value.Value;
+        }
+
+        private static string GetConfigString(ConfigKey key)
+        {
+            var value = PcreBuild.GetConfigString(key);
+            if (value == null)
+                throw new InvalidOperationException("Could not retrieve the configuration property: " + key);
+            return value;
         }
     }
 }

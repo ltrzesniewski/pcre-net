@@ -100,6 +100,14 @@ namespace PCRE.Tests.Pcre
             return sb.ToString();
         }
 
+        public static string UnescapeBinarySubject(this string str)
+        {
+            var sb = new StringBuilder();
+            foreach (var charCode in str.Split(' '))
+                sb.Append((char)Convert.ToInt16(charCode, 16));
+            return sb.ToString();
+        }
+
         public static string UnescapeGroup(this string str)
         {
             if (str == null)

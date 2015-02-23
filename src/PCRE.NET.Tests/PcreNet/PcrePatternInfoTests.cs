@@ -8,10 +8,10 @@ namespace PCRE.Tests.PcreNet
         [Test]
         public void should_return_pattern_and_options()
         {
-            var re = new PcreRegex(@"foo\s+bar", PcreOptions.IgnoreCase | PcreOptions.Studied);
+            var re = new PcreRegex(@"foo\s+bar", PcreOptions.IgnoreCase);
 
             Assert.That(re.PaternInfo.PatternString, Is.EqualTo(@"foo\s+bar"));
-            Assert.That(re.PaternInfo.Options, Is.EqualTo(PcreOptions.IgnoreCase | PcreOptions.Studied));
+            Assert.That(re.PaternInfo.Options, Is.EqualTo(PcreOptions.IgnoreCase));
         }
 
         [Test]
@@ -30,7 +30,7 @@ namespace PCRE.Tests.PcreNet
         [TestCase(@"a{3,5}b", 4)]
         public void should_detect_min_subject_length(string pattern, int expected)
         {
-            var re = new PcreRegex(pattern, PcreOptions.Studied);
+            var re = new PcreRegex(pattern);
             Assert.That(re.PaternInfo.MinSubjectLength, Is.EqualTo(expected));
         }
 

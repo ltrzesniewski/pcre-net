@@ -21,7 +21,6 @@ namespace PCRE.Tests.Pcre
             Assert.That(expectedResult.Pattern, Is.EqualTo(testCase.Pattern));
 
             RunTest(testCase, expectedResult, PcreOptions.None);
-            RunTest(testCase, expectedResult, PcreOptions.Studied);
             RunTest(testCase, expectedResult, PcreOptions.Compiled);
         }
 
@@ -38,8 +37,8 @@ namespace PCRE.Tests.Pcre
             }
             catch (Exception ex)
             {
-                if (ex.Message.Contains(@"\C not allowed in lookbehind assertion")) // Not supported
-                    Assert.Inconclusive("Not supported: " + ex.Message);
+                if (ex.Message.Contains(@"\C is not allowed in a lookbehind assertion"))
+                    Assert.Inconclusive(ex.Message);
 
                 throw;
             }
@@ -53,8 +52,12 @@ namespace PCRE.Tests.Pcre
 
                 Assert.That(expected.SubjectLine, Is.EqualTo(subject));
 
+                subject = testCase.Pattern.HexEncoding
+                    ? subject.UnescapeBinarySubject()
+                    : subject.UnescapeSubject();
+
                 var matches = regex
-                    .Matches(subject.UnescapeSubject())
+                    .Matches(subject)
                     .Take(testCase.Pattern.AllMatches ? int.MaxValue : 1)
                     .ToList();
 
@@ -116,7 +119,7 @@ namespace PCRE.Tests.Pcre
         {
             private static readonly string[,] InputFiles =
             {
-                { "testinput1", "testoutput1" }
+                { "testinput1", "testoutput1" },
                 //{ "testinput2", "testoutput2" }
             };
 

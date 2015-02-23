@@ -1,7 +1,7 @@
 #/bin/sh
 
-# Script to prepare the files for building a PCRE release. It does some
-# processing of the documentation, detrails files, and creates pcre.h.generic
+# Script to prepare the files for building a PCRE2 release. It does some
+# processing of the documentation, detrails files, and creates pcre2.h.generic
 # and config.h.generic (for use by builders who can't run ./configure).
 
 # You must run this script before runnning "make dist". If its first argument
@@ -9,7 +9,7 @@
 # arguments. The script makes use of the following files:
 
 # 132html     A Perl script that converts a .1 or .3 man page into HTML. It
-#             "knows" the relevant troff constructs that are used in the PCRE
+#             "knows" the relevant troff constructs that are used in the PCRE2
 #             man pages.
 
 # CheckMan    A Perl script that checks man pages for typos in the mark up.
@@ -27,19 +27,19 @@
 
 # README & NON-AUTOTOOLS-BUILD
 #             These files are copied into the doc/html directory, with .txt
-#             extensions so that they can by hyperlinked from the HTML 
+#             extensions so that they can by hyperlinked from the HTML
 #             documentation, because some people just go to the HTML without
 #             looking for text files.
 
 
-# First, sort out the documentation. Remove pcredemo.3 first because it won't
+# First, sort out the documentation. Remove pcre2demo.3 first because it won't
 # pass the markup check (it is created below, using markup that none of the
 # other pages use).
 
 cd doc
 echo Processing documentation
 
-/bin/rm -f pcredemo.3
+/bin/rm -f pcre2demo.3
 
 # Check the remaining man pages
 
@@ -50,37 +50,41 @@ if [ $? != 0 ] ; then exit 1; fi
 # tidy for online reading. Concatenate all the .3 stuff, but omit the
 # individual function pages.
 
-cat <<End >pcre.txt
+cat <<End >pcre2.txt
 -----------------------------------------------------------------------------
-This file contains a concatenation of the PCRE man pages, converted to plain
+This file contains a concatenation of the PCRE2 man pages, converted to plain
 text format for ease of searching with a text editor, or for use on systems
 that do not have a man page processor. The small individual files that give
 synopses of each function in the library have not been included. Neither has
-the pcredemo program. There are separate text files for the pcregrep and
-pcretest commands.
+the pcre2demo program. There are separate text files for the pcre2grep and
+pcre2test commands.
 -----------------------------------------------------------------------------
 
 
 End
 
-echo "Making pcre.txt"
-for file in pcre pcre16 pcre32 pcrebuild pcrematching pcreapi pcrecallout \
-            pcrecompat pcrepattern pcresyntax pcreunicode pcrejit pcrepartial \
-            pcreprecompile pcreperform pcreposix pcrecpp pcresample \
-            pcrelimits pcrestack ; do
+echo "Making pcre2.txt"
+for file in pcre2 pcre2api pcre2build pcre2callout pcre2compat pcre2jit \
+            pcre2limits pcre2matching pcre2partial pcre2unicode ; do
+
+#for file in  \
+#            pcre2syntax \
+#            pcre2precompile pcre2perform pcre2posix pcre2sample \
+#            pcre2stack ; do
+
   echo "  Processing $file.3"
   nroff -c -man $file.3 >$file.rawtxt
-  perl ../CleanTxt <$file.rawtxt >>pcre.txt
+  perl ../CleanTxt <$file.rawtxt >>pcre2.txt
   /bin/rm $file.rawtxt
-  echo "------------------------------------------------------------------------------" >>pcre.txt
-  if [ "$file" != "pcresample" ] ; then
-    echo " " >>pcre.txt
-    echo " " >>pcre.txt
+  echo "------------------------------------------------------------------------------" >>pcre2.txt
+  if [ "$file" != "pcre2sample" ] ; then
+    echo " " >>pcre2.txt
+    echo " " >>pcre2.txt
   fi
 done
 
 # The three commands
-for file in pcretest pcregrep pcre-config ; do
+for file in pcre2test pcre2grep pcre2-config ; do
   echo Making $file.txt
   nroff -c -man $file.1 >$file.rawtxt
   perl ../CleanTxt <$file.rawtxt >$file.txt
@@ -88,12 +92,12 @@ for file in pcretest pcregrep pcre-config ; do
 done
 
 
-# Make pcredemo.3 from the pcredemo.c source file
+# Make pcre2demo.3 from the pcre2demo.c source file
 
-echo "Making pcredemo.3"
-perl <<"END" >pcredemo.3
-  open(IN, "../pcredemo.c") || die "Failed to open pcredemo.c\n";
-  open(OUT, ">pcredemo.3") || die "Failed to open pcredemo.3\n";
+echo "Making pcre2demo.3"
+perl <<"END" >pcre2demo.3
+  open(IN, "../src/pcre2demo.c") || die "Failed to open src/pcre2demo.c\n";
+  open(OUT, ">pcre2demo.3") || die "Failed to open pcre2demo.3\n";
   print OUT ".\\\" Start example.\n" .
             ".de EX\n" .
             ".  nr mE \\\\n(.f\n" .
@@ -145,12 +149,12 @@ for file in *.3 ; do
   base=`basename $file .3`
   toc=-toc
   if [ `expr $base : '.*_'` -ne 0 ] ; then toc="" ; fi
-  if [ "$base" = "pcresample" ]  || \
-     [ "$base" = "pcrestack" ]   || \
-     [ "$base" = "pcrecompat" ]  || \
-     [ "$base" = "pcrelimits" ]  || \
-     [ "$base" = "pcreperform" ] || \
-     [ "$base" = "pcreunicode" ] ; then
+  if [ "$base" = "pcre2sample" ]  || \
+     [ "$base" = "pcre2stack" ]   || \
+     [ "$base" = "pcre2compat" ]  || \
+     [ "$base" = "pcre2limits" ]  || \
+     [ "$base" = "pcre2perform" ] || \
+     [ "$base" = "pcre2unicode" ] ; then
     toc=""
   fi
   echo "  Making $base.html"
@@ -167,20 +171,16 @@ if [ "$1" = "doc" ] ; then exit; fi
 # These files are detrailed; do not detrail the test data because there may be
 # significant trailing spaces. Do not detrail RunTest.bat, because it has CRLF
 # line endings and the detrail script removes all trailing white space. The
-# configure files are also omitted from the detrailing. We don't bother with
-# those pcre[16|32]_xx files that just define COMPILE_PCRE16 and then #include the
-# common file, because they aren't going to change.
+# configure files are also omitted from the detrailing.
 
 files="\
   Makefile.am \
-  Makefile.in \
   configure.ac \
   README \
   LICENCE \
   COPYING \
   AUTHORS \
   NEWS \
-  NON-UNIX-USE \
   NON-AUTOTOOLS-BUILD \
   INSTALL \
   132html \
@@ -190,65 +190,46 @@ files="\
   CMakeLists.txt \
   RunGrepTest \
   RunTest \
-  pcre-config.in \
-  libpcre.pc.in \
-  libpcre16.pc.in \
-  libpcre32.pc.in \
-  libpcreposix.pc.in \
-  libpcrecpp.pc.in \
-  config.h.in \
-  pcre_chartables.c.dist \
-  pcredemo.c \
-  pcregrep.c \
-  pcretest.c \
-  dftables.c \
-  pcreposix.c \
-  pcreposix.h \
-  pcre.h.in \
-  pcre_internal.h \
-  pcre_byte_order.c \
-  pcre_compile.c \
-  pcre_config.c \
-  pcre_dfa_exec.c \
-  pcre_exec.c \
-  pcre_fullinfo.c \
-  pcre_get.c \
-  pcre_globals.c \
-  pcre_jit_compile.c \
-  pcre_jit_test.c \
-  pcre_maketables.c \
-  pcre_newline.c \
-  pcre_ord2utf8.c \
-  pcre16_ord2utf16.c \
-  pcre32_ord2utf32.c \
-  pcre_printint.c \
-  pcre_refcount.c \
-  pcre_string_utils.c \
-  pcre_study.c \
-  pcre_tables.c \
-  pcre_valid_utf8.c \
-  pcre_version.c \
-  pcre_xclass.c \
-  pcre16_utf16_utils.c \
-  pcre32_utf32_utils.c \
-  pcre16_valid_utf16.c \
-  pcre32_valid_utf32.c \
-  pcre_scanner.cc \
-  pcre_scanner.h \
-  pcre_scanner_unittest.cc \
-  pcrecpp.cc \
-  pcrecpp.h \
-  pcrecpparg.h.in \
-  pcrecpp_unittest.cc \
-  pcre_stringpiece.cc \
-  pcre_stringpiece.h.in \
-  pcre_stringpiece_unittest.cc \
-  perltest.pl \
-  ucp.h \
-  makevp.bat \
-  pcre.def \
-  libpcre.def \
-  libpcreposix.def"
+  pcre2-config.in \
+  perltest.sh \
+  libpcre2-8.pc.in \
+  libpcre2-16.pc.in \
+  libpcre2-32.pc.in \
+  libpcre2-posix.pc.in \
+  src/dftables.c \
+  src/pcre2.h.in \
+  src/pcre2_auto_possess.c \
+  src/pcre2_compile.c \
+  src/pcre2_config.c \
+  src/pcre2_context.c \
+  src/pcre2_dfa_match.c \
+  src/pcre2_error.c \
+  src/pcre2_internal.h \
+  src/pcre2_intmodedep.h \
+  src/pcre2_jit_compile.c \
+  src/pcre2_jit_match.c \
+  src/pcre2_jit_misc.c \
+  src/pcre2_jit_test.c \
+  src/pcre2_maketables.c \
+  src/pcre2_match.c \
+  src/pcre2_match_data.c \
+  src/pcre2_newline.c \
+  src/pcre2_ord2utf.c \
+  src/pcre2_pattern_info.c \
+  src/pcre2_printint.c \
+  src/pcre2_string_utils.c \
+  src/pcre2_study.c \
+  src/pcre2_substring.c \
+  src/pcre2_tables.c \
+  src/pcre2_ucd.c \
+  src/pcre2_ucp.h \
+  src/pcre2_valid_utf.c \
+  src/pcre2_xclass.c \
+  src/pcre2demo.c \
+  src/pcre2grep.c \
+  src/pcre2posix.c \
+  src/pcre2posix.h \
+  src/pcre2test.c"
 
 echo Detrailing
 perl ./Detrail $files doc/p* doc/html/*

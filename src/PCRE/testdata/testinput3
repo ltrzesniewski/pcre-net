@@ -1,17 +1,17 @@
-/-- This set of tests checks local-specific features, using the "fr_FR" locale. 
-    It is not Perl-compatible. When run via RunTest, the locale is edited to
-    be whichever of "fr_FR", "french", or "fr" is found to exist. There is
-    different version of this file called wintestinput3 for use on Windows,
-    where the locale is called "french" and the tests are run using
-    RunTest.bat. --/
+# This set of tests checks local-specific features, using the "fr_FR" locale. 
+# It is not Perl-compatible. When run via RunTest, the locale is edited to
+# be whichever of "fr_FR", "french", or "fr" is found to exist. There is
+# different version of this file called wintestinput3 for use on Windows,
+# where the locale is called "french" and the tests are run using
+# RunTest.bat. 
 
-< forbid 8W 
+#forbid_utf
 
 /^[\w]+/
     *** Failers
     École
 
-/^[\w]+/Lfr_FR
+/^[\w]+/locale=fr_FR
     École
 
 /^[\w]+/
@@ -21,7 +21,7 @@
 /^[\W]+/
     École
 
-/^[\W]+/Lfr_FR
+/^[\W]+/locale=fr_FR
     *** Failers
     École
 
@@ -30,7 +30,7 @@
     *** Failers
     a
 
-/[\b]/Lfr_FR
+/[\b]/locale=fr_FR
     \b
     *** Failers
     a
@@ -39,13 +39,13 @@
     *** Failers
     École
 
-/^\w+/Lfr_FR
+/^\w+/locale=fr_FR
     École
 
 /(.+)\b(.+)/
     École
 
-/(.+)\b(.+)/Lfr_FR
+/(.+)\b(.+)/locale=fr_FR
     *** Failers
     École
 
@@ -54,47 +54,51 @@
     *** Failers
     école
 
-/École/iLfr_FR
+/École/i,locale=fr_FR
     École
     école
 
-/\w/IS
+/\w/I
 
-/\w/ISLfr_FR
+/\w/I,locale=fr_FR
 
-/^[\xc8-\xc9]/iLfr_FR
+# All remaining tests are in the fr_FR locale, so set the default.
+
+#pattern locale=fr_FR
+
+/^[\xc8-\xc9]/i
     École
     école
 
-/^[\xc8-\xc9]/Lfr_FR
+/^[\xc8-\xc9]/
     École
     *** Failers 
     école
 
-/\W+/Lfr_FR
+/\W+/
     >>>\xaa<<<
     >>>\xba<<< 
 
-/[\W]+/Lfr_FR
+/[\W]+/
     >>>\xaa<<<
     >>>\xba<<< 
 
-/[^[:alpha:]]+/Lfr_FR
+/[^[:alpha:]]+/
     >>>\xaa<<<
     >>>\xba<<< 
 
-/\w+/Lfr_FR
+/\w+/
     >>>\xaa<<<
     >>>\xba<<< 
 
-/[\w]+/Lfr_FR
+/[\w]+/
     >>>\xaa<<<
     >>>\xba<<< 
 
-/[[:alpha:]]+/Lfr_FR
+/[[:alpha:]]+/
     >>>\xaa<<<
     >>>\xba<<< 
     
-/[[:alpha:]][[:lower:]][[:upper:]]/DZLfr_FR 
+/[[:alpha:]][[:lower:]][[:upper:]]/IB
 
-/-- End of testinput3 --/
+# End of testinput3 

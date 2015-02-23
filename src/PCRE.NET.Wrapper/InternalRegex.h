@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "StudyOptions.h"
+#include "JitCompileOptions.h"
 #include "CalloutData.h"
 
 using namespace System;
@@ -11,19 +11,17 @@ namespace PCRE {
 	namespace Wrapper {
 
 		ref class MatchResult;
-		enum struct PatternOptions;
+		enum struct PatternOptions : unsigned int;
 		enum struct InfoKey;
 
 		public ref class InternalRegex sealed
 		{
 		public:
-			InternalRegex(String^ pattern, PatternOptions options, Nullable<StudyOptions> studyOptions);
+			InternalRegex(String^ pattern, PatternOptions options, JitCompileOptions jitCompileOptions);
 			~InternalRegex();
 			!InternalRegex();
 
-			bool IsMatch(String^ subject, int startOffset);
-			MatchResult^ Match(String^ subject, int startOffset, PatternOptions additionalOptions, Func<CalloutData^, CalloutResult>^ calloutCallback);
-			MatchResult^ DfaMatch(String^ subject, int startOffset, int maxMatches, PatternOptions additionalOptions, Func<CalloutData^, CalloutResult>^ calloutCallback);
+			MatchData^ Match(String^ subject, int startOffset, PatternOptions additionalOptions, Func<CalloutData^, CalloutResult>^ calloutCallback);
 
 			int GetInfoInt32(InfoKey key);
 
@@ -35,11 +33,15 @@ namespace PCRE {
 				Dictionary<String^, array<int>^>^ get() { return _captureNames; }
 			}
 
-		private:
-			static InternalRegex();
+		internal:
+			property pcre2_code* Code {
+				pcre2_code* get() { return _re; }
+			}
 
-			pcre16* _re;
-			pcre16_extra* _extra;
+		private:
+			//static InternalRegex();
+
+			pcre2_code* _re;
 			initonly int _captureCount;
 			initonly Dictionary<String^, array<int>^>^ _captureNames;
 		};

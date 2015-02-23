@@ -18,12 +18,6 @@
     <ClInclude Include="Stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\PCRE\pcre.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="StudyOptions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ConfigKey.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -39,13 +33,28 @@
     <ClInclude Include="InternalRegex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MatchResult.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CalloutData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MatchResultCode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\PCRE\src\pcre2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CompileContextOptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CompileContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MatchContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MatchData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JitCompileOptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -62,10 +71,16 @@
     <ClCompile Include="InternalRegex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MatchResult.cpp">
+    <ClCompile Include="CalloutData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CalloutData.cpp">
+    <ClCompile Include="CompileContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MatchContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MatchData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

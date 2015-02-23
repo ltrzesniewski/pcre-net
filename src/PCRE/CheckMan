@@ -1,6 +1,6 @@
 #! /usr/bin/perl
 
-# A script to scan PCRE's man pages to check for typos in the control
+# A script to scan PCRE2's man pages to check for typos in the control
 # sequences. I use only a small set of the available repertoire, so it is 
 # straightforward to check that nothing else has slipped in by mistake. This
 # script should be called in the doc directory.

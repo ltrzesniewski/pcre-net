@@ -1,43 +1,43 @@
-/-- This is a specialized test for checking, when PCRE is compiled with the
-EBCDIC option but in an ASCII environment, that newline and white space
-functionality is working. It catches cases where explicit values such as 0x0a
-have been used instead of names like CHAR_LF. Needless to say, it is not a
-genuine EBCDIC test! In patterns, alphabetic characters that follow a backslash
-must be in EBCDIC code. In data, newlines and other spacing characters must be
-in EBCDIC, but can be specified as escapes. --/
+# This is a specialized test for checking, when PCRE2 is compiled with the
+# EBCDIC option but in an ASCII environment, that newline and white space
+# functionality is working. It catches cases where explicit values such as 0x0a
+# have been used instead of names like CHAR_LF. Needless to say, it is not a
+# genuine EBCDIC test! In patterns, alphabetic characters that follow a
+# backslash must be in EBCDIC code. In data, NL, NEL, LF, ESC, and DEL must be
+# in EBCDIC, but can of course be specified as escapes.
 
-/-- Test default newline and variations --/
+# Test default newline and variations
 
 /^A/m
     ABC
     12\x15ABC
 
-/^A/m<any>
+/^A/m,newline=any
     12\x15ABC
     12\x0dABC
     12\x0d\x15ABC
     12\x25ABC
 
-/^A/m<anycrlf>
+/^A/m,newline=anycrlf
     12\x15ABC
     12\x0dABC
     12\x0d\x15ABC
     ** Fail
     12\x25ABC
 
-/-- Test \h --/
+# Test \h
 
 /^A\ˆ/
     A B
 
-/-- Test \H --/
+# Test \H
 
 /^A\È/
     AB
     ** Fail
     A B
 
-/-- Test \R --/
+# Test \R
 
 /^A\Ù/
     A\x15B
@@ -48,7 +48,7 @@ in EBCDIC, but can be specified as escapes. --/
     ** Fail
     A B
 
-/-- Test \v --/
+# Test \v
 
 /^A\¥/
     A\x15B
@@ -59,7 +59,7 @@ in EBCDIC, but can be specified as escapes. --/
     ** Fail
     A B
 
-/-- Test \V --/
+# Test \V
 
 /^A\å/
     A B
@@ -70,22 +70,22 @@ in EBCDIC, but can be specified as escapes. --/
     A\x0bB
     A\x0cB
     
-/-- For repeated items, use an atomic group so that the output is the same
-for DFA matching (otherwise it may show multiple matches). --/ 
+# For repeated items, use an atomic group so that the output is the same
+# for DFA matching (otherwise it may show multiple matches).
 
-/-- Test \h+ --/
+# Test \h+
 
 /^A(?>\ˆ+)/
     A B
 
-/-- Test \H+ --/
+# Test \H+
 
 /^A(?>\È+)/
     AB
     ** Fail
     A B
 
-/-- Test \R+ --/
+# Test \R+
 
 /^A(?>\Ù+)/
     A\x15B
@@ -96,7 +96,7 @@ for DFA matching (otherwise it may show multiple matches). --/
     ** Fail
     A B
 
-/-- Test \v+ --/
+# Test \v+
 
 /^A(?>\¥+)/
     A\x15B
@@ -107,7 +107,7 @@ for DFA matching (otherwise it may show multiple matches). --/
     ** Fail
     A B
 
-/-- Test \V+ --/
+# Test \V+
 
 /^A(?>\å+)/
     A B
@@ -118,4 +118,4 @@ for DFA matching (otherwise it may show multiple matches). --/
     A\x0bB
     A\x0cB
 
-/-- End --/
+# End

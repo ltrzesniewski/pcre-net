@@ -40,7 +40,7 @@ namespace PCRE.Tests.Pcre
                 if (String.IsNullOrWhiteSpace(line))
                     continue;
 
-                if (line.StartsWith("<"))
+                if (line.StartsWith("#"))
                     continue; // TODO : Interpret that
 
                 line = line.TrimStart();
@@ -107,66 +107,156 @@ namespace PCRE.Tests.Pcre
 
         private void ParseOptions(TestPattern pattern)
         {
-            var options = PcreOptions.None;
-            var resetOptions = PcreOptions.None;
+            pattern.PatternOptions = PcreOptions.None;
+            pattern.ResetOptionBits = PcreOptions.None;
 
-            foreach (var c in pattern.OptionsString)
+            foreach (var part in pattern.OptionsString.Split(','))
             {
-                switch (c)
+                var args = part.Split('=');
+
+                var name = args[0];
+                var value = args.Length == 2 ? args[1] : null;
+
+                switch (name)
                 {
-                    case 'i':
-                        options |= PcreOptions.IgnoreCase;
-                        break;
-
-                    case 'm':
-                        options |= PcreOptions.MultiLine;
-                        break;
-
-                    case 's':
-                        options |= PcreOptions.Singleline;
-                        break;
-
-                    case 'x':
-                        options |= PcreOptions.IgnorePatternWhitespace;
-                        break;
-
-                    case 'J':
-                        options |= PcreOptions.DuplicateNames;
-                        break;
-
-                    case 'g':
-                        pattern.AllMatches = true;
-                        break;
-
-                    case '+':
+                    case "aftertext":
+                    case "allaftertext":
                         pattern.GetRemainingString = true;
                         break;
 
-                    case 'K':
+                    case "dupnames":
+                        pattern.PatternOptions |= PcreOptions.DuplicateNames;
+                        break;
+
+                    case "mark":
                         pattern.ExtractMarks = true;
                         break;
 
-                    case 'S':
-                        if ((options & PcreOptions.Studied) != 0)
-                            resetOptions |= PcreOptions.Studied;
-
-                        options |= PcreOptions.Studied;
+                    case "no_start_optimize":
+                        pattern.PatternOptions |= PcreOptions.NoStartOptimize;
                         break;
 
-                    case 'Y':
-                        options |= PcreOptions.NoStartOptimize;
+                    case "hex":
+                        pattern.HexEncoding = true;
                         break;
 
-                    case ' ':
+                    case "dollar_endonly":
+                        pattern.PatternOptions |= PcreOptions.DollarEndOnly;
+                        break;
+
+                    case "anchored":
+                        pattern.PatternOptions |= PcreOptions.Anchored;
+                        break;
+
+                    case "ungreedy":
+                        pattern.PatternOptions |= PcreOptions.Ungreedy;
+                        break;
+
+                    case "global":
+                    case "altglobal":
+                        pattern.AllMatches = true;
+                        break;
+
+                    case "no_auto_possess":
+                        pattern.PatternOptions |= PcreOptions.NoAutoPossess;
+                        break;
+
+                    case "no_auto_capture":
+                        pattern.PatternOptions |= PcreOptions.ExplicitCapture;
+                        break;
+
+                    case "auto_callout":
+                        pattern.PatternOptions |= PcreOptions.AutoCallout;
+                        break;
+
+                    case "firstline":
+                        pattern.PatternOptions |= PcreOptions.FirstLineOnly;
+                        break;
+
+                    case "alt_bsux":
+                        pattern.PatternOptions |= PcreOptions.AltBsUX;
+                        break;
+
+                    case "allow_empty_class":
+                        pattern.PatternOptions |= PcreOptions.AllowEmptyClass;
+                        break;
+
+                    case "match_unset_backref":
+                        pattern.PatternOptions |= PcreOptions.MatchUnsetBackref;
+                        break;
+
+                    case "allcaptures":
+                        break;
+
+                    case "replace":
+                        pattern.ReplaceWith = value;
+                        break;
+
+                    case "info":
+                        pattern.IncludeInfo = true;
+                        break;
+
+                    case "no_dotstar_anchor":
+                        pattern.PatternOptions |= PcreOptions.NoDotStarAnchor;
+                        break;
+
+                    case "dotall":
+                        pattern.PatternOptions |= PcreOptions.Singleline;
+                        break;
+
+                    case "newline": // TODO
+                    case "bsr":
+                    case "startchar":
+                    case "stackguard":
+                    case "parens_nest_limit":
                         break;
 
                     default:
-                        throw InvalidInputException("Unknown modifier: " + c);
+                        foreach (var c in part)
+                        {
+                            switch (c)
+                            {
+                                case 'i':
+                                    pattern.PatternOptions |= PcreOptions.IgnoreCase;
+                                    break;
+
+                                case 'm':
+                                    pattern.PatternOptions |= PcreOptions.MultiLine;
+                                    break;
+
+                                case 's':
+                                    pattern.PatternOptions |= PcreOptions.Singleline;
+                                    break;
+
+                                case 'x':
+                                    pattern.PatternOptions |= PcreOptions.IgnorePatternWhitespace;
+                                    break;
+
+                                case 'g':
+                                    pattern.AllMatches = true;
+                                    break;
+
+                                case 'B':
+                                    break;
+
+                                case 'I':
+                                    pattern.IncludeInfo = true;
+                                    break;
+
+                                case '\\':
+                                    pattern.Pattern += "\\";
+                                    break;
+
+                                case ' ':
+                                    break;
+
+                                default:
+                                    throw InvalidInputException("Unknown option: " + part);
+                            }
+                        }
+                        break;
                 }
             }
-
-            pattern.PatternOptions = options;
-            pattern.ResetOptionBits = resetOptions;
         }
 
         protected InvalidOperationException InvalidInputException(string message, Exception innerException = null)

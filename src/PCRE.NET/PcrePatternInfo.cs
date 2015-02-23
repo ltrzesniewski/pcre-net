@@ -34,7 +34,7 @@ namespace PCRE
 
         public bool IsCompiled
         {
-            get { return _re.InternalRegex.GetInfoInt32(InfoKey.Jit) != 0; }
+            get { return _re.InternalRegex.GetInfoInt32(InfoKey.JitSize) != 0; }
         }
 
         public bool CanMatchEmptyString

@@ -6,7 +6,7 @@ using namespace System;
 namespace PCRE {
 	namespace Wrapper {
 
-		ref class MatchResult;
+		ref class MatchData;
 
 		public ref class CalloutData sealed
 		{
@@ -18,13 +18,13 @@ namespace PCRE {
 			property int LastCapture { int get() { return _lastCapture; } }
 			property int PatternPosition { int get() { return _patternPosition; } }
 			property int NextPatternItemLength { int get() { return _nextItemLength; } }
-			property MatchResult^ Match { MatchResult^ get() { return _match; } }
+			property MatchData^ Match { MatchData^ get() { return _match; } }
 
 		internal:
-			CalloutData(MatchResult^ match, pcre16_callout_block *block);
+			CalloutData(MatchData^ match, pcre2_callout_block *block);
 
 		private:
-			initonly MatchResult^ _match;
+			initonly MatchData^ _match;
 			initonly int _number;
 			initonly int _startOffset;
 			initonly int _currentOffset;
@@ -38,8 +38,8 @@ namespace PCRE {
 		{
 			Pass = 0,
 			Fail = 1,
-			NoMatch = PCRE_ERROR_NOMATCH,
-			Throw = PCRE_ERROR_CALLOUT
+			NoMatch = PCRE2_ERROR_NOMATCH,
+			Throw = PCRE2_ERROR_CALLOUT
 		};
 
 	}

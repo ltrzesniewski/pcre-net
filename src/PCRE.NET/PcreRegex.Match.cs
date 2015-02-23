@@ -19,13 +19,7 @@ namespace PCRE
         [Pure]
         public bool IsMatch(string subject, int startIndex)
         {
-            if (subject == null)
-                throw new ArgumentNullException("subject");
-
-            if (startIndex < 0 || startIndex > subject.Length)
-                throw new ArgumentOutOfRangeException("startIndex");
-
-            return InternalRegex.IsMatch(subject, startIndex);
+            return Match(subject, startIndex).Success;
         }
 
         [Pure]

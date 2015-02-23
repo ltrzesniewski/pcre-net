@@ -1,9 +1,22 @@
-/-- This test is run only when JIT support is not available. It checks that an 
-attempt to use it has the expected behaviour. It also tests things that
-are different without JIT. --/
-   
-/abc/S+I
+# These DFA tests are for the handling of characters greater than 255 in
+# 16-bit or 32-bit, non-UTF mode. 
 
-/a*/SI
+#forbid_utf
+#subject dfa
 
-/-- End of testinput13 --/
+/^\x{ffff}+/i
+    \x{ffff}
+
+/^\x{ffff}?/i
+    \x{ffff}
+
+/^\x{ffff}*/i
+    \x{ffff}
+
+/^\x{ffff}{3}/i
+    \x{ffff}\x{ffff}\x{ffff}
+
+/^\x{ffff}{0,3}/i
+    \x{ffff}
+
+# End of testinput13

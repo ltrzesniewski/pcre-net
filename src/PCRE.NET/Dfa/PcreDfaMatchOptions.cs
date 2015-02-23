@@ -4,7 +4,7 @@ using PCRE.Wrapper;
 namespace PCRE.Dfa
 {
     [Flags]
-    public enum PcreDfaMatchOptions : long
+    internal enum PcreDfaMatchOptions : long
     {
         None = 0,
 
@@ -14,15 +14,6 @@ namespace PCRE.Dfa
         NotEndOfLine = PatternOptions.NotEol,
         NotEmpty = PatternOptions.NotEmpty,
         NotEmptyAtStart = PatternOptions.NotEmptyAtStart,
-
-        NewLineCr = PatternOptions.NewLineCr,
-        NewLineLf = PatternOptions.NewLineLf,
-        NewLineCrLf = PatternOptions.NewLineCrLf,
-        NewLineAny = PatternOptions.NewLineAny,
-        NewLineAnyCrLf = PatternOptions.NewLineAnyCrLf,
-
-        BackslashRAnyCrLf = PatternOptions.BsrAnyCrLf,
-        BackslashRUnicode = PatternOptions.BsrUnicode,
 
         NoStartOptimize = PatternOptions.NoStartOptimize,
 

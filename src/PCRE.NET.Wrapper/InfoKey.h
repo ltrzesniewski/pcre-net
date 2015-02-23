@@ -10,33 +10,38 @@ namespace PCRE {
 
 		public enum struct InfoKey
 		{
-			Options                    = PCRE_INFO_OPTIONS,
-			Size                       = PCRE_INFO_SIZE,
-			CaptureCount               = PCRE_INFO_CAPTURECOUNT,
-			BackRefMax                 = PCRE_INFO_BACKREFMAX,
-			FirstByte                  = PCRE_INFO_FIRSTBYTE,
-			FirstChar                  = PCRE_INFO_FIRSTCHAR,
-			FirstTable                 = PCRE_INFO_FIRSTTABLE,
-			LastLiteral                = PCRE_INFO_LASTLITERAL,
-			NameEntrySize              = PCRE_INFO_NAMEENTRYSIZE,
-			NameCount                  = PCRE_INFO_NAMECOUNT,
-			NameTable                  = PCRE_INFO_NAMETABLE,
-			StudySize                  = PCRE_INFO_STUDYSIZE,
-			DefaultTables              = PCRE_INFO_DEFAULT_TABLES,
-			PkPartial                  = PCRE_INFO_OKPARTIAL,
-			JChanged                   = PCRE_INFO_JCHANGED,
-			HasCrOrLf                  = PCRE_INFO_HASCRORLF,
-			MinLength                  = PCRE_INFO_MINLENGTH,
-			Jit                        = PCRE_INFO_JIT,
-			JitSize                    = PCRE_INFO_JITSIZE,
-			MaxLookBehind              = PCRE_INFO_MAXLOOKBEHIND,
-			FirstCharacter             = PCRE_INFO_FIRSTCHARACTER,
-			FirstCharacterFlags        = PCRE_INFO_FIRSTCHARACTERFLAGS,
-			RequiredChar               = PCRE_INFO_REQUIREDCHAR,
-			RequiredCharFlags          = PCRE_INFO_REQUIREDCHARFLAGS,
-			MatchLimit                 = PCRE_INFO_MATCHLIMIT,
-			RecursionLimit             = PCRE_INFO_RECURSIONLIMIT,
-			MatchEmpty                 = PCRE_INFO_MATCH_EMPTY
+			AllOptions                 = PCRE2_INFO_ALLOPTIONS,
+			ArgOptions                 = PCRE2_INFO_ARGOPTIONS,
+			BackRefMax                 = PCRE2_INFO_BACKREFMAX,
+			Bsr                        = PCRE2_INFO_BSR,
+			CaptureCount               = PCRE2_INFO_CAPTURECOUNT,
+			FirstCodeUnit              = PCRE2_INFO_FIRSTCODEUNIT,
+			FirstCodeType              = PCRE2_INFO_FIRSTCODETYPE,
+			FirstBitmap                = PCRE2_INFO_FIRSTBITMAP,
+			HasCrOrLf                  = PCRE2_INFO_HASCRORLF,
+			JChanged                   = PCRE2_INFO_JCHANGED,
+			JitSize                    = PCRE2_INFO_JITSIZE,
+			LastCodeUnit               = PCRE2_INFO_LASTCODEUNIT,
+			LastCodeType               = PCRE2_INFO_LASTCODETYPE,
+			MatchEmpty                 = PCRE2_INFO_MATCHEMPTY,
+			MatchLimit                 = PCRE2_INFO_MATCHLIMIT,
+			MaxLookBehind              = PCRE2_INFO_MAXLOOKBEHIND,
+			MinLength                  = PCRE2_INFO_MINLENGTH,
+			NameCount                  = PCRE2_INFO_NAMECOUNT,
+			NameEntrySize              = PCRE2_INFO_NAMEENTRYSIZE,
+			NameTable                  = PCRE2_INFO_NAMETABLE,
+			NewLine                    = PCRE2_INFO_NEWLINE,
+			RecursionLimit             = PCRE2_INFO_RECURSIONLIMIT,
+			Size                       = PCRE2_INFO_SIZE
+		};
+
+		public enum struct NewLine
+		{
+			Cr                         = PCRE2_NEWLINE_CR,
+			Lf                         = PCRE2_NEWLINE_LF,
+			CrLf                       = PCRE2_NEWLINE_CRLF,
+			Any                        = PCRE2_NEWLINE_ANY,
+			AnyCrLf                    = PCRE2_NEWLINE_ANYCRLF
 		};
 
 	}

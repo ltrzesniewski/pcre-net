@@ -1,41 +1,172 @@
-/-- This set of tests is run only with the 8-bit library when Unicode property 
-    support is available. It starts with tests of the POSIX interface, because
-    that is supported only with the 8-bit library. --/
+# This test is run only when JIT support is available. It checks JIT complete
+# and partial modes, and things that are different with JIT.
 
-/\w/P
-    +++\x{c2}
+#pattern jitverify
 
-/\w/WP
-    +++\x{c2}
+# JIT does not support this pattern (callout at start of condition).
+
+/(?(?C1)(?=a)a)/I
+
+# Check that an infinite recursion loop is caught.
+
+/(?(R)a*(?1)|((?R))b)/
+    aaaabcde
+
+/abcd/I
+    abcd
+    xyz
+
+/abcd/
+    abcd
+    ab\=ps
+    ab\=ph
+    xyz
+
+/abcd/jitfast
+    abcd
+    ab\=ps
+    ab\=ph
+    xyz
+
+/abcd/jit=1
+    abcd
+    ab\=ps
+    ab\=ph
+    xyz
+    xyz\=ps
+
+/abcd/jit=1,jitfast
+    abcd
+    ab\=ps
+    ab\=ph
+    xyz
+    xyz\=ps
+
+/abcd/jit=2
+    abcd
+    ab\=ps
+    ab\=ph
+    xyz
+
+/abcd/jit=2,jitfast
+    abcd
+    ab\=ps
+    ab\=ph
+    xyz
+
+/abcd/jit=3
+    abcd
+    ab\=ps
+    ab\=ph
+    xyz
+
+/abcd/jit=4
+    abcd
+    ab\=ps
+    ab\=ph
+    xyz
+
+/abcd/jit=5
+    abcd
+    ab\=ps
+    ab\=ph
+    xyz
+
+/abcd/jit=6
+    abcd
+    ab\=ps
+    ab\=ph
+    xyz
+
+/abcd/jit=7
+    abcd
+    ab\=ps
+    ab\=ph
+    xyz
+
+/abcd/I,jit=2
+
+/(*NO_START_OPT)a(*:m)b/mark
+    a
+
+/^12345678abcd/m
+    12345678abcd
     
-/A\x{391}\x{10427}\x{ff3a}\x{1fb0}/8iDZ
+# Limits tests that give different output with JIT. 
 
-/A\x{391}\x{10427}\x{ff3a}\x{1fb0}/8DZ
+/(a+)*zz/I
+  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaazzbbbbbb\=find_limits
+  aaaaaaaaaaaaaz\=find_limits
 
-/AB\x{1fb0}/8DZ
+!((?:\s|//.*\\n|/[*](?:\\n|.)*?[*]/)*)!I
+   /* this is a C style comment */\=find_limits
 
-/AB\x{1fb0}/8DZi
+/^(?>a)++/
+    aa\=find_limits
+    aaaaaaaaa\=find_limits
+    
+/(a)(?1)++/
+    aa\=find_limits
+    aaaaaaaaa\=find_limits
 
-/\x{401}\x{420}\x{421}\x{422}\x{423}\x{424}\x{425}\x{426}\x{427}\x{428}\x{429}\x{42a}\x{42b}\x{42c}\x{42d}\x{42e}\x{42f}/8iSI
-    \x{401}\x{420}\x{421}\x{422}\x{423}\x{424}\x{425}\x{426}\x{427}\x{428}\x{429}\x{42a}\x{42b}\x{42c}\x{42d}\x{42e}\x{42f}
-    \x{451}\x{440}\x{441}\x{442}\x{443}\x{444}\x{445}\x{446}\x{447}\x{448}\x{449}\x{44a}\x{44b}\x{44c}\x{44d}\x{44e}\x{44f}
+/a(?:.)*?a/ims
+    abbbbbbbbbbbbbbbbbbbbba\=find_limits
+    
+/a(?:.(*THEN))*?a/ims
+    abbbbbbbbbbbbbbbbbbbbba\=find_limits
 
-/[ⱥ]/8iBZ
+/a(?:.(*THEN:ABC))*?a/ims
+    abbbbbbbbbbbbbbbbbbbbba\=find_limits
 
-/[^ⱥ]/8iBZ
+/^(?>a+)(?>b+)(?>c+)(?>d+)(?>e+)/
+     aabbccddee\=find_limits
 
-/\h/SI
+/^(?>(a+))(?>(b+))(?>(c+))(?>(d+))(?>(e+))/
+     aabbccddee\=find_limits
 
-/\v/SI
+/^(?>(a+))(?>b+)(?>(c+))(?>d+)(?>(e+))/
+     aabbccddee\=find_limits
 
-/\R/SI
+/^(?>(a+))(?>b+)(?>(c+))(?>d+)(?>(e+))/jitfast
+     aabbccddee\=find_limits
+     aabbccddee\=jitstack=1
 
-/[[:blank:]]/WBZ
+/(a+)*zz/
+    aaaaaaaaaaaaaz
+    aaaaaaaaaaaaaz\=match_limit=3000
 
-/\x{212a}+/i8SI
-    KKkk\x{212a}
+/(*LIMIT_MATCH=3000)(a+)*zz/I
+    aaaaaaaaaaaaaz
+    aaaaaaaaaaaaaz\=match_limit=60000
 
-/s+/i8SI
-    SSss\x{17f}
+/(*LIMIT_MATCH=60000)(*LIMIT_MATCH=3000)(a+)*zz/I
+    aaaaaaaaaaaaaz
 
-/-- End of testinput16 --/
+/(*LIMIT_MATCH=60000)(a+)*zz/I
+    aaaaaaaaaaaaaz
+    aaaaaaaaaaaaaz\=match_limit=3000
+
+# These three have infinitely nested recursions. 
+    
+/((?2))((?1))/
+    abc
+
+/((?(R2)a+|(?1)b))/
+    aaaabcde
+
+/(?(R)a*(?1)|((?R))b)/
+    aaaabcde
+    
+# Invalid options disable JIT when called via pcre2_match(), causing the
+# match to happen via the interpreter, but for fast JIT invalid options are
+# ignored, so an unanchored match happens.
+
+/abcd/jit
+    abcd\=anchored
+    fail abcd\=anchored 
+    
+/abcd/jitfast
+    abcd\=anchored 
+    succeed abcd\=anchored 
+    
+# End of testinput16

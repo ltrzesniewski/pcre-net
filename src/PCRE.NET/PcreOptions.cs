@@ -14,7 +14,7 @@ namespace PCRE
         Singleline = PatternOptions.DotAll,
         ExplicitCapture = PatternOptions.NoAutoCapture,
         IgnorePatternWhitespace = PatternOptions.Extended,
-        JavaScript = PatternOptions.JavaScriptCompat,
+        JavaScript = PatternOptions.AltBsUX | PatternOptions.MatchUnsetBackref,
         Unicode = PatternOptions.Ucp,
 
         Anchored = PatternOptions.Anchored,
@@ -27,25 +27,29 @@ namespace PCRE
         DuplicateNames = PatternOptions.DupNames,
         AutoCallout = PatternOptions.AutoCallout,
 
-        NewLineCr = PatternOptions.NewLineCr,
-        NewLineLf = PatternOptions.NewLineLf,
-        NewLineCrLf = PatternOptions.NewLineCrLf,
-        NewLineAny = PatternOptions.NewLineAny,
-        NewLineAnyCrLf = PatternOptions.NewLineAnyCrLf,
+        //NewLineCr = PatternOptions.NewLineCr,
+        //NewLineLf = PatternOptions.NewLineLf,
+        //NewLineCrLf = PatternOptions.NewLineCrLf,
+        //NewLineAny = PatternOptions.NewLineAny,
+        //NewLineAnyCrLf = PatternOptions.NewLineAnyCrLf,
 
-        BackslashRAnyCrLf = PatternOptions.BsrAnyCrLf,
-        BackslashRUnicode = PatternOptions.BsrUnicode,
+        //BackslashRAnyCrLf = PatternOptions.BsrAnyCrLf,
+        //BackslashRUnicode = PatternOptions.BsrUnicode,
 
         NoStartOptimize = PatternOptions.NoStartOptimize,
         NoAutoPossess = PatternOptions.NoAutoPossess,
         DollarEndOnly = PatternOptions.DollarEndOnly,
-        ExtraPcreFunctionality = PatternOptions.Extra,
+        //ExtraPcreFunctionality = PatternOptions.Extra,
+
+        AltBsUX =  PatternOptions.AltBsUX,
+        AllowEmptyClass = PatternOptions.AllowEmptyClass,
+        MatchUnsetBackref = PatternOptions.MatchUnsetBackref,
+        NoDotStarAnchor = PatternOptions.NoDotStarAnchor,
 
         // Flipped options
-        CheckUnicodeValidity = PatternOptions.NoUtf16Check,
+        CheckUnicodeValidity = PatternOptions.NoUtfCheck,
 
         // Extra options
-        Studied = 1L << 32,
-        Compiled = 1L << 33
+        Compiled = 1L << 32
     }
 }

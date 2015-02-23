@@ -1,8 +1,9 @@
-/-- This set of tests is for features that are compatible with all versions of
-    Perl >= 5.10, in non-UTF-8 mode. It should run clean for the 8-bit, 16-bit,
-    and 32-bit PCRE libraries. --/
+# This set of tests is for features that are compatible with all versions of
+# Perl >= 5.10, in non-UTF mode. It should run clean for the 8-bit, 16-bit, and
+# 32-bit PCRE libraries, and also using the perltest.pl script.
     
-< forbid 89?=ABCDEFfGILMNPTUWXZ<
+#forbid_utf
+#perltest
 
 /the quick brown fox/
     the quick brown fox
@@ -1486,11 +1487,6 @@
     abc\100\060
     abc\100\60
     
-/^A\8B\9C$/
-    A8B9C
-    *** Failers
-    A\08B\09C  
-    
 /^(A)(B)(C)(D)(E)(F)(G)(H)(I)\8\9$/
     ABCDEFGHIHI 
 
@@ -1504,9 +1500,6 @@
 
 /(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)\12\123/
     abcdefghijk\12S
-
-/ab\idef/
-    abidef
 
 /a{0}bc/
     bc
@@ -1623,7 +1616,7 @@
 /foo(.*)bar/
     The food is under the bar in the barn.
     
-/foo(.*?)bar/  
+/foo(.*?)bar/
     The food is under the bar in the barn.
 
 /(.*)(\d*)/
@@ -1888,13 +1881,13 @@
     the \"quick\" brown fox
     \"the \\\"quick\\\" brown fox\" 
 
-/.*?/g+
+/.*?/g,aftertext
     abc
   
-/\b/g+
+/\b/g,aftertext
     abc 
 
-/\b/+g
+/\b/g,aftertext
     abc 
 
 //g
@@ -2027,7 +2020,7 @@
 /((?>[^()]+)|\([^()]*\))+/
     ((abc(ade)ufh()()x
     
-/\(((?>[^()]+)|\([^()]+\))+\)/ 
+/\(((?>[^()]+)|\([^()]+\))+\)/
     (abc)
     (abc(def)xyz)
     *** Failers
@@ -2101,7 +2094,7 @@
     MORE THAN MILLION    
     more \n than \n million 
     
-/(?>a(?i)b+)+c/ 
+/(?>a(?i)b+)+c/
     abc
     aBbc
     aBBc 
@@ -2139,12 +2132,15 @@
     bb  
     *** Failers
     ab   
+    
+# Perl gets this next one wrong if the pattern ends with $; in that case it
+# fails to match "12". 
 
-/^(?(?=abc)\w{3}:|\d\d)$/
+/^(?(?=abc)\w{3}:|\d\d)/
     abc:
     12
-    *** Failers
     123
+    *** Failers
     xyz    
 
 /^(?(?!abc)\d\d|\w{3}:)$/
@@ -2613,7 +2609,7 @@
     a((b
 
 /a\\b/
-    a\b
+    a\\b
 
 /((a))/
     abc
@@ -2946,7 +2942,8 @@
     A((B
 
 /a\\b/i
-    A\B
+    A\\b
+    a\\B 
 
 /((a))/i
     ABC
@@ -3773,9 +3770,9 @@
     abc123abc
     abc123bc  
 
-/-- This tests for an IPv6 address in the form where it can have up to
-    eight components, one and only one of which is empty. This must be
-    an internal component. --/
+# This tests for an IPv6 address in the form where it can have up to
+# eight components, one and only one of which is empty. This must be
+# an internal component. 
 
 /^(?!:)                       # colon disallowed at start
   (?:                         # start of item
@@ -3785,7 +3782,7 @@
   ){1,7}                      # end item; 1-7 of them required               
   [0-9a-f]{1,4} $             # final hex number at end of string
   (?(1)|.)                    # check that there was an empty component
-  /xi
+  /ix
     a123::a123
     a123:b342::abcd
     a123:b342::324e:abcd
@@ -3811,13 +3808,6 @@
     *** Failers
     b     
 
-/[\z\C]/
-    z
-    C 
-    
-/\M/
-    M 
-    
 /(a+)*b/
     aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa 
     
@@ -3859,11 +3849,11 @@
     ** Failers
     offX 
 
-/^/mg
+/^/gm
     a\nb\nc\n
     \ 
     
-/(?<=C\n)^/mg
+/(?<=C\n)^/gm
     A\nC\nC\n 
 
 /(?:(?(1)a|b)(X))+/
@@ -4077,9 +4067,6 @@
 /[\x00-\xff\s]+/
     \x0a\x0b\x0c\x0d
 
-/^\c/
-    ?
-
 /(abc)\1/i
    abc
 
@@ -4099,7 +4086,7 @@
     12abc
     12ABC
     
-/[^a]+?X/i   
+/[^a]+?X/i
     ** Failers
     12abc
     12ABC
@@ -4158,10 +4145,10 @@
 /(?>(?>(a))b|(a)c)/
     ac
 
-/(?:(?>([ab])))+a=/+
+/(?:(?>([ab])))+a=/aftertext
     =ba=
 
-/(?>([ab]))+a=/+
+/(?>([ab]))+a=/aftertext
     =ba=
 
 /((?>(a+)b)+(aabab))/
@@ -4191,17 +4178,17 @@
 /^(?:a|ab)+c/
     aaaabc
 
-/(?=abc){3}abc/+
+/(?=abc){3}abc/aftertext
     abcabcabc
     ** Failers
     xyz  
     
-/(?=abc)+abc/+
+/(?=abc)+abc/aftertext
     abcabcabc
     ** Failers
     xyz  
     
-/(?=abc)++abc/+
+/(?=abc)++abc/aftertext
     abcabcabc
     ** Failers
     xyz  
@@ -4309,20 +4296,13 @@
 /(?<=ab\Cde)X/
     abZdeX
 
-/a[\CD]b/
-    aCb
-    aDb 
-
-/a[\C-X]b/
-    aJb
-
 /\H\h\V\v/
     X X\x0a
     X\x09X\x0b
     ** Failers
     \xa0 X\x0a   
     
-/\H*\h+\V?\v{3,4}/ 
+/\H*\h+\V?\v{3,4}/
     \x09\x20\xa0X\x0a\x0b\x0c\x0d\x0a
     \x09\x20\xa0\x0a\x0b\x0c\x0d\x0a
     \x09\x20\xa0\x0a\x0b\x0c
@@ -4357,16 +4337,16 @@
 /(foo\Kbar)baz/
     foobarbaz
 
-/abc\K|def\K/g+
+/abc\K|def\K/g,aftertext
     Xabcdefghi
 
-/ab\Kc|de\Kf/g+
+/ab\Kc|de\Kf/g,aftertext
     Xabcdefghi
     
-/(?=C)/g+
+/(?=C)/g,aftertext
     ABCDECBA
     
-/^abc\K/+
+/^abc\K/aftertext
     abcdef
     ** Failers
     defabcxyz   
@@ -4614,7 +4594,7 @@
     defdef
     abcdef    
 
-/(?:a(?<quote> (?<apostrophe>')|(?<realquote>")) |b(?<quote> (?<apostrophe>')|(?<realquote>")) ) (?('quote')[a-z]+|[0-9]+)/xJ
+/(?:a(?<quote> (?<apostrophe>')|(?<realquote>")) |b(?<quote> (?<apostrophe>')|(?<realquote>")) ) (?('quote')[a-z]+|[0-9]+)/x,dupnames
     a\"aaaaa
     b\"aaaaa 
     ** Failers 
@@ -4697,77 +4677,72 @@
     00
     0000  
 
-/--- This one does fail, as expected, in Perl. It needs the complex item at the
-     end of the pattern. A single letter instead of (B|D) makes it not fail,
-     which I think is a Perl bug. --- /
+# This one does fail, as expected, in Perl. It needs the complex item at the
+# end of the pattern. A single letter instead of (B|D) makes it not fail, which
+# I think is a Perl bug.
 
 /A(*COMMIT)(B|D)/
     ACABX
 
-/--- Check the use of names for failure ---/
+# Check the use of names for failure
 
-/^(A(*PRUNE:A)B|C(*PRUNE:B)D)/K
+/^(A(*PRUNE:A)B|C(*PRUNE:B)D)/mark
     ** Failers
     AC
     CB    
     
-/--- Force no study, otherwise mark is not seen. The studied version is in
-     test 2 because it isn't Perl-compatible. ---/
-
-/(*MARK:A)(*SKIP:B)(C|X)/KSS
+/(*MARK:A)(*SKIP:B)(C|X)/mark
     C
     D
      
-/^(A(*THEN:A)B|C(*THEN:B)D)/K
+/^(A(*THEN:A)B|C(*THEN:B)D)/mark
     ** Failers
     CB    
 
-/^(?:A(*THEN:A)B|C(*THEN:B)D)/K
+/^(?:A(*THEN:A)B|C(*THEN:B)D)/mark
     CB    
     
-/^(?>A(*THEN:A)B|C(*THEN:B)D)/K
+/^(?>A(*THEN:A)B|C(*THEN:B)D)/mark
     CB    
     
-/--- This should succeed, as the skip causes bump to offset 1 (the mark). Note
-that we have to have something complicated such as (B|Z) at the end because,
-for Perl, a simple character somehow causes an unwanted optimization to mess
-with the handling of backtracking verbs. ---/
+# This should succeed, as the skip causes bump to offset 1 (the mark). Note
+# that we have to have something complicated such as (B|Z) at the end because,
+# for Perl, a simple character somehow causes an unwanted optimization to mess
+# with the handling of backtracking verbs.
 
-/A(*MARK:A)A+(*SKIP:A)(B|Z) | AC/xK
+/A(*MARK:A)A+(*SKIP:A)(B|Z) | AC/x,mark
     AAAC
     
-/--- Test skipping over a non-matching mark. ---/
+# Test skipping over a non-matching mark.
 
-/A(*MARK:A)A+(*MARK:B)(*SKIP:A)(B|Z) | AC/xK
+/A(*MARK:A)A+(*MARK:B)(*SKIP:A)(B|Z) | AC/x,mark
     AAAC
     
-/--- Check shorthand for MARK ---/
+# Check shorthand for MARK.
 
-/A(*:A)A+(*SKIP:A)(B|Z) | AC/xK
+/A(*:A)A+(*SKIP:A)(B|Z) | AC/x,mark
     AAAC
 
-/--- Don't loop! Force no study, otherwise mark is not seen. ---/
-
-/(*:A)A+(*SKIP:A)(B|Z)/KSS
+/(*:A)A+(*SKIP:A)(B|Z)/mark
     AAAC
 
-/--- This should succeed, as a non-existent skip name disables the skip ---/ 
+# This should succeed, as a non-existent skip name disables the skip.
 
-/A(*MARK:A)A+(*SKIP:B)(B|Z) | AC/xK
+/A(*MARK:A)A+(*SKIP:B)(B|Z) | AC/x,mark
     AAAC
 
-/A(*MARK:A)A+(*SKIP:B)(B|Z) | AC(*:B)/xK
+/A(*MARK:A)A+(*SKIP:B)(B|Z) | AC(*:B)/x,mark
     AAAC
 
-/--- COMMIT at the start of a pattern should act like an anchor. Again, 
-however, we need the complication for Perl. ---/
+# COMMIT at the start of a pattern should act like an anchor. Again, however,
+# we need the complication for Perl.
 
 /(*COMMIT)(A|P)(B|P)(C|P)/
     ABCDEFG
     ** Failers
     DEFGABC  
 
-/--- COMMIT inside an atomic group can't stop backtracking over the group. ---/
+# COMMIT inside an atomic group can't stop backtracking over the group.
 
 /(\w+)(?>b(*COMMIT))\w{2}/
     abbb
@@ -4775,12 +4750,12 @@ however, we need the complication for Perl. ---/
 /(\w+)b(*COMMIT)\w{2}/
     abbb
 
-/--- Check opening parens in comment when seeking forward reference. ---/ 
+# Check opening parens in comment when seeking forward reference.
 
 /(?&t)(?#()(?(DEFINE)(?<t>a))/
     bac
 
-/--- COMMIT should override THEN ---/
+# COMMIT should override THEN.
 
 /(?>(*COMMIT)(?>yes|no)(*THEN)(*F))?/
   yes
@@ -4911,10 +4886,10 @@ however, we need the complication for Perl. ---/
 /^(a)(?1)++ab/
     aaaab
 
-/^(?=a(*:M))aZ/K
+/^(?=a(*:M))aZ/mark
     aZbc
 
-/^(?!(*:M)b)aZ/K
+/^(?!(*:M)b)aZ/mark
     aZbc
 
 /(?(DEFINE)(a))?b(?1)/
@@ -4942,10 +4917,10 @@ however, we need the complication for Perl. ---/
     aaa
 
 /((?(R)a|(?1)))+/
-    aaa
+    aaa 
 
 /a(*:any 
-name)/K
+name)/mark
     abc
     
 /(?>(?&t)c|(?&t))(?(DEFINE)(?<t>a|b(*PRUNE)c))/
@@ -4953,9 +4928,9 @@ name)/K
     ba
     bba 
     
-/--- Checking revised (*THEN) handling ---/ 
+# Checking revised (*THEN) handling.
 
-/--- Capture ---/
+# Capture
 
 /^.*? (a(*THEN)b) c/x
     aabc
@@ -4969,7 +4944,7 @@ name)/K
 /^.*? ( (a(*THEN)b) ) c/x
     aabc
 
-/--- Non-capture ---/
+# Non-capture
 
 /^.*? (?:a(*THEN)b) c/x
     aabc
@@ -4983,7 +4958,7 @@ name)/K
 /^.*? (?: (?:a(*THEN)b) ) c/x
     aabc
 
-/--- Atomic ---/
+# Atomic
 
 /^.*? (?>a(*THEN)b) c/x
     aabc
@@ -4997,7 +4972,7 @@ name)/K
 /^.*? (?> (?>a(*THEN)b) ) c/x
     aabc
 
-/--- Possessive capture ---/
+# Possessive capture
 
 /^.*? (a(*THEN)b)++ c/x
     aabc
@@ -5011,7 +4986,7 @@ name)/K
 /^.*? ( (a(*THEN)b)++ )++ c/x
     aabc
 
-/--- Possessive non-capture ---/
+# Possessive non-capture
 
 /^.*? (?:a(*THEN)b)++ c/x
     aabc
@@ -5025,12 +5000,12 @@ name)/K
 /^.*? (?: (?:a(*THEN)b)++ )++ c/x
     aabc
     
-/--- Condition assertion ---/
+# Condition assertion
 
 /^(?(?=a(*THEN)b)ab|ac)/
     ac
  
-/--- Condition ---/
+# Condition
 
 /^.*?(?(?=a)a|b(*THEN)c)/
     ba
@@ -5041,17 +5016,17 @@ name)/K
 /^.*?(?(?=a)a(*THEN)b|c)/
     ac
 
-/--- Assertion ---/
+# Assertion
 
-/^.*(?=a(*THEN)b)/ 
+/^.*(?=a(*THEN)b)/
     aabc
 
-/------------------------------/
+# --------------------------
 
-/(?>a(*:m))/imsxSK 
+/(?>a(*:m))/imsx,mark
     a
 
-/(?>(a)(*:m))/imsxSK 
+/(?>(a)(*:m))/imsx,mark
     a
 
 /(?<=a(*ACCEPT)b)c/
@@ -5069,7 +5044,7 @@ name)/K
     xcd
     acd 
 
-/(?<=a(*:N)b)c/K
+/(?<=a(*:N)b)c/mark
     xabcd
     
 /(?<=a(*PRUNE)b)c/
@@ -5084,50 +5059,50 @@ name)/K
 /(a)(?2){2}(.)/
     abcd
 
-/(*MARK:A)(*PRUNE:B)(C|X)/KS
+/(*MARK:A)(*PRUNE:B)(C|X)/mark
     C
     D 
 
-/(*MARK:A)(*PRUNE:B)(C|X)/KSS
+/(*MARK:A)(*PRUNE:B)(C|X)/mark
     C
     D 
 
-/(*MARK:A)(*THEN:B)(C|X)/KS
+/(*MARK:A)(*THEN:B)(C|X)/mark
     C
     D 
 
-/(*MARK:A)(*THEN:B)(C|X)/KSY
+/(*MARK:A)(*THEN:B)(C|X)/mark,no_start_optimize
     C
     D 
 
-/(*MARK:A)(*THEN:B)(C|X)/KSS
+/(*MARK:A)(*THEN:B)(C|X)/mark
     C
     D 
 
-/--- This should fail, as the skip causes a bump to offset 3 (the skip) ---/
+# This should fail, as the skip causes a bump to offset 3 (the skip).
 
-/A(*MARK:A)A+(*SKIP)(B|Z) | AC/xK
+/A(*MARK:A)A+(*SKIP)(B|Z) | AC/x,mark
     AAAC
 
-/--- Same --/
+# Same 
 
-/A(*MARK:A)A+(*MARK:B)(*SKIP:B)(B|Z) | AC/xK
+/A(*MARK:A)A+(*MARK:B)(*SKIP:B)(B|Z) | AC/x,mark
     AAAC
 
-/A(*:A)A+(*SKIP)(B|Z) | AC/xK
+/A(*:A)A+(*SKIP)(B|Z) | AC/x,mark
     AAAC
 
-/--- This should fail, as a null name is the same as no name ---/
+# This should fail, as a null name is the same as no name.
 
-/A(*MARK:A)A+(*SKIP:)(B|Z) | AC/xK
+/A(*MARK:A)A+(*SKIP:)(B|Z) | AC/x,mark
     AAAC
 
-/--- A check on what happens after hitting a mark and them bumping along to
-something that does not even start. Perl reports tags after the failures here, 
-though it does not when the individual letters are made into something 
-more complicated. ---/
+# A check on what happens after hitting a mark and them bumping along to
+# something that does not even start. Perl reports tags after the failures
+# here, though it does not when the individual letters are made into something
+# more complicated.
 
-/A(*:A)B|XX(*:B)Y/K
+/A(*:A)B|XX(*:B)Y/mark
     AABC
     XXYZ 
     ** Failers
@@ -5136,86 +5111,86 @@ more complicated. ---/
     AXQQQ 
     AXXQQQ 
     
-/^(A(*THEN:A)B|C(*THEN:B)D)/K
+/^(A(*THEN:A)B|C(*THEN:B)D)/mark
     AB
     CD
     ** Failers
     AC
     CB    
     
-/^(A(*PRUNE:A)B|C(*PRUNE:B)D)/K
+/^(A(*PRUNE:A)B|C(*PRUNE:B)D)/mark
     AB
     CD
     ** Failers
     AC
     CB    
     
-/--- An empty name does not pass back an empty string. It is the same as if no
-name were given. ---/ 
+# An empty name does not pass back an empty string. It is the same as if no
+# name were given.
 
-/^(A(*PRUNE:)B|C(*PRUNE:B)D)/K
+/^(A(*PRUNE:)B|C(*PRUNE:B)D)/mark
     AB
     CD 
 
-/--- PRUNE goes to next bumpalong; COMMIT does not. ---/
+# PRUNE goes to next bumpalong; COMMIT does not.
     
-/A(*PRUNE:A)B/K
+/A(*PRUNE:A)B/mark
     ACAB
 
-/--- Mark names can be duplicated ---/
+# Mark names can be duplicated.
 
-/A(*:A)B|X(*:A)Y/K
+/A(*:A)B|X(*:A)Y/mark
     AABC
     XXYZ 
     
-/b(*:m)f|a(*:n)w/K
+/b(*:m)f|a(*:n)w/mark
     aw 
     ** Failers 
     abc
 
-/b(*:m)f|aw/K
+/b(*:m)f|aw/mark
     abaw
     ** Failers 
     abc
     abax 
 
-/A(*MARK:A)A+(*SKIP:B)(B|Z) | AAC/xK
+/A(*MARK:A)A+(*SKIP:B)(B|Z) | AAC/x,mark
     AAAC
 
-/a(*PRUNE:X)bc|qq/KY
+/a(*PRUNE:X)bc|qq/mark,no_start_optimize
     ** Failers
     axy
 
-/a(*THEN:X)bc|qq/KY
+/a(*THEN:X)bc|qq/mark,no_start_optimize
     ** Failers
     axy
 
-/(?=a(*MARK:A)b)..x/K
+/(?=a(*MARK:A)b)..x/mark
     abxy
     ** Failers
     abpq  
 
-/(?=a(*MARK:A)b)..(*:Y)x/K
+/(?=a(*MARK:A)b)..(*:Y)x/mark
     abxy
     ** Failers
     abpq  
 
-/(?=a(*PRUNE:A)b)..x/K
+/(?=a(*PRUNE:A)b)..x/mark
     abxy
     ** Failers
     abpq  
 
-/(?=a(*PRUNE:A)b)..(*:Y)x/K
+/(?=a(*PRUNE:A)b)..(*:Y)x/mark
     abxy
     ** Failers
     abpq  
 
-/(?=a(*THEN:A)b)..x/K
+/(?=a(*THEN:A)b)..x/mark
     abxy
     ** Failers
     abpq  
 
-/(?=a(*THEN:A)b)..(*:Y)x/K
+/(?=a(*THEN:A)b)..(*:Y)x/mark
     abxy
     ** Failers
     abpq  
@@ -5230,10 +5205,10 @@ name were given. ---/
     aac
 
 /((?:a?)*)*c/
-  aac   
+    aac   
 
 /((?>a?)*)*c/
-  aac   
+    aac   
 
 /(?>.*?a)(?<=ba)/
     aba
@@ -5285,31 +5260,30 @@ name were given. ---/
 /(?<=(*SKIP)ac)a/
     aa
 
-/A(*MARK:A)A+(*SKIP:B)(B|Z) | AC/xK
+/A(*MARK:A)A+(*SKIP:B)(B|Z) | AC/x,mark
     AAAC
 
-/a(*SKIP:m)x|ac(*:n)(*SKIP:n)d|ac/K
+/a(*SKIP:m)x|ac(*:n)(*SKIP:n)d|ac/mark
     acacd
 
-/A(*SKIP:m)x|A(*SKIP:n)x|AB/K
+/A(*SKIP:m)x|A(*SKIP:n)x|AB/mark
     AB
 
-/((*SKIP:r)d){0}a(*SKIP:m)x|ac(*:n)|ac/K
+/((*SKIP:r)d){0}a(*SKIP:m)x|ac(*:n)|ac/mark
     acacd
 
-/-- Tests that try to figure out how Perl works. My hypothesis is that the
-    first verb that is backtracked onto is the one that acts. This seems to be
-    the case almost all the time, but there is one exception that is perhaps a 
-    bug. --/
+# Tests that try to figure out how Perl works. My hypothesis is that the first
+# verb that is backtracked onto is the one that acts. This seems to be the case
+# almost all the time, but there is one exception that is perhaps a bug.
 
-/-- This matches "aaaac"; each PRUNE advances one character until the subject
-    no longer starts with 5 'a's. --/
+# This matches "aaaac"; each PRUNE advances one character until the subject no
+# longer starts with 5 'a's.
 
 /aaaaa(*PRUNE)b|a+c/
     aaaaaac
 
-/-- Putting SKIP in front of PRUNE makes no difference, as it is never 
-backtracked onto, whether or not it has a label. --/
+# Putting SKIP in front of PRUNE makes no difference, as it is never
+# backtracked onto, whether or not it has a label.
 
 /aaaaa(*SKIP)(*PRUNE)b|a+c/
     aaaaaac
@@ -5320,70 +5294,68 @@ backtracked onto, whether or not it has a label. --/
 /aaaa(*:N)a(*SKIP:N)(*PRUNE)b|a+c/
     aaaaaac
 
-/-- Putting THEN in front makes no difference. */
+# Putting THEN in front makes no difference.
     
 /aaaaa(*THEN)(*PRUNE)b|a+c/
     aaaaaac
  
-/-- However, putting COMMIT in front of the prune changes it to "no match". I 
-    think this is inconsistent and possibly a bug. For the moment, running this
-    test is moved out of the Perl-compatible file. --/
+# However, putting COMMIT in front of the prune changes it to "no match". I 
+# think this is inconsistent and possibly a bug. For the moment, running this
+# test is moved out of the Perl-compatible file. 
 
 /aaaaa(*COMMIT)(*PRUNE)b|a+c/
     
+# OK, lets play the same game again using SKIP instead of PRUNE.
 
-/---- OK, lets play the same game again using SKIP instead of PRUNE. ----/
-
-/-- This matches "ac" because SKIP forces the next match to start on the
-    sixth "a". --/
+# This matches "ac" because SKIP forces the next match to start on the
+# sixth "a". 
 
 /aaaaa(*SKIP)b|a+c/
     aaaaaac
  
-/-- Putting PRUNE in front makes no difference. --/
+# Putting PRUNE in front makes no difference. 
 
 /aaaaa(*PRUNE)(*SKIP)b|a+c/
     aaaaaac
 
-/-- Putting THEN in front makes no difference. --/
+# Putting THEN in front makes no difference. 
 
 /aaaaa(*THEN)(*SKIP)b|a+c/
     aaaaaac
 
-/-- In this case, neither does COMMIT. This still matches "ac". --/
+# In this case, neither does COMMIT. This still matches "ac". 
 
 /aaaaa(*COMMIT)(*SKIP)b|a+c/
     aaaaaac
     
-/-- This gives "no match", as expected. --/
+# This gives "no match", as expected. 
 
 /aaaaa(*COMMIT)b|a+c/
     aaaaaac
-    
 
-/------ Tests using THEN ------/
+# ---- Tests using THEN ----
 
-/-- This matches "aaaaaac", as expected. --/
+# This matches "aaaaaac", as expected. 
 
 /aaaaa(*THEN)b|a+c/
     aaaaaac
 
-/-- Putting SKIP in front makes no difference. --/
+# Putting SKIP in front makes no difference. 
 
 /aaaaa(*SKIP)(*THEN)b|a+c/
     aaaaaac
     
-/-- Putting PRUNE in front makes no difference. --/
+# Putting PRUNE in front makes no difference. 
 
 /aaaaa(*PRUNE)(*THEN)b|a+c/
     aaaaaac
     
-/-- Putting COMMIT in front makes no difference. --/
+# Putting COMMIT in front makes no difference. 
 
 /aaaaa(*COMMIT)(*THEN)b|a+c/
     aaaaaac
     
-/-- End of "priority" tests --/ 
+# End of "priority" tests  
 
 /aaaaa(*:m)(*PRUNE:m)(*SKIP:m)m|a+/
     aaaaaa
@@ -5409,7 +5381,7 @@ backtracked onto, whether or not it has a label. --/
 /aaa(*MARK:A)a(*SKIP:A)b|a+c/
     aaaac
 
-/a(*:m)a(*COMMIT)(*SKIP:m)b|a+c/K
+/a(*:m)a(*COMMIT)(*SKIP:m)b|a+c/mark
     aaaaaac
 
 /.?(a|b(*THEN)c)/
@@ -5450,8 +5422,8 @@ backtracked onto, whether or not it has a label. --/
 /((?=a(*COMMIT)b)ab|ac){0}(?:(?1)|a(c))/
     ac 
     
-/-- These tests were formerly in test 2, but changes in PCRE and Perl have
-    made them compatible. --/
+# These tests were formerly in test 2, but changes in PCRE and Perl have
+# made them compatible. 
     
 /^(a)?(?(1)a|b)+$/
     *** Failers
@@ -5470,7 +5442,7 @@ backtracked onto, whether or not it has a label. --/
     abcd
 
 
-/A(*PRUNE:A)A+(*SKIP:A)(B|Z) | AC/xK
+/A(*PRUNE:A)A+(*SKIP:A)(B|Z) | AC/x,mark
     AAAC
 
 /^((abc|abcx)(*THEN)y|abcd)/
@@ -5479,43 +5451,43 @@ backtracked onto, whether or not it has a label. --/
     abcxy 
     
 /^((yes|no)(*THEN)(*F))?/
-  yes
+    yes
 
 /(A (.*)   C? (*THEN)  | A D) (*FAIL)/x
-AbcdCBefgBhiBqz
+    AbcdCBefgBhiBqz
 
 /(A (.*)   C? (*THEN)  | A D) z/x
-AbcdCBefgBhiBqz
+    AbcdCBefgBhiBqz
 
 /(A (.*)   C? (*THEN)  | A D) \s* (*FAIL)/x
-AbcdCBefgBhiBqz
+    AbcdCBefgBhiBqz
 
 /(A (.*)   C? (*THEN)  | A D) \s* z/x
-AbcdCBefgBhiBqz
+    AbcdCBefgBhiBqz
 
 /(A (.*)   (?:C|) (*THEN)  | A D) (*FAIL)/x
-AbcdCBefgBhiBqz
+    AbcdCBefgBhiBqz
 
 /(A (.*)   (?:C|) (*THEN)  | A D) z/x
-AbcdCBefgBhiBqz
+    AbcdCBefgBhiBqz
 
 /(A (.*)   C{0,6} (*THEN)  | A D) (*FAIL)/x
-AbcdCBefgBhiBqz
+    AbcdCBefgBhiBqz
 
 /(A (.*)   C{0,6} (*THEN)  | A D) z/x
-AbcdCBefgBhiBqz
+    AbcdCBefgBhiBqz
 
 /(A (.*)   (CE){0,6} (*THEN)  | A D) (*FAIL)/x
-AbcdCEBefgBhiBqz
+    AbcdCEBefgBhiBqz
 
 /(A (.*)   (CE){0,6} (*THEN)  | A D) z/x
-AbcdCEBefgBhiBqz
+    AbcdCEBefgBhiBqz
 
 /(A (.*)   (CE*){0,6} (*THEN)  | A D) (*FAIL)/x
-AbcdCBefgBhiBqz
+    AbcdCBefgBhiBqz
 
 /(A (.*)   (CE*){0,6} (*THEN)  | A D) z/x
-AbcdCBefgBhiBqz
+    AbcdCBefgBhiBqz
 
 /(?=a(*COMMIT)b|ac)ac|ac/
     ac
@@ -5523,22 +5495,22 @@ AbcdCBefgBhiBqz
 /(?=a(*COMMIT)b|(ac)) ac | (a)c/x
     ac
 
-/--------/
+# ----
 
 /(?(?!b(*THEN)a)bn|bnn)/
-   bnn 
+    bnn 
 
 /(?!b(*SKIP)a)bn|bnn/
     bnn
     
 /(?(?!b(*SKIP)a)bn|bnn)/
-   bnn 
+    bnn 
 
 /(?!b(*PRUNE)a)bn|bnn/
     bnn
     
 /(?(?!b(*PRUNE)a)bn|bnn)/
-   bnn 
+    bnn 
    
 /(?!b(*COMMIT)a)bn|bnn/
     bnn
@@ -5552,26 +5524,26 @@ AbcdCBefgBhiBqz
 /(?=b(*THEN)a)bn|bnn/
     bnn
     
- /^(?!a(*SKIP)b)/
-     ac
+/^(?!a(*SKIP)b)/
+    ac
 
- /^(?!a(*SKIP)b)../
-     acd
+/^(?!a(*SKIP)b)../
+    acd
 
 /(?!a(*SKIP)b)../
-     acd
+    acd
 
 /^(?(?!a(*SKIP)b))/
-     ac
+    ac
 
 /^(?!a(*PRUNE)b)../
-     acd
+    acd
 
 /(?!a(*PRUNE)b)../
-     acd
+    acd
 
- /(?!a(*COMMIT)b)ac|cd/
-     ac
+/(?!a(*COMMIT)b)ac|cd/
+    ac
 
 /\A.*?(?:a|bc)/
     ba
@@ -5579,16 +5551,16 @@ AbcdCBefgBhiBqz
 /^(A(*THEN)B|C(*THEN)D)/
     CD           
 
-/(*:m(m)(?&y)(?(DEFINE)(?<y>b))/K
+/(*:m(m)(?&y)(?(DEFINE)(?<y>b))/mark
     abc
 
-/(*PRUNE:m(m)(?&y)(?(DEFINE)(?<y>b))/K
+/(*PRUNE:m(m)(?&y)(?(DEFINE)(?<y>b))/mark
     abc
 
-/(*SKIP:m(m)(?&y)(?(DEFINE)(?<y>b))/K
+/(*SKIP:m(m)(?&y)(?(DEFINE)(?<y>b))/mark
     abc
 
-/(*THEN:m(m)(?&y)(?(DEFINE)(?<y>b))/K
+/(*THEN:m(m)(?&y)(?(DEFINE)(?<y>b))/mark
     abc
 
 /^\d*\w{4}/
@@ -5611,15 +5583,11 @@ AbcdCBefgBhiBqz
     aaaa
     aaa     
 
-/(?(?=ab)ab)/+
-    ca
-    cd 
-
-/(?:(?<n>foo)|(?<n>bar))\k<n>/J
+/(?:(?<n>foo)|(?<n>bar))\k<n>/dupnames
     foofoo
     barbar
 
-/(?<n>A)(?:(?<n>foo)|(?<n>bar))\k<n>/J
+/(?<n>A)(?:(?<n>foo)|(?<n>bar))\k<n>/dupnames
     AfooA
     AbarA  
     ** Failers 
@@ -5629,7 +5597,7 @@ AbcdCBefgBhiBqz
 /^(\d+)\s+IN\s+SOA\s+(\S+)\s+(\S+)\s*\(\s*$/
     1 IN SOA non-sp1 non-sp2(
 
-/^ (?:(?<A>A)|(?'B'B)(?<A>A)) (?('A')x) (?(<B>)y)$/xJ
+/^ (?:(?<A>A)|(?'B'B)(?<A>A)) (?('A')x) (?(<B>)y)$/x,dupnames
     Ax
     BAxy 
     
@@ -5657,19 +5625,19 @@ AbcdCBefgBhiBqz
 / ^ ( a + ) + + \w $ /x
     aaaab 
 
-/(?:a\Kb)*+/+
+/(?:a\Kb)*+/aftertext
     ababc
 
-/(?>a\Kb)*/+
+/(?>a\Kb)*/aftertext
     ababc
 
-/(?:a\Kb)*/+
+/(?:a\Kb)*/aftertext
     ababc
 
-/(a\Kb)*+/+
+/(a\Kb)*+/aftertext
     ababc
 
-/(a\Kb)*/+
+/(a\Kb)*/aftertext
     ababc
 
 /(?:x|(?:(xx|yy)+|x|x|x|x|x)|a|a|a)bc/
@@ -5688,21 +5656,21 @@ AbcdCBefgBhiBqz
     NON QUOTED \"QUOT\"\"ED\" AFTER \"NOT MATCHED
 
 /^\w+(?>\s*)(?<=\w)/
-  test test
+    test test
 
-/(?P<same>a)(?P<same>b)/gJ
+/(?P<same>a)(?P<same>b)/g,dupnames
     abbaba
 
-/(?P<same>a)(?P<same>b)(?P=same)/gJ
+/(?P<same>a)(?P<same>b)(?P=same)/g,dupnames
     abbaba
 
-/(?P=same)?(?P<same>a)(?P<same>b)/gJ
+/(?P=same)?(?P<same>a)(?P<same>b)/g,dupnames
     abbaba
 
-/(?:(?P=same)?(?:(?P<same>a)|(?P<same>b))(?P=same))+/gJ
+/(?:(?P=same)?(?:(?P<same>a)|(?P<same>b))(?P=same))+/g,dupnames
     bbbaaabaabb
 
-/(?:(?P=same)?(?:(?P=same)(?P<same>a)(?P=same)|(?P=same)?(?P<same>b)(?P=same)){2}(?P=same)(?P<same>c)(?P=same)){2}(?P<same>z)?/gJ
+/(?:(?P=same)?(?:(?P=same)(?P<same>a)(?P=same)|(?P=same)?(?P<same>b)(?P=same)){2}(?P=same)(?P<same>c)(?P=same)){2}(?P<same>z)?/g,dupnames
     bbbaaaccccaaabbbcc
 
 /(?P<Name>a)?(?P<Name2>b)?(?(<Name>)c|d)*l/
@@ -5720,4 +5688,21 @@ AbcdCBefgBhiBqz
 /[\Q]a\E]+/
     aa]]
 
-/-- End of testinput1 --/
+/A((((((((a))))))))\8B/ 
+    AaaB
+
+/A(((((((((a)))))))))\9B/ 
+    AaaB
+    
+/A[\8\9]B/
+    A8B
+    A9B  
+
+/(|ab)*?d/
+   abd
+   xyd 
+
+/(?:((abcd))|(((?:(?:(?:(?:abc|(?:abcdef))))b)abcdefghi)abc)|((*ACCEPT)))/
+    1234abcd
+
+# End of testinput1 
