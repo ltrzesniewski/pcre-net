@@ -37,8 +37,8 @@ namespace PCRE.Tests.Pcre
             }
             catch (Exception ex)
             {
-                if (ex.Message.Contains(@"\C not allowed in lookbehind assertion")) // Not supported
-                    Assert.Inconclusive("Not supported: " + ex.Message);
+                if (ex.Message.Contains(@"\C is not allowed in a lookbehind assertion"))
+                    Assert.Inconclusive(ex.Message);
 
                 throw;
             }

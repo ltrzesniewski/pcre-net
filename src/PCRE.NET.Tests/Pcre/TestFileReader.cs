@@ -40,7 +40,7 @@ namespace PCRE.Tests.Pcre
                 if (String.IsNullOrWhiteSpace(line))
                     continue;
 
-                if (line.StartsWith("<"))
+                if (line.StartsWith("#"))
                     continue; // TODO : Interpret that
 
                 line = line.TrimStart();
@@ -107,59 +107,64 @@ namespace PCRE.Tests.Pcre
 
         private void ParseOptions(TestPattern pattern)
         {
-            var options = PcreOptions.None;
-            var resetOptions = PcreOptions.None;
+            pattern.PatternOptions = PcreOptions.None;
+            pattern.ResetOptionBits = PcreOptions.None;
 
-            foreach (var c in pattern.OptionsString)
+            foreach (var part in pattern.OptionsString.Split(','))
             {
-                switch (c)
+                switch (part)
                 {
-                    case 'i':
-                        options |= PcreOptions.IgnoreCase;
-                        break;
-
-                    case 'm':
-                        options |= PcreOptions.MultiLine;
-                        break;
-
-                    case 's':
-                        options |= PcreOptions.Singleline;
-                        break;
-
-                    case 'x':
-                        options |= PcreOptions.IgnorePatternWhitespace;
-                        break;
-
-                    case 'J':
-                        options |= PcreOptions.DuplicateNames;
-                        break;
-
-                    case 'g':
-                        pattern.AllMatches = true;
-                        break;
-
-                    case '+':
+                    case "aftertext":
                         pattern.GetRemainingString = true;
                         break;
 
-                    case 'K':
+                    case "dupnames":
+                        pattern.PatternOptions |= PcreOptions.DuplicateNames;
+                        break;
+
+                    case "mark":
                         pattern.ExtractMarks = true;
                         break;
 
-                    case 'Y':
-                        options |= PcreOptions.NoStartOptimize;
-                        break;
-
-                    case ' ':
+                    case "no_start_optimize":
+                        pattern.PatternOptions |= PcreOptions.NoStartOptimize;
                         break;
 
                     default:
-                        throw InvalidInputException("Unknown modifier: " + c);
+                        foreach (var c in part)
+                        {
+                            switch (c)
+                            {
+                                case 'i':
+                                    pattern.PatternOptions |= PcreOptions.IgnoreCase;
+                                    break;
+
+                                case 'm':
+                                    pattern.PatternOptions |= PcreOptions.MultiLine;
+                                    break;
+
+                                case 's':
+                                    pattern.PatternOptions |= PcreOptions.Singleline;
+                                    break;
+
+                                case 'x':
+                                    pattern.PatternOptions |= PcreOptions.IgnorePatternWhitespace;
+                                    break;
+
+                                case 'g':
+                                    pattern.AllMatches = true;
+                                    break;
+
+                                case ' ':
+                                    break;
+
+                                default:
+                                    throw InvalidInputException("Unknown option: " + part);
+                            }
+                        }
+                        break;
                 }
             }
-
-            pattern.PatternOptions = options;
-            pattern.ResetOptionBits = resetOptions;
         }
 
         protected InvalidOperationException InvalidInputException(string message, Exception innerException = null)
