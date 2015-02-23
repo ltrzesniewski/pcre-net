@@ -19,7 +19,6 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match.Value, Is.EqualTo("aaabbccc"));
             Assert.That(match.Index, Is.EqualTo(3));
             Assert.That(match.EndIndex, Is.EqualTo(11));
-            Assert.That(match.PartialInspectionStartIndex, Is.EqualTo(-1));
             Assert.That(match.Length, Is.EqualTo(8));
 
             Assert.That(match[1], Is.Not.Null);
@@ -322,7 +321,6 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match.Success, Is.False);
             Assert.That(match.IsPartialMatch, Is.True);
             Assert.That(match.Index, Is.EqualTo(6));
-            Assert.That(match.PartialInspectionStartIndex, Is.EqualTo(3));
             Assert.That(match.EndIndex, Is.EqualTo(8));
             Assert.That(match.Length, Is.EqualTo(2));
             Assert.That(match.Value, Is.EqualTo("12"));

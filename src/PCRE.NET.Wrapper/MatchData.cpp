@@ -50,21 +50,6 @@ namespace PCRE {
 			return static_cast<int>(_oVector[2 * index + 1]);
 		}
 
-		int MatchData::GetPartialStartOffset()
-		{
-			return static_cast<int>(_oVector[2]);
-		}
-
-		int MatchData::GetPartialEndOffset()
-		{
-			return static_cast<int>(_oVector[1]);
-		}
-
-		int MatchData::GetPartialScanStartOffset()
-		{
-			return static_cast<int>(_oVector[0]);
-		}
-
 		String^ MatchData::Mark::get()
 		{
 			if (_mark == nullptr)

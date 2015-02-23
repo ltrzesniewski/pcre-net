@@ -34,15 +34,6 @@ namespace PCRE {
 			[Pure]
 			int GetEndOffset(int index);
 
-			[Pure]
-			int GetPartialStartOffset();
-
-			[Pure]
-			int GetPartialEndOffset();
-
-			[Pure]
-			int GetPartialScanStartOffset();
-
 		internal:
 			MatchData(MatchData^ result, pcre2_callout_block *calloutBlock);
 			void EmptyOffsetVector();

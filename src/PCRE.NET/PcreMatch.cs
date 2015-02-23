@@ -82,11 +82,6 @@ namespace PCRE
             get { return InternalResult.ResultCode == MatchResultCode.Partial; }
         }
 
-        public int PartialInspectionStartIndex
-        {
-            get { return IsPartialMatch ? InternalResult.GetPartialScanStartOffset() : -1; }
-        }
-
         public IEnumerator<PcreGroup> GetEnumerator()
         {
             return GetAllGroups().GetEnumerator();
@@ -114,13 +109,8 @@ namespace PCRE
         {
             var result = InternalResult;
 
-            if (result.ResultCode == MatchResultCode.Partial)
-            {
-                if (index == 0)
-                    return new PcreGroup(result.Subject, result.GetPartialStartOffset(), result.GetPartialEndOffset());
-
+            if (result.ResultCode == MatchResultCode.Partial && index != 0)
                 return PcreGroup.Empty;
-            }
 
             var startOffset = result.GetStartOffset(index);
             if (startOffset >= 0)
