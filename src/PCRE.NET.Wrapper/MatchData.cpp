@@ -1,5 +1,6 @@
 
 #include "stdafx.h"
+#include <memory>
 #include "MatchData.h"
 #include "InternalRegex.h"
 
@@ -14,14 +15,15 @@ namespace PCRE {
 			_oVector = pcre2_get_ovector_pointer(_matchData);
 		}
 
-		MatchData::MatchData(MatchData^ result)
+		MatchData::MatchData(MatchData^ result, pcre2_callout_block *calloutBlock)
 			: _re(result->_re),
 			_subject(result->_subject),
-			_mark(result->_mark),
-			_resultCode(result->_resultCode)
-			//_markPtr(result->_markPtr),
+			_resultCode(result->_resultCode),
+			_markPtr(calloutBlock->mark)
 		{
-			//result->_offsets->CopyTo(_offsets, 0);
+			_oVector = calloutBlock->offset_vector;
+			_oVector[0] = calloutBlock->start_match;
+			_oVector[1] = calloutBlock->current_position;
 		}
 
 		MatchData::~MatchData()
@@ -67,14 +69,26 @@ namespace PCRE {
 		{
 			if (_mark == nullptr)
 			{
-				auto markPtr = pcre2_get_mark(_matchData);
-				if (!markPtr)
-					return nullptr;
+				PCRE2_SPTR markPtr;
 
-				_mark = gcnew String(reinterpret_cast<const wchar_t*>(markPtr));
+				if (_markPtr)
+					markPtr = _markPtr;
+				else if (_matchData)
+					markPtr = pcre2_get_mark(_matchData);
+				else
+					markPtr = nullptr;
+
+				if (markPtr)
+					_mark = gcnew String(reinterpret_cast<const wchar_t*>(markPtr));
 			}
 
 			return _mark;
+		}
+
+		void MatchData::EmptyOffsetVector()
+		{
+			auto oVectorCount = pcre2_get_ovector_count(_matchData);
+			memset(_oVector, -1, sizeof(size_t) * oVectorCount);
 		}
 	}
 }

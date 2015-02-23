@@ -11,14 +11,7 @@
 namespace PCRE {
 	namespace Wrapper {
 
-		//int GlobalCalloutCallback(pcre16_callout_block *block);
-		//
-		//static InternalRegex::InternalRegex()
-		//{
-		//	pcre16_callout = &GlobalCalloutCallback;
-		//}
-
-		interior_ptr<const PCRE2_UCHAR> GetPtrToString(String^ string)
+		static inline interior_ptr<const PCRE2_UCHAR> GetPtrToString(String^ string)
 		{
 			return reinterpret_cast<interior_ptr<const PCRE2_UCHAR>>(PtrToStringChars(string));
 		}
@@ -110,29 +103,19 @@ namespace PCRE {
 		MatchData^ InternalRegex::Match(String^ subject, int startOffset, PatternOptions additionalOptions, Func<CalloutData^, CalloutResult>^ calloutCallback)
 		{
 			auto matchData = gcnew MatchData(this, subject);
-			auto matchContext = gcnew MatchContext();
-			//pin_ptr<MatchResult^> pinnedMatch;
+			MatchContext matchContext(matchData);
+			pin_ptr<MatchContext^> pinnedContext;
 
 			pin_ptr<const PCRE2_UCHAR> pinnedSubject = GetPtrToString(subject);
 
-			//auto extra = *_extra;
-			//PCRE_UCHAR16 *mark;
-			//extra.mark = &mark;
-			//extra.flags |= PCRE_EXTRA_MARK;
+			if (calloutCallback)
+			{
+				auto contextRef = %matchContext;
+				pinnedContext = &contextRef;
+				matchContext.SetCallout(calloutCallback, pinnedContext);
+			}
 
-			//if (calloutCallback)
-			//{
-			//	pinnedMatch = &match;
-			//	match->OnCallout = calloutCallback;
-			//	extra.callout_data = pinnedMatch;
-			//	extra.flags |= PCRE_EXTRA_CALLOUT_DATA;
-			//
-			//	// Initialize all offsets to -1 so we can tell which groups didn't match when in a callout
-			//	memset(offsets, -1, sizeof(int) * 2 * (CaptureCount + 1));
-			//}
-
-			auto result = pcre2_match(_re, pinnedSubject, subject->Length, startOffset, (int)additionalOptions, matchData->Block, matchContext->Context);
-			//match->SetMark(mark);
+			auto result = pcre2_match(_re, pinnedSubject, subject->Length, startOffset, (int)additionalOptions, matchData->Block, matchContext.Context);
 
 			if (result >= 0)
 			{
@@ -170,26 +153,5 @@ namespace PCRE {
 
 			return result;
 		}
-
-		//static int GlobalCalloutCallback(pcre16_callout_block *block)
-		//{
-		//	if (!block->callout_data)
-		//		return 0;
-
-		//	auto match = *static_cast<interior_ptr<MatchResult^>>(block->callout_data);
-		//	if (!match->OnCallout)
-		//		return 0;
-
-		//	try
-		//	{
-		//		match->CalloutException = nullptr;
-		//		return static_cast<int>(match->OnCallout(gcnew CalloutData(match, block)));
-		//	}
-		//	catch (Exception^ ex)
-		//	{
-		//		match->CalloutException = ex;
-		//		return PCRE_ERROR_CALLOUT;
-		//	}
-		//}
 	}
 }

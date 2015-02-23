@@ -16,7 +16,6 @@ namespace PCRE {
 		{
 		public:
 			MatchData(InternalRegex^ const re, String^ subject);
-			MatchData(MatchData^ result);
 			~MatchData();
 			!MatchData();
 
@@ -45,7 +44,9 @@ namespace PCRE {
 			int GetPartialScanStartOffset();
 
 		internal:
-			property Func<CalloutData^, CalloutResult>^ OnCallout;
+			MatchData(MatchData^ result, pcre2_callout_block *calloutBlock);
+			void EmptyOffsetVector();
+
 			property Exception^ CalloutException;
 			PCRE2_SIZE* _oVector;
 
@@ -58,6 +59,7 @@ namespace PCRE {
 			initonly String^ _subject;
 			MatchResultCode _resultCode;
 			String^ _mark;
+			PCRE2_SPTR _markPtr;
 			pcre2_match_data* _matchData;
 		};
 	}

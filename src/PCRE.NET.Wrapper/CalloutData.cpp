@@ -16,9 +16,7 @@ namespace PCRE {
 			_patternPosition(static_cast<int>(block->pattern_position)),
 			_nextItemLength(static_cast<int>(block->next_item_length))
 		{
-			_match = gcnew MatchData(match);
-			_match->_oVector[0] = _startOffset;
-			_match->_oVector[1] = _currentOffset;
+			_match = gcnew MatchData(match, block);
 		}
 
 	}
