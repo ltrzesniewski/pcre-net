@@ -41,6 +41,11 @@ namespace PCRE
         DollarEndOnly = PatternOptions.DollarEndOnly,
         //ExtraPcreFunctionality = PatternOptions.Extra,
 
+        AltBsUX =  PatternOptions.AltBsUX,
+        AllowEmptyClass = PatternOptions.AllowEmptyClass,
+        MatchUnsetBackref = PatternOptions.MatchUnsetBackref,
+        NoDotStarAnchor = PatternOptions.NoDotStarAnchor,
+
         // Flipped options
         CheckUnicodeValidity = PatternOptions.NoUtfCheck,
 

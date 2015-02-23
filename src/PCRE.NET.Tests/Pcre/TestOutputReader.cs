@@ -6,6 +6,8 @@ namespace PCRE.Tests.Pcre
 {
     public class TestOutputReader : TestFileReader
     {
+        private const string _separator = "------------------------------------------------------------------";
+
         public TestOutputReader(Stream inputStream)
             : base(inputStream)
         {
@@ -32,8 +34,24 @@ namespace PCRE.Tests.Pcre
                 {
                     var line = ReadLine();
 
+                    if (line == _separator)
+                    {
+                        do
+                        {
+                            line = ReadLine();
+                        } while (line != _separator && line != null);
+                        line = ReadLine();
+                    }
+
                     if (string.IsNullOrWhiteSpace(line))
                         break;
+
+                    if (pattern.ReplaceWith != null) // Not supported yet
+                    {
+                        while (!string.IsNullOrWhiteSpace(line))
+                            line = ReadLine();
+                        break;
+                    }
 
                     if (currentResult != null)
                     {

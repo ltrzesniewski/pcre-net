@@ -52,8 +52,12 @@ namespace PCRE.Tests.Pcre
 
                 Assert.That(expected.SubjectLine, Is.EqualTo(subject));
 
+                subject = testCase.Pattern.HexEncoding
+                    ? subject.UnescapeBinarySubject()
+                    : subject.UnescapeSubject();
+
                 var matches = regex
-                    .Matches(subject.UnescapeSubject())
+                    .Matches(subject)
                     .Take(testCase.Pattern.AllMatches ? int.MaxValue : 1)
                     .ToList();
 
@@ -115,7 +119,7 @@ namespace PCRE.Tests.Pcre
         {
             private static readonly string[,] InputFiles =
             {
-                { "testinput1", "testoutput1" }
+                { "testinput1", "testoutput1" },
                 //{ "testinput2", "testoutput2" }
             };
 

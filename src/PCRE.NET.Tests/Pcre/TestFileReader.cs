@@ -112,9 +112,15 @@ namespace PCRE.Tests.Pcre
 
             foreach (var part in pattern.OptionsString.Split(','))
             {
-                switch (part)
+                var args = part.Split('=');
+
+                var name = args[0];
+                var value = args.Length == 2 ? args[1] : null;
+
+                switch (name)
                 {
                     case "aftertext":
+                    case "allaftertext":
                         pattern.GetRemainingString = true;
                         break;
 
@@ -128,6 +134,81 @@ namespace PCRE.Tests.Pcre
 
                     case "no_start_optimize":
                         pattern.PatternOptions |= PcreOptions.NoStartOptimize;
+                        break;
+
+                    case "hex":
+                        pattern.HexEncoding = true;
+                        break;
+
+                    case "dollar_endonly":
+                        pattern.PatternOptions |= PcreOptions.DollarEndOnly;
+                        break;
+
+                    case "anchored":
+                        pattern.PatternOptions |= PcreOptions.Anchored;
+                        break;
+
+                    case "ungreedy":
+                        pattern.PatternOptions |= PcreOptions.Ungreedy;
+                        break;
+
+                    case "global":
+                    case "altglobal":
+                        pattern.AllMatches = true;
+                        break;
+
+                    case "no_auto_possess":
+                        pattern.PatternOptions |= PcreOptions.NoAutoPossess;
+                        break;
+
+                    case "no_auto_capture":
+                        pattern.PatternOptions |= PcreOptions.ExplicitCapture;
+                        break;
+
+                    case "auto_callout":
+                        pattern.PatternOptions |= PcreOptions.AutoCallout;
+                        break;
+
+                    case "firstline":
+                        pattern.PatternOptions |= PcreOptions.FirstLineOnly;
+                        break;
+
+                    case "alt_bsux":
+                        pattern.PatternOptions |= PcreOptions.AltBsUX;
+                        break;
+
+                    case "allow_empty_class":
+                        pattern.PatternOptions |= PcreOptions.AllowEmptyClass;
+                        break;
+
+                    case "match_unset_backref":
+                        pattern.PatternOptions |= PcreOptions.MatchUnsetBackref;
+                        break;
+
+                    case "allcaptures":
+                        break;
+
+                    case "replace":
+                        pattern.ReplaceWith = value;
+                        break;
+
+                    case "info":
+                        pattern.IncludeInfo = true;
+                        break;
+
+                    case "no_dotstar_anchor":
+                        pattern.PatternOptions |= PcreOptions.NoDotStarAnchor;
+                        break;
+
+                    case "dotall":
+                        pattern.PatternOptions |= PcreOptions.Singleline;
+                        break;
+
+                    case "newline": // TODO
+                    case "bsr":
+                    case "startchar":
+                    case "stackguard":
+                    case "parens_nest_limit":
                         break;
 
                     default:
@@ -153,6 +234,17 @@ namespace PCRE.Tests.Pcre
 
                                 case 'g':
                                     pattern.AllMatches = true;
+                                    break;
+
+                                case 'B':
+                                    break;
+
+                                case 'I':
+                                    pattern.IncludeInfo = true;
+                                    break;
+
+                                case '\\':
+                                    pattern.Pattern += "\\";
                                     break;
 
                                 case ' ':
