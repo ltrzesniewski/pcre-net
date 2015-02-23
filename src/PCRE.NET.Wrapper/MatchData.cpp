@@ -13,6 +13,7 @@ namespace PCRE {
 		{
 			_matchData = pcre2_match_data_create_from_pattern(re->Code, nullptr);
 			_oVector = pcre2_get_ovector_pointer(_matchData);
+			_oVectorCount = pcre2_get_ovector_count(_matchData);
 		}
 
 		MatchData::MatchData(MatchData^ result, pcre2_callout_block *calloutBlock)
@@ -21,7 +22,11 @@ namespace PCRE {
 			_resultCode(result->_resultCode),
 			_markPtr(calloutBlock->mark)
 		{
-			_oVector = calloutBlock->offset_vector;
+			_oVectorCount = calloutBlock->capture_top;
+			_matchData = pcre2_match_data_create(static_cast<uint32_t>(_oVectorCount), nullptr);
+			_oVector = pcre2_get_ovector_pointer(_matchData);
+
+			memcpy(_oVector, calloutBlock->offset_vector, _oVectorCount * sizeof(PCRE2_SIZE) * 2);
 			_oVector[0] = calloutBlock->start_match;
 			_oVector[1] = calloutBlock->current_position;
 		}
@@ -40,14 +45,14 @@ namespace PCRE {
 			}
 		}
 
-		int MatchData::GetStartOffset(int index)
+		int MatchData::GetStartOffset(unsigned int index)
 		{
-			return static_cast<int>(_oVector[2 * index]);
+			return index < _oVectorCount ? static_cast<int>(_oVector[2 * index]) : -1;
 		}
 
-		int MatchData::GetEndOffset(int index)
+		int MatchData::GetEndOffset(unsigned int index)
 		{
-			return static_cast<int>(_oVector[2 * index + 1]);
+			return index < _oVectorCount ? static_cast<int>(_oVector[2 * index + 1]) : -1;
 		}
 
 		String^ MatchData::Mark::get()
@@ -68,12 +73,6 @@ namespace PCRE {
 			}
 
 			return _mark;
-		}
-
-		void MatchData::EmptyOffsetVector()
-		{
-			auto oVectorCount = pcre2_get_ovector_count(_matchData);
-			memset(_oVector, -1, sizeof(size_t) * oVectorCount);
 		}
 	}
 }

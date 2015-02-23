@@ -29,14 +29,13 @@ namespace PCRE {
 			property String^ Mark { String^ get(); }
 
 			[Pure]
-			int GetStartOffset(int index);
+			int GetStartOffset(unsigned int index);
 
 			[Pure]
-			int GetEndOffset(int index);
+			int GetEndOffset(unsigned int index);
 
 		internal:
 			MatchData(MatchData^ result, pcre2_callout_block *calloutBlock);
-			void EmptyOffsetVector();
 
 			property Exception^ CalloutException;
 			PCRE2_SIZE* _oVector;
@@ -52,6 +51,7 @@ namespace PCRE {
 			String^ _mark;
 			PCRE2_SPTR _markPtr;
 			pcre2_match_data* _matchData;
+			PCRE2_SIZE _oVectorCount;
 		};
 	}
 }

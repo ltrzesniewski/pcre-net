@@ -36,7 +36,8 @@ namespace PCRE.Dfa
         private PcreDfaMatch CreateMatch(int index)
         {
             var result = InternalResult;
-            return new PcreDfaMatch(result.Subject, result.GetStartOffset(index), result.GetEndOffset(index));
+            var uindex = (uint)index;
+            return new PcreDfaMatch(result.Subject, result.GetStartOffset(uindex), result.GetEndOffset(uindex));
         }
 
         private IEnumerable<PcreDfaMatch> GetMatches()

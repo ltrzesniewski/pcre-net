@@ -112,9 +112,10 @@ namespace PCRE
             if (result.ResultCode == MatchResultCode.Partial && index != 0)
                 return PcreGroup.Empty;
 
-            var startOffset = result.GetStartOffset(index);
+            var uindex = (uint)index;
+            var startOffset = result.GetStartOffset(uindex);
             if (startOffset >= 0)
-                return new PcreGroup(result.Subject, startOffset, result.GetEndOffset(index));
+                return new PcreGroup(result.Subject, startOffset, result.GetEndOffset(uindex));
 
             return PcreGroup.Empty;
         }

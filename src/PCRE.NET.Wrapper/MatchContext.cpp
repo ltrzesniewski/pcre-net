@@ -53,8 +53,6 @@ namespace PCRE {
 		{
 			_onCallout = callback;
 			pcre2_set_callout(_ctx, &CalloutCallback, contextPtr); // contextPtr is a pinned pointer to this
-
-			_matchData->EmptyOffsetVector();
 		}
 	}
 }
