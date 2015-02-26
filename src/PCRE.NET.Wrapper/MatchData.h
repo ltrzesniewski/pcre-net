@@ -38,7 +38,6 @@ namespace PCRE {
 			MatchData(MatchData^ result, pcre2_callout_block *calloutBlock);
 
 			property Exception^ CalloutException;
-			PCRE2_SIZE* _oVector;
 
 			property pcre2_match_data* Block {
 				pcre2_match_data* get() { return _matchData; }
@@ -51,6 +50,7 @@ namespace PCRE {
 			String^ _mark;
 			PCRE2_SPTR _markPtr;
 			pcre2_match_data* _matchData;
+			PCRE2_SIZE* _oVector;
 			PCRE2_SIZE _oVectorCount;
 		};
 	}

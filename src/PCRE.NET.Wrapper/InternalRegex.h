@@ -10,7 +10,6 @@ using namespace System::Collections::Generic;
 namespace PCRE {
 	namespace Wrapper {
 
-		ref class MatchResult;
 		enum struct PatternOptions : unsigned int;
 		enum struct InfoKey;
 
@@ -21,7 +20,7 @@ namespace PCRE {
 			~InternalRegex();
 			!InternalRegex();
 
-			MatchData^ Match(String^ subject, int startOffset, PatternOptions additionalOptions, Func<CalloutData^, CalloutResult>^ calloutCallback);
+			MatchData^ Match(String^ subject, int startOffset, PatternOptions additionalOptions, CalloutDelegate^ calloutCallback);
 
 			int GetInfoInt32(InfoKey key);
 
@@ -39,8 +38,6 @@ namespace PCRE {
 			}
 
 		private:
-			//static InternalRegex();
-
 			pcre2_code* _re;
 			initonly int _captureCount;
 			initonly Dictionary<String^, array<int>^>^ _captureNames;

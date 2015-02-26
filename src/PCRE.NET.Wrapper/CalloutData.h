@@ -21,7 +21,7 @@ namespace PCRE {
 			property MatchData^ Match { MatchData^ get() { return _match; } }
 
 		internal:
-			CalloutData(MatchData^ match, pcre2_callout_block *block);
+			CalloutData(MatchData^ match, pcre2_callout_block* block);
 
 		private:
 			initonly MatchData^ _match;
@@ -41,6 +41,8 @@ namespace PCRE {
 			NoMatch = PCRE2_ERROR_NOMATCH,
 			Throw = PCRE2_ERROR_CALLOUT
 		};
+
+		typedef Func<CalloutData^, CalloutResult> CalloutDelegate;
 
 	}
 }

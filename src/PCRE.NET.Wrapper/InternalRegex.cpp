@@ -36,11 +36,9 @@ namespace PCRE {
 			if (!_re)
 			{
 				PCRE2_UCHAR16 errorBuffer[256];
-				auto getErrorResult = pcre2_get_error_message(errorCode, errorBuffer, sizeof(errorBuffer));
-
-				auto errorMessage = getErrorResult >= 0
+				auto errorMessage = pcre2_get_error_message(errorCode, errorBuffer, sizeof(errorBuffer)) >= 0
 					? gcnew String(reinterpret_cast<const wchar_t*>(errorBuffer))
-					: "Invalid pattern";
+					: "Unknown error";
 
 				throw gcnew ArgumentException(String::Format("Invalid pattern '{0}': {1} at offset {2}", pattern, errorMessage, errorOffset));
 			}
@@ -100,22 +98,29 @@ namespace PCRE {
 			}
 		}
 
-		MatchData^ InternalRegex::Match(String^ subject, int startOffset, PatternOptions additionalOptions, Func<CalloutData^, CalloutResult>^ calloutCallback)
+		MatchData^ InternalRegex::Match(String^ subject, int startOffset, PatternOptions additionalOptions, CalloutDelegate^ calloutCallback)
 		{
 			auto matchData = gcnew MatchData(this, subject);
 			MatchContext matchContext(matchData);
-			pin_ptr<MatchContext^> pinnedContext;
 
+			pin_ptr<MatchContext^> pinnedContext;
 			pin_ptr<const PCRE2_UCHAR> pinnedSubject = GetPtrToString(subject);
 
 			if (calloutCallback)
 			{
-				auto contextRef = %matchContext;
-				pinnedContext = &contextRef;
+				MatchContext^ context = %matchContext;
+				pinnedContext = &context;
 				matchContext.SetCallout(calloutCallback, pinnedContext);
 			}
 
-			auto result = pcre2_match(_re, pinnedSubject, subject->Length, startOffset, (int)additionalOptions, matchData->Block, matchContext.Context);
+			int result = pcre2_match(
+				_re,
+				pinnedSubject,
+				subject->Length,
+				startOffset,
+				static_cast<int>(additionalOptions),
+				matchData->Block,
+				matchContext.Context);
 
 			if (result >= 0)
 			{

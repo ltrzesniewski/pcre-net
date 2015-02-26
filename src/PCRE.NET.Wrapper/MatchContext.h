@@ -19,10 +19,10 @@ namespace PCRE {
 			!MatchContext();
 
 		internal:
-			void SetCallout(Func<CalloutData^, CalloutResult>^ callback, void* contextPtr);
+			void SetCallout(CalloutDelegate^ callback, void* contextPtr);
 
-			property Func<CalloutData^, CalloutResult>^ OnCallout {
-				Func<CalloutData^, CalloutResult>^ get() { return _onCallout; }
+			property CalloutDelegate^ OnCallout {
+				CalloutDelegate^ get() { return _onCallout; }
 			}
 
 			property MatchData^ Match {
@@ -36,7 +36,7 @@ namespace PCRE {
 		private:
 			pcre2_match_context* _ctx;
 			MatchData^ _matchData;
-			Func<CalloutData^, CalloutResult>^ _onCallout;
+			CalloutDelegate^ _onCallout;
 		};
 	}
 }

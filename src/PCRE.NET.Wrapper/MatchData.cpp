@@ -19,7 +19,6 @@ namespace PCRE {
 		MatchData::MatchData(MatchData^ result, pcre2_callout_block *calloutBlock)
 			: _re(result->_re),
 			_subject(result->_subject),
-			_resultCode(result->_resultCode),
 			_markPtr(calloutBlock->mark)
 		{
 			_oVectorCount = calloutBlock->capture_top;
