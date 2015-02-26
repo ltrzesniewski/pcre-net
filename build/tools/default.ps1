@@ -31,8 +31,12 @@ Task All -Depends Clean, Build, Merge, Test, NuGet
 Task Clean {
 	Write-Host "Output directory: $outputDir"
 	New-Item -ItemType Directory -Force -Path $outputDir > $null
-	Get-ChildItem $outputDir | Remove-Item -Recurse
+	Get-ChildItem $outputDir | Remove-Item -Recurse	
 	Set-Location $outputDir
+}
+
+Task Clean-LibZ-Cache {
+	Get-ChildItem -Path $env:TEMP -Recurse -Filter "*.dll" | ? { $_.Name -Match "^[0-9A-Fa-f]{32}\.dll$" } | Remove-Item
 }
 
 ##### Build #####
@@ -91,7 +95,7 @@ Function Run-Test([string]$runner, [string]$platform) {
 
 Task Test -Depends Test-AnyCPU, Test-x86
 
-Task Test-Init -Depends Merge {
+Task Test-Init -Depends Merge, Clean-LibZ-Cache {
 	New-Item -ItemType Directory -Path $testDir > $null
 
 	Copy-Item -Path $outDll -Destination $testDir
@@ -99,7 +103,6 @@ Task Test-Init -Depends Merge {
 	Copy-Item -Path (Join-Path $rootDir "src\PCRE.NET.Tests\bin\$config\NUnit.Framework.dll") -Destination $testDir
 	Copy-Item -Path (Join-Path $rootDir "src\PCRE.NET.Tests\bin\$config\Pcre") -Destination $testDir -Recurse
 }
-
 
 Task Test-AnyCPU -Depends Test-Init {
 	Run-Test "nunit-console.exe" "AnyCPU"
