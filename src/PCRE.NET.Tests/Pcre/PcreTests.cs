@@ -21,7 +21,7 @@ namespace PCRE.Tests.Pcre
             Assert.That(expectedResult.Pattern, Is.EqualTo(testCase.Pattern));
 
             RunTest(testCase, expectedResult, PcreOptions.None);
-            RunTest(testCase, expectedResult, PcreOptions.Compiled);
+            RunTest(testCase, expectedResult, PcreOptions.Compiled | PcreOptions.CompiledPartial);
         }
 
         private static void RunTest(TestCase testCase, TestOutput expectedResult, PcreOptions options)

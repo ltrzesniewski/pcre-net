@@ -18,10 +18,15 @@ namespace PCRE.Support
 
         public static JitCompileOptions ToJitCompileOptions(this PcreOptions options)
         {
-            if ((options & PcreOptions.Compiled) != 0)
-                return JitCompileOptions.Complete | JitCompileOptions.PartialSoft | JitCompileOptions.PartialHard;
+            var jitOptions = JitCompileOptions.None;
 
-            return JitCompileOptions.None;
+            if ((options & PcreOptions.Compiled) != 0)
+                jitOptions |= JitCompileOptions.Complete;
+
+            if ((options & PcreOptions.CompiledPartial) != 0)
+                jitOptions |= JitCompileOptions.PartialSoft | JitCompileOptions.PartialHard;
+
+            return jitOptions;
         }
     }
 }
