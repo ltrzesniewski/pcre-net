@@ -147,6 +147,19 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_detect_duplicate_names()
+        {
+            var re = new PcreRegex(@"(?J)(?<g>a)?(?<g>b)?(?<g>c)?");
+
+            var match = re.Match("bc");
+            Assert.That(match, Is.Not.Null);
+            Assert.That(match.Success, Is.True);
+            Assert.That(match["g"].Value, Is.EqualTo("b"));
+
+            Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo(new[] { false, true, true }));
+        }
+
+        [Test]
         public void should_return_marks()
         {
             var re = new PcreRegex(@"a(?:(*MARK:foo)b(*MARK:bar)|c)");

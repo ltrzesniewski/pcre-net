@@ -52,7 +52,8 @@ namespace PCRE {
 			if (nameCount)
 			{
 				int nameEntrySize = GetInfoInt32(InfoKey::NameEntrySize);
-				bool allowDuplicateNames = (options & PatternOptions::DupNames) != PatternOptions::None;
+				int effectiveOptions = GetInfoInt32(InfoKey::AllOptions);
+				bool allowDuplicateNames = (effectiveOptions & PCRE2_DUPNAMES) != 0;
 
 				_captureNames = gcnew Dictionary<String^, array<int>^>(nameCount, StringComparer::Ordinal);
 
