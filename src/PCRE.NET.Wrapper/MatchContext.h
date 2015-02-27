@@ -3,6 +3,7 @@
 
 #include "Stdafx.h"
 #include "CalloutData.h"
+#include "PatternOptions.h"
 
 using namespace System;
 
@@ -14,20 +15,19 @@ namespace PCRE {
 		public ref class MatchContext sealed
 		{
 		public:
-			MatchContext(MatchData^ matchData);
+			MatchContext();
 			~MatchContext();
 			!MatchContext();
 
+			property String^ Subject;
+			property int StartIndex;
+			property PatternOptions AdditionalOptions;
+			property CalloutDelegate^ CalloutHandler;
+
 		internal:
-			void SetCallout(CalloutDelegate^ callback, void* contextPtr);
+			void EnableCallout(void* contextPtr);
 
-			property CalloutDelegate^ OnCallout {
-				CalloutDelegate^ get() { return _onCallout; }
-			}
-
-			property MatchData^ Match {
-				MatchData^ get() { return _matchData; }
-			}
+			property MatchData^ Match;
 
 			property pcre2_match_context* Context {
 				pcre2_match_context* get() { return _ctx; }
@@ -35,8 +35,6 @@ namespace PCRE {
 
 		private:
 			pcre2_match_context* _ctx;
-			MatchData^ _matchData;
-			CalloutDelegate^ _onCallout;
 		};
 	}
 }

@@ -15,15 +15,6 @@ namespace PCRE
         NotEmpty = PatternOptions.NotEmpty,
         NotEmptyAtStart = PatternOptions.NotEmptyAtStart,
 
-        //NewLineCr = PatternOptions.NewLineCr,
-        //NewLineLf = PatternOptions.NewLineLf,
-        //NewLineCrLf = PatternOptions.NewLineCrLf,
-        //NewLineAny = PatternOptions.NewLineAny,
-        //NewLineAnyCrLf = PatternOptions.NewLineAnyCrLf,
-        
-        //BackslashRAnyCrLf = PatternOptions.BsrAnyCrLf,
-        //BackslashRUnicode = PatternOptions.BsrUnicode,
-
         NoStartOptimize = PatternOptions.NoStartOptimize,
 
         PartialSoft = PatternOptions.PartialSoft,

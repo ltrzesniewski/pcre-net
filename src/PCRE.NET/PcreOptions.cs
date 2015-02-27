@@ -27,19 +27,9 @@ namespace PCRE
         DuplicateNames = PatternOptions.DupNames,
         AutoCallout = PatternOptions.AutoCallout,
 
-        //NewLineCr = PatternOptions.NewLineCr,
-        //NewLineLf = PatternOptions.NewLineLf,
-        //NewLineCrLf = PatternOptions.NewLineCrLf,
-        //NewLineAny = PatternOptions.NewLineAny,
-        //NewLineAnyCrLf = PatternOptions.NewLineAnyCrLf,
-
-        //BackslashRAnyCrLf = PatternOptions.BsrAnyCrLf,
-        //BackslashRUnicode = PatternOptions.BsrUnicode,
-
         NoStartOptimize = PatternOptions.NoStartOptimize,
         NoAutoPossess = PatternOptions.NoAutoPossess,
         DollarEndOnly = PatternOptions.DollarEndOnly,
-        //ExtraPcreFunctionality = PatternOptions.Extra,
 
         AltBsUX =  PatternOptions.AltBsUX,
         AllowEmptyClass = PatternOptions.AllowEmptyClass,

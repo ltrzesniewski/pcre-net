@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using PCRE.Support;
 using PCRE.Wrapper;
 
 namespace PCRE
@@ -63,14 +62,34 @@ namespace PCRE
 
         public PcreMatch Match(string subject, int startIndex, PcreMatchOptions options, Func<PcreCallout, PcreCalloutResult> onCallout)
         {
+            var matchParams = new PcreMatchParameters
+            {
+                StartIndex = startIndex,
+                AdditionalOptions = options
+            };
+
+            if (onCallout != null)
+                matchParams.OnCallout += WrapCallout(onCallout);
+
+            return Match(subject, matchParams);
+        }
+
+        public PcreMatch Match(string subject, PcreMatchParameters parameters)
+        {
             if (subject == null)
                 throw new ArgumentNullException("subject");
 
-            if (startIndex < 0 || startIndex > subject.Length)
-                throw new ArgumentOutOfRangeException("startIndex");
+            if (parameters == null)
+                throw new ArgumentNullException("parameters");
 
-            var result = InternalRegex.Match(subject, startIndex, options.ToPatternOptions(), WrapCallout(onCallout));
-            return new PcreMatch(result);
+            if (parameters.StartIndex < 0 || parameters.StartIndex > subject.Length)
+                throw new IndexOutOfRangeException("Invalid StartIndex value");
+
+            using (var context = parameters.CreateMatchContext(subject))
+            {
+                var result = InternalRegex.Match(context);
+                return new PcreMatch(result);
+            }
         }
 
         [Pure]
@@ -91,32 +110,59 @@ namespace PCRE
             if (subject == null)
                 throw new ArgumentNullException("subject");
 
-            if (startIndex < 0 || startIndex > subject.Length)
-                throw new ArgumentOutOfRangeException("startIndex");
+            var parameters = new PcreMatchParameters
+            {
+                StartIndex = startIndex
+            };
 
-            return MatchesIterator(subject, startIndex, WrapCallout(onCallout));
+            if (onCallout != null)
+                parameters.OnCallout += WrapCallout(onCallout);
+
+            return MatchesIterator(subject, parameters);
         }
 
-        private IEnumerable<PcreMatch> MatchesIterator(string subject, int startIndex, Func<CalloutData, CalloutResult> onCallout)
+        [Pure]
+        public IEnumerable<PcreMatch> Matches(string subject, PcreMatchParameters parameters)
         {
-            var result = InternalRegex.Match(subject, startIndex, PatternOptions.None, onCallout);
+            if (subject == null)
+                throw new ArgumentNullException("subject");
 
-            if (result.ResultCode != MatchResultCode.Success)
-                yield break;
+            if (parameters == null)
+                throw new ArgumentNullException("parameters");
 
-            var match = new PcreMatch(result);
-            yield return match;
+            if (parameters.StartIndex < 0 || parameters.StartIndex > subject.Length)
+                throw new IndexOutOfRangeException("Invalid StartIndex value");
 
-            while (true)
+            return MatchesIterator(subject, parameters);
+        }
+
+        private IEnumerable<PcreMatch> MatchesIterator(string subject, PcreMatchParameters matchParams)
+        {
+            using (var context = matchParams.CreateMatchContext(subject))
             {
-                var nextOffset = match.GetStartOfNextMatchIndex();
-                result = InternalRegex.Match(subject, nextOffset, match.Length == 0 ? PatternOptions.NotEmptyAtStart : PatternOptions.None, onCallout);
+                var result = InternalRegex.Match(context);
 
                 if (result.ResultCode != MatchResultCode.Success)
                     yield break;
 
-                match = new PcreMatch(result);
+                var match = new PcreMatch(result);
                 yield return match;
+
+                var options = context.AdditionalOptions;
+
+                while (true)
+                {
+                    context.StartIndex = match.GetStartOfNextMatchIndex();
+                    context.AdditionalOptions = options | (match.Length == 0 ? PatternOptions.NotEmptyAtStart : PatternOptions.None);
+
+                    result = InternalRegex.Match(context);
+
+                    if (result.ResultCode != MatchResultCode.Success)
+                        yield break;
+
+                    match = new PcreMatch(result);
+                    yield return match;
+                }
             }
         }
 

@@ -2,7 +2,7 @@
 #pragma once
 
 #include "JitCompileOptions.h"
-#include "CalloutData.h"
+#include "MatchContext.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
@@ -20,7 +20,7 @@ namespace PCRE {
 			~InternalRegex();
 			!InternalRegex();
 
-			MatchData^ Match(String^ subject, int startOffset, PatternOptions additionalOptions, CalloutDelegate^ calloutCallback);
+			MatchData^ Match(MatchContext^ context);
 
 			int GetInfoInt32(InfoKey key);
 

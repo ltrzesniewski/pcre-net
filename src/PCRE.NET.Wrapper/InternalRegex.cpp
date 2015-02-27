@@ -99,29 +99,28 @@ namespace PCRE {
 			}
 		}
 
-		MatchData^ InternalRegex::Match(String^ subject, int startOffset, PatternOptions additionalOptions, CalloutDelegate^ calloutCallback)
+		MatchData^ InternalRegex::Match(MatchContext^ context)
 		{
-			auto matchData = gcnew MatchData(this, subject);
-			MatchContext matchContext(matchData);
+			auto matchData = gcnew MatchData(this, context->Subject);
+			context->Match = matchData;
 
 			pin_ptr<MatchContext^> pinnedContext;
-			pin_ptr<const PCRE2_UCHAR> pinnedSubject = GetPtrToString(subject);
+			pin_ptr<const PCRE2_UCHAR> pinnedSubject = GetPtrToString(context->Subject);
 
-			if (calloutCallback)
+			if (context->CalloutHandler)
 			{
-				MatchContext^ context = %matchContext;
 				pinnedContext = &context;
-				matchContext.SetCallout(calloutCallback, pinnedContext);
+				context->EnableCallout(pinnedContext);
 			}
 
 			int result = pcre2_match(
 				_re,
 				pinnedSubject,
-				subject->Length,
-				startOffset,
-				static_cast<int>(additionalOptions),
+				context->Subject->Length,
+				context->StartIndex,
+				static_cast<int>(context->AdditionalOptions),
 				matchData->Block,
-				matchContext.Context);
+				context->Context);
 
 			if (result >= 0)
 			{

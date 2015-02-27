@@ -8,8 +8,7 @@ namespace PCRE {
 
 		int CalloutCallback(pcre2_callout_block* block, void* data);
 
-		MatchContext::MatchContext(MatchData^ matchData)
-			: _matchData(matchData)
+		MatchContext::MatchContext()
 		{
 			_ctx = pcre2_match_context_create(nullptr);
 		}
@@ -34,13 +33,13 @@ namespace PCRE {
 				return 0;
 
 			auto ctx = *static_cast<interior_ptr<MatchContext^>>(data);
-			if (!ctx->OnCallout)
+			if (!ctx->CalloutHandler)
 				return 0;
 
 			try
 			{
 				ctx->Match->CalloutException = nullptr;
-				return static_cast<int>(ctx->OnCallout->Invoke(gcnew CalloutData(ctx->Match, block)));
+				return static_cast<int>(ctx->CalloutHandler->Invoke(gcnew CalloutData(ctx->Match, block)));
 			}
 			catch (Exception^ ex)
 			{
@@ -49,9 +48,8 @@ namespace PCRE {
 			}
 		}
 
-		void MatchContext::SetCallout(CalloutDelegate^ callback, void* contextPtr)
+		void MatchContext::EnableCallout(void* contextPtr)
 		{
-			_onCallout = callback;
 			pcre2_set_callout(_ctx, &CalloutCallback, contextPtr); // contextPtr is a pinned pointer to this
 		}
 	}
