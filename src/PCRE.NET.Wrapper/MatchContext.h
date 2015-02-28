@@ -23,6 +23,8 @@ namespace PCRE {
 			property int StartIndex;
 			property PatternOptions AdditionalOptions;
 			property CalloutDelegate^ CalloutHandler;
+			property unsigned int MatchLimit { void set(unsigned int); }
+			property unsigned int RecursionLimit { void set(unsigned int); }
 
 		internal:
 			void EnableCallout(void* contextPtr);

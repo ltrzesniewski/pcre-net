@@ -13,20 +13,12 @@ namespace PCRE {
 				: nullptr;
 		}
 
-		Nullable<Int32> PcreBuild::GetConfigInt32(ConfigKey key)
+		Nullable<UInt32> PcreBuild::GetConfigUInt32(ConfigKey key)
 		{
-			Int32 result;
+			UInt32 result;
 			return pcre2_config(static_cast<int>(key), &result) >= 0
-				? Nullable<Int32>(result)
-				: Nullable<Int32>();
-		}
-
-		Nullable<Int64> PcreBuild::GetConfigInt64(ConfigKey key)
-		{
-			Int64 result;
-			return pcre2_config(static_cast<int>(key), &result) >= 0
-				? Nullable<Int64>(result)
-				: Nullable<Int64>();
+				? result
+				: Nullable<UInt32>();
 		}
 
 	}

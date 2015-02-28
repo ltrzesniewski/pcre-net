@@ -69,7 +69,7 @@ namespace PCRE
             };
 
             if (onCallout != null)
-                settings.OnCallout += WrapCallout(onCallout);
+                settings.OnCallout += onCallout;
 
             return Match(subject, settings);
         }
@@ -116,7 +116,7 @@ namespace PCRE
             };
 
             if (onCallout != null)
-                settings.OnCallout += WrapCallout(onCallout);
+                settings.OnCallout += onCallout;
 
             return MatchesIterator(subject, settings);
         }
@@ -220,12 +220,5 @@ namespace PCRE
             return new PcreRegex(pattern, options).Matches(subject, startIndex);
         }
 
-        private static Func<CalloutData, CalloutResult> WrapCallout(Func<PcreCallout, PcreCalloutResult> callout)
-        {
-            if (callout == null)
-                return null;
-
-            return data => (CalloutResult)callout(new PcreCallout(data));
-        }
     }
 }

@@ -27,6 +27,16 @@ namespace PCRE {
 			}
 		}
 
+		void MatchContext::MatchLimit::set(unsigned int value)
+		{
+			pcre2_set_match_limit(_ctx, value);
+		}
+
+		void MatchContext::RecursionLimit::set(unsigned int value)
+		{
+			pcre2_set_recursion_limit(_ctx, value);
+		}
+
 		static int CalloutCallback(pcre2_callout_block* block, void* data)
 		{
 			if (!data)

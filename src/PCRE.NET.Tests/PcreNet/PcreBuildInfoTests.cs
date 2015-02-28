@@ -11,7 +11,7 @@ namespace PCRE.Tests.PcreNet
         [Test]
         public void should_report_version()
         {
-            var value = PcreBuildInfo.VersionString;
+            var value = PcreBuildInfo.Version;
             Console.WriteLine(value);
             Assert.IsNotNullOrEmpty(value);
         }

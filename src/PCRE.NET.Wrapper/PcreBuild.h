@@ -12,8 +12,7 @@ namespace PCRE {
 		{
 		public:
 			static String^ PcreBuild::GetConfigString(ConfigKey key);
-			static Nullable<Int32> PcreBuild::GetConfigInt32(ConfigKey key);
-			static Nullable<Int64> PcreBuild::GetConfigInt64(ConfigKey key);
+			static Nullable<UInt32> PcreBuild::GetConfigUInt32(ConfigKey key);
 		};
 	}
 }
