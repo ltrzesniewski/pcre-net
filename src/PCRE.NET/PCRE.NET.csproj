@@ -95,7 +95,7 @@
     <Compile Include="PcreCallout.cs" />
     <Compile Include="PcreCalloutResult.cs" />
     <Compile Include="PcreMatchOptions.cs" />
-    <Compile Include="PcreMatchParameters.cs" />
+    <Compile Include="PcreMatchSettings.cs" />
     <Compile Include="PcreRegex.Split.cs" />
     <Compile Include="PcreRegex.Replace.cs" />
     <Compile Include="PcreRegex.Match.cs" />

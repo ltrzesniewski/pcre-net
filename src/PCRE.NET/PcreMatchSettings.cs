@@ -4,7 +4,7 @@ using PCRE.Wrapper;
 
 namespace PCRE
 {
-    public class PcreMatchParameters
+    public class PcreMatchSettings
     {
         public PcreMatchOptions AdditionalOptions { get; set; }
         public int StartIndex { get; set; }

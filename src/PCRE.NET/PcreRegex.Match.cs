@@ -62,30 +62,30 @@ namespace PCRE
 
         public PcreMatch Match(string subject, int startIndex, PcreMatchOptions options, Func<PcreCallout, PcreCalloutResult> onCallout)
         {
-            var matchParams = new PcreMatchParameters
+            var settings = new PcreMatchSettings
             {
                 StartIndex = startIndex,
                 AdditionalOptions = options
             };
 
             if (onCallout != null)
-                matchParams.OnCallout += WrapCallout(onCallout);
+                settings.OnCallout += WrapCallout(onCallout);
 
-            return Match(subject, matchParams);
+            return Match(subject, settings);
         }
 
-        public PcreMatch Match(string subject, PcreMatchParameters parameters)
+        public PcreMatch Match(string subject, PcreMatchSettings settings)
         {
             if (subject == null)
                 throw new ArgumentNullException("subject");
 
-            if (parameters == null)
-                throw new ArgumentNullException("parameters");
+            if (settings == null)
+                throw new ArgumentNullException("settings");
 
-            if (parameters.StartIndex < 0 || parameters.StartIndex > subject.Length)
+            if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
                 throw new IndexOutOfRangeException("Invalid StartIndex value");
 
-            using (var context = parameters.CreateMatchContext(subject))
+            using (var context = settings.CreateMatchContext(subject))
             {
                 var result = InternalRegex.Match(context);
                 return new PcreMatch(result);
@@ -110,35 +110,35 @@ namespace PCRE
             if (subject == null)
                 throw new ArgumentNullException("subject");
 
-            var parameters = new PcreMatchParameters
+            var settings = new PcreMatchSettings
             {
                 StartIndex = startIndex
             };
 
             if (onCallout != null)
-                parameters.OnCallout += WrapCallout(onCallout);
+                settings.OnCallout += WrapCallout(onCallout);
 
-            return MatchesIterator(subject, parameters);
+            return MatchesIterator(subject, settings);
         }
 
         [Pure]
-        public IEnumerable<PcreMatch> Matches(string subject, PcreMatchParameters parameters)
+        public IEnumerable<PcreMatch> Matches(string subject, PcreMatchSettings settings)
         {
             if (subject == null)
                 throw new ArgumentNullException("subject");
 
-            if (parameters == null)
-                throw new ArgumentNullException("parameters");
+            if (settings == null)
+                throw new ArgumentNullException("settings");
 
-            if (parameters.StartIndex < 0 || parameters.StartIndex > subject.Length)
+            if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
                 throw new IndexOutOfRangeException("Invalid StartIndex value");
 
-            return MatchesIterator(subject, parameters);
+            return MatchesIterator(subject, settings);
         }
 
-        private IEnumerable<PcreMatch> MatchesIterator(string subject, PcreMatchParameters matchParams)
+        private IEnumerable<PcreMatch> MatchesIterator(string subject, PcreMatchSettings settings)
         {
-            using (var context = matchParams.CreateMatchContext(subject))
+            using (var context = settings.CreateMatchContext(subject))
             {
                 var result = InternalRegex.Match(context);
 
