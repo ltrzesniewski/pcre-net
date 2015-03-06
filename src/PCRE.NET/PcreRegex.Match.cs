@@ -219,6 +219,5 @@ namespace PCRE
         {
             return new PcreRegex(pattern, options).Matches(subject, startIndex);
         }
-
     }
 }

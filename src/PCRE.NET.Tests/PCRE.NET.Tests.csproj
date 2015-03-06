@@ -93,6 +93,7 @@
     <Compile Include="PcreNet\ReplaceTests.cs" />
     <Compile Include="PcreNet\SplitTests.cs" />
     <Compile Include="PcreNet\Support\PriorityCacheTests.cs" />
+    <Compile Include="PcreNet\Support\RegexKeyTests.cs" />
     <Compile Include="Pcre\ExpectedGroup.cs" />
     <Compile Include="Pcre\ExpectedMatch.cs" />
     <Compile Include="Pcre\ExpectedResult.cs" />

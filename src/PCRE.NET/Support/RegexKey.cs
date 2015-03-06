@@ -5,17 +5,17 @@ namespace PCRE.Support
     internal struct RegexKey : IEquatable<RegexKey>
     {
         public readonly string Pattern;
-        public readonly PcreOptions Options;
+        public readonly PcreRegexSettings Settings;
 
-        public RegexKey(string pattern, PcreOptions options)
+        public RegexKey(string pattern, PcreRegexSettings settings)
         {
             Pattern = pattern;
-            Options = options;
+            Settings = settings.AsReadOnly();
         }
 
         public bool Equals(RegexKey other)
         {
-            return Options == other.Options && Pattern == other.Pattern;
+            return Pattern == other.Pattern && Settings.CompareValues(other.Settings);
         }
 
         public override bool Equals(object obj)
@@ -27,7 +27,7 @@ namespace PCRE.Support
         {
             unchecked
             {
-                return ((Pattern != null ? Pattern.GetHashCode() : 0) * 397) ^ Options.GetHashCode();
+                return (Pattern != null ? Pattern.GetHashCode() : 0);
             }
         }
 

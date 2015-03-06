@@ -2,6 +2,7 @@
 #pragma once
 
 #include "JitCompileOptions.h"
+#include "CompileContext.h"
 #include "MatchContext.h"
 
 using namespace System;
@@ -16,7 +17,7 @@ namespace PCRE {
 		public ref class InternalRegex sealed
 		{
 		public:
-			InternalRegex(String^ pattern, PatternOptions options, JitCompileOptions jitCompileOptions);
+			InternalRegex(CompileContext^ context);
 			~InternalRegex();
 			!InternalRegex();
 

@@ -17,9 +17,14 @@ namespace PCRE
             get { return _re.Key.Pattern; }
         }
 
+        public PcreRegexSettings Settings
+        {
+            get { return _re.Key.Settings; }
+        }
+
         public PcreOptions Options
         {
-            get { return _re.Key.Options; }
+            get { return _re.Key.Settings.Options; }
         }
 
         public int MaxBackReference

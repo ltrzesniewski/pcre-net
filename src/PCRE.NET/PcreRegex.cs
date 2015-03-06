@@ -43,11 +43,18 @@ namespace PCRE
         }
 
         public PcreRegex(string pattern, PcreOptions options)
+            : this(pattern, new PcreRegexSettings(options))
+        {
+        }
+
+        public PcreRegex(string pattern, PcreRegexSettings settings)
         {
             if (pattern == null)
                 throw new ArgumentNullException("pattern");
+            if (settings == null)
+                throw new ArgumentNullException("settings");
 
-            Key = new RegexKey(pattern, options);
+            Key = new RegexKey(pattern, settings);
             _re = Caches.RegexCache.GetOrAdd(Key);
         }
 

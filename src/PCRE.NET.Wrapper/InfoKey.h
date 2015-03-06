@@ -44,5 +44,11 @@ namespace PCRE {
 			AnyCrLf                    = PCRE2_NEWLINE_ANYCRLF
 		};
 
+		public enum struct BackslashR
+		{
+			Unicode = PCRE2_BSR_UNICODE,
+			AnyCrLf = PCRE2_BSR_ANYCRLF
+		};
+
 	}
 }

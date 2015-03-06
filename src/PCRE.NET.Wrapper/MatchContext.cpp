@@ -27,12 +27,12 @@ namespace PCRE {
 			}
 		}
 
-		void MatchContext::MatchLimit::set(unsigned int value)
+		void MatchContext::MatchLimit::set(uint32_t value)
 		{
 			pcre2_set_match_limit(_ctx, value);
 		}
 
-		void MatchContext::RecursionLimit::set(unsigned int value)
+		void MatchContext::RecursionLimit::set(uint32_t value)
 		{
 			pcre2_set_recursion_limit(_ctx, value);
 		}

@@ -5,10 +5,9 @@ namespace PCRE
 {
     public static class PcreBuildInfo
     {
-        // TODO : Bsr
-
         static PcreBuildInfo()
         {
+            BackslashR = (PcreBackslashR)GetConfigUInt32(ConfigKey.Bsr);
             Jit = GetConfigBool(ConfigKey.Jit);
             JitTarget = PcreBuild.GetConfigString(ConfigKey.JitTarget);
             LinkSize = GetConfigUInt32(ConfigKey.LinkSize);
@@ -22,6 +21,7 @@ namespace PCRE
             Version = GetConfigString(ConfigKey.Version);
         }
 
+        public static PcreBackslashR BackslashR { get; private set; }
         public static bool Jit { get; private set; }
         public static string JitTarget { get; private set; }
         public static uint LinkSize { get; private set; }

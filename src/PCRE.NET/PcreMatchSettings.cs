@@ -4,7 +4,7 @@ using PCRE.Wrapper;
 
 namespace PCRE
 {
-    public class PcreMatchSettings
+    public sealed class PcreMatchSettings
     {
         private uint? _matchLimit;
         private uint? _recursionLimit;

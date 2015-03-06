@@ -92,6 +92,7 @@
     <Compile Include="IInternalRegexWrapper.cs" />
     <Compile Include="IPcreGroup.cs" />
     <Compile Include="IPcreGroupCollection.cs" />
+    <Compile Include="PcreBackslashR.cs" />
     <Compile Include="PcreCallout.cs" />
     <Compile Include="PcreCalloutResult.cs" />
     <Compile Include="PcreMatchOptions.cs" />
@@ -106,6 +107,7 @@
     <Compile Include="PcreNewLine.cs" />
     <Compile Include="PcreOptions.cs" />
     <Compile Include="PcrePatternInfo.cs" />
+    <Compile Include="PcreRegexSettings.cs" />
     <Compile Include="PcreSplitOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Support\PriorityCache.cs" />

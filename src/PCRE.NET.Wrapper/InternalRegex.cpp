@@ -16,17 +16,17 @@ namespace PCRE {
 			return reinterpret_cast<interior_ptr<const PCRE2_UCHAR>>(PtrToStringChars(string));
 		}
 
-		InternalRegex::InternalRegex(String^ pattern, PatternOptions options, JitCompileOptions jitCompileOptions)
+		InternalRegex::InternalRegex(CompileContext^ context)
 		{
 			int errorCode;
 			PCRE2_SIZE errorOffset;
 	
-			pin_ptr<const PCRE2_UCHAR> pinnedPattern = GetPtrToString(pattern);
+			pin_ptr<const PCRE2_UCHAR> pinnedPattern = GetPtrToString(context->Pattern);
 
 			_re = pcre2_compile(
 				pinnedPattern,
-				pattern->Length,
-				static_cast<int>(options),
+				context->Pattern->Length,
+				static_cast<int>(context->Options),
 				&errorCode,
 				&errorOffset,
 				nullptr);
@@ -40,11 +40,11 @@ namespace PCRE {
 					? gcnew String(reinterpret_cast<const wchar_t*>(errorBuffer))
 					: "Unknown error";
 
-				throw gcnew ArgumentException(String::Format("Invalid pattern '{0}': {1} at offset {2}", pattern, errorMessage, errorOffset));
+				throw gcnew ArgumentException(String::Format("Invalid pattern '{0}': {1} at offset {2}", context->Pattern, errorMessage, errorOffset));
 			}
 
-			if (jitCompileOptions != JitCompileOptions::None)
-				pcre2_jit_compile(_re, static_cast<uint32_t>(jitCompileOptions));
+			if (context->JitCompileOptions != JitCompileOptions::None)
+				pcre2_jit_compile(_re, static_cast<uint32_t>(context->JitCompileOptions));
 
 			_captureCount = GetInfoInt32(InfoKey::CaptureCount);
 
