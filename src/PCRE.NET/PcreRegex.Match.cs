@@ -87,8 +87,7 @@ namespace PCRE
 
             using (var context = settings.CreateMatchContext(subject))
             {
-                var result = InternalRegex.Match(context);
-                return new PcreMatch(result);
+                return new PcreMatch(ExecuteMatch(context));
             }
         }
 
@@ -118,7 +117,7 @@ namespace PCRE
             if (onCallout != null)
                 settings.OnCallout += onCallout;
 
-            return MatchesIterator(subject, settings);
+            return Matches(subject, settings);
         }
 
         [Pure]
@@ -140,7 +139,7 @@ namespace PCRE
         {
             using (var context = settings.CreateMatchContext(subject))
             {
-                var result = InternalRegex.Match(context);
+                var result = ExecuteMatch(context);
 
                 if (result.ResultCode != MatchResultCode.Success)
                     yield break;
@@ -155,7 +154,7 @@ namespace PCRE
                     context.StartIndex = match.GetStartOfNextMatchIndex();
                     context.AdditionalOptions = options | (match.Length == 0 ? PatternOptions.NotEmptyAtStart : PatternOptions.None);
 
-                    result = InternalRegex.Match(context);
+                    result = ExecuteMatch(context);
 
                     if (result.ResultCode != MatchResultCode.Success)
                         yield break;
@@ -163,6 +162,18 @@ namespace PCRE
                     match = new PcreMatch(result);
                     yield return match;
                 }
+            }
+        }
+
+        private MatchData ExecuteMatch(MatchContext context)
+        {
+            try
+            {
+                return InternalRegex.Match(context);
+            }
+            catch (MatchException ex)
+            {
+                throw PcreMatchException.FromException(ex);
             }
         }
 

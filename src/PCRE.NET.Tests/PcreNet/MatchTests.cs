@@ -269,7 +269,7 @@ namespace PCRE.Tests.PcreNet
         {
             var re = new PcreRegex(@".(?C42)");
 
-            var ex = Assert.Throws<InvalidOperationException>(() => re.Match("ab", data => { throw new DivideByZeroException("test"); }));
+            var ex = Assert.Throws<PcreCalloutException>(() => re.Match("ab", data => { throw new DivideByZeroException("test"); }));
 
             Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
         }

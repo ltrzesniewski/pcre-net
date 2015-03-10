@@ -7,6 +7,7 @@
 #include "InfoKey.h"
 #include "PatternOptions.h"
 #include "CalloutData.h"
+#include "MatchException.h"
 
 namespace PCRE {
 	namespace Wrapper {
@@ -137,11 +138,11 @@ namespace PCRE {
 					break;
 
 				case PCRE2_ERROR_CALLOUT:
-					throw gcnew InvalidOperationException(String::Format("An exception was thrown by the callout: {0}", matchData->CalloutException ? matchData->CalloutException->Message : nullptr), matchData->CalloutException);
+					throw gcnew MatchException(matchData, String::Format("An exception was thrown by the callout: {0}", matchData->CalloutException ? matchData->CalloutException->Message : nullptr), matchData->CalloutException);
 					break;
 
 				default:
-					throw gcnew InvalidOperationException(String::Format("Match error: {0}", matchData->ResultCode));
+					throw gcnew MatchException(matchData, String::Format("Match error: {0}", matchData->ResultCode), nullptr);
 				}
 			}
 

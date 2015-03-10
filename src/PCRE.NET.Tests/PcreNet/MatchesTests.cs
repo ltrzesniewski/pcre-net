@@ -89,6 +89,30 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_report_callout_exception()
+        {
+            var re = new PcreRegex(@"a(?C1)");
+
+            var resultCount = 0;
+
+            var seq = re.Matches("aaa", 0, callout =>
+            {
+                if (callout.StartOffset >= 2)
+                    throw new InvalidOperationException("Simulated exception");
+
+                return PcreCalloutResult.Pass;
+            }).Select(i =>
+            {
+                ++resultCount;
+                return i;
+            });
+
+            // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
+            Assert.Throws<PcreCalloutException>(() => seq.ToList());
+            Assert.That(resultCount, Is.EqualTo(2));
+        }
+
+        [Test]
         public void readme_backtracking_verbs_example()
         {
             var matches = PcreRegex.Matches("(foo) bar (baz) 42", @"\(\w+\)(*SKIP)(*FAIL)|\w+")

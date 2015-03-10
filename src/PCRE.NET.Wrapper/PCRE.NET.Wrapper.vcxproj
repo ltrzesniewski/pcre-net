@@ -185,6 +185,7 @@
     <ClInclude Include="MatchData.h" />
     <ClInclude Include="InfoKey.h" />
     <ClInclude Include="ConfigKey.h" />
+    <ClInclude Include="MatchException.h" />
     <ClInclude Include="MatchResultCode.h" />
     <ClInclude Include="PcreBuild.h" />
     <ClInclude Include="InternalRegex.h" />
