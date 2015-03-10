@@ -179,20 +179,24 @@ library. They are also documented in the pcre2build man page.
 
 . If you do not want to make use of the support for UTF-8 Unicode character
   strings in the 8-bit library, UTF-16 Unicode character strings in the 16-bit
-  library, and UTF-32 Unicode character strings in the 32-bit library, you can
+  library, or UTF-32 Unicode character strings in the 32-bit library, you can
   add --disable-unicode to the "configure" command. This reduces the size of
   the libraries. It is not possible to configure one library with Unicode
   support, and another without, in the same configuration.
 
   When Unicode support is available, the use of a UTF encoding still has to be
-  enabled by an option at run time. When PCRE2 is compiled with Unicode
-  support, its input can only either be ASCII or UTF-8/16/32, even when running
-  on EBCDIC platforms. It is not possible to use both --enable-unicode and
-  --enable-ebcdic at the same time.
+  enabled by setting the PCRE2_UTF option at run time or starting a pattern
+  with (*UTF). When PCRE2 is compiled with Unicode support, its input can only
+  either be ASCII or UTF-8/16/32, even when running on EBCDIC platforms. It is
+  not possible to use both --enable-unicode and --enable-ebcdic at the same
+  time.
 
   As well as supporting UTF strings, Unicode support includes support for the
   \P, \p, and \X sequences that recognize Unicode character properties.
   However, only the basic two-letter properties such as Lu are supported.
+  Escape sequences such as \d and \w in patterns do not by default make use of
+  Unicode properties, but can be made to do so by setting the PCRE2_UCP option
+  or starting a pattern with (*UCP).
 
 . You can build PCRE2 to recognize either CR or LF or the sequence CRLF, or any
   of the preceding, or any of the Unicode newline sequences, as indicating the
@@ -527,11 +531,10 @@ Testing PCRE2
 ------------
 
 To test the basic PCRE2 library on a Unix-like system, run the RunTest script.
-There is another script called RunGrepTest that tests the options of the
-pcre2grep command. When JIT support is enabled, a third test program called
-pcre2_jit_test is built. Both the scripts and all the program tests are run if
-you obey "make check". For other environments, see the instructions in
-NON-AUTOTOOLS-BUILD.
+There is another script called RunGrepTest that tests the pcre2grep command.
+When JIT support is enabled, a third test program called pcre2_jit_test is
+built. Both the scripts and all the program tests are run if you obey "make
+check". For other environments, see the instructions in NON-AUTOTOOLS-BUILD.
 
 The RunTest script runs the pcre2test test program (which is documented in its
 own man page) on each of the relevant testinput files in the testdata
@@ -544,9 +547,9 @@ Some tests are relevant only when certain build-time options were selected. For
 example, the tests for UTF-8/16/32 features are run only when Unicode support
 is available. RunTest outputs a comment when it skips a test.
 
-Many of the tests that are not skipped are run twice if JIT support is
-available. On the second run, JIT compilation is forced. This testing can be
-suppressed by putting "nojit" on the RunTest command line.
+Many (but not all) of the tests that are not skipped are run twice if JIT
+support is available. On the second run, JIT compilation is forced. This
+testing can be suppressed by putting "nojit" on the RunTest command line.
 
 The entire set of tests is run once for each of the 8-bit, 16-bit and 32-bit
 libraries that are enabled. If you want to run just one set of tests, call
@@ -570,14 +573,20 @@ in numerical order.
 You can also call RunTest with the single argument "list" to cause it to output
 a list of tests.
 
-The first two tests can always be run, as they expect only plain text strings
-(not UTF) and make no use of Unicode properties. The first test file can be fed
+The test sequence starts with "test 0", which is a special test that has no
+input file, and whose output is not checked. This is because it will be
+different on different hardware and with different configurations. The test
+exists in order to exercise some of pcre2test's code that would not otherwise
+be run.
+
+Tests 1 and 2 can always be run, as they expect only plain text strings (not
+UTF) and make no use of Unicode properties. The first test file can be fed
 directly into the perltest.sh script to check that Perl gives the same results.
 The only difference you should see is in the first few lines, where the Perl
 version is given instead of the PCRE2 version. The second set of tests check
 auxiliary functions, error detection, and run-time flags that are specific to
-PCRE2, as well as the POSIX wrapper API. It also uses the debugging flags to
-check some of the internals of pcre2_compile().
+PCRE2. It also uses the debugging flags to check some of the internals of
+pcre2_compile().
 
 If you build PCRE2 with a locale setting that is not the standard C locale, the
 character tables may be different (see next paragraph). In some cases, this may
@@ -585,18 +594,17 @@ cause failures in the second set of tests. For example, in a locale where the
 isprint() function yields TRUE for characters in the range 128-255, the use of
 [:isascii:] inside a character class defines a different set of characters, and
 this shows up in this test as a difference in the compiled code, which is being
-listed for checking. Where the comparison test output contains [\x00-\x7f] the
-test will contain [\x00-\xff], and similarly in some other cases. This is not a
-bug in PCRE2.
+listed for checking. For example, where the comparison test output contains
+[\x00-\x7f] the test might contain [\x00-\xff], and similarly in some other
+cases. This is not a bug in PCRE2.
 
-The third set of tests checks pcre2_maketables(), the facility for building a
-set of character tables for a specific locale and using them instead of the
-default tables. The script uses the "locale" command to check for the
-availability of the "fr_FR", "french", or "fr" locale, and uses the first one
-that it finds. If the "locale" command fails, or if its output doesn't include
-"fr_FR", "french", or "fr" in the list of available locales, the third test
-cannot be run, and a comment is output to say why. If running this test
-produces an error like this
+Test 3 checks pcre2_maketables(), the facility for building a set of character
+tables for a specific locale and using them instead of the default tables. The
+script uses the "locale" command to check for the availability of the "fr_FR",
+"french", or "fr" locale, and uses the first one that it finds. If the "locale"
+command fails, or if its output doesn't include "fr_FR", "french", or "fr" in
+the list of available locales, the third test cannot be run, and a comment is
+output to say why. If running this test produces an error like this:
 
   ** Failed to set locale "fr_FR"
 
@@ -606,33 +614,37 @@ alternative output files for the third test, because three different versions
 of the French locale have been encountered. The test passes if its output
 matches any one of them.
 
-The fourth and fifth tests check UTF and Unicode property support, the fourth
-being compatible with the perltest.sh script, and the fifth checking
-PCRE2-specific things.
+Tests 4 and 5 check UTF and Unicode property support, test 4 being compatible
+with the perltest.sh script, and test 5 checking PCRE2-specific things.
 
-The sixth and seventh tests check the pcre2_dfa_match() alternative matching
-function, in non-UTF mode and UTF-mode with Unicode property support,
-respectively.
+Tests 6 and 7 check the pcre2_dfa_match() alternative matching function, in
+non-UTF mode and UTF-mode with Unicode property support, respectively.
 
-The eighth test checks some internal offsets and code size features; it is
-run only when the default "link size" of 2 is set (in other cases the sizes
-change) and when Unicode support is enabled.
+Test 8 checks some internal offsets and code size features; it is run only when
+the default "link size" of 2 is set (in other cases the sizes change) and when
+Unicode support is enabled.
 
-The ninth and tenth tests are run only in 8-bit mode, and the eleventh and
-twelfth tests are run only in 16-bit and 32-bit modes. These are tests that
-generate different output in 8-bit mode. Each pair are for general cases and
-Unicode support, respectively. The thirteenth test checks the handling of
-non-UTF characters greater than 255 by pcre2_dfa_match() in 16-bit and 32-bit
-modes.
+Tests 9 and 10 are run only in 8-bit mode, and tests 11 and 12 are run only in
+16-bit and 32-bit modes. These are tests that generate different output in
+8-bit mode. Each pair are for general cases and Unicode support, respectively.
+Test 13 checks the handling of non-UTF characters greater than 255 by
+pcre2_dfa_match() in 16-bit and 32-bit modes.
 
-The fourteenth test is run only when JIT support is not available, and the
-fifteenth test is run only when JIT support is available. They test some
-JIT-specific features such as information output from pcre2test about JIT
-compilation.
+Test 14 contains a number of tests that must not be run with JIT. They check,
+among other non-JIT things, the match-limiting features of the intepretive
+matcher.
 
-The sixteenth and seventeenth tests are run only in 8-bit mode. They check the
-POSIX interface to the 8-bit library, without and with Unicode support,
-respectively.
+Test 15 is run only when JIT support is not available. It checks that an
+attempt to use JIT has the expected behaviour.
+
+Test 16 is run only when JIT support is available. It checks JIT complete and
+partial modes, match-limiting under JIT, and other JIT-specific features.
+
+Tests 17 and 18 are run only in 8-bit mode. They check the POSIX interface to
+the 8-bit library, without and with Unicode support, respectively.
+
+Test 19 checks the serialization functions by writing a set of compiled
+patterns to a file, and then reloading and checking them.
 
 
 Character tables
@@ -718,6 +730,7 @@ The distribution should contain the files listed below.
   src/pcre2_newline.c      )
   src/pcre2_ord2utf.c      )
   src/pcre2_pattern_info.c )
+  src/pcre2_serialize.c    )
   src/pcre2_string_utils.c )
   src/pcre2_study.c        )
   src/pcre2_substitute.c   )
@@ -816,4 +829,4 @@ The distribution should contain the files listed below.
 Philip Hazel
 Email local part: ph10
 Email domain: cam.ac.uk
-Last updated: 05 January 2015
+Last updated: 26 January 2015

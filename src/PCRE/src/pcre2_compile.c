@@ -573,7 +573,7 @@ enum { ERR0 = COMPILE_ERROR_BASE,
        ERR41, ERR42, ERR43, ERR44, ERR45, ERR46, ERR47, ERR48, ERR49, ERR50,
        ERR51, ERR52, ERR53, ERR54, ERR55, ERR56, ERR57, ERR58, ERR59, ERR60,
        ERR61, ERR62, ERR63, ERR64, ERR65, ERR66, ERR67, ERR68, ERR69, ERR70,
-       ERR71, ERR72, ERR73, ERR74, ERR75, ERR76, ERR77, ERR78, ERR79 };
+       ERR71, ERR72, ERR73, ERR74, ERR75, ERR76, ERR77, ERR78, ERR79, ERR80 };
 
 /* This is a table of start-of-pattern options such as (*UTF) and settings such
 as (*LIMIT_MATCH=nnnn) and (*CRLF). For completeness and backward
@@ -604,6 +604,7 @@ static pso pso_list[] = {
   { (uint8_t *)STRING_NOTEMPTY_ATSTART_RIGHTPAR,  17, PSO_FLG, PCRE2_NE_ATST_SET },
   { (uint8_t *)STRING_NO_AUTO_POSSESS_RIGHTPAR,   16, PSO_OPT, PCRE2_NO_AUTO_POSSESS },
   { (uint8_t *)STRING_NO_DOTSTAR_ANCHOR_RIGHTPAR, 18, PSO_OPT, PCRE2_NO_DOTSTAR_ANCHOR },
+  { (uint8_t *)STRING_NO_JIT_RIGHTPAR,             7, PSO_FLG, PCRE2_NOJIT },
   { (uint8_t *)STRING_NO_START_OPT_RIGHTPAR,      13, PSO_OPT, PCRE2_NO_START_OPTIMIZE },
   { (uint8_t *)STRING_LIMIT_MATCH_EQ,             12, PSO_LIMM, 0 },
   { (uint8_t *)STRING_LIMIT_RECURSION_EQ,         16, PSO_LIMR, 0 },
@@ -683,10 +684,28 @@ static const uint8_t opcode_possessify[] = {
 PCRE2_EXP_DEFN void PCRE2_CALL_CONVENTION
 pcre2_code_free(pcre2_code *code)
 {
+PCRE2_SIZE* ref_count;
+
 if (code != NULL)
   {
   if (code->executable_jit != NULL)
     PRIV(jit_free)(code->executable_jit, &code->memctl);
+
+  if ((code->flags & PCRE2_DEREF_TABLES) != 0)
+    {
+    /* Decoded tables belong to the codes after deserialization, and they must
+    be freed when there are no more reference to them. The *ref_count should
+    always be > 0. */
+
+    ref_count = (PCRE2_SIZE *)(code->tables + tables_length);
+    if (*ref_count > 0)
+      {
+      (*ref_count)--;
+      if (*ref_count == 0)
+        code->memctl.free((void *)code->tables, code->memctl.memory_data);
+      }
+    }
+
   code->memctl.free(code, code->memctl.memory_data);
   }
 }
@@ -2334,32 +2353,60 @@ for (;;)
       {
       case OP_CHAR:
       case OP_CHARI:
+      case OP_NOT:
+      case OP_NOTI:
       case OP_EXACT:
       case OP_EXACTI:
+      case OP_NOTEXACT:
+      case OP_NOTEXACTI:
       case OP_UPTO:
       case OP_UPTOI:
+      case OP_NOTUPTO:
+      case OP_NOTUPTOI:
       case OP_MINUPTO:
       case OP_MINUPTOI:
+      case OP_NOTMINUPTO:
+      case OP_NOTMINUPTOI:
       case OP_POSUPTO:
       case OP_POSUPTOI:
+      case OP_NOTPOSUPTO:
+      case OP_NOTPOSUPTOI:
       case OP_STAR:
       case OP_STARI:
+      case OP_NOTSTAR:
+      case OP_NOTSTARI:
       case OP_MINSTAR:
       case OP_MINSTARI:
+      case OP_NOTMINSTAR:
+      case OP_NOTMINSTARI:
       case OP_POSSTAR:
       case OP_POSSTARI:
+      case OP_NOTPOSSTAR:
+      case OP_NOTPOSSTARI:
       case OP_PLUS:
       case OP_PLUSI:
+      case OP_NOTPLUS:
+      case OP_NOTPLUSI:
       case OP_MINPLUS:
       case OP_MINPLUSI:
+      case OP_NOTMINPLUS:
+      case OP_NOTMINPLUSI:
       case OP_POSPLUS:
       case OP_POSPLUSI:
+      case OP_NOTPOSPLUS:
+      case OP_NOTPOSPLUSI:
       case OP_QUERY:
       case OP_QUERYI:
+      case OP_NOTQUERY:
+      case OP_NOTQUERYI:
       case OP_MINQUERY:
       case OP_MINQUERYI:
+      case OP_NOTMINQUERY:
+      case OP_NOTMINQUERYI:
       case OP_POSQUERY:
       case OP_POSQUERYI:
+      case OP_NOTPOSQUERY:
+      case OP_NOTPOSQUERYI:
       if (HAS_EXTRALEN(code[-1])) code += GET_EXTRALEN(code[-1]);
       break;
       }
@@ -2539,18 +2586,18 @@ the current group is on this list, it adjusts the offset in the list, not the
 value in the reference (which is a group number).
 
 Arguments:
-  group      points to the start of the group
-  adjust     the amount by which the group is to be moved
-  utf        TRUE in UTF mode
-  cb         compile data
-  save_hwm   the hwm forward reference pointer at the start of the group
+  group             points to the start of the group
+  adjust            the amount by which the group is to be moved
+  utf               TRUE in UTF mode
+  cb                compile data
+  save_hwm_offset   the hwm forward reference offset at the start of the group
 
 Returns:     nothing
 */
 
 static void
 adjust_recurse(PCRE2_UCHAR *group, int adjust, BOOL utf, compile_block *cb,
-  PCRE2_UCHAR *save_hwm)
+  size_t save_hwm_offset)
 {
 PCRE2_UCHAR *ptr = group;
 
@@ -2562,7 +2609,8 @@ while ((ptr = (PCRE2_UCHAR *)find_recurse(ptr, utf)) != NULL)
   /* See if this recursion is on the forward reference list. If so, adjust the
   reference. */
 
-  for (hc = save_hwm; hc < cb->hwm; hc += LINK_SIZE)
+  for (hc = (PCRE2_UCHAR *)cb->start_workspace + save_hwm_offset; hc < cb->hwm;
+       hc += LINK_SIZE)
     {
     offset = (int)GET(hc, 0);
     if (cb->start_code + offset == ptr + 1)
@@ -2816,7 +2864,11 @@ if ((options & PCRE2_CASELESS) != 0)
       range. Otherwise, use a recursive call to add the additional range. */
 
       else if (oc < start && od >= start - 1) start = oc; /* Extend downwards */
-      else if (od > end && oc <= end + 1) end = od;       /* Extend upwards */
+      else if (od > end && oc <= end + 1)
+        {
+        end = od;       /* Extend upwards */
+        if (end > classbits_end) classbits_end = (end <= 0xff ? end : 0xff);
+        }
       else n8 += add_to_class(classbits, uchardptr, options, cb, oc, od);
       }
     }
@@ -3046,7 +3098,7 @@ PCRE2_SPTR tempptr;
 PCRE2_SPTR nestptr = NULL;
 PCRE2_UCHAR *previous = NULL;
 PCRE2_UCHAR *previous_callout = NULL;
-PCRE2_UCHAR *save_hwm = NULL;
+size_t save_hwm_offset = 0;
 uint8_t classbits[32];
 
 /* We can fish out the UTF setting once and for all into a BOOL, but we must
@@ -4518,7 +4570,7 @@ for (;; ptr++)
         if (repeat_max <= 1)    /* Covers 0, 1, and unlimited */
           {
           *code = OP_END;
-          adjust_recurse(previous, 1, utf, cb, save_hwm);
+          adjust_recurse(previous, 1, utf, cb, save_hwm_offset);
           memmove(previous + 1, previous, CU2BYTES(len));
           code++;
           if (repeat_max == 0)
@@ -4542,7 +4594,7 @@ for (;; ptr++)
           {
           int offset;
           *code = OP_END;
-          adjust_recurse(previous, 2 + LINK_SIZE, utf, cb, save_hwm);
+          adjust_recurse(previous, 2 + LINK_SIZE, utf, cb, save_hwm_offset);
           memmove(previous + 2 + LINK_SIZE, previous, CU2BYTES(len));
           code += 2 + LINK_SIZE;
           *previous++ = OP_BRAZERO + repeat_type;
@@ -4605,26 +4657,25 @@ for (;; ptr++)
             for (i = 1; i < repeat_min; i++)
               {
               PCRE2_UCHAR *hc;
-              PCRE2_UCHAR *this_hwm = cb->hwm;
+              size_t this_hwm_offset = cb->hwm - cb->start_workspace;
               memcpy(code, previous, CU2BYTES(len));
 
               while (cb->hwm > cb->start_workspace + cb->workspace_size -
-                     WORK_SIZE_SAFETY_MARGIN - (this_hwm - save_hwm))
+                     WORK_SIZE_SAFETY_MARGIN -
+                     (this_hwm_offset - save_hwm_offset))
                 {
-                size_t save_offset = save_hwm - cb->start_workspace;
-                size_t this_offset = this_hwm - cb->start_workspace;
                 *errorcodeptr = expand_workspace(cb);
                 if (*errorcodeptr != 0) goto FAILED;
-                save_hwm = (PCRE2_UCHAR *)cb->start_workspace + save_offset;
-                this_hwm = (PCRE2_UCHAR *)cb->start_workspace + this_offset;
                 }
 
-              for (hc = save_hwm; hc < this_hwm; hc += LINK_SIZE)
+              for (hc = (PCRE2_UCHAR *)cb->start_workspace + save_hwm_offset;
+                   hc < (PCRE2_UCHAR *)cb->start_workspace + this_hwm_offset;
+                   hc += LINK_SIZE)
                 {
                 PUT(cb->hwm, 0, GET(hc, 0) + len);
                 cb->hwm += LINK_SIZE;
                 }
-              save_hwm = this_hwm;
+              save_hwm_offset = this_hwm_offset;
               code += len;
               }
             }
@@ -4669,7 +4720,7 @@ for (;; ptr++)
         else for (i = repeat_max - 1; i >= 0; i--)
           {
           PCRE2_UCHAR *hc;
-          PCRE2_UCHAR *this_hwm = cb->hwm;
+          size_t this_hwm_offset = cb->hwm - cb->start_workspace;
 
           *code++ = OP_BRAZERO + repeat_type;
 
@@ -4691,22 +4742,21 @@ for (;; ptr++)
           copying them. */
 
           while (cb->hwm > cb->start_workspace + cb->workspace_size -
-                 WORK_SIZE_SAFETY_MARGIN - (this_hwm - save_hwm))
+                 WORK_SIZE_SAFETY_MARGIN -
+                 (this_hwm_offset - save_hwm_offset))
             {
-            size_t save_offset = save_hwm - cb->start_workspace;
-            size_t this_offset = this_hwm - cb->start_workspace;
             *errorcodeptr = expand_workspace(cb);
             if (*errorcodeptr != 0) goto FAILED;
-            save_hwm = (PCRE2_UCHAR *)cb->start_workspace + save_offset;
-            this_hwm = (PCRE2_UCHAR *)cb->start_workspace + this_offset;
             }
 
-          for (hc = save_hwm; hc < this_hwm; hc += LINK_SIZE)
+          for (hc = (PCRE2_UCHAR *)cb->start_workspace + save_hwm_offset;
+               hc < (PCRE2_UCHAR *)cb->start_workspace + this_hwm_offset;
+               hc += LINK_SIZE)
             {
             PUT(cb->hwm, 0, GET(hc, 0) + len + ((i != 0)? 2+LINK_SIZE : 1));
             cb->hwm += LINK_SIZE;
             }
-          save_hwm = this_hwm;
+          save_hwm_offset = this_hwm_offset;
           code += len;
           }
 
@@ -4802,7 +4852,7 @@ for (;; ptr++)
               {
               int nlen = (int)(code - bracode);
               *code = OP_END;
-              adjust_recurse(bracode, 1 + LINK_SIZE, utf, cb, save_hwm);
+              adjust_recurse(bracode, 1 + LINK_SIZE, utf, cb, save_hwm_offset);
               memmove(bracode + 1 + LINK_SIZE, bracode, CU2BYTES(nlen));
               code += 1 + LINK_SIZE;
               nlen += 1 + LINK_SIZE;
@@ -4937,7 +4987,7 @@ for (;; ptr++)
         else
           {
           *code = OP_END;
-          adjust_recurse(tempcode, 1 + LINK_SIZE, utf, cb, save_hwm);
+          adjust_recurse(tempcode, 1 + LINK_SIZE, utf, cb, save_hwm_offset);
           memmove(tempcode + 1 + LINK_SIZE, tempcode, CU2BYTES(len));
           code += 1 + LINK_SIZE;
           len += 1 + LINK_SIZE;
@@ -4962,13 +5012,17 @@ for (;; ptr++)
     /* ===================================================================*/
     /* Start of nested parenthesized sub-expression, or comment or lookahead or
     lookbehind or option setting or condition or all the other extended
-    parenthesis forms.  */
+    parenthesis forms.  We must save the current high-water-mark for the
+    forward reference list so that we know where they start for this group.
+    However, because the list may be extended when there are very many forward
+    references (usually the result of a replicated inner group), we must use
+    an offset rather than an absolute address. */
 
     case CHAR_LEFT_PARENTHESIS:
     newoptions = options;
     skipbytes = 0;
     bravalue = OP_CBRA;
-    save_hwm = cb->hwm;
+    save_hwm_offset = cb->hwm - cb->start_workspace;
     reset_bracount = FALSE;
 
     /* First deal with various "verbs" that can be introduced by '*'. */
@@ -5159,14 +5213,19 @@ for (;; ptr++)
           }
 
         /* For conditions that are assertions, check the syntax, and then exit
-        the switch. This will take control down to where bracketed groups,
-        including assertions, are processed. */
+        the switch. This will take control down to where bracketed groups
+        are processed. The assertion will be handled as part of the group,
+        but we need to identify this case because the conditional assertion may
+        not be quantifier. */
 
         if (tempptr[1] == CHAR_QUESTION_MARK &&
               (tempptr[2] == CHAR_EQUALS_SIGN ||
                tempptr[2] == CHAR_EXCLAMATION_MARK ||
                tempptr[2] == CHAR_LESS_THAN_SIGN))
+          {
+          cb->iscondassert = TRUE;
           break;
+          }
 
         /* Other conditions use OP_CREF/OP_DNCREF/OP_RREF/OP_DNRREF, and all
         need to skip at least 1+IMM2_SIZE bytes at the start of the group. */
@@ -5277,9 +5336,10 @@ for (;; ptr++)
           }
 
         /* Otherwise we expect to read a name; anything else is an error. When
-        a name is one of a number of duplicates, a different opcode is used and
-        it needs more memory. Unfortunately we cannot tell whether a name is a
-        duplicate in the first pass, so we have to allow for more memory. */
+        the referenced name is one of a number of duplicates, a different
+        opcode is used and it needs more memory. Unfortunately we cannot tell
+        whether this is the case in the first pass, so we have to allow for
+        more memory always. */
 
         else
           {
@@ -5299,8 +5359,7 @@ for (;; ptr++)
             ptr++;
             }
           namelen = (int)(ptr - name);
-          if (lengthptr != NULL && (options & PCRE2_DUPNAMES) != 0)
-            *lengthptr += IMM2_SIZE;
+          if (lengthptr != NULL) *lengthptr += IMM2_SIZE;
           }
 
         /* Check the terminator */
@@ -5336,6 +5395,7 @@ for (;; ptr++)
             goto FAILED;
             }
           PUT2(code, 2+LINK_SIZE, recno);
+          if (recno > cb->top_backref) cb->top_backref = recno;
           break;
           }
 
@@ -5355,15 +5415,18 @@ for (;; ptr++)
 
         if (i < cb->names_found)
           {
-          int offset = i++;
-          int count = 1;
-          recno = GET2(slot, 0);   /* Number from first found */
-          for (; i < cb->names_found; i++)
+          int offset = i;            /* Offset of first name found */
+          int count = 0;
+
+          for (;;)
             {
+            recno = GET2(slot, 0);   /* Number for last found */
+            if (recno > cb->top_backref) cb->top_backref = recno;
+            count++;
+            if (++i >= cb->names_found) break;
             slot += cb->name_entry_size;
             if (PRIV(strncmp)(name, slot+IMM2_SIZE, namelen) != 0 ||
               (slot+IMM2_SIZE)[namelen] != 0) break;
-            count++;
             }
 
           if (count > 1)
@@ -5713,15 +5776,15 @@ for (;; ptr++)
             }
           recno = (i < cb->names_found)? ng->number : 0;
 
-          /* Count named back references. */
-
-          if (!is_recurse) cb->namedrefcount++;
-
           /* If duplicate names are permitted, we have to allow for a named
           reference to a duplicated name (this cannot be determined until the
-          second pass). This needs an extra 16-bit data item. */
+          second pass). This needs an extra data item. Counting named back
+          references and incrementing the count at the end does not work
+          because it does not account for duplication of groups containing such
+          references. Nor does checking for PCRE2_DUPNAMES because that need
+          not be set at the point of reference. */
 
-          if ((options & PCRE2_DUPNAMES) != 0) *lengthptr += IMM2_SIZE;
+          *lengthptr += IMM2_SIZE;
           }
 
         /* In the real compile, search the name table. We check the name
@@ -5916,7 +5979,8 @@ for (;; ptr++)
 
               /* Fudge the value of "called" so that when it is inserted as an
               offset below, what it actually inserted is the reference number
-              of the group. Then remember the forward reference. */
+              of the group. Then remember the forward reference, expanding the
+              working space where the list is kept if necessary. */
 
               called = cb->start_code + recno;
               if (cb->hwm >= cb->start_workspace + cb->workspace_size -
@@ -6075,12 +6139,22 @@ for (;; ptr++)
       goto FAILED;
       }
 
-    /* Assertions used not to be repeatable, but this was changed for Perl
-    compatibility, so all kinds can now be repeated. We copy code into a
+    /* All assertions used not to be repeatable, but this was changed for Perl
+    compatibility. All kinds can now be repeated except for assertions that are
+    conditions (Perl also forbids these to be repeated). We copy code into a
     non-register variable (tempcode) in order to be able to pass its address
-    because some compilers complain otherwise. */
+    because some compilers complain otherwise. At the start of a conditional
+    group whose condition is an assertion, cb->iscondassert is set. We unset it
+    here so as to allow assertions later in the group to be quantified. */
 
-    previous = code;                      /* For handling repetition */
+    if (bravalue >= OP_ASSERT && bravalue <= OP_ASSERTBACK_NOT &&
+        cb->iscondassert)
+      {
+      previous = NULL;
+      cb->iscondassert = FALSE;
+      }
+    else previous = code;
+
     *code = bravalue;
     tempcode = code;
     tempreqvary = cb->req_varyopt;        /* Save value before bracket */
@@ -6098,9 +6172,9 @@ for (;; ptr++)
          skipbytes,                       /* Skip over bracket number */
          cond_depth +
            ((bravalue == OP_COND)?1:0),   /* Depth of condition subpatterns */
-         &subfirstcu,                   /* For possible first char */
+         &subfirstcu,                     /* For possible first char */
          &subfirstcuflags,
-         &subreqcu,                     /* For possible last char */
+         &subreqcu,                       /* For possible last char */
          &subreqcuflags,
          bcptr,                           /* Current branch chain */
          cb,                              /* Compile data block */
@@ -6329,7 +6403,9 @@ for (;; ptr++)
         PCRE2_SPTR p;
         uint32_t cf;
 
-        save_hwm = cb->hwm;   /* Normally this is set when '(' is read */
+        /* Normally save_hwm_offset is set when '(' is read */
+
+        save_hwm_offset = cb->hwm - cb->start_workspace;
         terminator = (*(++ptr) == CHAR_LESS_THAN_SIGN)?
           CHAR_GREATER_THAN_SIGN : CHAR_APOSTROPHE;
 
@@ -6641,6 +6717,7 @@ int32_t firstcuflags, reqcuflags;
 uint32_t branchfirstcu, branchreqcu;
 int32_t branchfirstcuflags, branchreqcuflags;
 size_t length;
+size_t save_hwm_offset;
 unsigned int orig_bracount;
 unsigned int max_bracount;
 branch_chain bc;
@@ -6661,6 +6738,8 @@ bc.current_branch = code;
 
 firstcu = reqcu = 0;
 firstcuflags = reqcuflags = REQ_UNSET;
+
+save_hwm_offset = cb->hwm - cb->start_workspace;  /* hwm at start of group */
 
 /* Accumulate the length for use in the pre-compile phase. Start with the
 length of the BRA and KET and any extra code units that are required at the
@@ -6867,7 +6946,7 @@ for (;;)
         {
         *code = OP_END;
         adjust_recurse(start_bracket, 1 + LINK_SIZE,
-          (options & PCRE2_UTF) != 0, cb, cb->hwm);
+          (options & PCRE2_UTF) != 0, cb, save_hwm_offset);
         memmove(start_bracket + 1 + LINK_SIZE, start_bracket,
           CU2BYTES(code - start_bracket));
         *start_bracket = OP_ONCE;
@@ -7313,8 +7392,14 @@ for (i = 0; i < cb->names_found; i++)
 
 PUT2(slot, 0, groupno);
 memcpy(slot + IMM2_SIZE, name, CU2BYTES(length));
-slot[IMM2_SIZE + length] = 0;
 cb->names_found++;
+
+/* Add a terminating zero and fill the rest of the slot with zeroes so that
+the memory is all initialized. Otherwise valgrind moans about uninitialized
+memory when saving serialized compiled patterns. */
+
+memset(slot + IMM2_SIZE + length, 0,
+  CU2BYTES(cb->name_entry_size - length - IMM2_SIZE));
 }
 
 
@@ -7352,6 +7437,7 @@ PCRE2_SPTR codestart;                   /* Start of compiled code */
 PCRE2_SPTR ptr;                         /* Current pointer in pattern */
 
 size_t length = 1;                      /* Allow or final END opcode */
+size_t usedlength;                      /* Actual length used */
 size_t re_blocksize;                    /* Size of memory block */
 
 int32_t firstcuflags, reqcuflags;       /* Type of first/req code unit */
@@ -7444,12 +7530,12 @@ cb.end_pattern = pattern + patlen;
 cb.external_flags = 0;
 cb.external_options = options;
 cb.hwm = cworkspace;
+cb.iscondassert = FALSE;
 cb.max_lookbehind = 0;
 cb.name_entry_size = 0;
 cb.name_table = NULL;
 cb.named_groups = named_groups;
 cb.named_group_list_size = NAMED_GROUP_LIST_SIZE;
-cb.namedrefcount = 0;
 cb.names_found = 0;
 cb.open_caps = NULL;
 cb.parens_depth = 0;
@@ -7638,13 +7724,6 @@ if (length > MAX_PATTERN_SIZE)
   goto HAD_ERROR;
   }
 
-/* If there are groups with duplicate names and there are also references by
-name, we must allow for the possibility of named references to duplicated
-groups. These require an extra data item each. */
-
-if (cb.dupnames && cb.namedrefcount > 0)
-  length += cb.namedrefcount * IMM2_SIZE * sizeof(PCRE2_UCHAR);
-
 /* Compute the size of, and then get and initialize, the data block for storing
 the compiled pattern and names table. Integer overflow should no longer be
 possible because nowadays we limit the maximum value of cb.names_found and
@@ -7703,6 +7782,7 @@ cb.max_lookbehind = 0;
 cb.name_table = (PCRE2_UCHAR *)((uint8_t *)re + sizeof(pcre2_real_code));
 cb.start_code = codestart;
 cb.hwm = (PCRE2_UCHAR *)(cb.start_workspace);
+cb.iscondassert = FALSE;
 cb.req_varyopt = 0;
 cb.had_accept = FALSE;
 cb.had_pruneorskip = FALSE;
@@ -7745,22 +7825,27 @@ if (cb.had_accept)
   }
 
 /* If we have not reached end of pattern after a successful compile, there's an
-excess bracket. Otherwise, fill in the final opcode and check for disastrous
-overflow. */
+excess bracket. Fill in the final opcode and check for disastrous overflow.
+If no overflow, but the estimated length exceeds the really used length, adjust
+the value of re->blocksize, and if valgrind support is configured, mark the
+extra allocated memory as unaddressable, so that any out-of-bound reads can be
+detected. */
 
 if (errorcode == 0 && ptr < cb.end_pattern) errorcode = ERR22;
 *code++ = OP_END;
-if ((size_t)(code - codestart) > length) errorcode = ERR23;
-
+usedlength = code - codestart;
+if (usedlength > length) errorcode = ERR23; else
+  {
+  re->blocksize -= CU2BYTES(length - usedlength);
 #ifdef SUPPORT_VALGRIND
-/* If the estimated length exceeds the really used length, mark the extra
-allocated memory as unaddressable, so that any out-of-bound reads can be
-detected. */
-VALGRIND_MAKE_MEM_NOACCESS(code, (length - (code - codestart)) * sizeof(PCRE2_UCHAR));
+  VALGRIND_MAKE_MEM_NOACCESS(code, CU2BYTES(length - usedlength));
 #endif
+  }
 
 /* Fill in any forward references that are required. There may be repeated
-references; optimize for them, as searching a large regex takes time. */
+references; optimize for them, as searching a large regex takes time. The
+test of errorcode inside the loop means that nothing is done if it is already
+non-zero. */
 
 if (cb.hwm > cb.start_workspace)
   {
@@ -7790,22 +7875,22 @@ if (cb.workspace_size > COMPILE_WORK_SIZE)
     ccontext->memctl.memory_data);
 cb.start_workspace = NULL;
 
-/* Give an error if there's back reference to a non-existent capturing
-subpattern. */
+/* After a successful compile, give an error if there's back reference to a
+non-existent capturing subpattern. Then, unless disabled, check whether any
+single character iterators can be auto-possessified. The function overwrites
+the appropriate opcode values, so the type of the pointer must be cast. NOTE:
+the intermediate variable "temp" is used in this code because at least one
+compiler gives a warning about loss of "const" attribute if the cast
+(PCRE2_UCHAR *)codestart is used directly in the function call. */
 
-if (errorcode == 0 && re->top_backref > re->top_bracket) errorcode = ERR15;
-
-/* Unless disabled, check whether any single character iterators can be
-auto-possessified. The function overwrites the appropriate opcode values, so
-the type of the pointer must be cast. NOTE: the intermediate variable "temp" is
-used in this code because at least one compiler gives a warning about loss of
-"const" attribute if the cast (PCRE2_UCHAR *)codestart is used directly in the
-function call. */
-
-if ((options & PCRE2_NO_AUTO_POSSESS) == 0)
+if (errorcode == 0)
   {
-  PCRE2_UCHAR *temp = (PCRE2_UCHAR *)codestart;
-  PRIV(auto_possessify)(temp, utf, &cb);
+  if (re->top_backref > re->top_bracket) errorcode = ERR15;
+  else if ((options & PCRE2_NO_AUTO_POSSESS) == 0)
+    {
+    PCRE2_UCHAR *temp = (PCRE2_UCHAR *)codestart;
+    if (PRIV(auto_possessify)(temp, utf, &cb) != 0) errorcode = ERR80;
+    }
   }
 
 /* If there were any lookbehind assertions that contained OP_RECURSE
@@ -7816,7 +7901,7 @@ OP_RECURSE that are not fixed length get a diagnosic with a useful offset. The
 exceptional ones forgo this. We scan the pattern to check that they are fixed
 length, and set their lengths. */
 
-if (cb.check_lookbehind)
+if (errorcode == 0 && cb.check_lookbehind)
   {
   PCRE2_UCHAR *cc = (PCRE2_UCHAR *)codestart;
 

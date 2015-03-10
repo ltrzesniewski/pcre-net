@@ -54,6 +54,10 @@ dist_html_DATA = \
   doc/html/pcre2_match_data_create_from_pattern.html \
   doc/html/pcre2_match_data_free.html \
   doc/html/pcre2_pattern_info.html \
+  doc/html/pcre2_serialize_decode.html \
+  doc/html/pcre2_serialize_encode.html \
+  doc/html/pcre2_serialize_free.html \
+  doc/html/pcre2_serialize_get_number_of_codes.html \
   doc/html/pcre2_set_bsr.html \
   doc/html/pcre2_set_callout.html \
   doc/html/pcre2_set_character_tables.html \
@@ -89,6 +93,7 @@ dist_html_DATA = \
   doc/html/pcre2perform.html \
   doc/html/pcre2posix.html \
   doc/html/pcre2sample.html \
+  doc/html/pcre2serialize.html \
   doc/html/pcre2stack.html \
   doc/html/pcre2syntax.html \
   doc/html/pcre2test.html \
@@ -127,6 +132,10 @@ dist_man_MANS = \
   doc/pcre2_match_data_create_from_pattern.3 \
   doc/pcre2_match_data_free.3 \
   doc/pcre2_pattern_info.3 \
+  doc/pcre2_serialize_decode.3 \
+  doc/pcre2_serialize_encode.3 \
+  doc/pcre2_serialize_free.3 \
+  doc/pcre2_serialize_get_number_of_codes.3 \
   doc/pcre2_set_bsr.3 \
   doc/pcre2_set_callout.3 \
   doc/pcre2_set_character_tables.3 \
@@ -162,6 +171,7 @@ dist_man_MANS = \
   doc/pcre2perform.3 \
   doc/pcre2posix.3 \
   doc/pcre2sample.3 \
+  doc/pcre2serialize.3 \
   doc/pcre2stack.3 \
   doc/pcre2syntax.3 \
   doc/pcre2test.1 \
@@ -188,7 +198,7 @@ noinst_PROGRAMS =
 # and 'make maintainer-clean'.
 
 CLEANFILES =
-DISTCLEANFILES = src/config.h.in~
+DISTCLEANFILES = src/config.h.in~ config.h
 MAINTAINERCLEANFILES =
 
 # Additional files to bundle with the distribution, over and above what
@@ -316,6 +326,7 @@ COMMON_SOURCES = \
   src/pcre2_newline.c \
   src/pcre2_ord2utf.c \
   src/pcre2_pattern_info.c \
+  src/pcre2_serialize.c \
   src/pcre2_string_utils.c \
   src/pcre2_study.c \
   src/pcre2_substitute.c \
@@ -530,8 +541,7 @@ endif # WITH_GCOV
 TESTS += RunTest
 dist_noinst_SCRIPTS += RunTest
 
-# FIXME when somebody updates RunTest.bat
-#EXTRA_DIST += RunTest.bat
+EXTRA_DIST += RunTest.bat
 
 ## When the 8-bit library is configured, pcre2grep will have been built.
 
@@ -573,6 +583,7 @@ EXTRA_DIST += \
   testdata/testinput16 \
   testdata/testinput17 \
   testdata/testinput18 \
+  testdata/testinput19 \
   testdata/testinputEBC \
   testdata/testoutput1 \
   testdata/testoutput2 \
@@ -598,7 +609,10 @@ EXTRA_DIST += \
   testdata/testoutput16 \
   testdata/testoutput17 \
   testdata/testoutput18 \
+  testdata/testoutput19 \
   testdata/testoutputEBC \
+  testdata/wintestinput3 \
+  testdata/wintestoutput3 \
   perltest.sh
 
 # RunTest and RunGrepTest should clean up after themselves, but just in case

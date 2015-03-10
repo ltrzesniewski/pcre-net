@@ -46,6 +46,31 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 /*************************************************
+*           Free JIT read-only data              *
+*************************************************/
+
+void
+PRIV(jit_free_rodata)(void *current, void *allocator_data)
+{
+#ifndef SUPPORT_JIT
+(void)current;
+(void)allocator_data;
+#else  /* SUPPORT_JIT */
+void *next;
+
+SLJIT_UNUSED_ARG(allocator_data);
+
+while (current != NULL)
+  {
+  next = *(void**)current;
+  SLJIT_FREE(current, allocator_data);
+  current = next;
+  }
+
+#endif /* SUPPORT_JIT */
+}
+
+/*************************************************
 *           Free JIT compiled code               *
 *************************************************/
 
@@ -65,8 +90,7 @@ for (i = 0; i < JIT_NUMBER_OF_COMPILE_MODES; i++)
   {
   if (functions->executable_funcs[i] != NULL)
     sljit_free_code(functions->executable_funcs[i]);
-  if (functions->read_only_data[i] != NULL)
-    SLJIT_FREE(functions->read_only_data[i], allocator_data);
+  PRIV(jit_free_rodata)(functions->read_only_data_heads[i], allocator_data);
   }
 
 SLJIT_FREE(functions, allocator_data);

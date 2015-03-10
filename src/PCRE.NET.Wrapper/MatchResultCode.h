@@ -15,7 +15,7 @@ namespace PCRE {
 			NoMatch                    = PCRE2_ERROR_NOMATCH,
 			Partial                    = PCRE2_ERROR_PARTIAL,
 			BadData                    = PCRE2_ERROR_BADDATA,
-			BadLength                  = PCRE2_ERROR_BADLENGTH,
+			MixedTables                = PCRE2_ERROR_MIXEDTABLES,
 			BadMagic                   = PCRE2_ERROR_BADMAGIC,
 			BadMode                    = PCRE2_ERROR_BADMODE,
 			BadOffset                  = PCRE2_ERROR_BADOFFSET,

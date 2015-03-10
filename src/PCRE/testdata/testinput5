@@ -1636,4 +1636,9 @@
 /(?<=abc)(|def)/g,utf,replace=<$0>
       123abcáyzabcdef789abcሴqr
 
+/[^\xff]((?1))/utf,debug
+
+/[A-`]/iB,utf
+    abcdefghijklmno
+
 # End of testinput5 

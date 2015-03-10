@@ -7,7 +7,7 @@ and semantics are as close as possible to those of the Perl 5 language.
 
                        Written by Philip Hazel
      Original API code Copyright (c) 1997-2012 University of Cambridge
-         New API code Copyright (c) 2014 University of Cambridge
+         New API code Copyright (c) 2015 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -74,7 +74,7 @@ static const char compile_error_texts[] =
   "missing terminating ] for character class\0"
   "invalid escape sequence in character class\0"
   "range out of order in character class\0"
-  "nothing to repeat\0"
+  "quantifier does not follow a repeatable item\0"
   /* 10 */
   "internal error: unexpected repeat\0"
   "unrecognized character after (? or (?-\0"
@@ -159,6 +159,8 @@ static const char compile_error_texts[] =
   "character code point value in \\u.... sequence is too large\0"
   "digits missing in \\x{} or \\o{}\0"
   "syntax error in (?(VERSION condition\0"
+  /* 80 */
+  "internal error: unknown opcode in auto_possessify()\0"
   ;
 
 /* Match-time and UTF error texts are in the same format. */
@@ -200,7 +202,7 @@ static const char match_error_texts[] =
   "UTF-32 error: code points greater than 0x10ffff are not defined\0"
   "bad data value\0"
   /* 30 */
-  "bad length\0"
+  "patterns do not all use the same character tables\0"
   "magic number missing\0"
   "pattern compiled in wrong mode: 8/16/32-bit error\0"
   "bad offset value\0"

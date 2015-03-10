@@ -4075,13 +4075,25 @@ a random value. /Ix
 
 /(?<=abc)(|def)/g,replace=<$0>
     123abcxyzabcdef789abcpqr
+    
+/./replace=$0
+    a
+    
+/(.)(.)/replace=$2+$1
+    abc
+    
+/(?<A>.)(?<B>.)/replace=$B+$A
+    abc
+    
+/(.)(.)/g,replace=$2$1
+    abcdefgh  
 
 # End of substitute tests 
 
-"((?=(?(?=(?(?=(?(?=())))*)))))"
+"((?=(?(?=(?(?=(?(?=()))))))))"
     a
 
-"(?(?=)?==)(((((((((?=)))))))))"
+"(?(?=)==)(((((((((?=)))))))))"
     a
 
 /(a)(b)|(c)/
@@ -4115,5 +4127,55 @@ a random value. /Ix
 /.*\d/dotall,no_dotstar_anchor,info
 
 /(*NO_DOTSTAR_ANCHOR)(?s).*\d/info
+
+'^(?:(a)|b)(?(1)A|B)'
+    aA123\=ovector=1
+    aA123\=ovector=2
+
+'^(?:(?<AA>a)|b)(?(<AA>)A|B)'
+    aA123\=ovector=1
+    aA123\=ovector=2
+
+'^(?<AA>)(?:(?<AA>a)|b)(?(<AA>)A|B)'dupnames
+    aA123\=ovector=1
+    aA123\=ovector=2
+    aA123\=ovector=3
+
+'^(?:(?<AA>X)|)(?:(?<AA>a)|b)\k{AA}'dupnames
+    aa123\=ovector=1
+    aa123\=ovector=2
+    aa123\=ovector=3
+
+/(?<N111>(?J)(?<N111>1(111111)11|)1|1|)(?(<N111>)1)/
+
+/(?<N>(?J)(?<N>))(?-J)\k<N>/
+
+# Quantifiers are not allowed on condition assertions, but are otherwise
+# OK in conditions.
+
+/(?(?=0)?)+/
+
+/(?(?=0)(?=00)?00765)/
+     00765
+
+/(?(?=0)(?=00)?00765|(?!3).56)/
+     00765
+     456
+     ** Failers
+     356   
+
+'^(a)*+(\w)'
+    g
+    g\=ovector=1 
+
+'^(?:a)*+(\w)'
+    g
+    g\=ovector=1 
+    
+# These two pattern showeds up compile-time bugs
+
+"((?2){0,1999}())?"
+
+/((?+1)(\1))/B
 
 # End of testinput2 

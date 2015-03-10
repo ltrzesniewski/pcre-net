@@ -147,7 +147,7 @@ Failed: error 107 at offset 2: invalid escape sequence in character class
 Failed: error 108 at offset 3: range out of order in character class
 
 /^*/
-Failed: error 109 at offset 1: nothing to repeat
+Failed: error 109 at offset 1: quantifier does not follow a repeatable item
 
 /(abc/
 Failed: error 114 at offset 4: missing closing parenthesis
@@ -230,7 +230,7 @@ Subject length lower bound = 1
 Failed: error 115 at offset 6: reference to non-existent subpattern
 
 /{4,5}abc/
-Failed: error 109 at offset 4: nothing to repeat
+Failed: error 109 at offset 4: quantifier does not follow a repeatable item
 
 /(a)(b)(c)\2/I
 Capturing subpattern count = 3
@@ -883,10 +883,10 @@ Failed: error 106 at offset 4: missing terminating ] for character class
 Failed: error 106 at offset 2: missing terminating ] for character class
 
 /*a/
-Failed: error 109 at offset 0: nothing to repeat
+Failed: error 109 at offset 0: quantifier does not follow a repeatable item
 
 /(*)b/
-Failed: error 109 at offset 1: nothing to repeat
+Failed: error 109 at offset 1: quantifier does not follow a repeatable item
 
 /abc)/
 Failed: error 122 at offset 3: unmatched closing parenthesis
@@ -895,7 +895,7 @@ Failed: error 122 at offset 3: unmatched closing parenthesis
 Failed: error 114 at offset 4: missing closing parenthesis
 
 /a**/
-Failed: error 109 at offset 2: nothing to repeat
+Failed: error 109 at offset 2: quantifier does not follow a repeatable item
 
 /)(/
 Failed: error 122 at offset 0: unmatched closing parenthesis
@@ -919,10 +919,10 @@ Failed: error 106 at offset 4: missing terminating ] for character class
 Failed: error 106 at offset 2: missing terminating ] for character class
 
 /*a/Ii
-Failed: error 109 at offset 0: nothing to repeat
+Failed: error 109 at offset 0: quantifier does not follow a repeatable item
 
 /(*)b/Ii
-Failed: error 109 at offset 1: nothing to repeat
+Failed: error 109 at offset 1: quantifier does not follow a repeatable item
 
 /abc)/Ii
 Failed: error 122 at offset 3: unmatched closing parenthesis
@@ -931,7 +931,7 @@ Failed: error 122 at offset 3: unmatched closing parenthesis
 Failed: error 114 at offset 4: missing closing parenthesis
 
 /a**/Ii
-Failed: error 109 at offset 2: nothing to repeat
+Failed: error 109 at offset 2: quantifier does not follow a repeatable item
 
 /)(/Ii
 Failed: error 122 at offset 0: unmatched closing parenthesis
@@ -1535,28 +1535,33 @@ Subject length lower bound = 3
 
 /a(?(1)b)(.)/I
 Capturing subpattern count = 1
+Max back reference = 1
 First code unit = 'a'
 Subject length lower bound = 2
 
 /a(?(1)bag|big)(.)/I
 Capturing subpattern count = 1
+Max back reference = 1
 First code unit = 'a'
 Last code unit = 'g'
 Subject length lower bound = 5
 
 /a(?(1)bag|big)*(.)/I
 Capturing subpattern count = 1
+Max back reference = 1
 First code unit = 'a'
 Subject length lower bound = 2
 
 /a(?(1)bag|big)+(.)/I
 Capturing subpattern count = 1
+Max back reference = 1
 First code unit = 'a'
 Last code unit = 'g'
 Subject length lower bound = 5
 
 /a(?(1)b..|b..)(.)/I
 Capturing subpattern count = 1
+Max back reference = 1
 First code unit = 'a'
 Last code unit = 'b'
 Subject length lower bound = 5
@@ -3020,16 +3025,16 @@ Last code unit = 'c'
 Subject length lower bound = 3
 
 /a+?+/I
-Failed: error 109 at offset 3: nothing to repeat
+Failed: error 109 at offset 3: quantifier does not follow a repeatable item
 
 /a{2,3}?+b/I
-Failed: error 109 at offset 7: nothing to repeat
+Failed: error 109 at offset 7: quantifier does not follow a repeatable item
 
 /(?U)a+?+/I
-Failed: error 109 at offset 7: nothing to repeat
+Failed: error 109 at offset 7: quantifier does not follow a repeatable item
 
 /a{2,3}?+b/I,ungreedy
-Failed: error 109 at offset 7: nothing to repeat
+Failed: error 109 at offset 7: quantifier does not follow a repeatable item
 
 /x(?U)a++b/IB
 ------------------------------------------------------------------
@@ -3345,21 +3350,25 @@ Subject length lower bound = 1
 
 /(?(1)ab|ac)(.)/I
 Capturing subpattern count = 1
+Max back reference = 1
 First code unit = 'a'
 Subject length lower bound = 3
 
 /(?(1)abz|acz)(.)/I
 Capturing subpattern count = 1
+Max back reference = 1
 First code unit = 'a'
 Last code unit = 'z'
 Subject length lower bound = 4
 
 /(?(1)abz)(.)/I
 Capturing subpattern count = 1
+Max back reference = 1
 Subject length lower bound = 1
 
 /(?(1)abz)(1)23/I
 Capturing subpattern count = 1
+Max back reference = 1
 Last code unit = '3'
 Subject length lower bound = 3
 
@@ -5923,6 +5932,7 @@ Subject length lower bound = 6
 
 /^(?P<A>a)?(?(A)a|b)/I
 Capturing subpattern count = 1
+Max back reference = 1
 Named capturing subpatterns:
   A   1
 Compile options: <none>
@@ -5940,6 +5950,7 @@ No match
 
 /(?:(?(ZZ)a|b)(?P<ZZ>X))+/I
 Capturing subpattern count = 1
+Max back reference = 1
 Named capturing subpatterns:
   ZZ   1
 Last code unit = 'X'
@@ -5956,6 +5967,7 @@ Failed: error 115 at offset 9: reference to non-existent subpattern
 
 /(?:(?(ZZ)a|b)(?(ZZ)a|b)(?P<ZZ>X))+/I
 Capturing subpattern count = 1
+Max back reference = 1
 Named capturing subpatterns:
   ZZ   1
 Last code unit = 'X'
@@ -5966,6 +5978,7 @@ Subject length lower bound = 3
 
 /(?:(?(ZZ)a|\(b\))\\(?P<ZZ>X))+/I
 Capturing subpattern count = 1
+Max back reference = 1
 Named capturing subpatterns:
   ZZ   1
 Last code unit = 'X'
@@ -8803,7 +8816,7 @@ No match
  0: a
 
 /a(*FAIL)+b/
-Failed: error 109 at offset 8: nothing to repeat
+Failed: error 109 at offset 8: quantifier does not follow a repeatable item
 
 /(abc|pqr|123){0}[xyz]/I
 Capturing subpattern count = 1
@@ -9713,6 +9726,7 @@ Subject length lower bound = 9
   (?(1)|.)                    # check that there was an empty component
   /Iix
 Capturing subpattern count = 1
+Max back reference = 1
 Compile options: caseless extended
 Overall options: anchored caseless extended
 Last code unit = ':'
@@ -9740,6 +9754,7 @@ Failed: error 165 at offset 15: different names for subpatterns of the same numb
     b(?<quote> (?<apostrophe>')|(?<realquote>")) ) 
     (?('quote')[a-z]+|[0-9]+)/Ix,dupnames
 Capturing subpattern count = 6
+Max back reference = 4
 Named capturing subpatterns:
   apostrophe   2
   apostrophe   5
@@ -9802,6 +9817,7 @@ No match
         End
 ------------------------------------------------------------------
 Capturing subpattern count = 4
+Max back reference = 4
 Named capturing subpatterns:
   D   4
   D   1
@@ -9849,6 +9865,7 @@ No match
         End
 ------------------------------------------------------------------
 Capturing subpattern count = 4
+Max back reference = 4
 Named capturing subpatterns:
   A   1
   A   4
@@ -9964,6 +9981,7 @@ Subject length lower bound = 1
     
 /()i(?(1)a)/I
 Capturing subpattern count = 1
+Max back reference = 1
 First code unit = 'i'
 Subject length lower bound = 1
     ia
@@ -13540,6 +13558,7 @@ No match
 
 /(?:(?<VERSION>abc)|xyz)(?(VERSION)yes|no)/I
 Capturing subpattern count = 1
+Max back reference = 1
 Named capturing subpatterns:
   VERSION   1
 Starting code units: a x 
@@ -13702,16 +13721,32 @@ Failed: error -34: bad option value
 /(?<=abc)(|def)/g,replace=<$0>
     123abcxyzabcdef789abcpqr
  4: 123abc<>xyzabc<><def>789abc<>pqr
+    
+/./replace=$0
+    a
+ 1: a
+    
+/(.)(.)/replace=$2+$1
+    abc
+ 1: b+ac
+    
+/(?<A>.)(?<B>.)/replace=$B+$A
+    abc
+ 1: b+ac
+    
+/(.)(.)/g,replace=$2$1
+    abcdefgh  
+ 4: badcfehg
 
 # End of substitute tests 
 
-"((?=(?(?=(?(?=(?(?=())))*)))))"
+"((?=(?(?=(?(?=(?(?=()))))))))"
     a
  0: 
  1: 
  2: 
 
-"(?(?=)?==)(((((((((?=)))))))))"
+"(?(?=)==)(((((((((?=)))))))))"
     a
 No match
 
@@ -13831,5 +13866,107 @@ Capturing subpattern count = 0
 Compile options: <none>
 Overall options: dotall no_dotstar_anchor
 Subject length lower bound = 1
+
+'^(?:(a)|b)(?(1)A|B)'
+    aA123\=ovector=1
+Matched, but too many substrings
+ 0: aA
+    aA123\=ovector=2
+ 0: aA
+ 1: a
+
+'^(?:(?<AA>a)|b)(?(<AA>)A|B)'
+    aA123\=ovector=1
+Matched, but too many substrings
+ 0: aA
+    aA123\=ovector=2
+ 0: aA
+ 1: a
+
+'^(?<AA>)(?:(?<AA>a)|b)(?(<AA>)A|B)'dupnames
+    aA123\=ovector=1
+Matched, but too many substrings
+ 0: aA
+    aA123\=ovector=2
+Matched, but too many substrings
+ 0: aA
+ 1: 
+    aA123\=ovector=3
+ 0: aA
+ 1: 
+ 2: a
+
+'^(?:(?<AA>X)|)(?:(?<AA>a)|b)\k{AA}'dupnames
+    aa123\=ovector=1
+Matched, but too many substrings
+ 0: aa
+    aa123\=ovector=2
+Matched, but too many substrings
+ 0: aa
+ 1: <unset>
+    aa123\=ovector=3
+ 0: aa
+ 1: <unset>
+ 2: a
+
+/(?<N111>(?J)(?<N111>1(111111)11|)1|1|)(?(<N111>)1)/
+
+/(?<N>(?J)(?<N>))(?-J)\k<N>/
+
+# Quantifiers are not allowed on condition assertions, but are otherwise
+# OK in conditions.
+
+/(?(?=0)?)+/
+Failed: error 109 at offset 7: quantifier does not follow a repeatable item
+
+/(?(?=0)(?=00)?00765)/
+     00765
+ 0: 00765
+
+/(?(?=0)(?=00)?00765|(?!3).56)/
+     00765
+ 0: 00765
+     456
+ 0: 456
+     ** Failers
+No match
+     356   
+No match
+
+'^(a)*+(\w)'
+    g
+ 0: g
+ 1: <unset>
+ 2: g
+    g\=ovector=1 
+Matched, but too many substrings
+ 0: g
+
+'^(?:a)*+(\w)'
+    g
+ 0: g
+ 1: g
+    g\=ovector=1 
+Matched, but too many substrings
+ 0: g
+    
+# These two pattern showeds up compile-time bugs
+
+"((?2){0,1999}())?"
+
+/((?+1)(\1))/B
+------------------------------------------------------------------
+        Bra
+        Once
+        CBra 1
+        Recurse
+        CBra 2
+        \1
+        Ket
+        Ket
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
 
 # End of testinput2 

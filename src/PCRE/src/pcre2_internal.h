@@ -523,6 +523,8 @@ bytes in a code unit in that mode. */
 #define PCRE2_NL_SET        0x00008000  /* newline was set in the pattern */
 #define PCRE2_NOTEMPTY_SET  0x00010000  /* (*NOTEMPTY) used        ) keep */
 #define PCRE2_NE_ATST_SET   0x00020000  /* (*NOTEMPTY_ATSTART) used) together */
+#define PCRE2_DEREF_TABLES  0x00040000  /* Release character tables. */
+#define PCRE2_NOJIT         0x00080000  /* (*NOJIT) used */
 
 #define PCRE2_MODE_MASK     (PCRE2_MODE8 | PCRE2_MODE16 | PCRE2_MODE32)
 
@@ -905,6 +907,7 @@ a positive value. */
 #define STRING_UCP_RIGHTPAR               "UCP)"
 #define STRING_NO_AUTO_POSSESS_RIGHTPAR   "NO_AUTO_POSSESS)"
 #define STRING_NO_DOTSTAR_ANCHOR_RIGHTPAR "NO_DOTSTAR_ANCHOR)"
+#define STRING_NO_JIT_RIGHTPAR            "NO_JIT)"
 #define STRING_NO_START_OPT_RIGHTPAR      "NO_START_OPT)"
 #define STRING_NOTEMPTY_RIGHTPAR          "NOTEMPTY)"
 #define STRING_NOTEMPTY_ATSTART_RIGHTPAR  "NOTEMPTY_ATSTART)"
@@ -1175,6 +1178,7 @@ only. */
 #define STRING_UCP_RIGHTPAR               STR_U STR_C STR_P STR_RIGHT_PARENTHESIS
 #define STRING_NO_AUTO_POSSESS_RIGHTPAR   STR_N STR_O STR_UNDERSCORE STR_A STR_U STR_T STR_O STR_UNDERSCORE STR_P STR_O STR_S STR_S STR_E STR_S STR_S STR_RIGHT_PARENTHESIS
 #define STRING_NO_DOTSTAR_ANCHOR_RIGHTPAR STR_N STR_O STR_UNDERSCORE STR_D STR_O STR_T STR_S STR_T STR_A STR_R STR_UNDERSCORE STR_A STR_N STR_C STR_H STR_O STR_R STR_RIGHT_PARENTHESIS
+#define STRING_NO_JIT_RIGHTPAR            STR_N STR_O STR_UNDERSCORE STR_J STR_I STR_T STR_RIGHT_PARENTHESIS
 #define STRING_NO_START_OPT_RIGHTPAR      STR_N STR_O STR_UNDERSCORE STR_S STR_T STR_A STR_R STR_T STR_UNDERSCORE STR_O STR_P STR_T STR_RIGHT_PARENTHESIS
 #define STRING_NOTEMPTY_RIGHTPAR          STR_N STR_O STR_T STR_E STR_M STR_P STR_T STR_Y STR_RIGHT_PARENTHESIS
 #define STRING_NOTEMPTY_ATSTART_RIGHTPAR  STR_N STR_O STR_T STR_E STR_M STR_P STR_T STR_Y STR_UNDERSCORE STR_A STR_T STR_S STR_T STR_A STR_R STR_T STR_RIGHT_PARENTHESIS
@@ -1763,6 +1767,15 @@ typedef struct {
 #define UCD_CASESET(ch)     GET_UCD(ch)->caseset
 #define UCD_OTHERCASE(ch)   ((uint32_t)((int)ch + (int)(GET_UCD(ch)->other_case)))
 
+/* Header for serialized pcre2 codes. */
+
+typedef struct pcre2_serialized_data {
+  uint32_t magic;
+  uint32_t version;
+  uint32_t config;
+  int32_t  number_of_codes;
+} pcre2_serialized_data;
+
 
 
 /* ----------------- Items that need PCRE2_CODE_UNIT_WIDTH ----------------- */
@@ -1853,6 +1866,7 @@ is available. */
 #define _pcre2_auto_possessify       PCRE2_SUFFIX(_pcre2_auto_possessify_)
 #define _pcre2_find_bracket          PCRE2_SUFFIX(_pcre2_find_bracket_)
 #define _pcre2_is_newline            PCRE2_SUFFIX(_pcre2_is_newline_)
+#define _pcre2_jit_free_rodata       PCRE2_SUFFIX(_pcre2_jit_free_rodata_)
 #define _pcre2_jit_free              PCRE2_SUFFIX(_pcre2_jit_free_)
 #define _pcre2_jit_get_size          PCRE2_SUFFIX(_pcre2_jit_get_size_)
 #define _pcre2_jit_get_target        PCRE2_SUFFIX(_pcre2_jit_get_target_)
@@ -1869,11 +1883,12 @@ is available. */
 #define _pcre2_was_newline           PCRE2_SUFFIX(_pcre2_was_newline_)
 #define _pcre2_xclass                PCRE2_SUFFIX(_pcre2_xclass_)
 
-extern void         _pcre2_auto_possessify(PCRE2_UCHAR *, BOOL,
+extern int          _pcre2_auto_possessify(PCRE2_UCHAR *, BOOL,
                       const compile_block *);
 extern PCRE2_SPTR   _pcre2_find_bracket(PCRE2_SPTR, BOOL, int);
 extern BOOL         _pcre2_is_newline(PCRE2_SPTR, uint32_t, PCRE2_SPTR,
                       uint32_t *, BOOL);
+extern void         _pcre2_jit_free_rodata(void *, void *);
 extern void         _pcre2_jit_free(void *, pcre2_memctl *);
 extern size_t       _pcre2_jit_get_size(void *);
 const char *        _pcre2_jit_get_target(void);
