@@ -17,6 +17,14 @@ namespace PCRE {
 			return reinterpret_cast<interior_ptr<const PCRE2_UCHAR>>(PtrToStringChars(string));
 		}
 
+		static String^ GetErrorMessage(int errorCode)
+		{
+			PCRE2_UCHAR16 errorBuffer[256];
+			return pcre2_get_error_message(errorCode, errorBuffer, sizeof(errorBuffer)) >= 0
+				? gcnew String(reinterpret_cast<const wchar_t*>(errorBuffer))
+				: "Unknown error, code: " + errorCode;
+		}
+
 		InternalRegex::InternalRegex(CompileContext^ context)
 		{
 			int errorCode;
@@ -35,14 +43,7 @@ namespace PCRE {
 			pinnedPattern = nullptr;
 
 			if (!_re)
-			{
-				PCRE2_UCHAR16 errorBuffer[256];
-				auto errorMessage = pcre2_get_error_message(errorCode, errorBuffer, sizeof(errorBuffer)) >= 0
-					? gcnew String(reinterpret_cast<const wchar_t*>(errorBuffer))
-					: "Unknown error";
-
-				throw gcnew ArgumentException(String::Format("Invalid pattern '{0}': {1} at offset {2}", context->Pattern, errorMessage, errorOffset));
-			}
+				throw gcnew ArgumentException(String::Format("Invalid pattern '{0}': {1} at offset {2}", context->Pattern, GetErrorMessage(errorCode), errorOffset));
 
 			if (context->JitCompileOptions != JitCompileOptions::None)
 				pcre2_jit_compile(_re, static_cast<uint32_t>(context->JitCompileOptions));
@@ -139,16 +140,9 @@ namespace PCRE {
 
 				case PCRE2_ERROR_CALLOUT:
 					throw gcnew MatchException(matchData, String::Format("An exception was thrown by the callout: {0}", matchData->CalloutException ? matchData->CalloutException->Message : nullptr), matchData->CalloutException);
-					break;
 
 				default:
-					{
-						PCRE2_UCHAR16 errorBuffer[256];
-						auto errorMessage = pcre2_get_error_message(result, errorBuffer, sizeof(errorBuffer)) >= 0
-							? gcnew String(reinterpret_cast<const wchar_t*>(errorBuffer))
-							: "Match error, code: " + result;
-						throw gcnew MatchException(matchData, errorMessage, nullptr);
-					}
+					throw gcnew MatchException(matchData, GetErrorMessage(result), nullptr);
 				}
 			}
 
