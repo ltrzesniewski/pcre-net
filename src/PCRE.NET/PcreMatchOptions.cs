@@ -18,6 +18,8 @@ namespace PCRE
         NoStartOptimize = PatternOptions.NoStartOptimize,
 
         PartialSoft = PatternOptions.PartialSoft,
-        PartialHard = PatternOptions.PartialHard
+        PartialHard = PatternOptions.PartialHard,
+
+        NoUtfCheck = PatternOptions.NoUtfCheck
     }
 }

@@ -142,7 +142,13 @@ namespace PCRE {
 					break;
 
 				default:
-					throw gcnew MatchException(matchData, String::Format("Match error: {0}", matchData->ResultCode), nullptr);
+					{
+						PCRE2_UCHAR16 errorBuffer[256];
+						auto errorMessage = pcre2_get_error_message(result, errorBuffer, sizeof(errorBuffer)) >= 0
+							? gcnew String(reinterpret_cast<const wchar_t*>(errorBuffer))
+							: "Match error, code: " + result;
+						throw gcnew MatchException(matchData, errorMessage, nullptr);
+					}
 				}
 			}
 

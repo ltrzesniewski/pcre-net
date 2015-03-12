@@ -4,11 +4,9 @@ namespace PCRE.Support
 {
     internal static class PcreEnumExtensions
     {
-        private const PatternOptions FlippedOptions = PatternOptions.NoUtfCheck;
-
         public static PatternOptions ToPatternOptions(this PcreOptions options)
         {
-            return ((PatternOptions)((long)options & 0xFFFFFFFF) ^ FlippedOptions) | PatternOptions.Utf;
+            return (PatternOptions)((long)options & 0xFFFFFFFF) | PatternOptions.Utf;
         }
 
         public static PatternOptions ToPatternOptions(this PcreMatchOptions options)

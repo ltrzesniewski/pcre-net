@@ -36,8 +36,7 @@ namespace PCRE
         MatchUnsetBackref = PatternOptions.MatchUnsetBackref,
         NoDotStarAnchor = PatternOptions.NoDotStarAnchor,
 
-        // Flipped options
-        CheckUnicodeValidity = PatternOptions.NoUtfCheck,
+        NoPatternUtfCheck = PatternOptions.NoUtfCheck,
 
         // Extra options
         Compiled = 1L << 32,

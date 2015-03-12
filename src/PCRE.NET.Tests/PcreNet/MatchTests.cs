@@ -355,6 +355,21 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_check_pattern_utf_validity()
+        {
+            var ex = Assert.Throws<ArgumentException>(() => new PcreRegex("A\uD800B"));
+            Assert.That(ex.Message, Contains.Substring("invalid low surrogate"));
+        }
+
+        [Test]
+        public void should_check_subject_utf_validity()
+        {
+            var re = new PcreRegex(@"A");
+            var ex = Assert.Throws<PcreMatchException>(() => re.Match("A\uD800B"));
+            Assert.That(ex.Message, Contains.Substring("invalid low surrogate"));
+        }
+
+        [Test]
         public void readme_json_example()
         {
             const string jsonPattern = @"
