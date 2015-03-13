@@ -2,7 +2,7 @@ using System;
 
 namespace PCRE.Dfa
 {
-    internal class PcreDfaMatch : IPcreGroup
+    public class PcreDfaMatch : IPcreGroup
     {
         internal static readonly PcreDfaMatch[] EmptyMatches = new PcreDfaMatch[0];
 

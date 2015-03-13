@@ -4,7 +4,7 @@ using PCRE.Wrapper;
 namespace PCRE.Dfa
 {
     [Flags]
-    internal enum PcreDfaMatchOptions : long
+    public enum PcreDfaMatchOptions : long
     {
         None = 0,
 
@@ -19,6 +19,8 @@ namespace PCRE.Dfa
 
         PartialSoft = PatternOptions.PartialSoft,
         PartialHard = PatternOptions.PartialHard,
+
+        NoUtfCheck = PatternOptions.NoUtfCheck,
 
         ShortestMatch = PatternOptions.DfaShortest
     }

@@ -16,8 +16,14 @@ namespace PCRE {
 		{
 		public:
 			MatchData(InternalRegex^ const re, String^ subject);
+			MatchData(InternalRegex^ const re, String^ subject, uint32_t oVectorSize);
 			~MatchData();
 			!MatchData();
+
+			property int RawResultCode {
+				public: int get() { return _rawResultCode; }
+				internal: void set(int value) { _rawResultCode = value; }
+			}
 
 			property MatchResultCode ResultCode {
 				public: MatchResultCode get() { return _resultCode; }
@@ -27,6 +33,8 @@ namespace PCRE {
 			property InternalRegex^ Regex { InternalRegex^ get() { return _re; } }
 			property String^ Subject { String^ get() { return _subject; } }
 			property String^ Mark { String^ get(); }
+
+			property uint32_t OutputVectorLength { uint32_t get() { return static_cast<uint32_t>(_oVectorCount); } }
 
 			[Pure]
 			int GetStartOffset(unsigned int index);
@@ -46,6 +54,7 @@ namespace PCRE {
 		private:
 			initonly InternalRegex^ _re;
 			initonly String^ _subject;
+			int _rawResultCode;
 			MatchResultCode _resultCode;
 			String^ _mark;
 			PCRE2_SPTR _markPtr;

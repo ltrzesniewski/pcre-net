@@ -44,7 +44,7 @@ namespace PCRE
             return context;
         }
 
-        private static Func<CalloutData, CalloutResult> WrapCallout(Func<PcreCallout, PcreCalloutResult> callout)
+        internal static Func<CalloutData, CalloutResult> WrapCallout(Func<PcreCallout, PcreCalloutResult> callout)
         {
             if (callout == null)
                 return null;

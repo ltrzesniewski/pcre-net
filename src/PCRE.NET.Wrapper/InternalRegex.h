@@ -22,6 +22,7 @@ namespace PCRE {
 			!InternalRegex();
 
 			MatchData^ Match(MatchContext^ context);
+			MatchData^ DfaMatch(MatchContext^ context);
 
 			int GetInfoInt32(InfoKey key);
 

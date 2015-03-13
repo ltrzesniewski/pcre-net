@@ -16,6 +16,15 @@ namespace PCRE {
 			_oVectorCount = pcre2_get_ovector_count(_matchData);
 		}
 
+		MatchData::MatchData(InternalRegex^ re, String^ subject, uint32_t oVectorSize)
+			: _re(re),
+			_subject(subject)
+		{
+			_matchData = pcre2_match_data_create(oVectorSize, nullptr);
+			_oVector = pcre2_get_ovector_pointer(_matchData);
+			_oVectorCount = pcre2_get_ovector_count(_matchData);
+		}
+
 		MatchData::MatchData(MatchData^ result, pcre2_callout_block *calloutBlock)
 			: _re(result->_re),
 			_subject(result->_subject),

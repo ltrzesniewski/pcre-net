@@ -25,6 +25,8 @@ namespace PCRE {
 				: "Unknown error, code: " + errorCode;
 		}
 
+		static void AfterMatch(MatchData^);
+
 		InternalRegex::InternalRegex(CompileContext^ context)
 		{
 			int errorCode;
@@ -124,29 +126,72 @@ namespace PCRE {
 				matchData->Block,
 				context->Context);
 
-			if (result >= 0)
-			{
-				matchData->ResultCode = MatchResultCode::Success;
-			}
-			else
-			{
-				matchData->ResultCode = static_cast<MatchResultCode>(result);
-
-				switch (result)
-				{
-				case PCRE2_ERROR_NOMATCH:
-				case PCRE2_ERROR_PARTIAL:
-					break;
-
-				case PCRE2_ERROR_CALLOUT:
-					throw gcnew MatchException(matchData, String::Format("An exception was thrown by the callout: {0}", matchData->CalloutException ? matchData->CalloutException->Message : nullptr), matchData->CalloutException);
-
-				default:
-					throw gcnew MatchException(matchData, GetErrorMessage(result), nullptr);
-				}
-			}
+			matchData->RawResultCode = result;
+			AfterMatch(matchData);
 
 			return matchData;
+		}
+
+		MatchData^ InternalRegex::DfaMatch(MatchContext^ context)
+		{
+			auto matchData = gcnew MatchData(this, context->Subject, Math::Max(1u, context->DfaMaxResults));
+			context->Match = matchData;
+
+			pin_ptr<MatchContext^> pinnedContext;
+			pin_ptr<const PCRE2_UCHAR> pinnedSubject = GetPtrToString(context->Subject);
+
+			if (context->CalloutHandler)
+			{
+				pinnedContext = &context;
+				context->EnableCallout(pinnedContext);
+			}
+			
+			auto workspace = gcnew array<int>(Math::Max(20u, context->DfaWorkspaceSize));
+			pin_ptr<int> pinnedWorkspace = &workspace[0];
+
+			int result = pcre2_dfa_match(
+				_re,
+				pinnedSubject,
+				context->Subject->Length,
+				context->StartIndex,
+				static_cast<int>(context->AdditionalOptions),
+				matchData->Block,
+				context->Context,
+				pinnedWorkspace,
+				workspace->Length);
+
+			matchData->RawResultCode = result;
+			AfterMatch(matchData);
+
+			return matchData;
+		}
+
+		static void AfterMatch(MatchData^ matchData)
+		{
+			matchData->ResultCode = static_cast<MatchResultCode>(matchData->RawResultCode);
+
+			switch (matchData->ResultCode)
+			{
+			case MatchResultCode::NoMatch:
+			case MatchResultCode::Partial:
+				break;
+
+			case MatchResultCode::Callout:
+				throw gcnew MatchException(
+					matchData,
+					String::Format("An exception was thrown by the callout: {0}", matchData->CalloutException ? matchData->CalloutException->Message : nullptr),
+					matchData->CalloutException);
+
+			default:
+				auto intResult = static_cast<int>(matchData->ResultCode);
+				if (intResult >= 0)
+				{
+					matchData->ResultCode = MatchResultCode::Success;
+					break;
+				}
+
+				throw gcnew MatchException(matchData, GetErrorMessage(intResult), nullptr);
+			}
 		}
 
 		int InternalRegex::GetInfoInt32(InfoKey key)

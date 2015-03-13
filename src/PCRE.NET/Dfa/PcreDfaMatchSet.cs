@@ -5,7 +5,7 @@ using PCRE.Wrapper;
 
 namespace PCRE.Dfa
 {
-    internal class PcreDfaMatchSet : IReadOnlyCollection<PcreDfaMatch>
+    public class PcreDfaMatchSet : IReadOnlyList<PcreDfaMatch>
     {
         private readonly object _result; // See remark about JIT in PcreRegex
         private readonly PcreDfaMatch[] _matches;
@@ -13,7 +13,13 @@ namespace PCRE.Dfa
         internal PcreDfaMatchSet(MatchData result)
         {
             _result = result;
-            _matches = PcreDfaMatch.EmptyMatches;
+
+            if (result.RawResultCode > 0)
+                _matches = new PcreDfaMatch[result.RawResultCode];
+            else if (result.RawResultCode == 0)
+                _matches = new PcreDfaMatch[result.OutputVectorLength];
+            else
+                _matches = PcreDfaMatch.EmptyMatches;
         }
 
         private MatchData InternalResult
@@ -54,6 +60,11 @@ namespace PCRE.Dfa
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        public PcreDfaMatch this[int index]
+        {
+            get { return GetMatch(index); }
         }
 
         public int Count

@@ -26,6 +26,9 @@ namespace PCRE {
 			property uint32_t MatchLimit { void set(uint32_t); }
 			property uint32_t RecursionLimit { void set(uint32_t); }
 
+			property uint32_t DfaMaxResults;
+			property uint32_t DfaWorkspaceSize;
+
 		internal:
 			void EnableCallout(void* contextPtr);
 
