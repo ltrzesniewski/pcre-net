@@ -91,7 +91,7 @@
     <Compile Include="Dfa\PcreDfaMatchSettings.cs" />
     <Compile Include="IInternalRegexWrapper.cs" />
     <Compile Include="IPcreGroup.cs" />
-    <Compile Include="IPcreGroupCollection.cs" />
+    <Compile Include="IPcreGroupList.cs" />
     <Compile Include="PcreBackslashR.cs" />
     <Compile Include="PcreCallout.cs" />
     <Compile Include="PcreMatchException.cs" />

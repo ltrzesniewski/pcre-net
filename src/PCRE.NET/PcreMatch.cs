@@ -6,7 +6,7 @@ using PCRE.Wrapper;
 
 namespace PCRE
 {
-    public sealed class PcreMatch : IPcreGroup, IPcreGroupCollection
+    public sealed class PcreMatch : IPcreGroup, IPcreGroupList
     {
         private readonly object _result; // See remark about JIT in PcreRegex
         private readonly PcreGroup[] _groups;
@@ -72,7 +72,7 @@ namespace PCRE
             get { return InternalResult.Mark; }
         }
 
-        public IPcreGroupCollection Groups
+        public IPcreGroupList Groups
         {
             get { return this; }
         }
