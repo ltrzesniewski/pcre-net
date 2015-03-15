@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 
-namespace PCRE.Tests.PcreNet
+namespace PCRE.Tests.PcreNet.Dfa
 {
     [TestFixture]
     public class DfaMatchesTests

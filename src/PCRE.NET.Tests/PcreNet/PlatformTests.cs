@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using NUnit.Framework;
+using PCRE.Wrapper;
 
 namespace PCRE.Tests.PcreNet
 {
@@ -23,6 +25,26 @@ namespace PCRE.Tests.PcreNet
                 var hash = new Guid(MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(str.ToLowerInvariant())));
 
                 Console.WriteLine("{0:N} = {1}", hash, str);
+            }
+        }
+
+        [Test]
+        public void should_not_expose_wrapper_in_public_api()
+        {
+            var wrapperAssembly = typeof(InternalRegex).Assembly;
+
+            foreach (var type in typeof(PcreRegex).Assembly.GetExportedTypes())
+            {
+                if (type.BaseType != null)
+                    Assert.That(type.BaseType.Assembly, Is.Not.EqualTo(wrapperAssembly));
+
+                foreach (var method in type.GetMethods().Where(m => m.IsPublic || m.IsFamily))
+                {
+                    Assert.That(method.ReturnType.Assembly, Is.Not.EqualTo(wrapperAssembly));
+
+                    foreach (var param in method.GetParameters())
+                        Assert.That(param.ParameterType.Assembly, Is.Not.EqualTo(wrapperAssembly));
+                }
             }
         }
     }

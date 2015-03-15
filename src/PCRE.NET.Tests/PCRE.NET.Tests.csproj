@@ -75,6 +75,10 @@
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="PCRE.NET.Wrapper, Version=0.4.1.0, Culture=neutral, PublicKeyToken=8f58d558eeff25a3, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\PCRE.NET.Wrapper\bin\x64\Debug\PCRE.NET.Wrapper.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -84,8 +88,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PcreNet\DfaMatchesTests.cs" />
-    <Compile Include="PcreNet\DfaMatchTests.cs" />
+    <Compile Include="PcreNet\Dfa\DfaMatchesTests.cs" />
+    <Compile Include="PcreNet\Dfa\DfaMatchTests.cs" />
     <Compile Include="PcreNet\MatchesTests.cs" />
     <Compile Include="PcreNet\MatchTests.cs" />
     <Compile Include="PcreNet\PcreBuildInfoTests.cs" />

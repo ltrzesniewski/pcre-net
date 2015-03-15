@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using PCRE.Wrapper;
@@ -95,6 +96,12 @@ namespace PCRE.Dfa
         public PcreDfaMatch ShortestMatch
         {
             get { return GetMatch(Count - 1); }
+        }
+
+        public override string ToString()
+        {
+            var match = LongestMatch;
+            return match != null ? match.Value : String.Empty;
         }
     }
 }
