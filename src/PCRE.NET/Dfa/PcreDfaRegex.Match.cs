@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using PCRE.Wrapper;
 
@@ -59,6 +60,65 @@ namespace PCRE.Dfa
             using (var context = settings.CreateMatchContext(subject))
             {
                 return new PcreDfaMatchSet(ExecuteDfaMatch(context));
+            }
+        }
+
+        [Pure]
+        public IEnumerable<PcreDfaMatchSet> Matches(string subject)
+        {
+            return Matches(subject, 0);
+        }
+
+        [Pure]
+        public IEnumerable<PcreDfaMatchSet> Matches(string subject, int startIndex)
+        {
+            var settings = new PcreDfaMatchSettings
+            {
+                StartIndex = startIndex
+            };
+
+            return Matches(subject, settings);
+        }
+
+        [Pure]
+        public IEnumerable<PcreDfaMatchSet> Matches(string subject, PcreDfaMatchSettings settings)
+        {
+            if (subject == null)
+                throw new ArgumentNullException("subject");
+
+            if (settings == null)
+                throw new ArgumentNullException("settings");
+
+            if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
+                throw new IndexOutOfRangeException("Invalid StartIndex value");
+
+            return MatchesIterator(subject, settings);
+        }
+
+        private IEnumerable<PcreDfaMatchSet> MatchesIterator(string subject, PcreDfaMatchSettings settings)
+        {
+            using (var context = settings.CreateMatchContext(subject))
+            {
+                var result = ExecuteDfaMatch(context);
+
+                if (result.ResultCode != MatchResultCode.Success)
+                    yield break;
+
+                var match = new PcreDfaMatchSet(result);
+                yield return match;
+
+                while (true)
+                {
+                    context.StartIndex = match.Index + 1;
+
+                    result = ExecuteDfaMatch(context);
+
+                    if (result.ResultCode != MatchResultCode.Success)
+                        yield break;
+
+                    match = new PcreDfaMatchSet(result);
+                    yield return match;
+                }
             }
         }
 
