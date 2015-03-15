@@ -4,30 +4,37 @@ using PCRE.Wrapper;
 
 namespace PCRE.Dfa
 {
-    public static class PcreDfaRegex
+    public sealed class PcreDfaRegex
     {
         // ReSharper disable IntroduceOptionalParameters.Global
 
-        [Pure]
-        public static PcreDfaMatchSet DfaMatch(this PcreRegex regex, string subject)
+        private readonly PcreRegex _regex;
+
+        internal PcreDfaRegex(PcreRegex regex)
         {
-            return DfaMatch(regex, subject, 0, PcreDfaMatchOptions.None);
+            _regex = regex;
         }
 
         [Pure]
-        public static PcreDfaMatchSet DfaMatch(this PcreRegex regex, string subject, PcreDfaMatchOptions options)
+        public PcreDfaMatchSet Match(string subject)
         {
-            return DfaMatch(regex, subject, 0, options);
+            return Match(subject, 0, PcreDfaMatchOptions.None);
         }
 
         [Pure]
-        public static PcreDfaMatchSet DfaMatch(this PcreRegex regex, string subject, int startIndex)
+        public PcreDfaMatchSet Match(string subject, PcreDfaMatchOptions options)
         {
-            return DfaMatch(regex, subject, startIndex, PcreDfaMatchOptions.None);
+            return Match(subject, 0, options);
         }
 
         [Pure]
-        public static PcreDfaMatchSet DfaMatch(this PcreRegex regex, string subject, int startIndex, PcreDfaMatchOptions options)
+        public PcreDfaMatchSet Match(string subject, int startIndex)
+        {
+            return Match(subject, startIndex, PcreDfaMatchOptions.None);
+        }
+
+        [Pure]
+        public PcreDfaMatchSet Match(string subject, int startIndex, PcreDfaMatchOptions options)
         {
             var settings = new PcreDfaMatchSettings
             {
@@ -35,10 +42,10 @@ namespace PCRE.Dfa
                 StartIndex = startIndex
             };
 
-            return DfaMatch(regex, subject, settings);
+            return Match(subject, settings);
         }
 
-        public static PcreDfaMatchSet DfaMatch(this PcreRegex regex, string subject, PcreDfaMatchSettings settings)
+        public PcreDfaMatchSet Match(string subject, PcreDfaMatchSettings settings)
         {
             if (subject == null)
                 throw new ArgumentNullException("subject");
@@ -51,15 +58,15 @@ namespace PCRE.Dfa
 
             using (var context = settings.CreateMatchContext(subject))
             {
-                return new PcreDfaMatchSet(ExecuteDfaMatch(regex, context));
+                return new PcreDfaMatchSet(ExecuteDfaMatch(context));
             }
         }
 
-        private static MatchData ExecuteDfaMatch(PcreRegex regex, MatchContext context)
+        private MatchData ExecuteDfaMatch(MatchContext context)
         {
             try
             {
-                return regex.InternalRegex.DfaMatch(context);
+                return _regex.InternalRegex.DfaMatch(context);
             }
             catch (MatchException ex)
             {

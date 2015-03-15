@@ -5,7 +5,7 @@ using PCRE.Wrapper;
 
 namespace PCRE.Dfa
 {
-    public class PcreDfaMatchSet : IReadOnlyList<PcreDfaMatch>
+    public sealed class PcreDfaMatchSet : IReadOnlyList<PcreDfaMatch>
     {
         private readonly object _result; // See remark about JIT in PcreRegex
         private readonly PcreDfaMatch[] _matches;

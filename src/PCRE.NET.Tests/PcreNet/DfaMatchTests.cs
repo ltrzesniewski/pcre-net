@@ -10,7 +10,7 @@ namespace PCRE.Tests.PcreNet
         public void should_match_with_dfa()
         {
             var re = new PcreRegex(@"<.*>");
-            var match = re.DfaMatch("This is <something> <something else> <something further> no more");
+            var match = re.Dfa.Match("This is <something> <something else> <something further> no more");
 
             Assert.That(match, Is.Not.Null);
             Assert.That(match.Success, Is.True);
@@ -37,7 +37,7 @@ namespace PCRE.Tests.PcreNet
         public void should_get_shortest_match()
         {
             var re = new PcreRegex(@"<.*>");
-            var match = re.DfaMatch("This is <something> <something else> <something further> no more", PcreDfaMatchOptions.ShortestMatch);
+            var match = re.Dfa.Match("This is <something> <something else> <something further> no more", PcreDfaMatchOptions.ShortestMatch);
 
             Assert.That(match, Is.Not.Null);
             Assert.That(match.Success, Is.True);
@@ -53,7 +53,7 @@ namespace PCRE.Tests.PcreNet
         public void should_get_max_matches()
         {
             var re = new PcreRegex(@"<.*>");
-            var match = re.DfaMatch("This is <something> <something else> <something further> no more", new PcreDfaMatchSettings
+            var match = re.Dfa.Match("This is <something> <something else> <something further> no more", new PcreDfaMatchSettings
             {
                 MaxResults = 2
             });
@@ -75,7 +75,7 @@ namespace PCRE.Tests.PcreNet
         public void should_start_at_given_index()
         {
             var re = new PcreRegex(@"<.*>");
-            var match = re.DfaMatch("This is <something> <something else> <something further> no more", 10);
+            var match = re.Dfa.Match("This is <something> <something else> <something further> no more", 10);
 
             Assert.That(match, Is.Not.Null);
             Assert.That(match.Success, Is.True);

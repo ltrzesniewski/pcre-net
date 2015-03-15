@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using PCRE.Dfa;
 using PCRE.Support;
 using PCRE.Wrapper;
 
@@ -13,6 +14,7 @@ namespace PCRE
         // This type should always be loadable before the module initializer is executed.
         private readonly object _re;
         private PcrePatternInfo _info;
+        private PcreDfaRegex _dfa;
 
         public PcrePatternInfo PaternInfo
         {
@@ -35,6 +37,11 @@ namespace PCRE
         {
             get { return Caches.CacheSize; }
             set { Caches.CacheSize = value; }
+        }
+
+        public PcreDfaRegex Dfa
+        {
+            get { return _dfa ?? (_dfa = new PcreDfaRegex(this)); }
         }
 
         public PcreRegex(string pattern)
