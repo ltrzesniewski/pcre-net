@@ -17,25 +17,25 @@ namespace PCRE.Dfa
         }
 
         [Pure]
-        public PcreDfaMatchSet Match(string subject)
+        public PcreDfaMatchResult Match(string subject)
         {
             return Match(subject, 0, PcreDfaMatchOptions.None);
         }
 
         [Pure]
-        public PcreDfaMatchSet Match(string subject, PcreDfaMatchOptions options)
+        public PcreDfaMatchResult Match(string subject, PcreDfaMatchOptions options)
         {
             return Match(subject, 0, options);
         }
 
         [Pure]
-        public PcreDfaMatchSet Match(string subject, int startIndex)
+        public PcreDfaMatchResult Match(string subject, int startIndex)
         {
             return Match(subject, startIndex, PcreDfaMatchOptions.None);
         }
 
         [Pure]
-        public PcreDfaMatchSet Match(string subject, int startIndex, PcreDfaMatchOptions options)
+        public PcreDfaMatchResult Match(string subject, int startIndex, PcreDfaMatchOptions options)
         {
             var settings = new PcreDfaMatchSettings
             {
@@ -46,7 +46,7 @@ namespace PCRE.Dfa
             return Match(subject, settings);
         }
 
-        public PcreDfaMatchSet Match(string subject, PcreDfaMatchSettings settings)
+        public PcreDfaMatchResult Match(string subject, PcreDfaMatchSettings settings)
         {
             if (subject == null)
                 throw new ArgumentNullException("subject");
@@ -59,18 +59,18 @@ namespace PCRE.Dfa
 
             using (var context = settings.CreateMatchContext(subject))
             {
-                return new PcreDfaMatchSet(ExecuteDfaMatch(context));
+                return new PcreDfaMatchResult(ExecuteDfaMatch(context));
             }
         }
 
         [Pure]
-        public IEnumerable<PcreDfaMatchSet> Matches(string subject)
+        public IEnumerable<PcreDfaMatchResult> Matches(string subject)
         {
             return Matches(subject, 0);
         }
 
         [Pure]
-        public IEnumerable<PcreDfaMatchSet> Matches(string subject, int startIndex)
+        public IEnumerable<PcreDfaMatchResult> Matches(string subject, int startIndex)
         {
             var settings = new PcreDfaMatchSettings
             {
@@ -81,7 +81,7 @@ namespace PCRE.Dfa
         }
 
         [Pure]
-        public IEnumerable<PcreDfaMatchSet> Matches(string subject, PcreDfaMatchSettings settings)
+        public IEnumerable<PcreDfaMatchResult> Matches(string subject, PcreDfaMatchSettings settings)
         {
             if (subject == null)
                 throw new ArgumentNullException("subject");
@@ -95,7 +95,7 @@ namespace PCRE.Dfa
             return MatchesIterator(subject, settings);
         }
 
-        private IEnumerable<PcreDfaMatchSet> MatchesIterator(string subject, PcreDfaMatchSettings settings)
+        private IEnumerable<PcreDfaMatchResult> MatchesIterator(string subject, PcreDfaMatchSettings settings)
         {
             using (var context = settings.CreateMatchContext(subject))
             {
@@ -104,7 +104,7 @@ namespace PCRE.Dfa
                 if (result.ResultCode != MatchResultCode.Success)
                     yield break;
 
-                var match = new PcreDfaMatchSet(result);
+                var match = new PcreDfaMatchResult(result);
                 yield return match;
 
                 while (true)
@@ -116,7 +116,7 @@ namespace PCRE.Dfa
                     if (result.ResultCode != MatchResultCode.Success)
                         yield break;
 
-                    match = new PcreDfaMatchSet(result);
+                    match = new PcreDfaMatchResult(result);
                     yield return match;
                 }
             }

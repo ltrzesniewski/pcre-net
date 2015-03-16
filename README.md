@@ -8,10 +8,8 @@ PCRE.NET
 
 PCRE.NET is a .NET wrapper for the [PCRE library](http://www.pcre.org/). The goal of this project is to bring most of PCRE's features for use from .NET applications with as little overhead as possible.
 
-**Status:** Version **0.4**, based on PCRE **10.00**, is available on [NuGet](https://www.nuget.org/packages/PCRE.NET). Feedback is welcome.  
+**Status:** Version **0.5**, based on PCRE **10.10**, is available on [NuGet](https://www.nuget.org/packages/PCRE.NET). Feedback is welcome.  
 As it is still at major version 0, the API may change anytime.
-
-The currently wrapped PCRE version on the *master* branch is **10.10**.
 
 ## Features ##
 
@@ -26,6 +24,9 @@ The following regex operations are supported:
   - Replacement strings with placeholders: ``$n ${name} $& $_ $` $' $+``
 - String splitting on matches: `PcreRegex.Split`
   - Captured groups are included in the result
+- DFA matching:
+  - `regexInstance.Dfa.Matches`
+  - `regexInstance.Dfa.Match`
 - Partial matching (when the subject is too short to match the pattern)
 
 Library highlights:
@@ -129,8 +130,6 @@ var isValidJson = regex.IsMatch(subject);
 
 ## To do ##
 
-- Expose more PCRE features:
-  - DFA matching
 - Include more tests from the PCRE test suite
 - Documentation
 - XML doc comments

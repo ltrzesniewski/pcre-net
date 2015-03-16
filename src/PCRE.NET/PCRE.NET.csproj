@@ -87,7 +87,7 @@
   <ItemGroup>
     <Compile Include="Dfa\PcreDfaMatch.cs" />
     <Compile Include="Dfa\PcreDfaMatchOptions.cs" />
-    <Compile Include="Dfa\PcreDfaMatchSet.cs" />
+    <Compile Include="Dfa\PcreDfaMatchResult.cs" />
     <Compile Include="Dfa\PcreDfaMatchSettings.cs" />
     <Compile Include="IInternalRegexWrapper.cs" />
     <Compile Include="IPcreGroup.cs" />

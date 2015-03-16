@@ -6,12 +6,12 @@ using PCRE.Wrapper;
 
 namespace PCRE.Dfa
 {
-    public sealed class PcreDfaMatchSet : IReadOnlyList<PcreDfaMatch>
+    public sealed class PcreDfaMatchResult : IReadOnlyList<PcreDfaMatch>
     {
         private readonly object _result; // See remark about JIT in PcreRegex
         private readonly PcreDfaMatch[] _matches;
 
-        internal PcreDfaMatchSet(MatchData result)
+        internal PcreDfaMatchResult(MatchData result)
         {
             _result = result;
 
