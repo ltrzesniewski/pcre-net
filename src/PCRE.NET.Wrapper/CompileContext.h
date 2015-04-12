@@ -5,19 +5,17 @@
 #include "PatternOptions.h"
 #include "JitCompileOptions.h"
 
-using namespace System;
-
 namespace PCRE {
 	namespace Wrapper {
 
 		public ref class CompileContext sealed
 		{
 		public:
-			CompileContext(String^ pattern);
+			CompileContext(System::String^ pattern);
 			~CompileContext();
 			!CompileContext();
 
-			property String^ Pattern { String^ get() { return _pattern; } }
+			property System::String^ Pattern { System::String^ get() { return _pattern; } }
 			property PatternOptions Options;
 			property JitCompileOptions JitCompileOptions;
 
@@ -31,7 +29,7 @@ namespace PCRE {
 			}
 
 		private:
-			initonly String^ _pattern;
+			initonly System::String^ _pattern;
 			pcre2_compile_context* _ctx;
 		};
 	}

@@ -3,18 +3,16 @@
 
 #include "Stdafx.h"
 
-using namespace System;
-
 namespace PCRE {
 	namespace Wrapper {
 
 		ref class MatchData;
 
-		public ref class MatchException sealed : Exception
+		public ref class MatchException sealed : System::Exception
 		{
 		public:
-			MatchException(MatchData^ matchData, String^ message, Exception^ innerException)
-				: Exception(message, innerException),
+			MatchException(MatchData^ matchData, System::String^ message, System::Exception^ innerException)
+				: System::Exception(message, innerException),
 				_matchData(matchData)
 			{
 			}

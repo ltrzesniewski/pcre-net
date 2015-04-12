@@ -5,9 +5,6 @@
 #include "CompileContext.h"
 #include "MatchContext.h"
 
-using namespace System;
-using namespace System::Collections::Generic;
-
 namespace PCRE {
 	namespace Wrapper {
 
@@ -30,8 +27,8 @@ namespace PCRE {
 				int get() { return _captureCount; }
 			}
 
-			property Dictionary<String^, array<int>^>^ CaptureNames {
-				Dictionary<String^, array<int>^>^ get() { return _captureNames; }
+			property System::Collections::Generic::Dictionary<System::String^, array<int>^>^ CaptureNames {
+				System::Collections::Generic::Dictionary<System::String^, array<int>^>^ get() { return _captureNames; }
 			}
 
 		internal:
@@ -42,7 +39,7 @@ namespace PCRE {
 		private:
 			pcre2_code* _re;
 			initonly int _captureCount;
-			initonly Dictionary<String^, array<int>^>^ _captureNames;
+			initonly System::Collections::Generic::Dictionary<System::String^, array<int>^>^ _captureNames;
 		};
 	}
 }

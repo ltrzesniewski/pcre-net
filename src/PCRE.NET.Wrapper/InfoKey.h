@@ -3,8 +3,6 @@
 
 #include "Stdafx.h"
 
-using namespace System;
-
 namespace PCRE {
 	namespace Wrapper {
 
@@ -46,8 +44,8 @@ namespace PCRE {
 
 		public enum struct BackslashR
 		{
-			Unicode = PCRE2_BSR_UNICODE,
-			AnyCrLf = PCRE2_BSR_ANYCRLF
+			Unicode                    = PCRE2_BSR_UNICODE,
+			AnyCrLf                    = PCRE2_BSR_ANYCRLF
 		};
 
 	}

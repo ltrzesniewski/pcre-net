@@ -3,12 +3,10 @@
 
 #include "Stdafx.h"
 
-using namespace System;
-
 namespace PCRE {
 	namespace Wrapper {
 
-		[Flags]
+		[System::Flags]
 		public enum struct JitCompileOptions
 		{
 			None                                = 0,

@@ -5,8 +5,6 @@
 #include "CalloutData.h"
 #include "PatternOptions.h"
 
-using namespace System;
-
 namespace PCRE {
 	namespace Wrapper {
 
@@ -19,7 +17,7 @@ namespace PCRE {
 			~MatchContext();
 			!MatchContext();
 
-			property String^ Subject;
+			property System::String^ Subject;
 			property int StartIndex;
 			property PatternOptions AdditionalOptions;
 			property CalloutDelegate^ CalloutHandler;

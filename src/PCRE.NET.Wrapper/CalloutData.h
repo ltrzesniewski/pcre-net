@@ -1,8 +1,6 @@
 
 #pragma once
 
-using namespace System;
-
 namespace PCRE {
 	namespace Wrapper {
 
@@ -42,7 +40,7 @@ namespace PCRE {
 			Throw = PCRE2_ERROR_CALLOUT
 		};
 
-		typedef Func<CalloutData^, CalloutResult> CalloutDelegate;
+		typedef System::Func<CalloutData^, CalloutResult> CalloutDelegate;
 
 	}
 }

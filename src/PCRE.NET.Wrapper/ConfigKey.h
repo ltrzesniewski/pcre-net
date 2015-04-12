@@ -3,8 +3,6 @@
 
 #include "Stdafx.h"
 
-using namespace System;
-
 namespace PCRE {
 	namespace Wrapper {
 
