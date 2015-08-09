@@ -27,7 +27,7 @@ namespace PCRE.Support
         {
             unchecked
             {
-                return (Pattern != null ? Pattern.GetHashCode() : 0);
+                return Pattern?.GetHashCode() ?? 0;
             }
         }
 

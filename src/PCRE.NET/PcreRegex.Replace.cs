@@ -11,46 +11,38 @@ namespace PCRE
 
         [Pure]
         public string Replace(string subject, string replacement)
-        {
-            return Replace(subject, replacement, -1, 0);
-        }
+            => Replace(subject, replacement, -1, 0);
 
         [Pure]
         public string Replace(string subject, string replacement, int count)
-        {
-            return Replace(subject, replacement, count, 0);
-        }
+            => Replace(subject, replacement, count, 0);
 
         [Pure]
         public string Replace(string subject, string replacement, int count, int startIndex)
         {
             if (replacement == null)
-                throw new ArgumentNullException("replacement");
+                throw new ArgumentNullException(nameof(replacement));
 
             return Replace(subject, Caches.ReplacementCache.GetOrAdd(replacement), count, startIndex);
         }
 
         public string Replace(string subject, Func<PcreMatch, string> replacementFunc)
-        {
-            return Replace(subject, replacementFunc, -1, 0);
-        }
+            => Replace(subject, replacementFunc, -1, 0);
 
         public string Replace(string subject, Func<PcreMatch, string> replacementFunc, int count)
-        {
-            return Replace(subject, replacementFunc, count, 0);
-        }
+            => Replace(subject, replacementFunc, count, 0);
 
         public string Replace(string subject, Func<PcreMatch, string> replacementFunc, int count, int startIndex)
         {
             if (subject == null)
-                throw new ArgumentNullException("subject");
+                throw new ArgumentNullException(nameof(subject));
             if (replacementFunc == null)
-                throw new ArgumentNullException("replacementFunc");
+                throw new ArgumentNullException(nameof(replacementFunc));
 
             if (count == 0)
                 return subject;
 
-            var sb = new StringBuilder((int)(subject.Length * 1.2));
+            var sb = new StringBuilder((int) (subject.Length*1.2));
             var position = 0;
 
             foreach (var match in Matches(subject, startIndex))
@@ -69,46 +61,30 @@ namespace PCRE
 
         [Pure]
         public static string Replace(string subject, string pattern, string replacement)
-        {
-            return Replace(subject, pattern, replacement, PcreOptions.None, -1, 0);
-        }
+            => Replace(subject, pattern, replacement, PcreOptions.None, -1, 0);
 
         [Pure]
         public static string Replace(string subject, string pattern, string replacement, PcreOptions options)
-        {
-            return Replace(subject, pattern, replacement, options, -1, 0);
-        }
+            => Replace(subject, pattern, replacement, options, -1, 0);
 
         [Pure]
         public static string Replace(string subject, string pattern, string replacement, PcreOptions options, int count)
-        {
-            return Replace(subject, pattern, replacement, options, count, 0);
-        }
+            => Replace(subject, pattern, replacement, options, count, 0);
 
         [Pure]
         public static string Replace(string subject, string pattern, string replacement, PcreOptions options, int count, int startIndex)
-        {
-            return new PcreRegex(pattern, options).Replace(subject, replacement, count, startIndex);
-        }
+            => new PcreRegex(pattern, options).Replace(subject, replacement, count, startIndex);
 
         public static string Replace(string subject, string pattern, Func<PcreMatch, string> replacementFunc)
-        {
-            return Replace(subject, pattern, replacementFunc, PcreOptions.None, -1, 0);
-        }
+            => Replace(subject, pattern, replacementFunc, PcreOptions.None, -1, 0);
 
         public static string Replace(string subject, string pattern, Func<PcreMatch, string> replacementFunc, PcreOptions options)
-        {
-            return Replace(subject, pattern, replacementFunc, options, -1, 0);
-        }
+            => Replace(subject, pattern, replacementFunc, options, -1, 0);
 
         public static string Replace(string subject, string pattern, Func<PcreMatch, string> replacementFunc, PcreOptions options, int count)
-        {
-            return Replace(subject, pattern, replacementFunc, options, count, 0);
-        }
+            => Replace(subject, pattern, replacementFunc, options, count, 0);
 
         public static string Replace(string subject, string pattern, Func<PcreMatch, string> replacementFunc, PcreOptions options, int count, int startIndex)
-        {
-            return new PcreRegex(pattern, options).Replace(subject, replacementFunc, count, startIndex);
-        }
+            => new PcreRegex(pattern, options).Replace(subject, replacementFunc, count, startIndex);
     }
 }

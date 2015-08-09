@@ -5,7 +5,7 @@ namespace PCRE.Tests.Pcre
     public class TestOutput
     {
         public TestPattern Pattern { get; set; }
-        public IList<ExpectedResult> ExpectedResults { get; private set; }
+        public IList<ExpectedResult> ExpectedResults { get; }
 
         public TestOutput()
         {
@@ -14,7 +14,7 @@ namespace PCRE.Tests.Pcre
 
         public override string ToString()
         {
-            return Pattern != null ? Pattern.ToString() : "???";
+            return Pattern?.ToString() ?? "???";
         }
     }
 }

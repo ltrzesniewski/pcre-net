@@ -261,7 +261,7 @@ namespace PCRE.Tests.Pcre
 
         protected InvalidOperationException InvalidInputException(string message, Exception innerException = null)
         {
-            return new InvalidOperationException(String.Format("{0} at line {1}: {2}", message, _lineNumber, _lastReadLine), innerException);
+            return new InvalidOperationException($"{message} at line {_lineNumber}: {_lastReadLine}", innerException);
         }
     }
 }

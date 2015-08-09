@@ -10,7 +10,7 @@ namespace PCRE.Support
         public static Func<PcreMatch, string> Parse(string replacementPattern)
         {
             if (replacementPattern == null)
-                throw new ArgumentNullException("replacementPattern");
+                throw new ArgumentNullException(nameof(replacementPattern));
 
             if (replacementPattern.Length == 0)
                 return match => string.Empty;
@@ -181,7 +181,7 @@ namespace PCRE.Support
 
             public override string ToString()
             {
-                return String.Format("Literal: {0}", _text.Substring(_startIndex, _length));
+                return $"Literal: {_text.Substring(_startIndex, _length)}";
             }
         }
 
@@ -204,9 +204,7 @@ namespace PCRE.Support
 
                 if (group == null)
                 {
-                    if (_fallback != null)
-                        _fallback.Append(match, sb);
-
+                    _fallback?.Append(match, sb);
                     return;
                 }
 
@@ -218,7 +216,7 @@ namespace PCRE.Support
             {
                 return _index == 0
                     ? "Full match"
-                    : String.Format("Group: #{0}", _index);
+                    : $"Group: #{_index}";
             }
         }
 
@@ -233,7 +231,7 @@ namespace PCRE.Support
                 _name = name;
                 _fallback = fallback;
 
-                if (!Int32.TryParse(name, NumberStyles.None, CultureInfo.InvariantCulture, out _index))
+                if (!int.TryParse(name, NumberStyles.None, CultureInfo.InvariantCulture, out _index))
                     _index = -1;
             }
 
@@ -243,9 +241,7 @@ namespace PCRE.Support
 
                 if (group == null)
                 {
-                    if (_fallback != null)
-                        _fallback.Append(match, sb);
-
+                    _fallback?.Append(match, sb);
                     return;
                 }
 
@@ -255,7 +251,7 @@ namespace PCRE.Support
 
             public override string ToString()
             {
-                return String.Format("Group: {0}", _name);
+                return $"Group: {_name}";
             }
         }
 

@@ -53,10 +53,7 @@ namespace PCRE
             }
         }
 
-        internal bool ReadOnlySettings
-        {
-            get { return _readOnly; }
-        }
+        internal bool ReadOnlySettings => _readOnly;
 
         public PcreRegexSettings()
         {

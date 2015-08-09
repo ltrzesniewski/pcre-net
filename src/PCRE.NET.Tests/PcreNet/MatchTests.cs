@@ -357,6 +357,7 @@ namespace PCRE.Tests.PcreNet
         [Test]
         public void should_check_pattern_utf_validity()
         {
+            // ReSharper disable once ObjectCreationAsStatement
             var ex = Assert.Throws<ArgumentException>(() => new PcreRegex("A\uD800B"));
             Assert.That(ex.Message, Contains.Substring("invalid low surrogate"));
         }

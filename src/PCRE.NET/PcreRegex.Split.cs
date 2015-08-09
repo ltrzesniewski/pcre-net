@@ -10,35 +10,27 @@ namespace PCRE
 
         [Pure]
         public IEnumerable<string> Split(string subject)
-        {
-            return Split(subject, PcreSplitOptions.None, -1, 0);
-        }
+            => Split(subject, PcreSplitOptions.None, -1, 0);
 
         [Pure]
         public IEnumerable<string> Split(string subject, PcreSplitOptions options)
-        {
-            return Split(subject, options, -1, 0);
-        }
+            => Split(subject, options, -1, 0);
 
         [Pure]
         public IEnumerable<string> Split(string subject, int count)
-        {
-            return Split(subject, PcreSplitOptions.None, count, 0);
-        }
+            => Split(subject, PcreSplitOptions.None, count, 0);
 
         [Pure]
         public IEnumerable<string> Split(string subject, int count, int startIndex)
-        {
-            return Split(subject, PcreSplitOptions.None, count, startIndex);
-        }
+            => Split(subject, PcreSplitOptions.None, count, startIndex);
 
         [Pure]
         public IEnumerable<string> Split(string subject, PcreSplitOptions options, int count, int startIndex)
         {
             if (subject == null)
-                throw new ArgumentNullException("subject");
+                throw new ArgumentNullException(nameof(subject));
             if (startIndex < 0 || startIndex > subject.Length)
-                throw new ArgumentOutOfRangeException("startIndex");
+                throw new ArgumentOutOfRangeException(nameof(startIndex));
 
             return SplitIterator(subject, options, count, startIndex);
         }
@@ -79,38 +71,26 @@ namespace PCRE
 
         [Pure]
         public static IEnumerable<string> Split(string subject, string pattern)
-        {
-            return Split(subject, pattern, PcreOptions.None, PcreSplitOptions.None, -1, 0);
-        }
+            => Split(subject, pattern, PcreOptions.None, PcreSplitOptions.None, -1, 0);
 
         [Pure]
         public static IEnumerable<string> Split(string subject, string pattern, PcreOptions options)
-        {
-            return Split(subject, pattern, options, PcreSplitOptions.None, -1, 0);
-        }
+            => Split(subject, pattern, options, PcreSplitOptions.None, -1, 0);
 
         [Pure]
         public static IEnumerable<string> Split(string subject, string pattern, int count)
-        {
-            return Split(subject, pattern, PcreOptions.None, PcreSplitOptions.None, count, 0);
-        }
+            => Split(subject, pattern, PcreOptions.None, PcreSplitOptions.None, count, 0);
 
         [Pure]
         public static IEnumerable<string> Split(string subject, string pattern, PcreOptions options, PcreSplitOptions splitOptions)
-        {
-            return Split(subject, pattern, options, splitOptions, -1, 0);
-        }
+            => Split(subject, pattern, options, splitOptions, -1, 0);
 
         [Pure]
         public static IEnumerable<string> Split(string subject, string pattern, PcreOptions options, PcreSplitOptions splitOptions, int count)
-        {
-            return Split(subject, pattern, options, splitOptions, count, 0);
-        }
+            => Split(subject, pattern, options, splitOptions, count, 0);
 
         [Pure]
         public static IEnumerable<string> Split(string subject, string pattern, PcreOptions options, PcreSplitOptions splitOptions, int count, int startIndex)
-        {
-            return new PcreRegex(pattern, options).Split(subject, splitOptions, count, startIndex);
-        }
+            => new PcreRegex(pattern, options).Split(subject, splitOptions, count, startIndex);
     }
 }

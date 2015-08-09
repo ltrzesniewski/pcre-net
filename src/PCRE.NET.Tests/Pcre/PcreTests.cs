@@ -146,7 +146,7 @@ namespace PCRE.Tests.Pcre
                         {
                             var testCase = new TestCaseData(test.testCase, test.expectedResult)
                                 .SetCategory(testFileName)
-                                .SetName(String.Format("{0} line {1:0000}", testFileName, test.testCase.Pattern.LineNumber))
+                                .SetName($"{testFileName} line {test.testCase.Pattern.LineNumber:0000}")
                                 .SetDescription(test.testCase.Pattern.Pattern);
 
                             yield return testCase;
@@ -155,15 +155,8 @@ namespace PCRE.Tests.Pcre
                 }
             }
 
-            public IEnumerator<ITestCaseData> GetEnumerator()
-            {
-                return GetTestCases().GetEnumerator();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
+            public IEnumerator<ITestCaseData> GetEnumerator() => GetTestCases().GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
     }
 }

@@ -5,34 +5,18 @@ namespace PCRE
 {
     public static class PcreBuildInfo
     {
-        static PcreBuildInfo()
-        {
-            BackslashR = (PcreBackslashR)GetConfigUInt32(ConfigKey.Bsr);
-            Jit = GetConfigBool(ConfigKey.Jit);
-            JitTarget = PcreBuild.GetConfigString(ConfigKey.JitTarget);
-            LinkSize = GetConfigUInt32(ConfigKey.LinkSize);
-            MatchLimit = GetConfigUInt32(ConfigKey.MatchLimit);
-            NewLine = (PcreNewLine)GetConfigUInt32(ConfigKey.NewLine);
-            ParensLimit = GetConfigUInt32(ConfigKey.ParensLimit);
-            RecursionLimit = GetConfigUInt32(ConfigKey.RecursionLimit);
-            StackRecurse = GetConfigBool(ConfigKey.StackRecurse);
-            UnicodeVersion = GetConfigString(ConfigKey.UnicodeVersion);
-            Unicode = GetConfigBool(ConfigKey.Unicode);
-            Version = GetConfigString(ConfigKey.Version);
-        }
-
-        public static PcreBackslashR BackslashR { get; private set; }
-        public static bool Jit { get; private set; }
-        public static string JitTarget { get; private set; }
-        public static uint LinkSize { get; private set; }
-        public static uint MatchLimit { get; private set; }
-        public static PcreNewLine NewLine { get; private set; }
-        public static uint ParensLimit { get; private set; }
-        public static uint RecursionLimit { get; private set; }
-        public static bool StackRecurse { get; private set; }
-        public static string UnicodeVersion { get; private set; }
-        public static bool Unicode { get; private set; }
-        public static string Version { get; private set; }
+        public static PcreBackslashR BackslashR { get; } = (PcreBackslashR) GetConfigUInt32(ConfigKey.Bsr);
+        public static bool Jit { get; } = GetConfigBool(ConfigKey.Jit);
+        public static string JitTarget { get; } = PcreBuild.GetConfigString(ConfigKey.JitTarget);
+        public static uint LinkSize { get; } = GetConfigUInt32(ConfigKey.LinkSize);
+        public static uint MatchLimit { get; } = GetConfigUInt32(ConfigKey.MatchLimit);
+        public static PcreNewLine NewLine { get; } = (PcreNewLine) GetConfigUInt32(ConfigKey.NewLine);
+        public static uint ParensLimit { get; } = GetConfigUInt32(ConfigKey.ParensLimit);
+        public static uint RecursionLimit { get; } = GetConfigUInt32(ConfigKey.RecursionLimit);
+        public static bool StackRecurse { get; } = GetConfigBool(ConfigKey.StackRecurse);
+        public static string UnicodeVersion { get; } = GetConfigString(ConfigKey.UnicodeVersion);
+        public static bool Unicode { get; } = GetConfigBool(ConfigKey.Unicode);
+        public static string Version { get; } = GetConfigString(ConfigKey.Version);
 
         private static bool GetConfigBool(ConfigKey key)
         {

@@ -16,22 +16,16 @@ namespace PCRE
         private PcrePatternInfo _info;
         private PcreDfaRegex _dfa;
 
-        public PcrePatternInfo PaternInfo
-        {
-            get { return _info ?? (_info = new PcrePatternInfo(this)); }
-        }
+        public PcrePatternInfo PaternInfo => _info ?? (_info = new PcrePatternInfo(this));
 
-        internal RegexKey Key { get; private set; }
+        internal RegexKey Key { get; }
 
         internal InternalRegex InternalRegex
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)] get { return (InternalRegex)_re; }
         }
 
-        internal int CaptureCount
-        {
-            get { return InternalRegex.CaptureCount; }
-        }
+        internal int CaptureCount => InternalRegex.CaptureCount;
 
         public static int CacheSize
         {
@@ -39,10 +33,7 @@ namespace PCRE
             set { Caches.CacheSize = value; }
         }
 
-        public PcreDfaRegex Dfa
-        {
-            get { return _dfa ?? (_dfa = new PcreDfaRegex(this)); }
-        }
+        public PcreDfaRegex Dfa => _dfa ?? (_dfa = new PcreDfaRegex(this));
 
         public PcreRegex(string pattern)
             : this(pattern, PcreOptions.None)
@@ -57,22 +48,18 @@ namespace PCRE
         public PcreRegex(string pattern, PcreRegexSettings settings)
         {
             if (pattern == null)
-                throw new ArgumentNullException("pattern");
+                throw new ArgumentNullException(nameof(pattern));
             if (settings == null)
-                throw new ArgumentNullException("settings");
+                throw new ArgumentNullException(nameof(settings));
 
             Key = new RegexKey(pattern, settings);
             _re = Caches.RegexCache.GetOrAdd(Key);
         }
 
-        RegexKey IInternalRegexWrapper.Key
-        {
-            get { return Key; }
-        }
+        RegexKey IInternalRegexWrapper.Key => Key;
 
-        InternalRegex IInternalRegexWrapper.InternalRegex
-        {
-            get { return InternalRegex; }
-        }
+        InternalRegex IInternalRegexWrapper.InternalRegex => InternalRegex;
+
+        public override string ToString() => Key.Pattern;
     }
 }

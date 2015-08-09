@@ -57,7 +57,7 @@ namespace PCRE.Support
         {
             var keyHash = _keyComparer.GetHashCode(key);
 
-            var head = (CacheItem)Thread.VolatileRead(ref _head);
+            var head = (CacheItem)Volatile.Read(ref _head);
             if (head != null && head.KeyHashCode == keyHash && _keyComparer.Equals(head.Key, key))
                 return head.Value;
 
@@ -70,7 +70,7 @@ namespace PCRE.Support
                 {
                     if (node.Value.KeyHashCode == keyHash && _keyComparer.Equals(node.Value.Key, key))
                     {
-                        Thread.VolatileWrite(ref _head, node.Value);
+                        Volatile.Write(ref _head, node.Value);
                         _cache.Remove(node);
                         _cache.AddFirst(node);
                         return node.Value.Value;
@@ -79,7 +79,7 @@ namespace PCRE.Support
             }
 
             var item = new CacheItem(key, keyHash, _valueFactory(key));
-            Thread.VolatileWrite(ref _head, item);
+            Volatile.Write(ref _head, item);
 
             lock (_cache)
             {

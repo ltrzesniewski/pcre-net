@@ -18,44 +18,20 @@ namespace PCRE
             [MethodImpl(MethodImplOptions.AggressiveInlining)] get { return (CalloutData)_data; }
         }
 
-        public int Number
-        {
-            get { return InternalData.Number; }
-        }
+        public int Number => InternalData.Number;
 
-        public PcreMatch Match
-        {
-            get { return _match ?? (_match = new PcreMatch(InternalData.Match)); }
-        }
+        public PcreMatch Match => _match ?? (_match = new PcreMatch(InternalData.Match));
 
-        public int StartOffset
-        {
-            get { return InternalData.StartOffset; }
-        }
+        public int StartOffset => InternalData.StartOffset;
 
-        public int CurrentOffset
-        {
-            get { return InternalData.CurrentOffset; }
-        }
+        public int CurrentOffset => InternalData.CurrentOffset;
 
-        public int MaxCapture
-        {
-            get { return InternalData.MaxCapture; }
-        }
+        public int MaxCapture => InternalData.MaxCapture;
 
-        public int LastCapture
-        {
-            get { return InternalData.LastCapture; }
-        }
+        public int LastCapture => InternalData.LastCapture;
 
-        public int PatternPosition
-        {
-            get { return InternalData.PatternPosition; }
-        }
+        public int PatternPosition => InternalData.PatternPosition;
 
-        public int NextPatternItemLength
-        {
-            get { return InternalData.NextPatternItemLength; }
-        }
+        public int NextPatternItemLength => InternalData.NextPatternItemLength;
     }
 }

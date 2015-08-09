@@ -116,7 +116,6 @@ namespace PCRE.Tests.Pcre
                     currentMatch = null;
 
                     testOutput.ExpectedResults.Add(currentResult);
-                    continue;
                 }
 
                 yield return testOutput;

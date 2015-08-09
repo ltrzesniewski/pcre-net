@@ -1,5 +1,3 @@
-using System;
-
 namespace PCRE.Dfa
 {
     public sealed class PcreDfaMatch : IPcreGroup
@@ -15,32 +13,23 @@ namespace PCRE.Dfa
             EndIndex = endOffset;
 
             if (Length <= 0)
-                _value = String.Empty;
+                _value = string.Empty;
             else
                 _subject = subject;
         }
 
-        public int Index { get; private set; }
-        public int EndIndex { get; private set; }
+        public int Index { get; }
+        public int EndIndex { get; }
 
-        public int Length
-        {
-            get { return EndIndex > Index ? EndIndex - Index : 0; }
-        }
+        public int Length => EndIndex > Index ? EndIndex - Index : 0;
 
-        public string Value
-        {
-            get { return _value ?? (_value = _subject.Substring(Index, Length)); }
-        }
+        public string Value => _value ?? (_value = _subject.Substring(Index, Length));
 
-        public bool Success
-        {
-            get { return Index >= 0; }
-        }
+        public bool Success => Index >= 0;
 
         public static implicit operator string(PcreDfaMatch group)
         {
-            return group != null ? group.Value : null;
+            return group?.Value;
         }
 
         public override string ToString()

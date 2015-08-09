@@ -4,8 +4,8 @@ namespace PCRE.Tests.Pcre
     {
         public static readonly ExpectedGroup Unset = new ExpectedGroup();
 
-        public bool IsMatch { get; private set; }
-        public string Value { get; private set; }
+        public bool IsMatch { get; }
+        public string Value { get; }
 
         private ExpectedGroup()
         {

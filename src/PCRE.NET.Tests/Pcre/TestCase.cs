@@ -5,16 +5,13 @@ namespace PCRE.Tests.Pcre
     public class TestCase
     {
         public TestPattern Pattern { get; set; }
-        public IList<string> SubjectLines { get; private set; }
+        public IList<string> SubjectLines { get; }
 
         public TestCase()
         {
             SubjectLines = new List<string>();
         }
 
-        public override string ToString()
-        {
-            return Pattern != null ? Pattern.ToString() : "???";
-        }
+        public override string ToString() => Pattern?.ToString() ?? "???";
     }
 }

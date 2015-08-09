@@ -102,6 +102,7 @@ namespace PCRE.Tests.PcreNet
             var re = new PcreRegex(@"^\U$", PcreOptions.JavaScript);
             Assert.That(re.IsMatch("U"), Is.True);
 
+            // ReSharper disable once ObjectCreationAsStatement
             Assert.Throws<ArgumentException>(() => new PcreRegex(@"^\U$"));
         }
 

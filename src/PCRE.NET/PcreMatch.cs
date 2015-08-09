@@ -22,70 +22,31 @@ namespace PCRE
             [MethodImpl(MethodImplOptions.AggressiveInlining)] get { return (MatchData)_result; }
         }
 
-        public int CaptureCount
-        {
-            get { return InternalResult.Regex.CaptureCount; }
-        }
+        public int CaptureCount => InternalResult.Regex.CaptureCount;
 
-        public PcreGroup this[int index]
-        {
-            get { return GetGroup(index); }
-        }
+        public PcreGroup this[int index] => GetGroup(index);
 
-        public PcreGroup this[string name]
-        {
-            get { return GetGroup(name); }
-        }
+        public PcreGroup this[string name] => GetGroup(name);
 
-        internal string Subject
-        {
-            get { return InternalResult.Subject; }
-        }
+        internal string Subject => InternalResult.Subject;
 
-        public int Index
-        {
-            get { return this[0].Index; }
-        }
+        public int Index => this[0].Index;
 
-        public int EndIndex
-        {
-            get { return this[0].EndIndex; }
-        }
+        public int EndIndex => this[0].EndIndex;
 
-        public int Length
-        {
-            get { return this[0].Length; }
-        }
+        public int Length => this[0].Length;
 
-        public string Value
-        {
-            get { return this[0].Value; }
-        }
+        public string Value => this[0].Value;
 
-        public bool Success
-        {
-            get { return InternalResult.ResultCode == MatchResultCode.Success; }
-        }
+        public bool Success => InternalResult.ResultCode == MatchResultCode.Success;
 
-        public string Mark
-        {
-            get { return InternalResult.Mark; }
-        }
+        public string Mark => InternalResult.Mark;
 
-        public IPcreGroupList Groups
-        {
-            get { return this; }
-        }
+        public IPcreGroupList Groups => this;
 
-        public bool IsPartialMatch
-        {
-            get { return InternalResult.ResultCode == MatchResultCode.Partial; }
-        }
+        public bool IsPartialMatch => InternalResult.ResultCode == MatchResultCode.Partial;
 
-        public IEnumerator<PcreGroup> GetEnumerator()
-        {
-            return GetAllGroups().GetEnumerator();
-        }
+        public IEnumerator<PcreGroup> GetEnumerator() => GetAllGroups().GetEnumerator();
 
         private IEnumerable<PcreGroup> GetAllGroups()
         {
@@ -168,19 +129,10 @@ namespace PCRE
             return Math.Max(Index, EndIndex);
         }
 
-        public override string ToString()
-        {
-            return Value;
-        }
+        public override string ToString() => Value;
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        int IReadOnlyCollection<PcreGroup>.Count
-        {
-            get { return CaptureCount + 1; }
-        }
+        int IReadOnlyCollection<PcreGroup>.Count => CaptureCount + 1;
     }
 }

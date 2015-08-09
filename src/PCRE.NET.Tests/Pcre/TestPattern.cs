@@ -31,24 +31,12 @@ namespace PCRE.Tests.Pcre
             return other != null && string.Equals(FullString, other.FullString);
         }
 
-        public override int GetHashCode()
-        {
-            return (FullString != null ? FullString.GetHashCode() : 0);
-        }
+        public override int GetHashCode() => FullString?.GetHashCode() ?? 0;
 
-        public static bool operator ==(TestPattern left, TestPattern right)
-        {
-            return Equals(left, right);
-        }
+        public static bool operator ==(TestPattern left, TestPattern right) => Equals(left, right);
 
-        public static bool operator !=(TestPattern left, TestPattern right)
-        {
-            return !Equals(left, right);
-        }
+        public static bool operator !=(TestPattern left, TestPattern right) => !Equals(left, right);
 
-        public override string ToString()
-        {
-            return FullString ?? "???";
-        }
+        public override string ToString() => FullString ?? "???";
     }
 }

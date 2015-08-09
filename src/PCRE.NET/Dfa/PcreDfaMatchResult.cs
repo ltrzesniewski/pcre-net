@@ -63,40 +63,17 @@ namespace PCRE.Dfa
             return GetEnumerator();
         }
 
-        public PcreDfaMatch this[int index]
-        {
-            get { return GetMatch(index); }
-        }
+        public PcreDfaMatch this[int index] => GetMatch(index);
 
-        public int Count
-        {
-            get { return _matches.Length; }
-        }
+        public int Count => _matches.Length;
 
-        public bool Success
-        {
-            get { return InternalResult.ResultCode == MatchResultCode.Success; }
-        }
+        public bool Success => InternalResult.ResultCode == MatchResultCode.Success;
 
-        public int Index
-        {
-            // All matches share the same index
-            get
-            {
-                var match = LongestMatch;
-                return match != null ? match.Index : -1;
-            }
-        }
+        public int Index => LongestMatch?.Index ?? -1;
 
-        public PcreDfaMatch LongestMatch
-        {
-            get { return GetMatch(0); }
-        }
+        public PcreDfaMatch LongestMatch => GetMatch(0);
 
-        public PcreDfaMatch ShortestMatch
-        {
-            get { return GetMatch(Count - 1); }
-        }
+        public PcreDfaMatch ShortestMatch => GetMatch(Count - 1);
 
         public override string ToString()
         {

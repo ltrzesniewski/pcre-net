@@ -12,9 +12,6 @@ namespace PCRE.Tests.Pcre
             Matches = new List<ExpectedMatch>();
         }
 
-        public override string ToString()
-        {
-            return SubjectLine;
-        }
+        public override string ToString() => SubjectLine;
     }
 }
