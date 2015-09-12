@@ -6,7 +6,7 @@ Properties {
 	$outputDir = (Join-Path $buildDir "output")
 	
 	Add-Type -AssemblyName "Microsoft.Build.Utilities.v12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
-	$msbuild = ([Microsoft.Build.Utilities.ToolLocationHelper]::GetPathToBuildToolsFile("msbuild.exe", "12.0"))
+	$msbuild = ([Microsoft.Build.Utilities.ToolLocationHelper]::GetPathToBuildToolsFile("msbuild.exe", "14.0"))
 
 	$libz = (Join-Path $rootDir "src\packages\LibZ.Bootstrap.1.1.0.2\tools\libz.exe")
 	$nunitDir = (Join-Path $rootDir "src\packages\NUnit.Runners.2.6.3\tools")
