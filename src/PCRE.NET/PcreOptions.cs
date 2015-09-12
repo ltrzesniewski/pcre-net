@@ -32,11 +32,14 @@ namespace PCRE
         DollarEndOnly = PatternOptions.DollarEndOnly,
 
         AltBsUX =  PatternOptions.AltBsUX,
+        AltCircumflex =  PatternOptions.AltCircumflex,
         AllowEmptyClass = PatternOptions.AllowEmptyClass,
         MatchUnsetBackref = PatternOptions.MatchUnsetBackref,
         NoDotStarAnchor = PatternOptions.NoDotStarAnchor,
 
         NoPatternUtfCheck = PatternOptions.NoUtfCheck,
+        NeverUcp = PatternOptions.NeverUcp,
+        NeverBackslashC = PatternOptions.NeverBackslashC,
 
         // Extra options
         Compiled = 1L << 32,
