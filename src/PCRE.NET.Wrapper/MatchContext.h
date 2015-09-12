@@ -13,9 +13,9 @@ namespace PCRE {
 		public ref class MatchContext sealed
 		{
 		public:
-			MatchContext();
-			~MatchContext();
-			!MatchContext();
+			__clrcall MatchContext();
+			__clrcall ~MatchContext();
+			__clrcall !MatchContext();
 
 			property System::String^ Subject;
 			property int StartIndex;
@@ -28,12 +28,12 @@ namespace PCRE {
 			property uint32_t DfaWorkspaceSize;
 
 		internal:
-			void EnableCallout(void* contextPtr);
+			void __clrcall EnableCallout(void* contextPtr);
 
 			property MatchData^ Match;
 
 			property pcre2_match_context* Context {
-				pcre2_match_context* get() { return _ctx; }
+				pcre2_match_context* __clrcall get() { return _ctx; }
 			}
 
 		private:

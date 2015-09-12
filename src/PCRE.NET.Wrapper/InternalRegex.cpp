@@ -7,12 +7,12 @@
 using namespace System;
 using namespace PCRE::Wrapper;
 
-static inline interior_ptr<const PCRE2_UCHAR> GetPtrToString(String^ string)
+static inline interior_ptr<const PCRE2_UCHAR> __clrcall GetPtrToString(String^ string)
 {
 	return reinterpret_cast<interior_ptr<const PCRE2_UCHAR>>(PtrToStringChars(string));
 }
 
-static String^ GetErrorMessage(int errorCode)
+static String^ __clrcall GetErrorMessage(int errorCode)
 {
 	PCRE2_UCHAR16 errorBuffer[256];
 	return pcre2_get_error_message(errorCode, errorBuffer, sizeof(errorBuffer)) >= 0
@@ -20,7 +20,7 @@ static String^ GetErrorMessage(int errorCode)
 		: "Unknown error, code: " + errorCode;
 }
 
-static void AfterMatch(MatchData^);
+static void __clrcall AfterMatch(MatchData^);
 
 InternalRegex::InternalRegex(CompileContext^ context)
 {
@@ -98,7 +98,7 @@ InternalRegex::!InternalRegex()
 	}
 }
 
-MatchData^ InternalRegex::Match(MatchContext^ context)
+MatchData^ __clrcall InternalRegex::Match(MatchContext^ context)
 {
 	auto matchData = gcnew MatchData(this, context->Subject);
 	context->Match = matchData;
@@ -127,7 +127,7 @@ MatchData^ InternalRegex::Match(MatchContext^ context)
 	return matchData;
 }
 
-MatchData^ InternalRegex::DfaMatch(MatchContext^ context)
+MatchData^ __clrcall InternalRegex::DfaMatch(MatchContext^ context)
 {
 	auto matchData = gcnew MatchData(this, context->Subject, Math::Max(1u, context->DfaMaxResults));
 	context->Match = matchData;
@@ -161,7 +161,7 @@ MatchData^ InternalRegex::DfaMatch(MatchContext^ context)
 	return matchData;
 }
 
-static void AfterMatch(MatchData^ matchData)
+static void __clrcall AfterMatch(MatchData^ matchData)
 {
 	matchData->ResultCode = static_cast<MatchResultCode>(matchData->RawResultCode);
 
@@ -189,7 +189,7 @@ static void AfterMatch(MatchData^ matchData)
 	}
 }
 
-int InternalRegex::GetInfoInt32(InfoKey key)
+int __clrcall InternalRegex::GetInfoInt32(InfoKey key)
 {
 	int result;
 	int errorCode = pcre2_pattern_info(_re, static_cast<int>(key), &result);

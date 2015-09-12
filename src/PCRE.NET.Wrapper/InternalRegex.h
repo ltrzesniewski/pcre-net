@@ -18,8 +18,8 @@ namespace PCRE {
 			~InternalRegex();
 			!InternalRegex();
 
-			MatchData^ Match(MatchContext^ context);
-			MatchData^ DfaMatch(MatchContext^ context);
+			MatchData^ __clrcall Match(MatchContext^ context);
+			MatchData^ __clrcall DfaMatch(MatchContext^ context);
 
 			int GetInfoInt32(InfoKey key);
 
