@@ -3,6 +3,7 @@
 #include "InternalRegex.h"
 #include "MatchData.h"
 #include "MatchException.h"
+#include "CalloutInfo.h"
 
 using namespace System;
 using namespace PCRE::Wrapper;
@@ -82,6 +83,8 @@ InternalRegex::InternalRegex(CompileContext^ context)
 			item += nameEntrySize;
 		}
 	}
+
+	_callouts = CalloutInfo::GetCallouts(_re);
 }
 
 InternalRegex::~InternalRegex()

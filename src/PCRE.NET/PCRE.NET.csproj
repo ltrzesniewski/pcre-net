@@ -94,6 +94,7 @@
     <Compile Include="IPcreGroupList.cs" />
     <Compile Include="PcreBackslashR.cs" />
     <Compile Include="PcreCallout.cs" />
+    <Compile Include="PcreCalloutInfo.cs" />
     <Compile Include="PcreMatchException.cs" />
     <Compile Include="PcreCalloutResult.cs" />
     <Compile Include="PcreMatchOptions.cs" />

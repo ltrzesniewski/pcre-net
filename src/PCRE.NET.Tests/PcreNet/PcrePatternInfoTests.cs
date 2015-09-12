@@ -42,5 +42,25 @@ namespace PCRE.Tests.PcreNet
             var re = new PcreRegex(pattern, PcreOptions.Compiled);
             Assert.That(re.PaternInfo.IsCompiled, Is.True);
         }
+
+        [Test]
+        public void should_enumerate_callouts()
+        {
+            var re = new PcreRegex(@"a(?C42)bb(?C{ foo })(?:ccc)");
+
+            Assert.That(re.PaternInfo.Callouts.Count, Is.EqualTo(2));
+
+            Assert.That(re.PaternInfo.Callouts[0].Number, Is.EqualTo(42));
+            Assert.That(re.PaternInfo.Callouts[0].String, Is.Null);
+            Assert.That(re.PaternInfo.Callouts[0].StringOffset, Is.EqualTo(0));
+            Assert.That(re.PaternInfo.Callouts[0].PatternPosition, Is.EqualTo(7));
+            Assert.That(re.PaternInfo.Callouts[0].NextItemLength, Is.EqualTo(1));
+
+            Assert.That(re.PaternInfo.Callouts[1].Number, Is.EqualTo(0));
+            Assert.That(re.PaternInfo.Callouts[1].String, Is.EqualTo(" foo "));
+            Assert.That(re.PaternInfo.Callouts[1].StringOffset, Is.EqualTo(13));
+            Assert.That(re.PaternInfo.Callouts[1].PatternPosition, Is.EqualTo(20));
+            Assert.That(re.PaternInfo.Callouts[1].NextItemLength, Is.EqualTo(7));
+        }
     }
 }

@@ -180,6 +180,7 @@
   <ItemGroup>
     <ClInclude Include="..\PCRE\src\pcre2.h" />
     <ClInclude Include="CalloutData.h" />
+    <ClInclude Include="CalloutInfo.h" />
     <ClInclude Include="CompileContext.h" />
     <ClInclude Include="MatchContext.h" />
     <ClInclude Include="MatchData.h" />
@@ -196,6 +197,7 @@
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="CalloutData.cpp" />
+    <ClCompile Include="CalloutInfo.cpp" />
     <ClCompile Include="CompileContext.cpp" />
     <ClCompile Include="MatchContext.cpp" />
     <ClCompile Include="MatchData.cpp" />

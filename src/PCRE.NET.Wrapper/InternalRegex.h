@@ -10,6 +10,7 @@ namespace PCRE {
 
 		enum struct PatternOptions : unsigned int;
 		enum struct InfoKey;
+		ref class CalloutInfo;
 
 		public ref class InternalRegex sealed
 		{
@@ -27,8 +28,12 @@ namespace PCRE {
 				int get() { return _captureCount; }
 			}
 
-			property System::Collections::Generic::Dictionary<System::String^, array<int>^>^ CaptureNames {
-				System::Collections::Generic::Dictionary<System::String^, array<int>^>^ get() { return _captureNames; }
+			property System::Collections::Generic::IDictionary<System::String^, array<int>^>^ CaptureNames {
+				System::Collections::Generic::IDictionary<System::String^, array<int>^>^ get() { return _captureNames; }
+			}
+
+			property System::Collections::Generic::IList<CalloutInfo^>^ Callouts {
+				System::Collections::Generic::IList<CalloutInfo^>^ get() { return _callouts; }
 			}
 
 		internal:
@@ -39,7 +44,8 @@ namespace PCRE {
 		private:
 			pcre2_code* _re;
 			initonly int _captureCount;
-			initonly System::Collections::Generic::Dictionary<System::String^, array<int>^>^ _captureNames;
+			initonly System::Collections::Generic::IDictionary<System::String^, array<int>^>^ _captureNames;
+			initonly System::Collections::Generic::IList<CalloutInfo^>^ _callouts;
 		};
 	}
 }
