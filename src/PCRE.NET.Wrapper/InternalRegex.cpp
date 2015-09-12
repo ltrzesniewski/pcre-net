@@ -83,8 +83,6 @@ InternalRegex::InternalRegex(CompileContext^ context)
 			item += nameEntrySize;
 		}
 	}
-
-	_callouts = CalloutInfo::GetCallouts(_re);
 }
 
 InternalRegex::~InternalRegex()
@@ -200,5 +198,32 @@ int __clrcall InternalRegex::GetInfoInt32(InfoKey key)
 	if (errorCode)
 		throw gcnew InvalidOperationException(String::Format("Error in pcre2_pattern_info, code: {0}", errorCode));
 
+	return result;
+}
+
+System::Collections::Generic::IList<CalloutInfo^>^ InternalRegex::Callouts::get()
+{
+	if (_callouts == nullptr)
+	{
+		auto callouts = CalloutInfo::GetCallouts(_re);
+		System::Threading::Volatile::Write(_callouts, callouts);
+		return callouts;
+	}
+	
+	return _callouts;
+}
+
+CalloutInfo^ InternalRegex::GetCalloutInfoByPatternPosition(int position)
+{
+	if (_calloutInfoByPatternPosition == nullptr)
+	{
+		auto dict = gcnew System::Collections::Generic::Dictionary<int, CalloutInfo^>();
+		for each(auto info in Callouts)
+			dict->Add(info->PatternPosition, info);
+		System::Threading::Volatile::Write(_calloutInfoByPatternPosition, dict);
+	}
+
+	CalloutInfo^ result;
+	_calloutInfoByPatternPosition->TryGetValue(position, result);
 	return result;
 }

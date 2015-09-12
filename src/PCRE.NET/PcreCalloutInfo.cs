@@ -14,7 +14,7 @@ namespace PCRE
         public int Number => _info.Number;
         public string String => _info.String;
 
-        public int NextItemLength => _info.NextItemLength;
+        public int NextPatternItemLength => _info.NextPatternItemLength;
         public int PatternPosition => _info.PatternPosition;
         public int StringOffset => _info.StringOffset;
     }

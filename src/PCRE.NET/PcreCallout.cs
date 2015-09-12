@@ -15,7 +15,7 @@ namespace PCRE
 
         private CalloutData InternalData
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)] get { return (CalloutData)_data; }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)] get { return (CalloutData) _data; }
         }
 
         public int Number => InternalData.Number;
@@ -23,15 +23,12 @@ namespace PCRE
         public PcreMatch Match => _match ?? (_match = new PcreMatch(InternalData.Match));
 
         public int StartOffset => InternalData.StartOffset;
-
         public int CurrentOffset => InternalData.CurrentOffset;
-
         public int MaxCapture => InternalData.MaxCapture;
-
         public int LastCapture => InternalData.LastCapture;
-
         public int PatternPosition => InternalData.PatternPosition;
-
         public int NextPatternItemLength => InternalData.NextPatternItemLength;
+        public int StringOffset => InternalData.Info.StringOffset;
+        public string String => InternalData.Info.String;
     }
 }

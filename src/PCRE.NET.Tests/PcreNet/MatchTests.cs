@@ -207,6 +207,8 @@ namespace PCRE.Tests.PcreNet
                 Assert.That(data.LastCapture, Is.EqualTo(1));
                 Assert.That(data.MaxCapture, Is.EqualTo(2));
                 Assert.That(data.NextPatternItemLength, Is.EqualTo(4));
+                Assert.That(data.StringOffset, Is.EqualTo(0));
+                Assert.That(data.String, Is.Null);
 
                 Assert.That(data.Match.Value, Is.EqualTo("a"));
                 Assert.That(data.Match[1].Value, Is.EqualTo("a"));
@@ -291,6 +293,44 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match, Is.Not.Null);
             Assert.That(match.Success, Is.True);
             Assert.That(count, Is.EqualTo(4));
+        }
+
+        [Test]
+        public void should_execute_string_callout()
+        {
+            const string pattern = @"(a)(*MARK:foo)(x)?(?C{bar})(bc)";
+            var re = new PcreRegex(pattern);
+
+            var calls = 0;
+
+            var match = re.Match("abc", data =>
+            {
+                Assert.That(data.Number, Is.EqualTo(0));
+                Assert.That(data.CurrentOffset, Is.EqualTo(1));
+                Assert.That(data.PatternPosition, Is.EqualTo(pattern.IndexOf("(?C{bar})", StringComparison.Ordinal) + 9));
+                Assert.That(data.StartOffset, Is.EqualTo(0));
+                Assert.That(data.LastCapture, Is.EqualTo(1));
+                Assert.That(data.MaxCapture, Is.EqualTo(2));
+                Assert.That(data.NextPatternItemLength, Is.EqualTo(4));
+                Assert.That(data.StringOffset, Is.EqualTo(pattern.IndexOf("(?C{bar})", StringComparison.Ordinal) + 4));
+                Assert.That(data.String, Is.EqualTo("bar"));
+
+                Assert.That(data.Match.Value, Is.EqualTo("a"));
+                Assert.That(data.Match[1].Value, Is.EqualTo("a"));
+                Assert.That(data.Match[2].Success, Is.False);
+                Assert.That(data.Match[2].Value, Is.SameAs(String.Empty));
+                Assert.That(data.Match[3].Success, Is.False);
+                Assert.That(data.Match[3].Value, Is.SameAs(String.Empty));
+
+                Assert.That(data.Match.Mark, Is.EqualTo("foo"));
+
+                ++calls;
+                return PcreCalloutResult.Pass;
+            });
+
+            Assert.That(match, Is.Not.Null);
+            Assert.That(match.Success, Is.True);
+            Assert.That(calls, Is.EqualTo(1));
         }
 
         [Test]

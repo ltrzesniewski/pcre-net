@@ -10,7 +10,7 @@ namespace PCRE {
 		{
 		public:
 			property int PatternPosition { int get() { return _patternPosition; } }
-			property int NextItemLength { int get() { return _nextItemLength; } }
+			property int NextPatternItemLength { int get() { return _nextItemLength; } }
 			property int Number { int get() { return _number; } }
 			property int StringOffset { int get() { return _stringOffset; } }
 			property System::String^ String { System::String^ get() { return _string; } }

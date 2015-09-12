@@ -5,6 +5,7 @@ namespace PCRE {
 	namespace Wrapper {
 
 		ref class MatchData;
+		ref class CalloutInfo;
 
 		public ref class CalloutData sealed
 		{
@@ -16,6 +17,8 @@ namespace PCRE {
 			property int LastCapture { int get() { return _lastCapture; } }
 			property int PatternPosition { int get() { return _patternPosition; } }
 			property int NextPatternItemLength { int get() { return _nextItemLength; } }
+			property CalloutInfo^ Info { CalloutInfo^ get(); }
+
 			property MatchData^ Match { MatchData^ get() { return _match; } }
 
 		internal:
@@ -30,6 +33,7 @@ namespace PCRE {
 			initonly int _lastCapture;
 			initonly int _patternPosition;
 			initonly int _nextItemLength;
+			CalloutInfo^ _calloutInfo;
 		};
 
 		public enum struct CalloutResult

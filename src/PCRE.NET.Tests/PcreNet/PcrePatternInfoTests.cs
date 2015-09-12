@@ -54,13 +54,13 @@ namespace PCRE.Tests.PcreNet
             Assert.That(re.PaternInfo.Callouts[0].String, Is.Null);
             Assert.That(re.PaternInfo.Callouts[0].StringOffset, Is.EqualTo(0));
             Assert.That(re.PaternInfo.Callouts[0].PatternPosition, Is.EqualTo(7));
-            Assert.That(re.PaternInfo.Callouts[0].NextItemLength, Is.EqualTo(1));
+            Assert.That(re.PaternInfo.Callouts[0].NextPatternItemLength, Is.EqualTo(1));
 
             Assert.That(re.PaternInfo.Callouts[1].Number, Is.EqualTo(0));
             Assert.That(re.PaternInfo.Callouts[1].String, Is.EqualTo(" foo "));
             Assert.That(re.PaternInfo.Callouts[1].StringOffset, Is.EqualTo(13));
             Assert.That(re.PaternInfo.Callouts[1].PatternPosition, Is.EqualTo(20));
-            Assert.That(re.PaternInfo.Callouts[1].NextItemLength, Is.EqualTo(7));
+            Assert.That(re.PaternInfo.Callouts[1].NextPatternItemLength, Is.EqualTo(7));
         }
     }
 }

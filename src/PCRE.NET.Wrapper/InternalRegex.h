@@ -33,7 +33,7 @@ namespace PCRE {
 			}
 
 			property System::Collections::Generic::IList<CalloutInfo^>^ Callouts {
-				System::Collections::Generic::IList<CalloutInfo^>^ get() { return _callouts; }
+				System::Collections::Generic::IList<CalloutInfo^>^ get();
 			}
 
 		internal:
@@ -41,11 +41,14 @@ namespace PCRE {
 				pcre2_code* get() { return _re; }
 			}
 
+			CalloutInfo^ GetCalloutInfoByPatternPosition(int position);
+
 		private:
 			pcre2_code* _re;
 			initonly int _captureCount;
-			initonly System::Collections::Generic::IDictionary<System::String^, array<int>^>^ _captureNames;
-			initonly System::Collections::Generic::IList<CalloutInfo^>^ _callouts;
+			initonly System::Collections::Generic::Dictionary<System::String^, array<int>^>^ _captureNames;
+			System::Collections::Generic::IList<CalloutInfo^>^ _callouts;
+			System::Collections::Generic::Dictionary<int, CalloutInfo^>^ _calloutInfoByPatternPosition;
 		};
 	}
 }

@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "CalloutData.h"
 #include "MatchData.h"
+#include "InternalRegex.h"
 
 using namespace PCRE::Wrapper;
 
@@ -15,4 +16,12 @@ CalloutData::CalloutData(MatchData^ match, pcre2_callout_block *block)
 	_nextItemLength(static_cast<int>(block->next_item_length))
 {
 	_match = gcnew MatchData(match, block);
+}
+
+CalloutInfo^ CalloutData::Info::get()
+{
+	if (_calloutInfo == nullptr)
+		_calloutInfo = _match->Regex->GetCalloutInfoByPatternPosition(_patternPosition);
+
+	return _calloutInfo;
 }
