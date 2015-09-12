@@ -1,4 +1,4 @@
-.TH PCRE2API 3 "23 January 2015" "PCRE2 10.10"
+.TH PCRE2API 3 "22 April 2015" "PCRE2 10.20"
 .SH NAME
 PCRE2 - Perl-compatible regular expressions (revised API)
 .sp
@@ -233,6 +233,10 @@ document for an overview of all the PCRE2 documentation.
 .B const unsigned char *pcre2_maketables(pcre2_general_context *\fIgcontext\fP);
 .sp
 .B int pcre2_pattern_info(const pcre2 *\fIcode\fP, uint32_t \fIwhat\fP, void *\fIwhere\fP);
+.sp
+.B int pcre2_callout_enumerate(const pcre2_code *\fIcode\fP,
+.B "  int (*\fIcallback\fP)(pcre2_callout_enumerate_block *, void *),"
+.B "  void *\fIuser_data\fP);"
 .sp
 .B int pcre2_config(uint32_t \fIwhat\fP, void *\fIwhere\fP);
 .fi
@@ -1040,6 +1044,15 @@ to match. By default, as in Perl, a hexadecimal number is always expected after
 \ex, but it may have zero, one, or two digits (so, for example, \exz matches a
 binary zero character followed by z).
 .sp
+  PCRE2_ALT_CIRCUMFLEX
+.sp
+In multiline mode (when PCRE2_MULTILINE is set), the circumflex metacharacter
+matches at the start of the subject (unless PCRE2_NOTBOL is set), and also
+after any internal newline. However, it does not match after a newline at the
+end of the subject, for compatibility with Perl. If you want a multiline
+circumflex also to match after a terminating newline, you must set
+PCRE2_ALT_CIRCUMFLEX.
+.sp
   PCRE2_AUTO_CALLOUT
 .sp
 If this bit is set, \fBpcre2_compile()\fP automatically inserts callout items,
@@ -1143,8 +1156,19 @@ When PCRE2_MULTILINE it is set, the "start of line" and "end of line"
 constructs match immediately following or immediately before internal newlines
 in the subject string, respectively, as well as at the very start and end. This
 is equivalent to Perl's /m option, and it can be changed within a pattern by a
-(?m) option setting. If there are no newlines in a subject string, or no
-occurrences of ^ or $ in a pattern, setting PCRE2_MULTILINE has no effect.
+(?m) option setting. Note that the "start of line" metacharacter does not match
+after a newline at the end of the subject, for compatibility with Perl.
+However, you can change this by setting the PCRE2_ALT_CIRCUMFLEX option. If
+there are no newlines in a subject string, or no occurrences of ^ or $ in a
+pattern, setting PCRE2_MULTILINE has no effect.
+.sp
+  PCRE2_NEVER_BACKSLASH_C
+.sp
+This option locks out the use of \eC in the pattern that is being compiled.
+This escape can cause unpredictable behaviour in UTF-8 or UTF-16 modes, because
+it may leave the current matching point in the middle of a multi-code-unit
+character. This option may be useful in applications that process patterns from
+external sources.
 .sp
   PCRE2_NEVER_UCP
 .sp
@@ -1152,17 +1176,17 @@ This option locks out the use of Unicode properties for handling \eB, \eb, \eD,
 \ed, \eS, \es, \eW, \ew, and some of the POSIX character classes, as described
 for the PCRE2_UCP option below. In particular, it prevents the creator of the
 pattern from enabling this facility by starting the pattern with (*UCP). This
-may be useful in applications that process patterns from external sources. The
-option combination PCRE_UCP and PCRE_NEVER_UCP causes an error.
+option may be useful in applications that process patterns from external
+sources. The option combination PCRE_UCP and PCRE_NEVER_UCP causes an error.
 .sp
   PCRE2_NEVER_UTF
 .sp
 This option locks out interpretation of the pattern as UTF-8, UTF-16, or
 UTF-32, depending on which library is in use. In particular, it prevents the
 creator of the pattern from switching to UTF interpretation by starting the
-pattern with (*UTF). This may be useful in applications that process patterns
-from external sources. The combination of PCRE2_UTF and PCRE2_NEVER_UTF causes
-an error.
+pattern with (*UTF). This option may be useful in applications that process
+patterns from external sources. The combination of PCRE2_UTF and
+PCRE2_NEVER_UTF causes an error.
 .sp
   PCRE2_NO_AUTO_CAPTURE
 .sp
@@ -1427,14 +1451,19 @@ can be processed in different locales.
 .B int pcre2_pattern_info(const pcre2 *\fIcode\fP, uint32_t \fIwhat\fP, void *\fIwhere\fP);
 .fi
 .P
-The \fBpcre2_pattern_info()\fP function returns information about a compiled
-pattern. The first argument is a pointer to the compiled pattern. The second
-argument specifies which piece of information is required, and the third
-argument is a pointer to a variable to receive the data. If the third argument
-is NULL, the first argument is ignored, and the function returns the size in
-bytes of the variable that is required for the information requested.
-Otherwise, The yield of the function is zero for success, or one of the
-following negative numbers:
+The \fBpcre2_pattern_info()\fP function returns general information about a
+compiled pattern. For information about callouts, see the
+.\" HTML <a href="pcre2pattern.html#infoaboutcallouts">
+.\" </a>
+next section.
+.\"
+The first argument for \fBpcre2_pattern_info()\fP is a pointer to the compiled
+pattern. The second argument specifies which piece of information is required,
+and the third argument is a pointer to a variable to receive the data. If the
+third argument is NULL, the first argument is ignored, and the function returns
+the size in bytes of the variable that is required for the information
+requested. Otherwise, The yield of the function is zero for success, or one of
+the following negative numbers:
 .sp
   PCRE2_ERROR_NULL           the argument \fIcode\fP was NULL
   PCRE2_ERROR_BADMAGIC       the "magic number" was not found
@@ -1714,6 +1743,31 @@ memory in which to place the compiled pattern may be slightly larger than the
 value returned by this option, because there are cases where the code that
 calculates the size has to over-estimate. Processing a pattern with the JIT
 compiler does not alter the value returned by this option.
+.
+.
+.\" HTML <a name="infoaboutcallouts"></a>
+.SH "INFORMATION ABOUT A PATTERN'S CALLOUTS"
+.rs
+.sp
+.nf
+.B int pcre2_callout_enumerate(const pcre2_code *\fIcode\fP,
+.B "  int (*\fIcallback\fP)(pcre2_callout_enumerate_block *, void *),"
+.B "  void *\fIuser_data\fP);"
+.fi
+.sp
+A script language that supports the use of string arguments in callouts might
+like to scan all the callouts in a pattern before running the match. This can
+be done by calling \fBpcre2_callout_enumerate()\fP. The first argument is a
+pointer to a compiled pattern, the second points to a callback function, and
+the third is arbitrary user data. The callback function is called for every
+callout in the pattern in the order in which they appear. Its first argument is
+a pointer to a callout enumeration block, and its second argument is the
+\fIuser_data\fP value that was passed to \fBpcre2_callout_enumerate()\fP. The
+contents of the callout enumeration block are described in the
+.\" HREF
+\fBpcre2callout\fP
+.\"
+documentation, which also gives further details about callouts.
 .
 .
 .SH "SERIALIZATION AND PRECOMPILING"
@@ -2275,8 +2329,8 @@ of the subject.
   PCRE2_ERROR_CALLOUT
 .sp
 This error is never generated by \fBpcre2_match()\fP itself. It is provided for
-use by callout functions that want to cause \fBpcre2_match()\fP to return a
-distinctive error code. See the
+use by callout functions that want to cause \fBpcre2_match()\fP or
+\fBpcre2_callout_enumerate()\fP to return a distinctive error code. See the
 .\" HREF
 \fBpcre2callout\fP
 .\"
@@ -2885,6 +2939,6 @@ Cambridge, England.
 .rs
 .sp
 .nf
-Last updated: 23 January 2015
+Last updated: 22 April 2015
 Copyright (c) 1997-2015 University of Cambridge.
 .fi

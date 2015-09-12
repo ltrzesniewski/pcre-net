@@ -4178,4 +4178,153 @@ a random value. /Ix
 
 /((?+1)(\1))/B
 
+# Callouts with string arguments
+
+/a(?C"/
+
+/a(?C"a/
+
+/a(?C"a"/
+
+/a(?C"a"bcde(?C"b")xyz/
+
+/a(?C"a)b""c")/B
+
+/ab(?C" any text with spaces ")cde/B
+    abcde
+    12abcde
+
+/^a(b)c(?C1)def/
+      abcdef
+
+/^a(b)c(?C"AB")def/
+      abcdef
+
+/^a(b)c(?C1)def/
+      abcdef\=callout_capture
+
+/^a(b)c(?C{AB})def/B
+      abcdef\=callout_capture
+
+/(?C`a``b`)(?C'a''b')(?C"a""b")(?C^a^^b^)(?C%a%%b%)(?C#a##b#)(?C$a$$b$)(?C{a}}b})/B,callout_info
+
+/(?:a(?C`code`)){3}/B
+
+/^(?(?C25)(?=abc)abcd|xyz)/B,callout_info
+    abcdefg
+    xyz123 
+
+/^(?(?C$abc$)(?=abc)abcd|xyz)/B
+    abcdefg
+    xyz123 
+
+/^ab(?C'first')cd(?C"second")ef/
+    abcdefg
+
+/(?:a(?C`code`)){3}X/
+    aaaXY
+
+# Binary zero in callout string
+#  a  (  ?  C  '  x     z  '  )  b
+/ 61 28 3f 43 27 78 00 7a 27 29 62/hex,callout_info
+    abcdefgh
+
+/(?(?!)^)/
+
+/(?(?!)a|b)/
+    bbb
+    ** Failers 
+    aaa 
+
+# JIT gives a different error message for the infinite recursion
+
+"(*NO_JIT)((?2)+)((?1)){"
+    abcd{
+
+# Perl fails to diagnose the absence of an assertion
+
+"(?(?<E>.*!.*)?)"
+
+"X((?2)()*+){2}+"B
+
+"X((?2)()*+){2}"B
+
+/(?<=\bABQ(3(?-7)))/
+
+/(?<=\bABQ(3(?+7)))/
+
+";(?<=()((?3))((?2)))"
+
+# Perl loops on this (PCRE2 used to!)
+
+/(?<=\Ka)/g,aftertext
+    aaaaa
+
+/(?<=\Ka)/altglobal,aftertext
+    aaaaa
+
+/((?2){73}(?2))((?1))/info
+
+/ab\Cde/never_backslash_c
+
+/abc/
+    \[9x!xxx(]{9999}
+    
+/(abc)*/
+    \[abc]{5} 
+
+/^/gm
+    \n\n\n
+
+/^/gm,alt_circumflex
+    \n\n\n
+
+/((((((((x))))))))\81/
+    xx1
+
+/((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((x))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))\80/
+    xx
+
+/\80/
+
+/A\8B\9C/
+    A8B9C
+    
+/(?x:((?'a')) # comment (with parentheses) and | vertical
+(?-x:#not a comment (?'b')) # this is a comment ()
+(?'c')) # not a comment (?'d')/info
+
+/(?|(?'a')(2)(?'b')|(?'a')(?'a')(3))/I,dupnames
+    A23B
+    B32A 
+
+# These are some patterns that used to cause buffer overflows or other errors
+# while compiling. 
+
+/.((?2)(?R)|\1|$)()/B
+
+/.((?3)(?R)()(?2)|\1|$)()/B
+
+/(\9*+(?2);\3++()2|)++{/
+
+/\V\x85\9*+((?2)\3++()2)*:2/
+
+/(((?(R)){0,2}) (?'x'((?'R')((?'R')))))/dupnames
+
+/(((?(X)){0,2}) (?'x'((?'X')((?'X')))))/dupnames
+
+/(((?(R)){0,2}) (?'x'((?'X')((?'R')))))/
+
+"(?J)(?'d'(?'d'\g{d}))"
+
+"(?=!((?2)(?))({8(?<=(?1){29}8bbbb\x16\xd\xc6^($(\xa9H4){4}h}?1)B))\x15')"
+
+/A(?'')Z/
+
+"(?J:(?|(?'R')(\k'R')|((?'R'))))"
+
+/(?<=|(\,\$(?73591620449005828816)\xa8.{7}){6}\x09)/
+
+/^(?:(?(1)x|)+)+$()/B
+
 # End of testinput2 

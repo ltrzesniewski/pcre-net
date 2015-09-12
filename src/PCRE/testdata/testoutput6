@@ -7773,4 +7773,169 @@ Partial match: abc
 Copy substring 1 failed (-2): partial match
 get substring list failed (-2): partial match
 
+/ab(?C" any text with spaces ")cde/B
+------------------------------------------------------------------
+        Bra
+        ab
+        CalloutStr " any text with spaces " 6 30 1
+        cde
+        Ket
+        End
+------------------------------------------------------------------
+    abcde
+Callout (6): " any text with spaces "
+--->abcde
+    ^ ^       c
+ 0: abcde
+    12abcde
+Callout (6): " any text with spaces "
+--->12abcde
+      ^ ^       c
+ 0: abcde
+
+/^a(b)c(?C1)def/
+      abcdef
+--->abcdef
+  1 ^  ^       d
+ 0: abcdef
+
+/^a(b)c(?C"AB")def/
+      abcdef
+Callout (10): "AB"
+--->abcdef
+    ^  ^       d
+ 0: abcdef
+
+/^a(b)c(?C1)def/
+      abcdef\=callout_capture
+Callout 1: last capture = 0
+ 0: 
+--->abcdef
+    ^  ^       d
+ 0: abcdef
+
+/^a(b)c(?C{AB})def/B
+------------------------------------------------------------------
+        Bra
+        ^
+        a
+        CBra 1
+        b
+        Ket
+        c
+        CalloutStr {AB} 10 14 1
+        def
+        Ket
+        End
+------------------------------------------------------------------
+      abcdef\=callout_capture
+Callout (10): {AB} last capture = 0
+ 0: 
+--->abcdef
+    ^  ^       d
+ 0: abcdef
+
+/^(?(?C25)(?=abc)abcd|xyz)/B
+------------------------------------------------------------------
+        Bra
+        ^
+        Cond
+        Callout 25 9 7
+        Assert
+        abc
+        Ket
+        abcd
+        Alt
+        xyz
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+    abcdefg
+--->abcdefg
+ 25 ^           (?=abc)
+ 0: abcd
+    xyz123 
+--->xyz123
+ 25 ^          (?=abc)
+ 0: xyz
+
+/^(?(?C$abc$)(?=abc)abcd|xyz)/B
+------------------------------------------------------------------
+        Bra
+        ^
+        Cond
+        CalloutStr $abc$ 7 12 7
+        Assert
+        abc
+        Ket
+        abcd
+        Alt
+        xyz
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+    abcdefg
+Callout (7): $abc$
+--->abcdefg
+    ^           (?=abc)
+ 0: abcd
+    xyz123 
+Callout (7): $abc$
+--->xyz123
+    ^          (?=abc)
+ 0: xyz
+
+/^ab(?C'first')cd(?C"second")ef/
+    abcdefg
+Callout (7): 'first'
+--->abcdefg
+    ^ ^         c
+Callout (20): "second"
+--->abcdefg
+    ^   ^       e
+ 0: abcdef
+
+/(?:a(?C`code`)){3}X/
+    aaaXY
+Callout (8): `code`
+--->aaaXY
+    ^^        )
+Callout (8): `code`
+--->aaaXY
+    ^ ^       )
+Callout (8): `code`
+--->aaaXY
+    ^  ^      )
+ 0: aaaX
+
+# Binary zero in callout string
+#  a  (  ?  C  '  x     z  '  )  b
+/ 61 28 3f 43 27 78 00 7a 27 29 62/hex
+    abcdefgh
+Callout (5): 'x\x00z'
+--->abcdefgh
+    ^^           b
+ 0: ab
+
+/(?(?!)a|b)/
+    bbb
+ 0: b
+    aaa 
+No match
+
+/^/gm
+    \n\n\n
+ 0: 
+ 0: 
+ 0: 
+
+/^/gm,alt_circumflex
+    \n\n\n
+ 0: 
+ 0: 
+ 0: 
+ 0: 
+
 # End of testinput6

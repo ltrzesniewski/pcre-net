@@ -567,13 +567,13 @@ Failed: error 126 at offset 4: malformed number or name after (?(
 Failed: error 126 at offset 4: malformed number or name after (?(
 
 /(?(?i))/
-Failed: error 128 at offset 3: assertion expected after (?(
+Failed: error 128 at offset 3: assertion expected after (?( or (?(?C)
 
 /(?(abc))/
 Failed: error 115 at offset 7: reference to non-existent subpattern
 
 /(?(?<ab))/
-Failed: error 142 at offset 7: syntax error in subpattern name (missing terminator)
+Failed: error 128 at offset 3: assertion expected after (?( or (?(?C)
 
 /((?s)blah)\s+\1/I
 Capturing subpattern count = 1
@@ -3538,7 +3538,7 @@ Subject length lower bound = 2
 Failed: error 138 at offset 6: number after (?C is greater than 255
 
 /(?Cab)xx/I
-Failed: error 139 at offset 3: closing parenthesis for (?C expected
+Failed: error 182 at offset 3: unrecognized string delimiter follows (?C
 
 /(?C12vr)x/I
 Failed: error 139 at offset 5: closing parenthesis for (?C expected
@@ -7367,7 +7367,7 @@ No match
 Failed: error 126 at offset 6: malformed number or name after (?(
 
 /(?(''))/
-Failed: error 128 at offset 4: assertion expected after (?(
+Failed: error 128 at offset 4: assertion expected after (?( or (?(?C)
 
 /(?('R')stuff)/
 Failed: error 115 at offset 7: reference to non-existent subpattern
@@ -13293,7 +13293,7 @@ Failed: error 150 at offset 4: invalid range in character class
 Failed: error 144 at offset 3: group name must start with a non-digit
 
 /(?&1abc)xx(?<1abc>y)/
-Failed: error 144 at offset 3: group name must start with a non-digit
+Failed: error 144 at offset 13: group name must start with a non-digit
 
 /(?<ab-cd>xx)/
 Failed: error 142 at offset 5: syntax error in subpattern name (missing terminator)
@@ -13320,10 +13320,10 @@ Failed: error 144 at offset 4: group name must start with a non-digit
 Failed: error 144 at offset 3: group name must start with a non-digit
 
 /(?&1abc)xx(?<1abc>y)/
-Failed: error 144 at offset 3: group name must start with a non-digit
+Failed: error 144 at offset 13: group name must start with a non-digit
 
 /(?P>1abc)xx(?<1abc>y)/
-Failed: error 144 at offset 4: group name must start with a non-digit
+Failed: error 144 at offset 14: group name must start with a non-digit
 
 /\g'3gh'/
 Failed: error 157 at offset 7: \g is not followed by a braced, angle-bracketed, or quoted name/number or by a plain number
@@ -13964,6 +13964,507 @@ Matched, but too many substrings
         \1
         Ket
         Ket
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+
+# Callouts with string arguments
+
+/a(?C"/
+Failed: error 181 at offset 4: missing terminating delimiter for callout with string argument
+
+/a(?C"a/
+Failed: error 181 at offset 4: missing terminating delimiter for callout with string argument
+
+/a(?C"a"/
+Failed: error 139 at offset 7: closing parenthesis for (?C expected
+
+/a(?C"a"bcde(?C"b")xyz/
+Failed: error 139 at offset 7: closing parenthesis for (?C expected
+
+/a(?C"a)b""c")/B
+------------------------------------------------------------------
+        Bra
+        a
+        CalloutStr "a)b"c" 5 13 0
+        Ket
+        End
+------------------------------------------------------------------
+
+/ab(?C" any text with spaces ")cde/B
+------------------------------------------------------------------
+        Bra
+        ab
+        CalloutStr " any text with spaces " 6 30 1
+        cde
+        Ket
+        End
+------------------------------------------------------------------
+    abcde
+Callout (6): " any text with spaces "
+--->abcde
+    ^ ^       c
+ 0: abcde
+    12abcde
+Callout (6): " any text with spaces "
+--->12abcde
+      ^ ^       c
+ 0: abcde
+
+/^a(b)c(?C1)def/
+      abcdef
+--->abcdef
+  1 ^  ^       d
+ 0: abcdef
+ 1: b
+
+/^a(b)c(?C"AB")def/
+      abcdef
+Callout (10): "AB"
+--->abcdef
+    ^  ^       d
+ 0: abcdef
+ 1: b
+
+/^a(b)c(?C1)def/
+      abcdef\=callout_capture
+Callout 1: last capture = 1
+ 0: <unset>
+ 1: b
+--->abcdef
+    ^  ^       d
+ 0: abcdef
+ 1: b
+
+/^a(b)c(?C{AB})def/B
+------------------------------------------------------------------
+        Bra
+        ^
+        a
+        CBra 1
+        b
+        Ket
+        c
+        CalloutStr {AB} 10 14 1
+        def
+        Ket
+        End
+------------------------------------------------------------------
+      abcdef\=callout_capture
+Callout (10): {AB} last capture = 1
+ 0: <unset>
+ 1: b
+--->abcdef
+    ^  ^       d
+ 0: abcdef
+ 1: b
+
+/(?C`a``b`)(?C'a''b')(?C"a""b")(?C^a^^b^)(?C%a%%b%)(?C#a##b#)(?C$a$$b$)(?C{a}}b})/B,callout_info
+------------------------------------------------------------------
+        Bra
+        CalloutStr `a`b` 4 10 0
+        CalloutStr 'a'b' 14 20 0
+        CalloutStr "a"b" 24 30 0
+        CalloutStr ^a^b^ 34 40 0
+        CalloutStr %a%b% 44 50 0
+        CalloutStr #a#b# 54 60 0
+        CalloutStr $a$b$ 64 70 0
+        CalloutStr {a}b} 74 80 0
+        Ket
+        End
+------------------------------------------------------------------
+Callout `a`b`  (
+Callout 'a'b'  (
+Callout "a"b"  (
+Callout ^a^b^  (
+Callout %a%b%  (
+Callout #a#b#  (
+Callout $a$b$  (
+Callout {a}b}  
+
+/(?:a(?C`code`)){3}/B
+------------------------------------------------------------------
+        Bra
+        Bra
+        a
+        CalloutStr `code` 8 14 0
+        Ket
+        Bra
+        a
+        CalloutStr `code` 8 14 0
+        Ket
+        Bra
+        a
+        CalloutStr `code` 8 14 0
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+
+/^(?(?C25)(?=abc)abcd|xyz)/B,callout_info
+------------------------------------------------------------------
+        Bra
+        ^
+        Cond
+        Callout 25 9 7
+        Assert
+        abc
+        Ket
+        abcd
+        Alt
+        xyz
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+Callout 25  (?=abc)
+    abcdefg
+--->abcdefg
+ 25 ^           (?=abc)
+ 0: abcd
+    xyz123 
+--->xyz123
+ 25 ^          (?=abc)
+ 0: xyz
+
+/^(?(?C$abc$)(?=abc)abcd|xyz)/B
+------------------------------------------------------------------
+        Bra
+        ^
+        Cond
+        CalloutStr $abc$ 7 12 7
+        Assert
+        abc
+        Ket
+        abcd
+        Alt
+        xyz
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+    abcdefg
+Callout (7): $abc$
+--->abcdefg
+    ^           (?=abc)
+ 0: abcd
+    xyz123 
+Callout (7): $abc$
+--->xyz123
+    ^          (?=abc)
+ 0: xyz
+
+/^ab(?C'first')cd(?C"second")ef/
+    abcdefg
+Callout (7): 'first'
+--->abcdefg
+    ^ ^         c
+Callout (20): "second"
+--->abcdefg
+    ^   ^       e
+ 0: abcdef
+
+/(?:a(?C`code`)){3}X/
+    aaaXY
+Callout (8): `code`
+--->aaaXY
+    ^^        )
+Callout (8): `code`
+--->aaaXY
+    ^ ^       )
+Callout (8): `code`
+--->aaaXY
+    ^  ^      )
+ 0: aaaX
+
+# Binary zero in callout string
+#  a  (  ?  C  '  x     z  '  )  b
+/ 61 28 3f 43 27 78 00 7a 27 29 62/hex,callout_info
+Callout 'x\x00z'  b
+    abcdefgh
+Callout (5): 'x\x00z'
+--->abcdefgh
+    ^^           b
+ 0: ab
+
+/(?(?!)^)/
+
+/(?(?!)a|b)/
+    bbb
+ 0: b
+    ** Failers 
+No match
+    aaa 
+No match
+
+# JIT gives a different error message for the infinite recursion
+
+"(*NO_JIT)((?2)+)((?1)){"
+    abcd{
+Failed: error -52: nested recursion at the same subject position
+
+# Perl fails to diagnose the absence of an assertion
+
+"(?(?<E>.*!.*)?)"
+Failed: error 128 at offset 3: assertion expected after (?( or (?(?C)
+
+"X((?2)()*+){2}+"B
+------------------------------------------------------------------
+        Bra
+        X
+        Once
+        CBra 1
+        Recurse
+        Braposzero
+        SCBraPos 2
+        KetRpos
+        Ket
+        CBra 1
+        Recurse
+        Braposzero
+        SCBraPos 2
+        KetRpos
+        Ket
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+
+"X((?2)()*+){2}"B
+------------------------------------------------------------------
+        Bra
+        X
+        CBra 1
+        Recurse
+        Braposzero
+        SCBraPos 2
+        KetRpos
+        Ket
+        CBra 1
+        Recurse
+        Braposzero
+        SCBraPos 2
+        KetRpos
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+
+/(?<=\bABQ(3(?-7)))/
+Failed: error 115 at offset 15: reference to non-existent subpattern
+
+/(?<=\bABQ(3(?+7)))/
+Failed: error 115 at offset 15: reference to non-existent subpattern
+
+";(?<=()((?3))((?2)))"
+Failed: error 125 at offset 20: lookbehind assertion is not fixed length
+
+# Perl loops on this (PCRE2 used to!)
+
+/(?<=\Ka)/g,aftertext
+    aaaaa
+ 0: a
+ 0+ aaaa
+ 0: a
+ 0+ aaa
+ 0: a
+ 0+ aa
+ 0: a
+ 0+ a
+ 0: a
+ 0+ 
+
+/(?<=\Ka)/altglobal,aftertext
+    aaaaa
+ 0: a
+ 0+ aaaa
+ 0: a
+ 0+ aaa
+ 0: a
+ 0+ aa
+ 0: a
+ 0+ a
+ 0: a
+ 0+ 
+
+/((?2){73}(?2))((?1))/info
+Capturing subpattern count = 2
+May match empty string
+Subject length lower bound = 0
+
+/ab\Cde/never_backslash_c
+Failed: error 183 at offset 3: using \C is disabled by the application
+
+/abc/
+    \[9x!xxx(]{9999}
+No match
+    
+/(abc)*/
+    \[abc]{5} 
+ 0: abcabcabcabcabc
+ 1: abc
+
+/^/gm
+    \n\n\n
+ 0: 
+ 0: 
+ 0: 
+
+/^/gm,alt_circumflex
+    \n\n\n
+ 0: 
+ 0: 
+ 0: 
+ 0: 
+
+/((((((((x))))))))\81/
+Failed: error 115 at offset 20: reference to non-existent subpattern
+    xx1
+
+/((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((x))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))\80/
+    xx
+Matched, but too many substrings
+ 0: xx
+ 1: x
+ 2: x
+ 3: x
+ 4: x
+ 5: x
+ 6: x
+ 7: x
+ 8: x
+ 9: x
+10: x
+11: x
+12: x
+13: x
+14: x
+
+/\80/
+Failed: error 115 at offset 3: reference to non-existent subpattern
+
+/A\8B\9C/
+Failed: error 115 at offset 7: reference to non-existent subpattern
+    A8B9C
+    
+/(?x:((?'a')) # comment (with parentheses) and | vertical
+(?-x:#not a comment (?'b')) # this is a comment ()
+(?'c')) # not a comment (?'d')/info
+Capturing subpattern count = 5
+Named capturing subpatterns:
+  a   2
+  b   3
+  c   4
+  d   5
+First code unit = '#'
+Last code unit = ' '
+Subject length lower bound = 32
+
+/(?|(?'a')(2)(?'b')|(?'a')(?'a')(3))/I,dupnames
+Capturing subpattern count = 3
+Named capturing subpatterns:
+  a   1
+  a   2
+  b   3
+Options: dupnames
+Starting code units: 2 3 
+Subject length lower bound = 1
+    A23B
+ 0: 2
+ 1: 
+ 2: 2
+ 3: 
+    B32A 
+ 0: 3
+ 1: 
+ 2: 
+ 3: 3
+
+# These are some patterns that used to cause buffer overflows or other errors
+# while compiling. 
+
+/.((?2)(?R)|\1|$)()/B
+------------------------------------------------------------------
+        Bra
+        Any
+        Once
+        CBra 1
+        Recurse
+        Recurse
+        Alt
+        \1
+        Alt
+        $
+        Ket
+        Ket
+        CBra 2
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+
+/.((?3)(?R)()(?2)|\1|$)()/B
+------------------------------------------------------------------
+        Bra
+        Any
+        Once
+        CBra 1
+        Recurse
+        Recurse
+        CBra 2
+        Ket
+        Recurse
+        Alt
+        \1
+        Alt
+        $
+        Ket
+        Ket
+        CBra 3
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+
+/(\9*+(?2);\3++()2|)++{/
+Failed: error 115 at offset 22: reference to non-existent subpattern
+
+/\V\x85\9*+((?2)\3++()2)*:2/
+Failed: error 115 at offset 26: reference to non-existent subpattern
+
+/(((?(R)){0,2}) (?'x'((?'R')((?'R')))))/dupnames
+
+/(((?(X)){0,2}) (?'x'((?'X')((?'X')))))/dupnames
+
+/(((?(R)){0,2}) (?'x'((?'X')((?'R')))))/
+
+"(?J)(?'d'(?'d'\g{d}))"
+
+"(?=!((?2)(?))({8(?<=(?1){29}8bbbb\x16\xd\xc6^($(\xa9H4){4}h}?1)B))\x15')"
+Failed: error 125 at offset 72: lookbehind assertion is not fixed length
+
+/A(?'')Z/
+Failed: error 162 at offset 4: subpattern name expected
+
+"(?J:(?|(?'R')(\k'R')|((?'R'))))"
+
+/(?<=|(\,\$(?73591620449005828816)\xa8.{7}){6}\x09)/
+Failed: error 161 at offset 32: number is too big
+
+/^(?:(?(1)x|)+)+$()/B
+------------------------------------------------------------------
+        Bra
+        ^
+        SBra
+        SCond
+      1 Cond ref
+        x
+        Alt
+        KetRmax
+        KetRmax
+        $
+        CBra 1
         Ket
         Ket
         End

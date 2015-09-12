@@ -382,7 +382,7 @@ space. However, in many other sources it is listed as a space and has been in
 PCRE for a long time. */
 
 #define HSPACE_LIST \
-  CHAR_HT, CHAR_SPACE, 0xa0, \
+  CHAR_HT, CHAR_SPACE, CHAR_NBSP, \
   0x1680, 0x180e, 0x2000, 0x2001, 0x2002, 0x2003, 0x2004, 0x2005, \
   0x2006, 0x2007, 0x2008, 0x2009, 0x200A, 0x202f, 0x205f, 0x3000, \
   NOTACHAR
@@ -408,7 +408,7 @@ PCRE for a long time. */
 #define HSPACE_BYTE_CASES \
   case CHAR_HT: \
   case CHAR_SPACE: \
-  case 0xa0     /* NBSP */
+  case CHAR_NBSP
 
 #define HSPACE_CASES \
   HSPACE_BYTE_CASES: \
@@ -435,11 +435,12 @@ PCRE for a long time. */
 /* -------------- EBCDIC environments -------------- */
 
 #else
-#define HSPACE_LIST CHAR_HT, CHAR_SPACE
+#define HSPACE_LIST CHAR_HT, CHAR_SPACE, CHAR_NBSP, NOTACHAR
 
 #define HSPACE_BYTE_CASES \
   case CHAR_HT: \
-  case CHAR_SPACE
+  case CHAR_SPACE: \
+  case CHAR_NBSP
 
 #define HSPACE_CASES HSPACE_BYTE_CASES
 
@@ -525,6 +526,7 @@ bytes in a code unit in that mode. */
 #define PCRE2_NE_ATST_SET   0x00020000  /* (*NOTEMPTY_ATSTART) used) together */
 #define PCRE2_DEREF_TABLES  0x00040000  /* Release character tables. */
 #define PCRE2_NOJIT         0x00080000  /* (*NOJIT) used */
+#define PCRE2_HASBKPORX     0x00100000  /* contains \P, \p, or \X */
 
 #define PCRE2_MODE_MASK     (PCRE2_MODE8 | PCRE2_MODE16 | PCRE2_MODE32)
 
@@ -632,6 +634,7 @@ same code point. */
 
 #define CHAR_ESC                    '\047'
 #define CHAR_DEL                    '\007'
+#define CHAR_NBSP                   ((unsigned char)'\x41')
 #define STR_ESC                     "\047"
 #define STR_DEL                     "\007"
 
@@ -646,6 +649,7 @@ a positive value. */
 #define CHAR_NEL                    ((unsigned char)'\x85')
 #define CHAR_ESC                    '\033'
 #define CHAR_DEL                    '\177'
+#define CHAR_NBSP                   ((unsigned char)'\xa0')
 
 #define STR_LF                      "\n"
 #define STR_NL                      STR_LF
@@ -1028,6 +1032,7 @@ only. */
 #define CHAR_VERTICAL_LINE          '\174'
 #define CHAR_RIGHT_CURLY_BRACKET    '\175'
 #define CHAR_TILDE                  '\176'
+#define CHAR_NBSP                   ((unsigned char)'\xa0')
 
 #define STR_HT                      "\011"
 #define STR_VT                      "\013"
@@ -1191,31 +1196,6 @@ only. */
 
 /* -------------------- Definitions for compiled patterns -------------------*/
 
-/* Escape items that are just an encoding of a particular data value. */
-
-#ifndef ESC_e
-#define ESC_e CHAR_ESC
-#endif
-
-#ifndef ESC_f
-#define ESC_f CHAR_FF
-#endif
-
-#ifndef ESC_n
-#define ESC_n CHAR_LF
-#endif
-
-#ifndef ESC_r
-#define ESC_r CHAR_CR
-#endif
-
-/* We can't officially use ESC_t because it is a POSIX reserved identifier
-(presumably because of all the others like size_t). */
-
-#ifndef ESC_tee
-#define ESC_tee CHAR_HT
-#endif
-
 /* Codes for different types of Unicode property */
 
 #define PT_ANY        0    /* Any property - matches all chars */
@@ -1254,13 +1234,46 @@ contain characters with values greater than 255. */
 #define XCL_PROP      3    /* Unicode property (2-byte property code follows) */
 #define XCL_NOTPROP   4    /* Unicode inverted property (ditto) */
 
+/* Escape items that are just an encoding of a particular data value. These
+appear in the escapes[] table in pcre2_compile.c as positive numbers. */
+
+#ifndef ESC_a
+#define ESC_a CHAR_BEL
+#endif
+
+#ifndef ESC_e
+#define ESC_e CHAR_ESC
+#endif
+
+#ifndef ESC_f
+#define ESC_f CHAR_FF
+#endif
+
+#ifndef ESC_n
+#define ESC_n CHAR_LF
+#endif
+
+#ifndef ESC_r
+#define ESC_r CHAR_CR
+#endif
+
+/* We can't officially use ESC_t because it is a POSIX reserved identifier
+(presumably because of all the others like size_t). */
+
+#ifndef ESC_tee
+#define ESC_tee CHAR_HT
+#endif
+
 /* These are escaped items that aren't just an encoding of a particular data
 value such as \n. They must have non-zero values, as check_escape() returns 0
-for a data character.  Also, they must appear in the same order as in the
-opcode definitions below, up to ESC_z. There's a dummy for OP_ALLANY because it
-corresponds to "." in DOTALL mode rather than an escape sequence. It is also
-used for [^] in JavaScript compatibility mode, and for \C in non-utf mode. In
-non-DOTALL mode, "." behaves like \N.
+for a data character. In the escapes[] table in pcre2_compile.c their values
+are negated in order to distinguish them from data values.
+
+They must appear here in the same order as in the opcode definitions below, up
+to ESC_z. There's a dummy for OP_ALLANY because it corresponds to "." in DOTALL
+mode rather than an escape sequence. It is also used for [^] in JavaScript
+compatibility mode, and for \C in non-utf mode. In non-DOTALL mode, "." behaves
+like \N.
 
 The special values ESC_DU, ESC_du, etc. are used instead of ESC_D, ESC_d, etc.
 when PCRE_UCP is set and replacement of \d etc by \p sequences is required.
@@ -1477,84 +1490,85 @@ enum {
   OP_DNREFI,         /* 116 Match a duplicate name backref, caselessly */
   OP_RECURSE,        /* 117 Match a numbered subpattern (possibly recursive) */
   OP_CALLOUT,        /* 118 Call out to external function if provided */
+  OP_CALLOUT_STR,    /* 119 Call out with string argument */
 
-  OP_ALT,            /* 119 Start of alternation */
-  OP_KET,            /* 120 End of group that doesn't have an unbounded repeat */
-  OP_KETRMAX,        /* 121 These two must remain together and in this */
-  OP_KETRMIN,        /* 122 order. They are for groups the repeat for ever. */
-  OP_KETRPOS,        /* 123 Possessive unlimited repeat. */
+  OP_ALT,            /* 120 Start of alternation */
+  OP_KET,            /* 121 End of group that doesn't have an unbounded repeat */
+  OP_KETRMAX,        /* 122 These two must remain together and in this */
+  OP_KETRMIN,        /* 123 order. They are for groups the repeat for ever. */
+  OP_KETRPOS,        /* 124 Possessive unlimited repeat. */
 
   /* The assertions must come before BRA, CBRA, ONCE, and COND, and the four
   asserts must remain in order. */
 
-  OP_REVERSE,        /* 124 Move pointer back - used in lookbehind assertions */
-  OP_ASSERT,         /* 125 Positive lookahead */
-  OP_ASSERT_NOT,     /* 126 Negative lookahead */
-  OP_ASSERTBACK,     /* 127 Positive lookbehind */
-  OP_ASSERTBACK_NOT, /* 128 Negative lookbehind */
+  OP_REVERSE,        /* 125 Move pointer back - used in lookbehind assertions */
+  OP_ASSERT,         /* 126 Positive lookahead */
+  OP_ASSERT_NOT,     /* 127 Negative lookahead */
+  OP_ASSERTBACK,     /* 128 Positive lookbehind */
+  OP_ASSERTBACK_NOT, /* 129 Negative lookbehind */
 
   /* ONCE, ONCE_NC, BRA, BRAPOS, CBRA, CBRAPOS, and COND must come immediately
   after the assertions, with ONCE first, as there's a test for >= ONCE for a
   subpattern that isn't an assertion. The POS versions must immediately follow
   the non-POS versions in each case. */
 
-  OP_ONCE,           /* 129 Atomic group, contains captures */
-  OP_ONCE_NC,        /* 130 Atomic group containing no captures */
-  OP_BRA,            /* 131 Start of non-capturing bracket */
-  OP_BRAPOS,         /* 132 Ditto, with unlimited, possessive repeat */
-  OP_CBRA,           /* 133 Start of capturing bracket */
-  OP_CBRAPOS,        /* 134 Ditto, with unlimited, possessive repeat */
-  OP_COND,           /* 135 Conditional group */
+  OP_ONCE,           /* 130 Atomic group, contains captures */
+  OP_ONCE_NC,        /* 131 Atomic group containing no captures */
+  OP_BRA,            /* 132 Start of non-capturing bracket */
+  OP_BRAPOS,         /* 133 Ditto, with unlimited, possessive repeat */
+  OP_CBRA,           /* 134 Start of capturing bracket */
+  OP_CBRAPOS,        /* 135 Ditto, with unlimited, possessive repeat */
+  OP_COND,           /* 136 Conditional group */
 
   /* These five must follow the previous five, in the same order. There's a
   check for >= SBRA to distinguish the two sets. */
 
-  OP_SBRA,           /* 136 Start of non-capturing bracket, check empty  */
-  OP_SBRAPOS,        /* 137 Ditto, with unlimited, possessive repeat */
-  OP_SCBRA,          /* 138 Start of capturing bracket, check empty */
-  OP_SCBRAPOS,       /* 139 Ditto, with unlimited, possessive repeat */
-  OP_SCOND,          /* 140 Conditional group, check empty */
+  OP_SBRA,           /* 137 Start of non-capturing bracket, check empty  */
+  OP_SBRAPOS,        /* 138 Ditto, with unlimited, possessive repeat */
+  OP_SCBRA,          /* 139 Start of capturing bracket, check empty */
+  OP_SCBRAPOS,       /* 140 Ditto, with unlimited, possessive repeat */
+  OP_SCOND,          /* 141 Conditional group, check empty */
 
   /* The next two pairs must (respectively) be kept together. */
 
-  OP_CREF,           /* 141 Used to hold a capture number as condition */
-  OP_DNCREF,         /* 142 Used to point to duplicate names as a condition */
-  OP_RREF,           /* 143 Used to hold a recursion number as condition */
-  OP_DNRREF,         /* 144 Used to point to duplicate names as a condition */
-  OP_FALSE,          /* 145 Always false (used by DEFINE and VERSION) */
-  OP_TRUE,           /* 146 Always true (used by VERSION) */
+  OP_CREF,           /* 142 Used to hold a capture number as condition */
+  OP_DNCREF,         /* 143 Used to point to duplicate names as a condition */
+  OP_RREF,           /* 144 Used to hold a recursion number as condition */
+  OP_DNRREF,         /* 145 Used to point to duplicate names as a condition */
+  OP_FALSE,          /* 146 Always false (used by DEFINE and VERSION) */
+  OP_TRUE,           /* 147 Always true (used by VERSION) */
 
-  OP_BRAZERO,        /* 147 These two must remain together and in this */
-  OP_BRAMINZERO,     /* 148 order. */
-  OP_BRAPOSZERO,     /* 149 */
+  OP_BRAZERO,        /* 148 These two must remain together and in this */
+  OP_BRAMINZERO,     /* 149 order. */
+  OP_BRAPOSZERO,     /* 150 */
 
   /* These are backtracking control verbs */
 
-  OP_MARK,           /* 150 always has an argument */
-  OP_PRUNE,          /* 151 */
-  OP_PRUNE_ARG,      /* 152 same, but with argument */
-  OP_SKIP,           /* 153 */
-  OP_SKIP_ARG,       /* 154 same, but with argument */
-  OP_THEN,           /* 155 */
-  OP_THEN_ARG,       /* 156 same, but with argument */
-  OP_COMMIT,         /* 157 */
+  OP_MARK,           /* 151 always has an argument */
+  OP_PRUNE,          /* 152 */
+  OP_PRUNE_ARG,      /* 153 same, but with argument */
+  OP_SKIP,           /* 154 */
+  OP_SKIP_ARG,       /* 155 same, but with argument */
+  OP_THEN,           /* 156 */
+  OP_THEN_ARG,       /* 157 same, but with argument */
+  OP_COMMIT,         /* 158 */
 
   /* These are forced failure and success verbs */
 
-  OP_FAIL,           /* 158 */
-  OP_ACCEPT,         /* 159 */
-  OP_ASSERT_ACCEPT,  /* 160 Used inside assertions */
-  OP_CLOSE,          /* 161 Used before OP_ACCEPT to close open captures */
+  OP_FAIL,           /* 159 */
+  OP_ACCEPT,         /* 160 */
+  OP_ASSERT_ACCEPT,  /* 161 Used inside assertions */
+  OP_CLOSE,          /* 162 Used before OP_ACCEPT to close open captures */
 
   /* This is used to skip a subpattern with a {0} quantifier */
 
-  OP_SKIPZERO,       /* 162 */
+  OP_SKIPZERO,       /* 163 */
 
   /* This is used to identify a DEFINE group during compilation so that it can
   be checked for having only one branch. It is changed to OP_FALSE before
   compilation finishes. */
 
-  OP_DEFINE,         /* 163 */
+  OP_DEFINE,         /* 164 */
 
   /* This is not an opcode, but is used to check that tables indexed by opcode
   are the correct length, in order to catch updating errors - there have been
@@ -1598,7 +1612,7 @@ some cases doesn't actually use these names at all). */
   "*", "*?", "+", "+?", "?", "??", "{", "{",                      \
   "*+","++", "?+", "{",                                           \
   "class", "nclass", "xclass", "Ref", "Refi", "DnRef", "DnRefi",  \
-  "Recurse", "Callout",                                           \
+  "Recurse", "Callout", "CalloutStr",                             \
   "Alt", "Ket", "KetRmax", "KetRmin", "KetRpos",                  \
   "Reverse", "Assert", "Assert not", "AssertB", "AssertB not",    \
   "Once", "Once_NC",                                              \
@@ -1672,7 +1686,8 @@ in UTF-8 mode. The code that uses this table must know about such things. */
   1+2*IMM2_SIZE,                 /* DNREF                                  */ \
   1+2*IMM2_SIZE,                 /* DNREFI                                 */ \
   1+LINK_SIZE,                   /* RECURSE                                */ \
-  2+2*LINK_SIZE,                 /* CALLOUT                                */ \
+  1+2*LINK_SIZE+1,               /* CALLOUT                                */ \
+  0,                             /* CALLOUT_STR - variable length          */ \
   1+LINK_SIZE,                   /* Alt                                    */ \
   1+LINK_SIZE,                   /* Ket                                    */ \
   1+LINK_SIZE,                   /* KetRmax                                */ \
@@ -1806,6 +1821,8 @@ extern const uint8_t          PRIV(utf8_table4)[];
 #endif
 
 #define _pcre2_OP_lengths              PCRE2_SUFFIX(_pcre2_OP_lengths_)
+#define _pcre2_callout_end_delims      PCRE2_SUFFIX(_pcre2_callout_end_delims_)
+#define _pcre2_callout_start_delims    PCRE2_SUFFIX(_pcre2_callout_start_delims_)
 #define _pcre2_default_compile_context PCRE2_SUFFIX(_pcre2_default_compile_context_)
 #define _pcre2_default_match_context   PCRE2_SUFFIX(_pcre2_default_match_context_)
 #define _pcre2_default_tables          PCRE2_SUFFIX(_pcre2_default_tables_)
@@ -1824,6 +1841,8 @@ extern const uint8_t          PRIV(utf8_table4)[];
 #define _pcre2_utt_size                PCRE2_SUFFIX(_pcre2_utt_size_)
 
 extern const uint8_t                   PRIV(OP_lengths)[];
+extern const uint32_t                  PRIV(callout_end_delims)[];
+extern const uint32_t                  PRIV(callout_start_delims)[];
 extern const pcre2_compile_context     PRIV(default_compile_context);
 extern const pcre2_match_context       PRIV(default_match_context);
 extern const uint8_t                   PRIV(default_tables)[];

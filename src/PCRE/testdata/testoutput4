@@ -3739,4 +3739,16 @@ No match
     abcdefghijklmno
  0: a
 
+"[\S\V\H]"utf
+
+/\C\X*TӅ;
+{0,6}\v+F
+/utf
+    Ӆ\x0a
+No match
+
+/\C(\W?ſ)'?{{/utf
+    \\C(\\W?ſ)'?{{
+No match
+
 # End of testinput4

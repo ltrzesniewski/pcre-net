@@ -4811,4 +4811,49 @@
 /a(b)c(d)/
     abc\=ph,copy=0,copy=1,getall
 
+/ab(?C" any text with spaces ")cde/B
+    abcde
+    12abcde
+
+/^a(b)c(?C1)def/
+      abcdef
+
+/^a(b)c(?C"AB")def/
+      abcdef
+
+/^a(b)c(?C1)def/
+      abcdef\=callout_capture
+
+/^a(b)c(?C{AB})def/B
+      abcdef\=callout_capture
+
+/^(?(?C25)(?=abc)abcd|xyz)/B
+    abcdefg
+    xyz123 
+
+/^(?(?C$abc$)(?=abc)abcd|xyz)/B
+    abcdefg
+    xyz123 
+
+/^ab(?C'first')cd(?C"second")ef/
+    abcdefg
+
+/(?:a(?C`code`)){3}X/
+    aaaXY
+
+# Binary zero in callout string
+#  a  (  ?  C  '  x     z  '  )  b
+/ 61 28 3f 43 27 78 00 7a 27 29 62/hex
+    abcdefgh
+
+/(?(?!)a|b)/
+    bbb
+    aaa 
+
+/^/gm
+    \n\n\n
+
+/^/gm,alt_circumflex
+    \n\n\n
+
 # End of testinput6

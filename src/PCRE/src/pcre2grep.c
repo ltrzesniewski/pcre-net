@@ -171,6 +171,8 @@ static BOOL use_jit = TRUE;
 static BOOL use_jit = FALSE;
 #endif
 
+static const uint8_t *character_tables = NULL;
+
 static uint32_t pcre2_options = 0;
 static uint32_t process_options = 0;
 static uint32_t match_limit = 0;
@@ -581,7 +583,7 @@ isdirectory(char *filename)
 struct stat statbuf;
 if (stat(filename, &statbuf) < 0)
   return 0;        /* In the expectation that opening as a file will fail */
-return (statbuf.st_mode & S_IFMT) == S_IFDIR;
+return S_ISDIR(statbuf.st_mode);
 }
 
 static directory_type *
@@ -618,7 +620,7 @@ isregfile(char *filename)
 struct stat statbuf;
 if (stat(filename, &statbuf) < 0)
   return 1;        /* In the expectation that opening as a file will fail */
-return (statbuf.st_mode & S_IFMT) == S_IFREG;
+return S_ISREG(statbuf.st_mode);
 }
 
 
@@ -1433,7 +1435,7 @@ Returns:      TRUE if there was a match
 
 static BOOL
 match_patterns(char *matchptr, size_t length, unsigned int options,
-  int startoffset, int *mrc)
+  size_t startoffset, int *mrc)
 {
 int i;
 size_t slen = length;
@@ -1581,12 +1583,12 @@ while (ptr < endptr)
   {
   int endlinelength;
   int mrc = 0;
-  int startoffset = 0;
   unsigned int options = 0;
   BOOL match;
   char *matchptr = ptr;
   char *t = ptr;
   size_t length, linelength;
+  size_t startoffset = 0;
 
   /* At this point, ptr is at the start of a line. We need to find the length
   of the subject string to pass to pcre_exec(). In multiline mode, it is the
@@ -1729,6 +1731,8 @@ while (ptr < endptr)
       {
       if (!invert)
         {
+        size_t oldstartoffset;
+
         if (printname != NULL) fprintf(stdout, "%s:", printname);
         if (number) fprintf(stdout, "%d:", linenumber);
 
@@ -1772,12 +1776,23 @@ while (ptr < endptr)
           if (printed || printname != NULL || number) fprintf(stdout, "\n");
           }
 
-        /* Prepare to repeat to find the next match */
+        /* Prepare to repeat to find the next match. If the pattern contained a
+        lookbehind that included \K, it is possible that the end of the match
+        might be at or before the actual starting offset we have just used. In
+        this case, start one character further on. */
 
         match = FALSE;
         if (line_buffered) fflush(stdout);
         rc = 0;                      /* Had some success */
         startoffset = offsets[1];    /* Restart after the match */
+        oldstartoffset = pcre2_get_startchar(match_data);
+        if (startoffset <= oldstartoffset)
+          {
+          if (startoffset >= length) goto END_ONE_MATCH;  /* Were at end */
+          startoffset = oldstartoffset + 1;
+          if (utf)
+            while ((matchptr[startoffset] & 0xc0) == 0x80) startoffset++;
+          }
         goto ONLY_MATCHING_RESTART;
         }
       }
@@ -1917,7 +1932,7 @@ while (ptr < endptr)
         for (;;)
           {
           startoffset = offsets[1];
-          if (startoffset >= (int)linelength + endlinelength ||
+          if (startoffset >= linelength + endlinelength ||
               !match_patterns(matchptr, length, options, startoffset, &mrc))
             break;
           FWRITE(matchptr + startoffset, 1, offsets[0] - startoffset, stdout);
@@ -1973,6 +1988,7 @@ while (ptr < endptr)
   /* Advance to after the newline and increment the line number. The file
   offset to the current line is maintained in filepos. */
 
+  END_ONE_MATCH:
   ptr += linelength + endlinelength;
   filepos += (int)(linelength + endlinelength);
   linenumber++;
@@ -2970,7 +2986,8 @@ if (locale == NULL)
   locale_from = "LC_CTYPE";
   }
 
-/* If a locale is set, use it to generate the tables the PCRE needs. */
+/* If a locale is set, use it to generate the tables the PCRE needs. Passing
+NULL to pcre2_maketables() means that malloc() is used to get the memory. */
 
 if (locale != NULL)
   {
@@ -2980,7 +2997,8 @@ if (locale != NULL)
       locale, locale_from);
     goto EXIT2;
     }
-  pcre2_set_character_tables(compile_context, pcre2_maketables(NULL));
+  character_tables = pcre2_maketables(NULL);
+  pcre2_set_character_tables(compile_context, character_tables);
   }
 
 /* Sort out colouring */
@@ -3218,6 +3236,8 @@ if (jit_stack != NULL) pcre2_jit_stack_free(jit_stack);
 #endif
 
 free(main_buffer);
+free((void *)character_tables);
+
 pcre2_compile_context_free(compile_context);
 pcre2_match_context_free(match_context);
 pcre2_match_data_free(match_data);

@@ -211,7 +211,7 @@ sure both macros are undefined; an emulation function will then be used. */
 #define PACKAGE_NAME "PCRE2"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "PCRE2 10.10"
+#define PACKAGE_STRING "PCRE2 10.20"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "pcre2"
@@ -220,7 +220,7 @@ sure both macros are undefined; an emulation function will then be used. */
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "10.10"
+#define PACKAGE_VERSION "10.20"
 
 /* The value of PARENS_NEST_LIMIT specifies the maximum depth of nested
    parentheses (of any kind) in a pattern. This limits the amount of system
@@ -237,6 +237,9 @@ sure both macros are undefined; an emulation function will then be used. */
 #ifndef PCRE2GREP_BUFSIZE
 #define PCRE2GREP_BUFSIZE 20480
 #endif
+
+/* Define to any value to include debugging code. */
+/* #undef PCRE2_DEBUG */
 
 /* If you are compiling for a system other than a Unix-like system or
    Win32, and it needs some magic to be inserted before the definition
@@ -302,7 +305,7 @@ sure both macros are undefined; an emulation function will then be used. */
 /* #undef SUPPORT_VALGRIND */
 
 /* Version number of package */
-#define VERSION "10.00"
+#define VERSION "10.20"
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
@@ -313,5 +316,4 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 /* #undef size_t */
-
 #define _CRT_SECURE_NO_WARNINGS

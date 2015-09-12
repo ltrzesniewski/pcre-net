@@ -1310,13 +1310,15 @@ for (;;)
     /* Because of the way auto-callout works during compile, a callout item is
     inserted between OP_COND and an assertion condition. */
 
-    if (*ecode == OP_CALLOUT)
+    if (*ecode == OP_CALLOUT || *ecode == OP_CALLOUT_STR)
       {
+      unsigned int callout_length = (*ecode == OP_CALLOUT)
+          ? PRIV(OP_lengths)[OP_CALLOUT] : GET(ecode, 1 + 2*LINK_SIZE);
+
       if (mb->callout != NULL)
         {
         pcre2_callout_block cb;
-        cb.version          = 0;
-        cb.callout_number   = ecode[1];
+        cb.version          = 1;
         cb.capture_top      = offset_top/2;
         cb.capture_last     = mb->capture_last & CAPLMASK;
         cb.offset_vector    = mb->ovector;
@@ -1325,8 +1327,25 @@ for (;;)
         cb.subject_length   = (PCRE2_SIZE)(mb->end_subject - mb->start_subject);
         cb.start_match      = (PCRE2_SIZE)(mstart - mb->start_subject);
         cb.current_position = (PCRE2_SIZE)(eptr - mb->start_subject);
-        cb.pattern_position = GET(ecode, 2);
-        cb.next_item_length = GET(ecode, 2 + LINK_SIZE);
+        cb.pattern_position = GET(ecode, 1);
+        cb.next_item_length = GET(ecode, 1 + LINK_SIZE);
+
+        if (*ecode == OP_CALLOUT)
+          {
+          cb.callout_number = ecode[1 + 2*LINK_SIZE];
+          cb.callout_string_offset = 0;
+          cb.callout_string = NULL;
+          cb.callout_string_length = 0;
+          }
+        else
+          {
+          cb.callout_number = 0;
+          cb.callout_string_offset = GET(ecode, 1 + 3*LINK_SIZE);
+          cb.callout_string = ecode + (1 + 4*LINK_SIZE) + 1;
+          cb.callout_string_length =
+            callout_length - (1 + 4*LINK_SIZE) - 2;
+          }
+
         if ((rrc = mb->callout(&cb, mb->callout_data)) > 0)
           RRETURN(MATCH_NOMATCH);
         if (rrc < 0) RRETURN(rrc);
@@ -1335,8 +1354,8 @@ for (;;)
       /* Advance ecode past the callout, so it now points to the condition. We
       must adjust codelink so that the value of ecode+codelink is unchanged. */
 
-      ecode += PRIV(OP_lengths)[OP_CALLOUT];
-      codelink -= PRIV(OP_lengths)[OP_CALLOUT];
+      ecode += callout_length;
+      codelink -= callout_length;
       }
 
     /* Test the various possible conditions */
@@ -1389,6 +1408,7 @@ for (;;)
       break;
 
       case OP_FALSE:
+      case OP_FAIL:   /* The assertion (?!) becomes OP_FAIL */
       break;
 
       case OP_TRUE:
@@ -1716,26 +1736,49 @@ for (;;)
     function is able to force a failure. */
 
     case OP_CALLOUT:
-    if (mb->callout != NULL)
+    case OP_CALLOUT_STR:
       {
-      pcre2_callout_block cb;
-      cb.version          = 0;
-      cb.callout_number   = ecode[1];
-      cb.capture_top      = offset_top/2;
-      cb.capture_last     = mb->capture_last & CAPLMASK;
-      cb.offset_vector    = mb->ovector;
-      cb.mark             = mb->nomatch_mark;
-      cb.subject          = mb->start_subject;
-      cb.subject_length   = (PCRE2_SIZE)(mb->end_subject - mb->start_subject);
-      cb.start_match      = (PCRE2_SIZE)(mstart - mb->start_subject);
-      cb.current_position = (PCRE2_SIZE)(eptr - mb->start_subject);
-      cb.pattern_position = GET(ecode, 2);
-      cb.next_item_length = GET(ecode, 2 + LINK_SIZE);
-      if ((rrc = mb->callout(&cb, mb->callout_data)) > 0)
-        RRETURN(MATCH_NOMATCH);
-      if (rrc < 0) RRETURN(rrc);
+      unsigned int callout_length = (*ecode == OP_CALLOUT)
+          ? PRIV(OP_lengths)[OP_CALLOUT] : GET(ecode, 1 + 2*LINK_SIZE);
+
+      if (mb->callout != NULL)
+        {
+        pcre2_callout_block cb;
+        cb.version          = 1;
+        cb.callout_number   = ecode[LINK_SIZE + 1];
+        cb.capture_top      = offset_top/2;
+        cb.capture_last     = mb->capture_last & CAPLMASK;
+        cb.offset_vector    = mb->ovector;
+        cb.mark             = mb->nomatch_mark;
+        cb.subject          = mb->start_subject;
+        cb.subject_length   = (PCRE2_SIZE)(mb->end_subject - mb->start_subject);
+        cb.start_match      = (PCRE2_SIZE)(mstart - mb->start_subject);
+        cb.current_position = (PCRE2_SIZE)(eptr - mb->start_subject);
+        cb.pattern_position = GET(ecode, 1);
+        cb.next_item_length = GET(ecode, 1 + LINK_SIZE);
+
+        if (*ecode == OP_CALLOUT)
+          {
+          cb.callout_number = ecode[1 + 2*LINK_SIZE];
+          cb.callout_string_offset = 0;
+          cb.callout_string = NULL;
+          cb.callout_string_length = 0;
+          }
+        else
+          {
+          cb.callout_number = 0;
+          cb.callout_string_offset = GET(ecode, 1 + 3*LINK_SIZE);
+          cb.callout_string = ecode + (1 + 4*LINK_SIZE) + 1;
+          cb.callout_string_length =
+            callout_length - (1 + 4*LINK_SIZE) - 2;
+          }
+
+        if ((rrc = mb->callout(&cb, mb->callout_data)) > 0)
+          RRETURN(MATCH_NOMATCH);
+        if (rrc < 0) RRETURN(rrc);
+        }
+      ecode += callout_length;
       }
-    ecode += 2 + 2*LINK_SIZE;
     break;
 
     /* Recursion either matches the current regex, or some subexpression. The
@@ -2113,13 +2156,16 @@ for (;;)
     ecode++;
     break;
 
-    /* Multiline mode: start of subject unless notbol, or after any newline. */
+    /* Multiline mode: start of subject unless notbol, or after any newline
+    except for one at the very end, unless PCRE2_ALT_CIRCUMFLEX is set. */
 
     case OP_CIRCM:
     if ((mb->moptions & PCRE2_NOTBOL) != 0 && eptr == mb->start_subject)
       RRETURN(MATCH_NOMATCH);
     if (eptr != mb->start_subject &&
-        (eptr == mb->end_subject || !WAS_NEWLINE(eptr)))
+        ((eptr == mb->end_subject &&
+           (mb->poptions & PCRE2_ALT_CIRCUMFLEX) == 0) ||
+         !WAS_NEWLINE(eptr)))
       RRETURN(MATCH_NOMATCH);
     ecode++;
     break;
@@ -3533,9 +3579,13 @@ for (;;)
             }
 
           if (possessive) continue;    /* No backtracking */
+
+          /* After \C in UTF mode, pp might be in the middle of a Unicode
+          character. Use <= pp to ensure backtracking doesn't go too far. */
+
           for(;;)
             {
-            if (eptr == pp) goto TAIL_RECURSE;
+            if (eptr <= pp) goto TAIL_RECURSE;
             RMATCH(eptr, ecode, offset_top, mb, eptrb, RM23);
             if (rrc != MATCH_NOMATCH) RRETURN(rrc);
             eptr--;
@@ -3930,9 +3980,13 @@ for (;;)
             eptr += len;
             }
           if (possessive) continue;    /* No backtracking */
+
+          /* After \C in UTF mode, pp might be in the middle of a Unicode
+          character. Use <= pp to ensure backtracking doesn't go too far. */
+
           for(;;)
             {
-            if (eptr == pp) goto TAIL_RECURSE;
+            if (eptr <= pp) goto TAIL_RECURSE;
             RMATCH(eptr, ecode, offset_top, mb, eptrb, RM30);
             if (rrc != MATCH_NOMATCH) RRETURN(rrc);
             eptr--;
@@ -4065,9 +4119,13 @@ for (;;)
             eptr += len;
             }
           if (possessive) continue;    /* No backtracking */
+
+          /* After \C in UTF mode, pp might be in the middle of a Unicode
+          character. Use <= pp to ensure backtracking doesn't go too far. */
+
           for(;;)
             {
-            if (eptr == pp) goto TAIL_RECURSE;
+            if (eptr <= pp) goto TAIL_RECURSE;
             RMATCH(eptr, ecode, offset_top, mb, eptrb, RM34);
             if (rrc != MATCH_NOMATCH) RRETURN(rrc);
             eptr--;
@@ -5636,9 +5694,13 @@ for (;;)
         /* eptr is now past the end of the maximum run */
 
         if (possessive) continue;    /* No backtracking */
+
+        /* After \C in UTF mode, pp might be in the middle of a Unicode
+        character. Use <= pp to ensure backtracking doesn't go too far. */
+
         for(;;)
           {
-          if (eptr == pp) goto TAIL_RECURSE;
+          if (eptr <= pp) goto TAIL_RECURSE;
           RMATCH(eptr, ecode, offset_top, mb, eptrb, RM44);
           if (rrc != MATCH_NOMATCH) RRETURN(rrc);
           eptr--;
@@ -5680,12 +5742,17 @@ for (;;)
 
         if (possessive) continue;    /* No backtracking */
 
+        /* We use <= pp rather than == pp to detect the start of the run while
+        backtracking because the use of \C in UTF mode can cause BACKCHAR to
+        move back past pp. This is just palliative; the use of \C in UTF mode
+        is fraught with danger. */
+
         for(;;)
           {
           int lgb, rgb;
           PCRE2_SPTR fptr;
 
-          if (eptr == pp) goto TAIL_RECURSE;   /* At start of char run */
+          if (eptr <= pp) goto TAIL_RECURSE;   /* At start of char run */
           RMATCH(eptr, ecode, offset_top, mb, eptrb, RM45);
           if (rrc != MATCH_NOMATCH) RRETURN(rrc);
 
@@ -5703,7 +5770,7 @@ for (;;)
 
           for (;;)
             {
-            if (eptr == pp) goto TAIL_RECURSE;   /* At start of char run */
+            if (eptr <= pp) goto TAIL_RECURSE;   /* At start of char run */
             fptr = eptr - 1;
             if (!utf) c = *fptr; else
               {
@@ -5951,9 +6018,13 @@ for (;;)
           }
 
         if (possessive) continue;    /* No backtracking */
+
+        /* After \C in UTF mode, pp might be in the middle of a Unicode
+        character. Use <= pp to ensure backtracking doesn't go too far. */
+
         for(;;)
           {
-          if (eptr == pp) goto TAIL_RECURSE;
+          if (eptr <= pp) goto TAIL_RECURSE;
           RMATCH(eptr, ecode, offset_top, mb, eptrb, RM46);
           if (rrc != MATCH_NOMATCH) RRETURN(rrc);
           eptr--;

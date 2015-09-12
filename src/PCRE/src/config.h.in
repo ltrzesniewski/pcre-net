@@ -214,6 +214,9 @@ sure both macros are undefined; an emulation function will then be used. */
 /* to make a symbol visible */
 #undef PCRE2POSIX_EXP_DEFN
 
+/* Define to any value to include debugging code. */
+#undef PCRE2_DEBUG
+
 /* to make a symbol visible */
 #undef PCRE2_EXP_DECL
 

@@ -382,28 +382,29 @@ either on a pattern or a data line, so they must all be distinct. */
 #define CTL_ALTGLOBAL          0x00000010u
 #define CTL_BINCODE            0x00000020u
 #define CTL_CALLOUT_CAPTURE    0x00000040u
-#define CTL_CALLOUT_NONE       0x00000080u
-#define CTL_DFA                0x00000100u
-#define CTL_FINDLIMITS         0x00000200u
-#define CTL_FULLBINCODE        0x00000400u
-#define CTL_GETALL             0x00000800u
-#define CTL_GLOBAL             0x00001000u
-#define CTL_HEXPAT             0x00002000u
-#define CTL_INFO               0x00004000u
-#define CTL_JITFAST            0x00008000u
-#define CTL_JITVERIFY          0x00010000u
-#define CTL_MARK               0x00020000u
-#define CTL_MEMORY             0x00040000u
-#define CTL_POSIX              0x00080000u
-#define CTL_PUSH               0x00100000u
-#define CTL_STARTCHAR          0x00200000u
-#define CTL_ZERO_TERMINATE     0x00400000u
+#define CTL_CALLOUT_INFO       0x00000080u
+#define CTL_CALLOUT_NONE       0x00000100u
+#define CTL_DFA                0x00000200u
+#define CTL_FINDLIMITS         0x00000400u
+#define CTL_FULLBINCODE        0x00000800u
+#define CTL_GETALL             0x00001000u
+#define CTL_GLOBAL             0x00002000u
+#define CTL_HEXPAT             0x00004000u
+#define CTL_INFO               0x00008000u
+#define CTL_JITFAST            0x00010000u
+#define CTL_JITVERIFY          0x00020000u
+#define CTL_MARK               0x00040000u
+#define CTL_MEMORY             0x00080000u
+#define CTL_POSIX              0x00100000u
+#define CTL_PUSH               0x00200000u
+#define CTL_STARTCHAR          0x00400000u
+#define CTL_ZERO_TERMINATE     0x00800000u
 
 #define CTL_BSR_SET          0x80000000u  /* This is informational */
 #define CTL_NL_SET           0x40000000u  /* This is informational */
 
 #define CTL_DEBUG            (CTL_FULLBINCODE|CTL_INFO)  /* For setting */
-#define CTL_ANYINFO          (CTL_DEBUG|CTL_BINCODE)     /* For testing */
+#define CTL_ANYINFO          (CTL_DEBUG|CTL_BINCODE|CTL_CALLOUT_INFO)
 #define CTL_ANYGLOB          (CTL_ALTGLOBAL|CTL_GLOBAL)
 
 /* These are all the controls that may be set either on a pattern or on a
@@ -431,7 +432,7 @@ typedef struct patctl {    /* Structure for pattern modifiers. */
   uint32_t  jit;
   uint32_t  stackguard_test;
   uint32_t  tables_id;
-  uint8_t   locale[LOCALESIZE];
+   uint8_t  locale[LOCALESIZE];
 } patctl;
 
 #define MAXCPYGET 10
@@ -486,6 +487,7 @@ static modstruct modlist[] = {
   { "allow_empty_class",   MOD_PAT,  MOD_OPT, PCRE2_ALLOW_EMPTY_CLASS,   PO(options) },
   { "allusedtext",         MOD_PNDP, MOD_CTL, CTL_ALLUSEDTEXT,           PO(control) },
   { "alt_bsux",            MOD_PAT,  MOD_OPT, PCRE2_ALT_BSUX,            PO(options) },
+  { "alt_circumflex",      MOD_PAT,  MOD_OPT, PCRE2_ALT_CIRCUMFLEX,      PO(options) },
   { "altglobal",           MOD_PND,  MOD_CTL, CTL_ALTGLOBAL,             PO(control) },
   { "anchored",            MOD_PD,   MOD_OPT, PCRE2_ANCHORED,            PD(options) },
   { "auto_callout",        MOD_PAT,  MOD_OPT, PCRE2_AUTO_CALLOUT,        PO(options) },
@@ -494,6 +496,7 @@ static modstruct modlist[] = {
   { "callout_capture",     MOD_DAT,  MOD_CTL, CTL_CALLOUT_CAPTURE,       DO(control) },
   { "callout_data",        MOD_DAT,  MOD_INS, 0,                         DO(callout_data) },
   { "callout_fail",        MOD_DAT,  MOD_IN2, 0,                         DO(cfail) },
+  { "callout_info",        MOD_PAT,  MOD_CTL, CTL_CALLOUT_INFO,          PO(control) },
   { "callout_none",        MOD_DAT,  MOD_CTL, CTL_CALLOUT_NONE,          DO(control) },
   { "caseless",            MOD_PATP, MOD_OPT, PCRE2_CASELESS,            PO(options) },
   { "copy",                MOD_DAT,  MOD_NN,  DO(copy_numbers),          DO(copy_names) },
@@ -523,6 +526,7 @@ static modstruct modlist[] = {
   { "match_unset_backref", MOD_PAT,  MOD_OPT, PCRE2_MATCH_UNSET_BACKREF, PO(options) },
   { "memory",              MOD_PD,   MOD_CTL, CTL_MEMORY,                PD(control) },
   { "multiline",           MOD_PATP, MOD_OPT, PCRE2_MULTILINE,           PO(options) },
+  { "never_backslash_c",   MOD_PAT,  MOD_OPT, PCRE2_NEVER_BACKSLASH_C,   PO(options) },
   { "never_ucp",           MOD_PAT,  MOD_OPT, PCRE2_NEVER_UCP,           PO(options) },
   { "never_utf",           MOD_PAT,  MOD_OPT, PCRE2_NEVER_UTF,           PO(options) },
   { "newline",             MOD_CTC,  MOD_NL,  0,                         CO(newline_convention) },
@@ -578,8 +582,8 @@ static modstruct modlist[] = {
 /* Control bits that are not ignored with 'push'. */
 
 #define PUSH_SUPPORTED_COMPILE_CONTROLS ( \
-  CTL_BINCODE|CTL_FULLBINCODE|CTL_HEXPAT|CTL_INFO|CTL_JITVERIFY| \
-  CTL_MEMORY|CTL_PUSH|CTL_BSR_SET|CTL_NL_SET)
+  CTL_BINCODE|CTL_CALLOUT_INFO|CTL_FULLBINCODE|CTL_HEXPAT|CTL_INFO| \
+  CTL_JITVERIFY|CTL_MEMORY|CTL_PUSH|CTL_BSR_SET|CTL_NL_SET)
 
 /* Controls that apply only at compile time with 'push'. */
 
@@ -840,6 +844,17 @@ are supported. */
     (void)pchars16((PCRE2_SPTR16)(p)+offset, len, utf, f); \
   else \
     (void)pchars8((PCRE2_SPTR8)(p)+offset, len, utf, f)
+
+#define PCRE2_CALLOUT_ENUMERATE(a,b,c) \
+  if (test_mode == PCRE8_MODE) \
+     a = pcre2_callout_enumerate_8(compiled_code8, \
+       (int (*)(struct pcre2_callout_enumerate_block_8 *, void *))b,c); \
+  else if (test_mode == PCRE16_MODE) \
+     a = pcre2_callout_enumerate_16(compiled_code16, \
+       (int(*)(struct pcre2_callout_enumerate_block_16 *, void *))b,c); \
+  else \
+     a = pcre2_callout_enumerate_32(compiled_code32, \
+       (int (*)(struct pcre2_callout_enumerate_block_32 *, void *))b,c)
 
 #define PCRE2_COMPILE(a,b,c,d,e,f,g) \
   if (test_mode == PCRE8_MODE) \
@@ -1167,11 +1182,11 @@ are supported. */
 
 #define SETCASTPTR(x,y) \
   if (test_mode == PCRE8_MODE) \
-    G(x,8) = (uint8_t *)y; \
+    G(x,8) = (uint8_t *)(y); \
   else if (test_mode == PCRE16_MODE) \
-    G(x,16) = (uint16_t *)y; \
+    G(x,16) = (uint16_t *)(y); \
   else \
-    G(x,32) = (uint32_t *)y
+    G(x,32) = (uint32_t *)(y)
 
 #define STRLEN(p) ((test_mode == PCRE8_MODE)? ((int)strlen((char *)p)) : \
   (test_mode == PCRE16_MODE)? ((int)strlen16((PCRE2_SPTR16)p)) : \
@@ -1267,6 +1282,14 @@ the three different cases. */
     (void)G(pchars,BITONE)((G(PCRE2_SPTR,BITONE))(p)+offset, len, utf, f); \
   else \
     (void)G(pchars,BITTWO)((G(PCRE2_SPTR,BITTWO))(p)+offset, len, utf, f)
+
+#define PCRE2_CALLOUT_ENUMERATE(a,b,c) \
+  if (test_mode == G(G(PCRE,BITONE),_MODE)) \
+     a = G(pcre2_callout_enumerate,BITONE)(G(compiled_code,BITONE), \
+       (int (*)(struct G(pcre2_callout_enumerate_block_,BITONE) *, void *))b,c); \
+  else \
+     a = G(pcre2_callout_enumerate,BITTWO)(G(compiled_code,BITTWO), \
+       (int (*)(struct G(pcre2_callout_enumerate_block_,BITTWO) *, void *))b,c)
 
 #define PCRE2_COMPILE(a,b,c,d,e,f,g) \
   if (test_mode == G(G(PCRE,BITONE),_MODE)) \
@@ -1541,9 +1564,9 @@ the three different cases. */
 
 #define SETCASTPTR(x,y) \
   if (test_mode == G(G(PCRE,BITONE),_MODE)) \
-    G(x,BITONE) = (G(G(uint,BITONE),_t) *)y; \
+    G(x,BITONE) = (G(G(uint,BITONE),_t) *)(y); \
   else \
-    G(x,BITTWO) = (G(G(uint,BITTWO),_t) *)y
+    G(x,BITTWO) = (G(G(uint,BITTWO),_t) *)(y)
 
 #define STRLEN(p) ((test_mode == G(G(PCRE,BITONE),_MODE))? \
   G(strlen,BITONE)((G(PCRE2_SPTR,BITONE))p) : \
@@ -1588,6 +1611,9 @@ the three different cases. */
   lv = pchars8((PCRE2_SPTR8)(p)+offset, len, utf, f)
 #define PCHARSV(p, offset, len, utf, f) \
   (void)pchars8((PCRE2_SPTR8)(p)+offset, len, utf, f)
+#define PCRE2_CALLOUT_ENUMERATE(a,b,c) \
+   a = pcre2_callout_enumerate_8(compiled_code8, \
+     (int (*)(struct pcre2_callout_enumerate_block_8 *, void *))b,c)
 #define PCRE2_COMPILE(a,b,c,d,e,f,g) \
   G(a,8) = pcre2_compile_8(G(b,8),c,d,e,f,G(g,8))
 #define PCRE2_DFA_MATCH(a,b,c,d,e,f,g,h,i,j) \
@@ -1655,7 +1681,7 @@ the three different cases. */
 #define SETFLD(x,y,z) G(x,8)->y = z
 #define SETFLDVEC(x,y,v,z) G(x,8)->y[v] = z
 #define SETOP(x,y,z) G(x,8) z y
-#define SETCASTPTR(x,y) G(x,8) = (uint8_t *)y
+#define SETCASTPTR(x,y) G(x,8) = (uint8_t *)(y)
 #define STRLEN(p) (int)strlen((char *)p)
 #define SUB1(a,b) G(a,8)(G(b,8))
 #define SUB2(a,b,c) G(a,8)(G(b,8),G(c,8))
@@ -1676,6 +1702,9 @@ the three different cases. */
   lv = pchars16((PCRE2_SPTR16)(p)+offset, len, utf, f)
 #define PCHARSV(p, offset, len, utf, f) \
   (void)pchars16((PCRE2_SPTR16)(p)+offset, len, utf, f)
+#define PCRE2_CALLOUT_ENUMERATE(a,b,c) \
+   a = pcre2_callout_enumerate_16(compiled_code16, \
+     (int (*)(struct pcre2_callout_enumerate_block_16 *, void *))b,c)
 #define PCRE2_COMPILE(a,b,c,d,e,f,g) \
   G(a,16) = pcre2_compile_16(G(b,16),c,d,e,f,G(g,16))
 #define PCRE2_DFA_MATCH(a,b,c,d,e,f,g,h,i,j) \
@@ -1743,7 +1772,7 @@ the three different cases. */
 #define SETFLD(x,y,z) G(x,16)->y = z
 #define SETFLDVEC(x,y,v,z) G(x,16)->y[v] = z
 #define SETOP(x,y,z) G(x,16) z y
-#define SETCASTPTR(x,y) G(x,16) = (uint16_t *)y
+#define SETCASTPTR(x,y) G(x,16) = (uint16_t *)(y)
 #define STRLEN(p) (int)strlen16((PCRE2_SPTR16)p)
 #define SUB1(a,b) G(a,16)(G(b,16))
 #define SUB2(a,b,c) G(a,16)(G(b,16),G(c,16))
@@ -1764,6 +1793,9 @@ the three different cases. */
   lv = pchars32((PCRE2_SPTR32)(p)+offset, len, utf, f)
 #define PCHARSV(p, offset, len, utf, f) \
   (void)pchars32((PCRE2_SPTR32)(p)+offset, len, utf, f)
+#define PCRE2_CALLOUT_ENUMERATE(a,b,c) \
+   a = pcre2_callout_enumerate_32(compiled_code32, \
+     (int (*)(struct pcre2_callout_enumerate_block_32 *, void *))b,c)
 #define PCRE2_COMPILE(a,b,c,d,e,f,g) \
   G(a,32) = pcre2_compile_32(G(b,32),c,d,e,f,G(g,32))
 #define PCRE2_DFA_MATCH(a,b,c,d,e,f,g,h,i,j) \
@@ -1831,7 +1863,7 @@ the three different cases. */
 #define SETFLD(x,y,z) G(x,32)->y = z
 #define SETFLDVEC(x,y,v,z) G(x,32)->y[v] = z
 #define SETOP(x,y,z) G(x,32) z y
-#define SETCASTPTR(x,y) G(x,32) = (uint32_t *)y
+#define SETCASTPTR(x,y) G(x,32) = (uint32_t *)(y)
 #define STRLEN(p) (int)strlen32((PCRE2_SPTR32)p)
 #define SUB1(a,b) G(a,32)(G(b,32))
 #define SUB2(a,b,c) G(a,32)(G(b,32),G(c,32))
@@ -3381,7 +3413,7 @@ Returns:      nothing
 static void
 show_controls(uint32_t controls, const char *before)
 {
-fprintf(outfile, "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
+fprintf(outfile, "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
   before,
   ((controls & CTL_AFTERTEXT) != 0)? " aftertext" : "",
   ((controls & CTL_ALLAFTERTEXT) != 0)? " allaftertext" : "",
@@ -3390,6 +3422,7 @@ fprintf(outfile, "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
   ((controls & CTL_ALTGLOBAL) != 0)? " altglobal" : "",
   ((controls & CTL_BINCODE) != 0)? " bincode" : "",
   ((controls & CTL_CALLOUT_CAPTURE) != 0)? " callout_capture" : "",
+  ((controls & CTL_CALLOUT_INFO) != 0)? " callout_info" : "",
   ((controls & CTL_CALLOUT_NONE) != 0)? " callout_none" : "",
   ((controls & CTL_DFA) != 0)? " dfa" : "",
   ((controls & CTL_FINDLIMITS) != 0)? " find_limits" : "",
@@ -3428,9 +3461,10 @@ static void
 show_compile_options(uint32_t options, const char *before, const char *after)
 {
 if (options == 0) fprintf(outfile, "%s <none>%s", before, after);
-else fprintf(outfile, "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
+else fprintf(outfile, "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
   before,
   ((options & PCRE2_ALT_BSUX) != 0)? " alt_bsux" : "",
+  ((options & PCRE2_ALT_CIRCUMFLEX) != 0)? " alt_circumflex" : "",
   ((options & PCRE2_ALLOW_EMPTY_CLASS) != 0)? " allow_empty_class" : "",
   ((options & PCRE2_ANCHORED) != 0)? " anchored" : "",
   ((options & PCRE2_AUTO_CALLOUT) != 0)? " auto_callout" : "",
@@ -3442,6 +3476,7 @@ else fprintf(outfile, "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
   ((options & PCRE2_FIRSTLINE) != 0)? " firstline" : "",
   ((options & PCRE2_MATCH_UNSET_BACKREF) != 0)? " match_unset_backref" : "",
   ((options & PCRE2_MULTILINE) != 0)? " multiline" : "",
+  ((options & PCRE2_NEVER_BACKSLASH_C) != 0)? " never_backslash_c" : "",
   ((options & PCRE2_NEVER_UCP) != 0)? " never_ucp" : "",
   ((options & PCRE2_NEVER_UTF) != 0)? " never_utf" : "",
   ((options & PCRE2_NO_AUTO_CAPTURE) != 0)? " no_auto_capture" : "",
@@ -3513,6 +3548,56 @@ if (pat_patctl.jit != 0)
   (void)pattern_info(PCRE2_INFO_JITSIZE, &size, FALSE);
   fprintf(outfile, "Memory allocation (JIT code): %d\n", (int)size);
   }
+}
+
+
+
+/*************************************************
+*     Callback function for callout enumeration  *
+*************************************************/
+
+/* The only differences in the callout emumeration block for different code
+unit widths are that the pointers to the subject, the most recent MARK, and a
+callout argument string point to strings of the appropriate width. Casts can be
+used to deal with this.
+
+Argument:
+  cb            pointer to enumerate block
+  callout_data  user data
+
+Returns:    0
+*/
+
+static int callout_callback(pcre2_callout_enumerate_block_8 *cb,
+  void *callout_data)
+{
+uint32_t i;
+BOOL utf = (FLD(compiled_code, overall_options) & PCRE2_UTF) != 0;
+
+(void)callout_data;  /* Not currently displayed */
+
+fprintf(outfile, "Callout ");
+if (cb->callout_string != NULL)
+  {
+  uint32_t delimiter = CODE_UNIT(cb->callout_string, -1);
+  fprintf(outfile, "%c", delimiter);
+  PCHARSV(cb->callout_string, 0,
+    cb->callout_string_length, utf, outfile);
+  for (i = 0; callout_start_delims[i] != 0; i++)
+    if (delimiter == callout_start_delims[i])
+      {
+      delimiter = callout_end_delims[i];
+      break;
+      }
+  fprintf(outfile, "%c  ", delimiter);
+  }
+else fprintf(outfile, "%d  ", cb->callout_number);
+
+fprintf(outfile, "%.*s\n",
+  (int)((cb->next_item_length == 0)? 1 : cb->next_item_length),
+  pbuffer8 + cb->pattern_position);
+
+return 0;
 }
 
 
@@ -3786,6 +3871,24 @@ if ((pat_patctl.control & CTL_INFO) != 0)
 #else
       fprintf(outfile, "JIT support is not available in this version of PCRE2\n");
 #endif
+    }
+  }
+
+if ((pat_patctl.control & CTL_CALLOUT_INFO) != 0)
+  {
+  int errorcode;
+  PCRE2_CALLOUT_ENUMERATE(errorcode, callout_callback, 0);
+  if (errorcode != 0)
+    {
+    int len;
+    fprintf(outfile, "Callout enumerate failed: error %d: ", errorcode);
+    if (errorcode < 0)
+      {
+      PCRE2_GET_ERROR_MESSAGE(len, errorcode, pbuffer);
+      PCHARSV(CASTVAR(void *, pbuffer), 0, len, FALSE, outfile);
+      }
+    fprintf(outfile, "\n");
+    return PR_SKIP;
     }
   }
 
@@ -4390,6 +4493,20 @@ if (TEST(compiled_code, ==, NULL))
   return PR_SKIP;
   }
 
+/* If forbid_utf is non-zero, we are running a non-UTF test. UTF and UCP are
+locked out at compile time, but we must also check for occurrences of \P, \p,
+and \X, which are only supported when Unicode is supported. */
+
+if (forbid_utf != 0)
+  {
+  if ((FLD(compiled_code, flags) & PCRE2_HASBKPORX) != 0)
+    {
+    fprintf(outfile, "** \\P, \\p, and \\X are not allowed after the "
+      "#forbid_utf command\n");
+    return PR_SKIP;
+    }
+  }
+
 /* Remember the maximum lookbehind, for partial matching. */
 
 if (pattern_info(PCRE2_INFO_MAXLOOKBEHIND, &maxlookbehind, FALSE) != 0)
@@ -4519,9 +4636,9 @@ return capcount;
 /* Called from a PCRE2 library as a result of the (?C) item. We print out where
 we are in the match. Yield zero unless more callouts than the fail count, or
 the callout data is not zero. The only differences in the callout block for
-different code unit widths are that the pointers to the subject and the most
-recent MARK point to strings of the appropriate width. Casts can be used to
-deal with this.
+different code unit widths are that the pointers to the subject, the most
+recent MARK, and a callout argument string point to strings of the appropriate
+width. Casts can be used to deal with this.
 
 Argument:  a pointer to a callout block
 Return:
@@ -4533,24 +4650,51 @@ callout_function(pcre2_callout_block_8 *cb, void *callout_data_ptr)
 uint32_t i, pre_start, post_start, subject_length;
 BOOL utf = (FLD(compiled_code, overall_options) & PCRE2_UTF) != 0;
 BOOL callout_capture = (dat_datctl.control & CTL_CALLOUT_CAPTURE) != 0;
-FILE *f = (first_callout || callout_capture)? outfile : NULL;
+
+/* This FILE is used for echoing the subject. This is done only once in simple
+cases. */
+
+FILE *f = (first_callout || callout_capture || cb->callout_string != NULL)?
+  outfile : NULL;
+
+/* For a callout with a string argument, show the string first because there
+isn't a tidy way to fit it in the rest of the data. */
+
+if (cb->callout_string != NULL)
+  {
+  uint32_t delimiter = CODE_UNIT(cb->callout_string, -1);
+  fprintf(outfile, "Callout (%lu): %c",
+    (unsigned long int)cb->callout_string_offset, delimiter);
+  PCHARSV(cb->callout_string, 0,
+    cb->callout_string_length, utf, outfile);
+  for (i = 0; callout_start_delims[i] != 0; i++)
+    if (delimiter == callout_start_delims[i])
+      {
+      delimiter = callout_end_delims[i];
+      break;
+      }
+  fprintf(outfile, "%c", delimiter);
+  if (!callout_capture) fprintf(outfile, "\n");
+  }
+
+/* Show captured strings if required */
 
 if (callout_capture)
   {
-  fprintf(f, "Callout %d: last capture = %d\n",
-    cb->callout_number, cb->capture_last);
-
+  if (cb->callout_string == NULL)
+    fprintf(outfile, "Callout %d:", cb->callout_number);
+  fprintf(outfile, " last capture = %d\n", cb->capture_last);
   for (i = 0; i < cb->capture_top * 2; i += 2)
     {
-    fprintf(f, "%2d: ", i/2);
+    fprintf(outfile, "%2d: ", i/2);
     if (cb->offset_vector[i] == PCRE2_UNSET)
-      fprintf(f, "<unset>");
+      fprintf(outfile, "<unset>");
     else
       {
       PCHARSV(cb->subject, cb->offset_vector[i],
         cb->offset_vector[i+1] - cb->offset_vector[i], utf, f);
       }
-    fprintf(f, "\n");
+    fprintf(outfile, "\n");
     }
   }
 
@@ -4572,8 +4716,9 @@ PCHARSV(cb->subject, cb->current_position,
 
 if (f != NULL) fprintf(f, "\n");
 
-/* Always print appropriate indicators, with callout number if not already
-shown. For automatic callouts, show the pattern offset. */
+/* For automatic callouts, show the pattern offset. Otherwise, for a numerical
+callout whose number has not already been shown with captured strings, show the
+number here. A callout with a string argument has been displayed above. */
 
 if (cb->callout_number == 255)
   {
@@ -4582,9 +4727,11 @@ if (cb->callout_number == 255)
   }
 else
   {
-  if (callout_capture) fprintf(outfile, "    ");
+  if (callout_capture || cb->callout_string != NULL) fprintf(outfile, "    ");
     else fprintf(outfile, "%3d ", cb->callout_number);
   }
+
+/* Now show position indicators */
 
 for (i = 0; i < pre_start; i++) fprintf(outfile, " ");
 fprintf(outfile, "^");
@@ -4603,7 +4750,7 @@ fprintf(outfile, "%.*s",
   pbuffer8 + cb->pattern_position);
 
 fprintf(outfile, "\n");
-first_callout = 0;
+first_callout = FALSE;
 
 if (cb->mark != last_callout_mark)
   {
@@ -4948,12 +5095,13 @@ if (dbuffer != NULL)
 #endif
 
 /* Allocate a buffer to hold the data line; len+1 is an upper bound on
-the number of code units that will be needed. */
+the number of code units that will be needed (though the buffer may have to be
+extended if replication is involved). */
 
 needlen = (size_t)(len * code_unit_size);
-while (dbuffer == NULL || needlen >= dbuffer_size)
+if (dbuffer == NULL || needlen >= dbuffer_size)
   {
-  dbuffer_size *= 2;
+  while (needlen >= dbuffer_size) dbuffer_size *= 2;
   dbuffer = (uint8_t *)realloc(dbuffer, dbuffer_size);
   if (dbuffer == NULL)
     {
@@ -4964,7 +5112,7 @@ while (dbuffer == NULL || needlen >= dbuffer_size)
 SETCASTPTR(q, dbuffer);  /* Sets q8, q16, or q32, as appropriate. */
 
 /* Scan the data line, interpreting data escapes, and put the result into a
-buffer the appropriate width buffer. In UTF mode, input can be UTF-8. */
+buffer of the appropriate width. In UTF mode, input can be UTF-8. */
 
 while ((c = *p++) != 0)
   {
@@ -4975,7 +5123,8 @@ while ((c = *p++) != 0)
 
   if (c == ']' && start_rep != NULL)
     {
-    size_t qoffset = CAST8VAR(q) - (uint8_t *)dbuffer;
+    size_t qoffset = CAST8VAR(q) - dbuffer;
+    size_t rep_offset = start_rep - dbuffer;
 
     if (*p++ != '{')
       {
@@ -4995,10 +5144,11 @@ while ((c = *p++) != 0)
       }
 
     replen = CAST8VAR(q) - start_rep;
-    needlen += replen * (i - 1);
-    while (needlen >= dbuffer_size)
+    needlen += replen * i;
+
+    if (needlen >= dbuffer_size)
       {
-      dbuffer_size *= 2;
+      while (needlen >= dbuffer_size) dbuffer_size *= 2;
       dbuffer = (uint8_t *)realloc(dbuffer, dbuffer_size);
       if (dbuffer == NULL)
         {
@@ -5006,6 +5156,7 @@ while ((c = *p++) != 0)
         exit(1);
         }
       SETCASTPTR(q, dbuffer + qoffset);
+      start_rep = dbuffer + rep_offset;
       }
 
     while (i-- > 0)
@@ -5030,9 +5181,9 @@ while ((c = *p++) != 0)
   else switch ((c = *p++))
     {
     case '\\': break;
-    case 'a': c =    7; break;
+    case 'a': c = CHAR_BEL; break;
     case 'b': c = '\b'; break;
-    case 'e': c =   27; break;
+    case 'e': c = CHAR_ESC; break;
     case 'f': c = '\f'; break;
     case 'n': c = '\n'; break;
     case 'r': c = '\r'; break;
@@ -5555,20 +5706,20 @@ else for (gmatched = 0;; gmatched++)
 
   ovector = FLD(match_data, ovector);
 
-  /* After the first time round a global loop, save the current ovector[0,1] so
-  that we can check that they do change each time. Otherwise a matching bug
-  that returns the same string causes an infinite loop. It has happened! */
+  /* After the first time round a global loop, for a normal global (/g)
+  iteration, save the current ovector[0,1] so that we can check that they do
+  change each time. Otherwise a matching bug that returns the same string
+  causes an infinite loop. It has happened! */
 
-  if (gmatched > 0)
+  if (gmatched > 0 && (dat_datctl.control & CTL_GLOBAL) != 0)
     {
     ovecsave[0] = ovector[0];
     ovecsave[1] = ovector[1];
     }
 
-  /* Set the variables on the first iteration, just to stop a compiler warning
-  when ovecsave[] is referenced below. */
+  /* For altglobal (or first time round the loop), set an "unset" value. */
 
-  else ovecsave[0] = ovecsave[1] = 0;
+  else ovecsave[0] = ovecsave[1] = PCRE2_UNSET;
 
   /* Fill the ovector with junk to detect elements that do not get set
   when they should be. */
@@ -6040,13 +6191,48 @@ else for (gmatched = 0;; gmatched++)
       if (end_offset == ulen) break;      /* End of subject */
       g_notempty = PCRE2_NOTEMPTY_ATSTART | PCRE2_ANCHORED;
       }
-    else g_notempty = 0;
 
-    /* For /g, update the start offset, leaving the rest alone */
+    /* However, even after matching a non-empty string, there is still one
+    tricky case. If a pattern contains \K within a lookbehind assertion at the
+    start, the end of the matched string can be at the offset where the match
+    started. In the case of a normal /g iteration without special action, this
+    leads to a loop that keeps on returning the same substring. The loop would
+    be caught above, but we really want to move on to the next match. */
 
-    if ((dat_datctl.control & CTL_GLOBAL) != 0) dat_datctl.offset = end_offset;
+    else
+      {
+      g_notempty = 0;   /* Set for a "normal" repeat */
+      if ((dat_datctl.control & CTL_GLOBAL) != 0)
+        {
+        PCRE2_SIZE startchar;
+        PCRE2_GET_STARTCHAR(startchar, match_data);
+        if (end_offset <= startchar)
+          {
+          if (startchar >= ulen) break;       /* End of subject */
+          end_offset = startchar + 1;
+          if (utf && test_mode != PCRE32_MODE)
+            {
+            if (test_mode == PCRE8_MODE)
+              {
+              for (; end_offset < ulen; end_offset++)
+                if ((((PCRE2_SPTR8)pp)[end_offset] & 0xc0) != 0x80) break;
+              }
+            else  /* 16-bit mode */
+              {
+              for (; end_offset < ulen; end_offset++)
+                if ((((PCRE2_SPTR16)pp)[end_offset] & 0xfc00) != 0xdc00) break;
+              }
+            }
+          }
+        }
+      }
 
-    /* For /G, update the pointer and length */
+    /* For /g (global), update the start offset, leaving the rest alone. */
+
+    if ((dat_datctl.control & CTL_GLOBAL) != 0)
+      dat_datctl.offset = end_offset;
+
+    /* For altglobal, just update the pointer and length. */
 
     else
       {

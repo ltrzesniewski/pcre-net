@@ -9,17 +9,17 @@ dnl The PCRE2_PRERELEASE feature is for identifying release candidates. It might
 dnl be defined as -RC2, for example. For real releases, it should be empty.
 
 m4_define(pcre2_major, [10])
-m4_define(pcre2_minor, [10])
+m4_define(pcre2_minor, [20])
 m4_define(pcre2_prerelease, [])
-m4_define(pcre2_date, [2015-03-06])
+m4_define(pcre2_date, [2015-06-30])
 
 # NOTE: The CMakeLists.txt file searches for the above variables in the first
 # 50 lines of this file. Please update that if the variables above are moved.
 
 # Libtool shared library interface versions (current:revision:age)
-m4_define(libpcre2_8_version,     [1:0:1])
-m4_define(libpcre2_16_version,    [1:0:1])
-m4_define(libpcre2_32_version,    [1:0:1])
+m4_define(libpcre2_8_version,     [2:0:2])
+m4_define(libpcre2_16_version,    [2:0:2])
+m4_define(libpcre2_32_version,    [2:0:2])
 m4_define(libpcre2_posix_version, [0:0:0])
 
 AC_PREREQ(2.57)
@@ -129,6 +129,12 @@ AC_ARG_ENABLE(pcre2-32,
                              [enable 32 bit character support]),
               , enable_pcre2_32=unset)
 AC_SUBST(enable_pcre2_32)
+
+# Handle --dnable-debug (disabled by default)
+AC_ARG_ENABLE(debug,
+              AS_HELP_STRING([--enable-debug],
+                             [enable debugging code]),
+              , enable_debug=no)
 
 # Handle --enable-jit (disabled by default)
 AC_ARG_ENABLE(jit,
@@ -381,6 +387,7 @@ AC_CHECK_HEADERS([windows.h], [HAVE_WINDOWS_H=1])
 AM_CONDITIONAL(WITH_PCRE2_8, test "x$enable_pcre2_8" = "xyes")
 AM_CONDITIONAL(WITH_PCRE2_16, test "x$enable_pcre2_16" = "xyes")
 AM_CONDITIONAL(WITH_PCRE2_32, test "x$enable_pcre2_32" = "xyes")
+AM_CONDITIONAL(WITH_DEBUG, test "x$enable_debug" = "xyes")
 AM_CONDITIONAL(WITH_REBUILD_CHARTABLES, test "x$enable_rebuild_chartables" = "xyes")
 AM_CONDITIONAL(WITH_JIT, test "x$enable_jit" = "xyes")
 AM_CONDITIONAL(WITH_UNICODE, test "x$enable_unicode" = "xyes")
@@ -502,6 +509,11 @@ fi
 if test "$enable_pcre2_32" = "yes"; then
   AC_DEFINE([SUPPORT_PCRE2_32], [], [
     Define to any value to enable the 32 bit PCRE2 library.])
+fi
+
+if test "$enable_debug" = "yes"; then
+  AC_DEFINE([PCRE2_DEBUG], [], [
+    Define to any value to include debugging code.])
 fi
 
 # Unless running under Windows, JIT support requires pthreads.
@@ -864,6 +876,7 @@ $PACKAGE-$VERSION configuration summary:
     Build 8-bit pcre2 library ....... : ${enable_pcre2_8}
     Build 16-bit pcre2 library ...... : ${enable_pcre2_16}
     Build 32-bit pcre2 library ...... : ${enable_pcre2_32}
+    Include debugging code .......... : ${enable_debug}
     Enable JIT compiling support .... : ${enable_jit}
     Enable Unicode support .......... : ${enable_unicode}
     Newline char/sequence ........... : ${enable_newline}

@@ -1,4 +1,4 @@
-.TH PCRE2PATTERN 3 "28 January 2015" "PCRE2 10.00"
+.TH PCRE2PATTERN 3 "13 June 2015" "PCRE2 10.20"
 .SH NAME
 PCRE2 - Perl-compatible regular expressions (revised API)
 .SH "PCRE2 REGULAR EXPRESSION DETAILS"
@@ -337,10 +337,11 @@ A second use of backslash provides a way of encoding non-printing characters
 in patterns in a visible manner. There is no restriction on the appearance of
 non-printing characters in a pattern, but when a pattern is being prepared by
 text editing, it is often easier to use one of the following escape sequences
-than the binary character it represents:
+than the binary character it represents. In an ASCII or Unicode environment,
+these escapes are as follows:
 .sp
   \ea        alarm, that is, the BEL character (hex 07)
-  \ecx       "control-x", where x is any ASCII character
+  \ecx       "control-x", where x is any printable ASCII character
   \ee        escape (hex 1B)
   \ef        form feed (hex 0C)
   \en        linefeed (hex 0A)
@@ -357,21 +358,34 @@ The precise effect of \ecx on ASCII characters is as follows: if x is a lower
 case letter, it is converted to upper case. Then bit 6 of the character (hex
 40) is inverted. Thus \ecA to \ecZ become hex 01 to hex 1A (A is 41, Z is 5A),
 but \ec{ becomes hex 3B ({ is 7B), and \ec; becomes hex 7B (; is 3B). If the
-code unit following \ec has a value greater than 127, a compile-time error
-occurs. This locks out non-ASCII characters in all modes.
+code unit following \ec has a value less than 32 or greater than 126, a
+compile-time error occurs. This locks out non-printable ASCII characters in all
+modes.
 .P
-The \ec facility was designed for use with ASCII characters, but with the
-extension to Unicode it is even less useful than it once was. It is, however,
-recognized when PCRE2 is compiled in EBCDIC mode, where data items are always
-bytes. In this mode, all values are valid after \ec. If the next character is a
-lower case letter, it is converted to upper case. Then the 0xc0 bits of the
-byte are inverted. Thus \ecA becomes hex 01, as in ASCII (A is C1), but because
-the EBCDIC letters are disjoint, \ecZ becomes hex 29 (Z is E9), and other
-characters also generate different values.
+When PCRE2 is compiled in EBCDIC mode, \ea, \ee, \ef, \en, \er, and \et
+generate the appropriate EBCDIC code values. The \ec escape is processed
+as specified for Perl in the \fBperlebcdic\fP document. The only characters
+that are allowed after \ec are A-Z, a-z, or one of @, [, \e, ], ^, _, or ?. Any
+other character provokes a compile-time error. The sequence \e@ encodes
+character code 0; the letters (in either case) encode characters 1-26 (hex 01
+to hex 1A); [, \e, ], ^, and _ encode characters 27-31 (hex 1B to hex 1F), and
+\e? becomes either 255 (hex FF) or 95 (hex 5F).
+.P
+Thus, apart from \e?, these escapes generate the same character code values as
+they do in an ASCII environment, though the meanings of the values mostly
+differ. For example, \eG always generates code value 7, which is BEL in ASCII
+but DEL in EBCDIC.
+.P
+The sequence \e? generates DEL (127, hex 7F) in an ASCII environment, but
+because 127 is not a control character in EBCDIC, Perl makes it generate the
+APC character. Unfortunately, there are several variants of EBCDIC. In most of
+them the APC character has the value 255 (hex FF), but in the one Perl calls
+POSIX-BC its value is 95 (hex 5F). If certain other characters have POSIX-BC
+values, PCRE2 makes \e? generate 95; otherwise it generates 255.
 .P
 After \e0 up to two further octal digits are read. If there are fewer than two
-digits, just those that are present are used. Thus the sequence \e0\ex\e07
-specifies two binary zeros followed by a BEL character (code value 7). Make
+digits, just those that are present are used. Thus the sequence \e0\ex\e015
+specifies two binary zeros followed by a CR character (code value 13). Make
 sure you supply two digits after the initial zero if the pattern character that
 follows is itself an octal digit.
 .P
@@ -387,11 +401,13 @@ numbers, and \eg{} to specify back references. The following paragraphs
 describe the old, ambiguous syntax.
 .P
 The handling of a backslash followed by a digit other than 0 is complicated,
-and Perl has changed in recent releases, causing PCRE2 also to change. Outside
-a character class, PCRE2 reads the digit and any following digits as a decimal
-number. If the number is less than 8, or if there have been at least that many
-previous capturing left parentheses in the expression, the entire sequence is
-taken as a \fIback reference\fP. A description of how this works is given
+and Perl has changed over time, causing PCRE2 also to change.
+.P
+Outside a character class, PCRE2 reads the digit and any following digits as a
+decimal number. If the number is less than 10, begins with the digit 8 or 9, or
+if there are at least that many previous capturing left parentheses in the
+expression, the entire sequence is taken as a \fIback reference\fP. A
+description of how this works is given
 .\" HTML <a href="#backreferences">
 .\" </a>
 later,
@@ -401,12 +417,12 @@ following the discussion of
 .\" </a>
 parenthesized subpatterns.
 .\"
+Otherwise, up to three octal digits are read to form a character code.
 .P
-Inside a character class, or if the decimal number following \e is greater than
-7 and there have not been that many capturing subpatterns, PCRE2 handles \e8
-and \e9 as the literal characters "8" and "9", and otherwise re-reads up to
-three octal digits following the backslash, using them to generate a data
-character. Any subsequent digits stand for themselves. For example:
+Inside a character class, PCRE2 handles \e8 and \e9 as the literal characters
+"8" and "9", and otherwise reads up to three octal digits following the
+backslash, using them to generate a data character. Any subsequent digits stand
+for themselves. For example, outside a character class:
 .sp
   \e040   is another way of writing an ASCII space
 .\" JOIN
@@ -425,8 +441,7 @@ character. Any subsequent digits stand for themselves. For example:
   \e377   might be a back reference, otherwise
             the value 255 (decimal)
 .\" JOIN
-  \e81    is either a back reference, or the two
-            characters "8" and "1"
+  \e81    is always a back reference
 .sp
 Note that octal values of 100 or greater that are specified using this syntax
 must not be introduced by a leading zero, because no more than three octal
@@ -1110,14 +1125,18 @@ regular expression.
 .sp
 The circumflex and dollar metacharacters are zero-width assertions. That is,
 they test for a particular condition being true without consuming any
-characters from the subject string.
+characters from the subject string. These two metacharacters are concerned with
+matching the starts and ends of lines. If the newline convention is set so that
+only the two-character sequence CRLF is recognized as a newline, isolated CR
+and LF characters are treated as ordinary data characters, and are not
+recognized as newlines.
 .P
 Outside a character class, in the default matching mode, the circumflex
 character is an assertion that is true only if the current matching point is at
 the start of the subject string. If the \fIstartoffset\fP argument of
-\fBpcre2_match()\fP is non-zero, circumflex can never match if the
-PCRE2_MULTILINE option is unset. Inside a character class, circumflex has an
-entirely different meaning
+\fBpcre2_match()\fP is non-zero, or if PCRE2_NOTBOL is set, circumflex can
+never match if the PCRE2_MULTILINE option is unset. Inside a character class,
+circumflex has an entirely different meaning
 .\" HTML <a href="#characterclass">
 .\" </a>
 (see below).
@@ -1133,22 +1152,23 @@ to be anchored.)
 .P
 The dollar character is an assertion that is true only if the current matching
 point is at the end of the subject string, or immediately before a newline at
-the end of the string (by default). Note, however, that it does not actually
-match the newline. Dollar need not be the last character of the pattern if a
-number of alternatives are involved, but it should be the last item in any
-branch in which it appears. Dollar has no special meaning in a character class.
+the end of the string (by default), unless PCRE2_NOTEOL is set. Note, however,
+that it does not actually match the newline. Dollar need not be the last
+character of the pattern if a number of alternatives are involved, but it
+should be the last item in any branch in which it appears. Dollar has no
+special meaning in a character class.
 .P
 The meaning of dollar can be changed so that it matches only at the very end of
 the string, by setting the PCRE2_DOLLAR_ENDONLY option at compile time. This
 does not affect the \eZ assertion.
 .P
-The meanings of the circumflex and dollar characters are changed if the
-PCRE2_MULTILINE option is set. When this is the case, a circumflex matches
-immediately after internal newlines as well as at the start of the subject
-string. It does not match after a newline that ends the string. A dollar
-matches before any newlines in the string, as well as at the very end, when
-PCRE2_MULTILINE is set. When newline is specified as the two-character
-sequence CRLF, isolated CR and LF characters do not indicate newlines.
+The meanings of the circumflex and dollar metacharacters are changed if the
+PCRE2_MULTILINE option is set. When this is the case, a dollar character
+matches before any newlines in the string, as well as at the very end, and a
+circumflex matches immediately after internal newlines as well as at the start
+of the subject string. It does not match after a newline that ends the string,
+for compatibility with Perl. However, this can be changed by setting the
+PCRE2_ALT_CIRCUMFLEX option.
 .P
 For example, the pattern /^abc$/ matches the subject string "def\enabc" (where
 \en represents a newline) in multiline mode, but not otherwise. Consequently,
@@ -1200,12 +1220,15 @@ whether or not a UTF mode is set. In the 8-bit library, one code unit is one
 byte; in the 16-bit library it is a 16-bit unit; in the 32-bit library it is a
 32-bit unit. Unlike a dot, \eC always matches line-ending characters. The
 feature is provided in Perl in order to match individual bytes in UTF-8 mode,
-but it is unclear how it can usefully be used. Because \eC breaks up characters
-into individual code units, matching one unit with \eC in a UTF mode means that
-the rest of the string may start with a malformed UTF character. This has
-undefined results, because PCRE2 assumes that it is dealing with valid UTF
-strings (and by default it checks this at the start of processing unless the
-PCRE2_NO_UTF_CHECK option is used).
+but it is unclear how it can usefully be used.
+.P
+Because \eC breaks up characters into individual code units, matching one unit
+with \eC in UTF-8 or UTF-16 mode means that the rest of the string may start
+with a malformed UTF character. This has undefined results, because PCRE2
+assumes that it is matching character by character in a valid UTF string (by
+default it checks the subject string's validity at the start of processing
+unless the PCRE2_NO_UTF_CHECK option is used). An application can lock out the
+use of \eC by setting the PCRE2_NEVER_BACKSLASH_C option.
 .P
 PCRE2 does not allow \eC to appear in lookbehind assertions
 .\" HTML <a href="#lookbehind">
@@ -1482,7 +1505,8 @@ unset these options by preceding the letter with a hyphen, and a combined
 setting and unsetting such as (?im-sx), which sets PCRE2_CASELESS and
 PCRE2_MULTILINE while unsetting PCRE2_DOTALL and PCRE2_EXTENDED, is also
 permitted. If a letter appears both before and after the hyphen, the option is
-unset.
+unset. An empty options setting "(?)" is allowed. Needless to say, it has no
+effect.
 .P
 The PCRE2-specific options PCRE2_DUPNAMES and PCRE2_UNGREEDY can be changed in
 the same way as the Perl-compatible options by using the characters J and U
@@ -1511,11 +1535,19 @@ branch is abandoned before the option setting. This is because the effects of
 option settings happen at compile time. There would be some very weird
 behaviour otherwise.
 .P
+As a convenient shorthand, if any option settings are required at the start of
+a non-capturing subpattern (see the next section), the option letters may
+appear between the "?" and the ":". Thus the two patterns
+.sp
+  (?i:saturday|sunday)
+  (?:(?i)saturday|sunday)
+.sp
+match exactly the same set of strings.
+.P
 \fBNote:\fP There are other PCRE2-specific options that can be set by the
-application when the compiling function is called.
-The pattern can contain special leading sequences such as (*CRLF) to override
-what the application has set or what has been defaulted. Details are given in
-the section entitled
+application when the compiling function is called. The pattern can contain
+special leading sequences such as (*CRLF) to override what the application has
+set or what has been defaulted. Details are given in the section entitled
 .\" HTML <a href="#newlineseq">
 .\" </a>
 "Newline sequences"
@@ -2821,42 +2853,69 @@ same pair of parentheses when there is a repetition.
 PCRE2 provides a similar feature, but of course it cannot obey arbitrary Perl
 code. The feature is called "callout". The caller of PCRE2 provides an external
 function by putting its entry point in a match context using the function
-\fBpcre2_set_callout()\fP and passing the context to \fBpcre2_match()\fP or
-\fBpcre2_dfa_match()\fP. If no match context is passed, or if the callout entry
-point is set to NULL, callouts are disabled.
+\fBpcre2_set_callout()\fP, and then passing that context to \fBpcre2_match()\fP
+or \fBpcre2_dfa_match()\fP. If no match context is passed, or if the callout
+entry point is set to NULL, callouts are disabled.
 .P
-Within a regular expression, (?C) indicates the points at which the external
-function is to be called. If you want to identify different callout points, you
-can put a number less than 256 after the letter C. The default value is zero.
-For example, this pattern has two callout points:
+Within a regular expression, (?C<arg>) indicates a point at which the external
+function is to be called. There are two kinds of callout: those with a
+numerical argument and those with a string argument. (?C) on its own with no
+argument is treated as (?C0). A numerical argument allows the application to
+distinguish between different callouts. String arguments were added for release
+10.20 to make it possible for script languages that use PCRE2 to embed short
+scripts within patterns in a similar way to Perl.
+.P
+During matching, when PCRE2 reaches a callout point, the external function is
+called. It is provided with the number or string argument of the callout, the
+position in the pattern, and one item of data that is also set in the match
+block. The callout function may cause matching to proceed, to backtrack, or to
+fail.
+.P
+By default, PCRE2 implements a number of optimizations at matching time, and
+one side-effect is that sometimes callouts are skipped. If you need all
+possible callouts to happen, you need to set options that disable the relevant
+optimizations. More details, including a complete description of the
+programming interface to the callout function, are given in the
+.\" HREF
+\fBpcre2callout\fP
+.\"
+documentation.
+.
+.
+.SS "Callouts with numerical arguments"
+.rs
+.sp
+If you just want to have a means of identifying different callout points, put a
+number less than 256 after the letter C. For example, this pattern has two
+callout points:
 .sp
   (?C1)abc(?C2)def
 .sp
-If the PCRE2_AUTO_CALLOUT flag is passed to \fBpcre2_compile()\fP, callouts are
-automatically installed before each item in the pattern. They are all numbered
-255. If there is a conditional group in the pattern whose condition is an
-assertion, an additional callout is inserted just before the condition. An
-explicit callout may also be set at this position, as in this example:
+If the PCRE2_AUTO_CALLOUT flag is passed to \fBpcre2_compile()\fP, numerical
+callouts are automatically installed before each item in the pattern. They are
+all numbered 255. If there is a conditional group in the pattern whose
+condition is an assertion, an additional callout is inserted just before the
+condition. An explicit callout may also be set at this position, as in this
+example:
 .sp
   (?(?C9)(?=a)abc|def)
 .sp
 Note that this applies only to assertion conditions, not to other types of
 condition.
-.P
-During matching, when PCRE2 reaches a callout point, the external function is
-called. It is provided with the number of the callout, the position in the
-pattern, and one item of data that is also set in the match block. The callout
-function may cause matching to proceed, to backtrack, or to fail.
-.P
-By default, PCRE2 implements a number of optimizations at matching time, and
-one side-effect is that sometimes callouts are skipped. If you need all
-possible callouts to happen, you need to set options that disable the relevant
-optimizations. More details, and a complete description of the interface to the
-callout function, are given in the
-.\" HREF
-\fBpcre2callout\fP
-.\"
-documentation.
+.
+.
+.SS "Callouts with string arguments"
+.rs
+.sp
+A delimited string may be used instead of a number as a callout argument. The
+starting delimiter must be one of ` ' " ^ % # $ { and the ending delimiter is
+the same as the start, except for {, where the ending delimiter is }. If the
+ending delimiter is needed within the string, it must be doubled. For
+example:
+.sp
+  (?C'ab ''c'' d')xyz(?C{any text})pqr
+.sp
+The doubling is removed before the string is passed to the callout function.
 .
 .
 .\" HTML <a name="backtrackcontrol"></a>
@@ -3302,6 +3361,6 @@ Cambridge, England.
 .rs
 .sp
 .nf
-Last updated: 28 January 2015
+Last updated: 13 June 2015
 Copyright (c) 1997-2015 University of Cambridge.
 .fi

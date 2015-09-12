@@ -84,7 +84,7 @@ static const char compile_error_texts[] =
   /* 15 */
   "reference to non-existent subpattern\0"
   "pattern passed as NULL\0"
-  "unknown compile-time option bit(s)\0"
+  "unrecognised compile-time option bit(s)\0"
   "missing ) after (?# comment\0"
   "parentheses are too deeply nested\0"
   /* 20 */
@@ -97,7 +97,7 @@ static const char compile_error_texts[] =
   "lookbehind assertion is not fixed length\0"
   "malformed number or name after (?(\0"
   "conditional group contains more than two branches\0"
-  "assertion expected after (?(\0"
+  "assertion expected after (?( or (?(?C)\0"
   "(?R or (?[+-]digits must be followed by )\0"
   /* 30 */
   "unknown POSIX class name\0"
@@ -145,7 +145,11 @@ static const char compile_error_texts[] =
   "different names for subpatterns of the same number are not allowed\0"
   "(*MARK) must have an argument\0"
   "non-hex character in \\x{} (closing brace missing?)\0"
+#ifndef EBCDIC
   "\\c must be followed by a printable ASCII character\0"
+#else
+  "\\c must be followed by a letter or one of [\\]^_?\0"
+#endif
   "\\k is not followed by a braced, angle-bracketed, or quoted name\0"
   /* 70 */
   "internal error: unknown opcode in find_fixedlength()\0"
@@ -161,6 +165,10 @@ static const char compile_error_texts[] =
   "syntax error in (?(VERSION condition\0"
   /* 80 */
   "internal error: unknown opcode in auto_possessify()\0"
+  "missing terminating delimiter for callout with string argument\0"
+  "unrecognized string delimiter follows (?C\0"
+  "using \\C is disabled by the application\0"
+  "(?| and/or (?J: or (?x: parentheses are too deeply nested\0"
   ;
 
 /* Match-time and UTF error texts are in the same format. */
