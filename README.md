@@ -8,8 +8,13 @@ PCRE.NET
 
 PCRE.NET is a .NET wrapper for the [PCRE library](http://www.pcre.org/). The goal of this project is to bring most of PCRE's features for use from .NET applications with as little overhead as possible.
 
-**Status:** Version **0.5**, based on PCRE **10.10**, is available on [NuGet](https://www.nuget.org/packages/PCRE.NET). Feedback is welcome.  
+**Status:** Version **0.6**, based on PCRE **10.20**, is available on [NuGet](https://www.nuget.org/packages/PCRE.NET). Feedback is welcome.  
 As it is still at major version 0, the API may change anytime.
+
+## Dependencies ##
+
+- Version 0.6 requires the [Visual C++ 2015 Redistributable](https://www.microsoft.com/en-us/download/details.aspx?id=48145) package to be installed.
+- Versions prior to 0.6 require the [Visual C++ 2013 Redistributable](http://www.microsoft.com/en-us/download/details.aspx?id=40784) package.
 
 ## Features ##
 
@@ -36,13 +41,8 @@ Library highlights:
 - Support for compiled patterns (x86/x64 JIT)
 - Lazy evaluation whenever possible (for instance `PcreRegex.Matches` returns `IEnumerable<PcreMatch>`)
 - The API is similar to .NET's `System.Text.RegularExpressions`
-- Callout support
+- Callout support (numbered and string-based)
 - Mark retrieval support
-
-## Dependencies ##
-
-PCRE.NET depends on the [Visual C++ 2013 Redistributable](http://www.microsoft.com/en-us/download/details.aspx?id=40784) package.
-Specifically, it requires `msvcr120.dll` to be available.
 
 ## Example usage ##
 
@@ -130,6 +130,7 @@ var isValidJson = regex.IsMatch(subject);
 
 ## To do ##
 
+- Implement a less verbose managed/native interface
 - Include more tests from the PCRE test suite
 - Documentation
 - XML doc comments
