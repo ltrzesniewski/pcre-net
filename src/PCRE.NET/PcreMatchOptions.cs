@@ -10,8 +10,8 @@ namespace PCRE
 
         Anchored = PatternOptions.Anchored,
 
-        NotBeginningOfLine = PatternOptions.NotBol,
-        NotEndOfLine = PatternOptions.NotEol,
+        NotBol = PatternOptions.NotBol,
+        NotEol = PatternOptions.NotEol,
         NotEmpty = PatternOptions.NotEmpty,
         NotEmptyAtStart = PatternOptions.NotEmptyAtStart,
 

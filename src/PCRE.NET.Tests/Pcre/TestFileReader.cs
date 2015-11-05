@@ -125,7 +125,7 @@ namespace PCRE.Tests.Pcre
                         break;
 
                     case "dupnames":
-                        pattern.PatternOptions |= PcreOptions.DuplicateNames;
+                        pattern.PatternOptions |= PcreOptions.DupNames;
                         break;
 
                     case "mark":
@@ -170,7 +170,7 @@ namespace PCRE.Tests.Pcre
                         break;
 
                     case "firstline":
-                        pattern.PatternOptions |= PcreOptions.FirstLineOnly;
+                        pattern.PatternOptions |= PcreOptions.FirstLine;
                         break;
 
                     case "alt_bsux":

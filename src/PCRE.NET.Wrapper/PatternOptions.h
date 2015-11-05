@@ -16,7 +16,7 @@ namespace PCRE {
 			AltBsUX                    = PCRE2_ALT_BSUX,
 			AltCircumflex              = PCRE2_ALT_CIRCUMFLEX,
 			AutoCallout                = PCRE2_AUTO_CALLOUT,
-			CaseLess                   = PCRE2_CASELESS,
+			Caseless                   = PCRE2_CASELESS,
 			DollarEndOnly              = PCRE2_DOLLAR_ENDONLY,
 			DotAll                     = PCRE2_DOTALL,
 			DupNames                   = PCRE2_DUPNAMES,

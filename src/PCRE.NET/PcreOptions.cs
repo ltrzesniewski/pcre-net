@@ -9,40 +9,51 @@ namespace PCRE
         None = 0,
 
         // Normal options
-        IgnoreCase = PatternOptions.CaseLess,
+        IgnoreCase = PatternOptions.Caseless,
+        Caseless = PatternOptions.Caseless,
+
         MultiLine = PatternOptions.MultiLine,
+
         Singleline = PatternOptions.DotAll,
+        DotAll = PatternOptions.DotAll,
+
         ExplicitCapture = PatternOptions.NoAutoCapture,
+        NoAutoCapture = PatternOptions.NoAutoCapture,
+
         IgnorePatternWhitespace = PatternOptions.Extended,
+        Extended = PatternOptions.Extended,
+
         JavaScript = PatternOptions.AltBsUX | PatternOptions.MatchUnsetBackref,
+        AltBsUX = PatternOptions.AltBsUX,
+        MatchUnsetBackref = PatternOptions.MatchUnsetBackref,
+
         Unicode = PatternOptions.Ucp,
+        Ucp = PatternOptions.Ucp,
 
         Anchored = PatternOptions.Anchored,
         Ungreedy = PatternOptions.Ungreedy,
-        NotBeginningOfLine = PatternOptions.NotBol,
-        NotEndOfLine = PatternOptions.NotEol,
+        NotBol = PatternOptions.NotBol,
+        NotEol = PatternOptions.NotEol,
         NotEmpty = PatternOptions.NotEmpty,
         NotEmptyAtStart = PatternOptions.NotEmptyAtStart,
-        FirstLineOnly = PatternOptions.FirstLine,
-        DuplicateNames = PatternOptions.DupNames,
+        FirstLine = PatternOptions.FirstLine,
+        DupNames = PatternOptions.DupNames,
         AutoCallout = PatternOptions.AutoCallout,
 
         NoStartOptimize = PatternOptions.NoStartOptimize,
         NoAutoPossess = PatternOptions.NoAutoPossess,
         DollarEndOnly = PatternOptions.DollarEndOnly,
 
-        AltBsUX =  PatternOptions.AltBsUX,
-        AltCircumflex =  PatternOptions.AltCircumflex,
+        AltCircumflex = PatternOptions.AltCircumflex,
         AllowEmptyClass = PatternOptions.AllowEmptyClass,
-        MatchUnsetBackref = PatternOptions.MatchUnsetBackref,
         NoDotStarAnchor = PatternOptions.NoDotStarAnchor,
 
-        NoPatternUtfCheck = PatternOptions.NoUtfCheck,
+        NoUtfCheck = PatternOptions.NoUtfCheck,
         NeverUcp = PatternOptions.NeverUcp,
-        NeverBackslashC = PatternOptions.NeverBackslashC,
+        NeverBackslashC = PatternOptions.NeverBackslashC,       
 
         // Extra options
         Compiled = 1L << 32,
-        CompiledPartial = 1L << 33,
+        CompiledPartial = 1L << 33
     }
 }

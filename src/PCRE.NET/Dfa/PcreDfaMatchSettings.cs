@@ -27,7 +27,7 @@ namespace PCRE.Dfa
                 StartIndex = StartIndex,
                 AdditionalOptions = ((PcreMatchOptions)AdditionalOptions).ToPatternOptions(),
                 CalloutHandler = PcreMatchSettings.WrapCallout(OnCallout),
-                DfaMaxResults = (AdditionalOptions & PcreDfaMatchOptions.ShortestMatch) != 0 ? 1 : MaxResults,
+                DfaMaxResults = (AdditionalOptions & PcreDfaMatchOptions.DfaShortest) != 0 ? 1 : MaxResults,
                 DfaWorkspaceSize = WorkspaceSize
             };
 

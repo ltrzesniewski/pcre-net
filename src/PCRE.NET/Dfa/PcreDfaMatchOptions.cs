@@ -10,8 +10,8 @@ namespace PCRE.Dfa
 
         Anchored = PatternOptions.Anchored,
 
-        NotBeginningOfLine = PatternOptions.NotBol,
-        NotEndOfLine = PatternOptions.NotEol,
+        NotBol = PatternOptions.NotBol,
+        NotEol = PatternOptions.NotEol,
         NotEmpty = PatternOptions.NotEmpty,
         NotEmptyAtStart = PatternOptions.NotEmptyAtStart,
 
@@ -22,6 +22,6 @@ namespace PCRE.Dfa
 
         NoUtfCheck = PatternOptions.NoUtfCheck,
 
-        ShortestMatch = PatternOptions.DfaShortest
+        DfaShortest = PatternOptions.DfaShortest
     }
 }

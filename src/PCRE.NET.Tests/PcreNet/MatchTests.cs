@@ -50,7 +50,7 @@ namespace PCRE.Tests.PcreNet
 
             Assert.That(match[2], Is.Not.Null);
             Assert.That(match[2].Success, Is.False);
-            Assert.That(match[2].Value, Is.SameAs(String.Empty));
+            Assert.That(match[2].Value, Is.SameAs(string.Empty));
             Assert.That(match[2].Index, Is.EqualTo(-1));
             Assert.That(match[2].Length, Is.EqualTo(0));
 
@@ -129,21 +129,21 @@ namespace PCRE.Tests.PcreNet
         [Test]
         public void should_allow_duplicate_names()
         {
-            var re = new PcreRegex(@"(?<g>a)?(?<g>b)?(?<g>c)?", PcreOptions.DuplicateNames);
+            var re = new PcreRegex(@"(?<g>a)?(?<g>b)?(?<g>c)?", PcreOptions.DupNames);
             var match = re.Match("b");
 
             Assert.That(match, Is.Not.Null);
             Assert.That(match.Success, Is.True);
             Assert.That(match["g"].Value, Is.EqualTo("b"));
 
-            Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo(new[] { false, true, false }));
+            Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo(new[] {false, true, false}));
 
             match = re.Match("bc");
             Assert.That(match, Is.Not.Null);
             Assert.That(match.Success, Is.True);
             Assert.That(match["g"].Value, Is.EqualTo("b"));
 
-            Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo(new[] { false, true, true }));
+            Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo(new[] {false, true, true}));
         }
 
         [Test]
@@ -156,7 +156,7 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match.Success, Is.True);
             Assert.That(match["g"].Value, Is.EqualTo("b"));
 
-            Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo(new[] { false, true, true }));
+            Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo(new[] {false, true, true}));
         }
 
         [Test]
@@ -183,7 +183,7 @@ namespace PCRE.Tests.PcreNet
             var match = regex.Match(
                 "1542: not_this, 1764: hello",
                 data => data.Number == 1
-                        && int.Parse(data.Match[1].Value) % 42 == 0
+                        && int.Parse(data.Match[1].Value)%42 == 0
                     ? PcreCalloutResult.Pass
                     : PcreCalloutResult.Fail);
 
@@ -213,9 +213,9 @@ namespace PCRE.Tests.PcreNet
                 Assert.That(data.Match.Value, Is.EqualTo("a"));
                 Assert.That(data.Match[1].Value, Is.EqualTo("a"));
                 Assert.That(data.Match[2].Success, Is.False);
-                Assert.That(data.Match[2].Value, Is.SameAs(String.Empty));
+                Assert.That(data.Match[2].Value, Is.SameAs(string.Empty));
                 Assert.That(data.Match[3].Success, Is.False);
-                Assert.That(data.Match[3].Value, Is.SameAs(String.Empty));
+                Assert.That(data.Match[3].Value, Is.SameAs(string.Empty));
 
                 Assert.That(data.Match.Mark, Is.EqualTo("foo"));
 
@@ -318,9 +318,9 @@ namespace PCRE.Tests.PcreNet
                 Assert.That(data.Match.Value, Is.EqualTo("a"));
                 Assert.That(data.Match[1].Value, Is.EqualTo("a"));
                 Assert.That(data.Match[2].Success, Is.False);
-                Assert.That(data.Match[2].Value, Is.SameAs(String.Empty));
+                Assert.That(data.Match[2].Value, Is.SameAs(string.Empty));
                 Assert.That(data.Match[3].Success, Is.False);
-                Assert.That(data.Match[3].Value, Is.SameAs(String.Empty));
+                Assert.That(data.Match[3].Value, Is.SameAs(string.Empty));
 
                 Assert.That(data.Match.Mark, Is.EqualTo("foo"));
 

@@ -37,7 +37,7 @@ namespace PCRE.Tests.PcreNet.Dfa
         public void should_get_shortest_match()
         {
             var re = new PcreRegex(@"<.*>");
-            var result = re.Dfa.Match("This is <something> <something else> <something further> no more", PcreDfaMatchOptions.ShortestMatch);
+            var result = re.Dfa.Match("This is <something> <something else> <something further> no more", PcreDfaMatchOptions.DfaShortest);
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Success, Is.True);
