@@ -11,6 +11,8 @@ PCRE.NET is a .NET wrapper for the [PCRE library](http://www.pcre.org/). The goa
 **Status:** Version **0.6**, based on PCRE **10.20**, is available on [NuGet](https://www.nuget.org/packages/PCRE.NET). Feedback is welcome.  
 As it is still at major version 0, the API may change anytime.
 
+The current version on the *master* branch is **0.6.1**, based on PCRE **10.21**.
+
 ## Dependencies ##
 
 - Version 0.6 requires the [Visual C++ 2015 Redistributable](https://www.microsoft.com/en-us/download/details.aspx?id=48145) package to be installed.
@@ -37,7 +39,6 @@ The following regex operations are supported:
 Library highlights:
 
 - No marshaling - uses a mixed mode assembly to maximize performance
-- Support for studied patterns
 - Support for compiled patterns (x86/x64 JIT)
 - Lazy evaluation whenever possible (for instance `PcreRegex.Matches` returns `IEnumerable<PcreMatch>`)
 - The API is similar to .NET's `System.Text.RegularExpressions`
