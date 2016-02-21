@@ -31,6 +31,9 @@ namespace PCRE.Tests.Pcre
                     if (string.IsNullOrWhiteSpace(line))
                         break;
 
+                    if (line.StartsWith("\\="))
+                        continue;
+
                     line = line.Trim();
                     testCase.SubjectLines.Add(line);
                 }

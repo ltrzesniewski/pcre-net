@@ -16,6 +16,7 @@ namespace PCRE {
 			FirstCodeUnit              = PCRE2_INFO_FIRSTCODEUNIT,
 			FirstCodeType              = PCRE2_INFO_FIRSTCODETYPE,
 			FirstBitmap                = PCRE2_INFO_FIRSTBITMAP,
+			HasBackslashC              = PCRE2_INFO_HASBACKSLASHC,
 			HasCrOrLf                  = PCRE2_INFO_HASCRORLF,
 			JChanged                   = PCRE2_INFO_JCHANGED,
 			JitSize                    = PCRE2_INFO_JITSIZE,

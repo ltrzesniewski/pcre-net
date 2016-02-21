@@ -45,6 +45,7 @@ namespace PCRE
         DollarEndOnly = PatternOptions.DollarEndOnly,
 
         AltCircumflex = PatternOptions.AltCircumflex,
+        AltVerbNames = PatternOptions.AltVerbNames,
         AllowEmptyClass = PatternOptions.AllowEmptyClass,
         NoDotStarAnchor = PatternOptions.NoDotStarAnchor,
 

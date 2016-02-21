@@ -46,6 +46,9 @@ namespace PCRE.Tests.Pcre
                     if (string.IsNullOrWhiteSpace(line))
                         break;
 
+                    if (line.StartsWith("\\="))
+                        continue;
+
                     if (pattern.ReplaceWith != null) // Not supported yet
                     {
                         while (!string.IsNullOrWhiteSpace(line))

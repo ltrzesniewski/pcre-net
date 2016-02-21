@@ -1,4 +1,4 @@
-.TH PCRE2SYNTAX 3 "13 June 2015" "PCRE2 10.20"
+.TH PCRE2SYNTAX 3 "16 October 2015" "PCRE2 10.21"
 .SH NAME
 PCRE2 - Perl-compatible regular expressions (revised API)
 .SH "PCRE2 REGULAR EXPRESSION SYNTAX SUMMARY"
@@ -81,9 +81,10 @@ it matches a literal "u".
   \eW         a "non-word" character
   \eX         a Unicode extended grapheme cluster
 .sp
-The application can lock out the use of \eC by setting the
-PCRE2_NEVER_BACKSLASH_C option. It is dangerous because it may leave the
-current matching point in the middle of a UTF-8 or UTF-16 character.
+\eC is dangerous because it may leave the current matching point in the middle
+of a UTF-8 or UTF-16 character. The application can lock out the use of \eC by
+setting the PCRE2_NEVER_BACKSLASH_C option. It is also possible to build PCRE2
+with the use of \eC permanently disabled.
 .P
 By default, \ed, \es, and \ew match only ASCII characters, even in UTF-8 mode
 or in the 16-bit and 32-bit libraries. However, if locale-specific matching is
@@ -159,6 +160,8 @@ at release 5.18.
 .SH "SCRIPT NAMES FOR \ep AND \eP"
 .rs
 .sp
+Ahom,
+Anatolian_Hieroglyphs,
 Arabic,
 Armenian,
 Avestan,
@@ -199,6 +202,7 @@ Gurmukhi,
 Han,
 Hangul,
 Hanunoo,
+Hatran,
 Hebrew,
 Hiragana,
 Imperial_Aramaic,
@@ -235,12 +239,14 @@ Miao,
 Modi,
 Mongolian,
 Mro,
+Multani,
 Myanmar,
 Nabataean,
 New_Tai_Lue,
 Nko,
 Ogham,
 Ol_Chiki,
+Old_Hungarian,
 Old_Italic,
 Old_North_Arabian,
 Old_Permic,
@@ -262,6 +268,7 @@ Saurashtra,
 Sharada,
 Shavian,
 Siddham,
+SignWriting,
 Sinhala,
 Sora_Sompeng,
 Sundanese,
@@ -570,6 +577,6 @@ Cambridge, England.
 .rs
 .sp
 .nf
-Last updated: 13 June 2015
+Last updated: 16 October 2015
 Copyright (c) 1997-2015 University of Cambridge.
 .fi

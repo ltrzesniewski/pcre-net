@@ -52,8 +52,6 @@ InternalRegex::InternalRegex(CompileContext^ context)
 	if (nameCount)
 	{
 		int nameEntrySize = GetInfoInt32(InfoKey::NameEntrySize);
-		int effectiveOptions = GetInfoInt32(InfoKey::AllOptions);
-		bool allowDuplicateNames = (effectiveOptions & PCRE2_DUPNAMES) != 0;
 
 		_captureNames = gcnew System::Collections::Generic::Dictionary<String^, array<int>^>(nameCount, StringComparer::Ordinal);
 
@@ -69,7 +67,7 @@ InternalRegex::InternalRegex(CompileContext^ context)
 			String^ groupName = gcnew String(item + 1);
 			array<int>^ indexes = nullptr;
 
-			if (allowDuplicateNames && _captureNames->TryGetValue(groupName, indexes))
+			if (_captureNames->TryGetValue(groupName, indexes))
 			{
 				Array::Resize(indexes, indexes->Length + 1);
 				indexes[indexes->Length - 1] = groupIndex;

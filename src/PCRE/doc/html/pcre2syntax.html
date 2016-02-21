@@ -111,9 +111,10 @@ it matches a literal "u".
   \W         a "non-word" character
   \X         a Unicode extended grapheme cluster
 </pre>
-The application can lock out the use of \C by setting the
-PCRE2_NEVER_BACKSLASH_C option. It is dangerous because it may leave the
-current matching point in the middle of a UTF-8 or UTF-16 character.
+\C is dangerous because it may leave the current matching point in the middle
+of a UTF-8 or UTF-16 character. The application can lock out the use of \C by
+setting the PCRE2_NEVER_BACKSLASH_C option. It is also possible to build PCRE2
+with the use of \C permanently disabled.
 </P>
 <P>
 By default, \d, \s, and \w match only ASCII characters, even in UTF-8 mode
@@ -187,6 +188,8 @@ at release 5.18.
 </P>
 <br><a name="SEC7" href="#TOC1">SCRIPT NAMES FOR \p AND \P</a><br>
 <P>
+Ahom,
+Anatolian_Hieroglyphs,
 Arabic,
 Armenian,
 Avestan,
@@ -227,6 +230,7 @@ Gurmukhi,
 Han,
 Hangul,
 Hanunoo,
+Hatran,
 Hebrew,
 Hiragana,
 Imperial_Aramaic,
@@ -263,12 +267,14 @@ Miao,
 Modi,
 Mongolian,
 Mro,
+Multani,
 Myanmar,
 Nabataean,
 New_Tai_Lue,
 Nko,
 Ogham,
 Ol_Chiki,
+Old_Hungarian,
 Old_Italic,
 Old_North_Arabian,
 Old_Permic,
@@ -290,6 +296,7 @@ Saurashtra,
 Sharada,
 Shavian,
 Siddham,
+SignWriting,
 Sinhala,
 Sora_Sompeng,
 Sundanese,
@@ -582,7 +589,7 @@ Cambridge, England.
 </P>
 <br><a name="SEC27" href="#TOC1">REVISION</a><br>
 <P>
-Last updated: 13 June 2015
+Last updated: 16 October 2015
 <br>
 Copyright &copy; 1997-2015 University of Cambridge.
 <br>

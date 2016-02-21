@@ -204,12 +204,14 @@ for (;;)
     printf "data> " if $interact;
     last NEXT_RE if ! ($_ = <$infile>);
     chomp;
-    printf $outfile "$_\n" if ! $interact;
+    printf $outfile "%s", "$_\n" if ! $interact;
 
     s/\s+$//;  # Remove trailing space
     s/^\s+//;  # Remove leading space
 
     last if ($_ eq "");
+    next if $_ =~ /^\\=(?:\s|$)/;   # Comment line
+
     $x = eval "\"$_\"";   # To get escapes processed
 
     # Empty array for holding results, ensure $REGERROR and $REGMARK are

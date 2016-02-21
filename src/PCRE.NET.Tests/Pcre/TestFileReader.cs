@@ -43,6 +43,9 @@ namespace PCRE.Tests.Pcre
                 if (line.StartsWith("#"))
                     continue; // TODO : Interpret that
 
+                if (line.StartsWith("\\="))
+                    continue;
+
                 line = line.TrimStart();
 
                 if (line[0] <= ' ')

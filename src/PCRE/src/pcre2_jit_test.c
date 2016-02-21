@@ -7,7 +7,7 @@ and semantics are as close as possible to those of the Perl 5 language.
 
                        Written by Philip Hazel
      Original API code Copyright (c) 1997-2012 University of Cambridge
-         New API code Copyright (c) 2014 University of Cambridge
+         New API code Copyright (c) 2016 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -188,6 +188,7 @@ static struct regression_test_case regression_test_cases[] = {
 	{ CMUP, A, 0, 0, "\xf0\x90\x90\x80{2}", "\xf0\x90\x90\x80#\xf0\x90\x90\xa8\xf0\x90\x90\x80" },
 	{ CMUP, A, 0, 0, "\xf0\x90\x90\xa8{2}", "\xf0\x90\x90\x80#\xf0\x90\x90\xa8\xf0\x90\x90\x80" },
 	{ CMUP, A, 0, 0, "\xe1\xbd\xb8\xe1\xbf\xb8", "\xe1\xbf\xb8\xe1\xbd\xb8" },
+	{ M, A, 0, 0, "[3-57-9]", "5" },
 
 	/* Assertions. */
 	{ MU, A, 0, 0, "\\b[^A]", "A_B#" },
@@ -247,13 +248,17 @@ static struct regression_test_case regression_test_cases[] = {
 	{ M, A, 0, 0, "a\\z", "aaa" },
 	{ M, A, 0, 0 | F_NOMATCH, "a\\z", "aab" },
 
-	/* Brackets. */
+	/* Brackets and alternatives. */
 	{ MU, A, 0, 0, "(ab|bb|cd)", "bacde" },
 	{ MU, A, 0, 0, "(?:ab|a)(bc|c)", "ababc" },
 	{ MU, A, 0, 0, "((ab|(cc))|(bb)|(?:cd|efg))", "abac" },
 	{ CMU, A, 0, 0, "((aB|(Cc))|(bB)|(?:cd|EFg))", "AcCe" },
 	{ MU, A, 0, 0, "((ab|(cc))|(bb)|(?:cd|ebg))", "acebebg" },
 	{ MU, A, 0, 0, "(?:(a)|(?:b))(cc|(?:d|e))(a|b)k", "accabdbbccbk" },
+	{ MU, A, 0, 0, "\xc7\x82|\xc6\x82", "\xf1\x83\x82\x82\xc7\x82\xc7\x83" },
+	{ MU, A, 0, 0, "=\xc7\x82|#\xc6\x82", "\xf1\x83\x82\x82=\xc7\x82\xc7\x83" },
+	{ MU, A, 0, 0, "\xc7\x82\xc7\x83|\xc6\x82\xc6\x82", "\xf1\x83\x82\x82\xc7\x82\xc7\x83" },
+	{ MU, A, 0, 0, "\xc6\x82\xc6\x82|\xc7\x83\xc7\x83|\xc8\x84\xc8\x84", "\xf1\x83\x82\x82\xc8\x84\xc8\x84" },
 
 	/* Greedy and non-greedy ? operators. */
 	{ MU, A, 0, 0, "(?:a)?a", "laab" },
@@ -323,6 +328,14 @@ static struct regression_test_case regression_test_cases[] = {
 	{ CMU, A, 0, 0, "[^\xe1\xbd\xb8][^\xc3\xa9]", "\xe1\xbd\xb8\xe1\xbf\xb8\xc3\xa9\xc3\x89#" },
 	{ MU, A, 0, 0, "[^\xe1\xbd\xb8][^\xc3\xa9]", "\xe1\xbd\xb8\xe1\xbf\xb8\xc3\xa9\xc3\x89#" },
 	{ MU, A, 0, 0, "[^\xe1\xbd\xb8]{3,}?", "##\xe1\xbd\xb8#\xe1\xbd\xb8#\xc3\x89#\xe1\xbd\xb8" },
+	{ MU, A, 0, 0, "\\d+123", "987654321,01234" },
+	{ MU, A, 0, 0, "abcd*|\\w+xy", "aaaaa,abxyz" },
+	{ MU, A, 0, 0, "(?:abc|((?:amc|\\b\\w*xy)))", "aaaaa,abxyz" },
+	{ MU, A, 0, 0, "a(?R)|([a-z]++)#", ".abcd.abcd#."},
+	{ MU, A, 0, 0, "a(?R)|([a-z]++)#", ".abcd.mbcd#."},
+	{ MU, A, 0, 0, ".[ab]*.", "xx" },
+	{ MU, A, 0, 0, ".[ab]*a", "xxa" },
+	{ MU, A, 0, 0, ".[ab]?.", "xx" },
 
 	/* Bracket repeats with limit. */
 	{ MU, A, 0, 0, "(?:(ab){2}){5}M", "abababababababababababM" },
@@ -679,6 +692,7 @@ static struct regression_test_case regression_test_cases[] = {
 	{ MU | PCRE2_FIRSTLINE, PCRE2_NEWLINE_CRLF, 0, 1, ".", "\r\n" },
 	{ PCRE2_FIRSTLINE | PCRE2_DOTALL, PCRE2_NEWLINE_LF, 0, 0 | F_NOMATCH, "ab.", "ab" },
 	{ MU | PCRE2_FIRSTLINE, A, 0, 1 | F_NOMATCH, "^[a-d0-9]", "\nxx\nd" },
+	{ PCRE2_FIRSTLINE | PCRE2_DOTALL, PCRE2_NEWLINE_ANY, 0, 0, "....a", "012\n0a" },
 
 	/* Recurse. */
 	{ MU, A, 0, 0, "(a)(?1)", "aa" },
@@ -813,6 +827,9 @@ static struct regression_test_case regression_test_cases[] = {
 
 	/* (*SKIP) verb. */
 	{ MU, A, 0, 0 | F_NOMATCH, "(?=a(*SKIP)b)ab|ad", "ad" },
+	{ MU, A, 0, 0, "(\\w+(*SKIP)#)", "abcd,xyz#," },
+	{ MU, A, 0, 0, "\\w+(*SKIP)#|mm", "abcd,xyz#," },
+	{ MU, A, 0, 0 | F_NOMATCH, "b+(?<=(*SKIP)#c)|b+", "#bbb" },
 
 	/* (*THEN) verb. */
 	{ MU, A, 0, 0, "((?:a(*THEN)|aab)(*THEN)c|a+)+m", "aabcaabcaabcaabcnacm" },

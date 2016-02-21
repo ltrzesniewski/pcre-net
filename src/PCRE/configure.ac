@@ -9,18 +9,18 @@ dnl The PCRE2_PRERELEASE feature is for identifying release candidates. It might
 dnl be defined as -RC2, for example. For real releases, it should be empty.
 
 m4_define(pcre2_major, [10])
-m4_define(pcre2_minor, [20])
+m4_define(pcre2_minor, [21])
 m4_define(pcre2_prerelease, [])
-m4_define(pcre2_date, [2015-06-30])
+m4_define(pcre2_date, [2016-01-12])
 
 # NOTE: The CMakeLists.txt file searches for the above variables in the first
 # 50 lines of this file. Please update that if the variables above are moved.
 
 # Libtool shared library interface versions (current:revision:age)
-m4_define(libpcre2_8_version,     [2:0:2])
-m4_define(libpcre2_16_version,    [2:0:2])
-m4_define(libpcre2_32_version,    [2:0:2])
-m4_define(libpcre2_posix_version, [0:0:0])
+m4_define(libpcre2_8_version,     [3:0:3])
+m4_define(libpcre2_16_version,    [3:0:3])
+m4_define(libpcre2_32_version,    [3:0:3])
+m4_define(libpcre2_posix_version, [0:1:0])
 
 AC_PREREQ(2.57)
 AC_INIT(PCRE2, pcre2_major.pcre2_minor[]pcre2_prerelease, , pcre2)
@@ -190,6 +190,12 @@ AC_ARG_ENABLE(bsr-anycrlf,
                              [\R matches only CR, LF, CRLF by default]),
               , enable_bsr_anycrlf=no)
 
+# Handle --enable-never-backslash-C
+AC_ARG_ENABLE(never-backslash-C,
+              AS_HELP_STRING([--enable-never-backslash-C],
+                             [use of \C causes an error]),
+              , enable_never_backslash_C=no)
+
 # Handle --enable-ebcdic
 AC_ARG_ENABLE(ebcdic,
               AS_HELP_STRING([--enable-ebcdic],
@@ -333,12 +339,16 @@ fi
 # Make sure that if enable_ebcdic is set, rebuild_chartables is also enabled.
 # Also check that UTF support is not requested, because PCRE2 cannot handle
 # EBCDIC and UTF in the same build. To do so it would need to use different
-# character constants depending on the mode.
+# character constants depending on the mode. Also, EBCDIC cannot be used with
+# 16-bit and 32-bit libraries.
 #
 if test "x$enable_ebcdic" = "xyes"; then
   enable_rebuild_chartables=yes
   if test "x$enable_unicode" = "xyes"; then
     AC_MSG_ERROR([support for EBCDIC and Unicode cannot be enabled at the same time])
+  fi
+  if test "x$enable_pcre2_16" = "xyes" -o "x$enable_pcre2_32" = "xyes"; then
+    AC_MSG_ERROR([EBCDIC support is available only for the 8-bit library])
   fi
 fi
 
@@ -602,6 +612,11 @@ if test "$enable_bsr_anycrlf" = "yes"; then
     character or sequence of characters. If BSR_ANYCRLF is defined (to any
     value), this is changed so that backslash-R matches only CR, LF, or CRLF.
     The build-time default can be overridden by the user of PCRE2 at runtime.])
+fi
+
+if test "$enable_never_backslash_C" = "yes"; then
+  AC_DEFINE([NEVER_BACKSLASH_C], [], [
+    Defining NEVER_BACKSLASH_C locks out the use of \C in all patterns.])
 fi
 
 AC_DEFINE_UNQUOTED([LINK_SIZE], [$with_link_size], [
@@ -881,6 +896,7 @@ $PACKAGE-$VERSION configuration summary:
     Enable Unicode support .......... : ${enable_unicode}
     Newline char/sequence ........... : ${enable_newline}
     \R matches only ANYCRLF ......... : ${enable_bsr_anycrlf}
+    \C is disabled .................. : ${enable_never_backslash_C}
     EBCDIC coding ................... : ${enable_ebcdic}
     EBCDIC code for NL .............. : ${ebcdic_nl_code}
     Rebuild char tables ............. : ${enable_rebuild_chartables}

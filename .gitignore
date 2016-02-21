@@ -12,5 +12,6 @@ ipch/
 *.user
 *.sdf
 *.opensdf
+*.opendb
 *.aps
 Thumbs.db

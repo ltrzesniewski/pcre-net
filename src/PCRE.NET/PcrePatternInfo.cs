@@ -25,6 +25,7 @@ namespace PCRE
         public int MinSubjectLength => _re.InternalRegex.GetInfoInt32(InfoKey.MinLength);
         public int NamedGroupsCount => _re.InternalRegex.GetInfoInt32(InfoKey.NameCount);
         public int RecursionLimit => _re.InternalRegex.GetInfoInt32(InfoKey.RecursionLimit);
+        public bool HasBackslashC => _re.InternalRegex.GetInfoInt32(InfoKey.HasBackslashC) != 0;
 
         public IReadOnlyList<PcreCalloutInfo> Callouts => _callouts ?? (_callouts = _re.InternalRegex.Callouts.Select(i => new PcreCalloutInfo(i)).ToList().AsReadOnly());
 
