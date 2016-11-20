@@ -4,14 +4,14 @@ PCRE.NET
 
 **Perl Compatible Regular Expressions for .NET**
 
-[NuGet package](https://www.nuget.org/packages/PCRE.NET)
+[![NuGet package](https://img.shields.io/nuget/v/PCRE.NET.svg)](https://www.nuget.org/packages/PCRE.NET)
+[![GitHub release](https://img.shields.io/github/release/ltrzesniewski/pcre-net.svg)](https://github.com/ltrzesniewski/pcre-net/releases)
+[![PCRE](https://img.shields.io/badge/pcre-v10.22-blue.svg)](http://www.pcre.org/)
+[![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/ltrzesniewski/pcre-net/blob/master/LICENCE)
 
 PCRE.NET is a .NET wrapper for the [PCRE library](http://www.pcre.org/). The goal of this project is to bring most of PCRE's features for use from .NET applications with as little overhead as possible.
 
-**Status:** Version **0.6**, based on PCRE **10.20**, is available on [NuGet](https://www.nuget.org/packages/PCRE.NET). Feedback is welcome.  
-As it is still at major version 0, the API may change anytime.
-
-The current version on the *master* branch is **0.6.1**, based on PCRE **10.21**.
+The current version on the *master* branch is **0.6.2**, based on PCRE **10.22**.
 
 ## Dependencies ##
 
