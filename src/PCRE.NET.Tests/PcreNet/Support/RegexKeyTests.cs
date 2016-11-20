@@ -25,7 +25,8 @@ namespace PCRE.Tests.PcreNet.Support
             {
                 NewLine = PcreBuildInfo.NewLine,
                 BackslashR = PcreBuildInfo.BackslashR,
-                ParensLimit = PcreBuildInfo.ParensLimit
+                ParensLimit = PcreBuildInfo.ParensLimit,
+                MaxPatternLength = null
             };
 
             var keyA = new RegexKey("test", implicitDefaults);

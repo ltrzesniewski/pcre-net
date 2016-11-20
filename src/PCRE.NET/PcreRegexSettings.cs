@@ -12,6 +12,7 @@ namespace PCRE
         private PcreNewLine? _newLine;
         private PcreBackslashR? _backslashR;
         private uint? _parensLimit;
+        private uint? _maxPatternLength;
 
         public PcreOptions Options
         {
@@ -53,6 +54,16 @@ namespace PCRE
             }
         }
 
+        public uint? MaxPatternLength
+        {
+            get { return _maxPatternLength; }
+            set
+            {
+                EnsureIsMutable();
+                _maxPatternLength = value;
+            }
+        }
+
         internal bool ReadOnlySettings => _readOnly;
 
         public PcreRegexSettings()
@@ -70,6 +81,7 @@ namespace PCRE
             _newLine = settings._newLine;
             _backslashR = settings._backslashR;
             _parensLimit = settings._parensLimit;
+            _maxPatternLength = settings._maxPatternLength;
             _readOnly = readOnly;
         }
 
@@ -78,7 +90,8 @@ namespace PCRE
             return Options == other.Options
                    && NewLine == other.NewLine
                    && BackslashR == other.BackslashR
-                   && ParensLimit == other.ParensLimit;
+                   && ParensLimit == other.ParensLimit
+                   && MaxPatternLength == other.MaxPatternLength;
         }
 
         internal PcreRegexSettings AsReadOnly()
@@ -110,7 +123,10 @@ namespace PCRE
                 context.BackslashR = (BackslashR)_backslashR;
 
             if (_parensLimit != null)
-                context.ParensNestLimit = _parensLimit.Value;
+                context.ParensNestLimit = _parensLimit.GetValueOrDefault();
+
+            if (_maxPatternLength != null)
+                context.MaxPatternLength = _maxPatternLength.GetValueOrDefault();
 
             return context;
         }

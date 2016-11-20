@@ -22,6 +22,7 @@ namespace PCRE {
 			property NewLine NewLine { void set(PCRE::Wrapper::NewLine); }
 			property BackslashR BackslashR { void set(PCRE::Wrapper::BackslashR); }
 			property uint32_t ParensNestLimit { void set(uint32_t); }
+			property uint32_t MaxPatternLength { void set(uint32_t); }
 
 		internal:
 			property pcre2_compile_context* Context {
