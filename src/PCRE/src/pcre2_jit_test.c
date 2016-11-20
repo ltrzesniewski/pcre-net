@@ -140,7 +140,6 @@ int main(void)
 #define F_DIFF		0x080000
 #define F_FORCECONV	0x100000
 #define F_PROPERTY	0x200000
-#define F_STUDY		0x400000
 
 struct regression_test_case {
 	int compile_options;
@@ -693,6 +692,7 @@ static struct regression_test_case regression_test_cases[] = {
 	{ PCRE2_FIRSTLINE | PCRE2_DOTALL, PCRE2_NEWLINE_LF, 0, 0 | F_NOMATCH, "ab.", "ab" },
 	{ MU | PCRE2_FIRSTLINE, A, 0, 1 | F_NOMATCH, "^[a-d0-9]", "\nxx\nd" },
 	{ PCRE2_FIRSTLINE | PCRE2_DOTALL, PCRE2_NEWLINE_ANY, 0, 0, "....a", "012\n0a" },
+	{ MU | PCRE2_FIRSTLINE, A, 0, 0, "[aC]", "a" },
 
 	/* Recurse. */
 	{ MU, A, 0, 0, "(a)(?1)", "aa" },
@@ -779,11 +779,11 @@ static struct regression_test_case regression_test_cases[] = {
 	{ MU, A, 0, 0, "(?(DEFINE)(a(*:aa)))a(?1)b|aac", "aac" },
 	{ MU, A, 0, 0, "(a(*:aa)){0}(?:b(?1)b|c)+c", "babbab cc" },
 	{ MU, A, 0, 0, "(a(*:aa)){0}(?:b(?1)b)+", "babba" },
-	{ MU, A, 0, 0 | F_NOMATCH | F_STUDY, "(a(*:aa)){0}(?:b(?1)b)+", "ba" },
+	{ MU, A, 0, 0 | F_NOMATCH, "(a(*:aa)){0}(?:b(?1)b)+", "ba" },
 	{ MU, A, 0, 0, "(a\\K(*:aa)){0}(?:b(?1)b|c)+c", "babbab cc" },
 	{ MU, A, 0, 0, "(a\\K(*:aa)){0}(?:b(?1)b)+", "babba" },
-	{ MU, A, 0, 0 | F_NOMATCH | F_STUDY, "(a\\K(*:aa)){0}(?:b(?1)b)+", "ba" },
-	{ MU, A, 0, 0 | F_NOMATCH | F_STUDY, "(*:mark)m", "a" },
+	{ MU, A, 0, 0 | F_NOMATCH, "(a\\K(*:aa)){0}(?:b(?1)b)+", "ba" },
+	{ MU, A, 0, 0 | F_NOMATCH, "(*:mark)m", "a" },
 
 	/* (*COMMIT) verb. */
 	{ MU, A, 0, 0 | F_NOMATCH, "a(*COMMIT)b", "ac" },
@@ -1533,10 +1533,10 @@ static int regression_tests(void)
 							is_successful = 0;
 						}
 #endif
-#if defined SUPPORT_PCRE2_16 && defined SUPPORT_PCRE2_16
-						if (ovector16_1[i] != ovector16_2[i] || ovector16_1[i] != ovector16_1[i] || ovector16_1[i] != ovector16_2[i]) {
-							printf("\n16 and 16 bit: Ovector[%d] value differs(J16:%d,I16:%d,J32:%d,I32:%d): [%d] '%s' @ '%s' \n",
-								i, ovector16_1[i], ovector16_2[i], ovector16_1[i], ovector16_2[i],
+#if defined SUPPORT_PCRE2_16 && defined SUPPORT_PCRE2_32
+						if (ovector16_1[i] != ovector16_2[i] || ovector16_1[i] != ovector32_1[i] || ovector16_1[i] != ovector32_2[i]) {
+							printf("\n16 and 32 bit: Ovector[%d] value differs(J16:%d,I16:%d,J32:%d,I32:%d): [%d] '%s' @ '%s' \n",
+								i, ovector16_1[i], ovector16_2[i], ovector32_1[i], ovector32_2[i],
 								total, current->pattern, current->input);
 							is_successful = 0;
 						}

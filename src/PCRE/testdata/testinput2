@@ -4428,6 +4428,8 @@
 
 /(?R-:(?</
 
+/(?R-:(?<)/
+
 /(?(?C{\Q})(?!(?'/
 
 /(?(?C{\Q})(?!(?'abc')))/I
@@ -4792,12 +4794,29 @@ a)"xI
 /(*MARK:A\x00b)/mark,alt_verbnames
     abc
 
-# /(*MARK:A\x00b)/
-/28 2a 4d 41 52 4b 3a 41 00 62 29/mark,hex
+/"(*MARK:A" 00 "b)"/mark,hex
     abc
 
-# /(*MARK:A\x00b)/
-/28 2a 4d 41 52 4b 3a 41 00 62 29/mark,hex,alt_verbnames
+/"(*MARK:A" 00 "b)"/mark,hex,alt_verbnames
     abc
+
+/efg/hex
+
+/eff/hex
+
+/effg/hex
+
+/(?J)(?'a'))(?'a')/
+
+/(?<=((?C)0))/
+    9010
+\= Expect no match
+    abc
+
+/aaa/
+\[abc]{10000000000000000000000000000}
+\[a]{3}
+
+/\[AB]{6000000000000000000000}/expand
 
 # End of testinput2 

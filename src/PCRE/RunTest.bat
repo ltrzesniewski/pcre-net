@@ -25,6 +25,7 @@
 @rem The file was converted for PCRE2 by PH, February 2015.
 @rem Updated for new test 14 (moving others up a number), August 2015.
 @rem Tidied and updated for new tests 21, 22, 23 by PH, October 2015.
+@rem PH added missing "set type" for test 22, April 2016.
 
 
 setlocal enabledelayedexpansion
@@ -242,11 +243,18 @@ if [%3] == [] (
   exit /b 1
 )
 
+if %1 == 8 (
+  set outnum=8-%bits%-%link_size%
+) else if %1 == 22 (
+  set outnum=22-%bits%
+) else (
+  set outnum=%1
+)
 set testinput=testinput%1
-set testoutput=testoutput%1
+set testoutput=testoutput%outnum%
 if exist %srcdir%\testdata\win%testinput% (
   set testinput=wintestinput%1
-  set testoutput=wintestoutput%1
+  set testoutput=wintestoutput%outnum%
 )
 
 echo Test %1: %3
@@ -259,9 +267,6 @@ if errorlevel 1 (
 )
 
 set type=
-if [%1]==[8] (
-  set type=-%bits%
-)
 if [%1]==[11] (
   set type=-%bits%
 )
@@ -269,6 +274,9 @@ if [%1]==[12] (
   set type=-%bits%
 )
 if [%1]==[14] (
+  set type=-%bits%
+)
+if [%1]==[22] (
   set type=-%bits%
 )
 

@@ -545,7 +545,7 @@ Failed: error 127 at offset 13: conditional group contains more than two branche
 Failed: error 127 at offset 12: conditional group contains more than two branches
 
 /(?(1a)/
-Failed: error 126 at offset 4: malformed number or name after (?(
+Failed: error 114 at offset 6: missing closing parenthesis
 
 /(?(1a))/
 Failed: error 126 at offset 4: malformed number or name after (?(
@@ -14401,6 +14401,9 @@ Failed: error 106 at offset 353: missing terminating ] for character class
 ------------------------------------------------------------------
 
 /(?R-:(?</
+Failed: error 114 at offset 8: missing closing parenthesis
+
+/(?R-:(?<)/
 Failed: error 129 at offset 3: (?R or (?[+-]digits must be followed by )
 
 /(?(?C{\Q})(?!(?'/
@@ -14502,7 +14505,7 @@ No match
  0: ab
 
 /(?(8000000000/
-Failed: error 161 at offset 13: number is too big
+Failed: error 114 at offset 13: missing closing parenthesis
 
 /((?(R8000000000)))/
 Failed: error 161 at offset 16: number is too big
@@ -15146,16 +15149,58 @@ MK: A\x00b
  0: 
 MK: A\x00b
 
-# /(*MARK:A\x00b)/
-/28 2a 4d 41 52 4b 3a 41 00 62 29/mark,hex
+/"(*MARK:A" 00 "b)"/mark,hex
     abc
  0: 
 MK: A\x00b
 
-# /(*MARK:A\x00b)/
-/28 2a 4d 41 52 4b 3a 41 00 62 29/mark,hex,alt_verbnames
+/"(*MARK:A" 00 "b)"/mark,hex,alt_verbnames
     abc
  0: 
 MK: A\x00b
+
+/efg/hex
+** Unexpected non-hex-digit 'g' in hex pattern: quote missing?
+
+/eff/hex
+** Odd number of digits in hex pattern
+
+/effg/hex
+** Unexpected non-hex-digit 'g' in hex pattern: quote missing?
+
+/(?J)(?'a'))(?'a')/
+Failed: error 122 at offset 10: unmatched closing parenthesis
+
+/(?<=((?C)0))/
+    9010
+--->9010
+  0  ^       0
+  0   ^      0
+ 0: 
+ 1: 0
+\= Expect no match
+    abc
+--->abc
+  0  ^      0
+  0   ^     0
+  0    ^    0
+No match
+
+/aaa/
+\[abc]{10000000000000000000000000000}
+** Repeat count too large
+\[a]{3}
+ 0: aaa
+
+/\[AB]{6000000000000000000000}/expand
+** Pattern repeat count too large
 
 # End of testinput2 
+Error -63: PCRE2_ERROR_BADDATA (unknown error number)
+Error -62: bad serialized data
+Error -2: partial match
+Error -1: no match
+Error 0: PCRE2_ERROR_BADDATA (unknown error number)
+Error 100: no error
+Error 188: pattern string is longer than the limit set by the application
+Error 189: PCRE2_ERROR_BADDATA (unknown error number)

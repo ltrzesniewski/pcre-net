@@ -213,6 +213,12 @@
 #pop jit,jitverify
     abcdef
     
+/abcd/pushcopy,jitverify
+    abcd
+    
+#pop jitverify
+    abcd
+    
 # Test pattern compilation
 
 /(?:a|b|c|d|e)(?R)/jit=1
@@ -272,5 +278,23 @@
 
 /(.|.)*?bx/
     aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabax
+    
+# Test JIT disable 
+
+/abc/
+    abc
+    abc\=no_jit 
+    
+/abc/jitfast
+    abc
+    abc\=no_jit 
+    
+# ---- 
+
+/[aC]/mg,firstline,newline=lf
+match\nmatch
+
+/[aCz]/mg,firstline,newline=lf
+match\nmatch
 
 # End of testinput17

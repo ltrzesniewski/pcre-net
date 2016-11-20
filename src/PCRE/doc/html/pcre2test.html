@@ -98,10 +98,11 @@ further data is read.
 </P>
 <P>
 For maximum portability, therefore, it is safest to avoid non-printing
-characters in <b>pcre2test</b> input files. There is a facility for specifying a
-pattern's characters as hexadecimal pairs, thus making it possible to include
-binary zeroes in a pattern for testing purposes. Subject lines are processed
-for backslash escapes, which makes it possible to include any data value.
+characters in <b>pcre2test</b> input files. There is a facility for specifying
+some or all of a pattern's characters as hexadecimal pairs, thus making it
+possible to include binary zeroes in a pattern for testing purposes. Subject
+lines are processed for backslash escapes, which makes it possible to include
+any data value.
 </P>
 <br><a name="SEC4" href="#TOC1">COMMAND LINE OPTIONS</a><br>
 <P>
@@ -176,6 +177,13 @@ form and information about the compiled pattern is output after compilation;
 Behave as if each subject line has the <b>dfa</b> modifier; matching is done
 using the <b>pcre2_dfa_match()</b> function instead of the default
 <b>pcre2_match()</b>.
+</P>
+<P>
+<b>-error</b> <i>number[,number,...]</i>
+Call <b>pcre2_get_error_message()</b> for each of the error numbers in the
+comma-separated list, display the resulting messages on the standard output,
+then exit with zero exit code. The numbers may be positive or negative. This is
+a convenience facility for PCRE2 maintainers.
 </P>
 <P>
 <b>-help</b>
@@ -352,9 +360,10 @@ test files that are also processed by <b>perltest.sh</b>. The <b>#perltest</b>
 command helps detect tests that are accidentally put in the wrong file.
 <pre>
   #pop [&#60;modifiers&#62;]
+  #popcopy [&#60;modifiers&#62;]
 </pre>
-This command is used to manipulate the stack of compiled patterns, as described
-in the section entitled "Saving and restoring compiled patterns"
+These commands are used to manipulate the stack of compiled patterns, as
+described in the section entitled "Saving and restoring compiled patterns"
 <a href="#saverestore">below.</a>
 <pre>
   #save &#60;filename&#62;
@@ -559,7 +568,7 @@ about the pattern:
       debug                     same as info,fullbincode
       fullbincode               show binary code with lengths
   /I  info                      show info about compiled pattern
-      hex                       pattern is coded in hexadecimal
+      hex                       unquoted characters are hexadecimal
       jit[=&#60;number&#62;]            use JIT
       jitfast                   use JIT fast path
       jitverify                 verify JIT use
@@ -570,7 +579,9 @@ about the pattern:
       null_context              compile with a NULL context
       parens_nest_limit=&#60;n&#62;     set maximum parentheses depth
       posix                     use the POSIX API
+      posix_nosub               use the POSIX API with REG_NOSUB
       push                      push compiled pattern onto the stack
+      pushcopy                  push a copy onto the stack
       stackguard=&#60;number&#62;       test the stackguard feature
       tables=[0|1|2]            select internal tables
 </pre>
@@ -655,20 +666,31 @@ testing that <b>pcre2_compile()</b> behaves correctly in this case (it uses
 default values).
 </P>
 <br><b>
-Specifying a pattern in hex
+Specifying pattern characters in hexadecimal
 </b><br>
 <P>
-The <b>hex</b> modifier specifies that the characters of the pattern are to be
-interpreted as pairs of hexadecimal digits. White space is permitted between
-pairs. For example:
+The <b>hex</b> modifier specifies that the characters of the pattern, except for
+substrings enclosed in single or double quotes, are to be interpreted as pairs
+of hexadecimal digits. This feature is provided as a way of creating patterns
+that contain binary zeros and other non-printing characters. White space is
+permitted between pairs of digits. For example, this pattern contains three
+characters:
 <pre>
   /ab 32 59/hex
 </pre>
-This feature is provided as a way of creating patterns that contain binary zero
-and other non-printing characters. By default, <b>pcre2test</b> passes patterns
-as zero-terminated strings to <b>pcre2_compile()</b>, giving the length as
-PCRE2_ZERO_TERMINATED. However, for patterns specified in hexadecimal, the
-actual length of the pattern is passed.
+Parts of such a pattern are taken literally if quoted. This pattern contains
+nine characters, only two of which are specified in hexadecimal:
+<pre>
+  /ab "literal" 32/hex
+</pre>
+Either single or double quotes may be used. There is no way of including
+the delimiter within a substring.
+</P>
+<P>
+By default, <b>pcre2test</b> passes patterns as zero-terminated strings to
+<b>pcre2_compile()</b>, giving the length as PCRE2_ZERO_TERMINATED. However, for
+patterns specified with the <b>hex</b> modifier, the actual length of the
+pattern is passed.
 </P>
 <br><b>
 Generating long repetitive patterns
@@ -821,16 +843,17 @@ variable can hold (essentially unlimited).
 Using the POSIX wrapper API
 </b><br>
 <P>
-The <b>/posix</b> modifier causes <b>pcre2test</b> to call PCRE2 via the POSIX
-wrapper API rather than its native API. This supports only the 8-bit library.
-Note that it does not imply POSIX matching semantics; for more detail see the
+The <b>/posix</b> and <b>posix_nosub</b> modifiers cause <b>pcre2test</b> to call
+PCRE2 via the POSIX wrapper API rather than its native API. When
+<b>posix_nosub</b> is used, the POSIX option REG_NOSUB is passed to
+<b>regcomp()</b>. The POSIX wrapper supports only the 8-bit library. Note that
+it does not imply POSIX matching semantics; for more detail see the
 <a href="pcre2posix.html"><b>pcre2posix</b></a>
-documentation. When the POSIX API is being used, the following pattern
-modifiers set options for the <b>regcomp()</b> function:
+documentation. The following pattern modifiers set options for the
+<b>regcomp()</b> function:
 <pre>
   caseless           REG_ICASE
   multiline          REG_NEWLINE
-  no_auto_capture    REG_NOSUB
   dotall             REG_DOTALL     )
   ungreedy           REG_UNGREEDY   ) These options are not part of
   ucp                REG_UCP        )   the POSIX standard
@@ -847,7 +870,8 @@ large buffer is used.
 </P>
 <P>
 The <b>aftertext</b> and <b>allaftertext</b> subject modifiers work as described
-below. All other modifiers cause an error.
+below. All other modifiers are either ignored, with a warning message, or cause
+an error.
 </P>
 <br><b>
 Testing the stack guard feature
@@ -917,12 +941,16 @@ pushed onto a stack of compiled patterns, and <b>pcre2test</b> expects the next
 line to contain a new pattern (or a command) instead of a subject line. This
 facility is used when saving compiled patterns to a file, as described in the
 section entitled "Saving and restoring compiled patterns"
-<a href="#saverestore">below.</a>
-The <b>push</b> modifier is incompatible with compilation modifiers such as
-<b>global</b> that act at match time. Any that are specified are ignored, with a
-warning message, except for <b>replace</b>, which causes an error. Note that,
-<b>jitverify</b>, which is allowed, does not carry through to any subsequent
-matching that uses this pattern.
+<a href="#saverestore">below. If <b>pushcopy</b> is used instead of <b>push</b>, a copy of the compiled</a>
+pattern is stacked, leaving the original as current, ready to match the
+following input lines. This provides a way of testing the
+<b>pcre2_code_copy()</b> function.
+The <b>push</b> and <b>pushcopy </b> modifiers are incompatible with compilation
+modifiers such as <b>global</b> that act at match time. Any that are specified
+are ignored (for the stacked copy), with a warning message, except for
+<b>replace</b>, which causes an error. Note that <b>jitverify</b>, which is
+allowed, does not carry through to any subsequent matching that uses a stacked
+pattern.
 <a name="subjectmodifiers"></a></P>
 <br><a name="SEC11" href="#TOC1">SUBJECT MODIFIERS</a><br>
 <P>
@@ -941,6 +969,7 @@ for a description of their effects.
       anchored                  set PCRE2_ANCHORED
       dfa_restart               set PCRE2_DFA_RESTART
       dfa_shortest              set PCRE2_DFA_SHORTEST
+      no_jit                    set PCRE2_NO_JIT
       no_utf_check              set PCRE2_NO_UTF_CHECK
       notbol                    set PCRE2_NOTBOL
       notempty                  set PCRE2_NOTEMPTY
@@ -957,7 +986,7 @@ If the <b>/posix</b> modifier was present on the pattern, causing the POSIX
 wrapper API to be used, the only option-setting modifiers that have any effect
 are <b>notbol</b>, <b>notempty</b>, and <b>noteol</b>, causing REG_NOTBOL,
 REG_NOTEMPTY, and REG_NOTEOL, respectively, to be passed to <b>regexec()</b>.
-Any other modifiers cause an error.
+The other modifiers are ignored, with a warning message.
 </P>
 <br><b>
 Setting match controls
@@ -1001,7 +1030,10 @@ pattern.
       substitute_unset_empty     use PCRE2_SUBSTITUTE_UNSET_EMPTY
       zero_terminate             pass the subject as zero-terminated
 </pre>
-The effects of these modifiers are described in the following sections.
+The effects of these modifiers are described in the following sections. When
+matching via the POSIX wrapper API, the <b>aftertext</b>, <b>allaftertext</b>,
+and <b>ovector</b> subject modifiers work as described below. All other
+modifiers are either ignored, with a warning message, or cause an error.
 </P>
 <br><b>
 Showing more text
@@ -1058,7 +1090,8 @@ The <b>allcaptures</b> modifier requests that the values of all potential
 captured parentheses be output after a match. By default, only those up to the
 highest one actually used in the match are output (corresponding to the return
 code from <b>pcre2_match()</b>). Groups that did not take part in the match
-are output as "&#60;unset&#62;".
+are output as "&#60;unset&#62;". This modifier is not relevant for DFA matching (which
+does no capturing); it is ignored, with a warning message, if present.
 </P>
 <br><b>
 Testing callouts
@@ -1512,7 +1545,9 @@ item to be tested. For example:
 This output indicates that callout number 0 occurred for a match attempt
 starting at the fourth character of the subject string, when the pointer was at
 the seventh character, and when the next pattern item was \d. Just
-one circumflex is output if the start and current positions are the same.
+one circumflex is output if the start and current positions are the same, or if
+the current position precedes the start position, which can happen if the
+callout is in a lookbehind assertion.
 </P>
 <P>
 Callouts numbered 255 are assumed to be automatic callouts, inserted as a
@@ -1604,11 +1639,16 @@ can be used to test these functions.
 <P>
 When a pattern with <b>push</b> modifier is successfully compiled, it is pushed
 onto a stack of compiled patterns, and <b>pcre2test</b> expects the next line to
-contain a new pattern (or command) instead of a subject line. By this means, a
-number of patterns can be compiled and retained. The <b>push</b> modifier is
-incompatible with <b>posix</b>, and control modifiers that act at match time are
-ignored (with a message). The <b>jitverify</b> modifier applies only at compile
-time. The command
+contain a new pattern (or command) instead of a subject line. By contrast,
+the <b>pushcopy</b> modifier causes a copy of the compiled pattern to be
+stacked, leaving the original available for immediate matching. By using
+<b>push</b> and/or <b>pushcopy</b>, a number of patterns can be compiled and
+retained. These modifiers are incompatible with <b>posix</b>, and control
+modifiers that act at match time are ignored (with a message) for the stacked
+patterns. The <b>jitverify</b> modifier applies only at compile time.
+</P>
+<P>
+The command
 <pre>
   #save &#60;filename&#62;
 </pre>
@@ -1625,7 +1665,8 @@ usual by an empty line or end of file. This command may be followed by a
 modifier list containing only
 <a href="#controlmodifiers">control modifiers</a>
 that act after a pattern has been compiled. In particular, <b>hex</b>,
-<b>posix</b>, and <b>push</b> are not allowed, nor are any
+<b>posix</b>, <b>posix_nosub</b>, <b>push</b>, and <b>pushcopy</b> are not allowed,
+nor are any
 <a href="#optionmodifiers">option-setting modifiers.</a>
 The JIT modifiers are, however permitted. Here is an example that saves and
 reloads two patterns.
@@ -1642,6 +1683,11 @@ reloads two patterns.
 </pre>
 If <b>jitverify</b> is used with #pop, it does not automatically imply
 <b>jit</b>, which is different behaviour from when it is used on a pattern.
+</P>
+<P>
+The #popcopy command is analagous to the <b>pushcopy</b> modifier in that it
+makes current a copy of the topmost stack pattern, leaving the original still
+on the stack.
 </P>
 <br><a name="SEC19" href="#TOC1">SEE ALSO</a><br>
 <P>
@@ -1660,9 +1706,9 @@ Cambridge, England.
 </P>
 <br><a name="SEC21" href="#TOC1">REVISION</a><br>
 <P>
-Last updated: 12 December 2015
+Last updated: 06 July 2016
 <br>
-Copyright &copy; 1997-2015 University of Cambridge.
+Copyright &copy; 1997-2016 University of Cambridge.
 <br>
 <p>
 Return to the <a href="index.html">PCRE2 index page</a>.

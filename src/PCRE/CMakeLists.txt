@@ -71,6 +71,9 @@
 # 2015-07-16 PH updated for new pcre2_find_bracket source module
 # 2015-08-24 PH correct C_FLAGS setting (patch from Roy Ivy III)
 # 2015-10=16 PH added support for never-backslash-C
+# 2016-03-01 PH applied Chris Wilson's patch for MSVC static
+# 2016-06-24 PH applied Chris Wilson's second patch, putting the first under
+#            a new option instead of being unconditional.
 
 PROJECT(PCRE2 C)
 
@@ -157,6 +160,9 @@ SET(PCRE2_SUPPORT_JIT OFF CACHE BOOL
 SET(PCRE2_SUPPORT_PCRE2GREP_JIT ON CACHE BOOL
     "Enable use of Just-in-time compiling in pcre2grep.")
 
+SET(PCRE2_SUPPORT_PCRE2GREP_CALLOUT ON CACHE BOOL
+    "Enable callout string support in pcre2grep.")
+
 SET(PCRE2_SUPPORT_UNICODE ON CACHE BOOL
     "Enable support for Unicode and UTF-8/UTF-16/UTF-32 encoding.")
 
@@ -184,6 +190,9 @@ IF (MINGW)
 ENDIF(MINGW)
 
 IF(MSVC)
+  OPTION(PCRE_STATIC_RUNTIME OFF CACHE BOOL
+	"ON=Compile against the static runtime (/MT)."
+	OFF)
   OPTION(INSTALL_MSVC_PDB
          "ON=Install .pdb files built by MSVC, if generated"
          OFF)
@@ -271,6 +280,10 @@ ENDIF(PCRE2_SUPPORT_JIT)
 IF(PCRE2_SUPPORT_PCRE2GREP_JIT)
         SET(SUPPORT_PCRE2GREP_JIT 1)
 ENDIF(PCRE2_SUPPORT_PCRE2GREP_JIT)
+
+IF(PCRE2_SUPPORT_PCRE2GREP_CALLOUT)
+        SET(SUPPORT_PCRE2GREP_CALLOUT 1)
+ENDIF(PCRE2_SUPPORT_PCRE2GREP_CALLOUT)
 
 IF(PCRE2_SUPPORT_VALGRIND)
         SET(SUPPORT_VALGRIND 1)
@@ -455,6 +468,18 @@ SET(PCRE2POSIX_SOURCES
   ${PCRE2POSIX_SOURCES} pcre2posix.rc)
 ENDIF (EXISTS ${PROJECT_SOURCE_DIR}/pcre2posix.rc)
 ENDIF(MSVC AND NOT PCRE2_STATIC)
+
+# Fix static compilation with MSVC: https://bugs.exim.org/show_bug.cgi?id=1681
+# This code was taken from the CMake wiki, not from WebM.
+
+IF(MSVC AND PCRE2_STATIC_RUNTIME)
+  MESSAGE(STATUS "** MSVC and PCRE2_STATIC_RUNTIME: modifying compiler flags to use static runtime library")
+  foreach(flag_var
+          CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
+          CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO)
+    string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+  endforeach()
+ENDIF(MSVC AND PCRE2_STATIC_RUNTIME)
 
 # Build setup
 
@@ -740,6 +765,7 @@ IF(PCRE2_SHOW_REPORT)
   MESSAGE(STATUS "  Build static libs ............... : ${BUILD_STATIC_LIBS}")
   MESSAGE(STATUS "  Build pcre2grep ................. : ${PCRE2_BUILD_PCRE2GREP}")
   MESSAGE(STATUS "  Enable JIT in pcre2grep ......... : ${PCRE2_SUPPORT_PCRE2GREP_JIT}")
+  MESSAGE(STATUS "  Enable callouts in pcre2grep .... : ${PCRE2_SUPPORT_PCRE2GREP_CALLOUT}")
   MESSAGE(STATUS "  Buffer size for pcre2grep ....... : ${PCRE2GREP_BUFSIZE}")
   MESSAGE(STATUS "  Build tests (implies pcre2test  . : ${PCRE2_BUILD_TESTS}")
   MESSAGE(STATUS "               and pcre2grep)")

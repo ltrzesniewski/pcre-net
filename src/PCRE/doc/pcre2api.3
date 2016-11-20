@@ -1,4 +1,4 @@
-.TH PCRE2API 3 "16 December 2015" "PCRE2 10.21"
+.TH PCRE2API 3 "17 June 2016" "PCRE2 10.22"
 .SH NAME
 PCRE2 - Perl-compatible regular expressions (revised API)
 .sp
@@ -233,6 +233,8 @@ document for an overview of all the PCRE2 documentation.
 .rs
 .sp
 .nf
+.B pcre2_code *pcre2_code_copy(const pcre2_code *\fIcode\fP);
+.sp
 .B int pcre2_get_error_message(int \fIerrorcode\fP, PCRE2_UCHAR *\fIbuffer\fP,
 .B "  PCRE2_SIZE \fIbufflen\fP);"
 .sp
@@ -352,9 +354,10 @@ More complicated programs might need to make use of the specialist functions
 \fBpcre2_jit_stack_create()\fP, \fBpcre2_jit_stack_free()\fP, and
 \fBpcre2_jit_stack_assign()\fP in order to control the JIT code's memory usage.
 .P
-JIT matching is automatically used by \fBpcre2_match()\fP if it is available.
-There is also a direct interface for JIT matching, which gives improved
-performance. The JIT-specific functions are discussed in the
+JIT matching is automatically used by \fBpcre2_match()\fP if it is available,
+unless the PCRE2_NO_JIT option is set. There is also a direct interface for JIT
+matching, which gives improved performance. The JIT-specific functions are
+discussed in the
 .\" HREF
 \fBpcre2jit\fP
 .\"
@@ -393,9 +396,16 @@ The function \fBpcre2_substitute()\fP can be called to match a pattern and
 return a copy of the subject string with substitutions for parts that were
 matched.
 .P
+Functions whose names begin with \fBpcre2_serialize_\fP are used for saving
+compiled patterns on disc or elsewhere, and reloading them later.
+.P
 Finally, there are functions for finding out information about a compiled
 pattern (\fBpcre2_pattern_info()\fP) and about the configuration with which
 PCRE2 was built (\fBpcre2_config()\fP).
+.P
+Functions with names ending with \fB_free()\fP are used for freeing memory
+blocks of various sorts. In all cases, if one of these functions is called with
+a NULL argument, it does nothing.
 .
 .
 .SH "STRING LENGTHS AND OFFSETS"
@@ -461,21 +471,52 @@ time ensuring that multithreaded applications can use it.
 .P
 There are several different blocks of data that are used to pass information
 between the application and the PCRE2 libraries.
-.P
-(1) A pointer to the compiled form of a pattern is returned to the user when
+.
+.
+.SS "The compiled pattern"
+.rs
+.sp
+A pointer to the compiled form of a pattern is returned to the user when
 \fBpcre2_compile()\fP is successful. The data in the compiled pattern is fixed,
 and does not change when the pattern is matched. Therefore, it is thread-safe,
 that is, the same compiled pattern can be used by more than one thread
-simultaneously. An application can compile all its patterns at the start,
-before forking off multiple threads that use them. However, if the just-in-time
-optimization feature is being used, it needs separate memory stack areas for
-each thread. See the
+simultaneously. For example, an application can compile all its patterns at the
+start, before forking off multiple threads that use them. However, if the
+just-in-time optimization feature is being used, it needs separate memory stack
+areas for each thread. See the
 .\" HREF
 \fBpcre2jit\fP
 .\"
 documentation for more details.
 .P
-(2) The next section below introduces the idea of "contexts" in which PCRE2
+In a more complicated situation, where patterns are compiled only when they are
+first needed, but are still shared between threads, pointers to compiled
+patterns must be protected from simultaneous writing by multiple threads, at
+least until a pattern has been compiled. The logic can be something like this:
+.sp
+  Get a read-only (shared) lock (mutex) for pointer
+  if (pointer == NULL)
+    {
+    Get a write (unique) lock for pointer
+    pointer = pcre2_compile(...
+    }
+  Release the lock
+  Use pointer in pcre2_match()
+.sp
+Of course, testing for compilation errors should also be included in the code.
+.P
+If JIT is being used, but the JIT compilation is not being done immediately,
+(perhaps waiting to see if the pattern is used often enough) similar logic is
+required. JIT compilation updates a pointer within the compiled code block, so
+a thread must gain unique write access to the pointer before calling
+\fBpcre2_jit_compile()\fP. Alternatively, \fBpcre2_code_copy()\fP can be used
+to obtain a private copy of the compiled code.
+.
+.
+.SS "Context blocks"
+.rs
+.sp
+The next main section below introduces the idea of "contexts" in which PCRE2
 functions are called. A context is nothing more than a collection of parameters
 that control the way PCRE2 operates. Grouping a number of parameters together
 in a context is a convenient way of passing them to a PCRE2 function without
@@ -487,11 +528,15 @@ In a multithreaded application, if the parameters in a context are values that
 are never changed, the same context can be used by all the threads. However, if
 any thread needs to change any value in a context, it must make its own
 thread-specific copy.
-.P
-(3) The matching functions need a block of memory for working space and for
-storing the results of a match. This includes details of what was matched, as
-well as additional information such as the name of a (*MARK) setting. Each
-thread must provide its own version of this memory.
+.
+.
+.SS "Match blocks"
+.rs
+.sp
+The matching functions need a block of memory for working space and for storing
+the results of a match. This includes details of what was matched, as well as
+additional information such as the name of a (*MARK) setting. Each thread must
+provide its own copy of this memory.
 .
 .
 .SH "PCRE2 CONTEXTS"
@@ -979,34 +1024,51 @@ zero.
 .B "  pcre2_compile_context *\fIccontext\fP);"
 .sp
 .B void pcre2_code_free(pcre2_code *\fIcode\fP);
+.sp
+.B pcre2_code *pcre2_code_copy(const pcre2_code *\fIcode\fP);
 .fi
 .P
 The \fBpcre2_compile()\fP function compiles a pattern into an internal form.
-The pattern is defined by a pointer to a string of code units and a length, If
+The pattern is defined by a pointer to a string of code units and a length. If
 the pattern is zero-terminated, the length can be specified as
 PCRE2_ZERO_TERMINATED. The function returns a pointer to a block of memory that
-contains the compiled pattern and related data. The caller must free the memory
-by calling \fBpcre2_code_free()\fP when it is no longer needed.
+contains the compiled pattern and related data, or NULL if an error occurred.
+.P
+If the compile context argument \fIccontext\fP is NULL, memory for the compiled
+pattern is obtained by calling \fBmalloc()\fP. Otherwise, it is obtained from
+the same memory function that was used for the compile context. The caller must
+free the memory by calling \fBpcre2_code_free()\fP when it is no longer needed.
+.P
+The function \fBpcre2_code_copy()\fP makes a copy of the compiled code in new
+memory, using the same memory allocator as was used for the original. However,
+if the code has been processed by the JIT compiler (see
+.\" HTML <a href="#jitcompiling">
+.\" </a>
+below),
+.\"
+the JIT information cannot be copied (because it is position-dependent).
+The new copy can initially be used only for non-JIT matching, though it can be
+passed to \fBpcre2_jit_compile()\fP if required. The \fBpcre2_code_copy()\fP
+function provides a way for individual threads in a multithreaded application
+to acquire a private copy of shared compiled code.
 .P
 NOTE: When one of the matching functions is called, pointers to the compiled
 pattern and the subject string are set in the match data block so that they can
-be referenced by the extraction functions. After running a match, you must not
-free a compiled pattern (or a subject string) until after all operations on the
+be referenced by the substring extraction functions. After running a match, you
+must not free a compiled pattern (or a subject string) until after all
+operations on the
 .\" HTML <a href="#matchdatablock">
 .\" </a>
 match data block
 .\"
 have taken place.
 .P
-If the compile context argument \fIccontext\fP is NULL, memory for the compiled
-pattern is obtained by calling \fBmalloc()\fP. Otherwise, it is obtained from
-the same memory function that was used for the compile context.
-.P
-The \fIoptions\fP argument contains various bit settings that affect the
-compilation. It should be zero if no options are required. The available
-options are described below. Some of them (in particular, those that are
-compatible with Perl, but some others as well) can also be set and unset from
-within the pattern (see the detailed description in the
+The \fIoptions\fP argument for \fBpcre2_compile()\fP contains various bit
+settings that affect the compilation. It should be zero if no options are
+required. The available options are described below. Some of them (in
+particular, those that are compatible with Perl, but some others as well) can
+also be set and unset from within the pattern (see the detailed description in
+the
 .\" HREF
 \fBpcre2pattern\fP
 .\"
@@ -1025,13 +1087,22 @@ above).
 .\"
 .P
 If \fIerrorcode\fP or \fIerroroffset\fP is NULL, \fBpcre2_compile()\fP returns
-NULL immediately. Otherwise, if compilation of a pattern fails,
-\fBpcre2_compile()\fP returns NULL, having set these variables to an error code
-and an offset (number of code units) within the pattern, respectively. The
-\fBpcre2_get_error_message()\fP function provides a textual message for each
-error code. Compilation errors are positive numbers, but UTF formatting errors
-are negative numbers. For an invalid UTF-8 or UTF-16 string, the offset is that
-of the first code unit of the failing character.
+NULL immediately. Otherwise, the variables to which these point are set to an
+error code and an offset (number of code units) within the pattern,
+respectively, when \fBpcre2_compile()\fP returns NULL because a compilation
+error has occurred. The values are not defined when compilation is successful
+and \fBpcre2_compile()\fP returns a non-NULL value.
+.P
+The \fBpcre2_get_error_message()\fP function (see "Obtaining a textual error
+message"
+.\" HTML <a href="#geterrormessage">
+.\" </a>
+below)
+.\"
+provides a textual message for each error code. Compilation errors have
+positive error codes; UTF formatting error codes are negative. For an invalid
+UTF-8 or UTF-16 string, the offset is that of the first code unit of the
+failing character.
 .P
 Some errors are not detected until the whole pattern has been scanned; in these
 cases, the offset passed back is the length of the pattern. Note that the
@@ -1255,7 +1326,9 @@ If this option is set, it disables the use of numbered capturing parentheses in
 the pattern. Any opening parenthesis that is not followed by ? behaves as if it
 were followed by ?: but named parentheses can still be used for capturing (and
 they acquire numbers in the usual way). There is no equivalent of this option
-in Perl.
+in Perl. Note that, if this option is set, references to capturing groups (back
+references or recursion/subroutine calls) may only refer to named groups,
+though the reference can be by name or by number.
 .sp
   PCRE2_NO_AUTO_POSSESS
 .sp
@@ -1416,17 +1489,24 @@ page.
 .SH "COMPILATION ERROR CODES"
 .rs
 .sp
-There are over 80 positive error codes that \fBpcre2_compile()\fP may return if
-it finds an error in the pattern. There are also some negative error codes that
-are used for invalid UTF strings. These are the same as given by
-\fBpcre2_match()\fP and \fBpcre2_dfa_match()\fP, and are described in the
+There are over 80 positive error codes that \fBpcre2_compile()\fP may return
+(via \fIerrorcode\fP) if it finds an error in the pattern. There are also some
+negative error codes that are used for invalid UTF strings. These are the same
+as given by \fBpcre2_match()\fP and \fBpcre2_dfa_match()\fP, and are described
+in the
 .\" HREF
 \fBpcre2unicode\fP
 .\"
-page. The \fBpcre2_get_error_message()\fP function can be called to obtain a
-textual error message from any error code.
+page. The \fBpcre2_get_error_message()\fP function (see "Obtaining a textual
+error message"
+.\" HTML <a href="#geterrormessage">
+.\" </a>
+below)
+.\"
+can be called to obtain a textual error message from any error code.
 .
 .
+.\" HTML <a name="jitcompiling"></a>
 .SH "JUST-IN-TIME (JIT) COMPILATION"
 .rs
 .sp
@@ -1565,10 +1645,14 @@ are as follows:
 Return a copy of the pattern's options. The third argument should point to a
 \fBuint32_t\fP variable. PCRE2_INFO_ARGOPTIONS returns exactly the options that
 were passed to \fBpcre2_compile()\fP, whereas PCRE2_INFO_ALLOPTIONS returns
-the compile options as modified by any top-level option settings such as (*UTF)
-at the start of the pattern itself. For example, if the pattern /(*UTF)abc/ is
-compiled with the PCRE2_EXTENDED option, the result is PCRE2_EXTENDED and
-PCRE2_UTF.
+the compile options as modified by any top-level (*XXX) option settings such as
+(*UTF) at the start of the pattern itself.
+.P
+For example, if the pattern /(*UTF)abc/ is compiled with the PCRE2_EXTENDED
+option, the result for PCRE2_INFO_ALLOPTIONS is PCRE2_EXTENDED and PCRE2_UTF.
+Option settings such as (?i) that can change within a pattern do not affect the
+result of PCRE2_INFO_ALLOPTIONS, even if they appear right at the start of the
+pattern. (This was different in some earlier releases.)
 .P
 A pattern compiled without PCRE2_ANCHORED is automatically anchored by PCRE2 if
 the first significant item in every top-level branch is one of the following:
@@ -2043,13 +2127,14 @@ pattern does not require the match to be at the start of the subject.
 .sp
 The unused bits of the \fIoptions\fP argument for \fBpcre2_match()\fP must be
 zero. The only bits that may be set are PCRE2_ANCHORED, PCRE2_NOTBOL,
-PCRE2_NOTEOL, PCRE2_NOTEMPTY, PCRE2_NOTEMPTY_ATSTART, PCRE2_NO_UTF_CHECK,
-PCRE2_PARTIAL_HARD, and PCRE2_PARTIAL_SOFT. Their action is described below.
+PCRE2_NOTEOL, PCRE2_NOTEMPTY, PCRE2_NOTEMPTY_ATSTART, PCRE2_NO_JIT,
+PCRE2_NO_UTF_CHECK, PCRE2_PARTIAL_HARD, and PCRE2_PARTIAL_SOFT. Their action is
+described below.
 .P
 Setting PCRE2_ANCHORED at match time is not supported by the just-in-time (JIT)
 compiler. If it is set, JIT matching is disabled and the normal interpretive
-code in \fBpcre2_match()\fP is run. The remaining options are supported for JIT
-matching.
+code in \fBpcre2_match()\fP is run. Apart from PCRE2_NO_JIT (obviously), the
+remaining options are supported for JIT matching.
 .sp
   PCRE2_ANCHORED
 .sp
@@ -2096,6 +2181,13 @@ only at the first matching position, that is, at the start of the subject plus
 the starting offset. An empty string match later in the subject is permitted.
 If the pattern is anchored, such a match can occur only if the pattern contains
 \eK.
+.sp
+  PCRE2_NO_JIT
+.sp
+By default, if a pattern has been successfully processed by
+\fBpcre2_jit_compile()\fP, JIT is automatically used when \fBpcre2_match()\fP
+is called with options that JIT supports. Setting PCRE2_NO_JIT disables the use
+of JIT; it forces matching to be done by the interpreter.
 .sp
   PCRE2_NO_UTF_CHECK
 .sp
@@ -2378,11 +2470,16 @@ page.
 .rs
 .sp
 If \fBpcre2_match()\fP fails, it returns a negative number. This can be
-converted to a text string by calling \fBpcre2_get_error_message()\fP. Negative
-error codes are also returned by other functions, and are documented with them.
-The codes are given names in the header file. If UTF checking is in force and
-an invalid UTF subject string is detected, one of a number of UTF-specific
-negative error codes is returned. Details are given in the
+converted to a text string by calling the \fBpcre2_get_error_message()\fP
+function (see "Obtaining a textual error message"
+.\" HTML <a href="#geterrormessage">
+.\" </a>
+below).
+.\"
+Negative error codes are also returned by other functions, and are documented
+with them. The codes are given names in the header file. If UTF checking is in
+force and an invalid UTF subject string is detected, one of a number of
+UTF-specific negative error codes is returned. Details are given in the
 .\" HREF
 \fBpcre2unicode\fP
 .\"
@@ -2493,6 +2590,30 @@ is attempted.
   PCRE2_ERROR_RECURSIONLIMIT
 .sp
 The internal recursion limit was reached.
+.
+.
+.\" HTML <a name="geterrormessage"></a>
+.SH "OBTAINING A TEXTUAL ERROR MESSAGE"
+.rs
+.sp
+.nf
+.B int pcre2_get_error_message(int \fIerrorcode\fP, PCRE2_UCHAR *\fIbuffer\fP,
+.B "  PCRE2_SIZE \fIbufflen\fP);"
+.fi
+.P
+A text message for an error code from any PCRE2 function (compile, match, or
+auxiliary) can be obtained by calling \fBpcre2_get_error_message()\fP. The code
+is passed as the first argument, with the remaining two arguments specifying a
+code unit buffer and its length, into which the text message is placed. Note
+that the message is returned in code units of the appropriate width for the
+library that is being used.
+.P
+The returned message is terminated with a trailing zero, and the function
+returns the number of code units used, excluding the trailing zero. If the
+error number is unknown, the negative error code PCRE2_ERROR_BADDATA is
+returned. If the buffer is too small, the message is truncated (but still with
+a trailing zero), and the negative error code PCRE2_ERROR_NOMEMORY is returned.
+None of the messages are very long; a buffer size of 120 code units is ample.
 .
 .
 .\" HTML <a name="extractbynumber"></a>
@@ -2872,7 +2993,12 @@ substitution), and PCRE2_BADSUBPATTERN (the pattern match ended before it
 started, which can happen if \eK is used in an assertion).
 .P
 As for all PCRE2 errors, a text message that describes the error can be
-obtained by calling \fBpcre2_get_error_message()\fP.
+obtained by calling the \fBpcre2_get_error_message()\fP function (see
+"Obtaining a textual error message"
+.\" HTML <a href="#geterrormessage">
+.\" </a>
+above).
+.\"
 .
 .
 .SH "DUPLICATE SUBPATTERN NAMES"
@@ -3166,6 +3292,6 @@ Cambridge, England.
 .rs
 .sp
 .nf
-Last updated: 16 December 2015
-Copyright (c) 1997-2015 University of Cambridge.
+Last updated: 17 June 2016
+Copyright (c) 1997-2016 University of Cambridge.
 .fi

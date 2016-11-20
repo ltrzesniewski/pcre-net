@@ -9,18 +9,18 @@ dnl The PCRE2_PRERELEASE feature is for identifying release candidates. It might
 dnl be defined as -RC2, for example. For real releases, it should be empty.
 
 m4_define(pcre2_major, [10])
-m4_define(pcre2_minor, [21])
+m4_define(pcre2_minor, [22])
 m4_define(pcre2_prerelease, [])
-m4_define(pcre2_date, [2016-01-12])
+m4_define(pcre2_date, [2016-07-29])
 
 # NOTE: The CMakeLists.txt file searches for the above variables in the first
 # 50 lines of this file. Please update that if the variables above are moved.
 
 # Libtool shared library interface versions (current:revision:age)
-m4_define(libpcre2_8_version,     [3:0:3])
-m4_define(libpcre2_16_version,    [3:0:3])
-m4_define(libpcre2_32_version,    [3:0:3])
-m4_define(libpcre2_posix_version, [0:1:0])
+m4_define(libpcre2_8_version,     [4:0:4])
+m4_define(libpcre2_16_version,    [4:0:4])
+m4_define(libpcre2_32_version,    [4:0:4])
+m4_define(libpcre2_posix_version, [1:0:0])
 
 AC_PREREQ(2.57)
 AC_INIT(PCRE2, pcre2_major.pcre2_minor[]pcre2_prerelease, , pcre2)
@@ -147,6 +147,17 @@ AC_ARG_ENABLE(pcre2grep-jit,
               AS_HELP_STRING([--disable-pcre2grep-jit],
                              [disable JIT support in pcre2grep]),
               , enable_pcre2grep_jit=yes)
+
+# Handle --disable-pcre2grep-callout (enabled by default) but not supported
+# for Windows.
+if test "$HAVE_WINDOWS_H" != "1"; then
+  AC_ARG_ENABLE(pcre2grep-callout,
+                AS_HELP_STRING([--disable-pcre2grep-callout],
+                               [disable callout script support in pcre2grep]),
+                , enable_pcre2grep_callout=yes)
+else
+  enable_pcre2grep_callout=no
+fi
 
 # Handle --enable-rebuild-chartables
 AC_ARG_ENABLE(rebuild-chartables,
@@ -392,6 +403,7 @@ sure both macros are undefined; an emulation function will then be used. */])
 AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h sys/types.h sys/stat.h dirent.h)
 AC_CHECK_HEADERS([windows.h], [HAVE_WINDOWS_H=1])
+AC_CHECK_HEADERS([sys/wait.h], [HAVE_SYS_WAIT_H=1])
 
 # Conditional compilation
 AM_CONDITIONAL(WITH_PCRE2_8, test "x$enable_pcre2_8" = "xyes")
@@ -544,6 +556,21 @@ fi
 if test "$enable_pcre2grep_jit" = "yes"; then
   AC_DEFINE([SUPPORT_PCRE2GREP_JIT], [], [
     Define to any value to enable JIT support in pcre2grep.])
+fi
+
+# Currently pcre2grep callout string is not supported under Windows.
+
+if test "$enable_pcre2grep_callout" = "yes"; then
+  if test "$HAVE_WINDOWS_H" != "1"; then
+    if test "$HAVE_SYS_WAIT_H" != "1"; then
+      AC_MSG_ERROR([Callout script support needs sys/wait.h.])
+    fi
+    AC_DEFINE([SUPPORT_PCRE2GREP_CALLOUT], [], [
+      Define to any value to enable callout script support in pcre2grep.])
+  else
+    AC_MSG_WARN([Callout script support is not available for Windows: disabled])
+    enable_pcre2grep_callout=no
+  fi
 fi
 
 if test "$enable_unicode" = "yes"; then
@@ -908,6 +935,7 @@ $PACKAGE-$VERSION configuration summary:
     Build shared libs ............... : ${enable_shared}
     Build static libs ............... : ${enable_static}
     Use JIT in pcre2grep ............ : ${enable_pcre2grep_jit}
+    Enable callouts in pcre2grep .... : ${enable_pcre2grep_callout}
     Buffer size for pcre2grep ....... : ${with_pcre2grep_bufsize}
     Link pcre2grep with libz ........ : ${enable_pcre2grep_libz}
     Link pcre2grep with libbz2 ...... : ${enable_pcre2grep_libbz2}

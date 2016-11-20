@@ -831,6 +831,7 @@ dist_html_DATA = \
   doc/html/pcre2-config.html \
   doc/html/pcre2.html \
   doc/html/pcre2_callout_enumerate.html \
+  doc/html/pcre2_code_copy.html \
   doc/html/pcre2_code_free.html \
   doc/html/pcre2_compile.html \
   doc/html/pcre2_compile_context_copy.html \
@@ -911,6 +912,7 @@ dist_man_MANS = \
   doc/pcre2-config.1 \
   doc/pcre2.3 \
   doc/pcre2_callout_enumerate.3 \
+  doc/pcre2_code_copy.3 \
   doc/pcre2_code_free.3 \
   doc/pcre2_compile.3 \
   doc/pcre2_compile_context_copy.3 \
@@ -1052,16 +1054,17 @@ EXTRA_DIST = m4/ax_pthread.m4 m4/pcre2_visibility.m4 \
 	testdata/grepfilelist testdata/grepinput testdata/grepinput3 \
 	testdata/grepinput8 testdata/grepinputv testdata/grepinputx \
 	testdata/greplist testdata/grepoutput testdata/grepoutput8 \
-	testdata/grepoutputN testdata/greppatN4 testdata/testinput1 \
-	testdata/testinput2 testdata/testinput3 testdata/testinput4 \
-	testdata/testinput5 testdata/testinput6 testdata/testinput7 \
-	testdata/testinput8 testdata/testinput9 testdata/testinput10 \
-	testdata/testinput11 testdata/testinput12 testdata/testinput13 \
-	testdata/testinput14 testdata/testinput15 testdata/testinput16 \
-	testdata/testinput17 testdata/testinput18 testdata/testinput19 \
-	testdata/testinput20 testdata/testinput21 testdata/testinput22 \
-	testdata/testinput23 testdata/testinputEBC \
-	testdata/testoutput1 testdata/testoutput2 testdata/testoutput3 \
+	testdata/grepoutputC testdata/grepoutputN testdata/greppatN4 \
+	testdata/testinput1 testdata/testinput2 testdata/testinput3 \
+	testdata/testinput4 testdata/testinput5 testdata/testinput6 \
+	testdata/testinput7 testdata/testinput8 testdata/testinput9 \
+	testdata/testinput10 testdata/testinput11 testdata/testinput12 \
+	testdata/testinput13 testdata/testinput14 testdata/testinput15 \
+	testdata/testinput16 testdata/testinput17 testdata/testinput18 \
+	testdata/testinput19 testdata/testinput20 testdata/testinput21 \
+	testdata/testinput22 testdata/testinput23 \
+	testdata/testinputEBC testdata/testoutput1 \
+	testdata/testoutput2 testdata/testoutput3 \
 	testdata/testoutput3A testdata/testoutput3B \
 	testdata/testoutput4 testdata/testoutput5 testdata/testoutput6 \
 	testdata/testoutput7 testdata/testoutput8-16-2 \
