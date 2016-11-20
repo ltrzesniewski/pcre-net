@@ -43,7 +43,8 @@ namespace PCRE {
 			PartialSoft                = PCRE2_PARTIAL_SOFT,
 			PartialHard                = PCRE2_PARTIAL_HARD,
 			DfaRestart                 = PCRE2_DFA_RESTART,
-			DfaShortest                = PCRE2_DFA_SHORTEST
+			DfaShortest                = PCRE2_DFA_SHORTEST,
+			NoJit                      = PCRE2_NO_JIT
 		};
 
 	}

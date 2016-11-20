@@ -20,6 +20,7 @@ namespace PCRE
         PartialSoft = PatternOptions.PartialSoft,
         PartialHard = PatternOptions.PartialHard,
 
-        NoUtfCheck = PatternOptions.NoUtfCheck
+        NoUtfCheck = PatternOptions.NoUtfCheck,
+        NoJit = PatternOptions.NoJit
     }
 }
