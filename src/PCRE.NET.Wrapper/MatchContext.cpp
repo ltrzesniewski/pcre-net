@@ -35,6 +35,12 @@ void MatchContext::RecursionLimit::set(uint32_t value)
 	pcre2_set_recursion_limit(_ctx, value);
 }
 
+void MatchContext::OffsetLimit::set(uint32_t value)
+{
+	static_assert(sizeof(uint32_t) <= sizeof(PCRE2_SIZE), "Parameter size must fit into PCRE2_SIZE");
+	pcre2_set_offset_limit(_ctx, value);
+}
+
 static int CalloutCallback(pcre2_callout_block* block, void* data)
 {
 	if (!data)

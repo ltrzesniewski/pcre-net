@@ -51,7 +51,8 @@ namespace PCRE
 
         NoUtfCheck = PatternOptions.NoUtfCheck,
         NeverUcp = PatternOptions.NeverUcp,
-        NeverBackslashC = PatternOptions.NeverBackslashC,       
+        NeverBackslashC = PatternOptions.NeverBackslashC,
+        UseOffsetLimit = PatternOptions.UseOffsetLimit,
 
         // Extra options
         Compiled = 1L << 32,

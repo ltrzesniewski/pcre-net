@@ -411,6 +411,37 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_handle_offset_limit()
+        {
+            var re = new PcreRegex(@"bar", PcreOptions.UseOffsetLimit);
+
+            var match = re.Match("foobar");
+            Assert.That(match.Success, Is.True);
+
+            match = re.Match("foobar", new PcreMatchSettings
+            {
+                OffsetLimit = 3
+            });
+            Assert.That(match.Success, Is.True);
+
+            match = re.Match("foobar", new PcreMatchSettings
+            {
+                OffsetLimit = 2
+            });
+            Assert.That(match.Success, Is.False);
+        }
+
+        [Test]
+        public void should_detect_invalid_offset_limit_usage()
+        {
+            var re = new PcreRegex(@"bar");
+            Assert.Throws<PcreMatchException>(() => re.Match("foobar", new PcreMatchSettings
+            {
+                OffsetLimit = 3
+            }));
+        }
+
+        [Test]
         public void readme_json_example()
         {
             const string jsonPattern = @"

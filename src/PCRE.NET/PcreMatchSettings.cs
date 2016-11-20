@@ -25,6 +25,8 @@ namespace PCRE
             set { _recursionLimit = value; }
         }
 
+        public uint? OffsetLimit { get; set; }
+
         internal MatchContext CreateMatchContext(string subject)
         {
             var context = new MatchContext
@@ -36,10 +38,13 @@ namespace PCRE
             };
 
             if (_matchLimit != null)
-                context.MatchLimit = _matchLimit.Value;
+                context.MatchLimit = _matchLimit.GetValueOrDefault();
 
             if (_recursionLimit != null)
-                context.RecursionLimit = _recursionLimit.Value;
+                context.RecursionLimit = _recursionLimit.GetValueOrDefault();
+
+            if (OffsetLimit != null)
+                context.OffsetLimit = OffsetLimit.GetValueOrDefault();
 
             return context;
         }
