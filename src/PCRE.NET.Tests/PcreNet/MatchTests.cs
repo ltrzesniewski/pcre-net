@@ -206,7 +206,7 @@ namespace PCRE.Tests.PcreNet
                 Assert.That(data.StartOffset, Is.EqualTo(0));
                 Assert.That(data.LastCapture, Is.EqualTo(1));
                 Assert.That(data.MaxCapture, Is.EqualTo(2));
-                Assert.That(data.NextPatternItemLength, Is.EqualTo(4));
+                Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
                 Assert.That(data.StringOffset, Is.EqualTo(0));
                 Assert.That(data.String, Is.Null);
 
@@ -311,7 +311,7 @@ namespace PCRE.Tests.PcreNet
                 Assert.That(data.StartOffset, Is.EqualTo(0));
                 Assert.That(data.LastCapture, Is.EqualTo(1));
                 Assert.That(data.MaxCapture, Is.EqualTo(2));
-                Assert.That(data.NextPatternItemLength, Is.EqualTo(4));
+                Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
                 Assert.That(data.StringOffset, Is.EqualTo(pattern.IndexOf("(?C{bar})", StringComparison.Ordinal) + 4));
                 Assert.That(data.String, Is.EqualTo("bar"));
 
