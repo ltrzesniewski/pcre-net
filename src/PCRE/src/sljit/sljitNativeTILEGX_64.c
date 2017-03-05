@@ -2526,13 +2526,13 @@ SLJIT_API_FUNC_ATTRIBUTE struct sljit_const * sljit_emit_const(struct sljit_comp
 	return const_;
 }
 
-SLJIT_API_FUNC_ATTRIBUTE void sljit_set_jump_addr(sljit_uw addr, sljit_uw new_addr)
+SLJIT_API_FUNC_ATTRIBUTE void sljit_set_jump_addr(sljit_uw addr, sljit_uw new_target)
 {
 	sljit_ins *inst = (sljit_ins *)addr;
 
-	inst[0] = (inst[0] & ~(0xFFFFL << 43)) | (((new_addr >> 32) & 0xffff) << 43);
-	inst[1] = (inst[1] & ~(0xFFFFL << 43)) | (((new_addr >> 16) & 0xffff) << 43);
-	inst[2] = (inst[2] & ~(0xFFFFL << 43)) | ((new_addr & 0xffff) << 43);
+	inst[0] = (inst[0] & ~(0xFFFFL << 43)) | (((new_target >> 32) & 0xffff) << 43);
+	inst[1] = (inst[1] & ~(0xFFFFL << 43)) | (((new_target >> 16) & 0xffff) << 43);
+	inst[2] = (inst[2] & ~(0xFFFFL << 43)) | ((new_target & 0xffff) << 43);
 	SLJIT_CACHE_FLUSH(inst, inst + 3);
 }
 

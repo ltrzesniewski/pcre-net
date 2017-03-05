@@ -11,7 +11,8 @@ export LC_ALL
 
 # Remove any non-default colouring and aliases that the caller may have set.
 
-unset PCRE2GREP_COLOUR PCRE2GREP_COLOR
+unset PCRE2GREP_COLOUR PCRE2GREP_COLOR PCREGREP_COLOUR PCREGREP_COLOR
+unset GREP_COLOR GREP_COLORS
 unset cp ls mv rm
 
 # Remember the current (build) directory, set the program to be tested, and
@@ -22,12 +23,12 @@ pcre2grep=$builddir/pcre2grep
 pcre2test=$builddir/pcre2test
 
 if [ ! -x $pcre2grep ] ; then
-  echo "** $pcre2grep does not exist or is not execuatble."
+  echo "** $pcre2grep does not exist or is not executable."
   exit 1
 fi
 
 if [ ! -x $pcre2test ] ; then
-  echo "** $pcre2test does not exist or is not execuatble."
+  echo "** $pcre2test does not exist or is not executable."
   exit 1
 fi
 
@@ -440,7 +441,7 @@ echo "---------------------------- Test 82 -----------------------------" >>test
 echo "RC=$?" >>testtrygrep
 
 echo "---------------------------- Test 83 -----------------------------" >>testtrygrep
-(cd $srcdir; $valgrind $vjs $pcre2grep --buffer-size=100 "^a" ./testdata/grepinput3) >>testtrygrep 2>&1
+(cd $srcdir; $valgrind $vjs $pcre2grep --buffer-size=10 --max-buffer-size=100 "^a" ./testdata/grepinput3) >>testtrygrep 2>&1
 echo "RC=$?" >>testtrygrep
 
 echo "---------------------------- Test 84 -----------------------------" >>testtrygrep
@@ -566,6 +567,35 @@ echo "RC=$?" >>testtrygrep
 
 echo "---------------------------- Test 112 -----------------------------" >>testtrygrep
 (cd $srcdir; $valgrind $vjs $pcre2grep --file-offsets -M 'match (\d+):\n (.)\n' testdata/grepinput) >>testtrygrep
+echo "RC=$?" >>testtrygrep
+
+echo "---------------------------- Test 113 -----------------------------" >>testtrygrep
+(cd $srcdir; $valgrind $vjs $pcre2grep --total-count 'the' testdata/grepinput*) >>testtrygrep
+echo "RC=$?" >>testtrygrep
+
+echo "---------------------------- Test 114 -----------------------------" >>testtrygrep
+(cd $srcdir; $valgrind $vjs $pcre2grep -tc 'the' testdata/grepinput*) >>testtrygrep
+echo "RC=$?" >>testtrygrep
+
+echo "---------------------------- Test 115 -----------------------------" >>testtrygrep
+(cd $srcdir; $valgrind $vjs $pcre2grep -tlc 'the' testdata/grepinput*) >>testtrygrep
+echo "RC=$?" >>testtrygrep
+
+echo "---------------------------- Test 116 -----------------------------" >>testtrygrep
+(cd $srcdir; $valgrind $vjs $pcre2grep -th 'the' testdata/grepinput*) >>testtrygrep
+echo "RC=$?" >>testtrygrep
+
+echo "---------------------------- Test 117 -----------------------------" >>testtrygrep
+(cd $srcdir; $valgrind $vjs $pcre2grep -tch 'the' testdata/grepinput*) >>testtrygrep
+echo "RC=$?" >>testtrygrep
+
+echo "---------------------------- Test 118 -----------------------------" >>testtrygrep
+(cd $srcdir; $valgrind $vjs $pcre2grep -tL 'the' testdata/grepinput*) >>testtrygrep
+echo "RC=$?" >>testtrygrep
+
+echo "---------------------------- Test 119 -----------------------------" >>testtrygrep
+printf "123\n456\n789\n---abc\ndef\nxyz\n---\n" >testNinputgrep
+$valgrind $vjs $pcre2grep -Mo '(\n|[^-])*---' testNinputgrep >>testtrygrep
 echo "RC=$?" >>testtrygrep
 
 # Now compare the results.

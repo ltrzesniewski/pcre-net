@@ -2,6 +2,366 @@ Change Log for PCRE2
 --------------------
 
 
+Version 10.23 14-February-2017
+------------------------------
+
+1. Extended pcre2test with the utf8_input modifier so that it is able to
+generate all possible 16-bit and 32-bit code unit values in non-UTF modes.
+
+2. In any wide-character mode (8-bit UTF or any 16-bit or 32-bit mode), without
+PCRE2_UCP set, a negative character type such as \D in a positive class should
+cause all characters greater than 255 to match, whatever else is in the class.
+There was a bug that caused this not to happen if a Unicode property item was
+added to such a class, for example [\D\P{Nd}] or [\W\pL].
+
+3. There has been a major re-factoring of the pcre2_compile.c file. Most syntax
+checking is now done in the pre-pass that identifies capturing groups. This has
+reduced the amount of duplication and made the code tidier. While doing this,
+some minor bugs and Perl incompatibilities were fixed, including:
+
+  (a) \Q\E in the middle of a quantifier such as A+\Q\E+ is now ignored instead
+      of giving an invalid quantifier error.
+
+  (b) {0} can now be used after a group in a lookbehind assertion; previously
+      this caused an "assertion is not fixed length" error.
+
+  (c) Perl always treats (?(DEFINE) as a "define" group, even if a group with
+      the name "DEFINE" exists. PCRE2 now does likewise.
+
+  (d) A recursion condition test such as (?(R2)...) must now refer to an
+      existing subpattern.
+
+  (e) A conditional recursion test such as (?(R)...) misbehaved if there was a
+      group whose name began with "R".
+
+  (f) When testing zero-terminated patterns under valgrind, the terminating
+      zero is now marked "no access". This catches bugs that would otherwise
+      show up only with non-zero-terminated patterns.
+
+  (g) A hyphen appearing immediately after a POSIX character class (for example
+      /[[:ascii:]-z]/) now generates an error. Perl does accept this as a
+      literal, but gives a warning, so it seems best to fail it in PCRE.
+
+  (h) An empty \Q\E sequence may appear after a callout that precedes an
+      assertion condition (it is, of course, ignored).
+
+One effect of the refactoring is that some error numbers and messages have
+changed, and the pattern offset given for compiling errors is not always the
+right-most character that has been read. In particular, for a variable-length
+lookbehind assertion it now points to the start of the assertion. Another
+change is that when a callout appears before a group, the "length of next
+pattern item" that is passed now just gives the length of the opening
+parenthesis item, not the length of the whole group. A length of zero is now
+given only for a callout at the end of the pattern. Automatic callouts are no
+longer inserted before and after explicit callouts in the pattern.
+
+A number of bugs in the refactored code were subsequently fixed during testing
+before release, but after the code was made available in the repository. Many
+of the bugs were discovered by fuzzing testing. Several of them were related to
+the change from assuming a zero-terminated pattern (which previously had
+required non-zero terminated strings to be copied). These bugs were never in
+fully released code, but are noted here for the record.
+
+  (a) An overall recursion such as (?0) inside a lookbehind assertion was not
+      being diagnosed as an error.
+
+  (b) In utf mode, the length of a *MARK (or other verb) name was being checked
+      in characters instead of code units, which could lead to bad code being
+      compiled, leading to unpredictable behaviour.
+
+  (c) In extended /x mode, characters whose code was greater than 255 caused
+      a lookup outside one of the global tables. A similar bug existed for wide
+      characters in *VERB names.
+
+  (d) The amount of memory needed for a compiled pattern was miscalculated if a
+      lookbehind contained more than one toplevel branch and the first branch
+      was of length zero.
+
+  (e) In UTF-8 or UTF-16 modes with PCRE2_EXTENDED (/x) set and a non-zero-
+      terminated pattern, if a # comment ran on to the end of the pattern, one
+      or more code units past the end were being read.
+
+  (f) An unterminated repeat at the end of a non-zero-terminated pattern (e.g.
+      "{2,2") could cause reading beyond the pattern.
+
+  (g) When reading a callout string, if the end delimiter was at the end of the
+      pattern one further code unit was read.
+
+  (h) An unterminated number after \g' could cause reading beyond the pattern.
+
+  (i) An insufficient memory size was being computed for compiling with
+      PCRE2_AUTO_CALLOUT.
+
+  (j) A conditional group with an assertion condition used more memory than was
+      allowed for it during parsing, so too many of them could therefore
+      overrun a buffer.
+
+  (k) If parsing a pattern exactly filled the buffer, the internal test for
+      overrun did not check when the final META_END item was added.
+
+  (l) If a lookbehind contained a subroutine call, and the called group
+      contained an option setting such as (?s), and the PCRE2_ANCHORED option
+      was set, unpredictable behaviour could occur. The underlying bug was
+      incorrect code and insufficient checking while searching for the end of
+      the called subroutine in the parsed pattern.
+
+  (m) Quantifiers following (*VERB)s were not being diagnosed as errors.
+
+  (n) The use of \Q...\E in a (*VERB) name when PCRE2_ALT_VERBNAMES and
+      PCRE2_AUTO_CALLOUT were both specified caused undetermined behaviour.
+
+  (o) If \Q was preceded by a quantified item, and the following \E was
+      followed by '?' or '+', and there was at least one literal character
+      between them, an internal error "unexpected repeat" occurred (example:
+      /.+\QX\E+/).
+
+  (p) A buffer overflow could occur while sorting the names in the group name
+      list (depending on the order in which the names were seen).
+
+  (q) A conditional group that started with a callout was not doing the right
+      check for a following assertion, leading to compiling bad code. Example:
+      /(?(C'XX))?!XX/
+
+  (r) If a character whose code point was greater than 0xffff appeared within
+      a lookbehind that was within another lookbehind, the calculation of the
+      lookbehind length went wrong and could provoke an internal error.
+
+  (t) The sequence \E- or \Q\E- after a POSIX class in a character class caused
+      an internal error. Now the hyphen is treated as a literal.
+
+4. Back references are now permitted in lookbehind assertions when there are
+no duplicated group numbers (that is, (?| has not been used), and, if the
+reference is by name, there is only one group of that name. The referenced
+group must, of course be of fixed length.
+
+5. pcre2test has been upgraded so that, when run under valgrind with valgrind
+support enabled, reading past the end of the pattern is detected, both when
+compiling and during callout processing.
+
+6. \g{+<number>} (e.g. \g{+2} ) is now supported. It is a "forward back
+reference" and can be useful in repetitions (compare \g{-<number>} ). Perl does
+not recognize this syntax.
+
+7. Automatic callouts are no longer generated before and after callouts in the
+pattern.
+
+8. When pcre2test was outputing information from a callout, the caret indicator
+for the current position in the subject line was incorrect if it was after an
+escape sequence for a character whose code point was greater than \x{ff}.
+
+9. Change 19 for 10.22 had a typo (PCRE_STATIC_RUNTIME should be
+PCRE2_STATIC_RUNTIME). Fix from David Gaussmann.
+
+10. Added --max-buffer-size to pcre2grep, to allow for automatic buffer
+expansion when long lines are encountered. Original patch by Dmitry
+Cherniachenko.
+
+11. If pcre2grep was compiled with JIT support, but the library was compiled
+without it (something that neither ./configure nor CMake allow, but it can be
+done by editing config.h), pcre2grep was giving a JIT error. Now it detects
+this situation and does not try to use JIT.
+
+12. Added some "const" qualifiers to variables in pcre2grep.
+
+13. Added Dmitry Cherniachenko's patch for colouring output in Windows
+(untested by me). Also, look for GREP_COLOUR or GREP_COLOR if the environment
+variables PCRE2GREP_COLOUR and PCRE2GREP_COLOR are not found.
+
+14. Add the -t (grand total) option to pcre2grep.
+
+15. A number of bugs have been mended relating to match start-up optimizations
+when the first thing in a pattern is a positive lookahead. These all applied
+only when PCRE2_NO_START_OPTIMIZE was *not* set:
+
+    (a) A pattern such as (?=.*X)X$ was incorrectly optimized as if it needed
+        both an initial 'X' and a following 'X'.
+    (b) Some patterns starting with an assertion that started with .* were
+        incorrectly optimized as having to match at the start of the subject or
+        after a newline. There are cases where this is not true, for example,
+        (?=.*[A-Z])(?=.{8,16})(?!.*[\s]) matches after the start in lines that
+        start with spaces. Starting .* in an assertion is no longer taken as an
+        indication of matching at the start (or after a newline).
+
+16. The "offset" modifier in pcre2test was not being ignored (as documented)
+when the POSIX API was in use.
+
+17. Added --enable-fuzz-support to "configure", causing an non-installed
+library containing a test function that can be called by fuzzers to be
+compiled. A non-installed  binary to run the test function locally, called
+pcre2fuzzcheck is also compiled.
+
+18. A pattern with PCRE2_DOTALL (/s) set but not PCRE2_NO_DOTSTAR_ANCHOR, and
+which started with .* inside a positive lookahead was incorrectly being
+compiled as implicitly anchored.
+
+19. Removed all instances of "register" declarations, as they are considered
+obsolete these days and in any case had become very haphazard.
+
+20. Add strerror() to pcre2test for failed file opening.
+
+21. Make pcre2test -C list valgrind support when it is enabled.
+
+22. Add the use_length modifier to pcre2test.
+
+23. Fix an off-by-one bug in pcre2test for the list of names for 'get' and
+'copy' modifiers.
+
+24. Add PCRE2_CALL_CONVENTION into the prototype declarations in pcre2.h as it
+is apparently needed there as well as in the function definitions. (Why did
+nobody ask for this in PCRE1?)
+
+25. Change the _PCRE2_H and _PCRE2_UCP_H guard macros in the header files to
+PCRE2_H_IDEMPOTENT_GUARD and PCRE2_UCP_H_IDEMPOTENT_GUARD to be more standard
+compliant and unique.
+
+26. pcre2-config --libs-posix was listing -lpcre2posix instead of
+-lpcre2-posix. Also, the CMake build process was building the library with the
+wrong name.
+
+27. In pcre2test, give some offset information for errors in hex patterns.
+This uses the C99 formatting sequence %td, except for MSVC which doesn't
+support it - %lu is used instead.
+
+28. Implemented pcre2_code_copy_with_tables(), and added pushtablescopy to
+pcre2test for testing it.
+
+29. Fix small memory leak in pcre2test.
+
+30. Fix out-of-bounds read for partial matching of /./ against an empty string
+when the newline type is CRLF.
+
+31. Fix a bug in pcre2test that caused a crash when a locale was set either in
+the current pattern or a previous one and a wide character was matched.
+
+32. The appearance of \p, \P, or \X in a substitution string when
+PCRE2_SUBSTITUTE_EXTENDED was set caused a segmentation fault (NULL
+dereference).
+
+33. If the starting offset was specified as greater than the subject length in
+a call to pcre2_substitute() an out-of-bounds memory reference could occur.
+
+34. When PCRE2 was compiled to use the heap instead of the stack for recursive
+calls to match(), a repeated minimizing caseless back reference, or a
+maximizing one where the two cases had different numbers of code units,
+followed by a caseful back reference, could lose the caselessness of the first
+repeated back reference (example: /(Z)(a)\2{1,2}?(?-i)\1X/i should match ZaAAZX
+but didn't).
+
+35. When a pattern is too complicated, PCRE2 gives up trying to find a minimum
+matching length and just records zero. Typically this happens when there are
+too many nested or recursive back references. If the limit was reached in
+certain recursive cases it failed to be triggered and an internal error could
+be the result.
+
+36. The pcre2_dfa_match() function now takes note of the recursion limit for
+the internal recursive calls that are used for lookrounds and recursions within
+the pattern.
+
+37. More refactoring has got rid of the internal could_be_empty_branch()
+function (around 400 lines of code, including comments) by keeping track of
+could-be-emptiness as the pattern is compiled instead of scanning compiled
+groups. (This would have been much harder before the refactoring of #3 above.)
+This lifts a restriction on the number of branches in a group (more than about
+1100 would give "pattern is too complicated").
+
+38. Add the "-ac" command line option to pcre2test as a synonym for "-pattern
+auto_callout".
+
+39. In a library with Unicode support, incorrect data was compiled for a
+pattern with PCRE2_UCP set without PCRE2_UTF if a class required all wide
+characters to match (for example, /[\s[:^ascii:]]/).
+
+40. The callout_error modifier has been added to pcre2test to make it possible
+to return PCRE2_ERROR_CALLOUT from a callout.
+
+41. A minor change to pcre2grep: colour reset is now "<esc>[0m" instead of
+"<esc>[00m".
+
+42. The limit in the auto-possessification code that was intended to catch
+overly-complicated patterns and not spend too much time auto-possessifying was
+being reset too often, resulting in very long compile times for some patterns.
+Now such patterns are no longer completely auto-possessified.
+
+43. Applied Jason Hood's revised patch for RunTest.bat.
+
+44. Added a new Windows script RunGrepTest.bat, courtesy of Jason Hood.
+
+45. Minor cosmetic fix to pcre2test: move a variable that is not used under
+Windows into the "not Windows" code.
+
+46. Applied Jason Hood's patches to upgrade pcre2grep under Windows and tidy
+some of the code:
+
+  * normalised the Windows condition by ensuring WIN32 is defined;
+  * enables the callout feature under Windows;
+  * adds globbing (Microsoft's implementation expands quoted args),
+    using a tweaked opendirectory;
+  * implements the is_*_tty functions for Windows;
+  * --color=always will write the ANSI sequences to file;
+  * add sequences 4 (underline works on Win10) and 5 (blink as bright
+    background, relatively standard on DOS/Win);
+  * remove the (char *) casts for the now-const strings;
+  * remove GREP_COLOUR (grep's command line allowed the 'u', but not
+    the environment), parsing GREP_COLORS instead;
+  * uses the current colour if not set, rather than black;
+  * add print_match for the undefined case;
+  * fixes a typo.
+
+In addition, colour settings containing anything other than digits and
+semicolon are ignored, and the colour controls are no longer output for empty
+strings.
+
+47. Detecting patterns that are too large inside the length-measuring loop
+saves processing ridiculously long patterns to their end.
+
+48. Ignore PCRE2_CASELESS when processing \h, \H, \v, and \V in classes as it
+just wastes time. In the UTF case it can also produce redundant entries in
+XCLASS lists caused by characters with multiple other cases and pairs of
+characters in the same "not-x" sublists.
+
+49. A pattern such as /(?=(a\K))/ can report the end of the match being before
+its start; pcre2test was not handling this correctly when using the POSIX
+interface (it was OK with the native interface).
+
+50. In pcre2grep, ignore all JIT compile errors. This means that pcre2grep will
+continue to work, falling back to interpretation if anything goes wrong with
+JIT.
+
+51. Applied patches from Christian Persch to configure.ac to make use of the
+AC_USE_SYSTEM_EXTENSIONS macro and to test for functions used by the JIT
+modules.
+
+52. Minor fixes to pcre2grep from Jason Hood:
+    * fixed some spacing;
+    * Windows doesn't usually use single quotes, so I've added a define
+      to use appropriate quotes [in an example];
+    * LC_ALL was displayed as "LCC_ALL";
+    * numbers 11, 12 & 13 should end in "th";
+    * use double quotes in usage message.
+
+53. When autopossessifying, skip empty branches without recursion, to reduce
+stack usage for the benefit of clang with -fsanitize-address, which uses huge
+stack frames. Example pattern: /X?(R||){3335}/. Fixes oss-fuzz issue 553.
+
+54. A pattern with very many explicit back references to a group that is a long
+way from the start of the pattern could take a long time to compile because
+searching for the referenced group in order to find the minimum length was
+being done repeatedly. Now up to 128 group minimum lengths are cached and the
+attempt to find a minimum length is abandoned if there is a back reference to a
+group whose number is greater than 128. (In that case, the pattern is so
+complicated that this optimization probably isn't worth it.) This fixes
+oss-fuzz issue 557.
+
+55. Issue 32 for 10.22 below was not correctly fixed. If pcre2grep in multiline
+mode with --only-matching matched several lines, it restarted scanning at the
+next line instead of moving on to the end of the matched string, which can be
+several lines after the start.
+
+56. Applied Jason Hood's new patch for RunGrepTest.bat that updates it in line
+with updates to the non-Windows version.
+
+
+
 Version 10.22 29-July-2016
 --------------------------
 

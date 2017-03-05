@@ -4635,7 +4635,7 @@
 /((?(R)a+|(?1)b))/
     aaaabcde
 
-/((?(R2)a+|(?1)b))/
+/((?(R2)a+|(?1)b))()/
     aaaabcde
 
 /(?(R)a*(?1)|((?R))b)/
@@ -4879,7 +4879,11 @@
     abcd\=null_context
 
 /()()a+/no_auto_possess
-    aaa\=dfa,allcaptures
-    a\=dfa,allcaptures
+    aaa\=allcaptures
+    a\=allcaptures
+
+/(*LIMIT_RECURSION=100)^((.)(?1)|.)$/
+\= Expect recursion limit exceeded
+    a[00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]
 
 # End of testinput6

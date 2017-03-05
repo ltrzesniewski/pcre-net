@@ -3,6 +3,8 @@
 # results in 8-bit, 16-bit, and 32-bit modes are excluded (see tests 10 and
 # 12).
 
+#newline_default lf any anycrlf
+
 # PCRE2 and Perl disagree about the characteristics of certain Unicode
 # characters. For example, 061C is considered by Perl to be Arabic, though
 # is it not listed as such in the Unicode Scripts.txt file, and 2066-2069 are
@@ -1675,15 +1677,6 @@
 /((?<digit>\d)|(?<letter>\p{L}))/g,substitute_extended,replace=<${digit:+digit; :not digit; }${letter:+letter:not a letter}>
     ab12cde
 
-/[\W\p{Any}]/B
-    abc
-    123 
-
-/[\W\pL]/B
-    abc
-\= Expect no match
-    123     
-
 /(*UCP)(*UTF)[[:>:]]X/B
 
 /abc/utf,replace=xyz
@@ -1715,5 +1708,59 @@
 /L(?#(|++<!(2)?/B,utf,ucp,auto_callout
 
 /(*UTF)C\x09((?<!'(?x)!*H? #\xcc\x9a[^$]/
+
+/[\D]/utf
+    \x{1d7cf}
+
+/[\D\P{Nd}]/utf
+    \x{1d7cf}
+
+/[^\D]/utf
+    a9b
+\= Expect no match
+    \x{1d7cf}
+
+/[^\D\P{Nd}]/utf
+    a9b
+    \x{1d7cf}
+\= Expect no match
+    \x{10000}
+    
+# Hex uses pattern length, not zero-terminated. This tests for overrunning
+# the given length of a pattern.
+
+/'(*UTF)'/hex 
+
+/'#('/hex,extended,utf
+
+/a(?<=A\XB)/utf
+
+/ab(?<=A\RB)/utf
+
+/../utf,auto_callout
+    \n\x{123}\x{123}\x{123}\x{123}
+
+# This tests processing wide characters in extended mode.
+
+/XȀ/x,utf
+
+# These three test a bug fix that was not clearing up after a locale setting
+# when the test or a subsequent one matched a wide character.
+
+//locale=C
+
+/[\P{Yi}]/utf
+\x{2f000}
+
+/[\P{Yi}]/utf,locale=C
+\x{2f000}
+
+/^(?<!(?=􃡜))/B,utf
+
+# Horizontal and vertical space lists ignore caseless
+
+/[\HH]/Bi,utf
+
+/[^\HH]/Bi,utf
 
 # End of testinput5 

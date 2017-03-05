@@ -26,6 +26,14 @@
 
 #include "sljitLir.h"
 
+#if !(defined SLJIT_STD_MACROS_DEFINED && SLJIT_STD_MACROS_DEFINED)
+
+/* These libraries are needed for the macros below. */
+#include <stdlib.h>
+#include <string.h>
+
+#endif /* SLJIT_STD_MACROS_DEFINED */
+
 #define CHECK_ERROR() \
 	do { \
 		if (SLJIT_UNLIKELY(compiler->error)) \
@@ -242,7 +250,19 @@
 #if !(defined SLJIT_CONFIG_UNSUPPORTED && SLJIT_CONFIG_UNSUPPORTED)
 
 #if (defined SLJIT_EXECUTABLE_ALLOCATOR && SLJIT_EXECUTABLE_ALLOCATOR)
+
+#if (defined SLJIT_PROT_EXECUTABLE_ALLOCATOR && SLJIT_PROT_EXECUTABLE_ALLOCATOR)
+#include "sljitProtExecAllocator.c"
+#else
 #include "sljitExecAllocator.c"
+#endif
+
+#endif
+
+#if (defined SLJIT_PROT_EXECUTABLE_ALLOCATOR && SLJIT_PROT_EXECUTABLE_ALLOCATOR)
+#define SLJIT_ADD_EXEC_OFFSET(ptr, exec_offset) ((sljit_u8 *)(ptr) + (exec_offset))
+#else
+#define SLJIT_ADD_EXEC_OFFSET(ptr, exec_offset) ((sljit_u8 *)(ptr))
 #endif
 
 /* Argument checking features. */
@@ -2028,17 +2048,19 @@ SLJIT_API_FUNC_ATTRIBUTE struct sljit_const* sljit_emit_const(struct sljit_compi
 	return NULL;
 }
 
-SLJIT_API_FUNC_ATTRIBUTE void sljit_set_jump_addr(sljit_uw addr, sljit_uw new_addr)
+SLJIT_API_FUNC_ATTRIBUTE void sljit_set_jump_addr(sljit_uw addr, sljit_uw new_target, sljit_sw executable_offset)
 {
 	SLJIT_UNUSED_ARG(addr);
-	SLJIT_UNUSED_ARG(new_addr);
+	SLJIT_UNUSED_ARG(new_target);
+	SLJIT_UNUSED_ARG(executable_offset);
 	SLJIT_ASSERT_STOP();
 }
 
-SLJIT_API_FUNC_ATTRIBUTE void sljit_set_const(sljit_uw addr, sljit_sw new_constant)
+SLJIT_API_FUNC_ATTRIBUTE void sljit_set_const(sljit_uw addr, sljit_sw new_constant, sljit_sw executable_offset)
 {
 	SLJIT_UNUSED_ARG(addr);
 	SLJIT_UNUSED_ARG(new_constant);
+	SLJIT_UNUSED_ARG(executable_offset);
 	SLJIT_ASSERT_STOP();
 }
 

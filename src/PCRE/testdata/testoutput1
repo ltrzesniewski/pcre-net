@@ -9257,4 +9257,58 @@ No match
  1: b
  2: cccc
 
+# /x does not apply to MARK labels 
+
+/x (*MARK:ab cd # comment
+ef) x/x,mark
+    axxz
+ 0: xx
+MK: ab cd # comment\x0aef
+
+/(?<=a(B){0}c)X/
+    acX
+ 0: X
+
+/(?<DEFINE>b)(?(DEFINE)(a+))(?&DEFINE)/          
+    bbbb 
+ 0: bb
+ 1: b
+\= Expect no match     
+    baaab
+No match
+
+/(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[,;:])(?=.{8,16})(?!.*[\s])/
+    \   Fred:099
+ 0: 
+
+/(?=.*X)X$/ 
+    \  X
+ 0: X
+
+/(?s)(?=.*?)b/
+    aabc
+ 0: b
+
+/(Z)(a)\2{1,2}?(?-i)\1X/i
+    ZaAAZX
+ 0: ZaAAZX
+ 1: Z
+ 2: a
+
+/(?'c')XX(?'YYYYYYYYYYYYYYYYYYYYYYYCl')/
+
+/[s[:digit:]\E-H]+/
+    s09-H
+ 0: s09-H
+
+/[s[:digit:]\Q\E-H]+/
+    s09-H
+ 0: s09-H
+
+/a+(?:|b)a/
+    aaaa
+ 0: aaaa
+
+/X?(R||){3335}/
+
 # End of testinput1 

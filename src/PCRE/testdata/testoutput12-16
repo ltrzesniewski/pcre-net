@@ -557,7 +557,7 @@ Subject length lower bound = 1
  0: \x{11234}
 
 /(*UTF-32)\x{11234}/
-Failed: error 134 at offset 17: character code point value in \x{} or \o{} is too large
+Failed: error 160 at offset 5: (*VERB) not recognized or malformed
   abcd\x{11234}pqr
 
 /(*UTF-32)\x{112}/
@@ -1366,5 +1366,53 @@ Subject length lower bound = 2
 /./utf
     \x{110000}
 ** Failed: character \x{110000} is greater than 0x10ffff and so cannot be converted to UTF-16
+
+/(*UTF)abý¿¿¿¿¿z/B
+------------------------------------------------------------------
+        Bra
+        ab\x{fd}\x{bf}\x{bf}\x{bf}\x{bf}\x{bf}z
+        Ket
+        End
+------------------------------------------------------------------
+
+/abý¿¿¿¿¿z/utf
+** Failed: character value greater than 0x10ffff cannot be converted to UTF
+
+/[\W\p{Any}]/B
+------------------------------------------------------------------
+        Bra
+        [\x00-/:-@[-^`{-\xff\p{Any}\x{100}-\x{ffff}]
+        Ket
+        End
+------------------------------------------------------------------
+    abc
+ 0: a
+    123 
+ 0: 1
+
+/[\W\pL]/B
+------------------------------------------------------------------
+        Bra
+        [\x00-/:-@[-^`{-\xff\p{L}\x{100}-\x{ffff}]
+        Ket
+        End
+------------------------------------------------------------------
+    abc
+ 0: a
+    \x{100}
+ 0: \x{100}
+    \x{308}  
+ 0: \x{308}
+\= Expect no match
+    123     
+No match
+
+/[\s[:^ascii:]]/B,ucp
+------------------------------------------------------------------
+        Bra
+        [\x80-\xff\p{Xsp}\x{100}-\x{ffff}]
+        Ket
+        End
+------------------------------------------------------------------
 
 # End of testinput12

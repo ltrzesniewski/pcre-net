@@ -187,14 +187,6 @@
 /* External function definitions. */
 /**********************************/
 
-#if !(defined SLJIT_STD_MACROS_DEFINED && SLJIT_STD_MACROS_DEFINED)
-
-/* These libraries are needed for the macros below. */
-#include <stdlib.h>
-#include <string.h>
-
-#endif /* SLJIT_STD_MACROS_DEFINED */
-
 /* General macros:
    Note: SLJIT is designed to be independent from them as possible.
 
@@ -545,6 +537,14 @@ SLJIT_API_FUNC_ATTRIBUTE void sljit_free_exec(void* ptr);
 SLJIT_API_FUNC_ATTRIBUTE void sljit_free_unused_memory_exec(void);
 #define SLJIT_MALLOC_EXEC(size) sljit_malloc_exec(size)
 #define SLJIT_FREE_EXEC(ptr) sljit_free_exec(ptr)
+
+#if (defined SLJIT_PROT_EXECUTABLE_ALLOCATOR && SLJIT_PROT_EXECUTABLE_ALLOCATOR)
+SLJIT_API_FUNC_ATTRIBUTE sljit_sw sljit_exec_offset(void* ptr);
+#define SLJIT_EXEC_OFFSET(ptr) sljit_exec_offset(ptr)
+#else
+#define SLJIT_EXEC_OFFSET(ptr) 0
+#endif
+
 #endif
 
 /**********************************************/

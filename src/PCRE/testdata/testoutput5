@@ -3,6 +3,8 @@
 # results in 8-bit, 16-bit, and 32-bit modes are excluded (see tests 10 and
 # 12).
 
+#newline_default lf any anycrlf
+
 # PCRE2 and Perl disagree about the characteristics of certain Unicode
 # characters. For example, 061C is considered by Perl to be Arabic, though
 # is it not listed as such in the Unicode Scripts.txt file, and 2066-2069 are
@@ -1746,7 +1748,7 @@ No match
 ------------------------------------------------------------------
 
 /\ud800/utf,alt_bsux,allow_empty_class,match_unset_backref
-Failed: error 173 at offset 5: disallowed Unicode code point (>= 0xd800 && <= 0xdfff)
+Failed: error 173 at offset 6: disallowed Unicode code point (>= 0xd800 && <= 0xdfff)
 
 /^a+[a\x{200}]/B,utf
 ------------------------------------------------------------------
@@ -3997,7 +3999,7 @@ Failed: error 122 at offset 1227: unmatched closing parenthesis
 /$(&.+[\p{Me}].\s\xdcC*?(?(<y>))(?<!^)$C((;*?(R))+(?(R)){0,6}?|){12\x8a\X*?\x8a\x0b\xd1^9\3*+(\xc1,\k'P'\xb4)\xcc(z\z(?JJ)(?'X'8};(\x0b\xd1^9\?'3*+(\xc1.]k+\x0b'Pm'\xb4\xcc4'\xd1'(?'X'))?-%--\x95$9*\4'|\xd1(''%\x95*$9)#(?'R')3\x07?('P\xed')\\x16:;()\x1e\x10*:(?<y>)\xd1+!~:(?)''(d'E:yD!\s(?'R'\x1e;\x10:U))|')g!\xb0*){29+))#(?'P'})*?/
 
 "(*UTF)(*UCP)(.UTF).+X(\V+;\^(\D|)!999}(?(?C{7(?C')\H*\S*/^\x5\xa\\xd3\x85n?(;\D*(?m).[^mH+((*UCP)(*U:F)})(?!^)(?'"
-Failed: error 124 at offset 113: letter or underscore expected after (?< or (?'
+Failed: error 162 at offset 113: subpattern name expected
 
 /[\pS#moq]/
     =
@@ -4019,31 +4021,6 @@ MK: a\x{12345}b\x{09}(d)c
 /((?<digit>\d)|(?<letter>\p{L}))/g,substitute_extended,replace=<${digit:+digit; :not digit; }${letter:+letter:not a letter}>
     ab12cde
  7: <not digit; letter><not digit; letter><digit; not a letter><digit; not a letter><not digit; letter><not digit; letter><not digit; letter>
-
-/[\W\p{Any}]/B
-------------------------------------------------------------------
-        Bra
-        [\x00-/:-@[-^`{-\xff\p{Any}]
-        Ket
-        End
-------------------------------------------------------------------
-    abc
- 0: a
-    123 
- 0: 1
-
-/[\W\pL]/B
-------------------------------------------------------------------
-        Bra
-        [\x00-/:-@[-^`{-\xff\p{L}]
-        Ket
-        End
-------------------------------------------------------------------
-    abc
- 0: a
-\= Expect no match
-    123     
-No match
 
 /(*UCP)(*UTF)[[:>:]]X/B
 ------------------------------------------------------------------
@@ -4160,5 +4137,99 @@ No match
 
 /(*UTF)C\x09((?<!'(?x)!*H? #\xcc\x9a[^$]/
 Failed: error 114 at offset 39: missing closing parenthesis
+
+/[\D]/utf
+    \x{1d7cf}
+ 0: \x{1d7cf}
+
+/[\D\P{Nd}]/utf
+    \x{1d7cf}
+ 0: \x{1d7cf}
+
+/[^\D]/utf
+    a9b
+ 0: 9
+\= Expect no match
+    \x{1d7cf}
+No match
+
+/[^\D\P{Nd}]/utf
+    a9b
+ 0: 9
+    \x{1d7cf}
+ 0: \x{1d7cf}
+\= Expect no match
+    \x{10000}
+No match
+    
+# Hex uses pattern length, not zero-terminated. This tests for overrunning
+# the given length of a pattern.
+
+/'(*UTF)'/hex 
+
+/'#('/hex,extended,utf
+
+/a(?<=A\XB)/utf
+Failed: error 125 at offset 1: lookbehind assertion is not fixed length
+
+/ab(?<=A\RB)/utf
+Failed: error 125 at offset 2: lookbehind assertion is not fixed length
+
+/../utf,auto_callout
+    \n\x{123}\x{123}\x{123}\x{123}
+--->\x{0a}\x{123}\x{123}\x{123}\x{123}
+ +0 ^                                      .
+ +0       ^                                .
+ +1       ^      ^                         .
+ +2       ^             ^                  
+ 0: \x{123}\x{123}
+
+# This tests processing wide characters in extended mode.
+
+/XȀ/x,utf
+
+# These three test a bug fix that was not clearing up after a locale setting
+# when the test or a subsequent one matched a wide character.
+
+//locale=C
+
+/[\P{Yi}]/utf
+\x{2f000}
+ 0: \x{2f000}
+
+/[\P{Yi}]/utf,locale=C
+\x{2f000}
+ 0: \x{2f000}
+
+/^(?<!(?=􃡜))/B,utf
+------------------------------------------------------------------
+        Bra
+        ^
+        AssertB not
+        Assert
+        \x{10385c}
+        Ket
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+
+# Horizontal and vertical space lists ignore caseless
+
+/[\HH]/Bi,utf
+------------------------------------------------------------------
+        Bra
+        [\x00-\x08\x0a-\x1f!-\x9f\xa1-\xff\x{100}-\x{167f}\x{1681}-\x{180d}\x{180f}-\x{1fff}\x{200b}-\x{202e}\x{2030}-\x{205e}\x{2060}-\x{2fff}\x{3001}-\x{10ffff}]
+        Ket
+        End
+------------------------------------------------------------------
+
+/[^\HH]/Bi,utf
+------------------------------------------------------------------
+        Bra
+        [^\x00-\x08\x0a-\x1f!-\x9f\xa1-\xff\x{100}-\x{167f}\x{1681}-\x{180d}\x{180f}-\x{1fff}\x{200b}-\x{202e}\x{2030}-\x{205e}\x{2060}-\x{2fff}\x{3001}-\x{10ffff}]
+        Ket
+        End
+------------------------------------------------------------------
 
 # End of testinput5 

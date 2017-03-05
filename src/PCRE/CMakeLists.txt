@@ -74,6 +74,9 @@
 # 2016-03-01 PH applied Chris Wilson's patch for MSVC static
 # 2016-06-24 PH applied Chris Wilson's second patch, putting the first under
 #            a new option instead of being unconditional.
+# 2016-10-05 PH fixed a typo (PCRE should be PCRE2) in above patch
+#            fix by David Gaussmann
+# 2016-10-07 PH added PCREGREP_MAX_BUFSIZE
 
 PROJECT(PCRE2 C)
 
@@ -146,7 +149,10 @@ SET(PCRE2_MATCH_LIMIT_RECURSION "MATCH_LIMIT" CACHE STRING
     "Default limit on internal recursion. See MATCH_LIMIT_RECURSION in config.h.in for details.")
 
 SET(PCRE2GREP_BUFSIZE "20480" CACHE STRING
-    "Buffer size parameter for pcre2grep. See PCRE2GREP_BUFSIZE in config.h.in for details.")
+    "Buffer starting size parameter for pcre2grep. See PCRE2GREP_BUFSIZE in config.h.in for details.")
+
+SET(PCRE2GREP_MAX_BUFSIZE "1048576" CACHE STRING
+    "Buffer maximum size parameter for pcre2grep. See PCRE2GREP_MAX_BUFSIZE in config.h.in for details.")
 
 SET(PCRE2_NEWLINE "LF" CACHE STRING
     "What to recognize as a newline (one of CR, LF, CRLF, ANY, ANYCRLF).")
@@ -190,7 +196,7 @@ IF (MINGW)
 ENDIF(MINGW)
 
 IF(MSVC)
-  OPTION(PCRE_STATIC_RUNTIME OFF CACHE BOOL
+  OPTION(PCRE2_STATIC_RUNTIME
 	"ON=Compile against the static runtime (/MT)."
 	OFF)
   OPTION(INSTALL_MSVC_PDB
@@ -505,18 +511,18 @@ ADD_LIBRARY(pcre2-8 ${PCRE2_HEADERS} ${PCRE2_SOURCES} ${PROJECT_BINARY_DIR}/conf
 SET_PROPERTY(TARGET pcre2-8
   PROPERTY COMPILE_DEFINITIONS PCRE2_CODE_UNIT_WIDTH=8)
 SET(targets ${targets} pcre2-8)
-ADD_LIBRARY(pcre2posix ${PCRE2POSIX_HEADERS} ${PCRE2POSIX_SOURCES})
-SET_PROPERTY(TARGET pcre2posix
+ADD_LIBRARY(pcre2-posix ${PCRE2POSIX_HEADERS} ${PCRE2POSIX_SOURCES})
+SET_PROPERTY(TARGET pcre2-posix
   PROPERTY COMPILE_DEFINITIONS PCRE2_CODE_UNIT_WIDTH=8)
-SET(targets ${targets} pcre2posix)
-TARGET_LINK_LIBRARIES(pcre2posix pcre2-8)
+SET(targets ${targets} pcre2-posix)
+TARGET_LINK_LIBRARIES(pcre2-posix pcre2-8)
 
 IF(MINGW AND NOT PCRE2_STATIC)
   IF(NON_STANDARD_LIB_PREFIX)
-    SET_TARGET_PROPERTIES(pcre2-8 pcre2posix PROPERTIES PREFIX "")
+    SET_TARGET_PROPERTIES(pcre2-8 pcre2-posix PROPERTIES PREFIX "")
   ENDIF(NON_STANDARD_LIB_PREFIX)
   IF(NON_STANDARD_LIB_SUFFIX)
-    SET_TARGET_PROPERTIES(pcre2-8 pcre2posix PROPERTIES SUFFIX "-0.dll")
+    SET_TARGET_PROPERTIES(pcre2-8 pcre2-posix PROPERTIES SUFFIX "-0.dll")
   ENDIF(NON_STANDARD_LIB_SUFFIX)
 ENDIF(MINGW AND NOT PCRE2_STATIC)
 ENDIF(PCRE2_BUILD_PCRE2_8)
@@ -564,7 +570,7 @@ IF(PCRE2_BUILD_PCRE2GREP)
   SET_PROPERTY(TARGET pcre2grep
     PROPERTY COMPILE_DEFINITIONS PCRE2_CODE_UNIT_WIDTH=8)
   SET(targets ${targets} pcre2grep)
-  TARGET_LINK_LIBRARIES(pcre2grep pcre2posix ${PCRE2GREP_LIBS})
+  TARGET_LINK_LIBRARIES(pcre2grep pcre2-posix ${PCRE2GREP_LIBS})
 ENDIF(PCRE2_BUILD_PCRE2GREP)
 
 # Testing
@@ -577,7 +583,7 @@ IF(PCRE2_BUILD_TESTS)
   ADD_EXECUTABLE(pcre2test ${PCRE2TEST_SOURCES})
   SET(targets ${targets} pcre2test)
   IF(PCRE2_BUILD_PCRE2_8)
-    LIST(APPEND PCRE2TEST_LIBS pcre2posix pcre2-8)
+    LIST(APPEND PCRE2TEST_LIBS pcre2-posix pcre2-8)
   ENDIF(PCRE2_BUILD_PCRE2_8)
   IF(PCRE2_BUILD_PCRE2_16)
     LIST(APPEND PCRE2TEST_LIBS pcre2-16)

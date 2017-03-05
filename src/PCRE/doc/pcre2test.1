@@ -1,4 +1,4 @@
-.TH PCRE2TEST 1 "06 July 2016" "PCRE 10.22"
+.TH PCRE2TEST 1 "28 December 2016" "PCRE 10.23"
 .SH NAME
 pcre2test - a program for testing Perl-compatible regular expressions.
 .SH SYNOPSIS
@@ -29,7 +29,7 @@ subject is processed, and what output is produced.
 .P
 As the original fairly simple PCRE library evolved, it acquired many different
 features, and as a result, the original \fBpcretest\fP program ended up with a
-lot of options in a messy, arcane syntax, for testing all the features. The
+lot of options in a messy, arcane syntax for testing all the features. The
 move to the new PCRE2 API provided an opportunity to re-implement the test
 program as \fBpcre2test\fP, with a cleaner modifier syntax. Nevertheless, there
 are still many obscure modifiers, some of which are specifically designed for
@@ -47,32 +47,63 @@ strings that are encoded in 8-bit, 16-bit, or 32-bit code units. One, two, or
 all three of these libraries may be simultaneously installed. The
 \fBpcre2test\fP program can be used to test all the libraries. However, its own
 input and output are always in 8-bit format. When testing the 16-bit or 32-bit
-libraries, patterns and subject strings are converted to 16- or 32-bit format
-before being passed to the library functions. Results are converted back to
-8-bit code units for output.
+libraries, patterns and subject strings are converted to 16-bit or 32-bit
+format before being passed to the library functions. Results are converted back
+to 8-bit code units for output.
 .P
 In the rest of this document, the names of library functions and structures
 are given in generic form, for example, \fBpcre_compile()\fP. The actual
 names used in the libraries have a suffix _8, _16, or _32, as appropriate.
 .
 .
+.\" HTML <a name="inputencoding"></a>
 .SH "INPUT ENCODING"
 .rs
 .sp
 Input to \fBpcre2test\fP is processed line by line, either by calling the C
-library's \fBfgets()\fP function, or via the \fBlibreadline\fP library (see
-below). The input is processed using using C's string functions, so must not
-contain binary zeroes, even though in Unix-like environments, \fBfgets()\fP
-treats any bytes other than newline as data characters. In some Windows
-environments character 26 (hex 1A) causes an immediate end of file, and no
-further data is read.
+library's \fBfgets()\fP function, or via the \fBlibreadline\fP library. In some
+Windows environments character 26 (hex 1A) causes an immediate end of file, and
+no further data is read, so this character should be avoided unless you really
+want that action.
 .P
-For maximum portability, therefore, it is safest to avoid non-printing
-characters in \fBpcre2test\fP input files. There is a facility for specifying
-some or all of a pattern's characters as hexadecimal pairs, thus making it
-possible to include binary zeroes in a pattern for testing purposes. Subject
-lines are processed for backslash escapes, which makes it possible to include
-any data value.
+The input is processed using using C's string functions, so must not
+contain binary zeroes, even though in Unix-like environments, \fBfgets()\fP
+treats any bytes other than newline as data characters. An error is generated
+if a binary zero is encountered. Subject lines are processed for backslash
+escapes, which makes it possible to include any data value in strings that are
+passed to the library for matching. For patterns, there is a facility for
+specifying some or all of the 8-bit input characters as hexadecimal pairs,
+which makes it possible to include binary zeros.
+.
+.
+.SS "Input for the 16-bit and 32-bit libraries"
+.rs
+.sp
+When testing the 16-bit or 32-bit libraries, there is a need to be able to
+generate character code points greater than 255 in the strings that are passed
+to the library. For subject lines, backslash escapes can be used. In addition,
+when the \fButf\fP modifier (see
+.\" HTML <a href="#optionmodifiers">
+.\" </a>
+"Setting compilation options"
+.\"
+below) is set, the pattern and any following subject lines are interpreted as
+UTF-8 strings and translated to UTF-16 or UTF-32 as appropriate.
+.P
+For non-UTF testing of wide characters, the \fButf8_input\fP modifier can be
+used. This is mutually exclusive with \fButf\fP, and is allowed only in 16-bit
+or 32-bit mode. It causes the pattern and following subject lines to be treated
+as UTF-8 according to the original definition (RFC 2279), which allows for
+character values up to 0x7fffffff. Each character is placed in one 16-bit or
+32-bit code unit (in the 16-bit case, values greater than 0xffff cause an error
+to occur).
+.P
+UTF-8 is not capable of encoding values greater than 0x7fffffff, but such
+values can be handled by the 32-bit library. When testing this library in
+non-UTF mode with \fButf8_input\fP set, if any character is preceded by the
+byte 0xff (which is an illegal byte in UTF-8) 0x80000000 is added to the
+character's value. This is the only way of passing such code points in a
+pattern string. For subject strings, using an escape sequence is preferable.
 .
 .
 .SH "COMMAND LINE OPTIONS"
@@ -93,8 +124,12 @@ If the 32-bit library has been built, this option causes it to be used. If only
 the 32-bit library has been built, this is the default. If the 32-bit library
 has not been built, this option causes an error.
 .TP 10
+\fB-ac\fP
+Behave as if each pattern has the \fBauto_callout\fP modifier, that is, insert
+automatic callouts into every pattern that is compiled.
+.TP 10
 \fB-b\fP
-Behave as if each pattern has the \fB/fullbincode\fP modifier; the full
+Behave as if each pattern has the \fBfullbincode\fP modifier; the full
 internal binary form of the pattern is output after compilation.
 .TP 10
 \fB-C\fP
@@ -153,7 +188,7 @@ a convenience facility for PCRE2 maintainers.
 Output a brief summary these options and then exit.
 .TP 10
 \fB-i\fP
-Behave as if each pattern has the \fB/info\fP modifier; information about the
+Behave as if each pattern has the \fBinfo\fP modifier; information about the
 compiled pattern is given after compilation.
 .TP 10
 \fB-jit\fP
@@ -515,7 +550,9 @@ for a description of their effects.
 As well as turning on the PCRE2_UTF option, the \fButf\fP modifier causes all
 non-printing characters in output strings to be printed using the \ex{hh...}
 notation. Otherwise, those less than 0x100 are output in hex without the curly
-brackets.
+brackets. Setting \fButf\fP in 16-bit or 32-bit mode also causes pattern and
+subject strings to be translated to UTF-16 or UTF-32, respectively, before
+being passed to library functions.
 .
 .
 .\" HTML <a name="controlmodifiers"></a>
@@ -547,6 +584,8 @@ about the pattern:
       pushcopy                  push a copy onto the stack
       stackguard=<number>       test the stackguard feature
       tables=[0|1|2]            select internal tables
+      use_length                do not zero-terminate the pattern
+      utf8_input                treat input as UTF-8
 .sp
 The effects of these modifiers are described in the following sections.
 .
@@ -624,6 +663,18 @@ testing that \fBpcre2_compile()\fP behaves correctly in this case (it uses
 default values).
 .
 .
+.SS "Specifying the pattern's length"
+.rs
+.sp
+By default, patterns are passed to the compiling functions as zero-terminated
+strings. When using the POSIX wrapper API, there is no other option. However,
+when using PCRE2's native API, patterns can be passed by length instead of
+being zero-terminated. The \fBuse_length\fP modifier causes this to happen.
+Using a length happens automatically (whether or not \fBuse_length\fP is set)
+when \fBhex\fP is set, because patterns specified in hexadecimal may contain
+binary zeros.
+.
+.
 .SS "Specifying pattern characters in hexadecimal"
 .rs
 .sp
@@ -642,12 +693,29 @@ nine characters, only two of which are specified in hexadecimal:
   /ab "literal" 32/hex
 .sp
 Either single or double quotes may be used. There is no way of including
-the delimiter within a substring.
+the delimiter within a substring. The \fBhex\fP and \fBexpand\fP modifiers are
+mutually exclusive.
 .P
-By default, \fBpcre2test\fP passes patterns as zero-terminated strings to
-\fBpcre2_compile()\fP, giving the length as PCRE2_ZERO_TERMINATED. However, for
-patterns specified with the \fBhex\fP modifier, the actual length of the
-pattern is passed.
+The POSIX API cannot be used with patterns specified in hexadecimal because
+they may contain binary zeros, which conflicts with \fBregcomp()\fP's
+requirement for a zero-terminated string. Such patterns are always passed to
+\fBpcre2_compile()\fP as a string with a length, not as zero-terminated.
+.
+.
+.SS "Specifying wide characters in 16-bit and 32-bit modes"
+.rs
+.sp
+In 16-bit and 32-bit modes, all input is automatically treated as UTF-8 and
+translated to UTF-16 or UTF-32 when the \fButf\fP modifier is set. For testing
+the 16-bit and 32-bit libraries in non-UTF mode, the \fButf8_input\fP modifier
+can be used. It is mutually exclusive with \fButf\fP. Input lines are
+interpreted as UTF-8 as a means of specifying wide characters. More details are
+given in
+.\" HTML <a href="#inputencoding">
+.\" </a>
+"Input encoding"
+.\"
+above.
 .
 .
 .SS "Generating long repetitive patterns"
@@ -665,7 +733,8 @@ are expanded before the pattern is passed to \fBpcre2_compile()\fP. For
 example, \e[AB]{6000} is expanded to "ABAB..." 6000 times. This construction
 cannot be nested. An initial "\e[" sequence is recognized only if "]{" followed
 by decimal digits and "}" is found later in the pattern. If not, the characters
-remain in the pattern unaltered.
+remain in the pattern unaltered. The \fBexpand\fP and \fBhex\fP modifiers are
+mutually exclusive.
 .P
 If part of an expanded pattern looks like an expansion, but is really part of
 the actual pattern, unwanted expansion can be avoided by giving two values in
@@ -705,7 +774,7 @@ modes are to be compiled:
   2  compile JIT code for soft partial matching
   4  compile JIT code for hard partial matching
 .sp
-The possible values for the \fB/jit\fP modifier are therefore:
+The possible values for the \fBjit\fP modifier are therefore:
 .sp
   0  disable JIT
   1  normal matching only
@@ -750,14 +819,14 @@ code was actually used in the match.
 .SS "Setting a locale"
 .rs
 .sp
-The \fB/locale\fP modifier must specify the name of a locale, for example:
+The \fBlocale\fP modifier must specify the name of a locale, for example:
 .sp
   /pattern/locale=fr_FR
 .sp
 The given locale is set, \fBpcre2_maketables()\fP is called to build a set of
 character tables for the locale, and this is then passed to
 \fBpcre2_compile()\fP when compiling the regular expression. The same tables
-are used when matching the following subject lines. The \fB/locale\fP modifier
+are used when matching the following subject lines. The \fBlocale\fP modifier
 applies only to the pattern on which it appears, but can be given in a
 \fB#pattern\fP command if a default is needed. Setting a locale and alternate
 character tables are mutually exclusive.
@@ -766,7 +835,7 @@ character tables are mutually exclusive.
 .SS "Showing pattern memory"
 .rs
 .sp
-The \fB/memory\fP modifier causes the size in bytes of the memory used to hold
+The \fBmemory\fP modifier causes the size in bytes of the memory used to hold
 the compiled pattern to be output. This does not include the size of the
 \fBpcre2_code\fP block; it is just the actual compiled data. If the pattern is
 subsequently passed to the JIT compiler, the size of the JIT compiled code is
@@ -835,7 +904,7 @@ an error.
 .SS "Testing the stack guard feature"
 .rs
 .sp
-The \fB/stackguard\fP modifier is used to test the use of
+The \fBstackguard\fP modifier is used to test the use of
 \fBpcre2_set_compile_recursion_guard()\fP, a function that is provided to
 enable stack availability to be checked during compilation (see the
 .\" HREF
@@ -852,7 +921,7 @@ be aborted.
 .SS "Using alternative character tables"
 .rs
 .sp
-The value specified for the \fB/tables\fP modifier must be one of the digits 0,
+The value specified for the \fBtables\fP modifier must be one of the digits 0,
 1, or 2. It causes a specific set of built-in character tables to be passed to
 \fBpcre2_compile()\fP. This is used in the PCRE2 tests to check behaviour with
 different character tables. The digit specifies the tables as follows:
@@ -949,7 +1018,7 @@ for a description of their effects.
 The partial matching modifiers are provided with abbreviations because they
 appear frequently in tests.
 .P
-If the \fB/posix\fP modifier was present on the pattern, causing the POSIX
+If the \fBposix\fP modifier was present on the pattern, causing the POSIX
 wrapper API to be used, the only option-setting modifiers that have any effect
 are \fBnotbol\fP, \fBnotempty\fP, and \fBnoteol\fP, causing REG_NOTBOL,
 REG_NOTEMPTY, and REG_NOTEOL, respectively, to be passed to \fBregexec()\fP.
@@ -971,6 +1040,7 @@ pattern.
       altglobal                  alternative global matching
       callout_capture            show captures at callout time
       callout_data=<n>           set a value to pass via callouts
+      callout_error=<n>[:<m>]    control callout error
       callout_fail=<n>[:<m>]     control callout failure
       callout_none               do not supply a callout function
       copy=<number or name>      copy captured substring
@@ -1064,14 +1134,20 @@ does no capturing); it is ignored, with a warning message, if present.
 .sp
 A callout function is supplied when \fBpcre2test\fP calls the library matching
 functions, unless \fBcallout_none\fP is specified. If \fBcallout_capture\fP is
-set, the current captured groups are output when a callout occurs.
+set, the current captured groups are output when a callout occurs. The default
+return from the callout function is zero, which allows matching to continue.
 .P
 The \fBcallout_fail\fP modifier can be given one or two numbers. If there is
-only one number, 1 is returned instead of 0 when a callout of that number is
-reached. If two numbers are given, 1 is returned when callout <n> is reached
-for the <m>th time. Note that callouts with string arguments are always given
-the number zero. See "Callouts" below for a description of the output when a
-callout it taken.
+only one number, 1 is returned instead of 0 (causing matching to backtrack)
+when a callout of that number is reached. If two numbers (<n>:<m>) are given, 1
+is returned when callout <n> is reached and there have been at least <m>
+callouts. The \fBcallout_error\fP modifier is similar, except that
+PCRE2_ERROR_CALLOUT is returned, causing the entire matching process to be
+aborted. If both these modifiers are set for the same callout number,
+\fBcallout_error\fP takes precedence.
+.P
+Note that callouts with string arguments are always given the number zero. See
+"Callouts" below for a description of the output when a callout it taken.
 .P
 The \fBcallout_data\fP modifier can be given an unsigned or a negative number.
 This is set as the "user data" that is passed to the matching function, and
@@ -1083,7 +1159,7 @@ used as a return from \fBpcre2test\fP's callout function.
 .rs
 .sp
 Searching for all possible matches within a subject can be requested by the
-\fBglobal\fP or \fB/altglobal\fP modifier. After finding a match, the matching
+\fBglobal\fP or \fBaltglobal\fP modifier. After finding a match, the matching
 function is called again to search the remainder of the subject. The difference
 between \fBglobal\fP and \fBaltglobal\fP is that the former uses the
 \fIstart_offset\fP argument to \fBpcre2_match()\fP or \fBpcre2_dfa_match()\fP
@@ -1376,7 +1452,7 @@ unset substring is shown as "<unset>", as for the second data line.
 If the strings contain any non-printing characters, they are output as \exhh
 escapes if the value is less than 256 and UTF mode is not set. Otherwise they
 are output as \ex{hh...} escapes. See below for the definition of non-printing
-characters. If the \fB/aftertext\fP modifier is set, the output for substring
+characters. If the \fBaftertext\fP modifier is set, the output for substring
 0 is followed by the the rest of the subject string, identified by "0+" like
 this:
 .sp
@@ -1574,7 +1650,7 @@ therefore shown as hex escapes.
 .P
 When \fBpcre2test\fP is outputting text that is a matched part of a subject
 string, it behaves in the same way, unless a different locale has been set for
-the pattern (using the \fB/locale\fP modifier). In this case, the
+the pattern (using the \fBlocale\fP modifier). In this case, the
 \fBisprint()\fP function is used to distinguish printing and non-printing
 characters.
 .
@@ -1682,6 +1758,6 @@ Cambridge, England.
 .rs
 .sp
 .nf
-Last updated: 06 July 2016
+Last updated: 28 December 2016
 Copyright (c) 1997-2016 University of Cambridge.
 .fi
