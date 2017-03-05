@@ -12,11 +12,11 @@ using namespace System::Security::Permissions;
 [assembly:AssemblyConfigurationAttribute(L"")];
 [assembly:AssemblyCompanyAttribute(L"")];
 [assembly:AssemblyProductAttribute(L"PCRE.NET")];
-[assembly:AssemblyCopyrightAttribute(L"Copyright (c) Lucas Trzesniewski 2014-2016")];
+[assembly:AssemblyCopyrightAttribute(L"Copyright (c) Lucas Trzesniewski 2014-2017")];
 [assembly:AssemblyTrademarkAttribute(L"")];
 [assembly:AssemblyCultureAttribute(L"")];
 
 
-[assembly:AssemblyVersionAttribute("0.6.2.0")];
+[assembly:AssemblyVersionAttribute("0.6.3.0")];
 [assembly:ComVisible(false)];
 [assembly:CLSCompliantAttribute(true)];
