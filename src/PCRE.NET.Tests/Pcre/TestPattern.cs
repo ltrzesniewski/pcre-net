@@ -22,6 +22,8 @@ namespace PCRE.Tests.Pcre
         public string ReplaceWith { get; set; }
         public bool SubjectLiteral { get; set; }
 
+        public bool NotSupported { get; set; }
+
         public override bool Equals(object obj)
         {
             return Equals(obj as TestPattern);

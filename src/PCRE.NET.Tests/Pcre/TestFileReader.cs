@@ -215,7 +215,10 @@ namespace PCRE.Tests.Pcre
                     case "startchar":
                     case "stackguard":
                     case "parens_nest_limit":
-                    case "jitstack":
+                        break;
+
+                    case "jitstack": // TODO
+                        pattern.NotSupported = true;
                         break;
 
                     default:

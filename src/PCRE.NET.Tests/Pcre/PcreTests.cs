@@ -27,6 +27,10 @@ namespace PCRE.Tests.Pcre
         private static void RunTest(TestCase testCase, TestOutput expectedResult, PcreOptions options)
         {
             var pattern = testCase.Pattern;
+
+            if (pattern.NotSupported)
+                Assert.Inconclusive("Feature not supported");
+
             options = (options | pattern.PatternOptions) & ~pattern.ResetOptionBits;
 
             Console.WriteLine("Options: {0}", options);
