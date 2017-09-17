@@ -236,7 +236,10 @@ namespace PCRE.Tests.Pcre
                                     break;
 
                                 case 'x':
-                                    pattern.PatternOptions |= PcreOptions.IgnorePatternWhitespace;
+                                    if ((pattern.PatternOptions & PcreOptions.Extended) != 0)
+                                        pattern.PatternOptions = pattern.PatternOptions & ~PcreOptions.Extended | PcreOptions.ExtendedMore;
+                                    else
+                                        pattern.PatternOptions |= PcreOptions.Extended;
                                     break;
 
                                 case 'g':
