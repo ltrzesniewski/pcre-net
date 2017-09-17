@@ -1861,11 +1861,6 @@
 \= Expect no match
     aaa
 
-/[\d-z]+/
-    12-34z
-\= Expect no match
-    aaa
-
 /\x5c/
     \\
 
@@ -3813,13 +3808,6 @@
 /a*/g
     abbab
 
-/^[\d-a]/
-    abcde
-    -things
-    0digit
-\= Expect no match
-    bcdef    
-    
 /[[:space:]]+/
     > \x09\x0a\x0c\x0d\x0b<
      
@@ -4882,8 +4870,66 @@
     aaa\=allcaptures
     a\=allcaptures
 
-/(*LIMIT_RECURSION=100)^((.)(?1)|.)$/
-\= Expect recursion limit exceeded
+/(*LIMIT_DEPTH=100)^((.)(?1)|.)$/
+\= Expect depth limit exceeded
     a[00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]
+
+/(02-)?[0-9]{3}-[0-9]{3}/
+    02-123-123
+
+/^(a(?2))(b)(?1)/
+    abbab\=find_limits 
+
+/abc/endanchored
+    xyzabc
+\= Expect no match
+    xyzabcdef
+\= Expect error
+    xyzabc\=ph
+
+/abc/
+    xyzabc\=endanchored
+\= Expect no match
+    xyzabcdef\=endanchored
+\= Expect error
+    xyzabc\=ps,endanchored
+
+/abc|bcd/endanchored
+    xyzabcd
+\= Expect no match
+    xyzabcdef
+
+/(*NUL)^.*/
+    a\nb\x00ccc
+    
+/(*NUL)^.*/s
+    a\nb\x00ccc
+    
+/^x/m,newline=nul
+    ab\x00xy
+    
+/'#comment' 0d 0a 00 '^x\' 0a 'y'/x,newline=nul,hex
+    x\nyz 
+ 
+/(*NUL)^X\NY/
+    X\nY
+    X\rY
+\= Expect no match
+    X\x00Y      
+
+/(?<=abc|)/
+    abcde\=aftertext
+    
+/(?<=|abc)/ 
+    abcde\=aftertext
+
+/(?<=abc|)/endanchored
+    abcde\=aftertext
+    
+/(?<=|abc)/endanchored
+    abcde\=aftertext
+
+/(*LIMIT_MATCH=100).*(?![|H]?.*(?![|H]?););.*(?![|H]?.*(?![|H]?););\x00\x00\x00\x00\x00\x00\x00(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?![|);)?.*(![|H]?);)?.*(?![|H]?);)?.*(?![|H]?);)?.*(?![|H]););![|H]?););[|H]?);|H]?);)\x00\x00\x00\x00\x00\x00H]?););?![|H]?);)?.*(?![|H]?););[||H]?);)?.*(?![|H]?););[|H]?);(?![|H]?););![|H]?););[|H]?);|H]?);)?.*(?![|H]?););;[\x00\x00\x00\x00\x00\x00\x00![|H]?););![|H]?););[|H]?);|H]?);)?.*(?![|H]?););/no_dotstar_anchor
+.*(?![|H]?.*(?![|H]?););.*(?![|H]?.*(?![|H]?););\x00\x00\x00\x00\x00\x00\x00(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?!(?![|);)?.*(![|H]?);)?.*(?![|H]?);)?.*(?![|H]?);)?.*(?![|H]););![|H]?););[|H]?);|H]?);)\x00\x00\x00\x00\x00\x00H]?););?![|H]?);)?.*(?![|H]?););[||H]?);)?.*(?![|H]?););[|H]?);(?![|H]?););![|H]?););[|H]?);|H]?);)?.*(?![|H]?););;[\x00\x00\x00\x00\x00\x00\x00![|H]?););![|H]?););[|H]?);|H]?);)?.*(?![|H]?););
 
 # End of testinput6

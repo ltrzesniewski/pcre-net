@@ -1,12 +1,12 @@
 # This set of tests is not Perl-compatible. It checks on special features
 # of PCRE2's API, error diagnostics, and the compiled code of some patterns.
-# It also checks the non-Perl syntax that PCRE2 supports (Python, .NET, 
-# Oniguruma). There are also some tests where PCRE2 and Perl differ, 
-# either because PCRE2 can't be compatible, or there is a possible Perl 
+# It also checks the non-Perl syntax that PCRE2 supports (Python, .NET,
+# Oniguruma). There are also some tests where PCRE2 and Perl differ,
+# either because PCRE2 can't be compatible, or there is a possible Perl
 # bug.
 
 # NOTE: This is a non-UTF set of tests. When UTF support is needed, use
-# test 5. 
+# test 5.
 
 #forbid_utf
 #newline_default lf any anycrlf
@@ -72,6 +72,7 @@ No match
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 3
     abc
  0: abc
@@ -110,6 +111,7 @@ Subject length lower bound = 2
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 3
     abc
  0: abc
@@ -339,6 +341,7 @@ Subject length lower bound = 19
 /the quick brown fox/I,anchored
 Capturing subpattern count = 0
 Options: anchored
+First code unit = 't'
 Subject length lower bound = 19
     the quick brown fox
  0: the quick brown fox
@@ -351,6 +354,7 @@ Failed: error 111 at offset 4: unrecognized character after (? or (?-
 
 /^abc|def/I
 Capturing subpattern count = 0
+Starting code units: a d 
 Subject length lower bound = 3
     abcdef
  0: abc
@@ -495,12 +499,14 @@ Subject length lower bound = 1
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+First code unit = '1'
 Subject length lower bound = 4
 
 /(^b|(?i)^d)/I
 Capturing subpattern count = 1
 Compile options: <none>
 Overall options: anchored
+Starting code units: D b d 
 Subject length lower bound = 1
 
 /(?s).*/I
@@ -624,6 +630,7 @@ Capturing subpattern count = 0
 Max lookbehind = 1
 Compile options: multiline
 Overall options: anchored multiline
+First code unit = 'a'
 Subject length lower bound = 3
 
 /^abc/Im
@@ -637,6 +644,7 @@ Subject length lower bound = 3
 Capturing subpattern count = 5
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 3
   aaaaabbbbbcccccdef
  0: aaaaabbbbbcccccdef
@@ -808,13 +816,14 @@ Capturing subpattern count = 1
 Max back reference = 1
 Compile options: <none>
 Overall options: anchored
+Starting code units: a 
 Subject length lower bound = 4
 \= Expect no match
     aaaa
 No match
     aaaaaa
 No match
-    
+
 # Perl does not fail these two for the final subjects. Neither did PCRE until
 # release 8.01. The problem is in backtracking into a subpattern that contains
 # a recursive reference to itself. PCRE has now made these into atomic patterns.
@@ -1004,6 +1013,7 @@ Subject length lower bound = 16
 Capturing subpattern count = 3
 Compile options: <none>
 Overall options: anchored
+Starting code units: a b 
 Subject length lower bound = 4
     adef\=get=1,get=2,get=3,get=4,getall
  0: adef
@@ -1042,6 +1052,7 @@ Get substring 4 failed (-49): unknown substring
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 7
     abc\00def\=copy=0,getall
  0: abc\x00def
@@ -1227,6 +1238,7 @@ Subject length lower bound = 3
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+First code unit = 'i'
 Subject length lower bound = 3
     ississippi
  0: iss
@@ -1286,6 +1298,7 @@ Capturing subpattern count = 0
 Contains explicit CR or LF match
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 3
     ab\nab\ncd
  0: ab\x0a
@@ -1776,6 +1789,8 @@ Subject length lower bound = 2
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: 0 1 2 3 4 5 6 7 8 9 A B C D E F G H I J K L M N O P 
+  Q R S T U V W X Y Z a b c d e f g h i j k l m n o p q r s t u v w x y z 
 Subject length lower bound = 1
 
 /^[[:^alnum:]]/IB
@@ -1789,6 +1804,18 @@ Subject length lower bound = 1
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: \x00 \x01 \x02 \x03 \x04 \x05 \x06 \x07 \x08 \x09 \x0a 
+  \x0b \x0c \x0d \x0e \x0f \x10 \x11 \x12 \x13 \x14 \x15 \x16 \x17 \x18 \x19 
+  \x1a \x1b \x1c \x1d \x1e \x1f \x20 ! " # $ % & ' ( ) * + , - . / : ; < = > 
+  ? @ [ \ ] ^ _ ` { | } ~ \x7f \x80 \x81 \x82 \x83 \x84 \x85 \x86 \x87 \x88 
+  \x89 \x8a \x8b \x8c \x8d \x8e \x8f \x90 \x91 \x92 \x93 \x94 \x95 \x96 \x97 
+  \x98 \x99 \x9a \x9b \x9c \x9d \x9e \x9f \xa0 \xa1 \xa2 \xa3 \xa4 \xa5 \xa6 
+  \xa7 \xa8 \xa9 \xaa \xab \xac \xad \xae \xaf \xb0 \xb1 \xb2 \xb3 \xb4 \xb5 
+  \xb6 \xb7 \xb8 \xb9 \xba \xbb \xbc \xbd \xbe \xbf \xc0 \xc1 \xc2 \xc3 \xc4 
+  \xc5 \xc6 \xc7 \xc8 \xc9 \xca \xcb \xcc \xcd \xce \xcf \xd0 \xd1 \xd2 \xd3 
+  \xd4 \xd5 \xd6 \xd7 \xd8 \xd9 \xda \xdb \xdc \xdd \xde \xdf \xe0 \xe1 \xe2 
+  \xe3 \xe4 \xe5 \xe6 \xe7 \xe8 \xe9 \xea \xeb \xec \xed \xee \xef \xf0 \xf1 
+  \xf2 \xf3 \xf4 \xf5 \xf6 \xf7 \xf8 \xf9 \xfa \xfb \xfc \xfd \xfe \xff 
 Subject length lower bound = 1
 
 /^[[:alpha:]]/IB
@@ -1802,6 +1829,8 @@ Subject length lower bound = 1
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: A B C D E F G H I J K L M N O P Q R S T U V W X Y Z 
+  a b c d e f g h i j k l m n o p q r s t u v w x y z 
 Subject length lower bound = 1
 
 /^[[:^alpha:]]/IB
@@ -1815,6 +1844,19 @@ Subject length lower bound = 1
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: \x00 \x01 \x02 \x03 \x04 \x05 \x06 \x07 \x08 \x09 \x0a 
+  \x0b \x0c \x0d \x0e \x0f \x10 \x11 \x12 \x13 \x14 \x15 \x16 \x17 \x18 \x19 
+  \x1a \x1b \x1c \x1d \x1e \x1f \x20 ! " # $ % & ' ( ) * + , - . / 0 1 2 3 4 
+  5 6 7 8 9 : ; < = > ? @ [ \ ] ^ _ ` { | } ~ \x7f \x80 \x81 \x82 \x83 \x84 
+  \x85 \x86 \x87 \x88 \x89 \x8a \x8b \x8c \x8d \x8e \x8f \x90 \x91 \x92 \x93 
+  \x94 \x95 \x96 \x97 \x98 \x99 \x9a \x9b \x9c \x9d \x9e \x9f \xa0 \xa1 \xa2 
+  \xa3 \xa4 \xa5 \xa6 \xa7 \xa8 \xa9 \xaa \xab \xac \xad \xae \xaf \xb0 \xb1 
+  \xb2 \xb3 \xb4 \xb5 \xb6 \xb7 \xb8 \xb9 \xba \xbb \xbc \xbd \xbe \xbf \xc0 
+  \xc1 \xc2 \xc3 \xc4 \xc5 \xc6 \xc7 \xc8 \xc9 \xca \xcb \xcc \xcd \xce \xcf 
+  \xd0 \xd1 \xd2 \xd3 \xd4 \xd5 \xd6 \xd7 \xd8 \xd9 \xda \xdb \xdc \xdd \xde 
+  \xdf \xe0 \xe1 \xe2 \xe3 \xe4 \xe5 \xe6 \xe7 \xe8 \xe9 \xea \xeb \xec \xed 
+  \xee \xef \xf0 \xf1 \xf2 \xf3 \xf4 \xf5 \xf6 \xf7 \xf8 \xf9 \xfa \xfb \xfc 
+  \xfd \xfe \xff 
 Subject length lower bound = 1
 
 /[_[:alpha:]]/I
@@ -1834,6 +1876,12 @@ Subject length lower bound = 1
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: \x00 \x01 \x02 \x03 \x04 \x05 \x06 \x07 \x08 \x09 \x0a 
+  \x0b \x0c \x0d \x0e \x0f \x10 \x11 \x12 \x13 \x14 \x15 \x16 \x17 \x18 \x19 
+  \x1a \x1b \x1c \x1d \x1e \x1f \x20 ! " # $ % & ' ( ) * + , - . / 0 1 2 3 4 
+  5 6 7 8 9 : ; < = > ? @ A B C D E F G H I J K L M N O P Q R S T U V W X Y 
+  Z [ \ ] ^ _ ` a b c d e f g h i j k l m n o p q r s t u v w x y z { | } ~ 
+  \x7f 
 Subject length lower bound = 1
 
 /^[[:^ascii:]]/IB
@@ -1847,6 +1895,15 @@ Subject length lower bound = 1
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: \x80 \x81 \x82 \x83 \x84 \x85 \x86 \x87 \x88 \x89 \x8a 
+  \x8b \x8c \x8d \x8e \x8f \x90 \x91 \x92 \x93 \x94 \x95 \x96 \x97 \x98 \x99 
+  \x9a \x9b \x9c \x9d \x9e \x9f \xa0 \xa1 \xa2 \xa3 \xa4 \xa5 \xa6 \xa7 \xa8 
+  \xa9 \xaa \xab \xac \xad \xae \xaf \xb0 \xb1 \xb2 \xb3 \xb4 \xb5 \xb6 \xb7 
+  \xb8 \xb9 \xba \xbb \xbc \xbd \xbe \xbf \xc0 \xc1 \xc2 \xc3 \xc4 \xc5 \xc6 
+  \xc7 \xc8 \xc9 \xca \xcb \xcc \xcd \xce \xcf \xd0 \xd1 \xd2 \xd3 \xd4 \xd5 
+  \xd6 \xd7 \xd8 \xd9 \xda \xdb \xdc \xdd \xde \xdf \xe0 \xe1 \xe2 \xe3 \xe4 
+  \xe5 \xe6 \xe7 \xe8 \xe9 \xea \xeb \xec \xed \xee \xef \xf0 \xf1 \xf2 \xf3 
+  \xf4 \xf5 \xf6 \xf7 \xf8 \xf9 \xfa \xfb \xfc \xfd \xfe \xff 
 Subject length lower bound = 1
 
 /^[[:blank:]]/IB
@@ -1860,6 +1917,7 @@ Subject length lower bound = 1
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: \x09 \x20 
 Subject length lower bound = 1
 
 /^[[:^blank:]]/IB
@@ -1873,6 +1931,20 @@ Subject length lower bound = 1
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: \x00 \x01 \x02 \x03 \x04 \x05 \x06 \x07 \x08 \x0a \x0b 
+  \x0c \x0d \x0e \x0f \x10 \x11 \x12 \x13 \x14 \x15 \x16 \x17 \x18 \x19 \x1a 
+  \x1b \x1c \x1d \x1e \x1f ! " # $ % & ' ( ) * + , - . / 0 1 2 3 4 5 6 7 8 9 
+  : ; < = > ? @ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z [ \ ] ^ 
+  _ ` a b c d e f g h i j k l m n o p q r s t u v w x y z { | } ~ \x7f \x80 
+  \x81 \x82 \x83 \x84 \x85 \x86 \x87 \x88 \x89 \x8a \x8b \x8c \x8d \x8e \x8f 
+  \x90 \x91 \x92 \x93 \x94 \x95 \x96 \x97 \x98 \x99 \x9a \x9b \x9c \x9d \x9e 
+  \x9f \xa0 \xa1 \xa2 \xa3 \xa4 \xa5 \xa6 \xa7 \xa8 \xa9 \xaa \xab \xac \xad 
+  \xae \xaf \xb0 \xb1 \xb2 \xb3 \xb4 \xb5 \xb6 \xb7 \xb8 \xb9 \xba \xbb \xbc 
+  \xbd \xbe \xbf \xc0 \xc1 \xc2 \xc3 \xc4 \xc5 \xc6 \xc7 \xc8 \xc9 \xca \xcb 
+  \xcc \xcd \xce \xcf \xd0 \xd1 \xd2 \xd3 \xd4 \xd5 \xd6 \xd7 \xd8 \xd9 \xda 
+  \xdb \xdc \xdd \xde \xdf \xe0 \xe1 \xe2 \xe3 \xe4 \xe5 \xe6 \xe7 \xe8 \xe9 
+  \xea \xeb \xec \xed \xee \xef \xf0 \xf1 \xf2 \xf3 \xf4 \xf5 \xf6 \xf7 \xf8 
+  \xf9 \xfa \xfb \xfc \xfd \xfe \xff 
 Subject length lower bound = 1
 
 /[\n\x0b\x0c\x0d[:blank:]]/I
@@ -1892,6 +1964,9 @@ Subject length lower bound = 1
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: \x00 \x01 \x02 \x03 \x04 \x05 \x06 \x07 \x08 \x09 \x0a 
+  \x0b \x0c \x0d \x0e \x0f \x10 \x11 \x12 \x13 \x14 \x15 \x16 \x17 \x18 \x19 
+  \x1a \x1b \x1c \x1d \x1e \x1f \x7f 
 Subject length lower bound = 1
 
 /^[[:digit:]]/IB
@@ -1905,6 +1980,7 @@ Subject length lower bound = 1
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: 0 1 2 3 4 5 6 7 8 9 
 Subject length lower bound = 1
 
 /^[[:graph:]]/IB
@@ -1918,6 +1994,9 @@ Subject length lower bound = 1
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: ! " # $ % & ' ( ) * + , - . / 0 1 2 3 4 5 6 7 8 9 : 
+  ; < = > ? @ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z [ \ ] ^ _ 
+  ` a b c d e f g h i j k l m n o p q r s t u v w x y z { | } ~ 
 Subject length lower bound = 1
 
 /^[[:lower:]]/IB
@@ -1931,6 +2010,7 @@ Subject length lower bound = 1
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: a b c d e f g h i j k l m n o p q r s t u v w x y z 
 Subject length lower bound = 1
 
 /^[[:print:]]/IB
@@ -1944,6 +2024,9 @@ Subject length lower bound = 1
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: \x20 ! " # $ % & ' ( ) * + , - . / 0 1 2 3 4 5 6 7 8 
+  9 : ; < = > ? @ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z [ \ ] 
+  ^ _ ` a b c d e f g h i j k l m n o p q r s t u v w x y z { | } ~ 
 Subject length lower bound = 1
 
 /^[[:punct:]]/IB
@@ -1957,6 +2040,8 @@ Subject length lower bound = 1
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: ! " # $ % & ' ( ) * + , - . / : ; < = > ? @ [ \ ] ^ 
+  _ ` { | } ~ 
 Subject length lower bound = 1
 
 /^[[:space:]]/IB
@@ -1970,6 +2055,7 @@ Subject length lower bound = 1
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: \x09 \x0a \x0b \x0c \x0d \x20 
 Subject length lower bound = 1
 
 /^[[:upper:]]/IB
@@ -1983,6 +2069,7 @@ Subject length lower bound = 1
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: A B C D E F G H I J K L M N O P Q R S T U V W X Y Z 
 Subject length lower bound = 1
 
 /^[[:xdigit:]]/IB
@@ -1996,6 +2083,7 @@ Subject length lower bound = 1
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: 0 1 2 3 4 5 6 7 8 9 A B C D E F a b c d e f 
 Subject length lower bound = 1
 
 /^[[:word:]]/IB
@@ -2009,6 +2097,8 @@ Subject length lower bound = 1
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: 0 1 2 3 4 5 6 7 8 9 A B C D E F G H I J K L M N O P 
+  Q R S T U V W X Y Z _ a b c d e f g h i j k l m n o p q r s t u v w x y z 
 Subject length lower bound = 1
 
 /^[[:^cntrl:]]/IB
@@ -2022,6 +2112,18 @@ Subject length lower bound = 1
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: \x20 ! " # $ % & ' ( ) * + , - . / 0 1 2 3 4 5 6 7 8 
+  9 : ; < = > ? @ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z [ \ ] 
+  ^ _ ` a b c d e f g h i j k l m n o p q r s t u v w x y z { | } ~ \x80 \x81 
+  \x82 \x83 \x84 \x85 \x86 \x87 \x88 \x89 \x8a \x8b \x8c \x8d \x8e \x8f \x90 
+  \x91 \x92 \x93 \x94 \x95 \x96 \x97 \x98 \x99 \x9a \x9b \x9c \x9d \x9e \x9f 
+  \xa0 \xa1 \xa2 \xa3 \xa4 \xa5 \xa6 \xa7 \xa8 \xa9 \xaa \xab \xac \xad \xae 
+  \xaf \xb0 \xb1 \xb2 \xb3 \xb4 \xb5 \xb6 \xb7 \xb8 \xb9 \xba \xbb \xbc \xbd 
+  \xbe \xbf \xc0 \xc1 \xc2 \xc3 \xc4 \xc5 \xc6 \xc7 \xc8 \xc9 \xca \xcb \xcc 
+  \xcd \xce \xcf \xd0 \xd1 \xd2 \xd3 \xd4 \xd5 \xd6 \xd7 \xd8 \xd9 \xda \xdb 
+  \xdc \xdd \xde \xdf \xe0 \xe1 \xe2 \xe3 \xe4 \xe5 \xe6 \xe7 \xe8 \xe9 \xea 
+  \xeb \xec \xed \xee \xef \xf0 \xf1 \xf2 \xf3 \xf4 \xf5 \xf6 \xf7 \xf8 \xf9 
+  \xfa \xfb \xfc \xfd \xfe \xff 
 Subject length lower bound = 1
 
 /^[12[:^digit:]]/IB
@@ -2035,6 +2137,20 @@ Subject length lower bound = 1
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: \x00 \x01 \x02 \x03 \x04 \x05 \x06 \x07 \x08 \x09 \x0a 
+  \x0b \x0c \x0d \x0e \x0f \x10 \x11 \x12 \x13 \x14 \x15 \x16 \x17 \x18 \x19 
+  \x1a \x1b \x1c \x1d \x1e \x1f \x20 ! " # $ % & ' ( ) * + , - . / 1 2 : ; < 
+  = > ? @ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z [ \ ] ^ _ ` a 
+  b c d e f g h i j k l m n o p q r s t u v w x y z { | } ~ \x7f \x80 \x81 \x82 
+  \x83 \x84 \x85 \x86 \x87 \x88 \x89 \x8a \x8b \x8c \x8d \x8e \x8f \x90 \x91 
+  \x92 \x93 \x94 \x95 \x96 \x97 \x98 \x99 \x9a \x9b \x9c \x9d \x9e \x9f \xa0 
+  \xa1 \xa2 \xa3 \xa4 \xa5 \xa6 \xa7 \xa8 \xa9 \xaa \xab \xac \xad \xae \xaf 
+  \xb0 \xb1 \xb2 \xb3 \xb4 \xb5 \xb6 \xb7 \xb8 \xb9 \xba \xbb \xbc \xbd \xbe 
+  \xbf \xc0 \xc1 \xc2 \xc3 \xc4 \xc5 \xc6 \xc7 \xc8 \xc9 \xca \xcb \xcc \xcd 
+  \xce \xcf \xd0 \xd1 \xd2 \xd3 \xd4 \xd5 \xd6 \xd7 \xd8 \xd9 \xda \xdb \xdc 
+  \xdd \xde \xdf \xe0 \xe1 \xe2 \xe3 \xe4 \xe5 \xe6 \xe7 \xe8 \xe9 \xea \xeb 
+  \xec \xed \xee \xef \xf0 \xf1 \xf2 \xf3 \xf4 \xf5 \xf6 \xf7 \xf8 \xf9 \xfa 
+  \xfb \xfc \xfd \xfe \xff 
 Subject length lower bound = 1
 
 /^[[:^blank:]]/IB
@@ -2048,6 +2164,20 @@ Subject length lower bound = 1
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: \x00 \x01 \x02 \x03 \x04 \x05 \x06 \x07 \x08 \x0a \x0b 
+  \x0c \x0d \x0e \x0f \x10 \x11 \x12 \x13 \x14 \x15 \x16 \x17 \x18 \x19 \x1a 
+  \x1b \x1c \x1d \x1e \x1f ! " # $ % & ' ( ) * + , - . / 0 1 2 3 4 5 6 7 8 9 
+  : ; < = > ? @ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z [ \ ] ^ 
+  _ ` a b c d e f g h i j k l m n o p q r s t u v w x y z { | } ~ \x7f \x80 
+  \x81 \x82 \x83 \x84 \x85 \x86 \x87 \x88 \x89 \x8a \x8b \x8c \x8d \x8e \x8f 
+  \x90 \x91 \x92 \x93 \x94 \x95 \x96 \x97 \x98 \x99 \x9a \x9b \x9c \x9d \x9e 
+  \x9f \xa0 \xa1 \xa2 \xa3 \xa4 \xa5 \xa6 \xa7 \xa8 \xa9 \xaa \xab \xac \xad 
+  \xae \xaf \xb0 \xb1 \xb2 \xb3 \xb4 \xb5 \xb6 \xb7 \xb8 \xb9 \xba \xbb \xbc 
+  \xbd \xbe \xbf \xc0 \xc1 \xc2 \xc3 \xc4 \xc5 \xc6 \xc7 \xc8 \xc9 \xca \xcb 
+  \xcc \xcd \xce \xcf \xd0 \xd1 \xd2 \xd3 \xd4 \xd5 \xd6 \xd7 \xd8 \xd9 \xda 
+  \xdb \xdc \xdd \xde \xdf \xe0 \xe1 \xe2 \xe3 \xe4 \xe5 \xe6 \xe7 \xe8 \xe9 
+  \xea \xeb \xec \xed \xee \xef \xf0 \xf1 \xf2 \xf3 \xf4 \xf5 \xf6 \xf7 \xf8 
+  \xf9 \xfa \xfb \xfc \xfd \xfe \xff 
 Subject length lower bound = 1
 
 /[01[:alpha:]%]/IB
@@ -2418,6 +2548,7 @@ Subject length lower bound = 4
 Capturing subpattern count = 2
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 1
     aba
  0: aba
@@ -2428,6 +2559,7 @@ Subject length lower bound = 1
 Capturing subpattern count = 2
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 2
     aabbaa
  0: aabbaa
@@ -2438,6 +2570,7 @@ Subject length lower bound = 2
 Capturing subpattern count = 2
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 2
     aabbaa
  0: aabbaa
@@ -2448,6 +2581,7 @@ Subject length lower bound = 2
 Capturing subpattern count = 2
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 2
     aabbaa
  0: aabbaa
@@ -2458,6 +2592,7 @@ Subject length lower bound = 2
 Capturing subpattern count = 1
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 2
     aabbaa
  0: aabbaa
@@ -2467,6 +2602,7 @@ Subject length lower bound = 2
 Capturing subpattern count = 3
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 2
     aabbaa
  0: aabbaa
@@ -2478,6 +2614,7 @@ Subject length lower bound = 2
 Capturing subpattern count = 2
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 2
     aabbaa
  0: aabbaa
@@ -2488,6 +2625,7 @@ Subject length lower bound = 2
 Capturing subpattern count = 1
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 2
     aabbaa
  0: aabbaa
@@ -2497,6 +2635,7 @@ Subject length lower bound = 2
 Capturing subpattern count = 1
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 2
     aabbbaa
  0: aabbbaa
@@ -2506,6 +2645,7 @@ Subject length lower bound = 2
 Capturing subpattern count = 1
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 2
     aabbbaa
  0: aabbbaa
@@ -2515,6 +2655,7 @@ Subject length lower bound = 2
 Capturing subpattern count = 1
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 2
     aabbaa
  0: aabbaa
@@ -2524,6 +2665,7 @@ Subject length lower bound = 2
 Capturing subpattern count = 1
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 2
     aabbbaa
  0: aabbbaa
@@ -2533,6 +2675,7 @@ Subject length lower bound = 2
 Capturing subpattern count = 3
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 2
     aabbbaa
  0: aabbbaa
@@ -2544,6 +2687,7 @@ Subject length lower bound = 2
 Capturing subpattern count = 3
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 2
     aabbbbaa
  0: aabbbbaa
@@ -3052,6 +3196,7 @@ Subject length lower bound = 3
 Capturing subpattern count = 5
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 3
 
 /^x(?U)a+b/IB
@@ -3067,6 +3212,7 @@ Subject length lower bound = 3
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+First code unit = 'x'
 Last code unit = 'b'
 Subject length lower bound = 3
 
@@ -3085,6 +3231,7 @@ Subject length lower bound = 3
 Capturing subpattern count = 1
 Compile options: <none>
 Overall options: anchored
+First code unit = 'x'
 Last code unit = 'b'
 Subject length lower bound = 3
 
@@ -3517,12 +3664,10 @@ Subject length lower bound = 6
  1: abc
     123abcdef\=callout_capture
 Callout 0: last capture = 1
- 0: <unset>
  1: abc
 --->123abcdef
        ^  ^       d
 Callout 1: last capture = 1
- 0: <unset>
  1: abc
 --->123abcdef
        ^    ^     f
@@ -3572,18 +3717,15 @@ May match empty string
 Subject length lower bound = 0
     123\=callout_capture
 Callout 0: last capture = 0
- 0: <unset>
 --->123
     ^  ^    )*
  0: 123
  1: 123
     123456\=callout_capture
 Callout 0: last capture = 0
- 0: <unset>
 --->123456
     ^  ^       )*
 Callout 0: last capture = 1
- 0: <unset>
  1: 123
 --->123456
     ^     ^    )*
@@ -3591,16 +3733,13 @@ Callout 0: last capture = 1
  1: 456
     123456789\=callout_capture
 Callout 0: last capture = 0
- 0: <unset>
 --->123456789
     ^  ^          )*
 Callout 0: last capture = 1
- 0: <unset>
  1: 123
 --->123456789
     ^     ^       )*
 Callout 0: last capture = 1
- 0: <unset>
  1: 456
 --->123456789
     ^        ^    )*
@@ -3613,13 +3752,11 @@ First code unit = 'x'
 Subject length lower bound = 4
     xyzabc\=callout_capture
 Callout 0: last capture = 2
- 0: <unset>
  1: <unset>
  2: xyz
 --->xyzabc
     ^  ^       p
 Callout 1: last capture = 0
- 0: <unset>
 --->xyzabc
     ^          x
  0: xyzabc
@@ -3632,14 +3769,12 @@ Last code unit = 'x'
 Subject length lower bound = 5
     Xxyzabc\=callout_capture
 Callout 0: last capture = 3
- 0: <unset>
  1: X
  2: <unset>
  3: xyz
 --->Xxyzabc
     ^   ^       p
 Callout 1: last capture = 1
- 0: <unset>
  1: X
 --->Xxyzabc
     ^^          x
@@ -3654,7 +3789,6 @@ Last code unit = 'f'
 Subject length lower bound = 6
     abcdef\=callout_capture
 Callout 0: last capture = 1
- 0: <unset>
  1: abc
 --->abcdef
     ^          a
@@ -3668,12 +3802,10 @@ Last code unit = 'z'
 Subject length lower bound = 6
     abcxyz\=callout_capture
 Callout 1: last capture = 1
- 0: <unset>
  1: abc
 --->abcxyz
     ^  ^       d
 Callout 2: last capture = 0
- 0: <unset>
 --->abcxyz
     ^          a
  0: abcxyz
@@ -3686,7 +3818,6 @@ Last code unit = 'z'
 Subject length lower bound = 3
    abcxyz\=callout_capture
 Callout 0: last capture = 1
- 0: <unset>
  1: abc
 --->abcxyz
        ^       )
@@ -3741,6 +3872,7 @@ Subject length lower bound = 3
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 3
 
 /(?C)a|b/I
@@ -3801,6 +3933,7 @@ No match
 Capturing subpattern count = 1
 Compile options: <none>
 Overall options: anchored
+First code unit = '>'
 Last code unit = '<'
 Subject length lower bound = 10
    >abc>123<xyz<
@@ -3834,7 +3967,7 @@ Subject length lower bound = 2
         Bra
         CBra 1
         a
-        Once
+        SBra
         Recurse
         KetRmax
         b
@@ -3851,6 +3984,7 @@ Subject length lower bound = 2
 Capturing subpattern count = 2
 Compile options: <none>
 Overall options: anchored
+Starting code units: ( - 0 1 2 3 4 5 6 7 8 9 
 Subject length lower bound = 1
     12
  0: 12
@@ -3870,6 +4004,7 @@ No match
 Capturing subpattern count = 2
 Compile options: <none>
 Overall options: anchored
+First code unit = 'x'
 Subject length lower bound = 3
     xyz
  0: xyz
@@ -3929,6 +4064,7 @@ Failed: error 114 at offset 10: missing closing parenthesis
 Capturing subpattern count = 1
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 9
     abcdefabc
  0: abcdefabc
@@ -3938,7 +4074,8 @@ Subject length lower bound = 9
 Capturing subpattern count = 1
 Compile options: <none>
 Overall options: anchored
-Subject length lower bound = 3
+Starting code units: a b c 
+Subject length lower bound = 2
     a=a
  0: a=a
  1: a
@@ -3953,6 +4090,7 @@ Subject length lower bound = 3
 Capturing subpattern count = 2
 Compile options: <none>
 Overall options: anchored
+Starting code units: a b c 
 Subject length lower bound = 2
     a=a
  0: a=a
@@ -4262,7 +4400,7 @@ Subject length lower bound = 2
 Callout data = 1
  0: ab
  1: ab
-\= Expect no match    
+\= Expect no match
    aaabbb\=callout_data=-1
 --->aaabbb
   1 ^  ^       b
@@ -4706,7 +4844,7 @@ Subject length lower bound = 2
  +2 ^   ^     b
  +3 ^    ^    
  0: aaaab
-\= Expect no match 
+\= Expect no match
   aaaacb
 --->aaaacb
  +0 ^          a+
@@ -4774,7 +4912,7 @@ Subject length lower bound = 4
 +10 ^   ^    
  0: defx
  1: def
-\= Expect no match 
+\= Expect no match
   abcdefzx
 --->abcdefzx
  +0 ^            (
@@ -4848,7 +4986,7 @@ Subject length lower bound = 4
 +10 ^   ^    
  0: defx
  1: def
-\= Expect no match 
+\= Expect no match
   abcdefzx
 --->abcdefzx
  +0 ^            (
@@ -4964,7 +5102,7 @@ Capturing subpattern count = 1
 Options: auto_callout
 Starting code units: a b x 
 Subject length lower bound = 2
-\= Expect no match 
+\= Expect no match
     Note: that { does NOT introduce a quantifier
 --->Note: that { does NOT introduce a quantifier
  +0         ^                                        (
@@ -5014,7 +5152,7 @@ Capturing subpattern count = 1
 Options: auto_callout
 Starting code units: a b x 
 Subject length lower bound = 2
-\= Expect no match 
+\= Expect no match
     Note: that { does NOT introduce a quantifier
 --->Note: that { does NOT introduce a quantifier
  +0         ^                                        (
@@ -5189,6 +5327,7 @@ No match
 Capturing subpattern count = 3
 Compile options: <none>
 Overall options: anchored
+Starting code units: 0 1 2 3 4 5 6 7 8 9 
 Last code unit = '/'
 Subject length lower bound = 6
     13/05/04\=ps
@@ -5286,6 +5425,7 @@ Partial match: c12
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: 0 1 2 3 4 5 6 7 8 9 
 Last code unit = 'X'
 Subject length lower bound = 4
     1\=ps
@@ -5659,6 +5799,7 @@ Named capturing subpatterns:
   A   3
 Compile options: dupnames
 Overall options: anchored dupnames
+First code unit = 'a'
 Subject length lower bound = 2
     a1b\=copy=A
  0: a1
@@ -5678,7 +5819,7 @@ Subject length lower bound = 2
 Number not found for group 'Z'
 Copy substring 'Z' failed (-49): unknown substring
   C a1 (2) A (non-unique)
-    
+
 /(?|(?<a>)(?<b>)(?<a>)|(?<a>)(?<b>)(?<a>))/I,dupnames
 Capturing subpattern count = 3
 Named capturing subpatterns:
@@ -5696,6 +5837,7 @@ Named capturing subpatterns:
   A   2
 Compile options: dupnames
 Overall options: anchored dupnames
+First code unit = 'a'
 Subject length lower bound = 2
     ab\=copy=A
  0: ab
@@ -5709,6 +5851,7 @@ Named capturing subpatterns:
   A   1
   A   2
 Options: dupnames
+Starting code units: a c 
 Subject length lower bound = 2
     ab\=copy=A
  0: ab
@@ -5727,6 +5870,7 @@ Named capturing subpatterns:
   A   3
   A   4
 Options: dupnames
+Starting code units: a c 
 Subject length lower bound = 2
     cdefgh\=copy=A
  0: cdefgh
@@ -5743,6 +5887,7 @@ Named capturing subpatterns:
   A   3
 Compile options: dupnames
 Overall options: anchored dupnames
+First code unit = 'a'
 Subject length lower bound = 2
     a1b\=get=A
  0: a1
@@ -5770,6 +5915,7 @@ Named capturing subpatterns:
   A   2
 Compile options: dupnames
 Overall options: anchored dupnames
+First code unit = 'a'
 Subject length lower bound = 2
     ab\=get=A
  0: ab
@@ -5783,6 +5929,7 @@ Named capturing subpatterns:
   A   1
   A   2
 Options: dupnames
+Starting code units: a c 
 Subject length lower bound = 2
     ab\=get=A
  0: ab
@@ -5801,6 +5948,7 @@ Named capturing subpatterns:
   A   3
   A   4
 Options: dupnames
+Starting code units: a c 
 Subject length lower bound = 2
     cdefgh\=get=A
  0: cdefgh
@@ -5818,6 +5966,7 @@ Named capturing subpatterns:
 Compile options: <none>
 Overall options: anchored
 Duplicate name status changes
+First code unit = 'a'
 Subject length lower bound = 2
     a1b\=copy=A
  0: a1
@@ -5848,6 +5997,7 @@ Named capturing subpatterns:
 Compile options: <none>
 Overall options: anchored
 Duplicate name status changes
+First code unit = 'a'
 Subject length lower bound = 6
     a bc d\=copy=A,copy=B,copy=C
  0: a bc d
@@ -5997,7 +6147,7 @@ Subject length lower bound = 3
 No match
     xyz\rabclf
 No match
-    
+
 /^abc/Im,newline=cr
 Capturing subpattern count = 0
 Options: multiline
@@ -6249,6 +6399,7 @@ Subject length lower bound = 4
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: a b 
 Last code unit = 'b'
 Subject length lower bound = 2
 
@@ -6265,6 +6416,7 @@ Subject length lower bound = 2
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: a b 
 Last code unit = 'b'
 Subject length lower bound = 2
 
@@ -6281,6 +6433,7 @@ Subject length lower bound = 2
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+Starting code units: a b 
 Last code unit = 'b'
 Subject length lower bound = 2
 
@@ -6297,6 +6450,7 @@ Subject length lower bound = 2
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Last code unit = 'A'
 Subject length lower bound = 3
     aaaA5
@@ -6318,6 +6472,7 @@ No match
 Capturing subpattern count = 0
 Compile options: caseless
 Overall options: anchored caseless
+Starting code units: A a 
 Last code unit = 'A' (caseless)
 Subject length lower bound = 2
     aaaA5
@@ -7567,13 +7722,13 @@ No match
  0: \x0d\x0afoo
     \nfoo
  0: \x0afoo
-    
+
 /^$/gm,newline=any
     abc\r\rxyz
  0: 
-    abc\n\rxyz  
+    abc\n\rxyz
  0: 
-\= Expect no match 
+\= Expect no match
     abc\r\nxyz
 No match
 
@@ -7588,7 +7743,7 @@ No match
  0+ \x0d\x0a
  0: \x0d\x0a
  0+ 
-    
+
 /(?m)$/g,newline=any,aftertext
     abc\r\n\r\n
  0: 
@@ -7608,7 +7763,7 @@ No match
 /^X/m
     XABC
  0: X
-\= Expect no match 
+\= Expect no match
     XABC\=notbol
 No match
 
@@ -7643,9 +7798,9 @@ No match
  0: xyabcabc
  1: abc
 \= Expect no match
-    xyabc  
+    xyabc
 No match
-    
+
 /x(?-0)y/
 Failed: error 126 at offset 5: a relative value of zero is not allowed
 
@@ -7681,9 +7836,9 @@ Failed: error 115 at offset 5: reference to non-existent subpattern
     Y
  0: Y
 \= Expect no match
-    abcY   
+    abcY
 No match
-    
+
 /^((?(+1)X|Y)(abc))+/B
 ------------------------------------------------------------------
         Bra
@@ -7711,7 +7866,7 @@ No match
  1: Xabc
  2: abc
 \= Expect no match
-    XabcXabc  
+    XabcXabc
 No match
 
 /(?(-1)a)/B
@@ -7757,11 +7912,11 @@ Failed: error 115 at offset 6: reference to non-existent subpattern
     tom-tom
  0: tom-tom
  1: tom
-    bon-bon 
+    bon-bon
  0: bon-bon
  1: bon
 \= Expect no match
-    tom-bon  
+    tom-bon
 No match
 
 /\g{A/
@@ -7785,7 +7940,7 @@ Failed: error 142 at offset 4: syntax error in subpattern name (missing terminat
    >abc<
  0: abc
  1: abc
-   >xyz< 
+   >xyz<
  0: xyz
  1: xyz
 
@@ -7815,7 +7970,7 @@ Failed: error 142 at offset 4: syntax error in subpattern name (missing terminat
  1: x
  2: abc
  3: x
-    xxyzx 
+    xxyzx
  0: xxyzx
  1: x
  2: xyz
@@ -7851,7 +8006,7 @@ Failed: error 142 at offset 4: syntax error in subpattern name (missing terminat
  2: abc
  3: pqr
  4: x
-    xxyzx 
+    xxyzx
  0: xxyzx
  1: x
  2: xyz
@@ -7869,7 +8024,7 @@ Failed: error 142 at offset 4: syntax error in subpattern name (missing terminat
 \= Expect no match
     XXXX
 No match
-    
+
 /\H+\hY/B
 ------------------------------------------------------------------
         Bra
@@ -7879,7 +8034,7 @@ No match
         Ket
         End
 ------------------------------------------------------------------
-    XXXX Y 
+    XXXX Y
  0: XXXX Y
 
 /\H+ Y/B
@@ -8106,7 +8261,7 @@ Failed: error 106 at offset 10: missing terminating ] for character class
  +3 ^ ^        (*FAIL)
  +3 ^^         (*FAIL)
 No match
-    
+
 /a+b?c+(*FAIL)/auto_callout
 \= Expect no match
     aaabccc
@@ -8170,7 +8325,7 @@ No match
 +15 ^     ^     (*FAIL)
 +15 ^    ^      (*FAIL)
 No match
-    
+
 /a+b?(*SKIP)c+(*FAIL)/auto_callout
 \= Expect no match
     aaabcccaaabccc
@@ -8217,7 +8372,7 @@ No match
 +13   ^   ^     (*FAIL)
 +13   ^  ^      (*FAIL)
 No match
-    
+
 /a(*MARK)b/
 Failed: error 166 at offset 7: (*MARK) must have an argument
 
@@ -8242,17 +8397,17 @@ Failed: error 115 at offset 3: reference to non-existent subpattern
 \= Expect no match
     \r\nA
 No match
-    
+
 /\nA/newline=crlf
-    \r\nA 
+    \r\nA
  0: \x0aA
 
 /[\r\n]A/newline=crlf
-    \r\nA 
+    \r\nA
  0: \x0aA
 
 /(\r|\n)A/newline=crlf
-    \r\nA 
+    \r\nA
  0: \x0aA
  1: \x0a
 
@@ -8263,52 +8418,52 @@ Failed: error 160 at offset 5: (*VERB) not recognized or malformed
     a\nb
  0: a\x0ab
 \= Expect no match
-    a\rb  
+    a\rb
 No match
 
 /(*CR)a.b/newline=lf
     a\nb
  0: a\x0ab
 \= Expect no match
-    a\rb  
+    a\rb
 No match
 
 /(*LF)a.b/newline=CRLF
     a\rb
  0: a\x0db
 \= Expect no match
-    a\nb  
+    a\nb
 No match
 
 /(*CRLF)a.b/
     a\rb
  0: a\x0db
-    a\nb  
+    a\nb
  0: a\x0ab
 \= Expect no match
-    a\r\nb  
+    a\r\nb
 No match
 
 /(*ANYCRLF)a.b/newline=CR
 \= Expect no match
     a\rb
 No match
-    a\nb  
+    a\nb
 No match
-    a\r\nb  
+    a\r\nb
 No match
 
 /(*ANY)a.b/newline=cr
 \= Expect no match
     a\rb
 No match
-    a\nb  
+    a\nb
 No match
-    a\r\nb  
+    a\r\nb
 No match
-    a\x85b 
+    a\x85b
 No match
-    
+
 /(*ANY).*/g
     abc\r\ndef
  0: abc
@@ -8330,6 +8485,31 @@ No match
  0: def
  0: 
 
+/(*NUL)^.*/
+    a\nb\x00ccc
+ 0: a\x0ab
+
+/(*NUL)^.*/s
+    a\nb\x00ccc
+ 0: a\x0ab\x00ccc
+
+/^x/m,newline=NUL
+    ab\x00xy
+ 0: x
+
+/'#comment' 0d 0a 00 '^x\' 0a 'y'/x,newline=nul,hex
+    x\nyz
+ 0: x\x0ay
+
+/(*NUL)^X\NY/
+    X\nY
+ 0: X\x0aY
+    X\rY
+ 0: X\x0dY
+\= Expect no match
+    X\x00Y
+No match
+
 /a\Rb/I,bsr=anycrlf
 Capturing subpattern count = 0
 \R matches CR, LF, or CRLF
@@ -8345,7 +8525,7 @@ Subject length lower bound = 3
 \= Expect no match
     a\x85b
 No match
-    a\x0bb     
+    a\x0bb
 No match
 
 /a\Rb/I,bsr=unicode
@@ -8362,9 +8542,9 @@ Subject length lower bound = 3
  0: a\x0d\x0ab
     a\x85b
  0: a\x85b
-    a\x0bb     
+    a\x0bb
  0: a\x0bb
-    
+
 /a\R?b/I,bsr=anycrlf
 Capturing subpattern count = 0
 \R matches CR, LF, or CRLF
@@ -8380,7 +8560,7 @@ Subject length lower bound = 2
 \= Expect no match
     a\x85b
 No match
-    a\x0bb     
+    a\x0bb
 No match
 
 /a\R?b/I,bsr=unicode
@@ -8397,9 +8577,9 @@ Subject length lower bound = 2
  0: a\x0d\x0ab
     a\x85b
  0: a\x85b
-    a\x0bb     
+    a\x0bb
  0: a\x0bb
-    
+
 /a\R{2,4}b/I,bsr=anycrlf
 Capturing subpattern count = 0
 \R matches CR, LF, or CRLF
@@ -8415,7 +8595,7 @@ Subject length lower bound = 4
 \= Expect no match
     a\x85\x85b
 No match
-    a\x0b\x0bb     
+    a\x0b\x0bb
 No match
 
 /a\R{2,4}b/I,bsr=unicode
@@ -8432,12 +8612,12 @@ Subject length lower bound = 4
  0: a\x0d\x0a\x0a\x0d\x0db
     a\x85\x85b
  0: a\x85\x85b
-    a\x0b\x0bb     
+    a\x0b\x0bb
  0: a\x0b\x0bb
-\= Expect no match 
-    a\r\r\r\r\rb 
+\= Expect no match
+    a\r\r\r\r\rb
 No match
- 
+
 /(*BSR_ANYCRLF)a\Rb/I
 Capturing subpattern count = 0
 \R matches CR, LF, or CRLF
@@ -8446,7 +8626,7 @@ Last code unit = 'b'
 Subject length lower bound = 3
     a\nb
  0: a\x0ab
-    a\rb 
+    a\rb
  0: a\x0db
 
 /(*BSR_UNICODE)a\Rb/I
@@ -8467,7 +8647,7 @@ Last code unit = 'b'
 Subject length lower bound = 3
     a\nb
  0: a\x0ab
-    a\rb 
+    a\rb
  0: a\x0db
 
 /(*CRLF)(*BSR_UNICODE)a\Rb/I
@@ -8570,10 +8750,10 @@ Failed: error 157 at offset 8: \g is not followed by a braced, angle-bracketed, 
 /^(?+1)(?<a>x|y){0}z/
     xzxx
  0: xz
-    yzyy 
+    yzyy
  0: yz
 \= Expect no match
-    xxz  
+    xxz
 No match
 
 /(\3)(\1)(a)/
@@ -8587,13 +8767,13 @@ No match
  1: 
  2: 
  3: a
-    
+
 /TA]/
-    The ACTA] comes 
+    The ACTA] comes
  0: TA]
 
 /TA]/alt_bsux,allow_empty_class,match_unset_backref,dupnames
-    The ACTA] comes 
+    The ACTA] comes
  0: TA]
 
 /(?2)[]a()b](abc)/
@@ -8608,7 +8788,7 @@ Failed: error 115 at offset 3: reference to non-existent subpattern
     abcbabc
  0: abcbabc
  1: abc
-\= Expect no match 
+\= Expect no match
     abcXabc
 No match
 
@@ -8616,7 +8796,7 @@ No match
     abcXabc
  0: abcXabc
  1: abc
-\= Expect no match 
+\= Expect no match
     abcbabc
 No match
 
@@ -8647,30 +8827,30 @@ No match
 
 /a[]+b/alt_bsux,allow_empty_class,match_unset_backref,dupnames
 \= Expect no match
-    ab 
+    ab
 No match
 
 /a[]*+b/alt_bsux,allow_empty_class,match_unset_backref,dupnames
 \= Expect no match
-    ab 
+    ab
 No match
 
 /a[^]b/alt_bsux,allow_empty_class,match_unset_backref,dupnames
     aXb
  0: aXb
-    a\nb 
+    a\nb
  0: a\x0ab
 \= Expect no match
-    ab  
+    ab
 No match
-    
+
 /a[^]+b/alt_bsux,allow_empty_class,match_unset_backref,dupnames
     aXb
  0: aXb
-    a\nX\nXb 
+    a\nX\nXb
  0: a\x0aX\x0aXb
 \= Expect no match
-    ab  
+    ab
 No match
 
 /a(?!)b/B
@@ -8722,7 +8902,7 @@ Subject length lower bound = 0
 +12 ^       )
 +13 ^       
  0: 
-   abc 
+   abc
 --->abc
  +0 ^       (?
  +2 ^       (?=
@@ -8743,7 +8923,7 @@ Subject length lower bound = 0
 +10  ^^     |
 +13  ^^     
  0: b
-   
+
 /(?(?=b).*b|^d)/I
 Capturing subpattern count = 0
 Subject length lower bound = 1
@@ -8753,28 +8933,28 @@ Capturing subpattern count = 0
 Subject length lower bound = 1
 
 /xyz/auto_callout
-  xyz 
+  xyz
 --->xyz
  +0 ^       x
  +1 ^^      y
  +2 ^ ^     z
  +3 ^  ^    
  0: xyz
-  abcxyz 
+  abcxyz
 --->abcxyz
  +0    ^       x
  +1    ^^      y
  +2    ^ ^     z
  +3    ^  ^    
  0: xyz
-\= Expect no match 
+\= Expect no match
   abc
 No match
-  abcxypqr  
+  abcxypqr
 No match
-  
+
 /xyz/auto_callout,no_start_optimize
-  abcxyz 
+  abcxyz
 --->abcxyz
  +0 ^          x
  +0  ^         x
@@ -8784,7 +8964,7 @@ No match
  +2    ^ ^     z
  +3    ^  ^    
  0: xyz
-\= Expect no match 
+\= Expect no match
   abc
 --->abc
  +0 ^       x
@@ -8792,7 +8972,7 @@ No match
  +0   ^     x
  +0    ^    x
 No match
-  abcxypqr  
+  abcxypqr
 --->abcxypqr
  +0 ^            x
  +0  ^           x
@@ -8806,7 +8986,7 @@ No match
  +0        ^     x
  +0         ^    x
 No match
-  
+
 /(*NO_START_OPT)xyz/auto_callout
   abcxyz
 --->abcxyz
@@ -8818,7 +8998,7 @@ No match
 +17    ^ ^     z
 +18    ^  ^    
  0: xyz
-  
+
 /(*NO_AUTO_POSSESS)a+b/B
 ------------------------------------------------------------------
         Bra
@@ -8829,7 +9009,7 @@ No match
 ------------------------------------------------------------------
 
 /xyz/auto_callout,no_start_optimize
-  abcxyz 
+  abcxyz
 --->abcxyz
  +0 ^          x
  +0  ^         x
@@ -8887,7 +9067,7 @@ Failed: error 115 at offset 5: reference to non-existent subpattern
  3: c
  4: d
  5: Y
- 
+
 /Xa{2,4}b/
     X\=ps
 Partial match: X
@@ -8899,7 +9079,7 @@ Partial match: Xaa
 Partial match: Xaaa
     Xaaaa\=ps
 Partial match: Xaaaa
-    
+
 /Xa{2,4}?b/
     X\=ps
 Partial match: X
@@ -8911,7 +9091,7 @@ Partial match: Xaa
 Partial match: Xaaa
     Xaaaa\=ps
 Partial match: Xaaaa
-    
+
 /Xa{2,4}+b/
     X\=ps
 Partial match: X
@@ -8923,7 +9103,7 @@ Partial match: Xaa
 Partial match: Xaaa
     Xaaaa\=ps
 Partial match: Xaaaa
-    
+
 /X\d{2,4}b/
     X\=ps
 Partial match: X
@@ -8935,7 +9115,7 @@ Partial match: X33
 Partial match: X333
     X3333\=ps
 Partial match: X3333
-    
+
 /X\d{2,4}?b/
     X\=ps
 Partial match: X
@@ -8947,7 +9127,7 @@ Partial match: X33
 Partial match: X333
     X3333\=ps
 Partial match: X3333
-    
+
 /X\d{2,4}+b/
     X\=ps
 Partial match: X
@@ -8959,7 +9139,7 @@ Partial match: X33
 Partial match: X333
     X3333\=ps
 Partial match: X3333
-    
+
 /X\D{2,4}b/
     X\=ps
 Partial match: X
@@ -8971,7 +9151,7 @@ Partial match: Xaa
 Partial match: Xaaa
     Xaaaa\=ps
 Partial match: Xaaaa
-    
+
 /X\D{2,4}?b/
     X\=ps
 Partial match: X
@@ -8983,7 +9163,7 @@ Partial match: Xaa
 Partial match: Xaaa
     Xaaaa\=ps
 Partial match: Xaaaa
-    
+
 /X\D{2,4}+b/
     X\=ps
 Partial match: X
@@ -8995,7 +9175,7 @@ Partial match: Xaa
 Partial match: Xaaa
     Xaaaa\=ps
 Partial match: Xaaaa
-    
+
 /X[abc]{2,4}b/
     X\=ps
 Partial match: X
@@ -9007,7 +9187,7 @@ Partial match: Xaa
 Partial match: Xaaa
     Xaaaa\=ps
 Partial match: Xaaaa
-    
+
 /X[abc]{2,4}?b/
     X\=ps
 Partial match: X
@@ -9019,7 +9199,7 @@ Partial match: Xaa
 Partial match: Xaaa
     Xaaaa\=ps
 Partial match: Xaaaa
-    
+
 /X[abc]{2,4}+b/
     X\=ps
 Partial match: X
@@ -9031,7 +9211,7 @@ Partial match: Xaa
 Partial match: Xaaa
     Xaaaa\=ps
 Partial match: Xaaaa
-    
+
 /X[^a]{2,4}b/
     X\=ps
 Partial match: X
@@ -9043,7 +9223,7 @@ Partial match: Xzz
 Partial match: Xzzz
     Xzzzz\=ps
 Partial match: Xzzzz
-    
+
 /X[^a]{2,4}?b/
     X\=ps
 Partial match: X
@@ -9055,7 +9235,7 @@ Partial match: Xzz
 Partial match: Xzzz
     Xzzzz\=ps
 Partial match: Xzzzz
-    
+
 /X[^a]{2,4}+b/
     X\=ps
 Partial match: X
@@ -9067,7 +9247,7 @@ Partial match: Xzz
 Partial match: Xzzz
     Xzzzz\=ps
 Partial match: Xzzzz
-    
+
 /(Y)X\1{2,4}b/
     YX\=ps
 Partial match: YX
@@ -9079,7 +9259,7 @@ Partial match: YXYY
 Partial match: YXYYY
     YXYYYY\=ps
 Partial match: YXYYYY
-    
+
 /(Y)X\1{2,4}?b/
     YX\=ps
 Partial match: YX
@@ -9091,7 +9271,7 @@ Partial match: YXYY
 Partial match: YXYYY
     YXYYYY\=ps
 Partial match: YXYYYY
-    
+
 /(Y)X\1{2,4}+b/
     YX\=ps
 Partial match: YX
@@ -9103,7 +9283,7 @@ Partial match: YXYY
 Partial match: YXYYY
     YXYYYY\=ps
 Partial match: YXYYYY
-    
+
 /\++\KZ|\d+X|9+Y/startchar
     ++++123999\=ps
 Partial match: 123999
@@ -9119,7 +9299,7 @@ Partial match: 123999
 No match
     ZA\=ps
 No match
-    
+
 /Z(?!)/
 \= Expect no match
     Z\=ps
@@ -9132,7 +9312,7 @@ No match
  0: dog
     dogs\=ph
 Partial match: dogs
-    
+
 /dog(sbody)??/
     dogs\=ps
  0: dog
@@ -9144,7 +9324,7 @@ Partial match: dogs
  0: dog
     dogs\=ph
  0: dog
- 
+
 /dogsbody|dog/
     dogs\=ps
  0: dog
@@ -9162,7 +9342,7 @@ Partial match: the cat
  0: abc
    abc\=ph
  0: abc
-   
+
 /abc\K123/startchar
     xyzabc123pqr
  0: abc123
@@ -9171,9 +9351,9 @@ Partial match: the cat
 Partial match: abc12
     xyzabc12\=ph
 Partial match: abc12
-    
+
 /(?<=abc)123/
-    xyzabc123pqr 
+    xyzabc123pqr
  0: 123
     xyzabc12\=ps
 Partial match: abc12
@@ -9278,7 +9458,7 @@ Partial match: +ab
 No match
     xyzabcdef\=notempty
 No match
-    
+
 /^(?:(?=abc)|abc\K)/aftertext,startchar
     abcdef
  0: 
@@ -9287,7 +9467,7 @@ No match
  0: abc
     ^^^
  0+ def
-\= Expect no match 
+\= Expect no match
     abcdef\=notempty
 No match
 
@@ -9307,7 +9487,7 @@ No match
     xyz\=notempty_atstart
  0: 
  0+ yz
-\= Expect no match 
+\= Expect no match
     xyz\=notempty
 No match
 
@@ -9318,7 +9498,7 @@ No match
     xyzabc
  0: 
  0+ xyzabc
-\= Expect no match 
+\= Expect no match
     xyzabc\=notempty
 No match
     xyzabc\=notempty_atstart
@@ -9327,7 +9507,7 @@ No match
 No match
     xyz\=notempty
 No match
-    
+
 /^(?<name>a|b\g<name>c)/
     aaaa
  0: a
@@ -9335,7 +9515,7 @@ No match
     bacxxx
  0: bac
  1: bac
-    bbaccxxx 
+    bbaccxxx
  0: bbacc
  1: bbacc
     bbbacccxx
@@ -9349,7 +9529,7 @@ No match
     bacxxx
  0: bac
  1: bac
-    bbaccxxx 
+    bbaccxxx
  0: bbacc
  1: bbacc
     bbbacccxx
@@ -9363,7 +9543,7 @@ No match
     bacxxx
  0: bac
  1: bac
-    bbaccxxx 
+    bbaccxxx
  0: bbacc
  1: bbacc
     bbbacccxx
@@ -9377,7 +9557,7 @@ No match
     bacxxx
  0: bac
  1: bac
-    bbaccxxx 
+    bbaccxxx
  0: bbacc
  1: bbacc
     bbbacccxx
@@ -9391,7 +9571,7 @@ No match
     bacxxx
  0: bac
  1: bac
-    bbaccxxx 
+    bbaccxxx
  0: bbacc
  1: bbacc
     bbbacccxx
@@ -9407,7 +9587,7 @@ No match
  0: bac
  1: bac
  2: bac
-    bbaccxxx 
+    bbaccxxx
  0: bbacc
  1: bbacc
  2: bbacc
@@ -9420,7 +9600,7 @@ No match
     XaaX
  0: aa
  1: a
-    XAAX 
+    XAAX
  0: AA
  1: A
 
@@ -9428,15 +9608,15 @@ No match
     XaaX
  0: aa
  1: a
-\= Expect no match 
-    XAAX 
+\= Expect no match
+    XAAX
 No match
 
 /(?-i:\g<+1>)(?i:(a))/
     XaaX
  0: aa
  1: a
-    XAAX 
+    XAAX
  0: AA
  1: A
 
@@ -9446,7 +9626,7 @@ No match
    abc
  0: abc
  1: a
-   accccbbb 
+   accccbbb
  0: accccbbb
  1: a
 
@@ -9465,7 +9645,7 @@ No match
     xbaax
  0: a
  1: a
-    xzzzax 
+    xzzzax
  0: a
  1: a
 
@@ -9531,6 +9711,7 @@ Subject length lower bound = 2
 Capturing subpattern count = 1
 Compile options: <none>
 Overall options: anchored
+First code unit = 'F'
 Last code unit = ':'
 Subject length lower bound = 22
 
@@ -9581,7 +9762,7 @@ Subject length lower bound = 9
     (?: [0-9a-f]{1,4} |       # 1-4 hex digits or
     (?(1)0 | () ) )           # if null previously matched, fail; else null
     :                         # followed by colon
-  ){1,7}                      # end item; 1-7 of them required               
+  ){1,7}                      # end item; 1-7 of them required
   [0-9a-f]{1,4} $             # final hex number at end of string
   (?(1)|.)                    # check that there was an empty component
   /Iix
@@ -9611,7 +9792,7 @@ Subject length lower bound = 1
 Failed: error 165 at offset 16: different names for subpatterns of the same number are not allowed
 
 /(?:a(?<quote> (?<apostrophe>')|(?<realquote>")) |
-    b(?<quote> (?<apostrophe>')|(?<realquote>")) ) 
+    b(?<quote> (?<apostrophe>')|(?<realquote>")) )
     (?('quote')[a-z]+|[0-9]+)/Ix,dupnames
 Capturing subpattern count = 6
 Max back reference = 4
@@ -9630,7 +9811,7 @@ Subject length lower bound = 3
  1: "
  2: <unset>
  3: "
-    b"aaaaa 
+    b"aaaaa
  0: b"aaaaa
  1: <unset>
  2: <unset>
@@ -9638,12 +9819,12 @@ Subject length lower bound = 3
  4: "
  5: <unset>
  6: "
-\= Expect no match 
+\= Expect no match
     b"11111
 No match
-    a"11111 
+    a"11111
 No match
-    
+
 /^(?|(a)(b)(c)(?<D>d)|(?<D>e)) (?('D')X|Y)/IBx,dupnames
 ------------------------------------------------------------------
         Bra
@@ -9682,6 +9863,7 @@ Named capturing subpatterns:
   D   1
 Compile options: dupnames extended
 Overall options: anchored dupnames extended
+Starting code units: a e 
 Subject length lower bound = 2
     abcdX
  0: abcdX
@@ -9695,9 +9877,9 @@ Subject length lower bound = 2
 \= Expect no match
     abcdY
 No match
-    ey     
+    ey
 No match
-    
+
 /(?<A>a) (b)(c)  (?<A>d  (?(R&A)$ | (?4)) )/IBx,dupnames
 ------------------------------------------------------------------
         Bra
@@ -9738,7 +9920,7 @@ Subject length lower bound = 4
  3: c
  4: dd
 \= Expect no match
-    abcdde  
+    abcdde
 No match
 
 /abcd*/
@@ -9776,29 +9958,6 @@ Partial match: abca
     xxxxabcde\=ph
 Partial match: abcde
 
-# This is not in the Perl-compatible test because Perl seems currently to be
-# broken and not behaving as specified in that it *does* bumpalong after
-# hitting (*COMMIT). 
-
-/(?1)(A(*COMMIT)|B)D/
-    ABD
- 0: ABD
- 1: B
-    XABD
- 0: ABD
- 1: B
-    BAD
- 0: BAD
- 1: A
-    ABXABD  
- 0: ABD
- 1: B
-\= Expect no match 
-    ABX 
-No match
-    BAXBAD  
-No match
-
 /(\3)(\1)(a)/alt_bsux,allow_empty_class,match_unset_backref,dupnames
     cat
  0: a
@@ -9835,7 +9994,7 @@ First code unit = 'i'
 Subject length lower bound = 1
     i
  0: i
-    
+
 /()i(?(1)a)/I
 Capturing subpattern count = 1
 Max back reference = 1
@@ -9859,10 +10018,10 @@ Subject length lower bound = 1
  0: ab
     XAbX
  0: Ab
-    CcC 
+    CcC
  0: c
 \= Expect no match
-    XABX   
+    XABX
 No match
 
 /(?i)a(?s)b|c/B
@@ -9922,7 +10081,7 @@ No match
  0: xabcxd
  1: abcxd
  2: cx
-    
+
 /^(?&t)*+(?(DEFINE)(?<t>.))$/B
 ------------------------------------------------------------------
         Bra
@@ -9947,7 +10106,7 @@ No match
         Bra
         ^
         Brazero
-        Once
+        SBra
         Recurse
         KetRmax
         Cond
@@ -9963,9 +10122,9 @@ No match
 
 # This one is here because Perl gives the match as "b" rather than "ab". I
 # believe this to be a Perl bug.
-      
+
 /(?>a\Kb)z|(ab)/
-    ab\=startchar 
+    ab\=startchar
  0: ab
  1: ab
 
@@ -9974,7 +10133,7 @@ No match
  0: 
  1: 
  2: 
-    0abc 
+    0abc
  0: 0
  1: 0
  2: 0
@@ -9988,7 +10147,7 @@ Failed: error 166 at offset 6: (*MARK) must have an argument
 /abc(*FAIL:123)xyz/
 Failed: error 159 at offset 10: an argument is not allowed for (*ACCEPT), (*FAIL), or (*COMMIT)
 
-# This should, and does, fail. In Perl, it does not, which I think is a 
+# This should, and does, fail. In Perl, it does not, which I think is a
 # bug because replacing the B in the pattern by (B|D) does make it fail.
 
 /A(*COMMIT)B/aftertext,mark
@@ -10007,7 +10166,7 @@ No match
 \= Expect no match
     AC
 No match
-    
+
 # Mark names can be duplicated. Perl doesn't give a mark for this one,
 # though PCRE2 does.
 
@@ -10015,35 +10174,35 @@ No match
 \= Expect no match
     XAQQ
 No match, mark = A
-    
-# COMMIT at the start of a pattern should be the same as an anchor. Perl 
+
+# COMMIT at the start of a pattern should be the same as an anchor. Perl
 # optimizations defeat this. So does the PCRE2 optimization unless we disable
 # it.
 
 /(*COMMIT)ABC/
     ABCDEFG
  0: ABC
-    
+
 /(*COMMIT)ABC/no_start_optimize
 \= Expect no match
     DEFGABC
 No match
-    
+
 /^(ab (c+(*THEN)cd) | xyz)/x
 \= Expect no match
-    abcccd  
+    abcccd
 No match
 
 /^(ab (c+(*PRUNE)cd) | xyz)/x
 \= Expect no match
-    abcccd  
+    abcccd
 No match
 
 /^(ab (c+(*FAIL)cd) | xyz)/x
 \= Expect no match
-    abcccd  
+    abcccd
 No match
-    
+
 # Perl gets some of these wrong
 
 /(?>.(*ACCEPT))*?5/
@@ -10080,7 +10239,7 @@ No match
 \= Expect no match
     A\nB
 No match
-    ACB\n   
+    ACB\n
 No match
 
 /A\NB./Bs
@@ -10095,19 +10254,19 @@ No match
 ------------------------------------------------------------------
     ACBD
  0: ACBD
-    ACB\n 
+    ACB\n
  0: ACB\x0a
 \= Expect no match
-    A\nB  
+    A\nB
 No match
-  
+
 /A\NB/newline=crlf
     A\nB
  0: A\x0aB
     A\rB
  0: A\x0dB
 \= Expect no match
-    A\r\nB    
+    A\r\nB
 No match
 
 /\R+b/B
@@ -10285,7 +10444,7 @@ No match
 \= Bad offsets
     abc\=offset=4
 Failed: error -33: bad offset value
-    abc\=offset=-4 
+    abc\=offset=-4
 ** Invalid value in 'offset=-4'
 \= Valid data
     abc\=offset=0
@@ -10348,18 +10507,18 @@ Failed: error 115 at offset 12: reference to non-existent subpattern
         End
 ------------------------------------------------------------------
 
-# These tests are here because Perl gets the first one wrong. 
+# These tests are here because Perl gets the first one wrong.
 
 /(\R*)(.)/s
     \r\n
  0: \x0d
  1: 
  2: \x0d
-    \r\r\n\n\r 
+    \r\r\n\n\r
  0: \x0d\x0d\x0a\x0a\x0d
  1: \x0d\x0d\x0a\x0a
  2: \x0d
-    \r\r\n\n\r\n 
+    \r\r\n\n\r\n
  0: \x0d\x0d\x0a\x0a\x0d
  1: \x0d\x0d\x0a\x0a
  2: \x0d
@@ -10369,11 +10528,11 @@ Failed: error 115 at offset 12: reference to non-existent subpattern
  0: \x0d
  1: <unset>
  2: \x0d
-    \r\r\n\n\r 
+    \r\r\n\n\r
  0: \x0d\x0d\x0a\x0a\x0d
  1: \x0a
  2: \x0d
-    \r\r\n\n\r\n 
+    \r\r\n\n\r\n
  0: \x0d\x0d\x0a\x0a\x0d
  1: \x0a
  2: \x0d
@@ -10383,16 +10542,16 @@ Failed: error 115 at offset 12: reference to non-existent subpattern
  0: \x0d
  1: 
  2: \x0d
-    \r\r\n\n\r 
+    \r\r\n\n\r
  0: \x0d\x0d\x0a\x0a\x0d
  1: \x0d\x0d\x0a\x0a
  2: \x0d
-    \r\r\n\n\r\n 
+    \r\r\n\n\r\n
  0: \x0d\x0d\x0a\x0a\x0d
  1: \x0d\x0d\x0a\x0a
  2: \x0d
 
-# ------------- 
+# -------------
 
 /^abc$/B
 ------------------------------------------------------------------
@@ -10419,7 +10578,7 @@ Failed: error 115 at offset 12: reference to non-existent subpattern
  0: aaaaX
  1: a
  2: X
-\= Expect no match 
+\= Expect no match
     aaaa
 No match
 
@@ -10427,7 +10586,7 @@ No match
     aaaaX
  0: aaaaX
  1: X
-\= Expect no match 
+\= Expect no match
     aaaa
 No match
 
@@ -10459,12 +10618,14 @@ Failed: error 125 at offset 0: lookbehind assertion is not fixed length
 Capturing subpattern count = 1
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 2
 
 /(^ab)++/I
 Capturing subpattern count = 1
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 2
 
 /(^ab|^)+/I
@@ -10485,12 +10646,14 @@ Subject length lower bound = 0
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 2
 
 /(?:^ab)++/I
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 2
 
 /(?:^ab|^)+/I
@@ -10602,7 +10765,7 @@ Subject length lower bound = 1
 
 /(abc)\1+/
 
-# Perl doesn't get these right IMO (the 3rd is PCRE2-specific) 
+# Perl doesn't get these right IMO (the 3rd is PCRE2-specific)
 
 /(?1)(?:(b(*ACCEPT))){0}/
     b
@@ -10611,8 +10774,8 @@ Subject length lower bound = 1
 /(?1)(?:(b(*ACCEPT))){0}c/
     bc
  0: bc
-\= Expect no match 
-    b 
+\= Expect no match
+    b
 No match
 
 /(?1)(?:((*ACCEPT))){0}c/
@@ -10622,7 +10785,7 @@ No match
  0: c
 
 /^.*?(?(?=a)a|b(*THEN)c)/
-\= Expect no match 
+\= Expect no match
     ba
 No match
 
@@ -10631,20 +10794,20 @@ No match
  0: ba
 
 /^.*?(?(?=a)a(*THEN)b|c)/
-\= Expect no match 
+\= Expect no match
     ac
 No match
 
 /^.*?(?(?=a)a(*THEN)b)c/
-\= Expect no match 
+\= Expect no match
     ac
 No match
 
 /^.*?(a(*THEN)b)c/
-\= Expect no match 
+\= Expect no match
     aabc
 No match
-    
+
 /^.*? (?1) c (?(DEFINE)(a(*THEN)b))/x
     aabc
  0: aabc
@@ -10667,12 +10830,12 @@ No match
  0: C
  1: C
 MK: A
-\= Expect no match 
+\= Expect no match
     D
 No match, mark = A
-     
+
 /(*:A)A+(*SKIP:A)(B|Z)/mark
-\= Expect no match 
+\= Expect no match
     AAAC
 No match, mark = A
 
@@ -10683,17 +10846,17 @@ No match, mark = A
  0: c
     c\=notempty
  0: c
-    
+
 /(?1)c(?(DEFINE)((*ACCEPT)b))/
     c
  0: c
     c\=notempty
  0: c
-    
+
 /(?>(*ACCEPT)b)c/
     c
  0: 
-\= Expect no match 
+\= Expect no match
     c\=notempty
 No match
 
@@ -10708,7 +10871,7 @@ No match
     ac\=ovector=1
  0: ac
  0+ 
-    
+
 /(a)(b)x|abc/allaftertext
      abc\=ovector=2
  0: abc
@@ -10781,7 +10944,7 @@ Subject length lower bound = 6
  1: <unset>
  2: <unset>
  3: baz
-    foobarbazX    
+    foobarbazX
  0: bazX
  1: <unset>
  2: <unset>
@@ -11081,7 +11244,7 @@ Subject length lower bound = 0
 ------------------------------------------------------------------
         Bra
         ^
-        Once_NC
+        Once
         a++
         Ket
         Once
@@ -11097,7 +11260,7 @@ Subject length lower bound = 0
  0: aaaazzzzb
  1: zzzz
 \= Expect no match
-    aazz  
+    aazz
 No match
 
 /(.)(\1|a(?2))/
@@ -11105,15 +11268,15 @@ No match
  0: bab
  1: b
  2: ab
-    
+
 /\1|(.)(?R)\1/
     cbbbc
  0: cbbbc
  1: c
-    
+
 /(.)((?(1)c|a)|a(?2))/
 \= Expect no match
-    baa  
+    baa
 No match
 
 /(?P<abn>(?P=abn)xxx)/B
@@ -11223,7 +11386,7 @@ No match
 /a[\NB]c/
 Failed: error 171 at offset 4: \N is not supported in a class
     aNc
-    
+
 /a[B-\Nc]/
 Failed: error 150 at offset 6: invalid range in character class
 
@@ -11237,14 +11400,14 @@ Failed: error 171 at offset 5: \N is not supported in a class
 # This test, with something more complicated than individual letters, causes
 # different behaviour in Perl. Perhaps it disables some optimization; no tag is
 # passed back for the failures, whereas in PCRE2 there is a tag.
-    
+
 /(A|P)(*:A)(B|P) | (X|P)(X|P)(*:B)(Y|P)/x,mark
     AABC
  0: AB
  1: A
  2: B
 MK: A
-    XXYZ 
+    XXYZ
  0: XXY
  1: <unset>
  2: <unset>
@@ -11253,40 +11416,40 @@ MK: A
  5: Y
 MK: B
 \= Expect no match
-    XAQQ  
+    XAQQ
 No match, mark = A
-    XAQQXZZ  
+    XAQQXZZ
 No match, mark = A
-    AXQQQ 
+    AXQQQ
 No match, mark = A
-    AXXQQQ 
+    AXXQQQ
 No match, mark = B
 
 # Perl doesn't give marks for these, though it does if the alternatives are
-# replaced by single letters. 
-    
+# replaced by single letters.
+
 /(b|q)(*:m)f|a(*:n)w/mark
-    aw 
+    aw
  0: aw
 MK: n
-\= Expect no match 
+\= Expect no match
     abc
 No match, mark = m
 
 /(q|b)(*:m)f|a(*:n)w/mark
-    aw 
+    aw
  0: aw
 MK: n
-\= Expect no match 
+\= Expect no match
     abc
 No match, mark = m
 
-# After a partial match, the behaviour is as for a failure. 
+# After a partial match, the behaviour is as for a failure.
 
 /^a(*:X)bcde/mark
    abc\=ps
 Partial match, mark=X: abc
-   
+
 # These are here because Perl doesn't return a mark, except for the first.
 
 /(?=(*:x))(q|)/aftertext,mark
@@ -11416,7 +11579,7 @@ Partial match: ababa
     abababx
  0: abababx
  1: ab
-    ababababx  
+    ababababx
  0: ababababx
  1: ab
 
@@ -11430,10 +11593,10 @@ Partial match: ababa
     abababx
  0: abababx
  1: ab
-    ababababx  
+    ababababx
  0: ababababx
  1: ab
-    
+
 /^(..)(\1{2,3})ab/
     abababab
  0: abababab
@@ -11445,7 +11608,7 @@ Partial match: ababa
  0: \x0d
     \r\=ph
 Partial match: \x0d
-    
+
 /^\R{2,3}x/
     \r\=ps
 Partial match: \x0d
@@ -11461,7 +11624,7 @@ Partial match: \x0d\x0d\x0d
 Partial match: \x0d\x0d\x0d
     \r\rx
  0: \x0d\x0dx
-    \r\r\rx    
+    \r\r\rx
  0: \x0d\x0d\x0dx
 
 /^\R{2,3}?x/
@@ -11479,9 +11642,9 @@ Partial match: \x0d\x0d\x0d
 Partial match: \x0d\x0d\x0d
     \r\rx
  0: \x0d\x0dx
-    \r\r\rx    
+    \r\r\rx
  0: \x0d\x0d\x0dx
-    
+
 /^\R?x/
     \r\=ps
 Partial match: \x0d
@@ -11489,7 +11652,7 @@ Partial match: \x0d
 Partial match: \x0d
     x
  0: x
-    \rx  
+    \rx
  0: \x0dx
 
 /^\R+x/
@@ -11501,7 +11664,7 @@ Partial match: \x0d
 Partial match: \x0d\x0a
     \r\n\=ph
 Partial match: \x0d\x0a
-    \rx  
+    \rx
  0: \x0dx
 
 /^a$/newline=crlf
@@ -11535,7 +11698,7 @@ Partial match: a\x0d
  0: \x0d
     \r\=ph
 Partial match: \x0d
-  
+
 /.{2,3}/newline=crlf
     \r\=ps
 Partial match: \x0d
@@ -11568,9 +11731,9 @@ Partial match: \x0d\x0d
     ABCDGHI\=ovector=01
 Matched, but too many substrings
  0: ABCD
-    
+
 # These are all run as real matches in test 1; here we are just checking the
-# settings of the anchored and startline bits.  
+# settings of the anchored and startline bits.
 
 /(?>.*?a)(?<=ba)/I
 Capturing subpattern count = 0
@@ -11600,6 +11763,7 @@ Subject length lower bound = 2
 Capturing subpattern count = 0
 Compile options: dotall
 Overall options: anchored dotall
+First code unit = 'a'
 Subject length lower bound = 2
 
 /.*?a(*SKIP)b/I
@@ -11622,6 +11786,7 @@ Subject length lower bound = 2
 Capturing subpattern count = 0
 Compile options: dotall
 Overall options: anchored dotall
+First code unit = 'a'
 Subject length lower bound = 2
 
 /(?>.*?)(?<=(abcd)|(wxyz))/I
@@ -11669,43 +11834,36 @@ Subject length lower bound = 3
 /(?:(a)+(?C1)bb|aa(?C2)b)/
     aab\=callout_capture
 Callout 1: last capture = 1
- 0: <unset>
  1: a
 --->aab
     ^ ^     b
 Callout 1: last capture = 1
- 0: <unset>
  1: a
 --->aab
     ^^      b
 Callout 2: last capture = 0
- 0: <unset>
 --->aab
     ^ ^     b
  0: aab
-   
+
 /(?:(a)++(?C1)bb|aa(?C2)b)/
     aab\=callout_capture
 Callout 1: last capture = 1
- 0: <unset>
  1: a
 --->aab
     ^ ^     b
 Callout 2: last capture = 0
- 0: <unset>
 --->aab
     ^ ^     b
  0: aab
-    
+
 /(?:(?>(a))(?C1)bb|aa(?C2)b)/
     aab\=callout_capture
 Callout 1: last capture = 1
- 0: <unset>
  1: a
 --->aab
     ^^      b
 Callout 2: last capture = 0
- 0: <unset>
 --->aab
     ^ ^     b
  0: aab
@@ -11713,15 +11871,12 @@ Callout 2: last capture = 0
 /(?:(?1)(?C1)x|ab(?C2))((a)){0}/
     aab\=callout_capture
 Callout 1: last capture = 0
- 0: <unset>
 --->aab
     ^^      x
 Callout 1: last capture = 0
- 0: <unset>
 --->aab
      ^^     x
 Callout 2: last capture = 0
- 0: <unset>
 --->aab
      ^ ^    )
  0: ab
@@ -11729,13 +11884,11 @@ Callout 2: last capture = 0
 /(?1)(?C1)((a)(?C2)){0}/
     aab\=callout_capture
 Callout 2: last capture = 2
- 0: <unset>
  1: <unset>
  2: a
 --->aab
     ^^      ){0}
 Callout 1: last capture = 0
- 0: <unset>
 --->aab
     ^^      (
  0: a
@@ -11743,31 +11896,27 @@ Callout 1: last capture = 0
 /(?:(a)+(?C1)bb|aa(?C2)b)++/
     aab\=callout_capture
 Callout 1: last capture = 1
- 0: <unset>
  1: a
 --->aab
     ^ ^     b
 Callout 1: last capture = 1
- 0: <unset>
  1: a
 --->aab
     ^^      b
 Callout 2: last capture = 0
- 0: <unset>
 --->aab
     ^ ^     b
  0: aab
     aab\=callout_capture,ovector=1
 Callout 1: last capture = 1
- 0: <unset>
+ 1: a
 --->aab
     ^ ^     b
 Callout 1: last capture = 1
- 0: <unset>
+ 1: a
 --->aab
     ^^      b
 Callout 2: last capture = 0
- 0: <unset>
 --->aab
     ^ ^     b
  0: aab
@@ -11777,7 +11926,7 @@ Callout 2: last capture = 0
  0: ab
     ab\=ovector=1
  0: ab
-  
+
 /(?<=123)(*MARK:xx)abc/mark
     xxxx123a\=ph
 Partial match, mark=xx: 123a
@@ -11785,7 +11934,7 @@ Partial match, mark=xx: 123a
     xxxx123a\=ps
 Partial match, mark=xx: 123a
                         <<<
-    
+
 /123\Kabc/startchar
     xxxx123a\=ph
 Partial match: 123a
@@ -11823,18 +11972,18 @@ Partial match: 123a
 /aaaaa(*COMMIT)(*PRUNE)b|a+c/
     aaaaaac
  0: aaaac
-    
+
 # Here are some that Perl treats differently because of the way it handles
-# backtracking verbs. 
+# backtracking verbs.
 
 /(?!a(*COMMIT)b)ac|ad/
      ac
  0: ac
-     ad 
+     ad
  0: ad
 
 /^(?!a(*THEN)b|ac)../
-     ad 
+     ad
  0: ad
 \= Expect no match
      ac
@@ -11843,7 +11992,7 @@ No match
 /^(?=a(*THEN)b|ac)/
     ac
  0: 
-    
+
 /\A.*?(?:a|b(*THEN)c)/
     ba
  0: ba
@@ -11857,7 +12006,7 @@ No match
  0: ba
 
 /(?:(a(*MARK:X)a+(*SKIP:X)b)){0}(?:(?1)|aac)/
-    aac 
+    aac
  0: aac
 
 /\A.*?(a|b(*THEN)c)/
@@ -11866,24 +12015,23 @@ No match
  1: a
 
 /^(A(*THEN)B|A(*THEN)D)/
-    AD           
+    AD
  0: AD
  1: AD
-    
+
 /(?!b(*THEN)a)bn|bnn/
     bnn
  0: bn
 
 /(?(?=b(*SKIP)a)bn|bnn)/
-\= Expect no match
     bnn
-No match
+ 0: bnn
 
 /(?=b(*THEN)a|)bn|bnn/
     bnn
  0: bn
 
-# This test causes a segfault with Perl 5.18.0 
+# This test causes a segfault with Perl 5.18.0
 
 /^(?=(a)){0}b(?1)/
     backgammon
@@ -12566,7 +12714,7 @@ Subject length lower bound = 5
         cc
         Ket
         a++
-        Once_NC
+        Once
         bb
         Alt
         cc
@@ -12915,7 +13063,7 @@ Subject length lower bound = 5
 ------------------------------------------------------------------
         Bra
         [a-f]*+
-        Once_NC
+        Once
         gg
         Alt
         hh
@@ -12923,7 +13071,7 @@ Subject length lower bound = 5
         #
         [a-f]*+
         Brazero
-        Once_NC
+        Once
         gg
         Alt
         hh
@@ -12931,7 +13079,7 @@ Subject length lower bound = 5
         #
         [a-f]*
         Brazero
-        Once_NC
+        Once
         gg
         Alt
         hh
@@ -12939,7 +13087,7 @@ Subject length lower bound = 5
         a#
         [a-f]*+
         Brazero
-        Once_NC
+        Once
         gg
         Alt
         hh
@@ -13014,7 +13162,7 @@ Starting code units: a b c d
 Last code unit = 'd'
 Subject length lower bound = 1
 
-# End of special auto-possessive tests 
+# End of special auto-possessive tests
 
 /^A\o{1239}B/
 Failed: error 164 at offset 8: non-octal character in \o{} (closing brace missing?)
@@ -13022,7 +13170,7 @@ Failed: error 164 at offset 8: non-octal character in \o{} (closing brace missin
 
 /^A\oB/
 Failed: error 155 at offset 4: missing opening brace after \o
-    
+
 /^A\x{zz}B/
 Failed: error 167 at offset 5: non-hex character in \x{} (closing brace missing?)
 
@@ -13184,18 +13332,18 @@ Failed: error 144 at offset 5: group name must start with a non-digit
 ------------------------------------------------------------------
     little red riding hood
  0: red
-    a /red/ thing 
+    a /red/ thing
  0: red
     red is a colour
  0: red
-    put it all on red  
+    put it all on red
  0: red
 \= Expect no match
     no reduction
 No match
     Alfred Winifred
 No match
-    
+
 /[a[:<:]] should give error/
 Failed: error 130 at offset 4: unknown POSIX class name
 
@@ -13209,7 +13357,7 @@ Start of matched string is beyond its end - displaying from end to start.
 \= Expect no match
     xx\nxabcd
 No match
-    
+
 # Test stack guard external calls.
 
 /(((a)))/stackguard=1
@@ -13229,7 +13377,7 @@ Failed: error 133 at offset 7: parentheses are too deeply nested (stack check)
         Bra
         ^
         \w+
-        Once_NC
+        Once
         \s*+
         Ket
         AssertB
@@ -13263,9 +13411,9 @@ Failed: error 115 at offset 2: reference to non-existent subpattern
 /A\9B/
 Failed: error 115 at offset 2: reference to non-existent subpattern
 
-# This one is here because Perl fails to match "12" for this pattern when the $ 
+# This one is here because Perl fails to match "12" for this pattern when the $
 # is present.
-    
+
 /^(?(?=abc)\w{3}:|\d\d)$/
     abc:
  0: abc:
@@ -13274,10 +13422,10 @@ Failed: error 115 at offset 2: reference to non-existent subpattern
 \= Expect no match
     123
 No match
-    xyz    
+    xyz
 No match
 
-# Perl gets this one wrong, giving "a" as the after text for ca and failing to 
+# Perl gets this one wrong, giving "a" as the after text for ca and failing to
 # match for cd.
 
 /(?(?=ab)ab)/aftertext
@@ -13287,11 +13435,11 @@ No match
     ca
  0: 
  0+ ca
-    cd 
+    cd
  0: 
  0+ cd
-    
-# This should test both paths for processing OP_RECURSE. 
+
+# This should test both paths for processing OP_RECURSE.
 
 /(?(R)a+|(?R)b)/
     aaaabcde
@@ -13308,14 +13456,14 @@ No match
  0: a
     ba
  0: b
-    cb  
+    cb
  0: b
 
 /(*NOTEMPTY_ATSTART)a*?b*?/aftertext
     ab
  0: a
  0+ b
-    cdab 
+    cdab
  0: 
  0+ dab
 
@@ -13324,7 +13472,7 @@ Capturing subpattern count = 0
 Subject length lower bound = 2
     yesno
  0: yes
-    
+
 /(?(VERSION=8)yes){3}/BI,aftertext
 ------------------------------------------------------------------
         Bra
@@ -13348,7 +13496,7 @@ Subject length lower bound = 6
     yesnononoyes
  0: nonono
 \= Expect no match
-    yesno   
+    yesno
 No match
 
 /(?:(?<VERSION>abc)|xyz)(?(VERSION)yes|no)/I
@@ -13366,7 +13514,7 @@ Subject length lower bound = 5
 \= Expect no match
     abcno
 No match
-    xyzyes    
+    xyzyes
 No match
 
 /(?(VERSION<10)yes|no)/
@@ -13400,18 +13548,17 @@ Subject length lower bound = 1
    abd
  0: abd
  1: ab
-   xyd 
+   xyd
  0: d
 
 /(|ab)*?d/I,no_start_optimize
 Capturing subpattern count = 1
 Options: no_start_optimize
-Last code unit = 'd'
 Subject length lower bound = 0
    abd
  0: abd
  1: ab
-   xyd 
+   xyd
  0: d
 
 /\k<A>*(?<A>aa)(?<A>bb)/match_unset_backref,dupnames
@@ -13498,7 +13645,7 @@ Failed: error -58 at offset 4 in replacement: expected closing curly bracket in 
 /abc/replace=[9]XYZ
     123abc123
 Failed: error -48: no more memory
-    
+
 /abc/replace=xyz
     1abc2\=partial_hard
 Failed: error -34: bad option value
@@ -13516,29 +13663,29 @@ Failed: error -34: bad option value
 /(?<=abc)(|def)/g,replace=<$0>
     123abcxyzabcdef789abcpqr
  4: 123abc<>xyzabc<><def>789abc<>pqr
-    
+
 /./replace=$0
     a
  1: a
-    
+
 /(.)(.)/replace=$2+$1
     abc
  1: b+ac
-    
+
 /(?<A>.)(?<B>.)/replace=$B+$A
     abc
  1: b+ac
-    
+
 /(.)(.)/g,replace=$2$1
-    abcdefgh  
+    abcdefgh
  4: badcfehg
-    
+
 /(*:pear)apple|(*:orange)lemon|(*:strawberry)blackberry/g,replace=${*MARK}
     apple lemon blackberry
  3: pear orange strawberry
     apple strudel
  1: pear strudel
-    fruitless  
+    fruitless
  0: fruitless
 
 /(*:pear)apple|(*:orange)lemon|(*:strawberry)blackberry/replace=${*MARK} sauce,
@@ -13550,10 +13697,10 @@ Failed: error -34: bad option value
  3: <pear> <orange> <strawberry>
     apple strudel
  1: <pear> strudel
-    fruitless  
+    fruitless
  0: fruitless
-    
-/(*:pear)apple/g,replace=${*MARKING} 
+
+/(*:pear)apple/g,replace=${*MARKING}
     apple lemon blackberry
 Failed: error -35 at offset 11 in replacement: invalid replacement string
 
@@ -13561,7 +13708,7 @@ Failed: error -35 at offset 11 in replacement: invalid replacement string
     apple lemon blackberry
 Failed: error -58 at offset 7 in replacement: expected closing curly bracket in replacement string
 
-/(*:pear)apple/g,replace=${*mark} 
+/(*:pear)apple/g,replace=${*mark}
     apple lemon blackberry
 Failed: error -35 at offset 8 in replacement: invalid replacement string
 
@@ -13625,13 +13772,13 @@ Get substring 3 failed (-54): requested value is not available
 Get substring 4 failed (-49): unknown substring
  0L c
  1L 
-    
+
 /x(?=ab\K)/
-    xab\=get=0 
+    xab\=get=0
 Start of matched string is beyond its end - displaying from end to start.
  0: ab
  0G  (0)
-    xab\=copy=0 
+    xab\=copy=0
 Start of matched string is beyond its end - displaying from end to start.
  0: ab
  0C  (0)
@@ -13672,12 +13819,14 @@ get substring list failed (-2): partial match
 Capturing subpattern count = 0
 Compile options: <none>
 Overall options: anchored
+First code unit = 'a'
 Subject length lower bound = 3
 
 /^abc/info,no_dotstar_anchor
 Capturing subpattern count = 0
 Compile options: no_dotstar_anchor
 Overall options: anchored no_dotstar_anchor
+First code unit = 'a'
 Subject length lower bound = 3
 
 /.*\d/info,auto_callout
@@ -13795,7 +13944,7 @@ Failed: error 109 at offset 7: quantifier does not follow a repeatable item
      456
  0: 456
 \= Expect no match
-     356   
+     356
 No match
 
 '^(a)*+(\w)'
@@ -13803,7 +13952,7 @@ No match
  0: g
  1: <unset>
  2: g
-    g\=ovector=1 
+    g\=ovector=1
 Matched, but too many substrings
  0: g
 
@@ -13811,10 +13960,10 @@ Matched, but too many substrings
     g
  0: g
  1: g
-    g\=ovector=1 
+    g\=ovector=1
 Matched, but too many substrings
  0: g
-    
+
 # These two pattern showeds up compile-time bugs
 
 "((?2){0,1999}())?"
@@ -13895,7 +14044,6 @@ Callout (10): "AB"
 /^a(b)c(?C1)def/
       abcdef\=callout_capture
 Callout 1: last capture = 1
- 0: <unset>
  1: b
 --->abcdef
     ^  ^       d
@@ -13918,7 +14066,6 @@ Callout 1: last capture = 1
 ------------------------------------------------------------------
       abcdef\=callout_capture
 Callout (10): {AB} last capture = 1
- 0: <unset>
  1: b
 --->abcdef
     ^  ^       d
@@ -13988,7 +14135,7 @@ Callout 25  (?=
 --->abcdefg
  25 ^           (?=
  0: abcd
-    xyz123 
+    xyz123
 --->xyz123
  25 ^          (?=
  0: xyz
@@ -14014,7 +14161,7 @@ Callout (7): $abc$
 --->abcdefg
     ^           (?=
  0: abcd
-    xyz123 
+    xyz123
 Callout (7): $abc$
 --->xyz123
     ^          (?=
@@ -14058,8 +14205,8 @@ Callout (5): 'x\x00z'
 /(?(?!)a|b)/
     bbb
  0: b
-\= Expect no match 
-    aaa 
+\= Expect no match
+    aaa
 No match
 
 # JIT gives a different error message for the infinite recursion
@@ -14161,9 +14308,9 @@ Subject length lower bound = 0
 \= Expect no match
     \[9x!xxx(]{9999}
 No match
-    
+
 /(abc)*/
-    \[abc]{5} 
+    \[abc]{5}
  0: abcabcabcabcabc
  1: abc
 
@@ -14209,7 +14356,7 @@ Failed: error 115 at offset 2: reference to non-existent subpattern
 /A\8B\9C/
 Failed: error 115 at offset 2: reference to non-existent subpattern
     A8B9C
-    
+
 /(?x:((?'a')) # comment (with parentheses) and | vertical
 (?-x:#not a comment (?'b')) # this is a comment ()
 (?'c')) # not a comment (?'d')/info
@@ -14237,14 +14384,14 @@ Subject length lower bound = 1
  1: 
  2: 2
  3: 
-    B32A 
+    B32A
  0: 3
  1: 
  2: 
  3: 3
 
 # These are some patterns that used to cause buffer overflows or other errors
-# while compiling. 
+# while compiling.
 
 /.((?2)(?R)|\1|$)()/B
 ------------------------------------------------------------------
@@ -14476,7 +14623,7 @@ Subject length lower bound = 0
  0: {4,5a}bc
 
 /\x0{ab}/
-    \0{ab} 
+    \0{ab}
  0: \x00{ab}
 
 /^(a(b))\1\g1\g{1}\g-1\g{-1}\g{-02}Z/
@@ -14536,9 +14683,9 @@ No match
     aacb
 No match
 
-/(*MARK:a\zb)z/alt_verbnames 
+/(*MARK:a\zb)z/alt_verbnames
 Failed: error 140 at offset 10: invalid escape sequence in (*VERB) name
-    
+
 /(*:ab\t(d\)c)xxx/
 Failed: error 122 at offset 12: unmatched closing parenthesis
 
@@ -14551,38 +14698,38 @@ MK: ab\x09(d)c
     x
  0: x
 MK: Axx)xB
-    
+
 /(*:A\ExxxB)x/alt_verbnames,mark
-    x 
+    x
  0: x
 MK: AxxxB
-    
+
 /(*: A \ and #comment
      \ B)x/x,alt_verbnames,mark
-    x  
+    x
  0: x
 MK: A and B
-    
+
 /(*: A \ and #comment
      \ B)x/alt_verbnames,mark
-    x  
+    x
  0: x
 MK:  A  and #comment\x0a      B
-    
+
 /(*: A \ and #comment
      \ B)x/x,mark
-    x  
+    x
  0: x
 MK:  A \ and #comment\x0a     \ B
-    
+
 /(*: A \ and #comment
      \ B)x/mark
-    x  
+    x
  0: x
 MK:  A \ and #comment\x0a     \ B
-    
+
 /(*:A
-B)x/alt_verbnames,mark 
+B)x/alt_verbnames,mark
     x
  0: x
 MK: A\x0aB
@@ -14611,7 +14758,7 @@ No match
 \= Expect no match
     1234abc\=offset_limit=6
 No match
-    
+
 /A/g,replace=-,use_offset_limit
     XAXAXAXAXA\=offset_limit=4
  2: X-X-XAXAXA
@@ -14630,20 +14777,20 @@ No match
 /abcd/null_context
     abcd\=null_context
  0: abcd
-\= Expect error     
+\= Expect error
     abcd\=null_context,find_limits
 ** Not allowed together: find_limits null_context
-    abcd\=allusedtext,startchar 
+    abcd\=allusedtext,startchar
 ** Not allowed together: allusedtext startchar
 
 /abcd/replace=w\rx\x82y\o{333}z(\Q12\$34$$\x34\E5$$),substitute_extended
     abcd
  1: w\x0dx\x82y\xdbz(12\$34$$\x345$)
-    
+
 /a(bc)(DE)/replace=a\u$1\U$1\E$1\l$2\L$2\Eab\Uab\LYZ\EDone,substitute_extended
     abcDE
  1: aBcBCbcdEdeabAByzDone
- 
+
 /abcd/replace=xy\kz,substitute_extended
     abcd
 Failed: error -57 at offset 4 in replacement: bad escape sequence in replacement string
@@ -14697,9 +14844,9 @@ Failed: error -49 at offset 10 in replacement: unknown substring
 /(?J)(?:(?<A>a)|(?<A>b))/replace=<$A>
     [a]
  1: [<a>]
-    [b] 
+    [b]
  1: [<b>]
-\= Expect error     
+\= Expect error
     (a)\=ovector=1
 Failed: error -54 at offset 3 in replacement: requested value is not available
 
@@ -14717,6 +14864,7 @@ Capturing subpattern count = 2
 Max back reference = 1
 Compile options: <none>
 Overall options: anchored
+First code unit = 'o'
 Last code unit = '}'
 Subject length lower bound = 65535
 
@@ -14742,11 +14890,11 @@ Subject length lower bound = 1
 /(?=a\K)/replace=z
     BaCaD
 Failed: error -60: match with end before start is not supported
-    
+
 /(?'abcdefghijklmnopqrstuvwxyzABCDEFG'toolong)/
 Failed: error 148 at offset 36: subpattern name is too long (maximum 32 characters)
- 
-/(?'abcdefghijklmnopqrstuvwxyzABCDEF'justright)/ 
+
+/(?'abcdefghijklmnopqrstuvwxyzABCDEF'justright)/
 
 # These two use zero-termination
 /abcd/max_pattern_length=3
@@ -15098,7 +15246,7 @@ Failed: error 162 at offset 49: subpattern name expected
 /a|(b)c/replace=>$1<,substitute_unset_empty
     cat
  1: c><t
-    xbcom 
+    xbcom
  1: x>b<om
 
 /a|(b)c/
@@ -15120,23 +15268,23 @@ Failed: error -49 at offset 9 in replacement: unknown substring
 /a|(?'X'b)c/replace=>$X<,substitute_unset_empty
     cat
  1: c><t
-    xbcom 
+    xbcom
  1: x>b<om
 
 /a|(?'X'b)c/replace=>$Y<,substitute_unset_empty
     cat
 Failed: error -49 at offset 3 in replacement: unknown substring
-    cat\=substitute_unknown_unset 
+    cat\=substitute_unknown_unset
  1: c><t
-    cat\=substitute_unknown_unset,-substitute_unset_empty 
+    cat\=substitute_unknown_unset,-substitute_unset_empty
 Failed: error -55 at offset 3 in replacement: requested value is not set
 
 /a|(b)c/replace=>$2<,substitute_unset_empty
     cat
 Failed: error -49 at offset 3 in replacement: unknown substring
-    cat\=substitute_unknown_unset 
+    cat\=substitute_unknown_unset
  1: c><t
-    cat\=substitute_unknown_unset,-substitute_unset_empty 
+    cat\=substitute_unknown_unset,-substitute_unset_empty
 Failed: error -55 at offset 3 in replacement: requested value is not set
 
 /()()()/use_offset_limit
@@ -15146,13 +15294,13 @@ Failed: error -55 at offset 3 in replacement: requested value is not set
 ** Invalid value in 'callout_fail=11000000000'
     \=callout_fail=1:11000000000
 ** Invalid value in 'callout_fail=1:11000000000'
-    \=callout_data=11000000000 
+    \=callout_data=11000000000
 ** Invalid value in 'callout_data=11000000000'
-    \=callout_data=-11000000000 
+    \=callout_data=-11000000000
 ** Invalid value in 'callout_data=-11000000000'
-    \=offset_limit=1100000000000000000000 
+    \=offset_limit=1100000000000000000000
 ** Invalid value in 'offset_limit=1100000000000000000000'
-    \=copy=11000000000 
+    \=copy=11000000000
 ** Invalid value in 'copy=11000000000'
 
 /(*MARK:A\x00b)/mark
@@ -15232,13 +15380,13 @@ Failed: error 114 at offset 1: missing closing parenthesis
     a11az
  0: a11az
  1: a
-    b11bz 
+    b11bz
  0: b11bz
  1: b
 \= Expect no match
-    b11az 
+    b11az
 No match
-    
+
 /(?|([ab]))...(?<=\1)z/
 Failed: error 125 at offset 13: lookbehind assertion is not fixed length
 
@@ -15247,19 +15395,19 @@ Failed: error 125 at offset 13: lookbehind assertion is not fixed length
  0: aa11az
  1: a
  2: a
-    
-/(a\2)(b\1)(?<=\2)/ 
+
+/(a\2)(b\1)(?<=\2)/
 Failed: error 125 at offset 10: lookbehind assertion is not fixed length
- 
+
 /(?<A>[ab])...(?<=\k'A')z/
     a11az
  0: a11az
  1: a
-    b11bz 
+    b11bz
  0: b11bz
  1: b
 \= Expect no match
-    b11az 
+    b11az
 No match
 
 /(?<A>[ab])...(?<=\k'A')(?<A>)z/dupnames
@@ -15291,8 +15439,8 @@ Failed: error 125 at offset 13: lookbehind assertion is not fixed length
   1 ^ ^     c
  +8 ^  ^    
  0: abc
-    
-# Perl accepts these, but gives a warning. We can't warn, so give an error. 
+
+# Perl accepts these, but gives a warning. We can't warn, so give an error.
 
 /[a-[:digit:]]+/
 Failed: error 150 at offset 4: invalid range in character class
@@ -15419,7 +15567,7 @@ Contains explicit CR or LF match
 Subject length lower bound = 1
 
 # This checks that new code for handling groups that may match an empty string
-# works on a very large number of alternatives. This pattern used to provoke a 
+# works on a very large number of alternatives. This pattern used to provoke a
 # complaint that it was too complicated.
 
 /(?:\[A|B|C|D|E|F|G|H|I|J|]{200}Z)/expand
@@ -15479,14 +15627,726 @@ First code unit = 'a'
 Last code unit = 'z'
 Subject length lower bound = 11
 
-# End of testinput2 
-Error -63: PCRE2_ERROR_BADDATA (unknown error number)
+//
+    \=ovector=7777777777
+** Invalid value in 'ovector=7777777777'
+
+# This is here because Perl matches, even though a COMMIT is encountered
+# outside of the recursion.
+
+/(?1)(A(*COMMIT)|B)D/
+    BAXBAD
+No match
+
+"(?1){2}(a)"B
+------------------------------------------------------------------
+        Bra
+        Recurse
+        Recurse
+        CBra 1
+        a
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+
+"(?1){2,4}(a)"B
+------------------------------------------------------------------
+        Bra
+        Recurse
+        Recurse
+        Brazero
+        Bra
+        Bra
+        Recurse
+        Ket
+        Brazero
+        Bra
+        Recurse
+        Ket
+        Ket
+        CBra 1
+        a
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+
+# This test differs from Perl for the first subject. Perl ends up with
+# $1 set to 'B'; PCRE2 has it unset (which I think is right).
+
+/^(?:
+(?:A| (?:B|B(*ACCEPT)) (?<=(.)) D)
+(Z)
+)+$/x
+    AZB
+ 0: AZB
+ 1: <unset>
+ 2: Z
+    AZBDZ
+ 0: AZBDZ
+ 1: B
+ 2: Z
+
+# The first of these, when run by Perl, gives the mark 'aa', which is wrong.
+
+'(?>a(*:aa))b|ac' mark
+    ac
+ 0: ac
+
+'(?:a(*:aa))b|ac' mark
+    ac
+ 0: ac
+
+/(R?){65}/
+    (R?){65}
+ 0: 
+ 1: 
+
+/\[(a)]{60}/expand
+    aaaa
+No match
+
+/(?<!\1((?U)1((?U))))(*F)/never_backslash_c,alt_bsux,anchored,extended
+
+/\g{3/
+Failed: error 157 at offset 2: \g is not followed by a braced, angle-bracketed, or quoted name/number or by a plain number
+
+/(a(?C1)(b)(c)d)+/
+  abcdabcd\=callout_capture
+Callout 1: last capture = 0
+--->abcdabcd
+    ^^           (
+Callout 1: last capture = 1
+ 1: abcd
+ 2: b
+ 3: c
+--->abcdabcd
+    ^    ^       (
+ 0: abcdabcd
+ 1: abcd
+ 2: b
+ 3: c
+
+# Perl matches this one, but PCRE does not because (*ACCEPT) clears out any
+# pending backtracks in the recursion.
+
+/^ (?(DEFINE) (..(*ACCEPT)|...) ) (?1)$/x
+\= Expect no match
+    abc
+No match
+
+# Perl gives no match for this one
+
+/(a(*MARK:m)(*ACCEPT)){0}(?1)/mark
+    abc
+ 0: a
+MK: m
+
+/abc/endanchored
+    xyzabc
+ 0: abc
+\= Expect no match
+    xyzabcdef
+No match
+\= Expect error
+    xyzabc\=ph
+Failed: error -34: bad option value
+
+/abc/
+    xyzabc\=endanchored
+ 0: abc
+\= Expect no match
+    xyzabcdef\=endanchored
+No match
+\= Expect error
+    xyzabc\=ps,endanchored
+Failed: error -34: bad option value
+
+/abc(*ACCEPT)d/endanchored
+    xyzabc
+ 0: abc
+\= Expect no match
+    xyzabcdef
+No match
+
+/abc|bcd/endanchored
+    xyzabcd
+ 0: bcd
+\= Expect no match
+    xyzabcdef
+No match
+
+/a(*ACCEPT)x|aa/endanchored
+    aaa
+ 0: a
+
+# Check auto-anchoring when there is a group that is never obeyed at
+# the start of a branch.
+
+/(?(DEFINE)(a))^bc/I
+Capturing subpattern count = 1
+Compile options: <none>
+Overall options: anchored
+First code unit = 'b'
+Subject length lower bound = 2
+
+/(a){0}.*bc/sI
+Capturing subpattern count = 1
+Compile options: dotall
+Overall options: anchored dotall
+Last code unit = 'c'
+Subject length lower bound = 2
+
+# This should be anchored, as the condition is always false and there is
+# no alternative branch.
+
+/(?(VERSION>=999)yes)^bc/I
+Capturing subpattern count = 0
+Compile options: <none>
+Overall options: anchored
+Subject length lower bound = 2
+
+# This should not be anchored.
+
+/(?(VERSION>=999)yes|no)^bc/I
+Capturing subpattern count = 0
+Last code unit = 'c'
+Subject length lower bound = 4
+
+/(*LIMIT_HEAP=0)xxx/I
+Capturing subpattern count = 0
+Heap limit = 0
+First code unit = 'x'
+Last code unit = 'x'
+Subject length lower bound = 3
+
+/\d{0,3}(*:abc)(?C1)xxx/callout_info
+Callout 1  x
+
+# ----------------------------------------------------------------------
+
+# These are a whole pile of tests that touch lines of code that are not
+# used by any other tests (at least when these were created).
+
+/^a+?x/i,no_start_optimize,no_auto_possess
+\= Expect no match
+    aaa
+No match
+
+/^[^a]{3,}?x/i,no_start_optimize,no_auto_possess
+\= Expect no match
+    bbb
+No match
+    cc
+No match
+
+/^X\S/no_start_optimize,no_auto_possess
+\= Expect no match
+    X
+No match
+
+/^X\W/no_start_optimize,no_auto_possess
+\= Expect no match
+    X
+No match
+
+/^X\H/no_start_optimize,no_auto_possess
+\= Expect no match
+    X
+No match
+
+/^X\h/no_start_optimize,no_auto_possess
+\= Expect no match
+    X
+No match
+
+/^X\V/no_start_optimize,no_auto_possess
+\= Expect no match
+    X
+No match
+
+/^X\v/no_start_optimize,no_auto_possess
+\= Expect no match
+    X
+No match
+
+/^X\h/no_start_optimize,no_auto_possess
+\= Expect no match
+    XY
+No match
+
+/^X\V/no_start_optimize,no_auto_possess
+\= Expect no match
+    X\n
+No match
+
+/^X\v/no_start_optimize,no_auto_possess
+\= Expect no match
+    XX
+No match
+
+/^X.+?/s,no_start_optimize,no_auto_possess
+\= Expect no match
+    X
+No match
+
+/^X\R+?/no_start_optimize,no_auto_possess
+\= Expect no match
+    XX
+No match
+
+/^X\H+?/no_start_optimize,no_auto_possess
+\= Expect no match
+    X
+No match
+
+/^X\h+?/no_start_optimize,no_auto_possess
+\= Expect no match
+    X
+No match
+
+/^X\V+?/no_start_optimize,no_auto_possess
+\= Expect no match
+    X
+No match
+    X\n
+No match
+
+/^X\D+?/no_start_optimize,no_auto_possess
+\= Expect no match
+    X
+No match
+    X9
+No match
+
+/^X\S+?/no_start_optimize,no_auto_possess
+\= Expect no match
+    X
+No match
+    X\n
+No match
+
+/^X\W+?/no_start_optimize,no_auto_possess
+\= Expect no match
+    X
+No match
+    XX
+No match
+
+/^X.+?Z/no_start_optimize,no_auto_possess
+\= Expect no match
+    XY\n
+No match
+
+/(*CRLF)^X.+?Z/no_start_optimize,no_auto_possess
+\= Expect no match
+    XY\r\=ps
+Partial match: XY\x0d
+
+/^X\R+?Z/no_start_optimize,no_auto_possess
+\= Expect no match
+    X\nX
+No match
+    X\n\r\n
+No match
+    X\n\rY
+No match
+    X\n\nY
+No match
+    X\n\x{0c}Y
+No match
+
+/(*BSR_ANYCRLF)^X\R+?Z/no_start_optimize,no_auto_possess
+\= Expect no match
+    X\nX
+No match
+    X\n\r\n
+No match
+    X\n\rY
+No match
+    X\n\nY
+No match
+    X\n\x{0c}Y
+No match
+
+/^X\H+?Z/no_start_optimize,no_auto_possess
+\= Expect no match
+    XY\t
+No match
+    XYY
+No match
+
+/^X\h+?Z/no_start_optimize,no_auto_possess
+\= Expect no match
+    X\t\t
+No match
+    X\tY
+No match
+
+/^X\V+?Z/no_start_optimize,no_auto_possess
+\= Expect no match
+    XY\n
+No match
+    XYY
+No match
+
+/^X\v+?Z/no_start_optimize,no_auto_possess
+\= Expect no match
+    X\n\n
+No match
+    X\nY
+No match
+
+/^X\D+?Z/no_start_optimize,no_auto_possess
+\= Expect no match
+    XY9
+No match
+    XYY
+No match
+
+/^X\d+?Z/no_start_optimize,no_auto_possess
+\= Expect no match
+    X99
+No match
+    X9Y
+No match
+
+/^X\S+?Z/no_start_optimize,no_auto_possess
+\= Expect no match
+    XY\n
+No match
+    XYY
+No match
+
+/^X\s+?Z/no_start_optimize,no_auto_possess
+\= Expect no match
+    X\n\n
+No match
+    X\nY
+No match
+
+/^X\W+?Z/no_start_optimize,no_auto_possess
+\= Expect no match
+    X.A
+No match
+    X++
+No match
+
+/^X\w+?Z/no_start_optimize,no_auto_possess
+\= Expect no match
+    Xa.
+No match
+    Xaa
+No match
+
+/^X.{1,3}Z/s,no_start_optimize,no_auto_possess
+\= Expect no match
+    Xa.bd
+No match
+
+/^X\h+Z/no_start_optimize,no_auto_possess
+\= Expect no match
+    X\t\t
+No match
+    X\tY
+No match
+
+/^X\V+Z/no_start_optimize,no_auto_possess
+\= Expect no match
+    XY\n
+No match
+    XYY
+No match
+
+/^(X(*THEN)Y|AB){0}(?1)/
+    ABX
+ 0: AB
+\= Expect no match
+    XAB
+No match
+
+/^(?!A(?C1)B)C/
+    ABC\=callout_error=1,no_jit
+No match
+
+/^(?!A(?C1)B)C/no_start_optimize
+    ABC\=callout_error=1
+--->ABC
+  1 ^^      B
+Failed: error -37: callout error code
+
+/^(?(?!A(?C1)B)C)/
+    ABC\=callout_error=1
+--->ABC
+  1 ^^      B
+Failed: error -37: callout error code
+
+# ----------------------------------------------------------------------
+
+/[a b c]/BxxI
+------------------------------------------------------------------
+        Bra
+        [a-c]
+        Ket
+        End
+------------------------------------------------------------------
+Capturing subpattern count = 0
+Options: extended_more
+Starting code units: a b c 
+Subject length lower bound = 1
+
+/[a b c]/BxxxI
+------------------------------------------------------------------
+        Bra
+        [a-c]
+        Ket
+        End
+------------------------------------------------------------------
+Capturing subpattern count = 0
+Options: extended extended_more
+Starting code units: a b c 
+Subject length lower bound = 1
+
+/[a b c]/B,extended_more
+------------------------------------------------------------------
+        Bra
+        [a-c]
+        Ket
+        End
+------------------------------------------------------------------
+
+/[ a b c ]/B,extended_more
+------------------------------------------------------------------
+        Bra
+        [a-c]
+        Ket
+        End
+------------------------------------------------------------------
+
+/[a b](?xx: [ 12 ] (?-xx:[ 34 ]) )y z/B
+------------------------------------------------------------------
+        Bra
+        [ ab]
+        Bra
+        [12]
+        Bra
+        [ 34]
+        Ket
+        Ket
+        y z
+        Ket
+        End
+------------------------------------------------------------------
+
+# Unsetting /x also unsets /xx
+
+/[a b](?xx: [ 12 ] (?-x:[ 34 ]) )y z/B
+------------------------------------------------------------------
+        Bra
+        [ ab]
+        Bra
+        [12]
+        Bra
+        [ 34]
+        Ket
+        Ket
+        y z
+        Ket
+        End
+------------------------------------------------------------------
+
+/(a)(?-n:(b))(c)/nB
+------------------------------------------------------------------
+        Bra
+        Bra
+        a
+        Ket
+        Bra
+        CBra 1
+        b
+        Ket
+        Ket
+        Bra
+        c
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+
+# ----------------------------------------------------------------------
+# These test the dangerous PCRE2_EXTRA_BAD_ESCAPE_IS_LITERAL option.
+
+/\j\x{z}\o{82}\L\uabcd\u\U\g{\g/B,\bad_escape_is_literal
+** Unrecognized modifier '\' in '\bad_escape_is_literal'
+
+/\N{\c/B,bad_escape_is_literal
+------------------------------------------------------------------
+        Bra
+        N{c
+        Ket
+        End
+------------------------------------------------------------------
+
+/[\j\x{z}\o\gA-\Nb-\g]/B,bad_escape_is_literal
+------------------------------------------------------------------
+        Bra
+        [A-Nb-gjoxz{}]
+        Ket
+        End
+------------------------------------------------------------------
+
+/[Q-\N]/B,bad_escape_is_literal
+Failed: error 108 at offset 4: range out of order in character class
+
+# ----------------------------------------------------------------------
+
+/a\b(c/literal
+    a\\b(c
+ 0: a\b(c
+
+/a\b(c/literal,caseless
+    a\\b(c
+ 0: a\b(c
+    a\\B(c
+ 0: a\B(c
+
+/a\b(c/literal,firstline
+    XYYa\\b(c
+ 0: a\b(c
+\= Expect no match
+    X\na\\b(c
+No match
+
+/a\b?c/literal,use_offset_limit
+    XXXXa\\b?c\=offset_limit=4
+ 0: a\b?c
+\= Expect no match
+    XXXXa\\b?c\=offset_limit=3
+No match
+
+/a\b(c/literal,anchored,endanchored
+    a\\b(c
+ 0: a\b(c
+\= Expect no match
+    Xa\\b(c
+No match
+    a\\b(cX
+No match
+    Xa\\b(cX
+No match
+
+//literal,extended
+Failed: error 192 at offset 0: invalid option bits with PCRE2_LITERAL
+
+/a\b(c/literal,auto_callout,no_start_optimize
+    XXXXa\\b(c
+--->XXXXa\b(c
+ +0 ^             a
+ +0  ^            a
+ +0   ^           a
+ +0    ^          a
+ +0     ^         a
+ +1     ^^        \
+ +2     ^ ^       b
+ +3     ^  ^      (
+ +4     ^   ^     c
+ +5     ^    ^    
+ 0: a\b(c
+
+/a\b(c/literal,auto_callout
+    XXXXa\\b(c
+--->XXXXa\b(c
+ +0     ^         a
+ +1     ^^        \
+ +2     ^ ^       b
+ +3     ^  ^      (
+ +4     ^   ^     c
+ +5     ^    ^    
+ 0: a\b(c
+
+/(*CR)abc/literal
+    (*CR)abc
+ 0: (*CR)abc
+
+/cat|dog/match_word
+    the cat sat
+ 0: cat
+\= Expect no match
+    caterpillar
+No match
+    snowcat
+No match
+    syndicate
+No match
+
+/(cat)|dog/match_line,literal
+    (cat)|dog
+ 0: (cat)|dog
+\= Expect no match
+    the cat sat
+No match
+    caterpillar
+No match
+    snowcat
+No match
+    syndicate
+No match
+
+/a whole line/match_line,multiline
+    Rhubarb \na whole line\n custard
+ 0: a whole line
+\= Expect no match
+    Not a whole line
+No match
+
+# Perl gets this wrong, failing to capture 'b' in group 1.
+
+/^(b+|a){1,2}?bc/
+    bbc
+ 0: bbc
+ 1: b
+    
+# And again here, for the "babc" subject string. 
+
+/^(b*|ba){1,2}?bc/
+    babc
+ 0: babc
+ 1: ba
+    bbabc
+ 0: bbabc
+ 1: ba
+    bababc
+ 0: bababc
+ 1: ba
+\= Expect no match
+    bababbc
+No match
+    babababc
+No match
+
+/[[:digit:]-a]/
+Failed: error 150 at offset 10: invalid range in character class
+
+/[[:digit:]-[:print:]]/
+Failed: error 150 at offset 10: invalid range in character class
+
+/[\d-a]/
+Failed: error 150 at offset 3: invalid range in character class
+
+/[\H-z]/
+Failed: error 150 at offset 3: invalid range in character class
+
+/[\d-[:print:]]/
+Failed: error 150 at offset 3: invalid range in character class
+
+# End of testinput2
+Error -65: PCRE2_ERROR_BADDATA (unknown error number)
 Error -62: bad serialized data
 Error -2: partial match
 Error -1: no match
 Error 0: PCRE2_ERROR_BADDATA (unknown error number)
 Error 100: no error
-Error 188: pattern string is longer than the limit set by the application
-Error 189: internal error: unknown code in parsed pattern
-Error 190: internal error: bad code value in parsed_skip()
-Error 191: PCRE2_ERROR_BADDATA (unknown error number)
+Error 101: \ at end of pattern
+Error 191: PCRE2_EXTRA_ALLOW_SURROGATE_ESCAPES is not allowed in UTF-16 mode
+Error 200: PCRE2_ERROR_BADDATA (unknown error number)

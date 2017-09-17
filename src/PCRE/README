@@ -15,8 +15,8 @@ subscribe or manage your subscription here:
 
    https://lists.exim.org/mailman/listinfo/pcre-dev
 
-Please read the NEWS file if you are upgrading from a previous release.
-The contents of this README file are:
+Please read the NEWS file if you are upgrading from a previous release. The
+contents of this README file are:
 
   The PCRE2 APIs
   Documentation for PCRE2
@@ -44,8 +44,8 @@ wrappers.
 
 The distribution does contain a set of C wrapper functions for the 8-bit
 library that are based on the POSIX regular expression API (see the pcre2posix
-man page). These can be found in a library called libpcre2-posix. Note that this
-just provides a POSIX calling interface to PCRE2; the regular expressions
+man page). These can be found in a library called libpcre2-posix. Note that
+this just provides a POSIX calling interface to PCRE2; the regular expressions
 themselves still follow Perl syntax and semantics. The POSIX API is restricted,
 and does not give full access to all of PCRE2's facilities.
 
@@ -95,10 +95,9 @@ PCRE2 documentation is supplied in two other forms:
 Building PCRE2 on non-Unix-like systems
 ---------------------------------------
 
-For a non-Unix-like system, please read the comments in the file
-NON-AUTOTOOLS-BUILD, though if your system supports the use of "configure" and
-"make" you may be able to build PCRE2 using autotools in the same way as for
-many Unix-like systems.
+For a non-Unix-like system, please read the file NON-AUTOTOOLS-BUILD, though if
+your system supports the use of "configure" and "make" you may be able to build
+PCRE2 using autotools in the same way as for many Unix-like systems.
 
 PCRE2 can also be configured using CMake, which can be run in various ways
 (command line, GUI, etc). This creates Makefiles, solution files, etc. The file
@@ -172,21 +171,24 @@ library. They are also documented in the pcre2build man page.
   give large performance improvements on certain platforms, add --enable-jit to
   the "configure" command. This support is available only for certain hardware
   architectures. If you try to enable it on an unsupported architecture, there
-  will be a compile time error.
+  will be a compile time error. If you are running under SELinux you may also
+  want to add --enable-jit-sealloc, which enables the use of an execmem
+  allocator in JIT that is compatible with SELinux. This has no effect if JIT
+  is not enabled.
 
-. If you do not want to make use of the support for UTF-8 Unicode character
-  strings in the 8-bit library, UTF-16 Unicode character strings in the 16-bit
-  library, or UTF-32 Unicode character strings in the 32-bit library, you can
-  add --disable-unicode to the "configure" command. This reduces the size of
-  the libraries. It is not possible to configure one library with Unicode
-  support, and another without, in the same configuration.
+. If you do not want to make use of the default support for UTF-8 Unicode
+  character strings in the 8-bit library, UTF-16 Unicode character strings in
+  the 16-bit library, or UTF-32 Unicode character strings in the 32-bit
+  library, you can add --disable-unicode to the "configure" command. This
+  reduces the size of the libraries. It is not possible to configure one
+  library with Unicode support, and another without, in the same configuration.
+  It is also not possible to use --enable-ebcdic (see below) with Unicode
+  support, so if this option is set, you must also use --disable-unicode.
 
   When Unicode support is available, the use of a UTF encoding still has to be
   enabled by setting the PCRE2_UTF option at run time or starting a pattern
   with (*UTF). When PCRE2 is compiled with Unicode support, its input can only
-  either be ASCII or UTF-8/16/32, even when running on EBCDIC platforms. It is
-  not possible to use both --enable-unicode and --enable-ebcdic at the same
-  time.
+  either be ASCII or UTF-8/16/32, even when running on EBCDIC platforms.
 
   As well as supporting UTF strings, Unicode support includes support for the
   \P, \p, and \X sequences that recognize Unicode character properties.
@@ -196,13 +198,14 @@ library. They are also documented in the pcre2build man page.
   or starting a pattern with (*UCP).
 
 . You can build PCRE2 to recognize either CR or LF or the sequence CRLF, or any
-  of the preceding, or any of the Unicode newline sequences, as indicating the
-  end of a line. Whatever you specify at build time is the default; the caller
-  of PCRE2 can change the selection at run time. The default newline indicator
-  is a single LF character (the Unix standard). You can specify the default
-  newline indicator by adding --enable-newline-is-cr, --enable-newline-is-lf,
-  --enable-newline-is-crlf, --enable-newline-is-anycrlf, or
-  --enable-newline-is-any to the "configure" command, respectively.
+  of the preceding, or any of the Unicode newline sequences, or the NUL (zero)
+  character as indicating the end of a line. Whatever you specify at build time
+  is the default; the caller of PCRE2 can change the selection at run time. The
+  default newline indicator is a single LF character (the Unix standard). You
+  can specify the default newline indicator by adding --enable-newline-is-cr,
+  --enable-newline-is-lf, --enable-newline-is-crlf,
+  --enable-newline-is-anycrlf, --enable-newline-is-any, or
+  --enable-newline-is-nul to the "configure" command, respectively.
 
 . By default, the sequence \R in a pattern matches any Unicode line ending
   sequence. This is independent of the option specifying what PCRE2 considers
@@ -224,26 +227,35 @@ library. They are also documented in the pcre2build man page.
 
   --with-parens-nest-limit=500
 
-. PCRE2 has a counter that can be set to limit the amount of resources it uses
-  when matching a pattern. If the limit is exceeded during a match, the match
-  fails. The default is ten million. You can change the default by setting, for
-  example,
+. PCRE2 has a counter that can be set to limit the amount of computing resource
+  it uses when matching a pattern. If the limit is exceeded during a match, the
+  match fails. The default is ten million. You can change the default by
+  setting, for example,
 
   --with-match-limit=500000
 
   on the "configure" command. This is just the default; individual calls to
-  pcre2_match() can supply their own value. There is more discussion on the
-  pcre2api man page.
+  pcre2_match() or pcre2_dfa_match() can supply their own value. There is more
+  discussion in the pcre2api man page (search for pcre2_set_match_limit).
 
-. There is a separate counter that limits the depth of recursive function calls
-  during a matching process. This also has a default of ten million, which is
-  essentially "unlimited". You can change the default by setting, for example,
+. There is a separate counter that limits the depth of nested backtracking
+  during a matching process, which indirectly limits the amount of heap memory
+  that is used. This also has a default of ten million, which is essentially
+  "unlimited". You can change the default by setting, for example,
 
-  --with-match-limit-recursion=500000
+  --with-match-limit-depth=5000
 
-  Recursive function calls use up the runtime stack; running out of stack can
-  cause programs to crash in strange ways. There is a discussion about stack
-  sizes in the pcre2stack man page.
+  There is more discussion in the pcre2api man page (search for
+  pcre2_set_depth_limit).
+
+. You can also set an explicit limit on the amount of heap memory used by
+  the pcre2_match() interpreter:
+
+  --with-heap-limit=500
+
+  The units are kilobytes. This limit does not apply when the JIT optimization
+  (which has its own memory control features) is used. There is more discussion
+  on the pcre2api man page (search for pcre2_set_heap_limit).
 
 . In the 8-bit library, the default maximum compiled pattern size is around
   64K bytes. You can increase this by adding --with-link-size=3 to the
@@ -253,20 +265,6 @@ library. They are also documented in the pcre2build man page.
   libraries) uses four-byte offsets. Increasing the internal link size reduces
   performance in the 8-bit and 16-bit libraries. In the 32-bit library, the
   link size setting is ignored, as 4-byte offsets are always used.
-
-. You can build PCRE2 so that its internal match() function that is called from
-  pcre2_match() does not call itself recursively. Instead, it uses memory
-  blocks obtained from the heap to save data that would otherwise be saved on
-  the stack. To build PCRE2 like this, use
-
-  --disable-stack-for-recursion
-
-  on the "configure" command. PCRE2 runs more slowly in this mode, but it may
-  be necessary in environments with limited stack sizes. This applies only to
-  the normal execution of the pcre2_match() function; if JIT support is being
-  successfully used, it is not relevant. Equally, it does not apply to
-  pcre2_dfa_match(), which does not use deeply nested recursion. There is a
-  discussion about stack sizes in the pcre2stack man page.
 
 . For speed, PCRE2 uses four tables for manipulating and identifying characters
   whose code point values are less than 256. By default, it uses a set of
@@ -388,6 +386,13 @@ library. They are also documented in the pcre2build man page.
   arguments: if an argument starts with "=" the rest of it is a literal input
   string. Otherwise, it is assumed to be a file name, and the contents of the
   file are the test string.
+
+. Releases before 10.30 could be compiled with --disable-stack-for-recursion,
+  which caused pcre2_match() to use individual blocks on the heap for
+  backtracking instead of recursive function calls (which use the stack). This
+  is now obsolete since pcre2_match() was refactored always to use the heap (in
+  a much more efficient way than before). This option is retained for backwards
+  compatibility, but has no effect other than to output a warning.
 
 The "configure" script builds the following files for the basic C library:
 
@@ -655,31 +660,42 @@ with the perltest.sh script, and test 5 checking PCRE2-specific things.
 Tests 6 and 7 check the pcre2_dfa_match() alternative matching function, in
 non-UTF mode and UTF-mode with Unicode property support, respectively.
 
-Test 8 checks some internal offsets and code size features; it is run only when
-the default "link size" of 2 is set (in other cases the sizes change) and when
-Unicode support is enabled.
+Test 8 checks some internal offsets and code size features, but it is run only
+when Unicode support is enabled. The output is different in 8-bit, 16-bit, and
+32-bit modes and for different link sizes, so there are different output files
+for each mode and link size.
 
 Tests 9 and 10 are run only in 8-bit mode, and tests 11 and 12 are run only in
 16-bit and 32-bit modes. These are tests that generate different output in
 8-bit mode. Each pair are for general cases and Unicode support, respectively.
+
 Test 13 checks the handling of non-UTF characters greater than 255 by
 pcre2_dfa_match() in 16-bit and 32-bit modes.
 
-Test 14 contains a number of tests that must not be run with JIT. They check,
+Test 14 contains some special UTF and UCP tests that give different output for
+different code unit widths.
+
+Test 15 contains a number of tests that must not be run with JIT. They check,
 among other non-JIT things, the match-limiting features of the intepretive
 matcher.
 
-Test 15 is run only when JIT support is not available. It checks that an
+Test 16 is run only when JIT support is not available. It checks that an
 attempt to use JIT has the expected behaviour.
 
-Test 16 is run only when JIT support is available. It checks JIT complete and
+Test 17 is run only when JIT support is available. It checks JIT complete and
 partial modes, match-limiting under JIT, and other JIT-specific features.
 
-Tests 17 and 18 are run only in 8-bit mode. They check the POSIX interface to
+Tests 18 and 19 are run only in 8-bit mode. They check the POSIX interface to
 the 8-bit library, without and with Unicode support, respectively.
 
-Test 19 checks the serialization functions by writing a set of compiled
+Test 20 checks the serialization functions by writing a set of compiled
 patterns to a file, and then reloading and checking them.
+
+Tests 21 and 22 test \C support when the use of \C is not locked out, without
+and with UTF support, respectively. Test 23 tests \C when it is locked out.
+
+Tests 24 and 25 test the experimental pattern conversion functions, without and
+with UTF support, respectively.
 
 
 Character tables
@@ -699,7 +715,7 @@ specified for ./configure, a different version of pcre2_chartables.c is built
 by the program dftables (compiled from dftables.c), which uses the ANSI C
 character handling functions such as isalnum(), isalpha(), isupper(),
 islower(), etc. to build the table sources. This means that the default C
-locale which is set for your system will control the contents of these default
+locale that is set for your system will control the contents of these default
 tables. You can change the default tables by editing pcre2_chartables.c and
 then re-building PCRE2. If you do this, you should take care to ensure that the
 file does not get automatically re-generated. The best way to do this is to
@@ -754,6 +770,7 @@ The distribution should contain the files listed below.
   src/pcre2_compile.c      )
   src/pcre2_config.c       )
   src/pcre2_context.c      )
+  src/pcre2_convert.c      )
   src/pcre2_dfa_match.c    )
   src/pcre2_error.c        )
   src/pcre2_find_bracket.c )
@@ -793,7 +810,6 @@ The distribution should contain the files listed below.
   src/pcre2demo.c          simple demonstration of coding calls to PCRE2
   src/pcre2grep.c          source of a grep utility that uses PCRE2
   src/pcre2test.c          comprehensive test program
-  src/pcre2_printint.c     part of pcre2test
   src/pcre2_jit_test.c     JIT test program
 
 (C) Auxiliary files:
@@ -858,12 +874,12 @@ The distribution should contain the files listed below.
 
 (E) Auxiliary files for building PCRE2 "by hand"
 
-  pcre2.h.generic         ) a version of the public PCRE2 header file
+  src/pcre2.h.generic     ) a version of the public PCRE2 header file
                           )   for use in non-"configure" environments
-  config.h.generic        ) a version of config.h for use in non-"configure"
+  src/config.h.generic    ) a version of config.h for use in non-"configure"
                           )   environments
 
 Philip Hazel
 Email local part: ph10
 Email domain: cam.ac.uk
-Last updated: 01 November 2016
+Last updated: 18 July 2017

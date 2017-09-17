@@ -77,6 +77,9 @@
 # 2016-10-05 PH fixed a typo (PCRE should be PCRE2) in above patch
 #            fix by David Gaussmann
 # 2016-10-07 PH added PCREGREP_MAX_BUFSIZE
+# 2017-03-11 PH turned HEAP_MATCH_RECURSE into a NO-OP for 10.30
+# 2017-04-08 PH added HEAP_LIMIT
+# 2017-06-15 ZH added SUPPORT_JIT_SEALLOC support
 
 PROJECT(PCRE2 C)
 
@@ -142,11 +145,14 @@ SET(PCRE2_LINK_SIZE "2" CACHE STRING
 SET(PCRE2_PARENS_NEST_LIMIT "250" CACHE STRING
     "Default nested parentheses limit. See PARENS_NEST_LIMIT in config.h.in for details.")
 
+SET(PCRE2_HEAP_LIMIT "20000000" CACHE STRING
+    "Default limit on heap memory (kilobytes). See HEAP_LIMIT in config.h.in for details.")
+
 SET(PCRE2_MATCH_LIMIT "10000000" CACHE STRING
     "Default limit on internal looping. See MATCH_LIMIT in config.h.in for details.")
 
-SET(PCRE2_MATCH_LIMIT_RECURSION "MATCH_LIMIT" CACHE STRING
-    "Default limit on internal recursion. See MATCH_LIMIT_RECURSION in config.h.in for details.")
+SET(PCRE2_MATCH_LIMIT_DEPTH "MATCH_LIMIT" CACHE STRING
+    "Default limit on internal depth of search. See MATCH_LIMIT_DEPTH in config.h.in for details.")
 
 SET(PCRE2GREP_BUFSIZE "20480" CACHE STRING
     "Buffer starting size parameter for pcre2grep. See PCRE2GREP_BUFSIZE in config.h.in for details.")
@@ -155,13 +161,16 @@ SET(PCRE2GREP_MAX_BUFSIZE "1048576" CACHE STRING
     "Buffer maximum size parameter for pcre2grep. See PCRE2GREP_MAX_BUFSIZE in config.h.in for details.")
 
 SET(PCRE2_NEWLINE "LF" CACHE STRING
-    "What to recognize as a newline (one of CR, LF, CRLF, ANY, ANYCRLF).")
+    "What to recognize as a newline (one of CR, LF, CRLF, ANY, ANYCRLF, NUL).")
 
 SET(PCRE2_HEAP_MATCH_RECURSE OFF CACHE BOOL
-    "If ON, then don't use stack recursion when matching. See HEAP_MATCH_RECURSE in config.h.in for details.")
+    "Obsolete option: do not use")
 
 SET(PCRE2_SUPPORT_JIT OFF CACHE BOOL
     "Enable support for Just-in-time compiling.")
+
+SET(PCRE2_SUPPORT_JIT_SEALLOC OFF CACHE BOOL
+    "Enable SELinux compatible execmem allocator in JIT.")
 
 SET(PCRE2_SUPPORT_PCRE2GREP_JIT ON CACHE BOOL
     "Enable use of Just-in-time compiling in pcre2grep.")
@@ -283,6 +292,10 @@ IF(PCRE2_SUPPORT_JIT)
         SET(SUPPORT_JIT 1)
 ENDIF(PCRE2_SUPPORT_JIT)
 
+IF(PCRE2_SUPPORT_JIT_SEALLOC)
+        SET(SLJIT_PROT_EXECUTABLE_ALLOCATOR 1)
+ENDIF(PCRE2_SUPPORT_JIT_SEALLOC)
+
 IF(PCRE2_SUPPORT_PCRE2GREP_JIT)
         SET(SUPPORT_PCRE2GREP_JIT 1)
 ENDIF(PCRE2_SUPPORT_PCRE2GREP_JIT)
@@ -339,6 +352,9 @@ ENDIF(PCRE2_NEWLINE STREQUAL "ANY")
 IF(PCRE2_NEWLINE STREQUAL "ANYCRLF")
         SET(NEWLINE_DEFAULT "5")
 ENDIF(PCRE2_NEWLINE STREQUAL "ANYCRLF")
+IF(PCRE2_NEWLINE STREQUAL "NUL")
+        SET(NEWLINE_DEFAULT "6")
+ENDIF(PCRE2_NEWLINE STREQUAL "NUL")
 
 IF(NEWLINE_DEFAULT STREQUAL "")
         MESSAGE(FATAL_ERROR "The PCRE2_NEWLINE variable must be set to one of the following values: \"LF\", \"CR\", \"CRLF\", \"ANY\", \"ANYCRLF\".")
@@ -352,10 +368,6 @@ IF(PCRE2_EBCDIC_NL25)
         SET(EBCDIC 1)
         SET(EBCDIC_NL25 1)
 ENDIF(PCRE2_EBCDIC_NL25)
-
-IF(PCRE2_HEAP_MATCH_RECURSE)
-        SET(HEAP_MATCH_RECURSE 1)
-ENDIF(PCRE2_HEAP_MATCH_RECURSE)
 
 # Output files
 
@@ -417,6 +429,7 @@ SET(PCRE2_SOURCES
   src/pcre2_compile.c
   src/pcre2_config.c
   src/pcre2_context.c
+  src/pcre2_convert.c
   src/pcre2_dfa_match.c
   src/pcre2_error.c
   src/pcre2_find_bracket.c
@@ -738,6 +751,10 @@ ELSE(BUILD_SHARED_LIBS)
   SET(BUILD_STATIC_LIBS ON)
 ENDIF(BUILD_SHARED_LIBS)
 
+IF(PCRE2_HEAP_MATCH_RECURSE)
+  MESSAGE(WARNING "HEAP_MATCH_RECURSE is obsolete and does nothing.")
+ENDIF(PCRE2_HEAP_MATCH_RECURSE)
+
 IF(PCRE2_SHOW_REPORT)
   STRING(TOUPPER "${CMAKE_BUILD_TYPE}" buildtype)
   IF (CMAKE_C_FLAGS)
@@ -755,6 +772,7 @@ IF(PCRE2_SHOW_REPORT)
   MESSAGE(STATUS "  Build 16 bit PCRE2 library ...... : ${PCRE2_BUILD_PCRE2_16}")
   MESSAGE(STATUS "  Build 32 bit PCRE2 library ...... : ${PCRE2_BUILD_PCRE2_32}")
   MESSAGE(STATUS "  Enable JIT compiling support .... : ${PCRE2_SUPPORT_JIT}")
+  MESSAGE(STATUS "  Use SELinux allocator in JIT .... : ${PCRE2_SUPPORT_JIT_SEALLOC}")
   MESSAGE(STATUS "  Enable Unicode support .......... : ${PCRE2_SUPPORT_UNICODE}")
   MESSAGE(STATUS "  Newline char/sequence ........... : ${PCRE2_NEWLINE}")
   MESSAGE(STATUS "  \\R matches only ANYCRLF ......... : ${PCRE2_SUPPORT_BSR_ANYCRLF}")
@@ -762,11 +780,11 @@ IF(PCRE2_SHOW_REPORT)
   MESSAGE(STATUS "  EBCDIC coding ................... : ${PCRE2_EBCDIC}")
   MESSAGE(STATUS "  EBCDIC coding with NL=0x25 ...... : ${PCRE2_EBCDIC_NL25}")
   MESSAGE(STATUS "  Rebuild char tables ............. : ${PCRE2_REBUILD_CHARTABLES}")
-  MESSAGE(STATUS "  Use heap recursion .............. : ${PCRE2_HEAP_MATCH_RECURSE}")
   MESSAGE(STATUS "  Internal link size .............. : ${PCRE2_LINK_SIZE}")
   MESSAGE(STATUS "  Parentheses nest limit .......... : ${PCRE2_PARENS_NEST_LIMIT}")
+  MESSAGE(STATUS "  Heap limit ...................... : ${PCRE2_HEAP_LIMIT}")
   MESSAGE(STATUS "  Match limit ..................... : ${PCRE2_MATCH_LIMIT}")
-  MESSAGE(STATUS "  Match limit recursion ........... : ${PCRE2_MATCH_LIMIT_RECURSION}")
+  MESSAGE(STATUS "  Match depth limit ............... : ${PCRE2_MATCH_LIMIT_DEPTH}")
   MESSAGE(STATUS "  Build shared libs ............... : ${BUILD_SHARED_LIBS}")
   MESSAGE(STATUS "  Build static libs ............... : ${BUILD_STATIC_LIBS}")
   MESSAGE(STATUS "  Build pcre2grep ................. : ${PCRE2_BUILD_PCRE2GREP}")

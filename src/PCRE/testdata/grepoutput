@@ -392,7 +392,7 @@ pcre2grep: pcre2_match() gave error -47 while matching this text:
 
 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
-pcre2grep: Error -46, -47 or -53 means that a resource limit was exceeded.
+pcre2grep: Error -46, -47, -53 or -63 means that a resource limit was exceeded.
 pcre2grep: Check your regex for nested unlimited loops.
 ---------------------------- Test 38 ------------------------------
 This line contains a binary zero here > < for testing.
@@ -454,6 +454,11 @@ RC=1
 ---------------------------- Test 51 ------------------------------
 over the lazy dog.
 This time it jumps and jumps and jumps.
+This line contains \E and (regex) *meta* [characters].
+The word is cat in this line
+The caterpillar sat on the mat
+The snowcat is not an animal
+A buried feline in the syndicate
 RC=0
 ---------------------------- Test 52 ------------------------------
 fox [1;31mjumps[0m
@@ -516,7 +521,7 @@ This is a file of miscellaneous text that is used as test data for checking
 that the pcregrep command is working correctly. The file must be more than 24K
 long so that it needs more than a single read
 
-pcre2grep: Error -46, -47 or -53 means that a resource limit was exceeded.
+pcre2grep: Error -46, -47, -53 or -63 means that a resource limit was exceeded.
 pcre2grep: Check your regex for nested unlimited loops.
 RC=1
 ---------------------------- Test 63 -----------------------------
@@ -526,7 +531,7 @@ This is a file of miscellaneous text that is used as test data for checking
 that the pcregrep command is working correctly. The file must be more than 24K
 long so that it needs more than a single read
 
-pcre2grep: Error -46, -47 or -53 means that a resource limit was exceeded.
+pcre2grep: Error -46, -47, -53 or -63 means that a resource limit was exceeded.
 pcre2grep: Check your regex for nested unlimited loops.
 RC=1
 ---------------------------- Test 64 ------------------------------
@@ -788,32 +793,32 @@ RC=0
 37216,12
 RC=0
 ---------------------------- Test 113 -----------------------------
-476
+478
 RC=0
 ---------------------------- Test 114 -----------------------------
 testdata/grepinput:469
 testdata/grepinput3:0
 testdata/grepinput8:0
-testdata/grepinputv:1
+testdata/grepinputv:3
 testdata/grepinputx:6
-TOTAL:476
+TOTAL:478
 RC=0
 ---------------------------- Test 115 -----------------------------
 testdata/grepinput:469
-testdata/grepinputv:1
+testdata/grepinputv:3
 testdata/grepinputx:6
-TOTAL:476
+TOTAL:478
 RC=0
 ---------------------------- Test 116 -----------------------------
-476
+478
 RC=0
 ---------------------------- Test 117 -----------------------------
 469
 0
 0
-1
+3
 6
-476
+478
 RC=0
 ---------------------------- Test 118 -----------------------------
 testdata/grepinput3
@@ -828,4 +833,20 @@ abc
 def
 xyz
 ---
+RC=0
+---------------------------- Test 120 ------------------------------
+./testdata/grepinput:the binary zero.:zerothe.
+./testdata/grepinput:a binary zero:zeroa
+./testdata/grepinput:the binary zero.:zerothe.
+RC=0
+---------------------------- Test 121 -----------------------------
+This line contains \E and (regex) *meta* [characters].
+RC=0
+---------------------------- Test 122 -----------------------------
+over the lazy dog.
+The word is cat in this line
+RC=0
+---------------------------- Test 122 -----------------------------
+over the lazy dog.
+The word is cat in this line
 RC=0

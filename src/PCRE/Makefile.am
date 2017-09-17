@@ -36,6 +36,10 @@ dist_html_DATA = \
   doc/html/pcre2_compile_context_create.html \
   doc/html/pcre2_compile_context_free.html \
   doc/html/pcre2_config.html \
+  doc/html/pcre2_convert_context_copy.html \
+  doc/html/pcre2_convert_context_create.html \
+  doc/html/pcre2_convert_context_free.html \
+  doc/html/pcre2_converted_pattern_free.html \
   doc/html/pcre2_dfa_match.html \
   doc/html/pcre2_general_context_copy.html \
   doc/html/pcre2_general_context_create.html \
@@ -59,6 +63,7 @@ dist_html_DATA = \
   doc/html/pcre2_match_data_create.html \
   doc/html/pcre2_match_data_create_from_pattern.html \
   doc/html/pcre2_match_data_free.html \
+  doc/html/pcre2_pattern_convert.html \
   doc/html/pcre2_pattern_info.html \
   doc/html/pcre2_serialize_decode.html \
   doc/html/pcre2_serialize_encode.html \
@@ -67,7 +72,12 @@ dist_html_DATA = \
   doc/html/pcre2_set_bsr.html \
   doc/html/pcre2_set_callout.html \
   doc/html/pcre2_set_character_tables.html \
+  doc/html/pcre2_set_compile_extra_options.html \
   doc/html/pcre2_set_compile_recursion_guard.html \
+  doc/html/pcre2_set_depth_limit.html \
+  doc/html/pcre2_set_glob_escape.html \
+  doc/html/pcre2_set_glob_separator.html \
+  doc/html/pcre2_set_heap_limit.html \
   doc/html/pcre2_set_match_limit.html \
   doc/html/pcre2_set_max_pattern_length.html \
   doc/html/pcre2_set_offset_limit.html \
@@ -91,6 +101,7 @@ dist_html_DATA = \
   doc/html/pcre2build.html \
   doc/html/pcre2callout.html \
   doc/html/pcre2compat.html \
+  doc/html/pcre2convert.html \
   doc/html/pcre2demo.html \
   doc/html/pcre2grep.html \
   doc/html/pcre2jit.html \
@@ -102,7 +113,6 @@ dist_html_DATA = \
   doc/html/pcre2posix.html \
   doc/html/pcre2sample.html \
   doc/html/pcre2serialize.html \
-  doc/html/pcre2stack.html \
   doc/html/pcre2syntax.html \
   doc/html/pcre2test.html \
   doc/html/pcre2unicode.html
@@ -119,6 +129,10 @@ dist_man_MANS = \
   doc/pcre2_compile_context_create.3 \
   doc/pcre2_compile_context_free.3 \
   doc/pcre2_config.3 \
+  doc/pcre2_convert_context_copy.3 \
+  doc/pcre2_convert_context_create.3 \
+  doc/pcre2_convert_context_free.3 \
+  doc/pcre2_converted_pattern_free.3 \
   doc/pcre2_dfa_match.3 \
   doc/pcre2_general_context_copy.3 \
   doc/pcre2_general_context_create.3 \
@@ -142,6 +156,7 @@ dist_man_MANS = \
   doc/pcre2_match_data_create.3 \
   doc/pcre2_match_data_create_from_pattern.3 \
   doc/pcre2_match_data_free.3 \
+  doc/pcre2_pattern_convert.3 \
   doc/pcre2_pattern_info.3 \
   doc/pcre2_serialize_decode.3 \
   doc/pcre2_serialize_encode.3 \
@@ -150,7 +165,12 @@ dist_man_MANS = \
   doc/pcre2_set_bsr.3 \
   doc/pcre2_set_callout.3 \
   doc/pcre2_set_character_tables.3 \
+  doc/pcre2_set_compile_extra_options.3 \
   doc/pcre2_set_compile_recursion_guard.3 \
+  doc/pcre2_set_depth_limit.3 \
+  doc/pcre2_set_glob_escape.3 \
+  doc/pcre2_set_glob_separator.3 \
+  doc/pcre2_set_heap_limit.3 \
   doc/pcre2_set_match_limit.3 \
   doc/pcre2_set_max_pattern_length.3 \
   doc/pcre2_set_offset_limit.3 \
@@ -174,6 +194,7 @@ dist_man_MANS = \
   doc/pcre2build.3 \
   doc/pcre2callout.3 \
   doc/pcre2compat.3 \
+  doc/pcre2convert.3 \
   doc/pcre2demo.3 \
   doc/pcre2grep.1 \
   doc/pcre2jit.3 \
@@ -185,7 +206,6 @@ dist_man_MANS = \
   doc/pcre2posix.3 \
   doc/pcre2sample.3 \
   doc/pcre2serialize.3 \
-  doc/pcre2stack.3 \
   doc/pcre2syntax.3 \
   doc/pcre2test.1 \
   doc/pcre2unicode.3
@@ -328,6 +348,7 @@ COMMON_SOURCES = \
   src/pcre2_compile.c \
   src/pcre2_config.c \
   src/pcre2_context.c \
+  src/pcre2_convert.c \
   src/pcre2_dfa_match.c \
   src/pcre2_error.c \
   src/pcre2_find_bracket.c \
@@ -421,6 +442,7 @@ EXTRA_DIST += \
   src/sljit/sljitNativeX86_32.c \
   src/sljit/sljitNativeX86_64.c \
   src/sljit/sljitNativeX86_common.c \
+  src/sljit/sljitProtExecAllocator.c \
   src/sljit/sljitUtils.c
 
 # Some of the JIT sources are also in separate files that are #included.
@@ -619,6 +641,8 @@ EXTRA_DIST += \
   testdata/testinput21 \
   testdata/testinput22 \
   testdata/testinput23 \
+  testdata/testinput24 \
+  testdata/testinput25 \
   testdata/testinputEBC \
   testdata/testoutput1 \
   testdata/testoutput2 \
@@ -659,6 +683,8 @@ EXTRA_DIST += \
   testdata/testoutput22-32 \
   testdata/testoutput22-8 \
   testdata/testoutput23 \
+  testdata/testoutput24 \
+  testdata/testoutput25 \
   testdata/testoutputEBC \
   testdata/valgrind-jit.supp \
   testdata/wintestinput3 \
