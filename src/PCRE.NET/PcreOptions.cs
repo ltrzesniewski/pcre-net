@@ -22,15 +22,18 @@ namespace PCRE
 
         IgnorePatternWhitespace = PatternOptions.Extended,
         Extended = PatternOptions.Extended,
+        ExtendedMore = PatternOptions.ExtendedMore,
 
         JavaScript = PatternOptions.AltBsUX | PatternOptions.MatchUnsetBackref,
         AltBsUX = PatternOptions.AltBsUX,
         MatchUnsetBackref = PatternOptions.MatchUnsetBackref,
+        Literal = PatternOptions.Literal,
 
         Unicode = PatternOptions.Ucp,
         Ucp = PatternOptions.Ucp,
 
         Anchored = PatternOptions.Anchored,
+        EndAnchored = PatternOptions.EndAnchored,
         Ungreedy = PatternOptions.Ungreedy,
         NotBol = PatternOptions.NotBol,
         NotEol = PatternOptions.NotEol,

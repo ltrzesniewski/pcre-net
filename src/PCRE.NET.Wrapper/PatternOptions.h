@@ -11,6 +11,7 @@ namespace PCRE {
 		{
 			None                       = 0,
 			Anchored                   = PCRE2_ANCHORED,
+			EndAnchored                = PCRE2_ENDANCHORED,
 			NoUtfCheck                 = PCRE2_NO_UTF_CHECK,
 			AllowEmptyClass            = PCRE2_ALLOW_EMPTY_CLASS,
 			AltBsUX                    = PCRE2_ALT_BSUX,
@@ -22,6 +23,7 @@ namespace PCRE {
 			DotAll                     = PCRE2_DOTALL,
 			DupNames                   = PCRE2_DUPNAMES,
 			Extended                   = PCRE2_EXTENDED,
+			ExtendedMore               = PCRE2_EXTENDED_MORE,
 			FirstLine                  = PCRE2_FIRSTLINE,
 			MatchUnsetBackref          = PCRE2_MATCH_UNSET_BACKREF,
 			MultiLine                  = PCRE2_MULTILINE,
@@ -40,6 +42,7 @@ namespace PCRE {
 			NotEol                     = PCRE2_NOTEOL,
 			NotEmpty                   = PCRE2_NOTEMPTY,
 			NotEmptyAtStart            = PCRE2_NOTEMPTY_ATSTART,
+			Literal                    = PCRE2_LITERAL,
 			PartialSoft                = PCRE2_PARTIAL_SOFT,
 			PartialHard                = PCRE2_PARTIAL_HARD,
 			DfaRestart                 = PCRE2_DFA_RESTART,
