@@ -4,6 +4,7 @@ obj/
 Debug/
 Release/
 ipch/
+.vs/
 
 /src/packages/*/
 /build/output

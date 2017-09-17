@@ -85,7 +85,6 @@ namespace PCRE.Tests.Pcre
                                 return result;
                             }
                         }
-
                         else if (line[i] == '\\')
                         {
                             pattern.Append('\\');
@@ -207,11 +206,16 @@ namespace PCRE.Tests.Pcre
                         pattern.PatternOptions |= PcreOptions.Singleline;
                         break;
 
+                    case "subject_literal":
+                        pattern.SubjectLiteral = true;
+                        break;
+
                     case "newline": // TODO
                     case "bsr":
                     case "startchar":
                     case "stackguard":
                     case "parens_nest_limit":
+                    case "jitstack":
                         break;
 
                     default:

@@ -26,14 +26,15 @@ namespace PCRE.Tests.Pcre
 
         private static void RunTest(TestCase testCase, TestOutput expectedResult, PcreOptions options)
         {
-            options = (options | testCase.Pattern.PatternOptions) & ~testCase.Pattern.ResetOptionBits;
+            var pattern = testCase.Pattern;
+            options = (options | pattern.PatternOptions) & ~pattern.ResetOptionBits;
 
             Console.WriteLine("Options: {0}", options);
 
             PcreRegex regex;
             try
             {
-                regex = new PcreRegex(testCase.Pattern.Pattern, options);
+                regex = new PcreRegex(pattern.Pattern, options);
             }
             catch (Exception ex)
             {
@@ -52,13 +53,16 @@ namespace PCRE.Tests.Pcre
 
                 Assert.That(expected.SubjectLine, Is.EqualTo(subject));
 
-                subject = testCase.Pattern.HexEncoding
-                    ? subject.UnescapeBinarySubject()
-                    : subject.UnescapeSubject();
+                if (!pattern.SubjectLiteral)
+                {
+                    subject = pattern.HexEncoding
+                        ? subject.UnescapeBinarySubject()
+                        : subject.UnescapeSubject();
+                }
 
                 var matches = regex
                     .Matches(subject)
-                    .Take(testCase.Pattern.AllMatches ? int.MaxValue : 1)
+                    .Take(pattern.AllMatches ? int.MaxValue : 1)
                     .ToList();
 
                 Assert.That(matches.Count, Is.EqualTo(expected.Matches.Count));
@@ -68,12 +72,12 @@ namespace PCRE.Tests.Pcre
                     var actualMatch = matches[matchIndex];
                     var expectedMatch = expected.Matches[matchIndex];
 
-                    CompareGroups(actualMatch, expectedMatch);
+                    CompareGroups(pattern, actualMatch, expectedMatch);
 
-                    if (testCase.Pattern.ExtractMarks)
+                    if (pattern.ExtractMarks)
                         CompareMark(actualMatch, expectedMatch);
 
-                    if (testCase.Pattern.GetRemainingString)
+                    if (pattern.GetRemainingString)
                         CompareRemainingString(actualMatch, expectedMatch);
                 }
             }
@@ -82,7 +86,7 @@ namespace PCRE.Tests.Pcre
             Console.WriteLine();
         }
 
-        private static void CompareGroups(PcreMatch actualMatch, ExpectedMatch expectedMatch)
+        private static void CompareGroups(TestPattern pattern, PcreMatch actualMatch, ExpectedMatch expectedMatch)
         {
             var actualGroups = actualMatch.ToList();
             var expectedGroups = expectedMatch.Groups.ToList();
@@ -101,7 +105,13 @@ namespace PCRE.Tests.Pcre
                 Assert.That(actualGroup.Success, Is.EqualTo(expectedGroup.IsMatch));
 
                 if (expectedGroup.IsMatch)
-                    Assert.That(actualGroup.Value, Is.EqualTo(expectedGroup.Value.UnescapeGroup()));
+                {
+                    var expectedValue = pattern.SubjectLiteral
+                        ? expectedGroup.Value
+                        : expectedGroup.Value.UnescapeGroup();
+
+                    Assert.That(actualGroup.Value, Is.EqualTo(expectedValue));
+                }
             }
         }
 

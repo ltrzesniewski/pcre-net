@@ -20,6 +20,7 @@ namespace PCRE.Tests.Pcre
         public bool IncludeInfo { get; set; }
 
         public string ReplaceWith { get; set; }
+        public bool SubjectLiteral { get; set; }
 
         public override bool Equals(object obj)
         {
