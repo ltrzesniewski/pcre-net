@@ -44,6 +44,7 @@ Library highlights:
 - The API is similar to .NET's `System.Text.RegularExpressions`
 - Callout support (numbered and string-based)
 - Mark retrieval support
+- Conversion from POSIX BRE, POSIX ERE and glob patterns (`PcreConvert` class)
 
 ## Example usage ##
 
