@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PCRE
+﻿namespace PCRE
 {
     public sealed class PcreGroup : IPcreGroup
     {

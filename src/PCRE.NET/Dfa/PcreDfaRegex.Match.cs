@@ -17,22 +17,16 @@ namespace PCRE.Dfa
         }
 
         [Pure]
-        public PcreDfaMatchResult Match(string subject)
-        {
-            return Match(subject, 0, PcreDfaMatchOptions.None);
-        }
+        public PcreDfaMatchResult Match(string subject) 
+            => Match(subject, 0, PcreDfaMatchOptions.None);
 
         [Pure]
-        public PcreDfaMatchResult Match(string subject, PcreDfaMatchOptions options)
-        {
-            return Match(subject, 0, options);
-        }
+        public PcreDfaMatchResult Match(string subject, PcreDfaMatchOptions options) 
+            => Match(subject, 0, options);
 
         [Pure]
-        public PcreDfaMatchResult Match(string subject, int startIndex)
-        {
-            return Match(subject, startIndex, PcreDfaMatchOptions.None);
-        }
+        public PcreDfaMatchResult Match(string subject, int startIndex) 
+            => Match(subject, startIndex, PcreDfaMatchOptions.None);
 
         [Pure]
         public PcreDfaMatchResult Match(string subject, int startIndex, PcreDfaMatchOptions options)
@@ -64,10 +58,8 @@ namespace PCRE.Dfa
         }
 
         [Pure]
-        public IEnumerable<PcreDfaMatchResult> Matches(string subject)
-        {
-            return Matches(subject, 0);
-        }
+        public IEnumerable<PcreDfaMatchResult> Matches(string subject) 
+            => Matches(subject, 0);
 
         [Pure]
         public IEnumerable<PcreDfaMatchResult> Matches(string subject, int startIndex)

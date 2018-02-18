@@ -2,7 +2,7 @@
 
 namespace PCRE.Support
 {
-    internal struct RegexKey : IEquatable<RegexKey>
+    internal readonly struct RegexKey : IEquatable<RegexKey>
     {
         public readonly string Pattern;
         public readonly PcreRegexSettings Settings;
@@ -14,14 +14,11 @@ namespace PCRE.Support
         }
 
         public bool Equals(RegexKey other)
-        {
-            return Pattern == other.Pattern && Settings.CompareValues(other.Settings);
-        }
+            => Pattern == other.Pattern
+               && Settings.CompareValues(other.Settings);
 
         public override bool Equals(object obj)
-        {
-            return obj is RegexKey && Equals((RegexKey)obj);
-        }
+            => obj is RegexKey key && Equals(key);
 
         public override int GetHashCode()
         {
@@ -31,14 +28,7 @@ namespace PCRE.Support
             }
         }
 
-        public static bool operator ==(RegexKey left, RegexKey right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(RegexKey left, RegexKey right)
-        {
-            return !left.Equals(right);
-        }
+        public static bool operator ==(RegexKey left, RegexKey right) => left.Equals(right);
+        public static bool operator !=(RegexKey left, RegexKey right) => !left.Equals(right);
     }
 }

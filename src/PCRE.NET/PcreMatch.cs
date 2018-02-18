@@ -87,8 +87,7 @@ namespace PCRE
             if (map == null)
                 return null;
 
-            int[] indexes;
-            if (!map.TryGetValue(name, out indexes))
+            if (!map.TryGetValue(name, out var indexes))
                 return null;
 
             if (indexes.Length == 1)
@@ -110,8 +109,7 @@ namespace PCRE
             if (map == null)
                 yield break;
 
-            int[] indexes;
-            if (!map.TryGetValue(name, out indexes))
+            if (!map.TryGetValue(name, out var indexes))
                 yield break;
 
             foreach (var index in indexes)

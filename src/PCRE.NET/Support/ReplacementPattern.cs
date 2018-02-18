@@ -174,15 +174,11 @@ namespace PCRE.Support
                 _length = length;
             }
 
-            public override void Append(PcreMatch match, StringBuilder sb)
-            {
-                sb.Append(_text, _startIndex, _length);
-            }
+            public override void Append(PcreMatch match, StringBuilder sb) 
+                => sb.Append(_text, _startIndex, _length);
 
-            public override string ToString()
-            {
-                return $"Literal: {_text.Substring(_startIndex, _length)}";
-            }
+            public override string ToString() 
+                => $"Literal: {_text.Substring(_startIndex, _length)}";
         }
 
         private sealed class IndexedGroupPart : ReplacementPart
@@ -213,11 +209,9 @@ namespace PCRE.Support
             }
 
             public override string ToString()
-            {
-                return _index == 0
+                => _index == 0
                     ? "Full match"
                     : $"Group: #{_index}";
-            }
         }
 
         private sealed class NamedGroupPart : ReplacementPart
@@ -249,25 +243,19 @@ namespace PCRE.Support
                     sb.Append(match.Subject, group.Index, group.Length);
             }
 
-            public override string ToString()
-            {
-                return $"Group: {_name}";
-            }
+            public override string ToString() 
+                => $"Group: {_name}";
         }
 
         private sealed class PreMatchPart : ReplacementPart
         {
             public static readonly PreMatchPart Instance = new PreMatchPart();
 
-            public override void Append(PcreMatch match, StringBuilder sb)
-            {
-                sb.Append(match.Subject, 0, match.Index);
-            }
+            public override void Append(PcreMatch match, StringBuilder sb) 
+                => sb.Append(match.Subject, 0, match.Index);
 
-            public override string ToString()
-            {
-                return "Pre match";
-            }
+            public override string ToString() 
+                => "Pre match";
         }
 
         private sealed class PostMatchPart : ReplacementPart
@@ -280,25 +268,19 @@ namespace PCRE.Support
                 sb.Append(match.Subject, endOfMatch, match.Subject.Length - endOfMatch);
             }
 
-            public override string ToString()
-            {
-                return "Post match";
-            }
+            public override string ToString() 
+                => "Post match";
         }
 
         private sealed class FullInputPart : ReplacementPart
         {
             public static readonly FullInputPart Instance = new FullInputPart();
 
-            public override void Append(PcreMatch match, StringBuilder sb)
-            {
-                sb.Append(match.Subject);
-            }
+            public override void Append(PcreMatch match, StringBuilder sb) 
+                => sb.Append(match.Subject);
 
-            public override string ToString()
-            {
-                return "Full input";
-            }
+            public override string ToString() 
+                => "Full input";
         }
 
         private sealed class LastMatchedGroupPart : ReplacementPart
@@ -318,10 +300,8 @@ namespace PCRE.Support
                 }
             }
 
-            public override string ToString()
-            {
-                return "Last matched group";
-            }
+            public override string ToString() 
+                => "Last matched group";
         }
     }
 }

@@ -23,7 +23,7 @@ namespace PCRE.Support
 
         public int CacheSize
         {
-            get { return _cacheSize; }
+            get => _cacheSize;
             set
             {
                 if (value < 0)
@@ -114,9 +114,6 @@ namespace PCRE.Support
             }
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

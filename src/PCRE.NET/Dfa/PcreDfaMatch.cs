@@ -27,14 +27,8 @@ namespace PCRE.Dfa
 
         public bool Success => Index >= 0;
 
-        public static implicit operator string(PcreDfaMatch group)
-        {
-            return group?.Value;
-        }
+        public static implicit operator string(PcreDfaMatch group) => @group?.Value;
 
-        public override string ToString()
-        {
-            return Value;
-        }
+        public override string ToString() => Value;
     }
 }

@@ -12,7 +12,7 @@ namespace PCRE.Support
 
         public static int CacheSize
         {
-            get { return RegexCache.CacheSize; }
+            get => RegexCache.CacheSize;
             set
             {
                 RegexCache.CacheSize = value;

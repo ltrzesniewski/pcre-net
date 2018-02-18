@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using PCRE.Wrapper;
@@ -25,7 +24,8 @@ namespace PCRE.Dfa
 
         private MatchData InternalResult
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)] get { return (MatchData)_result; }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return (MatchData)_result; }
         }
 
         private PcreDfaMatch GetMatch(int index)
@@ -53,15 +53,8 @@ namespace PCRE.Dfa
                 yield return GetMatch(i);
         }
 
-        public IEnumerator<PcreDfaMatch> GetEnumerator()
-        {
-            return GetMatches().GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        public IEnumerator<PcreDfaMatch> GetEnumerator() => GetMatches().GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public PcreDfaMatch this[int index] => GetMatch(index);
 
@@ -78,7 +71,7 @@ namespace PCRE.Dfa
         public override string ToString()
         {
             var match = LongestMatch;
-            return match != null ? match.Value : String.Empty;
+            return match != null ? match.Value : string.Empty;
         }
     }
 }
