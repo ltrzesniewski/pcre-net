@@ -13,7 +13,7 @@ namespace PCRE.Tests.PcreNet
         {
             var value = PcreBuildInfo.Version;
             Console.WriteLine(value);
-            Assert.IsNotNullOrEmpty(value);
+            Assert.That(value, Is.Not.Null.Or.Empty);
         }
 
         [Test]
@@ -21,7 +21,7 @@ namespace PCRE.Tests.PcreNet
         {
             var value = PcreBuildInfo.JitTarget;
             Console.WriteLine(value);
-            Assert.IsNotNullOrEmpty(value);
+            Assert.That(value, Is.Not.Null.Or.Empty);
         }
 
         [Test]

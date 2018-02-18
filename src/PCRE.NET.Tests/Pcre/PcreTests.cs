@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 
 namespace PCRE.Tests.Pcre
 {
@@ -151,7 +152,7 @@ namespace PCRE.Tests.Pcre
 
             private static IEnumerable<ITestCaseData> GetTestCases()
             {
-                const string testCasesDir = @"Pcre\TestCases";
+                var testCasesDir = Path.Combine(Path.GetDirectoryName(typeof(PcreTests).Assembly.Location) ?? throw new InvalidOperationException(), @"Pcre\TestCases");
 
                 for (var fileIndex = 0; fileIndex < InputFiles.GetLength(0); ++fileIndex)
                 {

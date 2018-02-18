@@ -97,15 +97,15 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
-        [TestCase("<$2$$$1$>", Result = "foo <$2$bb$> bar <$2$bb$><$2$b$> baz")]
-        [TestCase("<>${2", Result = "foo <>${2 bar <>${2<>${2 baz")]
-        [TestCase("<$42>", Result = "foo <$42> bar <$42><$42> baz")]
-        [TestCase("<$99999999999999999999>", Result = "foo <$99999999999999999999> bar <$99999999999999999999><$99999999999999999999> baz")]
-        [TestCase("<${x}>", Result = "foo <${x}> bar <${x}><${x}> baz")]
-        [TestCase("$42", Result = "foo $42 bar $42$42 baz")]
-        [TestCase("${x}", Result = "foo ${x} bar ${x}${x} baz")]
-        [TestCase("${x", Result = "foo ${x bar ${x${x baz")]
-        [TestCase("$", Result = "foo $ bar $$ baz")]
+        [TestCase("<$2$$$1$>", ExpectedResult = "foo <$2$bb$> bar <$2$bb$><$2$b$> baz")]
+        [TestCase("<>${2", ExpectedResult = "foo <>${2 bar <>${2<>${2 baz")]
+        [TestCase("<$42>", ExpectedResult = "foo <$42> bar <$42><$42> baz")]
+        [TestCase("<$99999999999999999999>", ExpectedResult = "foo <$99999999999999999999> bar <$99999999999999999999><$99999999999999999999> baz")]
+        [TestCase("<${x}>", ExpectedResult = "foo <${x}> bar <${x}><${x}> baz")]
+        [TestCase("$42", ExpectedResult = "foo $42 bar $42$42 baz")]
+        [TestCase("${x}", ExpectedResult = "foo ${x} bar ${x}${x} baz")]
+        [TestCase("${x", ExpectedResult = "foo ${x bar ${x${x baz")]
+        [TestCase("$", ExpectedResult = "foo $ bar $$ baz")]
         public string should_not_throw_on_invalid_replacement_patterns(string replacement)
         {
             var re = new PcreRegex(@"a+(?<n>b+)", PcreOptions.IgnoreCase);
@@ -149,12 +149,12 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
-        [TestCase("#", Result = "aab#ab#")]
-        [TestCase("$_", Result = "aabaabababaabab")]
-        [TestCase("$`", Result = "aabaababaabab")]
-        [TestCase("$'", Result = "aabaabababab")]
-        [TestCase("$+", Result = "aabab")]
-        [TestCase("$&", Result = "aabab")]
+        [TestCase("#", ExpectedResult = "aab#ab#")]
+        [TestCase("$_", ExpectedResult = "aabaabababaabab")]
+        [TestCase("$`", ExpectedResult = "aabaababaabab")]
+        [TestCase("$'", ExpectedResult = "aabaabababab")]
+        [TestCase("$+", ExpectedResult = "aabab")]
+        [TestCase("$&", ExpectedResult = "aabab")]
         public string should_handle_backslash_k_in_lookahead(string replacement)
         {
             var re = new PcreRegex(@"(?=a+b\K)");

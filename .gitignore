@@ -8,6 +8,7 @@ ipch/
 
 /src/packages/*/
 /build/output
+/build/tools/tools
 
 *.suo
 *.user

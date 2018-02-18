@@ -73,12 +73,8 @@
     <AssemblyOriginatorKeyFile>..\PCRE.NET.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="PCRE.NET.Wrapper, Version=0.4.1.0, Culture=neutral, PublicKeyToken=8f58d558eeff25a3, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\PCRE.NET.Wrapper\bin\x64\Debug\PCRE.NET.Wrapper.dll</HintPath>
+    <Reference Include="nunit.framework, Version=3.9.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.9.0\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -136,6 +132,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\PCRE.NET.Wrapper\PCRE.NET.Wrapper.vcxproj">
+      <Project>{df45f672-5e08-4cb4-bbea-c3b0d5f89b95}</Project>
+      <Name>PCRE.NET.Wrapper</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PCRE.NET\PCRE.NET.csproj">
       <Project>{bc79c3f4-531d-49fe-82de-b2103e6d6c97}</Project>
       <Name>PCRE.NET</Name>
