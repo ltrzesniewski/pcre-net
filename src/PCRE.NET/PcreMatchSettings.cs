@@ -7,7 +7,7 @@ namespace PCRE
     public sealed class PcreMatchSettings
     {
         private uint? _matchLimit;
-        private uint? _recursionLimit;
+        private uint? _depthLimit;
 
         public PcreMatchOptions AdditionalOptions { get; set; }
         public int StartIndex { get; set; }
@@ -15,14 +15,14 @@ namespace PCRE
 
         public uint MatchLimit
         {
-            get { return _matchLimit ?? PcreBuildInfo.MatchLimit; }
-            set { _matchLimit = value; }
+            get => _matchLimit ?? PcreBuildInfo.MatchLimit;
+            set => _matchLimit = value;
         }
 
-        public uint RecursionLimit
+        public uint DepthLimit
         {
-            get { return _recursionLimit ?? PcreBuildInfo.RecursionLimit; }
-            set { _recursionLimit = value; }
+            get => _depthLimit ?? PcreBuildInfo.DepthLimit;
+            set => _depthLimit = value;
         }
 
         public uint? OffsetLimit { get; set; }
@@ -40,8 +40,8 @@ namespace PCRE
             if (_matchLimit != null)
                 context.MatchLimit = _matchLimit.GetValueOrDefault();
 
-            if (_recursionLimit != null)
-                context.RecursionLimit = _recursionLimit.GetValueOrDefault();
+            if (_depthLimit != null)
+                context.DepthLimit = _depthLimit.GetValueOrDefault();
 
             if (OffsetLimit != null)
                 context.OffsetLimit = OffsetLimit.GetValueOrDefault();

@@ -22,7 +22,7 @@ namespace PCRE
             [MethodImpl(MethodImplOptions.AggressiveInlining)] get { return (MatchData)_result; }
         }
 
-        public int CaptureCount => InternalResult.Regex.CaptureCount;
+        public int CaptureCount => (int)InternalResult.Regex.CaptureCount;
 
         public PcreGroup this[int index] => GetGroup(index);
 

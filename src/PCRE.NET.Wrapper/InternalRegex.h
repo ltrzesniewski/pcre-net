@@ -22,10 +22,11 @@ namespace PCRE {
 			MatchData^ __clrcall Match(MatchContext^ context);
 			MatchData^ __clrcall DfaMatch(MatchContext^ context);
 
-			int GetInfoInt32(InfoKey key);
+			uint32_t GetInfoUInt32(InfoKey key) { return GetInfo<uint32_t>(key); }
+			System::UIntPtr GetInfoNativeInt(InfoKey key) { return static_cast<System::UIntPtr>(GetInfo<size_t>(key)); }
 
-			property int CaptureCount {
-				int get() { return _captureCount; }
+			property uint32_t CaptureCount {
+				uint32_t get() { return _captureCount; }
 			}
 
 			property System::Collections::Generic::IDictionary<System::String^, array<int>^>^ CaptureNames {
@@ -45,10 +46,11 @@ namespace PCRE {
 
 		private:
 			pcre2_code* _re;
-			initonly int _captureCount;
+			initonly uint32_t _captureCount;
 			initonly System::Collections::Generic::Dictionary<System::String^, array<int>^>^ _captureNames;
 			System::Collections::Generic::IList<CalloutInfo^>^ _callouts;
 			System::Collections::Generic::Dictionary<int, CalloutInfo^>^ _calloutInfoByPatternPosition;
+			template<typename T> T InternalRegex::GetInfo(InfoKey key);
 		};
 	}
 }

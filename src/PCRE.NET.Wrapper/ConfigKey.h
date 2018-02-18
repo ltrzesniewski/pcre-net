@@ -15,11 +15,11 @@ namespace PCRE {
 			MatchLimit                 = PCRE2_CONFIG_MATCHLIMIT,
 			NewLine                    = PCRE2_CONFIG_NEWLINE,
 			ParensLimit                = PCRE2_CONFIG_PARENSLIMIT,
-			RecursionLimit             = PCRE2_CONFIG_RECURSIONLIMIT,
-			StackRecurse               = PCRE2_CONFIG_STACKRECURSE,
+			DepthLimit                 = PCRE2_CONFIG_DEPTHLIMIT,
 			Unicode                    = PCRE2_CONFIG_UNICODE,
 			UnicodeVersion             = PCRE2_CONFIG_UNICODE_VERSION,
-			Version                    = PCRE2_CONFIG_VERSION
+			Version                    = PCRE2_CONFIG_VERSION,
+			HeapLimit                  = PCRE2_CONFIG_HEAPLIMIT
 		};
 
 	}

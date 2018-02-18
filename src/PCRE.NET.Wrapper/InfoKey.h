@@ -30,8 +30,10 @@ namespace PCRE {
 			NameEntrySize              = PCRE2_INFO_NAMEENTRYSIZE,
 			NameTable                  = PCRE2_INFO_NAMETABLE,
 			NewLine                    = PCRE2_INFO_NEWLINE,
-			RecursionLimit             = PCRE2_INFO_RECURSIONLIMIT,
-			Size                       = PCRE2_INFO_SIZE
+			DepthLimit                 = PCRE2_INFO_DEPTHLIMIT,
+			Size                       = PCRE2_INFO_SIZE,
+			FrameSize                  = PCRE2_INFO_FRAMESIZE,
+			HeapLimit                  = PCRE2_INFO_HEAPLIMIT
 		};
 
 		public enum struct NewLine

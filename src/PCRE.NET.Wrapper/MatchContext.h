@@ -22,7 +22,7 @@ namespace PCRE {
 			property PatternOptions AdditionalOptions;
 			property CalloutDelegate^ CalloutHandler;
 			property uint32_t MatchLimit { void set(uint32_t); }
-			property uint32_t RecursionLimit { void set(uint32_t); }
+			property uint32_t DepthLimit { void set(uint32_t); }
 			property uint32_t OffsetLimit { void set(uint32_t); }
 
 			property uint32_t DfaMaxResults;

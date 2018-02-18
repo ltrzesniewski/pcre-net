@@ -30,9 +30,9 @@ void MatchContext::MatchLimit::set(uint32_t value)
 	pcre2_set_match_limit(_ctx, value);
 }
 
-void MatchContext::RecursionLimit::set(uint32_t value)
+void MatchContext::DepthLimit::set(uint32_t value)
 {
-	pcre2_set_recursion_limit(_ctx, value);
+	pcre2_set_depth_limit(_ctx, value);
 }
 
 void MatchContext::OffsetLimit::set(uint32_t value)

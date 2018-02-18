@@ -46,12 +46,12 @@ InternalRegex::InternalRegex(CompileContext^ context)
 	if (context->JitCompileOptions != JitCompileOptions::None)
 		pcre2_jit_compile(_re, static_cast<uint32_t>(context->JitCompileOptions));
 
-	_captureCount = GetInfoInt32(InfoKey::CaptureCount);
+	_captureCount = GetInfoUInt32(InfoKey::CaptureCount);
 
-	int nameCount = GetInfoInt32(InfoKey::NameCount);
+	uint32_t nameCount = GetInfoUInt32(InfoKey::NameCount);
 	if (nameCount)
 	{
-		int nameEntrySize = GetInfoInt32(InfoKey::NameEntrySize);
+		uint32_t nameEntrySize = GetInfoUInt32(InfoKey::NameEntrySize);
 
 		_captureNames = gcnew System::Collections::Generic::Dictionary<String^, array<int>^>(nameCount, StringComparer::Ordinal);
 
@@ -61,7 +61,7 @@ InternalRegex::InternalRegex(CompileContext^ context)
 			throw gcnew InvalidOperationException(String::Format("Could not get name table, code: {0}", errorCode));
 
 		wchar_t *item = nameEntryTable;
-		for (int i = 0; i < nameCount; ++i)
+		for (uint32_t i = 0; i < nameCount; ++i)
 		{
 			int groupIndex = static_cast<short>(*item);
 			String^ groupName = gcnew String(item + 1);
@@ -188,13 +188,14 @@ static void __clrcall AfterMatch(MatchData^ matchData)
 	}
 }
 
-int __clrcall InternalRegex::GetInfoInt32(InfoKey key)
+template<typename T>
+T __clrcall InternalRegex::GetInfo(InfoKey key)
 {
-	int result;
+	T result;
 	int errorCode = pcre2_pattern_info(_re, static_cast<int>(key), &result);
 
 	if (errorCode)
-		throw gcnew InvalidOperationException(String::Format("Error in pcre2_pattern_info, code: {0}", errorCode));
+		throw gcnew InvalidOperationException(String::Format("Error in pcre2_pattern_info: {0}", GetErrorMessage(errorCode)));
 
 	return result;
 }

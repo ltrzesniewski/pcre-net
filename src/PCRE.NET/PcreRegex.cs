@@ -25,12 +25,12 @@ namespace PCRE
             [MethodImpl(MethodImplOptions.AggressiveInlining)] get { return (InternalRegex)_re; }
         }
 
-        internal int CaptureCount => InternalRegex.CaptureCount;
+        internal int CaptureCount => (int)InternalRegex.CaptureCount;
 
         public static int CacheSize
         {
-            get { return Caches.CacheSize; }
-            set { Caches.CacheSize = value; }
+            get => Caches.CacheSize;
+            set => Caches.CacheSize = value;
         }
 
         public PcreDfaRegex Dfa => _dfa ?? (_dfa = new PcreDfaRegex(this));
