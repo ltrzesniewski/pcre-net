@@ -13,7 +13,8 @@ CalloutData::CalloutData(MatchData^ match, pcre2_callout_block *block)
 	_maxCapture(static_cast<int>(block->capture_top)),
 	_lastCapture(static_cast<int>(block->capture_last)),
 	_patternPosition(static_cast<int>(block->pattern_position)),
-	_nextItemLength(static_cast<int>(block->next_item_length))
+	_nextItemLength(static_cast<int>(block->next_item_length)),
+	_flags(static_cast<CalloutFlags>(block->callout_flags))
 {
 	_match = gcnew MatchData(match, block);
 }

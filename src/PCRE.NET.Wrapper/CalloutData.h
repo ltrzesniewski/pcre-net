@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "CalloutFlags.h"
+
 namespace PCRE {
 	namespace Wrapper {
 
@@ -17,6 +19,7 @@ namespace PCRE {
 			property int LastCapture { int get() { return _lastCapture; } }
 			property int PatternPosition { int get() { return _patternPosition; } }
 			property int NextPatternItemLength { int get() { return _nextItemLength; } }
+			property CalloutFlags Flags { CalloutFlags get() { return _flags; } }
 			property CalloutInfo^ Info { CalloutInfo^ get(); }
 
 			property MatchData^ Match { MatchData^ get() { return _match; } }
@@ -33,6 +36,7 @@ namespace PCRE {
 			initonly int _lastCapture;
 			initonly int _patternPosition;
 			initonly int _nextItemLength;
+			initonly CalloutFlags _flags;
 			CalloutInfo^ _calloutInfo;
 		};
 

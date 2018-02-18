@@ -180,6 +180,7 @@
   <ItemGroup>
     <ClInclude Include="..\PCRE\src\pcre2.h" />
     <ClInclude Include="CalloutData.h" />
+    <ClInclude Include="CalloutFlags.h" />
     <ClInclude Include="CalloutInfo.h" />
     <ClInclude Include="CompileContext.h" />
     <ClInclude Include="ConvertContext.h" />

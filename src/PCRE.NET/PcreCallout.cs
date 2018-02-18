@@ -30,5 +30,8 @@ namespace PCRE
         public int NextPatternItemLength => InternalData.NextPatternItemLength;
         public int StringOffset => InternalData.Info.StringOffset;
         public string String => InternalData.Info.String;
+
+        public bool StartMatch => (InternalData.Flags & CalloutFlags.StartMatch) != 0;
+        public bool Backtrack => (InternalData.Flags & CalloutFlags.Backtrack) != 0;
     }
 }

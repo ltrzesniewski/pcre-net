@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
@@ -293,6 +294,25 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match, Is.Not.Null);
             Assert.That(match.Success, Is.True);
             Assert.That(count, Is.EqualTo(4));
+        }
+
+        [Test]
+        public void should_provide_callout_flags()
+        {
+            var re = new PcreRegex(@"a(?C1)(?:(?C2)(*FAIL)|b)(?C3)");
+
+            var startMatchList = new List<bool>();
+            var backtrackList = new List<bool>();
+
+            var match = re.Match("abc", data =>
+            {
+                startMatchList.Add(data.StartMatch);
+                backtrackList.Add(data.Backtrack);
+                return PcreCalloutResult.Pass;
+            });
+
+            Assert.That(startMatchList, Is.EqualTo(new[] { true, false, false }));
+            Assert.That(backtrackList, Is.EqualTo(new[] { false, false, true }));
         }
 
         [Test]
