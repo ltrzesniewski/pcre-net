@@ -182,6 +182,8 @@
     <ClInclude Include="CalloutData.h" />
     <ClInclude Include="CalloutInfo.h" />
     <ClInclude Include="CompileContext.h" />
+    <ClInclude Include="ConvertContext.h" />
+    <ClInclude Include="ConvertOptions.h" />
     <ClInclude Include="MatchContext.h" />
     <ClInclude Include="MatchData.h" />
     <ClInclude Include="InfoKey.h" />
@@ -193,12 +195,14 @@
     <ClInclude Include="PatternOptions.h" />
     <ClInclude Include="JitCompileOptions.h" />
     <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="Support.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="CalloutData.cpp" />
     <ClCompile Include="CalloutInfo.cpp" />
     <ClCompile Include="CompileContext.cpp" />
+    <ClCompile Include="ConvertContext.cpp" />
     <ClCompile Include="MatchContext.cpp" />
     <ClCompile Include="MatchData.cpp" />
     <ClCompile Include="PcreBuild.cpp" />
@@ -209,6 +213,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Support.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PCRE.NET.Native\PCRE.NET.Native.vcxproj">

@@ -87,6 +87,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Conversion\PcreConvert.cs" />
+    <Compile Include="Conversion\PcreGlobConversionOptions.cs" />
     <Compile Include="Dfa\PcreDfaMatch.cs" />
     <Compile Include="Dfa\PcreDfaMatchOptions.cs" />
     <Compile Include="Dfa\PcreDfaMatchResult.cs" />

@@ -81,6 +81,9 @@
     <ClCompile Include="..\PCRE\src\pcre2_find_bracket.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\PCRE\src\pcre2_convert.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\PCRE\src\config.h">

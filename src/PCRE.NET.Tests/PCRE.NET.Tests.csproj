@@ -89,6 +89,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PcreNet\Conversion\PcreConvertTests.cs" />
     <Compile Include="PcreNet\Dfa\DfaMatchesTests.cs" />
     <Compile Include="PcreNet\Dfa\DfaMatchTests.cs" />
     <Compile Include="PcreNet\MatchesTests.cs" />

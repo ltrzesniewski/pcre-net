@@ -4,22 +4,10 @@
 #include "MatchData.h"
 #include "MatchException.h"
 #include "CalloutInfo.h"
+#include "Support.h"
 
 using namespace System;
 using namespace PCRE::Wrapper;
-
-static inline interior_ptr<const PCRE2_UCHAR> __clrcall GetPtrToString(String^ string)
-{
-	return reinterpret_cast<interior_ptr<const PCRE2_UCHAR>>(PtrToStringChars(string));
-}
-
-static String^ __clrcall GetErrorMessage(int errorCode)
-{
-	PCRE2_UCHAR16 errorBuffer[256];
-	return pcre2_get_error_message(errorCode, errorBuffer, sizeof(errorBuffer)) >= 0
-		? gcnew String(reinterpret_cast<const wchar_t*>(errorBuffer))
-		: "Unknown error, code: " + errorCode;
-}
 
 static void __clrcall AfterMatch(MatchData^);
 
@@ -33,7 +21,7 @@ InternalRegex::InternalRegex(CompileContext^ context)
 	_re = pcre2_compile(
 		pinnedPattern,
 		context->Pattern->Length,
-		static_cast<int>(context->Options),
+		static_cast<uint32_t>(context->Options),
 		&errorCode,
 		&errorOffset,
 		context->Context);
@@ -41,7 +29,7 @@ InternalRegex::InternalRegex(CompileContext^ context)
 	pinnedPattern = nullptr;
 
 	if (!_re)
-		throw gcnew ArgumentException(String::Format("Invalid pattern '{0}': {1} at offset {2}", context->Pattern, GetErrorMessage(errorCode), errorOffset));
+		throw gcnew ArgumentException(String::Format("Invalid pattern '{0}': {1} at offset {2}", context->Pattern, GetPcreErrorMessage(errorCode), errorOffset));
 
 	if (context->JitCompileOptions != JitCompileOptions::None)
 		pcre2_jit_compile(_re, static_cast<uint32_t>(context->JitCompileOptions));
@@ -184,7 +172,7 @@ static void __clrcall AfterMatch(MatchData^ matchData)
 			break;
 		}
 
-		throw gcnew MatchException(matchData, GetErrorMessage(intResult), nullptr);
+		throw gcnew MatchException(matchData, GetPcreErrorMessage(intResult), nullptr);
 	}
 }
 
@@ -195,7 +183,7 @@ T __clrcall InternalRegex::GetInfo(InfoKey key)
 	int errorCode = pcre2_pattern_info(_re, static_cast<int>(key), &result);
 
 	if (errorCode)
-		throw gcnew InvalidOperationException(String::Format("Error in pcre2_pattern_info: {0}", GetErrorMessage(errorCode)));
+		throw gcnew InvalidOperationException(String::Format("Error in pcre2_pattern_info: {0}", GetPcreErrorMessage(errorCode)));
 
 	return result;
 }
