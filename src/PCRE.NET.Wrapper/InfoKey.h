@@ -33,7 +33,8 @@ namespace PCRE {
 			DepthLimit                 = PCRE2_INFO_DEPTHLIMIT,
 			Size                       = PCRE2_INFO_SIZE,
 			FrameSize                  = PCRE2_INFO_FRAMESIZE,
-			HeapLimit                  = PCRE2_INFO_HEAPLIMIT
+			HeapLimit                  = PCRE2_INFO_HEAPLIMIT,
+			ExtraOptions               = PCRE2_INFO_EXTRAOPTIONS
 		};
 
 		public enum struct NewLine

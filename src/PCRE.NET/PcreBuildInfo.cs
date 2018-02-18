@@ -13,10 +13,12 @@ namespace PCRE
         public static PcreNewLine NewLine { get; } = (PcreNewLine) GetConfigUInt32(ConfigKey.NewLine);
         public static uint ParensLimit { get; } = GetConfigUInt32(ConfigKey.ParensLimit);
         public static uint DepthLimit { get; } = GetConfigUInt32(ConfigKey.DepthLimit);
-        public static uint HeapLimit { get; } = GetConfigUInt32(ConfigKey.HeapLimit);
-        public static string UnicodeVersion { get; } = GetConfigString(ConfigKey.UnicodeVersion);
         public static bool Unicode { get; } = GetConfigBool(ConfigKey.Unicode);
+        public static string UnicodeVersion { get; } = GetConfigString(ConfigKey.UnicodeVersion);
         public static string Version { get; } = GetConfigString(ConfigKey.Version);
+        public static uint HeapLimit { get; } = GetConfigUInt32(ConfigKey.HeapLimit);
+        public static bool NeverBackslashC { get; } = GetConfigBool(ConfigKey.NeverBackslashC);
+        public static uint CompiledWidths { get; } = GetConfigUInt32(ConfigKey.CompiledWidths);
 
         private static bool GetConfigBool(ConfigKey key) 
             => PcreBuild.GetConfigUInt32(key).GetValueOrDefault() != 0;

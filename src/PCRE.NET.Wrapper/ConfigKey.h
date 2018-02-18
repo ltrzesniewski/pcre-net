@@ -19,7 +19,9 @@ namespace PCRE {
 			Unicode                    = PCRE2_CONFIG_UNICODE,
 			UnicodeVersion             = PCRE2_CONFIG_UNICODE_VERSION,
 			Version                    = PCRE2_CONFIG_VERSION,
-			HeapLimit                  = PCRE2_CONFIG_HEAPLIMIT
+			HeapLimit                  = PCRE2_CONFIG_HEAPLIMIT,
+			NeverBackslashC            = PCRE2_CONFIG_NEVER_BACKSLASH_C,
+			CompiledWidths             = PCRE2_CONFIG_COMPILED_WIDTHS
 		};
 
 	}

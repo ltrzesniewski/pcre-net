@@ -17,7 +17,9 @@ namespace PCRE
         public string PatternString => _re.Key.Pattern;
         public PcreRegexSettings Settings => _re.Key.Settings;
         public PcreOptions Options => _re.Key.Settings.Options;
+        public PcreOptions ArgOptions => (PcreOptions)_re.InternalRegex.GetInfoUInt32(InfoKey.ArgOptions);
         public PcreOptions AllOptions => (PcreOptions)_re.InternalRegex.GetInfoUInt32(InfoKey.AllOptions);
+        public PcreExtraCompileOptions ExtraOptions => (PcreExtraCompileOptions)_re.InternalRegex.GetInfoUInt32(InfoKey.ExtraOptions);
         public uint MaxBackReference => _re.InternalRegex.GetInfoUInt32(InfoKey.BackRefMax);
         public int CaptureCount => (int)_re.InternalRegex.CaptureCount;
         public bool IsCompiled => _re.InternalRegex.GetInfoUInt32(InfoKey.JitSize) != 0;
