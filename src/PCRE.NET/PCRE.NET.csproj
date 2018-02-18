@@ -22,6 +22,7 @@
     <WarningLevel>4</WarningLevel>
     <NoWarn>
     </NoWarn>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,6 +33,7 @@
     <WarningLevel>4</WarningLevel>
     <NoWarn>
     </NoWarn>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -95,6 +97,7 @@
     <Compile Include="PcreBackslashR.cs" />
     <Compile Include="PcreCallout.cs" />
     <Compile Include="PcreCalloutInfo.cs" />
+    <Compile Include="PcreExtraCompileOptions.cs" />
     <Compile Include="PcreMatchException.cs" />
     <Compile Include="PcreCalloutResult.cs" />
     <Compile Include="PcreMatchOptions.cs" />

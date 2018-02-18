@@ -13,10 +13,11 @@ namespace PCRE
         private PcreBackslashR? _backslashR;
         private uint? _parensLimit;
         private uint? _maxPatternLength;
+        private PcreExtraCompileOptions _extraCompileOptions;
 
         public PcreOptions Options
         {
-            get { return _options; }
+            get => _options;
             set
             {
                 EnsureIsMutable();
@@ -26,7 +27,7 @@ namespace PCRE
 
         public PcreNewLine NewLine
         {
-            get { return _newLine ?? PcreBuildInfo.NewLine; }
+            get => _newLine ?? PcreBuildInfo.NewLine;
             set
             {
                 EnsureIsMutable();
@@ -36,7 +37,7 @@ namespace PCRE
 
         public PcreBackslashR BackslashR
         {
-            get { return _backslashR ?? PcreBuildInfo.BackslashR; }
+            get => _backslashR ?? PcreBuildInfo.BackslashR;
             set
             {
                 EnsureIsMutable();
@@ -46,7 +47,7 @@ namespace PCRE
 
         public uint ParensLimit
         {
-            get { return _parensLimit ?? PcreBuildInfo.ParensLimit; }
+            get => _parensLimit ?? PcreBuildInfo.ParensLimit;
             set
             {
                 EnsureIsMutable();
@@ -56,11 +57,21 @@ namespace PCRE
 
         public uint? MaxPatternLength
         {
-            get { return _maxPatternLength; }
+            get => _maxPatternLength;
             set
             {
                 EnsureIsMutable();
                 _maxPatternLength = value;
+            }
+        }
+
+        public PcreExtraCompileOptions ExtraCompileOptions
+        {
+            get => _extraCompileOptions;
+            set
+            {
+                EnsureIsMutable();
+                _extraCompileOptions = value;
             }
         }
 
@@ -82,6 +93,7 @@ namespace PCRE
             _backslashR = settings._backslashR;
             _parensLimit = settings._parensLimit;
             _maxPatternLength = settings._maxPatternLength;
+            _extraCompileOptions = settings._extraCompileOptions;
             _readOnly = readOnly;
         }
 
@@ -91,7 +103,8 @@ namespace PCRE
                    && NewLine == other.NewLine
                    && BackslashR == other.BackslashR
                    && ParensLimit == other.ParensLimit
-                   && MaxPatternLength == other.MaxPatternLength;
+                   && MaxPatternLength == other.MaxPatternLength
+                   && ExtraCompileOptions == other.ExtraCompileOptions;
         }
 
         internal PcreRegexSettings AsReadOnly()
@@ -127,6 +140,9 @@ namespace PCRE
 
             if (_maxPatternLength != null)
                 context.MaxPatternLength = _maxPatternLength.GetValueOrDefault();
+
+            if (_extraCompileOptions != PcreExtraCompileOptions.None)
+                context.ExtraCompileOptions = (ExtraCompileOptions)_extraCompileOptions;
 
             return context;
         }

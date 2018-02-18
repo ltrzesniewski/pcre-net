@@ -50,5 +50,15 @@ namespace PCRE {
 			NoJit                      = PCRE2_NO_JIT
 		};
 
+		[System::Flags]
+		public enum struct ExtraCompileOptions : unsigned int
+		{
+			None = 0,
+			AllowSurrogateEscapes = PCRE2_EXTRA_ALLOW_SURROGATE_ESCAPES, // Invalid in UTF-16 mode
+			BadEscapeIsLiteral = PCRE2_EXTRA_BAD_ESCAPE_IS_LITERAL,
+			MatchWord = PCRE2_EXTRA_MATCH_WORD,
+			MatchLine = PCRE2_EXTRA_MATCH_LINE
+		};
+
 	}
 }

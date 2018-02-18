@@ -23,6 +23,7 @@ namespace PCRE {
 			property BackslashR BackslashR { void set(PCRE::Wrapper::BackslashR); }
 			property uint32_t ParensNestLimit { void set(uint32_t); }
 			property uint32_t MaxPatternLength { void set(uint32_t); }
+			property ExtraCompileOptions ExtraCompileOptions { void set(PCRE::Wrapper::ExtraCompileOptions); }
 
 		internal:
 			property pcre2_compile_context* Context {

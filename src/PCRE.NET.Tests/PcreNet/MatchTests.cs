@@ -363,6 +363,18 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_handle_extra_options()
+        {
+            var re = new PcreRegex(@"bar", new PcreRegexSettings(PcreOptions.Literal)
+            {
+                ExtraCompileOptions = PcreExtraCompileOptions.MatchWord
+            });
+
+            Assert.That(re.IsMatch("foo bar baz"), Is.True);
+            Assert.That(re.IsMatch("foobar baz"), Is.False);
+        }
+
+        [Test]
         [TestCase(PcreMatchOptions.PartialSoft)]
         [TestCase(PcreMatchOptions.PartialHard)]
         public void should_match_partially(PcreMatchOptions options)

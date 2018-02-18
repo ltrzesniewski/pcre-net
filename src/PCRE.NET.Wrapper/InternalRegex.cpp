@@ -36,7 +36,7 @@ InternalRegex::InternalRegex(CompileContext^ context)
 		static_cast<int>(context->Options),
 		&errorCode,
 		&errorOffset,
-		nullptr);
+		context->Context);
 
 	pinnedPattern = nullptr;
 
