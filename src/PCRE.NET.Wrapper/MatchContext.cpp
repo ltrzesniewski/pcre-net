@@ -35,6 +35,11 @@ void MatchContext::DepthLimit::set(uint32_t value)
 	pcre2_set_depth_limit(_ctx, value);
 }
 
+void MatchContext::HeapLimit::set(uint32_t value)
+{
+	pcre2_set_heap_limit(_ctx, value);
+}
+
 void MatchContext::OffsetLimit::set(uint32_t value)
 {
 	static_assert(sizeof(uint32_t) <= sizeof(PCRE2_SIZE), "Parameter size must fit into PCRE2_SIZE");

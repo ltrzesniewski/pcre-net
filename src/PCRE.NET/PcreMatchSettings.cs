@@ -8,6 +8,7 @@ namespace PCRE
     {
         private uint? _matchLimit;
         private uint? _depthLimit;
+        private uint? _heapLimit;
 
         public PcreMatchOptions AdditionalOptions { get; set; }
         public int StartIndex { get; set; }
@@ -23,6 +24,12 @@ namespace PCRE
         {
             get => _depthLimit ?? PcreBuildInfo.DepthLimit;
             set => _depthLimit = value;
+        }
+
+        public uint HeapLimit
+        {
+            get => _heapLimit ?? PcreBuildInfo.HeapLimit;
+            set => _heapLimit = value;
         }
 
         public uint? OffsetLimit { get; set; }
@@ -42,6 +49,9 @@ namespace PCRE
 
             if (_depthLimit != null)
                 context.DepthLimit = _depthLimit.GetValueOrDefault();
+
+            if (_heapLimit != null)
+                context.HeapLimit = _heapLimit.GetValueOrDefault();
 
             if (OffsetLimit != null)
                 context.OffsetLimit = OffsetLimit.GetValueOrDefault();
