@@ -9,6 +9,7 @@ namespace PCRE
         Lf = NewLine.Lf,
         CrLf = NewLine.CrLf,
         Any = NewLine.Any,
-        AnyCrLf = NewLine.AnyCrLf
+        AnyCrLf = NewLine.AnyCrLf,
+        Nul = NewLine.Nul
     }
 }

@@ -40,7 +40,8 @@ namespace PCRE {
 			Lf                         = PCRE2_NEWLINE_LF,
 			CrLf                       = PCRE2_NEWLINE_CRLF,
 			Any                        = PCRE2_NEWLINE_ANY,
-			AnyCrLf                    = PCRE2_NEWLINE_ANYCRLF
+			AnyCrLf                    = PCRE2_NEWLINE_ANYCRLF,
+			Nul                        = PCRE2_NEWLINE_NUL
 		};
 
 		public enum struct BackslashR
