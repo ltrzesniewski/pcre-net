@@ -6,16 +6,16 @@ PCRE.NET
 
 [![NuGet package](https://img.shields.io/nuget/v/PCRE.NET.svg)](https://www.nuget.org/packages/PCRE.NET)
 [![GitHub release](https://img.shields.io/github/release/ltrzesniewski/pcre-net.svg)](https://github.com/ltrzesniewski/pcre-net/releases)
-[![PCRE](https://img.shields.io/badge/pcre-v10.23-blue.svg)](http://www.pcre.org/)
+[![PCRE](https://img.shields.io/badge/pcre-v10.31-blue.svg)](http://www.pcre.org/)
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/ltrzesniewski/pcre-net/blob/master/LICENCE)
 
 PCRE.NET is a .NET wrapper for the [PCRE library](http://www.pcre.org/). The goal of this project is to bring most of PCRE's features for use from .NET applications with as little overhead as possible.
 
-The current version on the *master* branch is **0.6.3**, based on PCRE **10.23**.
+The current version on the *master* branch is **0.7.0**, based on PCRE **10.31**.
 
 ## Dependencies ##
 
-- Version 0.6 requires the [Visual C++ 2015 Redistributable](https://www.microsoft.com/en-us/download/details.aspx?id=48145) package to be installed.
+- Version 0.6 or above requires the [Visual C++ 2015 Redistributable](https://www.microsoft.com/en-us/download/details.aspx?id=48145) package to be installed.
 - Versions prior to 0.6 require the [Visual C++ 2013 Redistributable](http://www.microsoft.com/en-us/download/details.aspx?id=40784) package.
 
 ## Features ##
