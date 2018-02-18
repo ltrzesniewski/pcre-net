@@ -184,6 +184,7 @@
     <ClInclude Include="CompileContext.h" />
     <ClInclude Include="ConvertContext.h" />
     <ClInclude Include="ConvertOptions.h" />
+    <ClInclude Include="JitStack.h" />
     <ClInclude Include="MatchContext.h" />
     <ClInclude Include="MatchData.h" />
     <ClInclude Include="InfoKey.h" />
@@ -203,6 +204,7 @@
     <ClCompile Include="CalloutInfo.cpp" />
     <ClCompile Include="CompileContext.cpp" />
     <ClCompile Include="ConvertContext.cpp" />
+    <ClCompile Include="JitStack.cpp" />
     <ClCompile Include="MatchContext.cpp" />
     <ClCompile Include="MatchData.cpp" />
     <ClCompile Include="PcreBuild.cpp" />

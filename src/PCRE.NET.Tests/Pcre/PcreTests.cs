@@ -48,41 +48,53 @@ namespace PCRE.Tests.Pcre
                 throw;
             }
 
-            for (var line = 0; line < testCase.SubjectLines.Count; ++line)
+            var jitStack = pattern.JitStack != 0 && (options & PcreOptions.Compiled) != 0
+                ? new PcreJitStack(1, pattern.JitStack)
+                : null;
+
+            using (jitStack)
             {
-                Console.WriteLine("  Subject #{0}: {1}", line, testCase.SubjectLines[line]);
-
-                var subject = testCase.SubjectLines[line];
-                var expected = expectedResult.ExpectedResults[line];
-
-                Assert.That(expected.SubjectLine, Is.EqualTo(subject));
-
-                if (!pattern.SubjectLiteral)
+                for (var line = 0; line < testCase.SubjectLines.Count; ++line)
                 {
-                    subject = pattern.HexEncoding
-                        ? subject.UnescapeBinarySubject()
-                        : subject.UnescapeSubject();
-                }
+                    Console.WriteLine("  Subject #{0}: {1}", line, testCase.SubjectLines[line]);
 
-                var matches = regex
-                    .Matches(subject)
-                    .Take(pattern.AllMatches ? int.MaxValue : 1)
-                    .ToList();
+                    var subject = testCase.SubjectLines[line];
+                    var expected = expectedResult.ExpectedResults[line];
 
-                Assert.That(matches.Count, Is.EqualTo(expected.Matches.Count));
+                    Assert.That(expected.SubjectLine, Is.EqualTo(subject));
 
-                for (var matchIndex = 0; matchIndex < matches.Count; ++matchIndex)
-                {
-                    var actualMatch = matches[matchIndex];
-                    var expectedMatch = expected.Matches[matchIndex];
+                    if (!pattern.SubjectLiteral)
+                    {
+                        subject = pattern.HexEncoding
+                            ? subject.UnescapeBinarySubject()
+                            : subject.UnescapeSubject();
+                    }
 
-                    CompareGroups(pattern, actualMatch, expectedMatch);
+                    var matchSettings = new PcreMatchSettings
+                    {
+                        JitStack = jitStack
+                    };
 
-                    if (pattern.ExtractMarks)
-                        CompareMark(actualMatch, expectedMatch);
+                    var matches = regex
+                        .Matches(subject, matchSettings)
+                        .Take(pattern.AllMatches ? int.MaxValue : 1)
+                        .ToList();
 
-                    if (pattern.GetRemainingString)
-                        CompareRemainingString(actualMatch, expectedMatch);
+                    Assert.That(matches.Count, Is.EqualTo(expected.Matches.Count));
+
+                    for (var matchIndex = 0; matchIndex < matches.Count; ++matchIndex)
+                    {
+                        var actualMatch = matches[matchIndex];
+                        var expectedMatch = expected.Matches[matchIndex];
+
+                        CompareGroups(pattern, actualMatch, expectedMatch);
+
+                        if (pattern.ExtractMarks)
+                            CompareMark(actualMatch, expectedMatch);
+
+                        if (pattern.GetRemainingString)
+                            CompareRemainingString(actualMatch, expectedMatch);
+                    }
                 }
             }
 
@@ -133,7 +145,7 @@ namespace PCRE.Tests.Pcre
         {
             private static readonly string[,] InputFiles =
             {
-                { "testinput1", "testoutput1" },
+                { "testinput1", "testoutput1" }
                 //{ "testinput2", "testoutput2" }
             };
 

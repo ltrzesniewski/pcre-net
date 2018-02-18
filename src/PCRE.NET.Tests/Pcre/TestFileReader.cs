@@ -210,15 +210,15 @@ namespace PCRE.Tests.Pcre
                         pattern.SubjectLiteral = true;
                         break;
 
+                    case "jitstack":
+                        pattern.JitStack = uint.Parse(value ?? "0") * 1024;
+                        break;
+
                     case "newline": // TODO
                     case "bsr":
                     case "startchar":
                     case "stackguard":
                     case "parens_nest_limit":
-                        break;
-
-                    case "jitstack": // TODO
-                        pattern.NotSupported = true;
                         break;
 
                     default:

@@ -34,6 +34,8 @@ namespace PCRE
 
         public uint? OffsetLimit { get; set; }
 
+        public PcreJitStack JitStack { get; set; }
+
         internal MatchContext CreateMatchContext(string subject)
         {
             var context = new MatchContext
@@ -55,6 +57,9 @@ namespace PCRE
 
             if (OffsetLimit != null)
                 context.OffsetLimit = OffsetLimit.GetValueOrDefault();
+
+            if (JitStack != null)
+                context.JitStack = JitStack.GetStack();
 
             return context;
         }

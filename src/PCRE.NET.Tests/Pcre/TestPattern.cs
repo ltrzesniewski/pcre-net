@@ -24,6 +24,8 @@ namespace PCRE.Tests.Pcre
 
         public bool NotSupported { get; set; }
 
+        public uint JitStack { get; set; }
+
         public override bool Equals(object obj)
         {
             return Equals(obj as TestPattern);

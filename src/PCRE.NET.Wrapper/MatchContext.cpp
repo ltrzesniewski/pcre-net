@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "MatchContext.h"
 #include "MatchData.h"
+#include "JitStack.h"
 
 using namespace System;
 using namespace PCRE::Wrapper;
@@ -44,6 +45,11 @@ void MatchContext::OffsetLimit::set(uint32_t value)
 {
 	static_assert(sizeof(uint32_t) <= sizeof(PCRE2_SIZE), "Parameter size must fit into PCRE2_SIZE");
 	pcre2_set_offset_limit(_ctx, value);
+}
+
+void MatchContext::JitStack::set(PCRE::Wrapper::JitStack^ value)
+{
+	pcre2_jit_stack_assign(_ctx, nullptr, value ? value->Stack : nullptr);
 }
 
 static int CalloutCallback(pcre2_callout_block* block, void* data)

@@ -9,6 +9,7 @@ namespace PCRE {
 	namespace Wrapper {
 
 		ref class MatchData;
+		ref class JitStack;
 
 		public ref class MatchContext sealed
 		{
@@ -25,6 +26,7 @@ namespace PCRE {
 			property uint32_t DepthLimit { void set(uint32_t); }
 			property uint32_t HeapLimit { void set(uint32_t); }
 			property uint32_t OffsetLimit { void set(uint32_t); }
+			property JitStack^ JitStack { void set(PCRE::Wrapper::JitStack^); }
 
 			property uint32_t DfaMaxResults;
 			property uint32_t DfaWorkspaceSize;

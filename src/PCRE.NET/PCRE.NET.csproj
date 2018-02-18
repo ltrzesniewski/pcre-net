@@ -100,6 +100,7 @@
     <Compile Include="PcreCallout.cs" />
     <Compile Include="PcreCalloutInfo.cs" />
     <Compile Include="PcreExtraCompileOptions.cs" />
+    <Compile Include="PcreJitStack.cs" />
     <Compile Include="PcreMatchException.cs" />
     <Compile Include="PcreCalloutResult.cs" />
     <Compile Include="PcreMatchOptions.cs" />
