@@ -1,4 +1,4 @@
-.TH PCRE2API 3 "10 July 2017" "PCRE2 10.30"
+.TH PCRE2API 3 "31 December 2017" "PCRE2 10.31"
 .SH NAME
 PCRE2 - Perl-compatible regular expressions (revised API)
 .sp
@@ -859,11 +859,14 @@ The \fIoffset_limit\fP parameter limits how far an unanchored search can
 advance in the subject string. The default value is PCRE2_UNSET. The
 \fBpcre2_match()\fP and \fBpcre2_dfa_match()\fP functions return
 PCRE2_ERROR_NOMATCH if a match with a starting point before or at the given
-offset is not found. For example, if the pattern /abc/ is matched against
-"123abc" with an offset limit less than 3, the result is PCRE2_ERROR_NO_MATCH.
-A match can never be found if the \fIstartoffset\fP argument of
-\fBpcre2_match()\fP or \fBpcre2_dfa_match()\fP is greater than the offset
-limit.
+offset is not found. The \fBpcre2_substitute()\fP function makes no more
+substitutions.
+.P
+For example, if the pattern /abc/ is matched against "123abc" with an offset
+limit less than 3, the result is PCRE2_ERROR_NO_MATCH. A match can never be
+found if the \fIstartoffset\fP argument of \fBpcre2_match()\fP,
+\fBpcre2_dfa_match()\fP, or \fBpcre2_substitute()\fP is greater than the offset
+limit set in the match context.
 .P
 When using this facility, you must set the PCRE2_USE_OFFSET_LIMIT option when
 calling \fBpcre2_compile()\fP so that when JIT is in use, different code can be
@@ -871,10 +874,11 @@ compiled. If a match is started with a non-default match limit when
 PCRE2_USE_OFFSET_LIMIT is not set, an error is generated.
 .P
 The offset limit facility can be used to track progress when searching large
-subject strings. See also the PCRE2_FIRSTLINE option, which requires a match to
-start within the first line of the subject. If this is set with an offset
-limit, a match must occur in the first line and also within the offset limit.
-In other words, whichever limit comes first is used.
+subject strings or to limit the extent of global substitutions. See also the
+PCRE2_FIRSTLINE option, which requires a match to start before or at the first
+newline that follows the start of matching in the subject. If this is set with
+an offset limit, a match must occur in the first line and also within the
+offset limit. In other words, whichever limit comes first is used.
 .sp
 .nf
 .B int pcre2_set_heap_limit(pcre2_match_context *\fImcontext\fP,
@@ -1015,6 +1019,12 @@ PCRE2_BSR_UNICODE means that \eR matches any Unicode line ending sequence; a
 value of PCRE2_BSR_ANYCRLF means that \eR matches only CR, LF, or CRLF. The
 default can be overridden when a pattern is compiled.
 .sp
+  PCRE2_CONFIG_COMPILED_WIDTHS
+.sp
+The output is a uint32_t integer whose lower bits indicate which code unit
+widths were selected when PCRE2 was built. The 1-bit indicates 8-bit support,
+and the 2-bit and 4-bit indicate 16-bit and 32-bit support, respectively.
+.sp
   PCRE2_CONFIG_DEPTHLIMIT
 .sp
 The output is a uint32_t integer that gives the default limit for the depth of
@@ -1080,6 +1090,11 @@ sequence that is recognized as meaning "newline". The values are:
 The default should normally correspond to the standard sequence for your
 operating system.
 .sp
+  PCRE2_CONFIG_NEVER_BACKSLASH_C
+.sp
+The output is a uint32_t integer that is set to one if the use of \eC was
+permanently disabled when PCRE2 was built; otherwise it is set to zero.
+.sp
   PCRE2_CONFIG_PARENSLIMIT
 .sp
 The output is a uint32_t integer that gives the maximum depth of nesting
@@ -1136,8 +1151,8 @@ zero.
 .fi
 .P
 The \fBpcre2_compile()\fP function compiles a pattern into an internal form.
-The pattern is defined by a pointer to a string of code units and a length. If
-the pattern is zero-terminated, the length can be specified as
+The pattern is defined by a pointer to a string of code units and a length (in
+code units). If the pattern is zero-terminated, the length can be specified as
 PCRE2_ZERO_TERMINATED. The function returns a pointer to a block of memory that
 contains the compiled pattern and related data, or NULL if an error occurred.
 .P
@@ -1215,22 +1230,30 @@ respectively, when \fBpcre2_compile()\fP returns NULL because a compilation
 error has occurred. The values are not defined when compilation is successful
 and \fBpcre2_compile()\fP returns a non-NULL value.
 .P
-The value returned in \fIerroroffset\fP is an indication of where in the
-pattern the error occurred. It is not necessarily the furthest point in the
-pattern that was read. For example, after the error "lookbehind assertion is
-not fixed length", the error offset points to the start of the failing
-assertion.
-.P
-The \fBpcre2_get_error_message()\fP function (see "Obtaining a textual error
+There are nearly 100 positive error codes that \fBpcre2_compile()\fP may return
+if it finds an error in the pattern. There are also some negative error codes
+that are used for invalid UTF strings. These are the same as given by
+\fBpcre2_match()\fP and \fBpcre2_dfa_match()\fP, and are described in the
+.\" HREF
+\fBpcre2unicode\fP
+.\"
+page. There is no separate documentation for the positive error codes, because
+the textual error messages that are obtained by calling the
+\fBpcre2_get_error_message()\fP function (see "Obtaining a textual error
 message"
 .\" HTML <a href="#geterrormessage">
 .\" </a>
 below)
 .\"
-provides a textual message for each error code. Compilation errors have
-positive error codes; UTF formatting error codes are negative. For an invalid
-UTF-8 or UTF-16 string, the offset is that of the first code unit of the
-failing character.
+should be self-explanatory. Macro names starting with PCRE2_ERROR_ are defined
+for both positive and negative error codes in \fBpcre2.h\fP.
+.P
+The value returned in \fIerroroffset\fP is an indication of where in the
+pattern the error occurred. It is not necessarily the furthest point in the
+pattern that was read. For example, after the error "lookbehind assertion is
+not fixed length", the error offset points to the start of the failing
+assertion. For an invalid UTF-8 or UTF-16 string, the offset is that of the
+first code unit of the failing character.
 .P
 Some errors are not detected until the whole pattern has been scanned; in these
 cases, the offset passed back is the length of the pattern. Note that the
@@ -1423,11 +1446,16 @@ changed within a pattern by a (?xx) option setting.
   PCRE2_FIRSTLINE
 .sp
 If this option is set, the start of an unanchored pattern match must be before
-or at the first newline in the subject string, though the matched text may
-continue over the newline. See also PCRE2_USE_OFFSET_LIMIT, which provides a
-more general limiting facility. If PCRE2_FIRSTLINE is set with an offset limit,
-a match must occur in the first line and also within the offset limit. In other
-words, whichever limit comes first is used.
+or at the first newline in the subject string following the start of matching,
+though the matched text may continue over the newline. If \fIstartoffset\fP is
+non-zero, the limiting newline is not necessarily the first newline in the
+subject. For example, if the subject string is "abc\enxyz" (where \en
+represents a single-character newline) a pattern match for "yz" succeeds with
+PCRE2_FIRSTLINE if \fIstartoffset\fP is greater than 3. See also
+PCRE2_USE_OFFSET_LIMIT, which provides a more general limiting facility. If
+PCRE2_FIRSTLINE is set with an offset limit, a match must occur in the first
+line and also within the offset limit. In other words, whichever limit comes
+first is used.
 .sp
   PCRE2_LITERAL
 .sp
@@ -1746,26 +1774,6 @@ used with PCRE2_LITERAL. However, it is ignored if PCRE2_EXTRA_MATCH_LINE is
 also set.
 .
 .
-.SH "COMPILATION ERROR CODES"
-.rs
-.sp
-There are nearly 100 positive error codes that \fBpcre2_compile()\fP may return
-(via \fIerrorcode\fP) if it finds an error in the pattern. There are also some
-negative error codes that are used for invalid UTF strings. These are the same
-as given by \fBpcre2_match()\fP and \fBpcre2_dfa_match()\fP, and are described
-in the
-.\" HREF
-\fBpcre2unicode\fP
-.\"
-page. The \fBpcre2_get_error_message()\fP function (see "Obtaining a textual
-error message"
-.\" HTML <a href="#geterrormessage">
-.\" </a>
-below)
-.\"
-can be called to obtain a textual error message from any error code.
-.
-.
 .\" HTML <a name="jitcompiling"></a>
 .SH "JUST-IN-TIME (JIT) COMPILATION"
 .rs
@@ -1901,12 +1909,15 @@ are as follows:
 .sp
   PCRE2_INFO_ALLOPTIONS
   PCRE2_INFO_ARGOPTIONS
+  PCRE2_INFO_EXTRAOPTIONS
 .sp
-Return a copy of the pattern's options. The third argument should point to a
+Return copies of the pattern's options. The third argument should point to a
 \fBuint32_t\fP variable. PCRE2_INFO_ARGOPTIONS returns exactly the options that
 were passed to \fBpcre2_compile()\fP, whereas PCRE2_INFO_ALLOPTIONS returns
 the compile options as modified by any top-level (*XXX) option settings such as
-(*UTF) at the start of the pattern itself.
+(*UTF) at the start of the pattern itself. PCRE2_INFO_EXTRAOPTIONS returns the
+extra options that were set in the compile context by calling the
+pcre2_set_compile_extra_options() function.
 .P
 For example, if the pattern /(*UTF)abc/ is compiled with the PCRE2_EXTENDED
 option, the result for PCRE2_INFO_ALLOPTIONS is PCRE2_EXTENDED and PCRE2_UTF.
@@ -2336,7 +2347,7 @@ Here is an example of a simple call to \fBpcre2_match()\fP:
     11,             /* the length of the subject string */
     0,              /* start at offset 0 in the subject */
     0,              /* default options */
-    match_data,     /* the match data block */
+    md,             /* the match data block */
     NULL);          /* a match context; NULL means use defaults */
 .sp
 If the subject string is zero-terminated, the length can be given as
@@ -2718,24 +2729,27 @@ appropriate circumstances. If they are called at other times, the result is
 undefined.
 .P
 After a successful match, a partial match (PCRE2_ERROR_PARTIAL), or a failure
-to match (PCRE2_ERROR_NOMATCH), a (*MARK) name may be available, and
-\fBpcre2_get_mark()\fP can be called. It returns a pointer to the
-zero-terminated name, which is within the compiled pattern. Otherwise NULL is
-returned. The length of the (*MARK) name (excluding the terminating zero) is
-stored in the code unit that preceeds the name. You should use this instead of
-relying on the terminating zero if the (*MARK) name might contain a binary
-zero.
+to match (PCRE2_ERROR_NOMATCH), a (*MARK), (*PRUNE), or (*THEN) name may be
+available. The function \fBpcre2_get_mark()\fP can be called to access this
+name. The same function applies to all three verbs. It returns a pointer to the
+zero-terminated name, which is within the compiled pattern. If no name is
+available, NULL is returned. The length of the name (excluding the terminating
+zero) is stored in the code unit that precedes the name. You should use this
+length instead of relying on the terminating zero if the name might contain a
+binary zero.
 .P
-After a successful match, the (*MARK) name that is returned is the
-last one encountered on the matching path through the pattern. After a "no
-match" or a partial match, the last encountered (*MARK) name is returned. For
-example, consider this pattern:
+After a successful match, the name that is returned is the last (*MARK),
+(*PRUNE), or (*THEN) name encountered on the matching path through the pattern.
+Instances of (*PRUNE) and (*THEN) without names are ignored. Thus, for example,
+if the matching path contains (*MARK:A)(*PRUNE), the name "A" is returned.
+After a "no match" or a partial match, the last encountered name is returned.
+For example, consider this pattern:
 .sp
   ^(*MARK:A)((*MARK:B)a|b)c
 .sp
-When it matches "bc", the returned mark is A. The B mark is "seen" in the first
+When it matches "bc", the returned name is A. The B mark is "seen" in the first
 branch of the group, but it is not on the matching path. On the other hand,
-when this pattern fails to match "bx", the returned mark is B.
+when this pattern fails to match "bx", the returned name is B.
 .P
 After a successful match, a partial match, or one of the invalid UTF errors
 (for example, PCRE2_ERROR_UTF8_ERR5), \fBpcre2_get_startchar()\fP can be
@@ -3136,12 +3150,12 @@ length is in code units, not bytes.
 In the replacement string, which is interpreted as a UTF string in UTF mode,
 and is checked for UTF validity unless the PCRE2_NO_UTF_CHECK option is set, a
 dollar character is an escape character that can specify the insertion of
-characters from capturing groups or (*MARK) items in the pattern. The following
-forms are always recognized:
+characters from capturing groups or (*MARK), (*PRUNE), or (*THEN) items in the
+pattern. The following forms are always recognized:
 .sp
   $$                  insert a dollar character
   $<n> or ${<n>}      insert the contents of group <n>
-  $*MARK or ${*MARK}  insert the name of the last (*MARK) encountered
+  $*MARK or ${*MARK}  insert a (*MARK), (*PRUNE), or (*THEN) name
 .sp
 Either a group number or a group name can be given for <n>. Curly brackets are
 required only if the following character would be interpreted as part of the
@@ -3149,24 +3163,41 @@ number or name. The number may be zero to include the entire matched string.
 For example, if the pattern a(b)c is matched with "=abc=" and the replacement
 string "+$1$0$1+", the result is "=+babcb+=".
 .P
-The facility for inserting a (*MARK) name can be used to perform simple
-simultaneous substitutions, as this \fBpcre2test\fP example shows:
+$*MARK inserts the name from the last encountered (*MARK), (*PRUNE), or (*THEN)
+on the matching path that has a name. (*MARK) must always include a name, but
+(*PRUNE) and (*THEN) need not. For example, in the case of (*MARK:A)(*PRUNE)
+the name inserted is "A", but for (*MARK:A)(*PRUNE:B) the relevant name is "B".
+This facility can be used to perform simple simultaneous substitutions, as this
+\fBpcre2test\fP example shows:
 .sp
-  /(*:pear)apple|(*:orange)lemon/g,replace=${*MARK}
+  /(*MARK:pear)apple|(*MARK:orange)lemon/g,replace=${*MARK}
       apple lemon
    2: pear orange
 .sp
 As well as the usual options for \fBpcre2_match()\fP, a number of additional
-options can be set in the \fIoptions\fP argument.
+options can be set in the \fIoptions\fP argument of \fBpcre2_substitute()\fP.
 .P
 PCRE2_SUBSTITUTE_GLOBAL causes the function to iterate over the subject string,
-replacing every matching substring. If this is not set, only the first matching
-substring is replaced. If any matched substring has zero length, after the
-substitution has happened, an attempt to find a non-empty match at the same
-position is performed. If this is not successful, the current position is
-advanced by one character except when CRLF is a valid newline sequence and the
-next two characters are CR, LF. In this case, the current position is advanced
-by two characters.
+replacing every matching substring. If this option is not set, only the first
+matching substring is replaced. The search for matches takes place in the
+original subject string (that is, previous replacements do not affect it).
+Iteration is implemented by advancing the \fIstartoffset\fP value for each
+search, which is always passed the entire subject string. If an offset limit is
+set in the match context, searching stops when that limit is reached.
+.P
+You can restrict the effect of a global substitution to a portion of the
+subject string by setting either or both of \fIstartoffset\fP and an offset
+limit. Here is a \fPpcre2test\fP example:
+.sp
+  /B/g,replace=!,use_offset_limit
+  ABC ABC ABC ABC\e=offset=3,offset_limit=12
+   2: ABC A!C A!C ABC
+.sp
+When continuing with global substitutions after matching a substring with zero
+length, an attempt to find a non-empty match at the same offset is performed.
+If this is not successful, the offset is advanced by one character except when
+CRLF is a valid newline sequence and the next two characters are CR, LF. In
+this case, the offset is advanced by two characters.
 .P
 PCRE2_SUBSTITUTE_OVERFLOW_LENGTH changes what happens when the output buffer is
 too small. The default action is to return PCRE2_ERROR_NOMEMORY immediately. If
@@ -3268,10 +3299,10 @@ default.
 .P
 PCRE2_ERROR_BADREPLACEMENT is used for miscellaneous syntax errors in the
 replacement string, with more particular errors being PCRE2_ERROR_BADREPESCAPE
-(invalid escape sequence), PCRE2_ERROR_REPMISSING_BRACE (closing curly bracket
-not found), PCRE2_BADSUBSTITUTION (syntax error in extended group
-substitution), and PCRE2_BADSUBPATTERN (the pattern match ended before it
-started, which can happen if \eK is used in an assertion).
+(invalid escape sequence), PCRE2_ERROR_REPMISSINGBRACE (closing curly bracket
+not found), PCRE2_ERROR_BADSUBSTITUTION (syntax error in extended group
+substitution), and PCRE2_ERROR_BADSUBSPATTERN (the pattern match ended before
+it started, which can happen if \eK is used in an assertion).
 .P
 As for all PCRE2 errors, a text message that describes the error can be
 obtained by calling the \fBpcre2_get_error_message()\fP function (see
@@ -3397,7 +3428,7 @@ Here is an example of a simple call to \fBpcre2_dfa_match()\fP:
     11,             /* the length of the subject string */
     0,              /* start at offset 0 in the subject */
     0,              /* default options */
-    match_data,     /* the match data block */
+    md,             /* the match data block */
     NULL,           /* a match context; NULL means use defaults */
     wspace,         /* working space vector */
     20);            /* number of elements (NOT size in bytes) */
@@ -3574,6 +3605,6 @@ Cambridge, England.
 .rs
 .sp
 .nf
-Last updated: 10 July 2017
+Last updated: 31 December 2017
 Copyright (c) 1997-2017 University of Cambridge.
 .fi

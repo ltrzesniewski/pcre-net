@@ -109,7 +109,7 @@ typedef int BOOL;
 #define MAXPATLEN 8192
 #endif
 
-#define FNBUFSIZ 1024
+#define FNBUFSIZ 2048
 #define ERRBUFSIZ 256
 
 /* Values for the "filenames" variable, which specifies options for file name
@@ -196,8 +196,9 @@ static int bufthird = PCRE2GREP_BUFSIZE;
 static int max_bufthird = PCRE2GREP_MAX_BUFSIZE;
 static int bufsize = 3*PCRE2GREP_BUFSIZE;
 static int endlinetype;
-static int total_count = 0;
-static int counts_printed = 0;
+
+static unsigned long int total_count = 0;
+static unsigned long int counts_printed = 0;
 
 #ifdef WIN32
 static int dee_action = dee_SKIP;
@@ -520,6 +521,22 @@ Returns:   does not return
 static void
 pcre2grep_exit(int rc)
 {
+/* VMS does exit codes differently: both exit(1) and exit(0) return with a
+status of 1, which is not helpful. To help with this problem, define a symbol
+(akin to an environment variable) called "PCRE2GREP_RC" and put the exit code
+therein. */
+
+#ifdef __VMS
+#include descrip
+#include lib$routines
+  char val_buf[4];
+  $DESCRIPTOR(sym_nam, "PCRE2GREP_RC");
+  $DESCRIPTOR(sym_val, val_buf);
+  sprintf(val_buf, "%d", rc);
+  sym_val.dsc$w_length = strlen(val_buf);
+  lib$set_symbol(&sym_nam, &sym_val);
+#endif
+
 if (resource_error)
   {
   fprintf(stderr, "pcre2grep: Error %d, %d, %d or %d means that a resource "
@@ -1590,8 +1607,8 @@ Returns:            nothing
 */
 
 static void
-do_after_lines(int lastmatchnumber, char *lastmatchrestart, char *endptr,
-  const char *printname)
+do_after_lines(unsigned long int lastmatchnumber, char *lastmatchrestart,
+  char *endptr, const char *printname)
 {
 if (after_context > 0 && lastmatchnumber > 0)
   {
@@ -1602,7 +1619,7 @@ if (after_context > 0 && lastmatchnumber > 0)
     char *pp = end_of_line(lastmatchrestart, endptr, &ellength);
     if (ellength == 0 && pp == main_buffer + bufsize) break;
     if (printname != NULL) fprintf(stdout, "%s-", printname);
-    if (number) fprintf(stdout, "%d-", lastmatchnumber++);
+    if (number) fprintf(stdout, "%lu-", lastmatchnumber++);
     FWRITE_IGNORE(lastmatchrestart, 1, pp - lastmatchrestart, stdout);
     lastmatchrestart = pp;
     count++;
@@ -2293,10 +2310,10 @@ static int
 pcre2grep(void *handle, int frtype, const char *filename, const char *printname)
 {
 int rc = 1;
-int linenumber = 1;
-int lastmatchnumber = 0;
-int count = 0;
 int filepos = 0;
+unsigned long int linenumber = 1;
+unsigned long int lastmatchnumber = 0;
+unsigned long int count = 0;
 char *lastmatchrestart = NULL;
 char *ptr = main_buffer;
 char *endptr;
@@ -2316,6 +2333,7 @@ if (frtype != FR_LIBZ && frtype != FR_LIBBZ2)
   in = (FILE *)handle;
   if (is_file_tty(in)) input_line_buffered = TRUE;
   }
+else input_line_buffered = FALSE;
 
 bufflength = fill_buffer(handle, frtype, main_buffer, bufsize,
   input_line_buffered);
@@ -2349,7 +2367,6 @@ while (ptr < endptr)
   int mrc = 0;
   unsigned int options = 0;
   BOOL match;
-  char *matchptr = ptr;
   char *t = ptr;
   size_t length, linelength;
   size_t startoffset = 0;
@@ -2384,7 +2401,7 @@ while (ptr < endptr)
       if (new_buffer == NULL)
         {
         fprintf(stderr,
-          "pcre2grep: line %d%s%s is too long for the internal buffer\n"
+          "pcre2grep: line %lu%s%s is too long for the internal buffer\n"
           "pcre2grep: not enough memory to increase the buffer size to %d\n",
           linenumber,
           (filename == NULL)? "" : " of file ",
@@ -2414,7 +2431,7 @@ while (ptr < endptr)
     else
       {
       fprintf(stderr,
-        "pcre2grep: line %d%s%s is too long for the internal buffer\n"
+        "pcre2grep: line %lu%s%s is too long for the internal buffer\n"
         "pcre2grep: the maximum buffer size is %d\n"
         "pcre2grep: use the --max-buffer-size option to change it\n",
         linenumber,
@@ -2487,10 +2504,13 @@ while (ptr < endptr)
   match, set PCRE2_NOTEMPTY to disable any further matches of null strings in
   this line. */
 
-  match = match_patterns(matchptr, length, options, startoffset, &mrc);
+  match = match_patterns(ptr, length, options, startoffset, &mrc);
   options = PCRE2_NOTEMPTY;
 
-  /* If it's a match or a not-match (as required), do what's wanted. */
+  /* If it's a match or a not-match (as required), do what's wanted. NOTE: Use
+  only FWRITE_IGNORE() - which is just a packaged fwrite() that ignores its
+  return code - to output data lines, so that binary zeroes are treated as just
+  another data character. */
 
   if (match != invert)
     {
@@ -2543,19 +2563,19 @@ while (ptr < endptr)
         size_t oldstartoffset;
 
         if (printname != NULL) fprintf(stdout, "%s:", printname);
-        if (number) fprintf(stdout, "%d:", linenumber);
+        if (number) fprintf(stdout, "%lu:", linenumber);
 
         /* Handle --line-offsets */
 
         if (line_offsets)
-          fprintf(stdout, "%d,%d" STDOUT_NL, (int)(matchptr + offsets[0] - ptr),
+          fprintf(stdout, "%d,%d" STDOUT_NL, (int)(ptr + offsets[0] - ptr),
             (int)(offsets[1] - offsets[0]));
 
         /* Handle --file-offsets */
 
         else if (file_offsets)
           fprintf(stdout, "%d,%d" STDOUT_NL,
-            (int)(filepos + matchptr + offsets[0] - ptr),
+            (int)(filepos + ptr + offsets[0] - ptr),
             (int)(offsets[1] - offsets[0]));
 
         /* Handle --output (which has already been syntax checked) */
@@ -2563,7 +2583,7 @@ while (ptr < endptr)
         else if (output_text != NULL)
           {
           if (display_output_text((PCRE2_SPTR)output_text, FALSE,
-              (PCRE2_SPTR)matchptr, offsets, mrc) || printname != NULL ||
+              (PCRE2_SPTR)ptr, offsets, mrc) || printname != NULL ||
               number)
             fprintf(stdout, STDOUT_NL);
           }
@@ -2585,7 +2605,7 @@ while (ptr < endptr)
                 {
                 if (printed && om_separator != NULL)
                   fprintf(stdout, "%s", om_separator);
-                print_match(matchptr + offsets[n*2], plen);
+                print_match(ptr + offsets[n*2], plen);
                 printed = TRUE;
                 }
               }
@@ -2612,7 +2632,7 @@ while (ptr < endptr)
           {
           if (startoffset >= length) goto END_ONE_MATCH;  /* Were at end */
           startoffset = oldstartoffset + 1;
-          if (utf) while ((matchptr[startoffset] & 0xc0) == 0x80) startoffset++;
+          if (utf) while ((ptr[startoffset] & 0xc0) == 0x80) startoffset++;
           }
 
         /* If the current match ended past the end of the line (only possible
@@ -2621,7 +2641,7 @@ while (ptr < endptr)
 
         while (startoffset > linelength)
           {
-          matchptr = ptr += linelength + endlinelength;
+          ptr += linelength + endlinelength;
           filepos += (int)(linelength + endlinelength);
           linenumber++;
           startoffset -= (int)(linelength + endlinelength);
@@ -2663,7 +2683,7 @@ while (ptr < endptr)
           {
           char *pp = lastmatchrestart;
           if (printname != NULL) fprintf(stdout, "%s-", printname);
-          if (number) fprintf(stdout, "%d-", lastmatchnumber++);
+          if (number) fprintf(stdout, "%lu-", lastmatchnumber++);
           pp = end_of_line(pp, endptr, &ellength);
           FWRITE_IGNORE(lastmatchrestart, 1, pp - lastmatchrestart, stdout);
           lastmatchrestart = pp;
@@ -2703,7 +2723,7 @@ while (ptr < endptr)
           int ellength;
           char *pp = p;
           if (printname != NULL) fprintf(stdout, "%s-", printname);
-          if (number) fprintf(stdout, "%d-", linenumber - linecount--);
+          if (number) fprintf(stdout, "%lu-", linenumber - linecount--);
           pp = end_of_line(pp, endptr, &ellength);
           FWRITE_IGNORE(p, 1, pp - p, stdout);
           p = pp;
@@ -2717,28 +2737,7 @@ while (ptr < endptr)
         endhyphenpending = TRUE;
 
       if (printname != NULL) fprintf(stdout, "%s:", printname);
-      if (number) fprintf(stdout, "%d:", linenumber);
-
-      /* In multiline mode, we want to print to the end of the line in which
-      the end of the matched string is found, so we adjust linelength and the
-      line number appropriately, but only when there actually was a match
-      (invert not set). Because the PCRE2_FIRSTLINE option is set, the start of
-      the match will always be before the first newline sequence. */
-
-      if (multiline & !invert)
-        {
-        char *endmatch = ptr + offsets[1];
-        t = ptr;
-        while (t <= endmatch)
-          {
-          t = end_of_line(t, endptr, &endlinelength);
-          if (t < endmatch) linenumber++; else break;
-          }
-        linelength = t - ptr - endlinelength;
-        }
-
-      /*** NOTE: Use only fwrite() to output the data line, so that binary
-      zeroes are treated as just another data character. */
+      if (number) fprintf(stdout, "%lu:", linenumber);
 
       /* This extra option, for Jeffrey Friedl's debugging requirements,
       replaces the matched string, or a specific captured string if it exists,
@@ -2756,33 +2755,100 @@ while (ptr < endptr)
       else
 #endif
 
-      /* We have to split the line(s) up if colouring, and search for further
-      matches, but not of course if the line is a non-match. */
+      /* In multiline mode, or if colouring, we have to split the line(s) up
+      and search for further matches, but not of course if the line is a
+      non-match. In multiline mode this is necessary in case there is another
+      match that spans the end of the current line. When colouring we want to
+      colour all matches. */
 
-      if (do_colour && !invert)
+      if ((multiline || do_colour) && !invert)
         {
         int plength;
+        PCRE2_SIZE endprevious;
+
+        /* The use of \K may make the end offset earlier than the start. In
+        this situation, swap them round. */
+
+        if (offsets[0] > offsets[1])
+          {
+          PCRE2_SIZE temp = offsets[0];
+          offsets[0] = offsets[1];
+          offsets[1] = temp;
+          }
+
         FWRITE_IGNORE(ptr, 1, offsets[0], stdout);
         print_match(ptr + offsets[0], offsets[1] - offsets[0]);
+
         for (;;)
           {
-          startoffset = offsets[1];
-          if (startoffset >= linelength + endlinelength ||
-              !match_patterns(matchptr, length, options, startoffset, &mrc))
-            break;
-          FWRITE_IGNORE(matchptr + startoffset, 1, offsets[0] - startoffset, stdout);
-          print_match(matchptr + offsets[0], offsets[1] - offsets[0]);
+          PCRE2_SIZE oldstartoffset = pcre2_get_startchar(match_data);
+
+          endprevious = offsets[1];
+          startoffset = endprevious;  /* Advance after previous match. */
+
+          /* If the pattern contained a lookbehind that included \K, it is
+          possible that the end of the match might be at or before the actual
+          starting offset we have just used. In this case, start one character
+          further on. */
+
+          if (startoffset <= oldstartoffset)
+            {
+            startoffset = oldstartoffset + 1;
+            if (utf) while ((ptr[startoffset] & 0xc0) == 0x80) startoffset++;
+            }
+
+          /* If the current match ended past the end of the line (only possible
+          in multiline mode), we must move on to the line in which it did end
+          before searching for more matches. Because the PCRE2_FIRSTLINE option
+          is set, the start of the match will always be before the first
+          newline sequence. */
+
+          while (startoffset > linelength + endlinelength)
+            {
+            ptr += linelength + endlinelength;
+            filepos += (int)(linelength + endlinelength);
+            linenumber++;
+            startoffset -= (int)(linelength + endlinelength);
+            endprevious -= (int)(linelength + endlinelength);
+            t = end_of_line(ptr, endptr, &endlinelength);
+            linelength = t - ptr - endlinelength;
+            length = (size_t)(endptr - ptr);
+            }
+
+          /* If startoffset is at the exact end of the line it means this
+          complete line was the final part of the match, so there is nothing
+          more to do. */
+
+          if (startoffset == linelength + endlinelength) break;
+
+          /* Otherwise, run a match from within the final line, and if found,
+          loop for any that may follow. */
+
+          if (!match_patterns(ptr, length, options, startoffset, &mrc)) break;
+
+          /* The use of \K may make the end offset earlier than the start. In
+          this situation, swap them round. */
+
+          if (offsets[0] > offsets[1])
+            {
+            PCRE2_SIZE temp = offsets[0];
+            offsets[0] = offsets[1];
+            offsets[1] = temp;
+            }
+
+          FWRITE_IGNORE(ptr + endprevious, 1, offsets[0] - endprevious, stdout);
+          print_match(ptr + offsets[0], offsets[1] - offsets[0]);
           }
 
         /* In multiline mode, we may have already printed the complete line
         and its line-ending characters (if they matched the pattern), so there
         may be no more to print. */
 
-        plength = (int)((linelength + endlinelength) - startoffset);
-        if (plength > 0) FWRITE_IGNORE(ptr + startoffset, 1, plength, stdout);
+        plength = (int)((linelength + endlinelength) - endprevious);
+        if (plength > 0) FWRITE_IGNORE(ptr + endprevious, 1, plength, stdout);
         }
 
-      /* Not colouring; no need to search for further matches */
+      /* Not colouring or multiline; no need to search for further matches. */
 
       else FWRITE_IGNORE(ptr, 1, linelength + endlinelength, stdout);
       }
@@ -2892,7 +2958,7 @@ if (count_only && !quiet)
     {
     if (printname != NULL && filenames != FN_NONE)
       fprintf(stdout, "%s:", printname);
-    fprintf(stdout, "%d" STDOUT_NL, count);
+    fprintf(stdout, "%lu" STDOUT_NL, count);
     counts_printed++;
     }
   }
@@ -3016,7 +3082,7 @@ if (isdirectory(pathname))
 
   if (dee_action == dee_RECURSE)
     {
-    char buffer[1024];
+    char buffer[FNBUFSIZ];
     char *nextfile;
     directory_type *dir = opendirectory(pathname);
 
@@ -3031,7 +3097,14 @@ if (isdirectory(pathname))
     while ((nextfile = readdirectory(dir)) != NULL)
       {
       int frc;
-      sprintf(buffer, "%.512s%c%.128s", pathname, FILESEP, nextfile);
+      int fnlength = strlen(pathname) + strlen(nextfile) + 2;
+      if (fnlength > FNBUFSIZ)
+        {
+        fprintf(stderr, "pcre2grep: recursive filename is too long\n");
+        rc = 2;
+        break;
+        }
+      sprintf(buffer, "%s%c%s", pathname, FILESEP, nextfile);
       frc = grep_or_recurse(buffer, dir_recurse, FALSE);
       if (frc > 1) rc = frc;
        else if (frc == 0 && rc == 1) rc = 0;
@@ -4163,7 +4236,7 @@ if (show_total_count && counts_printed != 1 && filenames != FN_NOMATCH_ONLY)
   {
   if (counts_printed != 0 && filenames >= FN_DEFAULT)
     fprintf(stdout, "TOTAL:");
-  fprintf(stdout, "%d" STDOUT_NL, total_count);
+  fprintf(stdout, "%lu" STDOUT_NL, total_count);
   }
 
 EXIT:

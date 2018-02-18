@@ -1099,6 +1099,9 @@
 
 /(?C)a|b/I
 
+/a|(b)(?C)/I
+    b
+
 /x(ab|(bc|(de|(?R))))/I
     xab
     xbc
@@ -5287,7 +5290,7 @@ a)"xI
 
 /\j\x{z}\o{82}\L\uabcd\u\U\g{\g/B,\bad_escape_is_literal
 
-/\N{\c/B,bad_escape_is_literal
+/\N{\c/IB,bad_escape_is_literal
 
 /[\j\x{z}\o\gA-\Nb-\g]/B,bad_escape_is_literal
 
@@ -5330,14 +5333,14 @@ a)"xI
 /(*CR)abc/literal
     (*CR)abc
 
-/cat|dog/match_word
+/cat|dog/I,match_word
     the cat sat
 \= Expect no match
     caterpillar
     snowcat
     syndicate
 
-/(cat)|dog/match_line,literal
+/(cat)|dog/I,match_line,literal
     (cat)|dog
 \= Expect no match
     the cat sat
@@ -5374,5 +5377,56 @@ a)"xI
 /[\H-z]/
 
 /[\d-[:print:]]/
+
+# Perl gets the second of these wrong, giving no match.
+
+"(?<=(a))\1?b"I
+    ab
+    aaab 
+
+"(?=(a))\1?b"I
+    ab
+    aaab
+    
+# JIT does not support callout_extra  
+    
+/(*NO_JIT)(a+)b/auto_callout,no_start_optimize,no_auto_possess
+\= Expect no match
+    aac\=callout_extra 
+    
+/(*NO_JIT)a+(?C'XXX')b/no_start_optimize,no_auto_possess
+\= Expect no match
+    aac\=callout_extra 
+
+/\n/firstline
+    xyz\nabc
+
+/\nabc/firstline
+    xyz\nabc
+
+/\x{0a}abc/firstline,newline=crlf
+\= Expect no match
+    xyz\r\nabc
+
+/[abc]/firstline
+\= Expect no match
+    \na
+    
+# These tests are matched in test 1 as they are Perl compatible. Here we are
+# looking at what does and does not get auto-possessified. 
+
+/(?(DEFINE)(?<optional_a>a?))^(?&optional_a)a$/B
+
+/(?(DEFINE)(?<optional_a>a?)X)^(?&optional_a)a$/B
+    
+/^(a?)b(?1)a/B
+
+/^(a?)+b(?1)a/B
+
+/^(a?)++b(?1)a/B
+
+/^(a?)+b/B
+
+/(?=a+)a(a+)++b/B
 
 # End of testinput2

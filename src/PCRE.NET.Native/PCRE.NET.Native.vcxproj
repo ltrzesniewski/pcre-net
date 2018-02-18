@@ -27,6 +27,7 @@
     <ClCompile Include="..\PCRE\src\pcre2_convert.c" />
     <ClCompile Include="..\PCRE\src\pcre2_dfa_match.c" />
     <ClCompile Include="..\PCRE\src\pcre2_error.c" />
+    <ClCompile Include="..\PCRE\src\pcre2_extuni.c" />
     <ClCompile Include="..\PCRE\src\pcre2_find_bracket.c" />
     <ClCompile Include="..\PCRE\src\pcre2_jit_compile.c" />
     <ClCompile Include="..\PCRE\src\pcre2_maketables.c" />

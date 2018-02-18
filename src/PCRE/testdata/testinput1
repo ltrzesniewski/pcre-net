@@ -6149,4 +6149,44 @@ ef) x/x,mark
 /[[:digit:]-]+/
     12-24
 
+/((?<=((*ACCEPT)) )\1?\b) /
+\= Expect no match     
+    ((?<=((*ACCEPT)) )\\1?\\b)\x20
+
+/((?<=((*ACCEPT))X)\1?Y)\1/
+    XYYZ
+
+/((?<=((*ACCEPT))X)\1?Y(*ACCEPT))\1/
+    XYYZ
+
+/(?(DEFINE)(?<optional_a>a?)X)^(?&optional_a)a$/
+    aa
+    a
+
+/^(a?)b(?1)a/
+    abaa
+    aba 
+    baa
+    ba  
+
+/^(a?)+b(?1)a/
+    abaa
+    aba 
+    baa
+    ba  
+
+/^(a?)++b(?1)a/
+    abaa
+    aba 
+    baa
+    ba  
+
+/^(a?)+b/
+    b
+    ab
+    aaab 
+
+/(?=a+)a(a+)++b/
+    aab
+
 # End of testinput1 

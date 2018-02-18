@@ -2,6 +2,148 @@ Change Log for PCRE2
 --------------------
 
 
+Version 10.31 12-February-2018
+------------------------------
+
+1. Fix typo (missing ]) in VMS code in pcre2test.c.
+
+2. Replace the replicated code for matching extended Unicode grapheme sequences
+(which got a lot more complicated by change 10.30/49) by a single subroutine
+that is called by both pcre2_match() and pcre2_dfa_match().
+
+3. Add idempotent guard to pcre2_internal.h.
+
+4. Add new pcre2_config() options: PCRE2_CONFIG_NEVER_BACKSLASH_C and
+PCRE2_CONFIG_COMPILED_WIDTHS.
+
+5. Cut out \C tests in the JIT regression tests when NEVER_BACKSLASH_C is
+defined (e.g. by --enable-never-backslash-C).
+
+6. Defined public names for all the pcre2_compile() error numbers, and used
+the public names in pcre2_convert.c.
+
+7. Fixed a small memory leak in pcre2test (convert contexts).
+
+8. Added two casts to compile.c and one to match.c to avoid compiler warnings.
+
+9. Added code to pcre2grep when compiled under VMS to set the symbol
+PCRE2GREP_RC to the exit status, because VMS does not distinguish between
+exit(0) and exit(1).
+
+10. Added the -LM (list modifiers) option to pcre2test. Also made -C complain
+about a bad option only if the following argument item does not start with a
+hyphen.
+
+11. pcre2grep was truncating components of file names to 128 characters when
+processing files with the -r option, and also (some very odd code) truncating
+path names to 512 characters. There is now a check on the absolute length of
+full path file names, which may be up to 2047 characters long.
+
+12. When an assertion contained (*ACCEPT) it caused all open capturing groups
+to be closed (as for a non-assertion ACCEPT), which was wrong and could lead to
+misbehaviour for subsequent references to groups that started outside the
+assertion. ACCEPT in an assertion now closes only those groups that were
+started within that assertion. Fixes oss-fuzz issues 3852 and 3891.
+
+13. Multiline matching in pcre2grep was misbehaving if the pattern matched
+within a line, and then matched again at the end of the line and over into
+subsequent lines. Behaviour was different with and without colouring, and
+sometimes context lines were incorrectly printed and/or line endings were lost.
+All these issues should now be fixed.
+
+14. If --line-buffered was specified for pcre2grep when input was from a
+compressed file (.gz or .bz2) a segfault occurred. (Line buffering should be
+ignored for compressed files.)
+
+15. Although pcre2_jit_match checks whether the pattern is compiled
+in a given mode, it was also expected that at least one mode is available.
+This is fixed and pcre2_jit_match returns with PCRE2_ERROR_JIT_BADOPTION
+when the pattern is not optimized by JIT at all.
+
+16. The line number and related variables such as match counts in pcre2grep
+were all int variables, causing overflow when files with more than 2147483647
+lines were processed (assuming 32-bit ints). They have all been changed to
+unsigned long ints.
+
+17. If a backreference with a minimum repeat count of zero was first in a
+pattern, apart from assertions, an incorrect first matching character could be
+recorded. For example, for the pattern /(?=(a))\1?b/, "b" was incorrectly set
+as the first character of a match.
+
+18. Characters in a leading positive assertion are considered for recording a
+first character of a match when the rest of the pattern does not provide one.
+However, a character in a non-assertive group within a leading assertion such
+as in the pattern /(?=(a))\1?b/ caused this process to fail. This was an
+infelicity rather than an outright bug, because it did not affect the result of
+a match, just its speed. (In fact, in this case, the starting 'a' was
+subsequently picked up in the study.)
+
+19. A minor tidy in pcre2_match(): making all PCRE2_ERROR_ returns use "return"
+instead of "RRETURN" saves unwinding the backtracks in these cases (only one
+didn't).
+
+20. Allocate a single callout block on the stack at the start of pcre2_match()
+and set its never-changing fields once only. Do the same for pcre2_dfa_match().
+
+21. Save the extra compile options (set in the compile context) with the
+compiled pattern (they were not previously saved), add PCRE2_INFO_EXTRAOPTIONS
+to retrieve them, and update pcre2test to show them.
+
+22. Added PCRE2_CALLOUT_STARTMATCH and PCRE2_CALLOUT_BACKTRACK bits to a new
+field callout_flags in callout blocks. The bits are set by pcre2_match(), but
+not by JIT or pcre2_dfa_match(). Their settings are shown in pcre2test callouts
+if the callout_extra subject modifier is set. These bits are provided to help
+with tracking how a backtracking match is proceeding.
+
+23. Updated the pcre2demo.c demonstration program, which was missing the extra
+code for -g that handles the case when \K in an assertion causes the match to
+end at the original start point. Also arranged for it to detect when \K causes
+the end of a match to be before its start.
+
+24. Similar to 23 above, strange things (including loops) could happen in
+pcre2grep when \K was used in an assertion when --colour was used or in
+multiline mode. The "end at original start point" bug is fixed, and if the end
+point is found to be before the start point, they are swapped.
+
+25. When PCRE2_FIRSTLINE without PCRE2_NO_START_OPTIMIZE was used in non-JIT
+matching (both pcre2_match() and pcre2_dfa_match()) and the matched string
+started with the first code unit of a newline sequence, matching failed because
+it was not tried at the newline.
+
+26. Code for giving up a non-partial match after failing to find a starting
+code unit anywhere in the subject was missing when searching for one of a
+number of code units (the bitmap case) in both pcre2_match() and
+pcre2_dfa_match(). This was a missing optimization rather than a bug.
+
+27. Tidied up the ACROSSCHAR macro to be like FORWARDCHAR and BACKCHAR, using a
+pointer argument rather than a code unit value. This should not have affected
+the generated code.
+
+28. The JIT compiler has been updated.
+
+29. Avoid pointer overflow for unset captures in pcre2_substring_list_get().
+This could not actually cause a crash because it was always used in a memcpy()
+call with zero length.
+
+30. Some internal structures have a variable-length ovector[] as their last
+element. Their actual memory is obtained dynamically, giving an ovector of
+appropriate length. However, they are defined in the structure as
+ovector[NUMBER], where NUMBER is large so that array bound checkers don't
+grumble. The value of NUMBER was 10000, but a fuzzer exceeded 5000 capturing
+groups, making the ovector larger than this. The number has been increased to
+131072, which allows for the maximum number of captures (65535) plus the
+overall match. This fixes oss-fuzz issue 5415.
+
+31. Auto-possessification at the end of a capturing group was dependent on what
+follows the group (e.g. /(a+)b/ would auto-possessify the a+) but this caused
+incorrect behaviour when the group was called recursively from elsewhere in the
+pattern where something different might follow. This bug is an unforseen
+consequence of change #1 for 10.30 - the implementation of backtracking into
+recursions. Iterators at the ends of capturing groups are no longer considered
+for auto-possessification if the pattern contains any recursions. Fixes
+Bugzilla #2232.
+
+
 Version 10.30 14-August-2017
 ----------------------------
 
