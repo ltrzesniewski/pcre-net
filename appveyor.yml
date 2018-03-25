@@ -1,8 +1,13 @@
 version: 1.0.{build}
 image: Visual Studio 2017
 build_script:
- - ps: Set-Location build
- - ps: .\tools\build.ps1 -Script tools\build.cake -Verbosity Diagnostic
+ - ps: |
+     Set-Location build
+     .\tools\build.ps1 -Script tools\build.cake -Verbosity Diagnostic
+after_build:
+ - ps: |
+     $wc = New-Object 'System.Net.WebClient'
+     $wc.UploadFile("https://ci.appveyor.com/api/testresults/nunit3/$($env:APPVEYOR_JOB_ID)", (Resolve-Path .\output\test\TestResult.xml))
 test: off
 artifacts:
  - path: build\output\*.nupkg
