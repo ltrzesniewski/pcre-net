@@ -1,0 +1,9 @@
+version: 1.0.{build}
+image: Visual Studio 2017
+build_script:
+ - ps: Set-Location build
+ - ps: .\tools\build.ps1 -Script tools\build.cake -Verbosity Diagnostic
+test: off
+artifacts:
+ - path: build\output\*.nupkg
+ - path: build\output\*.dll
