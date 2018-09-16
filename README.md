@@ -7,12 +7,12 @@ PCRE.NET
 [![NuGet package](https://img.shields.io/nuget/v/PCRE.NET.svg)](https://www.nuget.org/packages/PCRE.NET)
 [![Build status](https://ci.appveyor.com/api/projects/status/u48itxciyspgi8cu/branch/master?svg=true)](https://ci.appveyor.com/project/ltrzesniewski/pcre-net/branch/master)
 [![GitHub release](https://img.shields.io/github/release/ltrzesniewski/pcre-net.svg)](https://github.com/ltrzesniewski/pcre-net/releases)
-[![PCRE](https://img.shields.io/badge/pcre-v10.31-blue.svg)](http://www.pcre.org/)
+[![PCRE](https://img.shields.io/badge/pcre-v10.32-blue.svg)](http://www.pcre.org/)
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/ltrzesniewski/pcre-net/blob/master/LICENCE)
 
 PCRE.NET is a .NET wrapper for the [PCRE library](http://www.pcre.org/). The goal of this project is to bring most of PCRE's features for use from .NET applications with as little overhead as possible.
 
-The current version on the *master* branch is **0.7.0**, based on PCRE **10.31**.
+The current version on the *master* branch is **0.7.1**, based on PCRE **10.32**.
 
 ## Dependencies ##
 
@@ -133,7 +133,7 @@ var isValidJson = regex.IsMatch(subject);
 
 ## To do ##
 
-- Implement a less verbose managed/native interface
+- ~Implement a less verbose managed/native interface~ Rewrite the library to use P/Invoke instead of C++/CLI
 - Include more tests from the PCRE test suite
 - Documentation
 - XML doc comments
