@@ -2184,6 +2184,11 @@
     Blah blah      
     blaH blah 
 
+/((?i)blah)\s+(?m)A(?i:\1)/
+    blah ABLAH
+\= Expect no match
+    blah aBLAH
+
 /(?>a*)*/
     a
     aa
@@ -5157,14 +5162,6 @@ name)/mark
 /A(*MARK:A)A+(*SKIP:B)(B|Z) | AAC/x,mark
     AAAC
 
-/a(*PRUNE:X)bc|qq/mark,no_start_optimize
-\= Expect no match
-    axy
-
-/a(*THEN:X)bc|qq/mark,no_start_optimize
-\= Expect no match
-    axy
-
 /(?=a(*MARK:A)b)..x/mark
     abxy
 \= Expect no match
@@ -6188,5 +6185,82 @@ ef) x/x,mark
 
 /(?=a+)a(a+)++b/
     aab
+
+/(?<=\G.)/g,aftertext
+    abc
+
+/(?<=(?=.)?)/
+
+/(?<=(?=.)?+)/
+
+/(?<=(?=.)*)/
+
+/(?<=(?=.){4,5})/
+
+/(?<=(?=.){4,5}x)/
+
+/a(?=.(*:X))(*SKIP:X)(*F)|(.)/
+    abc
+
+/a(?>(*:X))(*SKIP:X)(*F)|(.)/
+    abc
+
+/a(?:(*:X))(*SKIP:X)(*F)|(.)/
+    abc
+
+#pattern no_start_optimize
+
+/(?>a(*:1))(?>b(*:1))(*SKIP:1)x|.*/
+    abc
+
+/(?>a(*:1))(?>b)(*SKIP:1)x|.*/
+    abc
+
+#subject mark
+
+/a(*ACCEPT:X)b/
+    abc
+    
+/(?=a(*ACCEPT:QQ)bc)axyz/
+    axyz
+
+/(?(DEFINE)(a(*ACCEPT:X)))(?1)b/
+    abc
+    
+/a(*F:X)b/
+    abc
+    
+/(?(DEFINE)(a(*F:X)))(?1)b/
+    abc
+
+/a(*COMMIT:X)b/
+    abc
+    
+/(?(DEFINE)(a(*COMMIT:X)))(?1)b/
+    abc
+    
+/a+(*:Z)b(*COMMIT:X)(*SKIP:Z)c|.*/
+    aaaabd
+
+/a+(*:Z)b(*COMMIT:X)(*SKIP:X)c|.*/
+    aaaabd
+
+/a(*COMMIT:X)b/
+    axabc
+
+#pattern -no_start_optimize
+#subject -mark 
+
+/(.COMMIT)(*COMMIT::::::::::interal error:::)/
+
+/(*COMMIT:ÿÿ)/
+
+/(*COMMIT:]w)/
+
+/(?i)A(?^)B(?^x:C D)(?^i)e f/
+    aBCDE F
+\= Expect no match
+    aBCDEF
+    AbCDe f
 
 # End of testinput1 

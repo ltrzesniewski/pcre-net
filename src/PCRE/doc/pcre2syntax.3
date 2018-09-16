@@ -1,4 +1,4 @@
-.TH PCRE2SYNTAX 3 "17 June 2017" "PCRE2 10.30"
+.TH PCRE2SYNTAX 3 "02 September 2018" "PCRE2 10.32"
 .SH NAME
 PCRE2 - Perl-compatible regular expressions (revised API)
 .SH "PCRE2 REGULAR EXPRESSION SYNTAX SUMMARY"
@@ -35,9 +35,10 @@ This table applies to ASCII and Unicode environments.
   \eddd       character with octal code ddd, or backreference
   \eo{ddd..}  character with octal code ddd..
   \eU         "U" if PCRE2_ALT_BSUX is set (otherwise is an error)
+  \eN{U+hh..} character with Unicode code point hh.. (Unicode mode only)
   \euhhhh     character with hex code hhhh (if PCRE2_ALT_BSUX is set)
   \exhh       character with hex code hh
-  \ex{hhh..}  character with hex code hhh..
+  \ex{hh..}   character with hex code hh..
 .sp
 Note that \e0dd is always an octal code. The treatment of backslash followed by
 a non-zero digit is complicated; for details see the section
@@ -50,7 +51,9 @@ in the
 \fBpcre2pattern\fP
 .\"
 documentation, where details of escape processing in EBCDIC environments are
-also given.
+also given. \eN{U+hh..} is synonymous with \ex{hh..} in PCRE2 but is not
+supported in EBCDIC environments. Note that \eN not followed by an opening
+curly bracket has a different meaning (see below).
 .P
 When \ex is not followed by {, from zero to two hexadecimal digits are read,
 but if PCRE2_ALT_BSUX is set, \ex must be followed by two hexadecimal digits to
@@ -160,6 +163,7 @@ at release 5.18.
 .SH "SCRIPT NAMES FOR \ep AND \eP"
 .rs
 .sp
+Adlam,
 Ahom,
 Anatolian_Hieroglyphs,
 Arabic,
@@ -170,6 +174,7 @@ Bamum,
 Bassa_Vah,
 Batak,
 Bengali,
+Bhaiksuki,
 Bopomofo,
 Brahmi,
 Braille,
@@ -188,6 +193,7 @@ Cypriot,
 Cyrillic,
 Deseret,
 Devanagari,
+Dogra,
 Duployan,
 Egyptian_Hieroglyphs,
 Elbasan,
@@ -198,9 +204,11 @@ Gothic,
 Grantha,
 Greek,
 Gujarati,
+Gunjala_Gondi,
 Gurmukhi,
 Han,
 Hangul,
+Hanifi_Rohingya,
 Hanunoo,
 Hatran,
 Hebrew,
@@ -228,9 +236,13 @@ Lisu,
 Lycian,
 Lydian,
 Mahajani,
+Makasar,
 Malayalam,
 Mandaic,
 Manichaean,
+Marchen,
+Masaram_Gondi,
+Medefaidrin,
 Meetei_Mayek,
 Mende_Kikakui,
 Meroitic_Cursive,
@@ -243,7 +255,9 @@ Multani,
 Myanmar,
 Nabataean,
 New_Tai_Lue,
+Newa,
 Nko,
+Nushu,
 Ogham,
 Ol_Chiki,
 Old_Hungarian,
@@ -251,9 +265,11 @@ Old_Italic,
 Old_North_Arabian,
 Old_Permic,
 Old_Persian,
+Old_Sogdian,
 Old_South_Arabian,
 Old_Turkic,
 Oriya,
+Osage,
 Osmanya,
 Pahawh_Hmong,
 Palmyrene,
@@ -270,7 +286,9 @@ Shavian,
 Siddham,
 SignWriting,
 Sinhala,
+Sogdian,
 Sora_Sompeng,
+Soyombo,
 Sundanese,
 Syloti_Nagri,
 Syriac,
@@ -281,6 +299,7 @@ Tai_Tham,
 Tai_Viet,
 Takri,
 Tamil,
+Tangut,
 Telugu,
 Thaana,
 Thai,
@@ -290,7 +309,8 @@ Tirhuta,
 Ugaritic,
 Vai,
 Warang_Citi,
-Yi.
+Yi,
+Zanabazar_Square.
 .
 .
 .SH "CHARACTER CLASSES"
@@ -361,10 +381,10 @@ but some of them use Unicode properties if PCRE2_UCP is set. You can use
   \eG          first matching position in subject
 .
 .
-.SH "MATCH POINT RESET"
+.SH "REPORTED MATCH POINT SETTING"
 .rs
 .sp
-  \eK          reset start of match
+  \eK          set reported start of match
 .sp
 \eK is honoured in positive assertions, but ignored in negative ones.
 .
@@ -393,8 +413,6 @@ but some of them use Unicode properties if PCRE2_UCP is set. You can use
   (?>...)         atomic, non-capturing group
 .
 .
-.
-.
 .SH "COMMENT"
 .rs
 .sp
@@ -403,6 +421,8 @@ but some of them use Unicode properties if PCRE2_UCP is set. You can use
 .
 .SH "OPTION SETTING"
 .rs
+Changes of these options within a group are automatically cancelled at the end
+of the group.
 .sp
   (?i)            caseless
   (?J)            allow duplicate names
@@ -413,13 +433,20 @@ but some of them use Unicode properties if PCRE2_UCP is set. You can use
   (?x)            extended: ignore white space except in classes
   (?xx)           as (?x) but also ignore space and tab in classes
   (?-...)         unset option(s)
+  (?^)            unset imnsx options
 .sp
+Unsetting x or xx unsets both. Several options may be set at once, and a
+mixture of setting and unsetting such as (?i-x) is allowed, but there may be
+only one hyphen. Setting (but no unsetting) is allowed after (?^ for example
+(?^in). An option setting may appear at the start of a non-capturing group, for
+example (?i:...).
+.P
 The following are recognized only at the very start of a pattern or after one
 of the newline or \eR options with similar syntax. More than one of them may
 appear. For the first three, d is a decimal number.
 .sp
   (*LIMIT_DEPTH=d) set the backtracking limit to d
-  (*LIMIT_HEAP=d)  set the heap size limit to d kilobytes
+  (*LIMIT_HEAP=d)  set the heap size limit to d * 1024 bytes
   (*LIMIT_MATCH=d) set the match limit to d
   (*NOTEMPTY)      set PCRE2_NOTEMPTY when matching
   (*NOTEMPTY_ATSTART) set PCRE2_NOTEMPTY_ATSTART when matching
@@ -535,7 +562,11 @@ condition if the relevant named group exists.
 .SH "BACKTRACKING CONTROL"
 .rs
 .sp
-The following act immediately they are reached:
+All backtracking control verbs may be in the form (*VERB:NAME). For (*MARK) the
+name is mandatory, for the others it is optional. (*SKIP) changes its behaviour
+if :NAME is present. The others just set a name for passing back to the caller,
+but this is not a name that (*SKIP) can see. The following act immediately they
+are reached:
 .sp
   (*ACCEPT)       force successful match
   (*FAIL)         force backtrack; synonym (*F)
@@ -548,12 +579,13 @@ pattern is not anchored.
 .sp
   (*COMMIT)       overall failure, no advance of starting point
   (*PRUNE)        advance to next starting character
-  (*PRUNE:NAME)   equivalent to (*MARK:NAME)(*PRUNE)
   (*SKIP)         advance to current matching position
   (*SKIP:NAME)    advance to position corresponding to an earlier
                   (*MARK:NAME); if not found, the (*SKIP) is ignored
   (*THEN)         local failure, backtrack to next alternation
-  (*THEN:NAME)    equivalent to (*MARK:NAME)(*THEN)
+.sp
+The effect of one of these verbs in a group called as a subroutine is confined
+to the subroutine call.
 .
 .
 .SH "CALLOUTS"
@@ -589,6 +621,6 @@ Cambridge, England.
 .rs
 .sp
 .nf
-Last updated: 17 June 2017
-Copyright (c) 1997-2017 University of Cambridge.
+Last updated: 02 September 2018
+Copyright (c) 1997-2018 University of Cambridge.
 .fi

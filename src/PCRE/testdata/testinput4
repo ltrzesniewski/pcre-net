@@ -1394,28 +1394,15 @@
     \x{6e9} 
     \x{6ef}
     \x{6fa}  
-\= Expect no match
-    \x{650}
-    \x{651}  
-    \x{652}  
-    \x{653}  
-    \x{654} 
-    \x{655} 
-    
+
 /^\p{Cyrillic}/utf
     \x{1d2b} 
     
 /^\p{Common}/utf
-    \x{589}
-    \x{60c}
-    \x{61f}  
-    \x{964}
-    \x{965}  
+    \x{2116}
+    \x{1D183}  
 
 /^\p{Inherited}/utf
-    \x{64b}
-    \x{654}
-    \x{655}
     \x{200c} 
 \= Expect no match
     \x{64a}
@@ -2300,5 +2287,35 @@
     \x{123}\x{122}\x{123}
 \= Expect no match     
     \x{123}\x{124}\x{123}
+    
+/\N{U+1234}/utf
+    \x{1234}
+
+/[\N{U+1234}]/utf
+    \x{1234}
+    
+# Test the full list of Unicode "Pattern White Space" characters that are to
+# be ignored by /x. The pattern lines below may show up oddly in text editors
+# or when listed to the screen. Note that characters such as U+2002, which are
+# matched as space by \h and \v are *not* "Pattern White Space".
+
+/A‎‏  B/x,utf
+    AB
+
+/A B/x,utf
+    A\x{2002}B
+\= Expect no match
+    AB
+    
+# ------- 
+
+/[^\x{100}-\x{ffff}]*[\x80-\xff]/utf
+    \x{99}\x{99}\x{99}
+
+/[^\x{100}-\x{ffff}ABC]*[\x80-\xff]/utf
+    \x{99}\x{99}\x{99}
+
+/[^\x{100}-\x{ffff}]*[\x80-\xff]/i,utf
+    \x{99}\x{99}\x{99}
 
 # End of testinput4

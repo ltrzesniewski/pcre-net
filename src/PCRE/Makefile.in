@@ -767,6 +767,8 @@ PACKAGE_URL = @PACKAGE_URL@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PCRE2_DATE = @PCRE2_DATE@
+PCRE2_HAVE_INTTYPES_H = @PCRE2_HAVE_INTTYPES_H@
+PCRE2_HAVE_STDINT_H = @PCRE2_HAVE_STDINT_H@
 PCRE2_MAJOR = @PCRE2_MAJOR@
 PCRE2_MINOR = @PCRE2_MINOR@
 PCRE2_PRERELEASE = @PCRE2_PRERELEASE@
@@ -1064,7 +1066,8 @@ CLEANFILES = src/pcre2_chartables.c testSinput test3input test3output \
 	test3outputA test3outputB testtry teststdout teststderr \
 	teststderrgrep testtemp1grep testtemp2grep testtrygrep \
 	testNinputgrep
-DISTCLEANFILES = src/config.h.in~ config.h $(am__append_36)
+DISTCLEANFILES = src/config.h.in~ config.h pcre2.h.generic \
+	$(am__append_36)
 MAINTAINERCLEANFILES = src/pcre2.h.generic src/config.h.generic
 
 # Additional files to bundle with the distribution, over and above what
@@ -1129,7 +1132,7 @@ EXTRA_DIST = m4/ax_pthread.m4 m4/pcre2_visibility.m4 \
 	testdata/testoutput3A testdata/testoutput3B \
 	testdata/testoutput4 testdata/testoutput5 testdata/testoutput6 \
 	testdata/testoutput7 testdata/testoutput8-16-2 \
-	testdata/testoutput8-16-3 testdata/testoutput8-16-3 \
+	testdata/testoutput8-16-3 testdata/testoutput8-16-4 \
 	testdata/testoutput8-32-2 testdata/testoutput8-32-3 \
 	testdata/testoutput8-32-4 testdata/testoutput8-8-2 \
 	testdata/testoutput8-8-3 testdata/testoutput8-8-4 \

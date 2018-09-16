@@ -43,15 +43,25 @@ fi
 #   afteralltext       ignored
 #   dupnames           ignored (Perl always allows)
 #   jitstack           ignored
-#   mark               ignored
+#   mark               show mark information
 #   no_auto_possess    ignored
-#   no_start_optimize  ignored
+#   no_start_optimize  insert (??{""}) at pattern start (disables optimizing)
+#  -no_start_optimize  ignored
 #   subject_literal    does not process subjects for escapes
 #   ucp                sets Perl's /u modifier
 #   utf                invoke UTF-8 functionality
 #
+# Comment lines are ignored. The #pattern command can be used to set modifiers
+# that will be added to each subsequent pattern, after any modifiers it may
+# already have. NOTE: this is different to pcre2test where #pattern sets
+# defaults which can be overridden on individual patterns. The #subject command
+# may be used to set or unset a default "mark" modifier for data lines. This is
+# the only use of #subject that is supported. The #perltest, #forbid_utf, and
+# #newline_default commands, which are needed in the relevant pcre2test files,
+# are ignored. Any other #-command is ignored, with a warning message.
+#
 # The data lines must not have any pcre2test modifiers. Unless
-# "subject_litersl" is on the pattern, data lines are processed as
+# "subject_literal" is on the pattern, data lines are processed as
 # Perl double-quoted strings, so if they contain " $ or @ characters, these
 # have to be escaped. For this reason, all such characters in the
 # Perl-compatible testinput1 and testinput4 files are escaped so that they can
@@ -127,7 +137,42 @@ for (;;)
   printf "  re> " if $interact;
   last if ! ($_ = <$infile>);
   printf $outfile "$_" if ! $interact;
-  next if ($_ =~ /^\s*$/ || $_ =~ /^#/);
+  next if ($_ =~ /^\s*$/ || $_ =~ /^#[\s!]/);
+
+  # A few of pcre2test's #-commands are supported, or just ignored. Any others
+  # cause an error.
+
+  if ($_ =~ /^#pattern(.*)/)
+    {
+    $extra_modifiers = $1;
+    chomp($extra_modifiers);
+    $extra_modifiers =~ s/\s+$//;
+    next;
+    }
+  elsif ($_ =~ /^#subject(.*)/)
+    {
+    $mod = $1;
+    chomp($mod);
+    $mod =~ s/\s+$//;
+    if ($mod =~ s/(-?)mark,?//)
+      {
+      $minus = $1;
+      $default_show_mark = ($minus =~ /^$/);
+      }
+    if ($mod !~ /^\s*$/)
+      {
+      printf $outfile "** Warning: \"$mod\" in #subject ignored\n";
+      }
+    next;
+    }
+  elsif ($_ =~ /^#/)
+    {
+    if ($_ !~ /^#newline_default|^#perltest|^#forbid_utf/)
+      {
+      printf $outfile "** Warning: #-command ignored: %s", $_;
+      }
+    next;
+    }
 
   $pattern = $_;
 
@@ -146,7 +191,9 @@ for (;;)
 
   $pattern =~ /^\s*((.).*\2)(.*)$/s;
   $pat = $1;
-  $mod = $3;
+  $del = $2;
+  $mod = "$3,$extra_modifiers";
+  $mod =~ s/^,\s*//;
 
   # The private "aftertext" modifier means "print $' afterwards".
 
@@ -172,18 +219,24 @@ for (;;)
 
   $mod =~ s/jitstack=\d+,?//;
 
-  # Remove "mark" (asks pcre2test to check MARK data) */
+  # The "mark" modifier requests checking of MARK data */
 
-  $mod =~ s/mark,?//;
+  $show_mark = $default_show_mark | ($mod =~ s/mark,?//);
 
   # "ucp" asks pcre2test to set PCRE2_UCP; change this to /u for Perl
 
   $mod =~ s/ucp,?/u/;
 
-  # Remove "no_auto_possess" and "no_start_optimize" (disable PCRE2 optimizations)
+  # Remove "no_auto_possess".
 
   $mod =~ s/no_auto_possess,?//;
-  $mod =~ s/no_start_optimize,?//;
+
+  # Use no_start_optimize (disable PCRE2 start-up optimization) to disable Perl
+  # optimization by inserting (??{""}) at the start of the pattern. We may
+  # also encounter -no_start_optimize from a #pattern setting.
+
+  $mod =~ s/-no_start_optimize,?//;
+  if ($mod =~ s/no_start_optimize,?//) { $pat =~ s/$del/$del(??{""})/; }
 
   # Add back retained modifiers and check that the pattern is valid.
 
@@ -279,7 +332,7 @@ for (;;)
     elsif (scalar(@subs) == 0)
       {
       printf $outfile "No match";
-      if (defined $REGERROR && $REGERROR != 1)
+      if ($show_mark && defined $REGERROR && $REGERROR != 1)
         { printf $outfile (", mark = %s", &pchars($REGERROR)); }
       printf $outfile "\n";
       }
@@ -307,7 +360,7 @@ for (;;)
       # set and the input pattern was a UTF-8 string. We can, however, force
       # it to be so marked.
 
-      if (defined $REGMARK && $REGMARK != 1)
+      if ($show_mark && defined $REGMARK && $REGMARK != 1)
         {
         $xx = $REGMARK;
         $xx = Encode::decode_utf8($xx) if $utf8;

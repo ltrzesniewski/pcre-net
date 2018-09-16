@@ -13,7 +13,7 @@ distribution because other apparatus is needed to compile pcre2grep for z/OS.
 The header can be found in the special z/OS distribution, which is available
 from www.zaconsultants.net or from www.cbttape.org.
 
-           Copyright (c) 1997-2017 University of Cambridge
+           Copyright (c) 1997-2018 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -64,8 +64,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 /* Some cmake's define it still */
-#if defined(__CYGWIN__) && !defined(WIN32)
-#define WIN32
+#if defined(__CYGWIN__) && defined(WIN32)
+#undef WIN32
 #endif
 
 #ifdef WIN32
@@ -95,6 +95,14 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include "pcre2.h"
+
+/* Older versions of MSVC lack snprintf(). This define allows for
+warning/error-free compilation and testing with MSVC compilers back to at least
+MSVC 10/2010. Except for VC6 (which is missing some fundamentals and fails). */
+
+#if defined(_MSC_VER) && (_MSC_VER < 1900)
+#define snprintf _snprintf
+#endif
 
 #define FALSE 0
 #define TRUE 1
@@ -303,6 +311,7 @@ also for include/exclude patterns. */
 typedef struct patstr {
   struct patstr *next;
   char *string;
+  PCRE2_SIZE length;
   pcre2_code *compiled;
 } patstr;
 
@@ -407,7 +416,7 @@ static option_item optionlist[] = {
   { OP_NODATA,     N_LBUFFER, NULL,             "line-buffered", "use line buffering" },
   { OP_NODATA,     N_LOFFSETS, NULL,            "line-offsets",  "output line numbers and offsets, not text" },
   { OP_STRING,     N_LOCALE, &locale,           "locale=locale", "use the named locale" },
-  { OP_SIZE,       N_H_LIMIT, &heap_limit,      "heap-limit=number",  "set PCRE2 heap limit option (kilobytes)" },
+  { OP_SIZE,       N_H_LIMIT, &heap_limit,      "heap-limit=number",  "set PCRE2 heap limit option (kibibytes)" },
   { OP_U32NUMBER,  N_M_LIMIT, &match_limit,     "match-limit=number", "set PCRE2 match limit option" },
   { OP_U32NUMBER,  N_M_LIMIT_DEP, &depth_limit, "depth-limit=number", "set PCRE2 depth limit option" },
   { OP_U32NUMBER,  N_M_LIMIT_DEP, &depth_limit, "recursion-limit=number", "obsolete synonym for depth-limit" },
@@ -459,6 +468,43 @@ const char utf8_table4[] = {
   2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
   3,3,3,3,3,3,3,3,4,4,4,4,5,5,5,5 };
 
+
+#if !defined(VPCOMPAT) && !defined(HAVE_MEMMOVE)
+/*************************************************
+*    Emulated memmove() for systems without it   *
+*************************************************/
+
+/* This function can make use of bcopy() if it is available. Otherwise do it by
+steam, as there are some non-Unix environments that lack both memmove() and
+bcopy(). */
+
+static void *
+emulated_memmove(void *d, const void *s, size_t n)
+{
+#ifdef HAVE_BCOPY
+bcopy(s, d, n);
+return d;
+#else
+size_t i;
+unsigned char *dest = (unsigned char *)d;
+const unsigned char *src = (const unsigned char *)s;
+if (dest > src)
+  {
+  dest += n;
+  src += n;
+  for (i = 0; i < n; ++i) *(--dest) = *(--src);
+  return (void *)dest;
+  }
+else
+  {
+  for (i = 0; i < n; ++i) *dest++ = *src++;
+  return (void *)(dest - n);
+  }
+#endif   /* not HAVE_BCOPY */
+}
+#undef memmove
+#define memmove(d,s,n) emulated_memmove(d,s,n)
+#endif   /* not VPCOMPAT && not HAVE_MEMMOVE */
 
 
 /*************************************************
@@ -557,13 +603,14 @@ exit(rc);
 
 Arguments:
   s          pattern string to add
+  patlen     length of pattern
   after      if not NULL points to item to insert after
 
 Returns:     new pattern block or NULL on error
 */
 
 static patstr *
-add_pattern(char *s, patstr *after)
+add_pattern(char *s, PCRE2_SIZE patlen, patstr *after)
 {
 patstr *p = (patstr *)malloc(sizeof(patstr));
 if (p == NULL)
@@ -571,7 +618,7 @@ if (p == NULL)
   fprintf(stderr, "pcre2grep: malloc failed\n");
   pcre2grep_exit(2);
   }
-if (strlen(s) > MAXPATLEN)
+if (patlen > MAXPATLEN)
   {
   fprintf(stderr, "pcre2grep: pattern is too long (limit is %d bytes)\n",
     MAXPATLEN);
@@ -580,6 +627,7 @@ if (strlen(s) > MAXPATLEN)
   }
 p->next = NULL;
 p->string = s;
+p->length = patlen;
 p->compiled = NULL;
 
 if (after != NULL)
@@ -1276,12 +1324,14 @@ return om;
 *            Read one line of input              *
 *************************************************/
 
-/* Normally, input is read using fread() (or gzread, or BZ2_read) into a large
-buffer, so many lines may be read at once. However, doing this for tty input
-means that no output appears until a lot of input has been typed. Instead, tty
-input is handled line by line. We cannot use fgets() for this, because it does
-not stop at a binary zero, and therefore there is no way of telling how many
-characters it has read, because there may be binary zeros embedded in the data.
+/* Normally, input that is to be scanned is read using fread() (or gzread, or
+BZ2_read) into a large buffer, so many lines may be read at once. However,
+doing this for tty input means that no output appears until a lot of input has
+been typed. Instead, tty input is handled line by line. We cannot use fgets()
+for this, because it does not stop at a binary zero, and therefore there is no
+way of telling how many characters it has read, because there may be binary
+zeros embedded in the data. This function is also used for reading patterns
+from files (the -f option).
 
 Arguments:
   buffer     the buffer to read into
@@ -1291,7 +1341,7 @@ Arguments:
 Returns:     the number of characters read, zero at end of file
 */
 
-static unsigned int
+static PCRE2_SIZE
 read_one_line(char *buffer, int length, FILE *f)
 {
 int c;
@@ -1651,11 +1701,11 @@ Returns:      TRUE if there was a match
 */
 
 static BOOL
-match_patterns(char *matchptr, size_t length, unsigned int options,
-  size_t startoffset, int *mrc)
+match_patterns(char *matchptr, PCRE2_SIZE length, unsigned int options,
+  PCRE2_SIZE startoffset, int *mrc)
 {
 int i;
-size_t slen = length;
+PCRE2_SIZE slen = length;
 patstr *p = patterns;
 const char *msg = "this text:\n\n";
 
@@ -2314,10 +2364,10 @@ int filepos = 0;
 unsigned long int linenumber = 1;
 unsigned long int lastmatchnumber = 0;
 unsigned long int count = 0;
-char *lastmatchrestart = NULL;
+char *lastmatchrestart = main_buffer;
 char *ptr = main_buffer;
 char *endptr;
-size_t bufflength;
+PCRE2_SIZE bufflength;
 BOOL binary = FALSE;
 BOOL endhyphenpending = FALSE;
 BOOL input_line_buffered = line_buffered;
@@ -2339,7 +2389,7 @@ bufflength = fill_buffer(handle, frtype, main_buffer, bufsize,
   input_line_buffered);
 
 #ifdef SUPPORT_LIBBZ2
-if (frtype == FR_LIBBZ2 && (int)bufflength < 0) return 2;   /* Gotcha: bufflength is size_t; */
+if (frtype == FR_LIBBZ2 && (int)bufflength < 0) return 2;   /* Gotcha: bufflength is PCRE2_SIZE; */
 #endif
 
 endptr = main_buffer + bufflength;
@@ -2368,8 +2418,8 @@ while (ptr < endptr)
   unsigned int options = 0;
   BOOL match;
   char *t = ptr;
-  size_t length, linelength;
-  size_t startoffset = 0;
+  PCRE2_SIZE length, linelength;
+  PCRE2_SIZE startoffset = 0;
 
   /* At this point, ptr is at the start of a line. We need to find the length
   of the subject string to pass to pcre2_match(). In multiline mode, it is the
@@ -2381,7 +2431,7 @@ while (ptr < endptr)
 
   t = end_of_line(t, endptr, &endlinelength);
   linelength = t - ptr - endlinelength;
-  length = multiline? (size_t)(endptr - ptr) : linelength;
+  length = multiline? (PCRE2_SIZE)(endptr - ptr) : linelength;
 
   /* Check to see if the line we are looking at extends right to the very end
   of the buffer without a line terminator. This means the line is too long to
@@ -2560,7 +2610,7 @@ while (ptr < endptr)
       {
       if (!invert)
         {
-        size_t oldstartoffset;
+        PCRE2_SIZE oldstartoffset;
 
         if (printname != NULL) fprintf(stdout, "%s:", printname);
         if (number) fprintf(stdout, "%lu:", linenumber);
@@ -2647,7 +2697,7 @@ while (ptr < endptr)
           startoffset -= (int)(linelength + endlinelength);
           t = end_of_line(ptr, endptr, &endlinelength);
           linelength = t - ptr - endlinelength;
-          length = (size_t)(endptr - ptr);
+          length = (PCRE2_SIZE)(endptr - ptr);
           }
 
         goto ONLY_MATCHING_RESTART;
@@ -2812,7 +2862,7 @@ while (ptr < endptr)
             endprevious -= (int)(linelength + endlinelength);
             t = end_of_line(ptr, endptr, &endlinelength);
             linelength = t - ptr - endlinelength;
-            length = (size_t)(endptr - ptr);
+            length = (PCRE2_SIZE)(endptr - ptr);
             }
 
           /* If startoffset is at the exact end of the line it means this
@@ -2895,7 +2945,7 @@ while (ptr < endptr)
   /* If input is line buffered, and the buffer is not yet full, read another
   line and add it into the buffer. */
 
-  if (input_line_buffered && bufflength < (size_t)bufsize)
+  if (input_line_buffered && bufflength < (PCRE2_SIZE)bufsize)
     {
     int add = read_one_line(ptr, bufsize - (int)(ptr - main_buffer), in);
     bufflength += add;
@@ -2907,7 +2957,7 @@ while (ptr < endptr)
   1/3 and refill it. Before we do this, if some unprinted "after" lines are
   about to be lost, print them. */
 
-  if (bufflength >= (size_t)bufsize && ptr > main_buffer + 2*bufthird)
+  if (bufflength >= (PCRE2_SIZE)bufsize && ptr > main_buffer + 2*bufthird)
     {
     if (after_context > 0 &&
         lastmatchnumber > 0 &&
@@ -2919,7 +2969,7 @@ while (ptr < endptr)
 
     /* Now do the shuffle */
 
-    memmove(main_buffer, main_buffer + bufthird, 2*bufthird);
+    (void)memmove(main_buffer, main_buffer + bufthird, 2*bufthird);
     ptr -= bufthird;
 
     bufflength = 2*bufthird + fill_buffer(handle, frtype,
@@ -3395,9 +3445,8 @@ PCRE2_SIZE patlen, erroffset;
 PCRE2_UCHAR errmessbuffer[ERRBUFSIZ];
 
 if (p->compiled != NULL) return TRUE;
-
 ps = p->string;
-patlen = strlen(ps);
+patlen = p->length;
 
 if ((options & PCRE2_LITERAL) != 0)
   {
@@ -3407,8 +3456,8 @@ if ((options & PCRE2_LITERAL) != 0)
 
   if (ellength != 0)
     {
-    if (add_pattern(pe, p) == NULL) return FALSE;
-    patlen = (int)(pe - ps - ellength);
+    patlen = pe - ps - ellength;
+    if (add_pattern(pe, p->length-patlen-ellength, p) == NULL) return FALSE;
     }
   }
 
@@ -3470,6 +3519,7 @@ static BOOL
 read_pattern_file(char *name, patstr **patptr, patstr **patlastptr)
 {
 int linenumber = 0;
+PCRE2_SIZE patlen;
 FILE *f;
 const char *filename;
 char buffer[MAXPATLEN+20];
@@ -3490,20 +3540,18 @@ else
   filename = name;
   }
 
-while (fgets(buffer, sizeof(buffer), f) != NULL)
+while ((patlen = read_one_line(buffer, sizeof(buffer), f)) > 0)
   {
-  char *s = buffer + (int)strlen(buffer);
-  while (s > buffer && isspace((unsigned char)(s[-1]))) s--;
-  *s = 0;
+  while (patlen > 0 && isspace((unsigned char)(buffer[patlen-1]))) patlen--;
   linenumber++;
-  if (buffer[0] == 0) continue;   /* Skip blank lines */
+  if (patlen == 0) continue;   /* Skip blank lines */
 
   /* Note: this call to add_pattern() puts a pointer to the local variable
   "buffer" into the pattern chain. However, that pointer is used only when
   compiling the pattern, which happens immediately below, so we flatten it
   afterwards, as a precaution against any later code trying to use it. */
 
-  *patlastptr = add_pattern(buffer, *patlastptr);
+  *patlastptr = add_pattern(buffer, patlen, *patlastptr);
   if (*patlastptr == NULL)
     {
     if (f != stdin) fclose(f);
@@ -3513,8 +3561,9 @@ while (fgets(buffer, sizeof(buffer), f) != NULL)
 
   /* This loop is needed because compiling a "pattern" when -F is set may add
   on additional literal patterns if the original contains a newline. In the
-  common case, it never will, because fgets() stops at a newline. However,
-  the -N option can be used to give pcre2grep a different newline setting. */
+  common case, it never will, because read_one_line() stops at a newline.
+  However, the -N option can be used to give pcre2grep a different newline
+  setting. */
 
   for(;;)
     {
@@ -3659,14 +3708,23 @@ for (i = 1; i < argc; i++)
         {
         char buff1[24];
         char buff2[24];
+        int ret;
 
         int baselen = (int)(opbra - op->long_name);
         int fulllen = (int)(strchr(op->long_name, ')') - op->long_name + 1);
         int arglen = (argequals == NULL || equals == NULL)?
           (int)strlen(arg) : (int)(argequals - arg);
 
-        sprintf(buff1, "%.*s", baselen, op->long_name);
-        sprintf(buff2, "%s%.*s", buff1, fulllen - baselen - 2, opbra + 1);
+        if ((ret = snprintf(buff1, sizeof(buff1), "%.*s", baselen, op->long_name),
+             ret < 0 || ret > (int)sizeof(buff1)) ||
+            (ret = snprintf(buff2, sizeof(buff2), "%s%.*s", buff1,
+                     fulllen - baselen - 2, opbra + 1),
+             ret < 0 || ret > (int)sizeof(buff2)))
+          {
+          fprintf(stderr, "pcre2grep: Buffer overflow when parsing %s option\n",
+            op->long_name);
+          pcre2grep_exit(2);
+          }
 
         if (strncmp(arg, buff1, arglen) == 0 ||
            strncmp(arg, buff2, arglen) == 0)
@@ -3833,7 +3891,8 @@ for (i = 1; i < argc; i++)
   else if (op->type == OP_PATLIST)
     {
     patdatastr *pd = (patdatastr *)op->dataptr;
-    *(pd->lastptr) = add_pattern(option_data, *(pd->lastptr));
+    *(pd->lastptr) = add_pattern(option_data, (PCRE2_SIZE)strlen(option_data),
+      *(pd->lastptr));
     if (*(pd->lastptr) == NULL) goto EXIT2;
     if (*(pd->anchor) == NULL) *(pd->anchor) = *(pd->lastptr);
     }
@@ -4095,7 +4154,9 @@ the first argument is the one and only pattern, and it must exist. */
 if (patterns == NULL && pattern_files == NULL)
   {
   if (i >= argc) return usage(2);
-  patterns = patterns_last = add_pattern(argv[i++], NULL);
+  patterns = patterns_last = add_pattern(argv[i], (PCRE2_SIZE)strlen(argv[i]),
+    NULL);
+  i++;
   if (patterns == NULL) goto EXIT2;
   }
 

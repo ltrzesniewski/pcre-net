@@ -231,7 +231,7 @@ noinst_PROGRAMS =
 # and 'make maintainer-clean'.
 
 CLEANFILES =
-DISTCLEANFILES = src/config.h.in~ config.h
+DISTCLEANFILES = src/config.h.in~ config.h pcre2.h.generic
 MAINTAINERCLEANFILES =
 
 # Additional files to bundle with the distribution, over and above what
@@ -657,7 +657,7 @@ EXTRA_DIST += \
   testdata/testoutput7 \
   testdata/testoutput8-16-2 \
   testdata/testoutput8-16-3 \
-  testdata/testoutput8-16-3 \
+  testdata/testoutput8-16-4 \
   testdata/testoutput8-32-2 \
   testdata/testoutput8-32-3 \
   testdata/testoutput8-32-4 \

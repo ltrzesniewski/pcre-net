@@ -171,10 +171,12 @@ library. They are also documented in the pcre2build man page.
   give large performance improvements on certain platforms, add --enable-jit to
   the "configure" command. This support is available only for certain hardware
   architectures. If you try to enable it on an unsupported architecture, there
-  will be a compile time error. If you are running under SELinux you may also
-  want to add --enable-jit-sealloc, which enables the use of an execmem
-  allocator in JIT that is compatible with SELinux. This has no effect if JIT
-  is not enabled.
+  will be a compile time error. If in doubt, use --enable-jit=auto, which
+  enables JIT only if the current hardware is supported.
+
+. If you are enabling JIT under SELinux you may also want to add
+  --enable-jit-sealloc, which enables the use of an execmem allocator in JIT
+  that is compatible with SELinux. This has no effect if JIT is not enabled.
 
 . If you do not want to make use of the default support for UTF-8 Unicode
   character strings in the 8-bit library, UTF-16 Unicode character strings in
@@ -239,9 +241,11 @@ library. They are also documented in the pcre2build man page.
   discussion in the pcre2api man page (search for pcre2_set_match_limit).
 
 . There is a separate counter that limits the depth of nested backtracking
-  during a matching process, which indirectly limits the amount of heap memory
-  that is used. This also has a default of ten million, which is essentially
-  "unlimited". You can change the default by setting, for example,
+  (pcre2_match()) or nested function calls (pcre2_dfa_match()) during a
+  matching process, which indirectly limits the amount of heap memory that is
+  used, and in the case of pcre2_dfa_match() the amount of stack as well. This
+  counter also has a default of ten million, which is essentially "unlimited".
+  You can change the default by setting, for example,
 
   --with-match-limit-depth=5000
 
@@ -249,16 +253,17 @@ library. They are also documented in the pcre2build man page.
   pcre2_set_depth_limit).
 
 . You can also set an explicit limit on the amount of heap memory used by
-  the pcre2_match() interpreter:
+  the pcre2_match() and pcre2_dfa_match() interpreters:
 
   --with-heap-limit=500
 
-  The units are kilobytes. This limit does not apply when the JIT optimization
-  (which has its own memory control features) is used. There is more discussion
-  on the pcre2api man page (search for pcre2_set_heap_limit).
+  The units are kibibytes (units of 1024 bytes). This limit does not apply when
+  the JIT optimization (which has its own memory control features) is used.
+  There is more discussion on the pcre2api man page (search for
+  pcre2_set_heap_limit).
 
 . In the 8-bit library, the default maximum compiled pattern size is around
-  64K bytes. You can increase this by adding --with-link-size=3 to the
+  64 kibibytes. You can increase this by adding --with-link-size=3 to the
   "configure" command. PCRE2 then uses three bytes instead of two for offsets
   to different parts of the compiled pattern. In the 16-bit library,
   --with-link-size=3 is the same as --with-link-size=4, which (in both
@@ -315,10 +320,10 @@ library. They are also documented in the pcre2build man page.
 . When JIT support is enabled, pcre2grep automatically makes use of it, unless
   you add --disable-pcre2grep-jit to the "configure" command.
 
-. On non-Windows sytems there is support for calling external scripts during
-  matching in the pcre2grep command via PCRE2's callout facility with string
-  arguments. This support can be disabled by adding --disable-pcre2grep-callout
-  to the "configure" command.
+. There is support for calling external programs during matching in the
+  pcre2grep command, using PCRE2's callout facility with string arguments. This
+  support can be disabled by adding --disable-pcre2grep-callout to the
+  "configure" command.
 
 . The pcre2grep program currently supports only 8-bit data files, and so
   requires the 8-bit PCRE2 library. It is possible to compile pcre2grep to use
@@ -883,4 +888,4 @@ The distribution should contain the files listed below.
 Philip Hazel
 Email local part: ph10
 Email domain: cam.ac.uk
-Last updated: 12 September 2017
+Last updated: 17 June 2018

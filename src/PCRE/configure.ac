@@ -9,18 +9,18 @@ dnl The PCRE2_PRERELEASE feature is for identifying release candidates. It might
 dnl be defined as -RC2, for example. For real releases, it should be empty.
 
 m4_define(pcre2_major, [10])
-m4_define(pcre2_minor, [31])
+m4_define(pcre2_minor, [32])
 m4_define(pcre2_prerelease, [])
-m4_define(pcre2_date, [2018-02-12])
+m4_define(pcre2_date, [2018-09-10])
 
 # NOTE: The CMakeLists.txt file searches for the above variables in the first
 # 50 lines of this file. Please update that if the variables above are moved.
 
 # Libtool shared library interface versions (current:revision:age)
-m4_define(libpcre2_8_version,     [7:0:7])
-m4_define(libpcre2_16_version,    [7:0:7])
-m4_define(libpcre2_32_version,    [7:0:7])
-m4_define(libpcre2_posix_version, [2:0:0])
+m4_define(libpcre2_8_version,     [7:1:7])
+m4_define(libpcre2_16_version,    [7:1:7])
+m4_define(libpcre2_32_version,    [7:1:7])
+m4_define(libpcre2_posix_version, [2:1:0])
 
 AC_PREREQ(2.57)
 AC_INIT(PCRE2, pcre2_major.pcre2_minor[]pcre2_prerelease, , pcre2)
@@ -142,6 +142,18 @@ AC_ARG_ENABLE(jit,
               AS_HELP_STRING([--enable-jit],
                              [enable Just-In-Time compiling support]),
               , enable_jit=no)
+
+# This code enables JIT if the hardware supports it.
+if test "$enable_jit" = "auto"; then
+  AC_LANG(C)
+  AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+  #define SLJIT_CONFIG_AUTO 1
+  #include "src/sljit/sljitConfigInternal.h"
+  #if (defined SLJIT_CONFIG_UNSUPPORTED && SLJIT_CONFIG_UNSUPPORTED)
+  #error unsupported
+  #endif]])], enable_jit=yes, enable_jit=no)
+  echo checking for JIT support on this hardware... $enable_jit
+fi
 
 # Handle --enable-jit-sealloc (disabled by default)
 AC_ARG_ENABLE(jit-sealloc,
@@ -276,7 +288,7 @@ AC_ARG_WITH(parens-nest-limit,
 # Handle --with-heap-limit
 AC_ARG_WITH(heap-limit,
             AS_HELP_STRING([--with-heap-limit=N],
-                           [default limit on heap memory (kilobytes, default=20000000)]),
+                           [default limit on heap memory (kibibytes, default=20000000)]),
             , with_heap_limit=20000000)
 
 # Handle --with-match-limit=N
@@ -423,10 +435,10 @@ to set the macro values. In this case, you do not have to set -DHAVE_CONFIG_H,
 but if you do, default values will be taken from config.h for non-boolean
 macros that are not defined on the command line.
 
-Boolean macros such as HAVE_STDLIB_H and SUPPORT_PCRE2_8 should either be defined
-(conventionally to 1) for TRUE, and not defined at all for FALSE. All such
-macros are listed as a commented #undef in config.h.generic. Macros such as
-MATCH_LIMIT, whose actual value is relevant, have defaults defined, but are
+Boolean macros such as HAVE_STDLIB_H and SUPPORT_PCRE2_8 should either be
+defined (conventionally to 1) for TRUE, and not defined at all for FALSE. All
+such macros are listed as a commented #undef in config.h.generic. Macros such
+as MATCH_LIMIT, whose actual value is relevant, have defaults defined, but are
 surrounded by #ifndef/#endif lines so that the value can be overridden by -D.
 
 PCRE2 uses memmove() if HAVE_MEMMOVE is defined; otherwise it uses bcopy() if
@@ -438,6 +450,11 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h sys/types.h sys/stat.h dirent.h)
 AC_CHECK_HEADERS([windows.h], [HAVE_WINDOWS_H=1])
 AC_CHECK_HEADERS([sys/wait.h], [HAVE_SYS_WAIT_H=1])
+
+AC_CHECK_HEADERS([stdint.h], [PCRE2_HAVE_STDINT_H=1], [PCRE2_HAVE_STDINT_H=0])
+AC_CHECK_HEADERS([inttypes.h], [PCRE2_HAVE_INTTYPES_H=1], [PCRE2_HAVE_INTTYPES_H=0])
+AC_SUBST([PCRE2_HAVE_STDINT_H])
+AC_SUBST([PCRE2_HAVE_INTTYPES_H])
 
 # Conditional compilation
 AM_CONDITIONAL(WITH_PCRE2_8, test "x$enable_pcre2_8" = "xyes")
@@ -694,8 +711,8 @@ fi
 AC_DEFINE_UNQUOTED([LINK_SIZE], [$with_link_size], [
   The value of LINK_SIZE determines the number of bytes used to store
   links as offsets within the compiled regex. The default is 2, which
-  allows for compiled patterns up to 64K long. This covers the vast
-  majority of cases. However, PCRE2 can also be compiled to use 3 or 4
+  allows for compiled patterns up to 65535 code units long. This covers the
+  vast majority of cases. However, PCRE2 can also be compiled to use 3 or 4
   bytes instead. This allows for longer patterns in extreme cases.])
 
 AC_DEFINE_UNQUOTED([PARENS_NEST_LIMIT], [$with_parens_nest_limit], [
@@ -706,10 +723,11 @@ AC_DEFINE_UNQUOTED([PARENS_NEST_LIMIT], [$with_parens_nest_limit], [
 AC_DEFINE_UNQUOTED([MATCH_LIMIT], [$with_match_limit], [
   The value of MATCH_LIMIT determines the default number of times the
   pcre2_match() function can record a backtrack position during a single
-  matching attempt. There is a runtime interface for setting a different limit.
-  The limit exists in order to catch runaway regular expressions that take for
-  ever to determine that they do not match. The default is set very large so
-  that it does not accidentally catch legitimate cases.])
+  matching attempt. The value is also used to limit a loop counter in
+  pcre2_dfa_match(). There is a runtime interface for setting a different
+  limit. The limit exists in order to catch runaway regular expressions that
+  take for ever to determine that they do not match. The default is set very
+  large so that it does not accidentally catch legitimate cases.])
 
 # --with-match-limit-recursion is an obsolete synonym for --with-match-limit-depth
 
@@ -733,11 +751,15 @@ AC_DEFINE_UNQUOTED([MATCH_LIMIT_DEPTH], [$with_match_limit_depth], [
   the maximum amount of heap memory that is used. The value of
   MATCH_LIMIT_DEPTH provides this facility. To have any useful effect, it must
   be less than the value of MATCH_LIMIT. The default is to use the same value
-  as MATCH_LIMIT. There is a runtime method for setting a different limit.])
+  as MATCH_LIMIT. There is a runtime method for setting a different limit. In
+  the case of pcre2_dfa_match(), this limit controls the depth of the internal
+  nested function calls that are used for pattern recursions, lookarounds, and
+  atomic groups.])
 
 AC_DEFINE_UNQUOTED([HEAP_LIMIT], [$with_heap_limit], [
-  This limits the amount of memory that pcre2_match() may use while matching
-  a pattern. The value is in kilobytes.])
+  This limits the amount of memory that may be used while matching
+  a pattern. It applies to both pcre2_match() and pcre2_dfa_match(). It does
+  not apply to JIT matching. The value is in kibibytes (units of 1024 bytes).])
 
 AC_DEFINE([MAX_NAME_SIZE], [32], [
   This limit is parameterized just in case anybody ever wants to
@@ -817,7 +839,7 @@ AC_SUBST(EXTRA_LIBPCRE2_POSIX_LDFLAGS)
 
 # When we run 'make distcheck', use these arguments. Turning off compiler
 # optimization makes it run faster.
-DISTCHECK_CONFIGURE_FLAGS="CFLAGS='' CXXFLAGS='' --enable-pcre2-16 --enable-pcre2-32 --enable-jit --enable-utf"
+DISTCHECK_CONFIGURE_FLAGS="CFLAGS='' CXXFLAGS='' --enable-pcre2-16 --enable-pcre2-32 --enable-jit"
 AC_SUBST(DISTCHECK_CONFIGURE_FLAGS)
 
 # Check that, if --enable-pcre2grep-libz or --enable-pcre2grep-libbz2 is
@@ -1000,7 +1022,7 @@ $PACKAGE-$VERSION configuration summary:
     Rebuild char tables ................ : ${enable_rebuild_chartables}
     Internal link size ................. : ${with_link_size}
     Nested parentheses limit ........... : ${with_parens_nest_limit}
-    Heap limit ......................... : ${with_heap_limit} kilobytes
+    Heap limit ......................... : ${with_heap_limit} kibibytes
     Match limit ........................ : ${with_match_limit}
     Match depth limit .................. : ${with_match_limit_depth}
     Build shared libs .................. : ${enable_shared}

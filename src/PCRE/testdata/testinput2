@@ -910,6 +910,8 @@
 
 /[:x:]/I
 
+/\F/I
+
 /\l/I
 
 /\L/I
@@ -2949,10 +2951,11 @@
 
 /abc(*:)pqr/
 
-/abc(*FAIL:123)xyz/
+/(*COMMIT:X)/B
 
 # This should, and does, fail. In Perl, it does not, which I think is a
 # bug because replacing the B in the pattern by (B|D) does make it fail.
+# Turning off Perl's optimization by inserting (??{""}) also makes it fail.
 
 /A(*COMMIT)B/aftertext,mark
 \= Expect no match
@@ -4007,6 +4010,9 @@
 /(?(VERSION>=10.0)yes|no)/I
     yesno
 
+/(?(VERSION>=10.04)yes|no)/
+    yesno
+
 /(?(VERSION=8)yes){3}/BI,aftertext
     yesno
 
@@ -4643,6 +4649,9 @@ B)x/alt_verbnames,mark
 
 /(?=a\K)/replace=z
     BaCaD
+    
+/(?<=\K.)/g,replace=-
+    ab
 
 /(?'abcdefghijklmnopqrstuvwxyzABCDEFG'toolong)/
 
@@ -4934,6 +4943,9 @@ a)"xI
 
 //replace=0
     \=offset=7
+
+/(?<=\G.)/g,replace=+
+    abc
 
 ".+\QX\E+"B,no_auto_possess
 
@@ -5428,5 +5440,69 @@ a)"xI
 /^(a?)+b/B
 
 /(?=a+)a(a+)++b/B
+
+/(?<=(?=.){4,5}x)/B
+
+# Perl behaves differently with these when optimization is turned off
+
+/a(*PRUNE:X)bc|qq/mark,no_start_optimize
+\= Expect no match
+    axy
+
+/a(*THEN:X)bc|qq/mark,no_start_optimize
+\= Expect no match
+    axy
+
+/(?^x-i)AB/ 
+
+/(?^-i)AB/ 
+
+/(?x-i-i)/
+
+/(?(?=^))b/I
+    abc
+
+/(?(?=^)|)b/I
+    abc
+
+/(?(?=^)|^)b/I
+    bbc
+\= Expect no match
+    abc     
+
+/(?(1)^|^())/I
+
+/(?(1)^())b/I
+
+/(?(1)^())+b/I,aftertext
+    abc
+
+/(?(1)^()|^)+b/I,aftertext
+    bbc 
+\= Expect no match     
+    abc
+
+/(?(1)^()|^)*b/I,aftertext
+    bbc 
+    abc
+    xbc 
+
+/(?(1)^())+b/I,aftertext
+    abc
+
+/(?(1)^a()|^a)+b/I,aftertext
+    abc 
+\= Expect no match     
+    bbc
+
+/(?(1)^|^(a))+b/I,aftertext
+    abc 
+\= Expect no match     
+    bbc
+
+/(?(1)^a()|^a)*b/I,aftertext
+    abc 
+    bbc
+    xbc 
 
 # End of testinput2

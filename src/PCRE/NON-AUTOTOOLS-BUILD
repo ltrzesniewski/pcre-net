@@ -10,6 +10,7 @@ This document contains the following sections:
   Calling conventions in Windows environments
   Comments about Win32 builds
   Building PCRE2 on Windows with CMake
+  Building PCRE2 on Windows with Visual Studio
   Testing with RunTest.bat
   Building PCRE2 on native z/OS and z/VM
 
@@ -126,7 +127,7 @@ can skip ahead to the CMake section.
      src/pcre2_jit_match.c and src/pcre2_jit_misc.c, so you should not compile
      these yourself.
 
-     Not also that the pcre2_fuzzsupport.c file contains special code that is
+     Note also that the pcre2_fuzzsupport.c file contains special code that is
      useful to those who want to run fuzzing tests on the PCRE2 library. Unless
      you are doing that, you can ignore it.
 
@@ -185,7 +186,7 @@ can skip ahead to the CMake section.
 
 STACK SIZE IN WINDOWS ENVIRONMENTS
 
-Prior to release 10.30 the default system stack size of 1Mb in some Windows
+Prior to release 10.30 the default system stack size of 1MiB in some Windows
 environments caused issues with some tests. This should no longer be the case
 for 10.30 and later releases.
 
@@ -330,6 +331,18 @@ cache can be deleted by selecting "File > Delete Cache".
     available for review in Testing\Temporary under your build dir.
 
 
+BUILDING PCRE2 ON WINDOWS WITH VISUAL STUDIO
+
+The code currently cannot be compiled without a stdint.h header, which is
+available only in relatively recent versions of Visual Studio. However, this
+portable and permissively-licensed implementation of the header worked without
+issue:
+
+  http://www.azillionmonkeys.com/qed/pstdint.h
+
+Just rename it and drop it into the top level of the build tree.
+
+
 TESTING WITH RUNTEST.BAT
 
 If configured with CMake, building the test project ("make test" or building
@@ -382,6 +395,6 @@ Everything in that location, source and executable, is in EBCDIC and native
 z/OS file formats. The port provides an API for LE languages such as COBOL and
 for the z/OS and z/VM versions of the Rexx languages.
 
-===============================
-Last Updated: 13 September 2017
-===============================
+===========================
+Last Updated: 19 April 2018
+===========================

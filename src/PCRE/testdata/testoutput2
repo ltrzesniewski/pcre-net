@@ -3244,20 +3244,23 @@ Failed: error 113 at offset 0: POSIX collating elements are not supported
 /[:x:]/I
 Failed: error 112 at offset 0: POSIX named classes are supported only within a class
 
+/\F/I
+Failed: error 137 at offset 2: PCRE2 does not support \F, \L, \l, \N{name}, \U, or \u
+
 /\l/I
-Failed: error 137 at offset 2: PCRE does not support \L, \l, \N{name}, \U, or \u
+Failed: error 137 at offset 2: PCRE2 does not support \F, \L, \l, \N{name}, \U, or \u
 
 /\L/I
-Failed: error 137 at offset 2: PCRE does not support \L, \l, \N{name}, \U, or \u
+Failed: error 137 at offset 2: PCRE2 does not support \F, \L, \l, \N{name}, \U, or \u
 
 /\N{name}/I
-Failed: error 137 at offset 2: PCRE does not support \L, \l, \N{name}, \U, or \u
+Failed: error 137 at offset 2: PCRE2 does not support \F, \L, \l, \N{name}, \U, or \u
 
 /\u/I
-Failed: error 137 at offset 2: PCRE does not support \L, \l, \N{name}, \U, or \u
+Failed: error 137 at offset 2: PCRE2 does not support \F, \L, \l, \N{name}, \U, or \u
 
 /\U/I
-Failed: error 137 at offset 2: PCRE does not support \L, \l, \N{name}, \U, or \u
+Failed: error 137 at offset 2: PCRE2 does not support \F, \L, \l, \N{name}, \U, or \u
 
 /a{1,3}b/ungreedy
     ab
@@ -10154,11 +10157,17 @@ Failed: error 166 at offset 10: (*MARK) must have an argument
 /abc(*:)pqr/
 Failed: error 166 at offset 6: (*MARK) must have an argument
 
-/abc(*FAIL:123)xyz/
-Failed: error 159 at offset 10: an argument is not allowed for (*ACCEPT), (*FAIL), or (*COMMIT)
+/(*COMMIT:X)/B
+------------------------------------------------------------------
+        Bra
+        *COMMIT X
+        Ket
+        End
+------------------------------------------------------------------
 
 # This should, and does, fail. In Perl, it does not, which I think is a
 # bug because replacing the B in the pattern by (B|D) does make it fail.
+# Turning off Perl's optimization by inserting (??{""}) also makes it fail.
 
 /A(*COMMIT)B/aftertext,mark
 \= Expect no match
@@ -13188,7 +13197,7 @@ Failed: error 167 at offset 5: non-hex character in \x{} (closing brace missing?
 Failed: error 167 at offset 7: non-hex character in \x{} (closing brace missing?)
 
 /^A\x{/
-Failed: error 178 at offset 5: digits missing in \x{} or \o{}
+Failed: error 178 at offset 5: digits missing in \x{} or \o{} or \N{U+}
 
 /[ab]++/B,no_auto_possess
 ------------------------------------------------------------------
@@ -13402,7 +13411,7 @@ Failed: error 133 at offset 7: parentheses are too deeply nested (stack check)
 Failed: error 155 at offset 2: missing opening brace after \o
 
 /\o{}/
-Failed: error 178 at offset 3: digits missing in \x{} or \o{}
+Failed: error 178 at offset 3: digits missing in \x{} or \o{} or \N{U+}
 
 /\o{whatever}/
 Failed: error 164 at offset 3: non-octal character in \o{} (closing brace missing?)
@@ -13410,7 +13419,7 @@ Failed: error 164 at offset 3: non-octal character in \o{} (closing brace missin
 /\xthing/
 
 /\x{}/
-Failed: error 178 at offset 3: digits missing in \x{} or \o{}
+Failed: error 178 at offset 3: digits missing in \x{} or \o{} or \N{U+}
 
 /\x{whatever}/
 Failed: error 167 at offset 3: non-hex character in \x{} (closing brace missing?)
@@ -13483,6 +13492,10 @@ Subject length lower bound = 2
     yesno
  0: yes
 
+/(?(VERSION>=10.04)yes|no)/
+    yesno
+ 0: yes
+
 /(?(VERSION=8)yes){3}/BI,aftertext
 ------------------------------------------------------------------
         Bra
@@ -13537,7 +13550,7 @@ Failed: error 179 at offset 11: syntax error or number too big in (?(VERSION con
 Failed: error 179 at offset 16: syntax error or number too big in (?(VERSION condition
 
 /(?(VERSION=10.101)yes|no)/
-Failed: error 179 at offset 17: syntax error or number too big in (?(VERSION condition
+Failed: error 179 at offset 16: syntax error or number too big in (?(VERSION condition
 
 /abcd/I
 Capturing subpattern count = 0
@@ -14899,7 +14912,11 @@ Subject length lower bound = 1
 
 /(?=a\K)/replace=z
     BaCaD
-Failed: error -60: match with end before start is not supported
+Failed: error -60: match with end before start or start moved backwards is not supported
+    
+/(?<=\K.)/g,replace=-
+    ab
+Failed: error -60: match with end before start or start moved backwards is not supported
 
 /(?'abcdefghijklmnopqrstuvwxyzABCDEFG'toolong)/
 Failed: error 148 at offset 36: subpattern name is too long (maximum 32 characters)
@@ -15544,6 +15561,10 @@ Failed: error -57 at offset 2 in replacement: bad escape sequence in replacement
 //replace=0
     \=offset=7
 Failed: error -33: bad offset value
+
+/(?<=\G.)/g,replace=+
+    abc
+ 3: a+b+c+
 
 ".+\QX\E+"B,no_auto_possess
 ------------------------------------------------------------------
@@ -16575,8 +16596,175 @@ No match
         End
 ------------------------------------------------------------------
 
+/(?<=(?=.){4,5}x)/B
+------------------------------------------------------------------
+        Bra
+        AssertB
+        Reverse
+        Assert
+        Any
+        Ket
+        x
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+
+# Perl behaves differently with these when optimization is turned off
+
+/a(*PRUNE:X)bc|qq/mark,no_start_optimize
+\= Expect no match
+    axy
+No match, mark = X
+
+/a(*THEN:X)bc|qq/mark,no_start_optimize
+\= Expect no match
+    axy
+No match, mark = X
+
+/(?^x-i)AB/ 
+Failed: error 194 at offset 4: invalid hyphen in option setting
+
+/(?^-i)AB/ 
+Failed: error 194 at offset 3: invalid hyphen in option setting
+
+/(?x-i-i)/
+Failed: error 194 at offset 5: invalid hyphen in option setting
+
+/(?(?=^))b/I
+Capturing subpattern count = 0
+Last code unit = 'b'
+Subject length lower bound = 1
+    abc
+ 0: b
+
+/(?(?=^)|)b/I
+Capturing subpattern count = 0
+First code unit = 'b'
+Subject length lower bound = 1
+    abc
+ 0: b
+
+/(?(?=^)|^)b/I
+Capturing subpattern count = 0
+Compile options: <none>
+Overall options: anchored
+First code unit = 'b'
+Subject length lower bound = 1
+    bbc
+ 0: b
+\= Expect no match
+    abc     
+No match
+
+/(?(1)^|^())/I
+Capturing subpattern count = 1
+Max back reference = 1
+May match empty string
+Compile options: <none>
+Overall options: anchored
+Subject length lower bound = 0
+
+/(?(1)^())b/I
+Capturing subpattern count = 1
+Max back reference = 1
+Last code unit = 'b'
+Subject length lower bound = 1
+
+/(?(1)^())+b/I,aftertext
+Capturing subpattern count = 1
+Max back reference = 1
+Last code unit = 'b'
+Subject length lower bound = 1
+    abc
+ 0: b
+ 0+ c
+
+/(?(1)^()|^)+b/I,aftertext
+Capturing subpattern count = 1
+Max back reference = 1
+Compile options: <none>
+Overall options: anchored
+First code unit = 'b'
+Subject length lower bound = 1
+    bbc 
+ 0: b
+ 0+ bc
+\= Expect no match     
+    abc
+No match
+
+/(?(1)^()|^)*b/I,aftertext
+Capturing subpattern count = 1
+Max back reference = 1
+First code unit = 'b'
+Subject length lower bound = 1
+    bbc 
+ 0: b
+ 0+ bc
+    abc
+ 0: b
+ 0+ c
+    xbc 
+ 0: b
+ 0+ c
+
+/(?(1)^())+b/I,aftertext
+Capturing subpattern count = 1
+Max back reference = 1
+Last code unit = 'b'
+Subject length lower bound = 1
+    abc
+ 0: b
+ 0+ c
+
+/(?(1)^a()|^a)+b/I,aftertext
+Capturing subpattern count = 1
+Max back reference = 1
+Compile options: <none>
+Overall options: anchored
+First code unit = 'a'
+Last code unit = 'b'
+Subject length lower bound = 2
+    abc 
+ 0: ab
+ 0+ c
+\= Expect no match     
+    bbc
+No match
+
+/(?(1)^|^(a))+b/I,aftertext
+Capturing subpattern count = 1
+Max back reference = 1
+Compile options: <none>
+Overall options: anchored
+Last code unit = 'b'
+Subject length lower bound = 1
+    abc 
+ 0: ab
+ 0+ c
+ 1: a
+\= Expect no match     
+    bbc
+No match
+
+/(?(1)^a()|^a)*b/I,aftertext
+Capturing subpattern count = 1
+Max back reference = 1
+Last code unit = 'b'
+Subject length lower bound = 1
+    abc 
+ 0: ab
+ 0+ c
+    bbc
+ 0: b
+ 0+ bc
+    xbc 
+ 0: b
+ 0+ c
+
 # End of testinput2
-Error -65: PCRE2_ERROR_BADDATA (unknown error number)
+Error -70: PCRE2_ERROR_BADDATA (unknown error number)
 Error -62: bad serialized data
 Error -2: partial match
 Error -1: no match

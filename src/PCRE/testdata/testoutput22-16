@@ -171,4 +171,12 @@ No match
     ab
 No match
 
+/\C[^\v]+\x80/utf
+    [AΏBŀC]
+No match
+
+/\C[^\d]+\x80/utf
+    [AΏBŀC]
+No match
+
 # End of testinput22

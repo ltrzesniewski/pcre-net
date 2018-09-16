@@ -80,6 +80,8 @@
 # 2017-03-11 PH turned HEAP_MATCH_RECURSE into a NO-OP for 10.30
 # 2017-04-08 PH added HEAP_LIMIT
 # 2017-06-15 ZH added SUPPORT_JIT_SEALLOC support
+# 2018-06-19 PH added checks for stdint.h and inttypes.h
+# 2018-06-27 PH added Daniel's patch to increase the stack for MSVC
 
 PROJECT(PCRE2 C)
 
@@ -112,6 +114,18 @@ CHECK_INCLUDE_FILE(sys/stat.h   HAVE_SYS_STAT_H)
 CHECK_INCLUDE_FILE(sys/types.h  HAVE_SYS_TYPES_H)
 CHECK_INCLUDE_FILE(unistd.h     HAVE_UNISTD_H)
 CHECK_INCLUDE_FILE(windows.h    HAVE_WINDOWS_H)
+
+IF(HAVE_INTTYPES_H)
+  SET(PCRE2_HAVE_INTTYPES_H 1)
+ELSE(HAVE_INTTYPES_H)
+  SET(PCRE2_HAVE_INTTYPES_H 0)
+ENDIF(HAVE_INTTYPES_H)
+
+IF(HAVE_STDINT_H)
+  SET(PCRE2_HAVE_STDINT_H 1)
+ELSE(HAVE_STDINT_H)
+  SET(PCRE2_HAVE_STDINT_H 0)
+ENDIF(HAVE_STDINT_H)
 
 CHECK_FUNCTION_EXISTS(bcopy     HAVE_BCOPY)
 CHECK_FUNCTION_EXISTS(memmove   HAVE_MEMMOVE)
@@ -146,7 +160,7 @@ SET(PCRE2_PARENS_NEST_LIMIT "250" CACHE STRING
     "Default nested parentheses limit. See PARENS_NEST_LIMIT in config.h.in for details.")
 
 SET(PCRE2_HEAP_LIMIT "20000000" CACHE STRING
-    "Default limit on heap memory (kilobytes). See HEAP_LIMIT in config.h.in for details.")
+    "Default limit on heap memory (kibibytes). See HEAP_LIMIT in config.h.in for details.")
 
 SET(PCRE2_MATCH_LIMIT "10000000" CACHE STRING
     "Default limit on internal looping. See MATCH_LIMIT in config.h.in for details.")
@@ -594,6 +608,13 @@ IF(PCRE2_BUILD_TESTS)
 
   SET(PCRE2TEST_SOURCES src/pcre2test.c)
 
+  IF(MSVC)
+    # This is needed to avoid a stack overflow error in the standard tests. The
+    # flag should be indicated with a forward-slash instead of a hyphen, but
+    # then CMake treats it as a file path.
+    SET(PCRE2TEST_LINKER_FLAGS -STACK:2500000)
+  ENDIF(MSVC)
+
   ADD_EXECUTABLE(pcre2test ${PCRE2TEST_SOURCES})
   SET(targets ${targets} pcre2test)
   IF(PCRE2_BUILD_PCRE2_8)
@@ -605,7 +626,7 @@ IF(PCRE2_BUILD_TESTS)
   IF(PCRE2_BUILD_PCRE2_32)
     LIST(APPEND PCRE2TEST_LIBS pcre2-32)
   ENDIF(PCRE2_BUILD_PCRE2_32)
-  TARGET_LINK_LIBRARIES(pcre2test ${PCRE2TEST_LIBS})
+  TARGET_LINK_LIBRARIES(pcre2test ${PCRE2TEST_LIBS} ${PCRE2TEST_LINKER_FLAGS})
 
   IF(PCRE2_SUPPORT_JIT)
     ADD_EXECUTABLE(pcre2_jit_test src/pcre2_jit_test.c)

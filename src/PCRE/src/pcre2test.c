@@ -11,7 +11,7 @@ hacked-up (non-) design had also run out of steam.
 
                        Written by Philip Hazel
      Original code Copyright (c) 1997-2012 University of Cambridge
-    Rewritten code Copyright (c) 2016-2017 University of Cambridge
+    Rewritten code Copyright (c) 2016-2018 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -80,7 +80,7 @@ from www.cbttape.org. */
 
 /* Debugging code enabler */
 
-// #define DEBUG_SHOW_MALLOC_ADDRESSES
+/* #define DEBUG_SHOW_MALLOC_ADDRESSES */
 
 /* Both libreadline and libedit are optionally supported. The user-supplied
 original patch uses readline/readline.h for libedit, but in at least one system
@@ -162,11 +162,16 @@ patterns. */
 void vms_setsymbol( char *, char *, int );
 #endif
 
-/* VC doesn't support "%td". */
-#ifdef _MSC_VER
-#define PTR_SPEC "%lu"
+/* VC and older compilers don't support %td or %zu. */
+
+#if defined(_MSC_VER) || !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#define PTR_FORM "lu"
+#define SIZ_FORM "lu"
+#define SIZ_CAST (unsigned long int)
 #else
-#define PTR_SPEC "%td"
+#define PTR_FORM "td"
+#define SIZ_FORM "zu"
+#define SIZ_CAST
 #endif
 
 /* ------------------End of system-specific definitions -------------------- */
@@ -492,7 +497,7 @@ so many of them that they are split into two fields. */
 
 /* These are the matching controls that may be set either on a pattern or on a
 data line. They are copied from the pattern controls as initial settings for
-data line controls Note that CTL_MEMORY is not included here, because it does
+data line controls. Note that CTL_MEMORY is not included here, because it does
 different things in the two cases. */
 
 #define CTL_ALLPD  (CTL_AFTERTEXT|\
@@ -2590,6 +2595,46 @@ static const uint8_t tables2[] = {
 };
 
 
+
+#if !defined(VPCOMPAT) && !defined(HAVE_MEMMOVE)
+/*************************************************
+*    Emulated memmove() for systems without it   *
+*************************************************/
+
+/* This function can make use of bcopy() if it is available. Otherwise do it by
+steam, as there are some non-Unix environments that lack both memmove() and
+bcopy(). */
+
+static void *
+emulated_memmove(void *d, const void *s, size_t n)
+{
+#ifdef HAVE_BCOPY
+bcopy(s, d, n);
+return d;
+#else
+size_t i;
+unsigned char *dest = (unsigned char *)d;
+const unsigned char *src = (const unsigned char *)s;
+if (dest > src)
+  {
+  dest += n;
+  src += n;
+  for (i = 0; i < n; ++i) *(--dest) = *(--src);
+  return (void *)dest;
+  }
+else
+  {
+  for (i = 0; i < n; ++i) *dest++ = *src++;
+  return (void *)(dest - n);
+  }
+#endif   /* not HAVE_BCOPY */
+}
+#undef memmove
+#define memmove(d,s,n) emulated_memmove(d,s,n)
+#endif   /* not VPCOMPAT && not HAVE_MEMMOVE */
+
+
+
 #ifndef HAVE_STRERROR
 /*************************************************
 *     Provide strerror() for non-ANSI libraries  *
@@ -2626,11 +2671,11 @@ if (show_memory)
   {
   if (block == NULL)
     {
-    fprintf(outfile, "** malloc() failed for %zd\n", size);
+    fprintf(outfile, "** malloc() failed for %" SIZ_FORM "\n", SIZ_CAST size);
     }
   else
     {
-    fprintf(outfile, "malloc  %5zd", size);
+    fprintf(outfile, "malloc  %5" SIZ_FORM, SIZ_CAST size);
 #ifdef DEBUG_SHOW_MALLOC_ADDRESSES
     fprintf(outfile, " %p", block);   /* Not portable */
 #endif
@@ -2660,7 +2705,7 @@ if (show_memory)
     {
     if (block == malloclist[i])
       {
-      fprintf(outfile, "    %5zd", malloclistlength[i]);
+      fprintf(outfile, "    %5" SIZ_FORM, SIZ_CAST malloclistlength[i]);
       malloclistptr--;
       for (j = i; j < malloclistptr; j++)
         {
@@ -3038,8 +3083,8 @@ if (pbuffer16_size < 2*len + 2)
   pbuffer16 = (uint16_t *)malloc(pbuffer16_size);
   if (pbuffer16 == NULL)
     {
-    fprintf(stderr, "pcre2test: malloc(%lu) failed for pbuffer16\n",
-      (unsigned long int)pbuffer16_size);
+    fprintf(stderr, "pcre2test: malloc(%" SIZ_FORM ") failed for pbuffer16\n",
+      SIZ_CAST pbuffer16_size);
     exit(1);
     }
   }
@@ -3125,8 +3170,8 @@ if (pbuffer32_size < 4*len + 4)
   pbuffer32 = (uint32_t *)malloc(pbuffer32_size);
   if (pbuffer32 == NULL)
     {
-    fprintf(stderr, "pcre2test: malloc(%lu) failed for pbuffer32\n",
-      (unsigned long int)pbuffer32_size);
+    fprintf(stderr, "pcre2test: malloc(%" SIZ_FORM ") failed for pbuffer32\n",
+      SIZ_CAST pbuffer32_size);
     exit(1);
     }
   }
@@ -4673,12 +4718,6 @@ uint16_t first_listed_newline;
 const char *cmdname;
 uint8_t *argptr, *serial;
 
-if (restrict_for_perl_test)
-  {
-  fprintf(outfile, "** #-commands are not allowed after #perltest\n");
-  return PR_ABEND;
-  }
-
 yield = PR_OK;
 cmd = CMD_UNKNOWN;
 cmdlen = 0;
@@ -4696,6 +4735,12 @@ for (i = 0; i < cmdlistcount; i++)
   }
 
 argptr = buffer + cmdlen + 1;
+
+if (restrict_for_perl_test && cmd != CMD_PATTERN && cmd != CMD_SUBJECT)
+  {
+  fprintf(outfile, "** #%s is not allowed after #perltest\n", cmdname);
+  return PR_ABEND;
+  }
 
 switch(cmd)
   {
@@ -4844,8 +4889,8 @@ switch(cmd)
   serial = malloc(serial_size);
   if (serial == NULL)
     {
-    fprintf(outfile, "** Failed to get memory (size %lu) for #load\n",
-      (unsigned long int)serial_size);
+    fprintf(outfile, "** Failed to get memory (size %" SIZ_FORM ") for #load\n",
+      SIZ_CAST serial_size);
     fclose(f);
     return PR_ABEND;
     }
@@ -5039,7 +5084,7 @@ if ((pat_patctl.control & CTL_HEXPAT) != 0)
         if (d == 0)
           {
           fprintf(outfile, "** Missing closing quote in hex pattern: "
-            "opening quote is at offset " PTR_SPEC ".\n", pq - buffer - 2);
+            "opening quote is at offset %" PTR_FORM ".\n", pq - buffer - 2);
           return PR_SKIP;
           }
         if (d == c) break;
@@ -5053,8 +5098,8 @@ if ((pat_patctl.control & CTL_HEXPAT) != 0)
       {
       if (!isxdigit(c))
         {
-        fprintf(outfile, "** Unexpected non-hex-digit '%c' at offset "
-          PTR_SPEC " in hex pattern: quote missing?\n", c, pp - buffer - 2);
+        fprintf(outfile, "** Unexpected non-hex-digit '%c' at offset %"
+          PTR_FORM " in hex pattern: quote missing?\n", c, pp - buffer - 2);
         return PR_SKIP;
         }
       if (*pp == 0)
@@ -5065,8 +5110,8 @@ if ((pat_patctl.control & CTL_HEXPAT) != 0)
       d = *pp;
       if (!isxdigit(d))
         {
-        fprintf(outfile, "** Unexpected non-hex-digit '%c' at offset "
-          PTR_SPEC " in hex pattern: quote missing?\n", d, pp - buffer - 1);
+        fprintf(outfile, "** Unexpected non-hex-digit '%c' at offset %"
+          PTR_FORM " in hex pattern: quote missing?\n", d, pp - buffer - 1);
         return PR_SKIP;
         }
       c = toupper(c);
@@ -5411,7 +5456,7 @@ switch(errorcode)
 
 /* The pattern is now in pbuffer[8|16|32], with the length in code units in
 patlen. If it is to be converted, copy the result back afterwards so that it
-it ends up back in the usual place. */
+ends up back in the usual place. */
 
 if (pat_patctl.convert_type != CONVERT_UNSET)
   {
@@ -5470,8 +5515,8 @@ if (pat_patctl.convert_type != CONVERT_UNSET)
 
   if (rc != 0)
     {
-    fprintf(outfile, "** Pattern conversion error at offset %zu: ",
-      converted_length);
+    fprintf(outfile, "** Pattern conversion error at offset %" SIZ_FORM ": ",
+      SIZ_CAST converted_length);
     convert_return = print_error_message(rc, "", "\n")? PR_SKIP:PR_ABEND;
     }
 
@@ -5735,7 +5780,7 @@ return PR_OK;
 *************************************************/
 
 /* This is used for DFA, normal, and JIT fast matching. For DFA matching it
-should only called with the third argument set to PCRE2_ERROR_DEPTHLIMIT.
+should only be called with the third argument set to PCRE2_ERROR_DEPTHLIMIT.
 
 Arguments:
   pp        the subject string
@@ -5760,6 +5805,8 @@ PCRE2_SET_HEAP_LIMIT(dat_context, max);
 
 for (;;)
   {
+  uint32_t stack_start = 0;
+
   if (errnumber == PCRE2_ERROR_HEAPLIMIT)
     {
     PCRE2_SET_HEAP_LIMIT(dat_context, mid);
@@ -5775,6 +5822,7 @@ for (;;)
 
   if ((dat_datctl.control & CTL_DFA) != 0)
     {
+    stack_start = DFA_START_RWS_SIZE/1024;
     if (dfa_workspace == NULL)
       dfa_workspace = (int *)malloc(DFA_WS_DIMENSION*sizeof(int));
     if (dfa_matched++ == 0)
@@ -5789,11 +5837,21 @@ for (;;)
       dat_datctl.options, match_data, PTR(dat_context));
 
   else
+    {
+    stack_start = START_FRAMES_SIZE/1024;
     PCRE2_MATCH(capcount, compiled_code, pp, ulen, dat_datctl.offset,
       dat_datctl.options, match_data, PTR(dat_context));
+    }
 
   if (capcount == errnumber)
     {
+    if ((mid & 0x80000000u) != 0)
+      {
+      fprintf(outfile, "Can't find minimum %s limit: check pattern for "
+        "restriction\n", msg);
+      break;
+      }
+
     min = mid;
     mid = (mid == max - 1)? max : (max != UINT32_MAX)? (min + max)/2 : mid*2;
     }
@@ -5802,11 +5860,12 @@ for (;;)
            capcount == PCRE2_ERROR_PARTIAL)
     {
     /* If we've not hit the error with a heap limit less than the size of the
-    initial stack frame vector, the heap is not being used, so the minimum
-    limit is zero; there's no need to go on. The other limits are always
-    greater than zero. */
+    initial stack frame vector (for pcre2_match()) or the initial stack
+    workspace vector (for pcre2_dfa_match()), the heap is not being used, so
+    the minimum limit is zero; there's no need to go on. The other limits are
+    always greater than zero. */
 
-    if (errnumber == PCRE2_ERROR_HEAPLIMIT && mid < START_FRAMES_SIZE/1024)
+    if (errnumber == PCRE2_ERROR_HEAPLIMIT && mid < stack_start)
       {
       fprintf(outfile, "Minimum %s limit = 0\n", msg);
       break;
@@ -5889,8 +5948,8 @@ isn't a tidy way to fit it in the rest of the data. */
 if (cb->callout_string != NULL)
   {
   uint32_t delimiter = CODE_UNIT(cb->callout_string, -1);
-  fprintf(outfile, "Callout (%lu): %c",
-    (unsigned long int)cb->callout_string_offset, delimiter);
+  fprintf(outfile, "Callout (%" SIZ_FORM "): %c",
+    SIZ_CAST cb->callout_string_offset, delimiter);
   PCHARSV(cb->callout_string, 0,
     cb->callout_string_length, utf, outfile);
   for (i = 0; callout_start_delims[i] != 0; i++)
@@ -6089,12 +6148,12 @@ for (i = 0; i < MAXCPYGET && dat_datctl.copy_numbers[i] >= 0; i++)
       }
     else if (length2 != length)
       {
-      fprintf(outfile, "Mismatched substring lengths: %lu %lu\n",
-        (unsigned long int)length, (unsigned long int)length2);
+      fprintf(outfile, "Mismatched substring lengths: %"
+        SIZ_FORM " %" SIZ_FORM "\n", SIZ_CAST length, SIZ_CAST length2);
       }
     fprintf(outfile, "%2dC ", n);
     PCHARSV(copybuffer, 0, length, utf, outfile);
-    fprintf(outfile, " (%lu)\n", (unsigned long)length);
+    fprintf(outfile, " (%" SIZ_FORM ")\n", SIZ_CAST length);
     }
   }
 
@@ -6144,12 +6203,12 @@ for (;;)
       }
     else if (length2 != length)
       {
-      fprintf(outfile, "Mismatched substring lengths: %lu %lu\n",
-        (unsigned long int)length, (unsigned long int)length2);
+      fprintf(outfile, "Mismatched substring lengths: %"
+        SIZ_FORM " %" SIZ_FORM "\n", SIZ_CAST length, SIZ_CAST length2);
       }
     fprintf(outfile, "  C ");
     PCHARSV(copybuffer, 0, length, utf, outfile);
-    fprintf(outfile, " (%lu) %s", (unsigned long)length, nptr);
+    fprintf(outfile, " (%" SIZ_FORM ") %s", SIZ_CAST length, nptr);
     if (groupnumber >= 0) fprintf(outfile, " (group %d)\n", groupnumber);
       else fprintf(outfile, " (non-unique)\n");
     }
@@ -6174,7 +6233,7 @@ for (i = 0; i < MAXCPYGET && dat_datctl.get_numbers[i] >= 0; i++)
     {
     fprintf(outfile, "%2dG ", n);
     PCHARSV(gotbuffer, 0, length, utf, outfile);
-    fprintf(outfile, " (%lu)\n", (unsigned long)length);
+    fprintf(outfile, " (%" SIZ_FORM ")\n", SIZ_CAST length);
     PCRE2_SUBSTRING_FREE(gotbuffer);
     }
   }
@@ -6218,7 +6277,7 @@ for (;;)
     {
     fprintf(outfile, "  G ");
     PCHARSV(gotbuffer, 0, length, utf, outfile);
-    fprintf(outfile, " (%lu) %s", (unsigned long)length, nptr);
+    fprintf(outfile, " (%" SIZ_FORM ") %s", SIZ_CAST length, nptr);
     if (groupnumber >= 0) fprintf(outfile, " (group %d)\n", groupnumber);
       else fprintf(outfile, " (non-unique)\n");
     PCRE2_SUBSTRING_FREE(gotbuffer);
@@ -6283,6 +6342,7 @@ size_t needlen;
 void *use_dat_context;
 BOOL utf;
 BOOL subject_literal;
+PCRE2_SIZE ovecsave[3];
 
 #ifdef SUPPORT_PCRE2_8
 uint8_t *q8 = NULL;
@@ -6761,13 +6821,17 @@ if ((pat_patctl.control & CTL_POSIX) != 0)
     fprintf(outfile, "Matched without capture\n");
   else
     {
-    size_t i;
+    size_t i, j;
+    size_t last_printed = (size_t)dat_datctl.oveccount;
     for (i = 0; i < (size_t)dat_datctl.oveccount; i++)
       {
       if (pmatch[i].rm_so >= 0)
         {
         PCRE2_SIZE start = pmatch[i].rm_so;
         PCRE2_SIZE end = pmatch[i].rm_eo;
+        for (j = last_printed + 1; j < i; j++)
+          fprintf(outfile, "%2d: <unset>\n", (int)j);
+        last_printed = i;
         if (start > end)
           {
           start = pmatch[i].rm_eo;
@@ -6926,6 +6990,9 @@ if (dat_datctl.replacement[0] != 0)
   if (timeitm)
     fprintf(outfile, "** Timing is not supported with replace: ignored\n");
 
+  if ((dat_datctl.control & CTL_ALTGLOBAL) != 0)
+    fprintf(outfile, "** Altglobal is not supported with replace: ignored\n");
+
   xoptions = (((dat_datctl.control & CTL_GLOBAL) == 0)? 0 :
                 PCRE2_SUBSTITUTE_GLOBAL) |
              (((dat_datctl.control2 & CTL2_SUBSTITUTE_EXTENDED) == 0)? 0 :
@@ -6955,8 +7022,8 @@ if (dat_datctl.replacement[0] != 0)
       }
     if (n > nsize)
       {
-      fprintf(outfile, "Replacement buffer setting (%lu) is too large "
-        "(max %lu)\n", (unsigned long int)n, (unsigned long int)nsize);
+      fprintf(outfile, "Replacement buffer setting (%" SIZ_FORM ") is too "
+        "large (max %" SIZ_FORM ")\n", SIZ_CAST n, SIZ_CAST nsize);
       return PR_OK;
       }
     nsize = n;
@@ -7044,34 +7111,23 @@ if (dat_datctl.replacement[0] != 0)
     }
 
   fprintf(outfile, "\n");
+  show_memory = FALSE;
+  return PR_OK;
   }   /* End of substitution handling */
 
 /* When a replacement string is not provided, run a loop for global matching
-with one of the basic matching functions. */
+with one of the basic matching functions. For altglobal (or first time round
+the loop), set an "unset" value for the previous match info. */
 
-else for (gmatched = 0;; gmatched++)
+ovecsave[0] = ovecsave[1] = ovecsave[2] = PCRE2_UNSET;
+
+for (gmatched = 0;; gmatched++)
   {
   PCRE2_SIZE j;
   int capcount;
   PCRE2_SIZE *ovector;
-  PCRE2_SIZE ovecsave[2];
 
   ovector = FLD(match_data, ovector);
-
-  /* After the first time round a global loop, for a normal global (/g)
-  iteration, save the current ovector[0,1] so that we can check that they do
-  change each time. Otherwise a matching bug that returns the same string
-  causes an infinite loop. It has happened! */
-
-  if (gmatched > 0 && (dat_datctl.control & CTL_GLOBAL) != 0)
-    {
-    ovecsave[0] = ovector[0];
-    ovecsave[1] = ovector[1];
-    }
-
-  /* For altglobal (or first time round the loop), set an "unset" value. */
-
-  else ovecsave[0] = ovecsave[1] = PCRE2_UNSET;
 
   /* Fill the ovector with junk to detect elements that do not get set
   when they should be. */
@@ -7135,18 +7191,16 @@ else for (gmatched = 0;; gmatched++)
         (double)CLOCKS_PER_SEC);
     }
 
-  /* Find the heap, match and depth limits if requested. The match and heap
-  limits are not relevant for DFA matching and the depth and heap limits are
-  not relevant for JIT. The return from check_match_limit() is the return from
-  the final call to pcre2_match() or pcre2_dfa_match(). */
+  /* Find the heap, match and depth limits if requested. The depth and heap
+  limits are not relevant for JIT. The return from check_match_limit() is the
+  return from the final call to pcre2_match() or pcre2_dfa_match(). */
 
   if ((dat_datctl.control & CTL_FINDLIMITS) != 0)
     {
     capcount = 0;  /* This stops compiler warnings */
 
-    if ((dat_datctl.control & CTL_DFA) == 0 &&
-        (FLD(compiled_code, executable_jit) == NULL ||
-          (dat_datctl.options & PCRE2_NO_JIT) != 0))
+    if (FLD(compiled_code, executable_jit) == NULL ||
+          (dat_datctl.options & PCRE2_NO_JIT) != 0)
       {
       (void)check_match_limit(pp, arg_ulen, PCRE2_ERROR_HEAPLIMIT, "heap");
       }
@@ -7160,6 +7214,12 @@ else for (gmatched = 0;; gmatched++)
       {
       capcount = check_match_limit(pp, arg_ulen, PCRE2_ERROR_DEPTHLIMIT,
         "depth");
+      }
+
+    if (capcount == 0)
+      {
+      fprintf(outfile, "Matched, but offsets vector is too small to show all matches\n");
+      capcount = dat_datctl.oveccount;
       }
     }
 
@@ -7239,12 +7299,23 @@ else for (gmatched = 0;; gmatched++)
       }
 
     /* If this is not the first time round a global loop, check that the
-    returned string has changed. If not, there is a bug somewhere and we must
-    break the loop because it will go on for ever. We know that there are
-    always at least two elements in the ovector. */
+    returned string has changed. If it has not, check for an empty string match
+    at different starting offset from the previous match. This is a failed test
+    retry for null-matching patterns that don't match at their starting offset,
+    for example /(?<=\G.)/. A repeated match at the same point is not such a
+    pattern, and must be discarded, and we then proceed to seek a non-null
+    match at the current point. For any other repeated match, there is a bug
+    somewhere and we must break the loop because it will go on for ever. We
+    know that there are always at least two elements in the ovector. */
 
     if (gmatched > 0 && ovecsave[0] == ovector[0] && ovecsave[1] == ovector[1])
       {
+      if (ovector[0] == ovector[1] && ovecsave[2] != dat_datctl.offset)
+        {
+        g_notempty = PCRE2_NOTEMPTY_ATSTART | PCRE2_ANCHORED;
+        ovecsave[2] = dat_datctl.offset;
+        continue;    /* Back to the top of the loop */
+        }
       fprintf(outfile,
         "** PCRE2 error: global repeat returned the same string as previous\n");
       fprintf(outfile, "** Global loop abandoned\n");
@@ -7534,7 +7605,7 @@ else for (gmatched = 0;; gmatched++)
         {
         PCRE2_SIZE startchar;
         PCRE2_GET_STARTCHAR(startchar, match_data);
-        fprintf(outfile, " at offset %lu", (unsigned long int)startchar);
+        fprintf(outfile, " at offset %" SIZ_FORM, SIZ_CAST startchar);
         }
       fprintf(outfile, "\n");
       break;
@@ -7552,6 +7623,7 @@ else for (gmatched = 0;; gmatched++)
 
   if ((dat_datctl.control & CTL_ANYGLOB) == 0) break; else
     {
+    PCRE2_SIZE match_offset = FLD(match_data, ovector)[0];
     PCRE2_SIZE end_offset = FLD(match_data, ovector)[1];
 
     /* We must now set up for the next iteration of a global search. If we have
@@ -7559,12 +7631,19 @@ else for (gmatched = 0;; gmatched++)
     subject. If so, the loop is over. Otherwise, mimic what Perl's /g option
     does. Set PCRE2_NOTEMPTY_ATSTART and PCRE2_ANCHORED and try the match again
     at the same point. If this fails it will be picked up above, where a fake
-    match is set up so that at this point we advance to the next character. */
+    match is set up so that at this point we advance to the next character.
 
-    if (FLD(match_data, ovector)[0] == end_offset)
+    However, in order to cope with patterns that never match at their starting
+    offset (e.g. /(?<=\G.)/) we don't do this when the match offset is greater
+    than the starting offset. This means there will be a retry with the
+    starting offset at the match offset. If this returns the same match again,
+    it is picked up above and ignored, and the special action is then taken. */
+
+    if (match_offset == end_offset)
       {
-      if (end_offset == ulen) break;      /* End of subject */
-      g_notempty = PCRE2_NOTEMPTY_ATSTART | PCRE2_ANCHORED;
+      if (end_offset == ulen) break;           /* End of subject */
+      if (match_offset <= dat_datctl.offset)
+        g_notempty = PCRE2_NOTEMPTY_ATSTART | PCRE2_ANCHORED;
       }
 
     /* However, even after matching a non-empty string, there is still one
@@ -7602,10 +7681,19 @@ else for (gmatched = 0;; gmatched++)
         }
       }
 
-    /* For /g (global), update the start offset, leaving the rest alone. */
+    /* For a normal global (/g) iteration, save the current ovector[0,1] and
+    the starting offset so that we can check that they do change each time.
+    Otherwise a matching bug that returns the same string causes an infinite
+    loop. It has happened! Then update the start offset, leaving other
+    parameters alone. */
 
     if ((dat_datctl.control & CTL_GLOBAL) != 0)
+      {
+      ovecsave[0] = ovector[0];
+      ovecsave[1] = ovector[1];
+      ovecsave[2] = dat_datctl.offset;
       dat_datctl.offset = end_offset;
+      }
 
     /* For altglobal, just update the pointer and length. */
 
@@ -7744,7 +7832,7 @@ printf("  -LM           list pattern and subject modifiers, then exit\n");
 printf("  -q            quiet: do not output PCRE2 version number at start\n");
 printf("  -pattern <s>  set default pattern modifier fields\n");
 printf("  -subject <s>  set default subject modifier fields\n");
-printf("  -S <n>        set stack size to <n> megabytes\n");
+printf("  -S <n>        set stack size to <n> mebibytes\n");
 printf("  -t [<n>]      time compilation and execution, repeating <n> times\n");
 printf("  -tm [<n>]     time execution (matching) only, repeating <n> times\n");
 printf("  -T            same as -t, but show total times at the end\n");
@@ -7789,7 +7877,7 @@ if (arg != NULL && arg[0] != CHAR_MINUS)
     {
     case CONF_BSR:
     (void)PCRE2_CONFIG(coptlist[i].value, &optval);
-    printf("%s\n", optval? "ANYCRLF" : "ANY");
+    printf("%s\n", (optval == PCRE2_BSR_ANYCRLF)? "ANYCRLF" : "ANY");
     break;
 
     case CONF_FIX:
@@ -7873,7 +7961,8 @@ else
 (void)PCRE2_CONFIG(PCRE2_CONFIG_NEWLINE, &optval);
 print_newline_config(optval, FALSE);
 (void)PCRE2_CONFIG(PCRE2_CONFIG_BSR, &optval);
-printf("  \\R matches %s\n", optval? "CR, LF, or CRLF only" :
+printf("  \\R matches %s\n",
+  (optval == PCRE2_BSR_ANYCRLF)? "CR, LF, or CRLF only" :
                                  "all Unicode newlines");
 (void)PCRE2_CONFIG(PCRE2_CONFIG_NEVER_BACKSLASH_C, &optval);
 printf("  \\C is %ssupported\n", optval? "not ":"");
@@ -8194,15 +8283,15 @@ while (argc > 1 && argv[op][0] == '-' && argv[op][1] != 0)
     if (rlim.rlim_cur > rlim.rlim_max)
       {
       fprintf(stderr,
-        "pcre2test: requested stack size %luM is greater than hard limit %lu\n",
-        (unsigned long int)stack_size,
-        (unsigned long int)(rlim.rlim_max));
+        "pcre2test: requested stack size %luMiB is greater than hard limit "
+          "%luMiB\n", (unsigned long int)stack_size,
+          (unsigned long int)(rlim.rlim_max));
       exit(1);
       }
     rc = setrlimit(RLIMIT_STACK, &rlim);
     if (rc != 0)
       {
-      fprintf(stderr, "pcre2test: setting stack size %luM failed: %s\n",
+      fprintf(stderr, "pcre2test: setting stack size %luMiB failed: %s\n",
         (unsigned long int)stack_size, strerror(errno));
       exit(1);
       }
@@ -8334,8 +8423,8 @@ least 128 code units, because it is used for retrieving error messages. */
     pbuffer16 = (uint16_t *)malloc(pbuffer16_size);
     if (pbuffer16 == NULL)
       {
-      fprintf(stderr, "pcre2test: malloc(%lu) failed for pbuffer16\n",
-        (unsigned long int)pbuffer16_size);
+      fprintf(stderr, "pcre2test: malloc(%" SIZ_FORM ") failed for pbuffer16\n",
+        SIZ_CAST pbuffer16_size);
       yield = 1;
       goto EXIT;
       }
@@ -8349,8 +8438,8 @@ least 128 code units, because it is used for retrieving error messages. */
     pbuffer32 = (uint32_t *)malloc(pbuffer32_size);
     if (pbuffer32 == NULL)
       {
-      fprintf(stderr, "pcre2test: malloc(%lu) failed for pbuffer32\n",
-        (unsigned long int)pbuffer32_size);
+      fprintf(stderr, "pcre2test: malloc(%" SIZ_FORM ") failed for pbuffer32\n",
+        SIZ_CAST pbuffer32_size);
       yield = 1;
       goto EXIT;
       }
