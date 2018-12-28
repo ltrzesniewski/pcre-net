@@ -1,3 +1,10 @@
+PCRE.NET LICENCE
+----------------
+
+PCRE.NET is a .NET library which wraps and includes PCRE2. It is distributed
+under the terms of the same "BSD" licence as PCRE2, as specified below.
+
+
 PCRE2 LICENCE
 -------------
 
@@ -54,6 +61,8 @@ THE PCRE.NET WRAPPER FOR THE .NET FRAMEWORK
 -------------------------------------------
 
 Written by:       Lucas Trzesniewski
+Email local part: lucas.trzesniewski
+Email domain:     gmail.com
 
 Copyright(c) 2014-2018 Lucas Trzesniewski
 All rights reserved.
