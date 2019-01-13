@@ -6,7 +6,7 @@
     <version>$version$</version>
     <authors>Philip Hazel, Zoltan Herczeg, Lucas Trzesniewski</authors>
     <owners>Lucas Trzesniewski</owners>
-    <licenseUrl>https://raw.githubusercontent.com/ltrzesniewski/pcre-net/master/LICENCE</licenseUrl>
+    <license type="expression">BSD-3-Clause</license>
     <projectUrl>https://github.com/ltrzesniewski/pcre-net</projectUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <summary>Perl Compatible Regular Expressions for .NET</summary>
