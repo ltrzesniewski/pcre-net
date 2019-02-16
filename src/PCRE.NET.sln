@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.27130.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PCRE.NET", "PCRE.NET\PCRE.NET.csproj", "{BC79C3F4-531D-49FE-82DE-B2103E6D6C97}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CB0EC78A-B7FB-423F-8ABB-0984A9D7B3BA} = {CB0EC78A-B7FB-423F-8ABB-0984A9D7B3BA}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCRE.NET.Tests", "PCRE.NET.Tests\PCRE.NET.Tests.csproj", "{D6C70567-615B-48FB-AEB4-565B9BBB59EF}"
 EndProject

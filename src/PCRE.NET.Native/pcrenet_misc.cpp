@@ -6,7 +6,7 @@ PCRENET_EXPORT(int32_t, get_error_message)(int32_t errorCode, uint16_t* errorBuf
     return pcre2_get_error_message(errorCode, errorBuffer, bufferSize);
 }
 
-PCRENET_EXPORT(int32_t, pattern_info)(const pcre2_code* code, uint32_t key, void* data)
+PCRENET_EXPORT(int32_t, pattern_info)(pcre2_code* code, uint32_t key, void* data)
 {
     return pcre2_pattern_info(code, key, data);
 }

@@ -21,7 +21,7 @@ namespace PCRE
         public PcreOptions AllOptions => (PcreOptions)_re.InternalRegex.GetInfoUInt32(PcreConstants.INFO_ALLOPTIONS);
         public PcreExtraCompileOptions ExtraOptions => (PcreExtraCompileOptions)_re.InternalRegex.GetInfoUInt32(PcreConstants.INFO_EXTRAOPTIONS);
         public uint MaxBackReference => _re.InternalRegex.GetInfoUInt32(PcreConstants.INFO_BACKREFMAX);
-        public int CaptureCount => (int)_re.InternalRegex.CaptureCount;
+        public int CaptureCount => _re.InternalRegex.CaptureCount;
         public bool IsCompiled => _re.InternalRegex.GetInfoUInt32(PcreConstants.INFO_JITSIZE) != 0;
         public bool CanMatchEmptyString => _re.InternalRegex.GetInfoUInt32(PcreConstants.INFO_MATCHEMPTY) != 0;
         public uint MaxLookBehind => _re.InternalRegex.GetInfoUInt32(PcreConstants.INFO_MAXLOOKBEHIND);

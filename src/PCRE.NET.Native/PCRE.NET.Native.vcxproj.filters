@@ -8,9 +8,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="PCRE.NET Headers">
-      <UniqueIdentifier>{019da996-3bbc-4ec7-a496-5ec60dd43238}</UniqueIdentifier>
-    </Filter>
     <Filter Include="PCRE\Sources">
       <UniqueIdentifier>{21e023c4-93e2-49e8-a895-b7dd925d0830}</UniqueIdentifier>
     </Filter>

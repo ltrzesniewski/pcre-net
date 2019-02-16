@@ -45,4 +45,9 @@
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll" Link="PCRE.NET.Native.x86.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" Condition="Exists('..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll')" />
+    <None Include="..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll" Link="PCRE.NET.Native.x64.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" Condition="Exists('..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll')" />
+  </ItemGroup>
+
 </Project>

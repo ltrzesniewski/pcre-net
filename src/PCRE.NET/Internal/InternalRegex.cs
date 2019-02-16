@@ -12,14 +12,19 @@ namespace PCRE.Internal
         {
             fixed (char* pPattern = pattern)
             {
-                var input = new Native.compile_input { pattern = pPattern };
+                var input = new Native.compile_input
+                {
+                    pattern = pPattern,
+                    pattern_length = (uint)pattern.Length
+                };
+
                 settings.FillCompileInput(ref input);
 
                 Native.compile(ref input, out var result);
                 _code = result.code;
 
                 if (_code == IntPtr.Zero || result.error_code != 0)
-                    throw new ArgumentException("PCRE pattern compilation failed"); // TODO get real error message
+                    throw new ArgumentException($"Invalid pattern '{pattern}': {Native.GetErrorMessage(result.error_code)} at offset {result.error_offset}");
             }
 
             CaptureCount = (int)GetInfoUInt32(PcreConstants.INFO_CAPTURECOUNT);

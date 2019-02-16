@@ -59,7 +59,7 @@ namespace PCRE.Internal
         internal struct compile_result
         {
             public IntPtr code;
-            public uint error_code;
+            public int error_code;
             public uint error_offset;
         }
     }

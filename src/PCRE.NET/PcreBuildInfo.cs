@@ -39,7 +39,7 @@ namespace PCRE
             var buffer = stackalloc char[256];
             var messageLength = Native.config(key, buffer);
             return messageLength >= 0
-                ? new string(buffer, 0, messageLength)
+                ? new string(buffer, 0, messageLength - 1)
                 : throw new InvalidOperationException("Could not retrieve the configuration property: " + key);
         }
     }

@@ -19,7 +19,7 @@ typedef struct
 typedef struct
 {
     pcre2_code* code;
-    uint32_t error_code;
+    int32_t error_code;
     uint32_t error_offset;
 } pcrenet_compile_result;
 
