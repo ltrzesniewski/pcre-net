@@ -19,7 +19,7 @@ namespace PCRE.Internal
                     ? new WinImpl()
                     : throw new PlatformNotSupportedException();
 
-                impl.test();
+                impl.get_error_message(0, null, 0);
                 return impl;
             }
             catch (DllNotFoundException) when (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -29,6 +29,16 @@ namespace PCRE.Internal
                     ? (LibImpl)new Win64Impl()
                     : new Win32Impl();
             }
+        }
+
+        public static string GetErrorMessage(int errorCode)
+        {
+            const int bufferSize = 256;
+            var buffer = stackalloc char[256];
+            var messageLength = get_error_message(errorCode, buffer, bufferSize);
+            return messageLength >= 0
+                ? new string(buffer, 0, messageLength)
+                : $"Unknown error, code: {errorCode}";
         }
 
         [StructLayout(LayoutKind.Sequential)]

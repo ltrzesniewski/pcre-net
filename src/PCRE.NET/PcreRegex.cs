@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
+using System.Diagnostics.CodeAnalysis;
 using PCRE.Dfa;
 using PCRE.Internal;
 using PCRE.Support;
@@ -8,22 +8,14 @@ namespace PCRE
 {
     public sealed partial class PcreRegex : IInternalRegexWrapper
     {
-        // ReSharper disable IntroduceOptionalParameters.Global, MemberCanBePrivate.Global, UnusedMember.Global
-
-        // Cannot store an InternalRegex field, because the x64 JIT may try to load this type before executing the module initializer in certain cases.
-        // This type should always be loadable before the module initializer is executed.
-        private readonly object _re;
         private PcrePatternInfo _info;
         private PcreDfaRegex _dfa;
 
-        public PcrePatternInfo PaternInfo => _info ?? (_info = new PcrePatternInfo(this));
+        public PcrePatternInfo PatternInfo => _info ?? (_info = new PcrePatternInfo(this));
 
         internal RegexKey Key { get; }
 
-        internal InternalRegex InternalRegex
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)] get { return (InternalRegex)_re; }
-        }
+        internal InternalRegex InternalRegex { get; }
 
         internal int CaptureCount => (int)InternalRegex.CaptureCount;
 
@@ -35,6 +27,7 @@ namespace PCRE
 
         public PcreDfaRegex Dfa => _dfa ?? (_dfa = new PcreDfaRegex(this));
 
+        [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
         public PcreRegex(string pattern)
             : this(pattern, PcreOptions.None)
         {
@@ -53,7 +46,7 @@ namespace PCRE
                 throw new ArgumentNullException(nameof(settings));
 
             Key = new RegexKey(pattern, settings);
-            _re = Caches.RegexCache.GetOrAdd(Key);
+            InternalRegex = Caches.RegexCache.GetOrAdd(Key);
         }
 
         RegexKey IInternalRegexWrapper.Key => Key;

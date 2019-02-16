@@ -8,9 +8,10 @@
 <#
 
 var funcs = ParseFuncs(@"
-    void test();
+    int get_error_message(int errorCode, char* errorBuffer, uint bufferSize);
     void compile(ref compile_input input, out compile_result result);
     void code_free(IntPtr code);
+    int pattern_info(IntPtr code, uint key, void* data);
 ").ToList();
 
 var platforms = new[] {

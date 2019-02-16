@@ -23,7 +23,7 @@ typedef struct
     uint32_t error_offset;
 } pcrenet_compile_result;
 
-PCRENET_EXPORT(void, pcrenet_compile)(pcrenet_compile_input* input, pcrenet_compile_result* result)
+PCRENET_EXPORT(void, compile)(const pcrenet_compile_input* input, pcrenet_compile_result* result)
 {
     const auto context = pcre2_compile_context_create(nullptr);
 
@@ -70,7 +70,7 @@ PCRENET_EXPORT(void, pcrenet_compile)(pcrenet_compile_input* input, pcrenet_comp
     pcre2_compile_context_free(context);
 }
 
-PCRENET_EXPORT(void, pcrenet_code_free)(pcre2_code* code)
+PCRENET_EXPORT(void, code_free)(pcre2_code* code)
 {
     if (code)
         pcre2_code_free(code);
