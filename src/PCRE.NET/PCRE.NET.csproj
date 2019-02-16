@@ -1,175 +1,48 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BC79C3F4-531D-49FE-82DE-B2103E6D6C97}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <RootNamespace>PCRE</RootNamespace>
-    <AssemblyName>PCRE.NET</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <NoWarn>
-    </NoWarn>
-    <LangVersion>latest</LangVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <NoWarn>
-    </NoWarn>
-    <LangVersion>latest</LangVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <LangVersion>latest</LangVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <LangVersion>latest</LangVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <LangVersion>latest</LangVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <LangVersion>latest</LangVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup>
     <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\PCRE.NET.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>PCRE.NET</PackageId>
+    <Title>PCRE.NET - Perl Compatible Regular Expressions for .NET</Title>
+    <Authors>Philip Hazel;Zoltan Herczeg;Lucas Trzesniewski</Authors>
+    <Copyright>Copyright © Lucas Trzesniewski 2014-2019</Copyright>
+    <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
+    <RequireLicenseAcceptance>true</RequireLicenseAcceptance>
+    <PackageProjectUrl>https://github.com/ltrzesniewski/pcre-net</PackageProjectUrl>
+    <Description>PCRE.NET is a .NET wrapper for the PCRE library. The goal of this project is to bring most of PCRE's features for use from .NET applications with as little overhead as possible.</Description>
+    <PackageTags>PCRE.NET;PCRE;Perl;Regex;Regexp;Regular-Expressions;Text</PackageTags>
+  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Conversion\PcreConvert.cs" />
-    <Compile Include="Conversion\PcreGlobConversionOptions.cs" />
-    <Compile Include="Dfa\PcreDfaMatch.cs" />
-    <Compile Include="Dfa\PcreDfaMatchOptions.cs" />
-    <Compile Include="Dfa\PcreDfaMatchResult.cs" />
-    <Compile Include="Dfa\PcreDfaMatchSettings.cs" />
-    <Compile Include="IInternalRegexWrapper.cs" />
-    <Compile Include="Internal\InternalRegex.cs" />
-    <Compile Include="Internal\Native.cs" />
-    <Compile Include="Internal\Native.Generated.cs">
+    <Compile Update="Internal\Native.Generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Native.Generated.tt</DependentUpon>
     </Compile>
-    <Compile Include="Internal\PcreConstants.cs">
+    <Compile Update="Internal\PcreConstants.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>PcreConstants.tt</DependentUpon>
     </Compile>
-    <Compile Include="IPcreGroup.cs" />
-    <Compile Include="IPcreGroupList.cs" />
-    <Compile Include="PcreBackslashR.cs" />
-    <Compile Include="PcreCallout.cs" />
-    <Compile Include="PcreCalloutInfo.cs" />
-    <Compile Include="PcreExtraCompileOptions.cs" />
-    <Compile Include="PcreJitStack.cs" />
-    <Compile Include="PcreMatchException.cs" />
-    <Compile Include="PcreCalloutResult.cs" />
-    <Compile Include="PcreMatchOptions.cs" />
-    <Compile Include="PcreMatchSettings.cs" />
-    <Compile Include="PcreRegex.Split.cs" />
-    <Compile Include="PcreRegex.Replace.cs" />
-    <Compile Include="PcreRegex.Match.cs" />
-    <Compile Include="PcreGroup.cs" />
-    <Compile Include="PcreMatch.cs" />
-    <Compile Include="PcreRegex.cs" />
-    <Compile Include="PcreBuildInfo.cs" />
-    <Compile Include="PcreNewLine.cs" />
-    <Compile Include="PcreOptions.cs" />
-    <Compile Include="PcrePatternInfo.cs" />
-    <Compile Include="PcreRegexSettings.cs" />
-    <Compile Include="PcreSplitOptions.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Support\PriorityCache.cs" />
-    <Compile Include="Support\PcreEnumExtensions.cs" />
-    <Compile Include="Support\Caches.cs" />
-    <Compile Include="Support\RegexKey.cs" />
-    <Compile Include="Support\ReplacementPattern.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Dfa\PcreDfaRegex.Match.cs" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Internal\Native.Generated.tt">
+    <None Update="Internal\Native.Generated.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Native.Generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Internal\PcreConstants.tt">
+    </None>
+    <None Update="Internal\PcreConstants.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>PcreConstants.cs</LastGenOutput>
-    </Content>
+    </None>
   </ItemGroup>
+
   <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>
