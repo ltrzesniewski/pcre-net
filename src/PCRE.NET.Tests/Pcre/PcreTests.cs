@@ -49,11 +49,11 @@ namespace PCRE.Tests.Pcre
                 throw;
             }
 
-            var jitStack = pattern.JitStack != 0 && (options & PcreOptions.Compiled) != 0
-                ? new PcreJitStack(1, pattern.JitStack)
-                : null;
+//            var jitStack = pattern.JitStack != 0 && (options & PcreOptions.Compiled) != 0
+//                ? new PcreJitStack(1, pattern.JitStack)
+//                : null;
 
-            using (jitStack)
+//            using (jitStack)
             {
                 for (var line = 0; line < testCase.SubjectLines.Count; ++line)
                 {
@@ -73,7 +73,7 @@ namespace PCRE.Tests.Pcre
 
                     var matchSettings = new PcreMatchSettings
                     {
-                        JitStack = jitStack
+//                        JitStack = jitStack
                     };
 
                     var matches = regex

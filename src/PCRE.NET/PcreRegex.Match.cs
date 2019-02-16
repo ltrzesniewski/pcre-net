@@ -14,7 +14,7 @@ namespace PCRE
 
         [Pure]
         public bool IsMatch(string subject, int startIndex)
-            => Match(subject, startIndex).Success;
+            => throw new NotImplementedException(); // Match(subject, startIndex).Success;
 
         [Pure]
         public PcreMatch Match(string subject)
@@ -66,10 +66,11 @@ namespace PCRE
             if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
                 throw new IndexOutOfRangeException("Invalid StartIndex value");
 
-            using (var context = settings.CreateMatchContext(subject))
-            {
-                return new PcreMatch(ExecuteMatch(context));
-            }
+            throw new NotImplementedException();
+//            using (var context = settings.CreateMatchContext(subject))
+//            {
+//                return new PcreMatch(ExecuteMatch(context));
+//            }
         }
 
         [Pure]
@@ -114,45 +115,46 @@ namespace PCRE
 
         private IEnumerable<PcreMatch> MatchesIterator(string subject, PcreMatchSettings settings)
         {
-            using (var context = settings.CreateMatchContext(subject))
-            {
-                var result = ExecuteMatch(context);
-
-                if (result.ResultCode != MatchResultCode.Success)
-                    yield break;
-
-                var match = new PcreMatch(result);
-                yield return match;
-
-                var options = context.AdditionalOptions;
-
-                while (true)
-                {
-                    context.StartIndex = match.GetStartOfNextMatchIndex();
-                    context.AdditionalOptions = options | (match.Length == 0 ? PatternOptions.NotEmptyAtStart : PatternOptions.None);
-
-                    result = ExecuteMatch(context);
-
-                    if (result.ResultCode != MatchResultCode.Success)
-                        yield break;
-
-                    match = new PcreMatch(result);
-                    yield return match;
-                }
-            }
+            throw new NotImplementedException();
+//            using (var context = settings.CreateMatchContext(subject))
+//            {
+//                var result = ExecuteMatch(context);
+//
+//                if (result.ResultCode != MatchResultCode.Success)
+//                    yield break;
+//
+//                var match = new PcreMatch(result);
+//                yield return match;
+//
+//                var options = context.AdditionalOptions;
+//
+//                while (true)
+//                {
+//                    context.StartIndex = match.GetStartOfNextMatchIndex();
+//                    context.AdditionalOptions = options | (match.Length == 0 ? PatternOptions.NotEmptyAtStart : PatternOptions.None);
+//
+//                    result = ExecuteMatch(context);
+//
+//                    if (result.ResultCode != MatchResultCode.Success)
+//                        yield break;
+//
+//                    match = new PcreMatch(result);
+//                    yield return match;
+//                }
+//            }
         }
 
-        private MatchData ExecuteMatch(MatchContext context)
-        {
-            try
-            {
-                return InternalRegex.Match(context);
-            }
-            catch (MatchException ex)
-            {
-                throw PcreMatchException.FromException(ex);
-            }
-        }
+//        private MatchData ExecuteMatch(MatchContext context)
+//        {
+//            try
+//            {
+//                return InternalRegex.Match(context);
+//            }
+//            catch (MatchException ex)
+//            {
+//                throw PcreMatchException.FromException(ex);
+//            }
+//        }
 
         [Pure]
         public static bool IsMatch(string subject, string pattern)

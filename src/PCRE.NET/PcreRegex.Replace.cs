@@ -42,25 +42,27 @@ namespace PCRE
             if (count == 0)
                 return subject;
 
-            StringBuilder sb = null;
-            var position = 0;
+            throw new NotImplementedException();
 
-            foreach (var match in Matches(subject, startIndex))
-            {
-                if (sb == null)
-                    sb = new StringBuilder((int)(subject.Length * 1.2));
-                sb.Append(subject, position, match.Index - position);
-                sb.Append(replacementFunc(match));
-                position = match.GetStartOfNextMatchIndex();
-
-                if (--count == 0)
-                    break;
-            }
-            if (sb == null)
-                return subject;
-
-            sb.Append(subject, position, subject.Length - position);
-            return sb.ToString();
+//            StringBuilder sb = null;
+//            var position = 0;
+//
+//            foreach (var match in Matches(subject, startIndex))
+//            {
+//                if (sb == null)
+//                    sb = new StringBuilder((int)(subject.Length * 1.2));
+//                sb.Append(subject, position, match.Index - position);
+//                sb.Append(replacementFunc(match));
+//                position = match.GetStartOfNextMatchIndex();
+//
+//                if (--count == 0)
+//                    break;
+//            }
+//            if (sb == null)
+//                return subject;
+//
+//            sb.Append(subject, position, subject.Length - position);
+//            return sb.ToString();
         }
 
         [Pure]

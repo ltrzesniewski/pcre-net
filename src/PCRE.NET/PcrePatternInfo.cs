@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using PCRE.Internal;
 
 namespace PCRE
@@ -6,7 +7,7 @@ namespace PCRE
     public sealed class PcrePatternInfo
     {
         private readonly IInternalRegexWrapper _re;
-        private IReadOnlyList<PcreCalloutInfo> _callouts;
+        //private IReadOnlyList<PcreCalloutInfo> _callouts;
 
         internal PcrePatternInfo(IInternalRegexWrapper re)
         {
@@ -41,19 +42,20 @@ namespace PCRE
         public uint LastCodeType => _re.InternalRegex.GetInfoUInt32(PcreConstants.INFO_LASTCODETYPE);
         public uint LastCodeUnit => _re.InternalRegex.GetInfoUInt32(PcreConstants.INFO_LASTCODEUNIT);
 
-        public IReadOnlyList<PcreCalloutInfo> Callouts => _callouts ?? (_callouts = _re.InternalRegex.Callouts.Select(i => new PcreCalloutInfo(i)).ToList().AsReadOnly());
+        public IReadOnlyList<PcreCalloutInfo> Callouts => throw new NotImplementedException(); // _callouts ?? (_callouts = _re.InternalRegex.Callouts.Select(i => new PcreCalloutInfo(i)).ToList().AsReadOnly());
 
         public IEnumerable<int> GetGroupIndexesByName(string name)
         {
-            var map = _re.InternalRegex.CaptureNames;
-            if (map == null)
-                yield break;
-
-            if (!map.TryGetValue(name, out var indexes))
-                yield break;
-
-            foreach (var index in indexes)
-                yield return index;
+            throw new NotImplementedException();
+//            var map = _re.InternalRegex.CaptureNames;
+//            if (map == null)
+//                yield break;
+//
+//            if (!map.TryGetValue(name, out var indexes))
+//                yield break;
+//
+//            foreach (var index in indexes)
+//                yield return index;
         }
     }
 }

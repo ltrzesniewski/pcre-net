@@ -43,30 +43,32 @@ namespace PCRE
                 yield break;
             }
 
-            var index = 0;
-            var captureCount = CaptureCount;
-            var includeGroupValues = (options & PcreSplitOptions.IncludeGroupValues) != 0;
+            throw new NotImplementedException();
 
-            foreach (var match in Matches(subject, startIndex))
-            {
-                yield return subject.Substring(index, match.Index - index);
-                index = match.GetStartOfNextMatchIndex();
-
-                if (includeGroupValues)
-                {
-                    for (var groupIdx = 1; groupIdx <= captureCount; ++groupIdx)
-                    {
-                        var group = match[groupIdx];
-                        if (group.Success)
-                            yield return group.Value;
-                    }
-                }
-
-                if (--count == 0)
-                    break;
-            }
-
-            yield return subject.Substring(index);
+//            var index = 0;
+//            var captureCount = CaptureCount;
+//            var includeGroupValues = (options & PcreSplitOptions.IncludeGroupValues) != 0;
+////
+//            foreach (var match in Matches(subject, startIndex))
+//            {
+//                yield return subject.Substring(index, match.Index - index);
+//                index = match.GetStartOfNextMatchIndex();
+//
+//                if (includeGroupValues)
+//                {
+//                    for (var groupIdx = 1; groupIdx <= captureCount; ++groupIdx)
+//                    {
+//                        var group = match[groupIdx];
+//                        if (group.Success)
+//                            yield return group.Value;
+//                    }
+//                }
+//
+//                if (--count == 0)
+//                    break;
+//            }
+//
+//            yield return subject.Substring(index);
         }
 
         [Pure]

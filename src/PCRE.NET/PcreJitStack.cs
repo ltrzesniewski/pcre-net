@@ -9,18 +9,18 @@ namespace PCRE
     {
         private object _stack; // See remark about JIT in PcreRegex
 
-        public PcreJitStack(uint startSize, uint maxSize)
-        {
-            _stack = new JitStack(startSize, maxSize);
-        }
-
-        internal JitStack GetStack()
-        {
-            if (_stack != null)
-                return (JitStack)_stack;
-
-            throw new ObjectDisposedException("The JIT stack has been disposed");
-        }
+//        public PcreJitStack(uint startSize, uint maxSize)
+//        {
+//            _stack = new JitStack(startSize, maxSize);
+//        }
+//
+//        internal JitStack GetStack()
+//        {
+//            if (_stack != null)
+//                return (JitStack)_stack;
+//
+//            throw new ObjectDisposedException("The JIT stack has been disposed");
+//        }
 
         public void Dispose()
         {

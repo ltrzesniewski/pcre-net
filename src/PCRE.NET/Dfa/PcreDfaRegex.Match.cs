@@ -50,10 +50,12 @@ namespace PCRE.Dfa
             if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
                 throw new IndexOutOfRangeException("Invalid StartIndex value");
 
-            using (var context = settings.CreateMatchContext(subject))
-            {
-                return new PcreDfaMatchResult(ExecuteDfaMatch(context));
-            }
+            throw new NotImplementedException();
+
+//            using (var context = settings.CreateMatchContext(subject))
+//            {
+//                return new PcreDfaMatchResult(ExecuteDfaMatch(context));
+//            }
         }
 
         [Pure]
@@ -88,41 +90,42 @@ namespace PCRE.Dfa
 
         private IEnumerable<PcreDfaMatchResult> MatchesIterator(string subject, PcreDfaMatchSettings settings)
         {
-            using (var context = settings.CreateMatchContext(subject))
-            {
-                var result = ExecuteDfaMatch(context);
-
-                if (result.ResultCode != MatchResultCode.Success)
-                    yield break;
-
-                var match = new PcreDfaMatchResult(result);
-                yield return match;
-
-                while (true)
-                {
-                    context.StartIndex = match.Index + 1;
-
-                    result = ExecuteDfaMatch(context);
-
-                    if (result.ResultCode != MatchResultCode.Success)
-                        yield break;
-
-                    match = new PcreDfaMatchResult(result);
-                    yield return match;
-                }
-            }
+            throw new NotImplementedException();
+//            using (var context = settings.CreateMatchContext(subject))
+//            {
+//                var result = ExecuteDfaMatch(context);
+//
+//                if (result.ResultCode != MatchResultCode.Success)
+//                    yield break;
+//
+//                var match = new PcreDfaMatchResult(result);
+//                yield return match;
+//
+//                while (true)
+//                {
+//                    context.StartIndex = match.Index + 1;
+//
+//                    result = ExecuteDfaMatch(context);
+//
+//                    if (result.ResultCode != MatchResultCode.Success)
+//                        yield break;
+//
+//                    match = new PcreDfaMatchResult(result);
+//                    yield return match;
+//                }
+//            }
         }
 
-        private MatchData ExecuteDfaMatch(MatchContext context)
-        {
-            try
-            {
-                return _regex.InternalRegex.DfaMatch(context);
-            }
-            catch (MatchException ex)
-            {
-                throw PcreMatchException.FromException(ex);
-            }
-        }
+//        private MatchData ExecuteDfaMatch(MatchContext context)
+//        {
+//            try
+//            {
+//                return _regex.InternalRegex.DfaMatch(context);
+//            }
+//            catch (MatchException ex)
+//            {
+//                throw PcreMatchException.FromException(ex);
+//            }
+//        }
     }
 }

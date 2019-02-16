@@ -1,9 +1,11 @@
-﻿namespace PCRE
+﻿using PCRE.Internal;
+
+namespace PCRE
 {
     public enum PcreCalloutResult
     {
-        Pass = CalloutResult.Pass,
-        Fail = CalloutResult.Fail,
-        Abort = CalloutResult.NoMatch
+        Pass = 0,
+        Fail = 1,
+        Abort = PcreConstants.ERROR_NOMATCH
     }
 }

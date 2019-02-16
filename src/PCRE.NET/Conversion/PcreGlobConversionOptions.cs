@@ -17,26 +17,26 @@
                 SeparatorCharacter = '/'
             };
 
-        internal ConvertContext CreateContext()
-        {
-            return new ConvertContext
-            {
-                GlobEscape = EscapeCharacter,
-                GlobSeparator = SeparatorCharacter
-            };
-        }
-
-        internal ConvertOptions GetConvertOptions()
-        {
-            var options = ConvertOptions.Glob;
-
-            if (NoWildcardSeparator)
-                options |= ConvertOptions.GlobNoWildcardSeparator;
-
-            if (NoStarStar)
-                options |= ConvertOptions.GlobNoStarStar;
-
-            return options;
-        }
+//        internal ConvertContext CreateContext()
+//        {
+//            return new ConvertContext
+//            {
+//                GlobEscape = EscapeCharacter,
+//                GlobSeparator = SeparatorCharacter
+//            };
+//        }
+//
+//        internal ConvertOptions GetConvertOptions()
+//        {
+//            var options = ConvertOptions.Glob;
+//
+//            if (NoWildcardSeparator)
+//                options |= ConvertOptions.GlobNoWildcardSeparator;
+//
+//            if (NoStarStar)
+//                options |= ConvertOptions.GlobNoStarStar;
+//
+//            return options;
+//        }
     }
 }

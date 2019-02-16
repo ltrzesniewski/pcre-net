@@ -55,5 +55,16 @@ namespace PCRE.Internal
 
             return result;
         }
+
+        public UIntPtr GetInfoNativeInt(uint key)
+        {
+            UIntPtr result;
+            var errorCode = Native.pattern_info(_code, key, &result);
+
+            if (errorCode != 0)
+                throw new InvalidOperationException($"Error in pcre2_pattern_info: {Native.GetErrorMessage(errorCode)}");
+
+            return result;
+        }
     }
 }

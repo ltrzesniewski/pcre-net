@@ -18,20 +18,24 @@ namespace PCRE.Conversion
             if (pattern == null) throw new ArgumentNullException(nameof(pattern));
             if (options == null) throw new ArgumentNullException(nameof(options));
 
-            using (var context = options.CreateContext())
-            {
-                return context.Convert(pattern, ImplicitOptions | options.GetConvertOptions());
-            }
+            throw new NotImplementedException();
+
+//            using (var context = options.CreateContext())
+//            {
+//                return context.Convert(pattern, ImplicitOptions | options.GetConvertOptions());
+//            }
         }
 
         private static string BasicConvert(string pattern, uint options)
         {
             if (pattern == null) throw new ArgumentNullException(nameof(pattern));
 
-            using (var context = new ConvertContext())
-            {
-                return context.Convert(pattern, ImplicitOptions | options);
-            }
+            throw new NotImplementedException();
+
+//            using (var context = new ConvertContext())
+//            {
+//                return context.Convert(pattern, ImplicitOptions | options);
+//            }
         }
     }
 }

@@ -10,3 +10,8 @@ PCRENET_EXPORT(int32_t, pattern_info)(const pcre2_code* code, uint32_t key, void
 {
     return pcre2_pattern_info(code, key, data);
 }
+
+PCRENET_EXPORT(int32_t, config)(uint32_t key, void* data)
+{
+    return pcre2_config(key, data);
+}

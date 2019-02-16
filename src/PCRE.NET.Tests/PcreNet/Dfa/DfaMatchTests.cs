@@ -95,7 +95,7 @@ namespace PCRE.Tests.PcreNet.Dfa
         {
             var re = new PcreRegex(@"<.*(?C1)>");
             var settings = new PcreDfaMatchSettings();
-            settings.OnCallout += callout => callout.Match.Subject[callout.CurrentOffset - 1] == 'e' ? PcreCalloutResult.Fail : PcreCalloutResult.Pass;
+            //settings.OnCallout += callout => callout.Match.Subject[callout.CurrentOffset - 1] == 'e' ? PcreCalloutResult.Fail : PcreCalloutResult.Pass;
 
             var result = re.Dfa.Match("This is <something> <something else> <something further> no more", settings);
 

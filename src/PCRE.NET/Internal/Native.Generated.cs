@@ -24,6 +24,9 @@ namespace PCRE.Internal
         public static int pattern_info(IntPtr code, uint key, void* data)
             => _impl.pattern_info(code, key, data);
 
+        public static int config(uint key, void* data)
+            => _impl.config(key, data);
+
 
         private abstract class LibImpl
         {
@@ -31,6 +34,7 @@ namespace PCRE.Internal
             public abstract void compile(ref compile_input input, out compile_result result);
             public abstract void code_free(IntPtr code);
             public abstract int pattern_info(IntPtr code, uint key, void* data);
+            public abstract int config(uint key, void* data);
         }
 
         [SuppressUnmanagedCodeSecurity]
@@ -59,6 +63,12 @@ namespace PCRE.Internal
 
             [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_pattern_info(IntPtr code, uint key, void* data);
+
+            public override int config(uint key, void* data)
+                => pcrenet_config(key, data);
+
+            [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
+            private static extern int pcrenet_config(uint key, void* data);
 
         }
 
@@ -89,6 +99,12 @@ namespace PCRE.Internal
             [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_pattern_info(IntPtr code, uint key, void* data);
 
+            public override int config(uint key, void* data)
+                => pcrenet_config(key, data);
+
+            [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
+            private static extern int pcrenet_config(uint key, void* data);
+
         }
 
         [SuppressUnmanagedCodeSecurity]
@@ -117,6 +133,12 @@ namespace PCRE.Internal
 
             [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_pattern_info(IntPtr code, uint key, void* data);
+
+            public override int config(uint key, void* data)
+                => pcrenet_config(key, data);
+
+            [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
+            private static extern int pcrenet_config(uint key, void* data);
 
         }
 

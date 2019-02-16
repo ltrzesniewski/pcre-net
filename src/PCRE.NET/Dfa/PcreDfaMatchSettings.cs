@@ -18,19 +18,24 @@ namespace PCRE.Dfa
             MaxResults = 128;
         }
 
-        internal MatchContext CreateMatchContext(string subject)
+        private void Dummy()
         {
-            var context = new MatchContext
-            {
-                Subject = subject,
-                StartIndex = StartIndex,
-                AdditionalOptions = ((PcreMatchOptions)AdditionalOptions).ToPatternOptions(),
-                CalloutHandler = PcreMatchSettings.WrapCallout(OnCallout),
-                DfaMaxResults = (AdditionalOptions & PcreDfaMatchOptions.DfaShortest) != 0 ? 1 : MaxResults,
-                DfaWorkspaceSize = WorkspaceSize
-            };
-
-            return context;
+            OnCallout?.Invoke(null);
         }
+
+//        internal MatchContext CreateMatchContext(string subject)
+//        {
+//            var context = new MatchContext
+//            {
+//                Subject = subject,
+//                StartIndex = StartIndex,
+//                AdditionalOptions = ((PcreMatchOptions)AdditionalOptions).ToPatternOptions(),
+//                CalloutHandler = PcreMatchSettings.WrapCallout(OnCallout),
+//                DfaMaxResults = (AdditionalOptions & PcreDfaMatchOptions.DfaShortest) != 0 ? 1 : MaxResults,
+//                DfaWorkspaceSize = WorkspaceSize
+//            };
+//
+//            return context;
+//        }
     }
 }

@@ -24,13 +24,13 @@ namespace PCRE
         {
         }
 
-        internal static PcreMatchException FromException(MatchException matchException)
-        {
-            if (matchException.AttemptedMatchData != null && matchException.AttemptedMatchData.ResultCode == MatchResultCode.Callout)
-                return new PcreCalloutException(matchException.Message, matchException.InnerException);
-
-            return new PcreMatchException(matchException.Message, matchException.InnerException);
-        }
+//        internal static PcreMatchException FromException(MatchException matchException)
+//        {
+//            if (matchException.AttemptedMatchData != null && matchException.AttemptedMatchData.ResultCode == MatchResultCode.Callout)
+//                return new PcreCalloutException(matchException.Message, matchException.InnerException);
+//
+//            return new PcreMatchException(matchException.Message, matchException.InnerException);
+//        }
     }
 
     public class PcreCalloutException : PcreMatchException

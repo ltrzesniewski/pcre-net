@@ -17,7 +17,7 @@
         ^ \s* \# \s* define \s+
         PCRE2_(?<name>\w+) \s+
         \(? \s*
-        (?<value> (?:0x)? [0-9]+ )
+        (?<value> -? (?:0x)? [0-9]+ )
         [uU]?
         \s* \)?
         \s* $
@@ -30,7 +30,7 @@
         "MAJOR", "MINOR", "LOCAL_WIDTH"
     };
 
-    var constants = new List<(string name, string value)>();
+    var constants = new List<(string type, string name, string value)>();
 
     foreach (var fileLine in File.ReadLines(Host.ResolvePath("../../PCRE/src/pcre2.h")))
     {
@@ -45,13 +45,15 @@
 
         var (name, value) = (m.Groups["name"].Value, m.Groups["value"].Value);
 
-        if (name.StartsWith("HAVE_") || name.StartsWith("ERROR_"))
+        if (name.StartsWith("HAVE_"))
             continue;
 
         if (toIgnore.Contains(name))
             continue;
 
-        constants.Add((name, value));        
+        var type = name.StartsWith("ERROR_") ? "int" : "uint";
+
+        constants.Add((type, name, value));        
     }
 #>
 //------------------------------------------------------------------------------
@@ -65,10 +67,10 @@ namespace PCRE.Internal
     internal static class PcreConstants
     {
 <#
-    foreach (var (name, value) in constants)
+    foreach (var (type, name, value) in constants)
     {
 #>
-        public const uint <#= name #> = <#= value #>;
+        public const <#= type #> <#= name #> = <#= value #>;
 <#
     }
 #>
