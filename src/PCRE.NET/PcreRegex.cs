@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using PCRE.Dfa;
+using PCRE.Internal;
 using PCRE.Support;
-using PCRE.Wrapper;
 
 namespace PCRE
 {

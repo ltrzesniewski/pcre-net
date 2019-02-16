@@ -1,5 +1,5 @@
 ﻿using System;
-using PCRE.Wrapper;
+using PCRE.Internal;
 
 namespace PCRE.Dfa
 {
@@ -8,20 +8,20 @@ namespace PCRE.Dfa
     {
         None = 0,
 
-        Anchored = PatternOptions.Anchored,
+        Anchored = PcreConstants.ANCHORED,
 
-        NotBol = PatternOptions.NotBol,
-        NotEol = PatternOptions.NotEol,
-        NotEmpty = PatternOptions.NotEmpty,
-        NotEmptyAtStart = PatternOptions.NotEmptyAtStart,
+        NotBol = PcreConstants.NOTBOL,
+        NotEol = PcreConstants.NOTEOL,
+        NotEmpty = PcreConstants.NOTEMPTY,
+        NotEmptyAtStart = PcreConstants.NOTEMPTY_ATSTART,
 
-        NoStartOptimize = PatternOptions.NoStartOptimize,
+        NoStartOptimize = PcreConstants.NO_START_OPTIMIZE,
 
-        PartialSoft = PatternOptions.PartialSoft,
-        PartialHard = PatternOptions.PartialHard,
+        PartialSoft = PcreConstants.PARTIAL_SOFT,
+        PartialHard = PcreConstants.PARTIAL_HARD,
 
-        NoUtfCheck = PatternOptions.NoUtfCheck,
+        NoUtfCheck = PcreConstants.NO_UTF_CHECK,
 
-        DfaShortest = PatternOptions.DfaShortest
+        DfaShortest = PcreConstants.DFA_SHORTEST
     }
 }

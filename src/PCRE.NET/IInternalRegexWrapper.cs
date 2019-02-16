@@ -1,5 +1,5 @@
-﻿using PCRE.Support;
-using PCRE.Wrapper;
+﻿using PCRE.Internal;
+using PCRE.Support;
 
 namespace PCRE
 {

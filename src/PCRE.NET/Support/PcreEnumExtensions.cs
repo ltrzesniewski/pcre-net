@@ -1,28 +1,24 @@
-﻿using PCRE.Wrapper;
+﻿using PCRE.Internal;
 
 namespace PCRE.Support
 {
     internal static class PcreEnumExtensions
     {
-        public static PatternOptions ToPatternOptions(this PcreOptions options)
-        {
-            return (PatternOptions)((long)options & 0xFFFFFFFF) | PatternOptions.Utf;
-        }
+        public static uint ToPatternOptions(this PcreOptions options)
+            => (uint)((long)options & 0xFFFFFFFF) | PcreConstants.UTF;
 
-        public static PatternOptions ToPatternOptions(this PcreMatchOptions options)
-        {
-            return (PatternOptions)((long)options & 0xFFFFFFFF);
-        }
+        public static uint ToPatternOptions(this PcreMatchOptions options)
+            => (uint)((long)options & 0xFFFFFFFF);
 
-        public static JitCompileOptions ToJitCompileOptions(this PcreOptions options)
+        public static uint ToJitCompileOptions(this PcreOptions options)
         {
-            var jitOptions = JitCompileOptions.None;
+            var jitOptions = 0u;
 
             if ((options & PcreOptions.Compiled) != 0)
-                jitOptions |= JitCompileOptions.Complete;
+                jitOptions |= PcreConstants.JIT_COMPLETE;
 
             if ((options & PcreOptions.CompiledPartial) != 0)
-                jitOptions |= JitCompileOptions.PartialSoft | JitCompileOptions.PartialHard;
+                jitOptions |= PcreConstants.JIT_PARTIAL_SOFT | PcreConstants.JIT_PARTIAL_HARD;
 
             return jitOptions;
         }

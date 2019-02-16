@@ -1,17 +1,17 @@
 ﻿using System;
-using PCRE.Wrapper;
+using PCRE.Internal;
 
 namespace PCRE.Conversion
 {
     public static class PcreConvert
     {
-        private const ConvertOptions ImplicitOptions = ConvertOptions.Utf;
+        private const uint ImplicitOptions = PcreConstants.UTF;
 
         public static string FromPosixBasic(string pattern)
-            => BasicConvert(pattern, ConvertOptions.PosixBasic);
+            => BasicConvert(pattern, PcreConstants.CONVERT_POSIX_BASIC);
 
         public static string FromPosixExtended(string pattern)
-            => BasicConvert(pattern, ConvertOptions.PosixExtended);
+            => BasicConvert(pattern, PcreConstants.CONVERT_POSIX_EXTENDED);
 
         public static string FromGlob(string pattern, PcreGlobConversionOptions options)
         {
@@ -24,7 +24,7 @@ namespace PCRE.Conversion
             }
         }
 
-        private static string BasicConvert(string pattern, ConvertOptions options)
+        private static string BasicConvert(string pattern, uint options)
         {
             if (pattern == null) throw new ArgumentNullException(nameof(pattern));
 
