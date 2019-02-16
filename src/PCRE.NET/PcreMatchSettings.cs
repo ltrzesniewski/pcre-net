@@ -1,6 +1,5 @@
 ﻿using System;
 using PCRE.Support;
-using PCRE.Wrapper;
 
 namespace PCRE
 {

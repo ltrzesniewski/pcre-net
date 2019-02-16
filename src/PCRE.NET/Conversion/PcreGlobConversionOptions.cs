@@ -1,6 +1,4 @@
-﻿using PCRE.Wrapper;
-
-namespace PCRE.Conversion
+﻿namespace PCRE.Conversion
 {
     public sealed class PcreGlobConversionOptions
     {

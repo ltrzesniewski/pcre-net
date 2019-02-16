@@ -3,7 +3,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using NUnit.Framework;
-using PCRE.Wrapper;
+using PCRE.Internal;
 
 namespace PCRE.Tests.PcreNet
 {

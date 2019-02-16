@@ -1,6 +1,4 @@
-﻿using PCRE.Wrapper;
-
-namespace PCRE
+﻿namespace PCRE
 {
     public enum PcreCalloutResult
     {
