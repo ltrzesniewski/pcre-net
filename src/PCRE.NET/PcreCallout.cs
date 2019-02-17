@@ -8,6 +8,7 @@ namespace PCRE
         private readonly InternalRegex _regex;
         private readonly uint _flags;
         private readonly uint[] _oVector;
+        private readonly char* _markPtr;
         private PcreMatch _match;
         private PcreCalloutInfo _info;
 
@@ -24,6 +25,7 @@ namespace PCRE
             LastCapture = (int)callout.capture_last;
             PatternPosition = (int)callout.pattern_position;
             NextPatternItemLength = (int)callout.next_item_length;
+            _markPtr = callout.mark;
 
             _oVector = new uint[callout.capture_top * 2];
             _oVector[0] = (uint)callout.start_match;
@@ -35,7 +37,7 @@ namespace PCRE
 
         public int Number { get; }
 
-        public PcreMatch Match => _match ?? (_match = new PcreMatch(_subject, _regex, _oVector));
+        public PcreMatch Match => _match ?? (_match = new PcreMatch(_subject, _regex, _oVector, _markPtr));
 
         public int StartOffset { get; }
         public int CurrentOffset { get; }

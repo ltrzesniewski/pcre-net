@@ -6,14 +6,18 @@ using PCRE.Internal;
 
 namespace PCRE
 {
-    public sealed class PcreMatch : IPcreGroup, IPcreGroupList
+    public sealed unsafe class PcreMatch : IPcreGroup, IPcreGroupList
     {
         private readonly InternalRegex _regex;
         private readonly int _resultCode;
         private readonly uint[] _oVector;
+        private readonly char* _markPtr;
 
         [CanBeNull]
         private PcreGroup[] _groups;
+
+        [CanBeNull]
+        private string _mark;
 
         internal PcreMatch(string subject, InternalRegex regex, ref Native.match_result result, uint[] oVector)
         {
@@ -22,17 +26,19 @@ namespace PCRE
             Subject = subject;
             _regex = regex;
             _oVector = oVector;
+            _markPtr = result.mark;
 
             _resultCode = result.result_code;
         }
 
-        internal PcreMatch(string subject, InternalRegex regex, uint[] oVector)
+        internal PcreMatch(string subject, InternalRegex regex, uint[] oVector, char* mark)
         {
             // Callout
 
             Subject = subject;
             _regex = regex;
             _oVector = oVector;
+            _markPtr = mark;
 
             _resultCode = oVector.Length / 2;
         }
@@ -55,7 +61,19 @@ namespace PCRE
 
         public bool Success => _resultCode > 0;
 
-        public string Mark => throw new NotImplementedException(); // InternalResult.Mark;
+        public string Mark
+        {
+            get
+            {
+                if (_mark == null)
+                {
+                    if (_markPtr != null)
+                        _mark = new string(_markPtr);
+                }
+
+                return _mark;
+            }
+        }
 
         public IPcreGroupList Groups => this;
 

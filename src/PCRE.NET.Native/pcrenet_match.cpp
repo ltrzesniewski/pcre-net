@@ -22,6 +22,7 @@ typedef struct
 typedef struct
 {
     int32_t result_code;
+    PCRE2_SPTR16 mark;
 } pcrenet_match_result;
 
 typedef struct
@@ -78,6 +79,8 @@ PCRENET_EXPORT(void, match)(const pcrenet_match_input* input, pcrenet_match_resu
         for (uint32_t i = 0; i < itemCount; ++i)
             input->output_vector[i] = static_cast<uint32_t>(oVector[i]);
     }
+
+    result->mark = pcre2_get_mark(matchData);
 
     pcre2_match_context_free(context);
     pcre2_match_data_free(matchData);

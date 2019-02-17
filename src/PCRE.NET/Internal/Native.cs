@@ -88,6 +88,7 @@ namespace PCRE.Internal
         internal ref struct match_result
         {
             public int result_code;
+            public char* mark;
         }
 
         [StructLayout(LayoutKind.Sequential)]
