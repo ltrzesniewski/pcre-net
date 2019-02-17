@@ -13,6 +13,7 @@ var funcs = ParseFuncs(@"
     void code_free(IntPtr code);
     int pattern_info(IntPtr code, uint key, void* data);
     int config(uint key, void* data);
+    void match(ref match_input input, out match_result result);
 ").ToList();
 
 var platforms = new[] {
@@ -57,7 +58,7 @@ namespace PCRE.Internal
             public override <#= func.Declaration #>
                 => pcrenet_<#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => $"{p.Modifier}{p.Name}")) #>);
 
-            [DllImport("<#= platform.LibName #>", CallingConvention = CallingConvention.Cdecl)]
+            [DllImport("<#= platform.LibName #>")]
             private static extern <#= func.ReturnType #> pcrenet_<#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => p.GetPInvokeAttributes() + p.Declaration)) #>);
 
 <# } #>

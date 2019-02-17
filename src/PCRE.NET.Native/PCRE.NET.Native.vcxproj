@@ -45,6 +45,7 @@
     <ClCompile Include="..\PCRE\src\pcre2_valid_utf.c" />
     <ClCompile Include="..\PCRE\src\pcre2_xclass.c" />
     <ClCompile Include="pcrenet_compile.cpp" />
+    <ClCompile Include="pcrenet_match.cpp" />
     <ClCompile Include="pcrenet_misc.cpp" />
   </ItemGroup>
   <ItemGroup>

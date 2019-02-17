@@ -17,7 +17,7 @@ namespace PCRE
 
         internal InternalRegex InternalRegex { get; }
 
-        internal int CaptureCount => (int)InternalRegex.CaptureCount;
+        internal int CaptureCount => InternalRegex.CaptureCount;
 
         public static int CacheSize
         {

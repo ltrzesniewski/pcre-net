@@ -103,6 +103,9 @@
     <ClCompile Include="pcrenet_misc.cpp">
       <Filter>PCRE.NET\Sources</Filter>
     </ClCompile>
+    <ClCompile Include="pcrenet_match.cpp">
+      <Filter>PCRE.NET\Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\PCRE\src\config.h">

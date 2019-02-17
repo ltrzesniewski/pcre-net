@@ -14,7 +14,7 @@ namespace PCRE
 
         [Pure]
         public bool IsMatch(string subject, int startIndex)
-            => throw new NotImplementedException(); // Match(subject, startIndex).Success;
+            => Match(subject, startIndex).Success;
 
         [Pure]
         public PcreMatch Match(string subject)
@@ -66,11 +66,7 @@ namespace PCRE
             if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
                 throw new IndexOutOfRangeException("Invalid StartIndex value");
 
-            throw new NotImplementedException();
-//            using (var context = settings.CreateMatchContext(subject))
-//            {
-//                return new PcreMatch(ExecuteMatch(context));
-//            }
+            return InternalRegex.Match(subject, settings);
         }
 
         [Pure]

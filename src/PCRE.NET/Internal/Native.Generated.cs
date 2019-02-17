@@ -27,6 +27,9 @@ namespace PCRE.Internal
         public static int config(uint key, void* data)
             => _impl.config(key, data);
 
+        public static void match(ref match_input input, out match_result result)
+            => _impl.match(ref input, out result);
+
 
         private abstract class LibImpl
         {
@@ -35,6 +38,7 @@ namespace PCRE.Internal
             public abstract void code_free(IntPtr code);
             public abstract int pattern_info(IntPtr code, uint key, void* data);
             public abstract int config(uint key, void* data);
+            public abstract void match(ref match_input input, out match_result result);
         }
 
         [SuppressUnmanagedCodeSecurity]
@@ -43,32 +47,38 @@ namespace PCRE.Internal
             public override int get_error_message(int errorCode, char* errorBuffer, uint bufferSize)
                 => pcrenet_get_error_message(errorCode, errorBuffer, bufferSize);
 
-            [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
+            [DllImport("PCRE.NET.Native.dll")]
             private static extern int pcrenet_get_error_message(int errorCode, char* errorBuffer, uint bufferSize);
 
             public override void compile(ref compile_input input, out compile_result result)
                 => pcrenet_compile(ref input, out result);
 
-            [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
+            [DllImport("PCRE.NET.Native.dll")]
             private static extern void pcrenet_compile(ref compile_input input, out compile_result result);
 
             public override void code_free(IntPtr code)
                 => pcrenet_code_free(code);
 
-            [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
+            [DllImport("PCRE.NET.Native.dll")]
             private static extern void pcrenet_code_free(IntPtr code);
 
             public override int pattern_info(IntPtr code, uint key, void* data)
                 => pcrenet_pattern_info(code, key, data);
 
-            [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
+            [DllImport("PCRE.NET.Native.dll")]
             private static extern int pcrenet_pattern_info(IntPtr code, uint key, void* data);
 
             public override int config(uint key, void* data)
                 => pcrenet_config(key, data);
 
-            [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
+            [DllImport("PCRE.NET.Native.dll")]
             private static extern int pcrenet_config(uint key, void* data);
+
+            public override void match(ref match_input input, out match_result result)
+                => pcrenet_match(ref input, out result);
+
+            [DllImport("PCRE.NET.Native.dll")]
+            private static extern void pcrenet_match(ref match_input input, out match_result result);
 
         }
 
@@ -78,32 +88,38 @@ namespace PCRE.Internal
             public override int get_error_message(int errorCode, char* errorBuffer, uint bufferSize)
                 => pcrenet_get_error_message(errorCode, errorBuffer, bufferSize);
 
-            [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
+            [DllImport("PCRE.NET.Native.x86.dll")]
             private static extern int pcrenet_get_error_message(int errorCode, char* errorBuffer, uint bufferSize);
 
             public override void compile(ref compile_input input, out compile_result result)
                 => pcrenet_compile(ref input, out result);
 
-            [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
+            [DllImport("PCRE.NET.Native.x86.dll")]
             private static extern void pcrenet_compile(ref compile_input input, out compile_result result);
 
             public override void code_free(IntPtr code)
                 => pcrenet_code_free(code);
 
-            [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
+            [DllImport("PCRE.NET.Native.x86.dll")]
             private static extern void pcrenet_code_free(IntPtr code);
 
             public override int pattern_info(IntPtr code, uint key, void* data)
                 => pcrenet_pattern_info(code, key, data);
 
-            [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
+            [DllImport("PCRE.NET.Native.x86.dll")]
             private static extern int pcrenet_pattern_info(IntPtr code, uint key, void* data);
 
             public override int config(uint key, void* data)
                 => pcrenet_config(key, data);
 
-            [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
+            [DllImport("PCRE.NET.Native.x86.dll")]
             private static extern int pcrenet_config(uint key, void* data);
+
+            public override void match(ref match_input input, out match_result result)
+                => pcrenet_match(ref input, out result);
+
+            [DllImport("PCRE.NET.Native.x86.dll")]
+            private static extern void pcrenet_match(ref match_input input, out match_result result);
 
         }
 
@@ -113,32 +129,38 @@ namespace PCRE.Internal
             public override int get_error_message(int errorCode, char* errorBuffer, uint bufferSize)
                 => pcrenet_get_error_message(errorCode, errorBuffer, bufferSize);
 
-            [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
+            [DllImport("PCRE.NET.Native.x64.dll")]
             private static extern int pcrenet_get_error_message(int errorCode, char* errorBuffer, uint bufferSize);
 
             public override void compile(ref compile_input input, out compile_result result)
                 => pcrenet_compile(ref input, out result);
 
-            [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
+            [DllImport("PCRE.NET.Native.x64.dll")]
             private static extern void pcrenet_compile(ref compile_input input, out compile_result result);
 
             public override void code_free(IntPtr code)
                 => pcrenet_code_free(code);
 
-            [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
+            [DllImport("PCRE.NET.Native.x64.dll")]
             private static extern void pcrenet_code_free(IntPtr code);
 
             public override int pattern_info(IntPtr code, uint key, void* data)
                 => pcrenet_pattern_info(code, key, data);
 
-            [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
+            [DllImport("PCRE.NET.Native.x64.dll")]
             private static extern int pcrenet_pattern_info(IntPtr code, uint key, void* data);
 
             public override int config(uint key, void* data)
                 => pcrenet_config(key, data);
 
-            [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
+            [DllImport("PCRE.NET.Native.x64.dll")]
             private static extern int pcrenet_config(uint key, void* data);
+
+            public override void match(ref match_input input, out match_result result)
+                => pcrenet_match(ref input, out result);
+
+            [DllImport("PCRE.NET.Native.x64.dll")]
+            private static extern void pcrenet_match(ref match_input input, out match_result result);
 
         }
 

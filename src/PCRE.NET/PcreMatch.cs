@@ -1,33 +1,34 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using PCRE.Internal;
 
 namespace PCRE
 {
     public sealed class PcreMatch : IPcreGroup, IPcreGroupList
     {
-//        private readonly object _result; // See remark about JIT in PcreRegex
-//        private readonly PcreGroup[] _groups;
+        private readonly PcreGroup[] _groups;
+        private readonly InternalRegex _regex;
+        private readonly int _resultCode;
+        private readonly uint[] _oVector;
 
-//        internal PcreMatch(MatchData result)
-//        {
-//            _result = result;
-//            _groups = new PcreGroup[result.Regex.CaptureCount + 1];
-//        }
-//
-//        private MatchData InternalResult
-//        {
-//            [MethodImpl(MethodImplOptions.AggressiveInlining)] get { return (MatchData)_result; }
-//        }
+        internal PcreMatch(string subject, InternalRegex regex, ref Native.match_result result, uint[] oVector)
+        {
+            Subject = subject;
+            _regex = regex;
+            _oVector = oVector;
+            _groups = new PcreGroup[regex.CaptureCount + 1];
 
-        public int CaptureCount => throw new NotImplementedException(); // (int)InternalResult.Regex.CaptureCount;
+            _resultCode = result.result_code;
+        }
+
+        public int CaptureCount => _regex.CaptureCount;
 
         public PcreGroup this[int index] => GetGroup(index);
 
         public PcreGroup this[string name] => GetGroup(name);
 
-        internal string Subject => throw new NotImplementedException(); // InternalResult.Subject;
+        internal string Subject { get; }
 
         public int Index => this[0].Index;
 
@@ -37,13 +38,13 @@ namespace PCRE
 
         public string Value => this[0].Value;
 
-        public bool Success => throw new NotImplementedException(); // InternalResult.ResultCode == MatchResultCode.Success;
+        public bool Success => _resultCode > 0;
 
         public string Mark => throw new NotImplementedException(); // InternalResult.Mark;
 
         public IPcreGroupList Groups => this;
 
-        public bool IsPartialMatch => throw new NotImplementedException(); // InternalResult.ResultCode == MatchResultCode.Partial;
+        public bool IsPartialMatch => _resultCode == PcreConstants.ERROR_PARTIAL;
 
         public IEnumerator<PcreGroup> GetEnumerator() => GetAllGroups().GetEnumerator();
 
@@ -55,31 +56,26 @@ namespace PCRE
 
         private PcreGroup GetGroup(int index)
         {
-            throw new NotImplementedException();
-//            if (index < 0 || index > CaptureCount)
-//                return null;
-//
-//            var group = _groups[index];
-//            if (group == null)
-//                _groups[index] = group = CreateGroup(index);
-//
-//            return group;
+            if (index < 0 || index > CaptureCount)
+                return null;
+
+            var group = _groups[index];
+            if (group == null)
+                _groups[index] = group = CreateGroup(index);
+
+            return group;
         }
 
         private PcreGroup CreateGroup(int index)
         {
-            throw new NotImplementedException();
-//            var result = InternalResult;
-//
-//            if (result.ResultCode == MatchResultCode.Partial && index != 0)
-//                return PcreGroup.Empty;
-//
-//            var uindex = (uint)index;
-//            var startOffset = result.GetStartOffset(uindex);
-//            if (startOffset >= 0)
-//                return new PcreGroup(result.Subject, startOffset, result.GetEndOffset(uindex));
-//
-//            return PcreGroup.Empty;
+            if (_resultCode == PcreConstants.ERROR_PARTIAL && index != 0)
+                return PcreGroup.Empty;
+
+            var startOffset = GetStartOffset(index);
+            if (startOffset >= 0)
+                return new PcreGroup(Subject, startOffset, GetEndOffset(index));
+
+            return PcreGroup.Empty;
         }
 
         private PcreGroup GetGroup(string name)
@@ -129,6 +125,12 @@ namespace PCRE
             // when the pattern contains \K in a lookahead
             return Math.Max(Index, EndIndex);
         }
+
+        private int GetStartOffset(int index)
+            => (uint)index < _oVector.Length ? (int)_oVector[2 * index] : -1;
+
+        private int GetEndOffset(int index)
+            => (uint)index < _oVector.Length ? (int)_oVector[2 * index + 1] : -1;
 
         public override string ToString() => Value;
 

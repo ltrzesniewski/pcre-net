@@ -1,4 +1,5 @@
 ﻿using System;
+using PCRE.Internal;
 using PCRE.Support;
 
 namespace PCRE
@@ -38,6 +39,16 @@ namespace PCRE
         void Dummy()
         {
             OnCallout?.Invoke(null);
+        }
+
+        internal void FillMatchInput(ref Native.match_input input)
+        {
+            input.additional_options = AdditionalOptions.ToPatternOptions();
+            input.start_index = (uint)StartIndex;
+            input.match_limit = _matchLimit.GetValueOrDefault();
+            input.depth_limit = _depthLimit.GetValueOrDefault();
+            input.heap_limit = _heapLimit.GetValueOrDefault();
+            input.offset_limit = OffsetLimit.GetValueOrDefault();
         }
 
 //        internal MatchContext CreateMatchContext(string subject)

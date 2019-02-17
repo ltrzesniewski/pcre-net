@@ -42,7 +42,7 @@ namespace PCRE.Internal
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        internal struct compile_input
+        internal ref struct compile_input
         {
             public char* pattern;
             public uint pattern_length;
@@ -56,11 +56,32 @@ namespace PCRE.Internal
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        internal struct compile_result
+        internal ref struct compile_result
         {
             public IntPtr code;
             public int error_code;
             public uint error_offset;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal ref struct match_input
+        {
+            public IntPtr code;
+            public char* subject;
+            public uint subject_length;
+            public uint start_index;
+            public uint additional_options;
+            public uint match_limit;
+            public uint depth_limit;
+            public uint heap_limit;
+            public uint offset_limit;
+            public uint* output_vector;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal ref struct match_result
+        {
+            public int result_code;
         }
     }
 }

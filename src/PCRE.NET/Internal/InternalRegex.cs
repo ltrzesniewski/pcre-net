@@ -71,5 +71,44 @@ namespace PCRE.Internal
 
             return result;
         }
+
+        public PcreMatch Match(string subject, PcreMatchSettings settings)
+        {
+            var oVector = new uint[2 * (CaptureCount + 1)];
+
+            fixed (char* pSubject = subject)
+            fixed (uint* pOVec = &oVector[0])
+            {
+                var input = new Native.match_input
+                {
+                    code = _code,
+                    subject = pSubject,
+                    subject_length = (uint)subject.Length,
+                    output_vector = pOVec
+                };
+
+                settings.FillMatchInput(ref input);
+
+                Native.match(ref input, out var result);
+
+                switch (result.result_code)
+                {
+                    case PcreConstants.ERROR_NOMATCH:
+                    case PcreConstants.ERROR_PARTIAL:
+                        break;
+
+                    case PcreConstants.ERROR_CALLOUT:
+                        throw new NotImplementedException();
+
+                    default:
+                        if (result.result_code < 0)
+                            throw new PcreMatchException(Native.GetErrorMessage(result.result_code));
+
+                        break;
+                }
+
+                return new PcreMatch(subject, this, ref result, oVector);
+            }
+        }
     }
 }
