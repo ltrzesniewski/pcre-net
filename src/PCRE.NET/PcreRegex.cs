@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using PCRE.Dfa;
 using PCRE.Internal;
-using PCRE.Support;
 
 namespace PCRE
 {

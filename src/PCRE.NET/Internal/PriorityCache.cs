@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace PCRE.Support
+namespace PCRE.Internal
 {
     internal class PriorityCache<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     {

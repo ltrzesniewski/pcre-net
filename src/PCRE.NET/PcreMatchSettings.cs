@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using PCRE.Internal;
-using PCRE.Support;
 
 namespace PCRE
 {

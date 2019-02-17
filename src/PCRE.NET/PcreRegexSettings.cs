@@ -1,6 +1,5 @@
 ﻿using System;
 using PCRE.Internal;
-using PCRE.Support;
 
 namespace PCRE
 {

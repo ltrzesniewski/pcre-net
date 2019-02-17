@@ -1,6 +1,4 @@
-﻿using PCRE.Internal;
-
-namespace PCRE.Support
+﻿namespace PCRE.Internal
 {
     internal static class PcreEnumExtensions
     {

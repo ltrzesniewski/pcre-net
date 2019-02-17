@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using PCRE.Internal;
-using PCRE.Support;
 
 namespace PCRE
 {

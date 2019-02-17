@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PCRE.Support
+namespace PCRE.Internal
 {
     internal readonly struct RegexKey : IEquatable<RegexKey>
     {

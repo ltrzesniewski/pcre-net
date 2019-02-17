@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using PCRE.Support;
+using PCRE.Internal;
 
 namespace PCRE.Tests.PcreNet.Support
 {

@@ -1,5 +1,4 @@
 ﻿using System;
-using PCRE.Support;
 
 namespace PCRE.Dfa
 {

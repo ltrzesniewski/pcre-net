@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Text;
-using PCRE.Support;
+using PCRE.Internal;
 
 namespace PCRE
 {
