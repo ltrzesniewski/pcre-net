@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace PCRE.Internal
 {
     internal sealed unsafe class InternalRegex : IDisposable
     {
         private IntPtr _code;
+        private Dictionary<int, PcreCalloutInfo> _calloutInfoByPatternPosition;
 
         public string Pattern { get; }
         public PcreRegexSettings Settings { get; }
@@ -157,6 +159,43 @@ namespace PCRE.Internal
             }
 
             return new PcreMatch(subject, this, ref result, oVector);
+        }
+
+        public IReadOnlyList<PcreCalloutInfo> GetCallouts()
+        {
+            var calloutCount = Native.get_callout_count(_code);
+            if (calloutCount == 0)
+                return Array.Empty<PcreCalloutInfo>();
+
+            var data = new Native.pcre2_callout_enumerate_block[calloutCount];
+
+            fixed (Native.pcre2_callout_enumerate_block* pData = &data[0])
+            {
+                Native.get_callouts(_code, pData);
+            }
+
+            var result = new List<PcreCalloutInfo>((int)calloutCount);
+
+            for (var i = 0; i < data.Length; ++i)
+                result.Add(new PcreCalloutInfo(ref data[i]));
+
+            return result.AsReadOnly();
+        }
+
+        public PcreCalloutInfo GetCalloutInfoByPatternPosition(int patternPosition)
+        {
+            if (_calloutInfoByPatternPosition == null)
+            {
+                var dict = new Dictionary<int, PcreCalloutInfo>();
+
+                foreach (var info in GetCallouts())
+                    dict.Add(info.PatternPosition, info);
+
+                Thread.MemoryBarrier();
+                _calloutInfoByPatternPosition = dict;
+            }
+
+            return _calloutInfoByPatternPosition.TryGetValue(patternPosition, out var result) ? result : null;
         }
     }
 }

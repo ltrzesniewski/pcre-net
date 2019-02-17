@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using PCRE.Internal;
 
 namespace PCRE
@@ -7,7 +6,7 @@ namespace PCRE
     public sealed class PcrePatternInfo
     {
         private readonly InternalRegex _re;
-        //private IReadOnlyList<PcreCalloutInfo> _callouts;
+        private IReadOnlyList<PcreCalloutInfo> _callouts;
 
         internal PcrePatternInfo(InternalRegex re)
         {
@@ -42,7 +41,7 @@ namespace PCRE
         public uint LastCodeType => _re.GetInfoUInt32(PcreConstants.INFO_LASTCODETYPE);
         public uint LastCodeUnit => _re.GetInfoUInt32(PcreConstants.INFO_LASTCODEUNIT);
 
-        public IReadOnlyList<PcreCalloutInfo> Callouts => throw new NotImplementedException(); // _callouts ?? (_callouts = _re.InternalRegex.Callouts.Select(i => new PcreCalloutInfo(i)).ToList().AsReadOnly());
+        public IReadOnlyList<PcreCalloutInfo> Callouts => _callouts ?? (_callouts = _re.GetCallouts());
 
         public IEnumerable<int> GetGroupIndexesByName(string name)
         {

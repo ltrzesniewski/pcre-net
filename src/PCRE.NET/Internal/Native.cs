@@ -117,5 +117,20 @@ namespace PCRE.Internal
             public uint callout_flags; /* See above for list */
             /* ------------------------------------------------------------------ */
         }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct pcre2_callout_enumerate_block
+        {
+            public uint version; /* Identifies version of block */
+
+            /* ------------------------ Version 0 ------------------------------- */
+            public UIntPtr pattern_position; /* Offset to next item in the pattern */
+            public UIntPtr next_item_length; /* Length of next item in the pattern */
+            public uint callout_number; /* Number compiled into pattern */
+            public UIntPtr callout_string_offset; /* Offset to string within pattern */
+            public UIntPtr callout_string_length; /* Length of string compiled into pattern */
+            public char* callout_string; /* String compiled into pattern */
+            /* ------------------------------------------------------------------ */
+        }
     }
 }
