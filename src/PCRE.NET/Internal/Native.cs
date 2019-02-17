@@ -86,6 +86,21 @@ namespace PCRE.Internal
         }
 
         [StructLayout(LayoutKind.Sequential)]
+        internal ref struct dfa_match_input
+        {
+            public IntPtr code;
+            public char* subject;
+            public uint subject_length;
+            public uint start_index;
+            public uint additional_options;
+            public uint* output_vector;
+            public void* callout;
+            public void* callout_data;
+            public uint max_results;
+            public uint workspace_size;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
         internal ref struct match_result
         {
             public int result_code;
@@ -131,6 +146,7 @@ namespace PCRE.Internal
             public uint callout_number; /* Number compiled into pattern */
             public UIntPtr callout_string_offset; /* Offset to string within pattern */
             public UIntPtr callout_string_length; /* Length of string compiled into pattern */
+
             public char* callout_string; /* String compiled into pattern */
             /* ------------------------------------------------------------------ */
         }

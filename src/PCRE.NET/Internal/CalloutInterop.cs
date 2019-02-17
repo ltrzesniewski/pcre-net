@@ -11,7 +11,7 @@ namespace PCRE.Internal
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private delegate int CalloutHandlerFunc(ref Native.pcre2_callout_block callout, void* data);
 
-        private static readonly CalloutHandlerFunc _calloutHandlerDelegate = CalloutHandler;
+        private static readonly CalloutHandlerFunc _calloutHandlerDelegate = CalloutHandler; // GC root
         private static readonly void* _calloutHandlerFnPtr = Marshal.GetFunctionPointerForDelegate(_calloutHandlerDelegate).ToPointer();
 
         private static int CalloutHandler(ref Native.pcre2_callout_block callout, void* data)
@@ -50,8 +50,29 @@ namespace PCRE.Internal
             }
         }
 
+        public static void Prepare(string subject, InternalRegex regex, ref Native.dfa_match_input input, out CalloutInteropInfo interopInfo, Func<PcreCallout, PcreCalloutResult> callout)
+        {
+            if (callout != null)
+            {
+                interopInfo = new CalloutInteropInfo
+                {
+                    Subject = subject,
+                    Regex = regex,
+                    Callout = callout
+                };
+
+                input.callout = _calloutHandlerFnPtr;
+                input.callout_data = interopInfo.ToPointer();
+            }
+            else
+            {
+                interopInfo = default;
+                input.callout = null;
+            }
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void* ToPointer(this ref CalloutInteropInfo value)
+        private static void* ToPointer(this ref CalloutInteropInfo value)
         {
             Ldarg(nameof(value));
             Conv_U();

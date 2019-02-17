@@ -1,53 +1,58 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using PCRE.Internal;
 
 namespace PCRE.Dfa
 {
     public sealed class PcreDfaMatchResult : IReadOnlyList<PcreDfaMatch>
     {
-//        private readonly object _result; // See remark about JIT in PcreRegex
-//        private readonly PcreDfaMatch[] _matches;
+        private readonly uint[] _oVector;
+        private readonly int _resultCode;
+        private readonly PcreDfaMatch[] _matches;
 
-//        internal PcreDfaMatchResult(MatchData result)
-//        {
-//            _result = result;
-//
-//            if (result.RawResultCode > 0)
-//                _matches = new PcreDfaMatch[result.RawResultCode];
-//            else if (result.RawResultCode == 0)
-//                _matches = new PcreDfaMatch[result.OutputVectorLength];
-//            else
-//                _matches = PcreDfaMatch.EmptyMatches;
-//        }
-//
-//        private MatchData InternalResult
-//        {
-//            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-//            get { return (MatchData)_result; }
-//        }
+        internal string Subject { get; }
+
+        internal PcreDfaMatchResult(string subject, ref Native.match_result result, uint[] oVector)
+        {
+            // Real match
+
+            Subject = subject;
+            _oVector = oVector;
+
+            _resultCode = result.result_code;
+
+            if (_resultCode > 0)
+                _matches = new PcreDfaMatch[_resultCode];
+            else if (_resultCode == 0)
+                _matches = new PcreDfaMatch[_oVector.Length / 2];
+            else
+                _matches = Array.Empty<PcreDfaMatch>();
+        }
 
         private PcreDfaMatch GetMatch(int index)
         {
             if (index < 0 || index >= Count)
                 return null;
 
-            throw new NotImplementedException();
+            var match = _matches[index];
+            if (match == null)
+                _matches[index] = match = CreateMatch(index);
 
-//            var match = _matches[index];
-//            if (match == null)
-//                _matches[index] = match = CreateMatch(index);
-//
-//            return match;
+            return match;
         }
 
-//        private PcreDfaMatch CreateMatch(int index)
-//        {
-//            var result = InternalResult;
-//            var uindex = (uint)index;
-//            return new PcreDfaMatch(result.Subject, result.GetStartOffset(uindex), result.GetEndOffset(uindex));
-//        }
+        private PcreDfaMatch CreateMatch(int index)
+        {
+            index *= 2;
+            if (index >= _oVector.Length)
+                return null;
+
+            var startOffset = (int)_oVector[index];
+            var endOffset = (int)_oVector[index + 1];
+
+            return new PcreDfaMatch(Subject, startOffset, endOffset);
+        }
 
         private IEnumerable<PcreDfaMatch> GetMatches()
         {
@@ -60,9 +65,9 @@ namespace PCRE.Dfa
 
         public PcreDfaMatch this[int index] => GetMatch(index);
 
-        public int Count => throw new NotImplementedException();
+        public int Count => _matches.Length;
 
-        public bool Success => throw new NotImplementedException(); // InternalResult.ResultCode == MatchResultCode.Success;
+        public bool Success => _resultCode >= 0;
 
         public int Index => LongestMatch?.Index ?? -1;
 

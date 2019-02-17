@@ -25,7 +25,7 @@ namespace PCRE
             set => Caches.CacheSize = value;
         }
 
-        public PcreDfaRegex Dfa => _dfa ?? (_dfa = new PcreDfaRegex(this));
+        public PcreDfaRegex Dfa => _dfa ?? (_dfa = new PcreDfaRegex(InternalRegex));
 
         [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
         public PcreRegex(string pattern)

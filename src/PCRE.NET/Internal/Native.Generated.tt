@@ -14,6 +14,7 @@ var funcs = ParseFuncs(@"
     int pattern_info(IntPtr code, uint key, void* data);
     int config(uint key, void* data);
     void match(ref match_input input, out match_result result);
+    void dfa_match(ref dfa_match_input input, out match_result result);
     uint get_callout_count(IntPtr code);
     void get_callouts(IntPtr code, pcre2_callout_enumerate_block* data);
     IntPtr jit_stack_create(uint startSize, uint maxSize);

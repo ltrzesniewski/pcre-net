@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using PCRE.Internal;
 
 namespace PCRE.Dfa
 {
@@ -6,35 +8,25 @@ namespace PCRE.Dfa
     {
         public PcreDfaMatchOptions AdditionalOptions { get; set; }
         public int StartIndex { get; set; }
-        public event Func<PcreCallout, PcreCalloutResult> OnCallout;
 
-        public uint MaxResults { get; set; }
-        public uint WorkspaceSize { get; set; }
+        public uint MaxResults { get; set; } = 128;
+        public uint WorkspaceSize { get; set; } = 128;
 
-        public PcreDfaMatchSettings()
+        [SuppressMessage("ReSharper", "DelegateSubtraction")]
+        public event Func<PcreCallout, PcreCalloutResult> OnCallout
         {
-            WorkspaceSize = 128;
-            MaxResults = 128;
+            add => Callout += value;
+            remove => Callout -= value;
         }
 
-        private void Dummy()  // TODO remove
-        {
-            OnCallout?.Invoke(null);
-        }
+        internal Func<PcreCallout, PcreCalloutResult> Callout { get; private set; }
 
-//        internal MatchContext CreateMatchContext(string subject)
-//        {
-//            var context = new MatchContext
-//            {
-//                Subject = subject,
-//                StartIndex = StartIndex,
-//                AdditionalOptions = ((PcreMatchOptions)AdditionalOptions).ToPatternOptions(),
-//                CalloutHandler = PcreMatchSettings.WrapCallout(OnCallout),
-//                DfaMaxResults = (AdditionalOptions & PcreDfaMatchOptions.DfaShortest) != 0 ? 1 : MaxResults,
-//                DfaWorkspaceSize = WorkspaceSize
-//            };
-//
-//            return context;
-//        }
+        internal void FillMatchInput(ref Native.dfa_match_input input)
+        {
+            input.additional_options = ((PcreMatchOptions)AdditionalOptions).ToPatternOptions();
+            input.start_index = (uint)StartIndex;
+            input.max_results = (AdditionalOptions & PcreDfaMatchOptions.DfaShortest) != 0 ? 1 : Math.Max(1, MaxResults);
+            input.workspace_size = WorkspaceSize;
+        }
     }
 }

@@ -30,6 +30,9 @@ namespace PCRE.Internal
         public static void match(ref match_input input, out match_result result)
             => _impl.match(ref input, out result);
 
+        public static void dfa_match(ref dfa_match_input input, out match_result result)
+            => _impl.dfa_match(ref input, out result);
+
         public static uint get_callout_count(IntPtr code)
             => _impl.get_callout_count(code);
 
@@ -51,6 +54,7 @@ namespace PCRE.Internal
             public abstract int pattern_info(IntPtr code, uint key, void* data);
             public abstract int config(uint key, void* data);
             public abstract void match(ref match_input input, out match_result result);
+            public abstract void dfa_match(ref dfa_match_input input, out match_result result);
             public abstract uint get_callout_count(IntPtr code);
             public abstract void get_callouts(IntPtr code, pcre2_callout_enumerate_block* data);
             public abstract IntPtr jit_stack_create(uint startSize, uint maxSize);
@@ -95,6 +99,12 @@ namespace PCRE.Internal
 
             [DllImport("PCRE.NET.Native.dll")]
             private static extern void pcrenet_match(ref match_input input, out match_result result);
+
+            public override void dfa_match(ref dfa_match_input input, out match_result result)
+                => pcrenet_dfa_match(ref input, out result);
+
+            [DllImport("PCRE.NET.Native.dll")]
+            private static extern void pcrenet_dfa_match(ref dfa_match_input input, out match_result result);
 
             public override uint get_callout_count(IntPtr code)
                 => pcrenet_get_callout_count(code);
@@ -161,6 +171,12 @@ namespace PCRE.Internal
             [DllImport("PCRE.NET.Native.x86.dll")]
             private static extern void pcrenet_match(ref match_input input, out match_result result);
 
+            public override void dfa_match(ref dfa_match_input input, out match_result result)
+                => pcrenet_dfa_match(ref input, out result);
+
+            [DllImport("PCRE.NET.Native.x86.dll")]
+            private static extern void pcrenet_dfa_match(ref dfa_match_input input, out match_result result);
+
             public override uint get_callout_count(IntPtr code)
                 => pcrenet_get_callout_count(code);
 
@@ -225,6 +241,12 @@ namespace PCRE.Internal
 
             [DllImport("PCRE.NET.Native.x64.dll")]
             private static extern void pcrenet_match(ref match_input input, out match_result result);
+
+            public override void dfa_match(ref dfa_match_input input, out match_result result)
+                => pcrenet_dfa_match(ref input, out result);
+
+            [DllImport("PCRE.NET.Native.x64.dll")]
+            private static extern void pcrenet_dfa_match(ref dfa_match_input input, out match_result result);
 
             public override uint get_callout_count(IntPtr code)
                 => pcrenet_get_callout_count(code);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using PCRE.Dfa;
 
 namespace PCRE.Internal
 {
@@ -142,6 +143,41 @@ namespace PCRE.Internal
                 Native.match(ref input, out result);
             }
 
+            AfterMatch(result, ref calloutInterop);
+
+            return new PcreMatch(subject, this, ref result, oVector);
+        }
+
+        public PcreDfaMatchResult DfaMatch(string subject, PcreDfaMatchSettings settings, int startIndex)
+        {
+            var input = new Native.dfa_match_input();
+            settings.FillMatchInput(ref input);
+
+            var oVector = new uint[2 * Math.Max(1, settings.MaxResults)];
+            Native.match_result result;
+            CalloutInterop.CalloutInteropInfo calloutInterop;
+
+            fixed (char* pSubject = subject)
+            fixed (uint* pOVec = &oVector[0])
+            {
+                input.code = _code;
+                input.subject = pSubject;
+                input.subject_length = (uint)subject.Length;
+                input.output_vector = pOVec;
+                input.start_index = (uint)startIndex;
+
+                CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, settings.Callout);
+
+                Native.dfa_match(ref input, out result);
+            }
+
+            AfterMatch(result, ref calloutInterop);
+
+            return new PcreDfaMatchResult(subject, ref result, oVector);
+        }
+
+        private static void AfterMatch(Native.match_result result, ref CalloutInterop.CalloutInteropInfo calloutInterop)
+        {
             switch (result.result_code)
             {
                 case PcreConstants.ERROR_NOMATCH:
@@ -157,8 +193,6 @@ namespace PCRE.Internal
 
                     break;
             }
-
-            return new PcreMatch(subject, this, ref result, oVector);
         }
 
         public IReadOnlyList<PcreCalloutInfo> GetCallouts()
