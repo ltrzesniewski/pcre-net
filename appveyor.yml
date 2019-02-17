@@ -11,4 +11,3 @@ after_build:
 test: off
 artifacts:
  - path: build\output\*.nupkg
- - path: build\output\*.dll
