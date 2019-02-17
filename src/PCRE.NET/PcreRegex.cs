@@ -9,14 +9,12 @@ namespace PCRE
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
-    public sealed partial class PcreRegex : IInternalRegexWrapper
+    public sealed partial class PcreRegex
     {
         private PcrePatternInfo _info;
         private PcreDfaRegex _dfa;
 
-        public PcrePatternInfo PatternInfo => _info ?? (_info = new PcrePatternInfo(this));
-
-        internal RegexKey Key { get; }
+        public PcrePatternInfo PatternInfo => _info ?? (_info = new PcrePatternInfo(InternalRegex));
 
         internal InternalRegex InternalRegex { get; }
 
@@ -48,14 +46,9 @@ namespace PCRE
             if (settings == null)
                 throw new ArgumentNullException(nameof(settings));
 
-            Key = new RegexKey(pattern, settings);
-            InternalRegex = Caches.RegexCache.GetOrAdd(Key);
+            InternalRegex = Caches.RegexCache.GetOrAdd(new RegexKey(InternalRegex.Pattern, InternalRegex.Settings));
         }
 
-        RegexKey IInternalRegexWrapper.Key => Key;
-
-        InternalRegex IInternalRegexWrapper.InternalRegex => InternalRegex;
-
-        public override string ToString() => Key.Pattern;
+        public override string ToString() => InternalRegex.Pattern;
     }
 }

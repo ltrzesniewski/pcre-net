@@ -3,15 +3,21 @@ using System.Collections.Generic;
 
 namespace PCRE.Internal
 {
-    internal unsafe class InternalRegex : IDisposable
+    internal sealed unsafe class InternalRegex : IDisposable
     {
         private IntPtr _code;
-        internal Dictionary<string, int[]> CaptureNames { get; }
 
+        public string Pattern { get; }
+        public PcreRegexSettings Settings { get; }
+
+        public Dictionary<string, int[]> CaptureNames { get; }
         public int CaptureCount { get; }
 
         public InternalRegex(string pattern, PcreRegexSettings settings)
         {
+            Pattern = pattern;
+            Settings = settings.AsReadOnly();
+
             Native.compile_result result;
 
             fixed (char* pPattern = pattern)
@@ -22,7 +28,7 @@ namespace PCRE.Internal
                     pattern_length = (uint)pattern.Length
                 };
 
-                settings.FillCompileInput(ref input);
+                Settings.FillCompileInput(ref input);
 
                 Native.compile(ref input, out result);
                 _code = result.code;
@@ -32,7 +38,6 @@ namespace PCRE.Internal
             }
 
             CaptureCount = (int)result.capture_count;
-
             CaptureNames = new Dictionary<string, int[]>((int)result.name_count, StringComparer.Ordinal);
 
             var currentItem = result.name_entry_table;

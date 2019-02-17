@@ -36,7 +36,7 @@ namespace PCRE
 
         public PcreJitStack JitStack { get; set; }
 
-        void Dummy()
+        void Dummy() // TODO remove
         {
             OnCallout?.Invoke(null);
         }
@@ -50,41 +50,5 @@ namespace PCRE
             input.heap_limit = _heapLimit.GetValueOrDefault();
             input.offset_limit = OffsetLimit.GetValueOrDefault();
         }
-
-//        internal MatchContext CreateMatchContext(string subject)
-//        {
-//            var context = new MatchContext
-//            {
-//                Subject = subject,
-//                StartIndex = StartIndex,
-//                AdditionalOptions = AdditionalOptions.ToPatternOptions(),
-//                CalloutHandler = WrapCallout(OnCallout)
-//            };
-//
-//            if (_matchLimit != null)
-//                context.MatchLimit = _matchLimit.GetValueOrDefault();
-//
-//            if (_depthLimit != null)
-//                context.DepthLimit = _depthLimit.GetValueOrDefault();
-//
-//            if (_heapLimit != null)
-//                context.HeapLimit = _heapLimit.GetValueOrDefault();
-//
-//            if (OffsetLimit != null)
-//                context.OffsetLimit = OffsetLimit.GetValueOrDefault();
-//
-//            if (JitStack != null)
-//                context.JitStack = JitStack.GetStack();
-//
-//            return context;
-//        }
-//
-//        internal static Func<CalloutData, CalloutResult> WrapCallout(Func<PcreCallout, PcreCalloutResult> callout)
-//        {
-//            if (callout == null)
-//                return null;
-//
-//            return data => (CalloutResult)callout(new PcreCallout(data));
-//        }
     }
 }

@@ -18,7 +18,7 @@ namespace PCRE.Dfa
             MaxResults = 128;
         }
 
-        private void Dummy()
+        private void Dummy()  // TODO remove
         {
             OnCallout?.Invoke(null);
         }
