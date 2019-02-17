@@ -21,6 +21,10 @@ typedef struct
     pcre2_code* code;
     int32_t error_code;
     uint32_t error_offset;
+    uint32_t capture_count;
+    uint32_t name_count;
+    uint32_t name_entry_size;
+    uint16_t* name_entry_table;
 } pcrenet_compile_result;
 
 PCRENET_EXPORT(void, compile)(const pcrenet_compile_input* input, pcrenet_compile_result* result)
@@ -60,6 +64,11 @@ PCRENET_EXPORT(void, compile)(const pcrenet_compile_input* input, pcrenet_compil
 
         if (input->flags_jit)
             pcre2_jit_compile(result->code, input->flags_jit);
+
+        pcre2_pattern_info(result->code, PCRE2_INFO_CAPTURECOUNT, &result->capture_count);
+        pcre2_pattern_info(result->code, PCRE2_INFO_NAMECOUNT, &result->name_count);
+        pcre2_pattern_info(result->code, PCRE2_INFO_NAMEENTRYSIZE, &result->name_entry_size);
+        pcre2_pattern_info(result->code, PCRE2_INFO_NAMETABLE, &result->name_entry_table);
     }
     else
     {

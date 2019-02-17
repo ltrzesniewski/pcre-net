@@ -61,6 +61,10 @@ namespace PCRE.Internal
             public IntPtr code;
             public int error_code;
             public uint error_offset;
+            public uint capture_count;
+            public uint name_count;
+            public uint name_entry_size;
+            public char* name_entry_table;
         }
 
         [StructLayout(LayoutKind.Sequential)]

@@ -1,15 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace PCRE.Internal
 {
     internal unsafe class InternalRegex : IDisposable
     {
         private IntPtr _code;
+        internal Dictionary<string, int[]> CaptureNames { get; }
 
         public int CaptureCount { get; }
 
         public InternalRegex(string pattern, PcreRegexSettings settings)
         {
+            Native.compile_result result;
+
             fixed (char* pPattern = pattern)
             {
                 var input = new Native.compile_input
@@ -20,14 +24,38 @@ namespace PCRE.Internal
 
                 settings.FillCompileInput(ref input);
 
-                Native.compile(ref input, out var result);
+                Native.compile(ref input, out result);
                 _code = result.code;
 
                 if (_code == IntPtr.Zero || result.error_code != 0)
                     throw new ArgumentException($"Invalid pattern '{pattern}': {Native.GetErrorMessage(result.error_code)} at offset {result.error_offset}");
             }
 
-            CaptureCount = (int)GetInfoUInt32(PcreConstants.INFO_CAPTURECOUNT);
+            CaptureCount = (int)result.capture_count;
+
+            CaptureNames = new Dictionary<string, int[]>((int)result.name_count, StringComparer.Ordinal);
+
+            var currentItem = result.name_entry_table;
+
+            for (var i = 0; i < result.name_count; ++i)
+            {
+                var groupIndex = (int)*currentItem;
+                var groupName = new string(currentItem + 1);
+
+                if (CaptureNames.TryGetValue(groupName, out var indexes))
+                {
+                    Array.Resize(ref indexes, indexes.Length + 1);
+                    indexes[indexes.Length - 1] = groupIndex;
+                }
+                else
+                {
+                    indexes = new[] { groupIndex };
+                }
+
+                CaptureNames[groupName] = indexes;
+
+                currentItem += result.name_entry_size;
+            }
         }
 
         ~InternalRegex()

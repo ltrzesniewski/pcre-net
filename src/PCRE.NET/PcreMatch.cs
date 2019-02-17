@@ -82,43 +82,41 @@ namespace PCRE
 
         private PcreGroup GetGroup(string name)
         {
-            throw new NotImplementedException();
-//            var map = InternalResult.Regex.CaptureNames;
-//            if (map == null)
-//                return null;
-//
-//            if (!map.TryGetValue(name, out var indexes))
-//                return null;
-//
-//            if (indexes.Length == 1)
-//                return GetGroup(indexes[0]);
-//
-//            foreach (var index in indexes)
-//            {
-//                var group = GetGroup(index);
-//                if (group != null && group.Success)
-//                    return group;
-//            }
-//
-//            return PcreGroup.Empty;
+            var map = _regex.CaptureNames;
+            if (map == null)
+                return null;
+
+            if (!map.TryGetValue(name, out var indexes))
+                return null;
+
+            if (indexes.Length == 1)
+                return GetGroup(indexes[0]);
+
+            foreach (var index in indexes)
+            {
+                var group = GetGroup(index);
+                if (group != null && group.Success)
+                    return group;
+            }
+
+            return PcreGroup.Empty;
         }
 
         public IEnumerable<PcreGroup> GetDuplicateNamedGroups(string name)
         {
-            throw new NotImplementedException();
-//            var map = InternalResult.Regex.CaptureNames;
-//            if (map == null)
-//                yield break;
-//
-//            if (!map.TryGetValue(name, out var indexes))
-//                yield break;
-//
-//            foreach (var index in indexes)
-//            {
-//                var group = GetGroup(index);
-//                if (group != null)
-//                    yield return group;
-//            }
+            var map = _regex.CaptureNames;
+            if (map == null)
+                yield break;
+
+            if (!map.TryGetValue(name, out var indexes))
+                yield break;
+
+            foreach (var index in indexes)
+            {
+                var group = GetGroup(index);
+                if (group != null)
+                    yield return group;
+            }
         }
 
         internal int GetStartOfNextMatchIndex()
