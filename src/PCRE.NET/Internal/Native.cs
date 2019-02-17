@@ -150,5 +150,22 @@ namespace PCRE.Internal
             public char* callout_string; /* String compiled into pattern */
             /* ------------------------------------------------------------------ */
         }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct convert_input
+        {
+            public char* pattern;
+            public uint pattern_length;
+            public uint options;
+            public uint glob_escape;
+            public uint glob_separator;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct convert_result
+        {
+            public char* output;
+            public uint output_length;
+        }
     }
 }

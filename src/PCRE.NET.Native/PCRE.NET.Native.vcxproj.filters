@@ -100,10 +100,13 @@
     <ClCompile Include="..\PCRE\src\pcre2_substring.c">
       <Filter>PCRE\Sources</Filter>
     </ClCompile>
-    <ClCompile Include="pcrenet_misc.cpp">
+    <ClCompile Include="pcrenet_match.cpp">
       <Filter>PCRE.NET\Sources</Filter>
     </ClCompile>
-    <ClCompile Include="pcrenet_match.cpp">
+    <ClCompile Include="pcrenet_info.cpp">
+      <Filter>PCRE.NET\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="pcrenet_convert.cpp">
       <Filter>PCRE.NET\Sources</Filter>
     </ClCompile>
   </ItemGroup>

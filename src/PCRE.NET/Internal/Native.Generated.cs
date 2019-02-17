@@ -45,6 +45,12 @@ namespace PCRE.Internal
         public static void jit_stack_free(IntPtr stack)
             => _impl.jit_stack_free(stack);
 
+        public static int convert(ref convert_input input, out convert_result result)
+            => _impl.convert(ref input, out result);
+
+        public static int convert_result_free(char* str)
+            => _impl.convert_result_free(str);
+
 
         private abstract class LibImpl
         {
@@ -59,6 +65,8 @@ namespace PCRE.Internal
             public abstract void get_callouts(IntPtr code, pcre2_callout_enumerate_block* data);
             public abstract IntPtr jit_stack_create(uint startSize, uint maxSize);
             public abstract void jit_stack_free(IntPtr stack);
+            public abstract int convert(ref convert_input input, out convert_result result);
+            public abstract int convert_result_free(char* str);
         }
 
         [SuppressUnmanagedCodeSecurity]
@@ -129,6 +137,18 @@ namespace PCRE.Internal
 
             [DllImport("PCRE.NET.Native.dll")]
             private static extern void pcrenet_jit_stack_free(IntPtr stack);
+
+            public override int convert(ref convert_input input, out convert_result result)
+                => pcrenet_convert(ref input, out result);
+
+            [DllImport("PCRE.NET.Native.dll")]
+            private static extern int pcrenet_convert(ref convert_input input, out convert_result result);
+
+            public override int convert_result_free(char* str)
+                => pcrenet_convert_result_free(str);
+
+            [DllImport("PCRE.NET.Native.dll")]
+            private static extern int pcrenet_convert_result_free(char* str);
 
         }
 
@@ -201,6 +221,18 @@ namespace PCRE.Internal
             [DllImport("PCRE.NET.Native.x86.dll")]
             private static extern void pcrenet_jit_stack_free(IntPtr stack);
 
+            public override int convert(ref convert_input input, out convert_result result)
+                => pcrenet_convert(ref input, out result);
+
+            [DllImport("PCRE.NET.Native.x86.dll")]
+            private static extern int pcrenet_convert(ref convert_input input, out convert_result result);
+
+            public override int convert_result_free(char* str)
+                => pcrenet_convert_result_free(str);
+
+            [DllImport("PCRE.NET.Native.x86.dll")]
+            private static extern int pcrenet_convert_result_free(char* str);
+
         }
 
         [SuppressUnmanagedCodeSecurity]
@@ -271,6 +303,18 @@ namespace PCRE.Internal
 
             [DllImport("PCRE.NET.Native.x64.dll")]
             private static extern void pcrenet_jit_stack_free(IntPtr stack);
+
+            public override int convert(ref convert_input input, out convert_result result)
+                => pcrenet_convert(ref input, out result);
+
+            [DllImport("PCRE.NET.Native.x64.dll")]
+            private static extern int pcrenet_convert(ref convert_input input, out convert_result result);
+
+            public override int convert_result_free(char* str)
+                => pcrenet_convert_result_free(str);
+
+            [DllImport("PCRE.NET.Native.x64.dll")]
+            private static extern int pcrenet_convert_result_free(char* str);
 
         }
 

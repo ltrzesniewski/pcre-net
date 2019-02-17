@@ -1,4 +1,6 @@
-﻿namespace PCRE.Conversion
+﻿using PCRE.Internal;
+
+namespace PCRE.Conversion
 {
     public sealed class PcreGlobConversionOptions
     {
@@ -8,7 +10,7 @@
         public char SeparatorCharacter { get; set; } = '\\';
 
         public static PcreGlobConversionOptions DefaultWindows()
-        => new PcreGlobConversionOptions();
+            => new PcreGlobConversionOptions();
 
         public static PcreGlobConversionOptions DefaultUnix()
             => new PcreGlobConversionOptions
@@ -17,26 +19,24 @@
                 SeparatorCharacter = '/'
             };
 
-//        internal ConvertContext CreateContext()
-//        {
-//            return new ConvertContext
-//            {
-//                GlobEscape = EscapeCharacter,
-//                GlobSeparator = SeparatorCharacter
-//            };
-//        }
-//
-//        internal ConvertOptions GetConvertOptions()
-//        {
-//            var options = ConvertOptions.Glob;
-//
-//            if (NoWildcardSeparator)
-//                options |= ConvertOptions.GlobNoWildcardSeparator;
-//
-//            if (NoStarStar)
-//                options |= ConvertOptions.GlobNoStarStar;
-//
-//            return options;
-//        }
+        internal void FillConvertInput(ref Native.convert_input input)
+        {
+            input.options = GetConvertOptions();
+            input.glob_escape = EscapeCharacter;
+            input.glob_separator = SeparatorCharacter;
+        }
+
+        private uint GetConvertOptions()
+        {
+            var options = PcreConstants.CONVERT_GLOB;
+
+            if (NoWildcardSeparator)
+                options |= PcreConstants.CONVERT_GLOB_NO_WILD_SEPARATOR;
+
+            if (NoStarStar)
+                options |= PcreConstants.CONVERT_GLOB_NO_STARSTAR;
+
+            return options;
+        }
     }
 }
