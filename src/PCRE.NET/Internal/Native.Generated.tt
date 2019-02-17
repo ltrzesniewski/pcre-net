@@ -16,6 +16,8 @@ var funcs = ParseFuncs(@"
     void match(ref match_input input, out match_result result);
     uint get_callout_count(IntPtr code);
     void get_callouts(IntPtr code, pcre2_callout_enumerate_block* data);
+    IntPtr jit_stack_create(uint startSize, uint maxSize);
+    void jit_stack_free(IntPtr stack);
 ").ToList();
 
 var platforms = new[] {

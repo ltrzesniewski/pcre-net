@@ -17,6 +17,7 @@ typedef struct
     uint32_t* output_vector;
     callout_fn callout;
     void* callout_data;
+    pcre2_jit_stack* jit_stack;
 } pcrenet_match_input;
 
 typedef struct
@@ -60,6 +61,9 @@ PCRENET_EXPORT(void, match)(const pcrenet_match_input* input, pcrenet_match_resu
         callout = { input->callout, input->callout_data };
         pcre2_set_callout(context, &callout_handler, &callout);
     }
+
+    if (input->jit_stack)
+        pcre2_jit_stack_assign(context, nullptr, input->jit_stack);
 
     result->result_code = pcre2_match(
         input->code,

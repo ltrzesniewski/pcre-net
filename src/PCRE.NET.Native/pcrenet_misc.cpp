@@ -42,3 +42,13 @@ PCRENET_EXPORT(void, get_callouts)(pcre2_code* code, pcre2_callout_enumerate_blo
 {
     pcre2_callout_enumerate(code, &get_callouts_handler, &blocks);
 }
+
+PCRENET_EXPORT(pcre2_jit_stack*, jit_stack_create)(uint32_t startSize, uint32_t maxSize)
+{
+    return pcre2_jit_stack_create(startSize, maxSize, nullptr);
+}
+
+PCRENET_EXPORT(void, jit_stack_free)(pcre2_jit_stack* stack)
+{
+    pcre2_jit_stack_free(stack);
+}

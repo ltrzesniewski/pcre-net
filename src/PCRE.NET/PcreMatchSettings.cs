@@ -53,6 +53,7 @@ namespace PCRE
             input.depth_limit = _depthLimit.GetValueOrDefault();
             input.heap_limit = _heapLimit.GetValueOrDefault();
             input.offset_limit = OffsetLimit.GetValueOrDefault();
+            input.jit_stack = JitStack?.GetStack() ?? IntPtr.Zero;
         }
     }
 }

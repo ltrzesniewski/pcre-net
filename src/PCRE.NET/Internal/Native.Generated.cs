@@ -36,6 +36,12 @@ namespace PCRE.Internal
         public static void get_callouts(IntPtr code, pcre2_callout_enumerate_block* data)
             => _impl.get_callouts(code, data);
 
+        public static IntPtr jit_stack_create(uint startSize, uint maxSize)
+            => _impl.jit_stack_create(startSize, maxSize);
+
+        public static void jit_stack_free(IntPtr stack)
+            => _impl.jit_stack_free(stack);
+
 
         private abstract class LibImpl
         {
@@ -47,6 +53,8 @@ namespace PCRE.Internal
             public abstract void match(ref match_input input, out match_result result);
             public abstract uint get_callout_count(IntPtr code);
             public abstract void get_callouts(IntPtr code, pcre2_callout_enumerate_block* data);
+            public abstract IntPtr jit_stack_create(uint startSize, uint maxSize);
+            public abstract void jit_stack_free(IntPtr stack);
         }
 
         [SuppressUnmanagedCodeSecurity]
@@ -99,6 +107,18 @@ namespace PCRE.Internal
 
             [DllImport("PCRE.NET.Native.dll")]
             private static extern void pcrenet_get_callouts(IntPtr code, pcre2_callout_enumerate_block* data);
+
+            public override IntPtr jit_stack_create(uint startSize, uint maxSize)
+                => pcrenet_jit_stack_create(startSize, maxSize);
+
+            [DllImport("PCRE.NET.Native.dll")]
+            private static extern IntPtr pcrenet_jit_stack_create(uint startSize, uint maxSize);
+
+            public override void jit_stack_free(IntPtr stack)
+                => pcrenet_jit_stack_free(stack);
+
+            [DllImport("PCRE.NET.Native.dll")]
+            private static extern void pcrenet_jit_stack_free(IntPtr stack);
 
         }
 
@@ -153,6 +173,18 @@ namespace PCRE.Internal
             [DllImport("PCRE.NET.Native.x86.dll")]
             private static extern void pcrenet_get_callouts(IntPtr code, pcre2_callout_enumerate_block* data);
 
+            public override IntPtr jit_stack_create(uint startSize, uint maxSize)
+                => pcrenet_jit_stack_create(startSize, maxSize);
+
+            [DllImport("PCRE.NET.Native.x86.dll")]
+            private static extern IntPtr pcrenet_jit_stack_create(uint startSize, uint maxSize);
+
+            public override void jit_stack_free(IntPtr stack)
+                => pcrenet_jit_stack_free(stack);
+
+            [DllImport("PCRE.NET.Native.x86.dll")]
+            private static extern void pcrenet_jit_stack_free(IntPtr stack);
+
         }
 
         [SuppressUnmanagedCodeSecurity]
@@ -205,6 +237,18 @@ namespace PCRE.Internal
 
             [DllImport("PCRE.NET.Native.x64.dll")]
             private static extern void pcrenet_get_callouts(IntPtr code, pcre2_callout_enumerate_block* data);
+
+            public override IntPtr jit_stack_create(uint startSize, uint maxSize)
+                => pcrenet_jit_stack_create(startSize, maxSize);
+
+            [DllImport("PCRE.NET.Native.x64.dll")]
+            private static extern IntPtr pcrenet_jit_stack_create(uint startSize, uint maxSize);
+
+            public override void jit_stack_free(IntPtr stack)
+                => pcrenet_jit_stack_free(stack);
+
+            [DllImport("PCRE.NET.Native.x64.dll")]
+            private static extern void pcrenet_jit_stack_free(IntPtr stack);
 
         }
 

@@ -82,6 +82,7 @@ namespace PCRE.Internal
             public uint* output_vector;
             public void* callout;
             public void* callout_data;
+            public IntPtr jit_stack;
         }
 
         [StructLayout(LayoutKind.Sequential)]
