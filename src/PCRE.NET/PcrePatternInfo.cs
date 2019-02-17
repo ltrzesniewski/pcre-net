@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using PCRE.Internal;
 
 namespace PCRE
@@ -21,7 +22,7 @@ namespace PCRE
         public PcreExtraCompileOptions ExtraOptions => (PcreExtraCompileOptions)_re.GetInfoUInt32(PcreConstants.INFO_EXTRAOPTIONS);
         public uint MaxBackReference => _re.GetInfoUInt32(PcreConstants.INFO_BACKREFMAX);
         public int CaptureCount => _re.CaptureCount;
-        public bool IsCompiled => _re.GetInfoUInt32(PcreConstants.INFO_JITSIZE) != 0;
+        public bool IsCompiled => _re.GetInfoNativeInt(PcreConstants.INFO_JITSIZE) != UIntPtr.Zero;
         public bool CanMatchEmptyString => _re.GetInfoUInt32(PcreConstants.INFO_MATCHEMPTY) != 0;
         public uint MaxLookBehind => _re.GetInfoUInt32(PcreConstants.INFO_MAXLOOKBEHIND);
         public uint MinSubjectLength => _re.GetInfoUInt32(PcreConstants.INFO_MINLENGTH);
