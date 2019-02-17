@@ -6,6 +6,9 @@ using PCRE.Support;
 
 namespace PCRE
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
     public sealed partial class PcreRegex : IInternalRegexWrapper
     {
         private PcrePatternInfo _info;

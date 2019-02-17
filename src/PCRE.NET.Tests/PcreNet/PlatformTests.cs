@@ -29,22 +29,11 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
-        public void should_not_expose_wrapper_in_public_api()
+        public void should_not_expose_internal_namespace()
         {
-            var wrapperAssembly = typeof(InternalRegex).Assembly;
-
             foreach (var type in typeof(PcreRegex).Assembly.GetExportedTypes())
             {
-                if (type.BaseType != null)
-                    Assert.That(type.BaseType.Assembly, Is.Not.EqualTo(wrapperAssembly));
-
-                foreach (var method in type.GetMethods().Where(m => m.IsPublic || m.IsFamily))
-                {
-                    Assert.That(method.ReturnType.Assembly, Is.Not.EqualTo(wrapperAssembly));
-
-                    foreach (var param in method.GetParameters())
-                        Assert.That(param.ParameterType.Assembly, Is.Not.EqualTo(wrapperAssembly));
-                }
+                Assert.That(type.Namespace, Does.Not.Contain("Internal"));
             }
         }
     }

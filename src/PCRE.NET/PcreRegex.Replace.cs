@@ -1,14 +1,16 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Text;
 using PCRE.Support;
 
 namespace PCRE
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
     public partial class PcreRegex
     {
-        // ReSharper disable IntroduceOptionalParameters.Global, MemberCanBePrivate.Global, UnusedMember.Global
-
         [Pure]
         public string Replace(string subject, string replacement)
             => Replace(subject, replacement, -1, 0);
@@ -42,27 +44,25 @@ namespace PCRE
             if (count == 0)
                 return subject;
 
-            throw new NotImplementedException();
+            StringBuilder sb = null;
+            var position = 0;
 
-//            StringBuilder sb = null;
-//            var position = 0;
-//
-//            foreach (var match in Matches(subject, startIndex))
-//            {
-//                if (sb == null)
-//                    sb = new StringBuilder((int)(subject.Length * 1.2));
-//                sb.Append(subject, position, match.Index - position);
-//                sb.Append(replacementFunc(match));
-//                position = match.GetStartOfNextMatchIndex();
-//
-//                if (--count == 0)
-//                    break;
-//            }
-//            if (sb == null)
-//                return subject;
-//
-//            sb.Append(subject, position, subject.Length - position);
-//            return sb.ToString();
+            foreach (var match in Matches(subject, startIndex))
+            {
+                if (sb == null)
+                    sb = new StringBuilder((int)(subject.Length * 1.2));
+                sb.Append(subject, position, match.Index - position);
+                sb.Append(replacementFunc(match));
+                position = match.GetStartOfNextMatchIndex();
+
+                if (--count == 0)
+                    break;
+            }
+            if (sb == null)
+                return subject;
+
+            sb.Append(subject, position, subject.Length - position);
+            return sb.ToString();
         }
 
         [Pure]

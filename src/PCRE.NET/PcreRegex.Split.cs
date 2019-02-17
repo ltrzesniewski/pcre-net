@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 
 namespace PCRE
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
     public partial class PcreRegex
     {
-        // ReSharper disable IntroduceOptionalParameters.Global, MemberCanBePrivate.Global, UnusedMember.Global
-
         [Pure]
         public IEnumerable<string> Split(string subject)
             => Split(subject, PcreSplitOptions.None, -1, 0);
@@ -43,32 +45,30 @@ namespace PCRE
                 yield break;
             }
 
-            throw new NotImplementedException();
+            var index = 0;
+            var captureCount = CaptureCount;
+            var includeGroupValues = (options & PcreSplitOptions.IncludeGroupValues) != 0;
 
-//            var index = 0;
-//            var captureCount = CaptureCount;
-//            var includeGroupValues = (options & PcreSplitOptions.IncludeGroupValues) != 0;
-////
-//            foreach (var match in Matches(subject, startIndex))
-//            {
-//                yield return subject.Substring(index, match.Index - index);
-//                index = match.GetStartOfNextMatchIndex();
-//
-//                if (includeGroupValues)
-//                {
-//                    for (var groupIdx = 1; groupIdx <= captureCount; ++groupIdx)
-//                    {
-//                        var group = match[groupIdx];
-//                        if (group.Success)
-//                            yield return group.Value;
-//                    }
-//                }
-//
-//                if (--count == 0)
-//                    break;
-//            }
-//
-//            yield return subject.Substring(index);
+            foreach (var match in Matches(subject, startIndex))
+            {
+                yield return subject.Substring(index, match.Index - index);
+                index = match.GetStartOfNextMatchIndex();
+
+                if (includeGroupValues)
+                {
+                    for (var groupIdx = 1; groupIdx <= captureCount; ++groupIdx)
+                    {
+                        var group = match[groupIdx];
+                        if (group.Success)
+                            yield return group.Value;
+                    }
+                }
+
+                if (--count == 0)
+                    break;
+            }
+
+            yield return subject.Substring(index);
         }
 
         [Pure]

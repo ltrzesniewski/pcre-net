@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using PCRE.Internal;
 using PCRE.Support;
 
 namespace PCRE
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
     public partial class PcreRegex
     {
-        // ReSharper disable IntroduceOptionalParameters.Global, MemberCanBePrivate.Global, UnusedMember.Global
-
         [Pure]
         public bool IsMatch(string subject)
             => IsMatch(subject, 0);
