@@ -12,12 +12,7 @@ PCRE.NET
 
 PCRE.NET is a .NET wrapper for the [PCRE library](http://www.pcre.org/). The goal of this project is to bring most of PCRE's features for use from .NET applications with as little overhead as possible.
 
-The current version on the *master* branch is **0.7.1**, based on PCRE **10.32**.
-
-## Dependencies ##
-
-- Version 0.6 or above requires the [Visual C++ 2015 Redistributable](https://www.microsoft.com/en-us/download/details.aspx?id=48145) package to be installed.
-- Versions prior to 0.6 require the [Visual C++ 2013 Redistributable](http://www.microsoft.com/en-us/download/details.aspx?id=40784) package.
+The current version on the *master* branch is **0.8.0**, based on PCRE **10.32**. It targets .NET Standard 2.0 on Windows.
 
 ## Features ##
 
@@ -39,7 +34,7 @@ The following regex operations are supported:
 
 Library highlights:
 
-- No marshaling - uses a mixed mode assembly to maximize performance
+- Works on the .NET Framework and on .NET Core on Windows (.NET Standard 2.0 target)
 - Support for compiled patterns (x86/x64 JIT)
 - Lazy evaluation whenever possible (for instance `PcreRegex.Matches` returns `IEnumerable<PcreMatch>`)
 - The API is similar to .NET's `System.Text.RegularExpressions`
@@ -133,7 +128,6 @@ var isValidJson = regex.IsMatch(subject);
 
 ## To do ##
 
-- ~Implement a less verbose managed/native interface~ Rewrite the library to use P/Invoke instead of C++/CLI
 - Include more tests from the PCRE test suite
 - Documentation
 - XML doc comments
