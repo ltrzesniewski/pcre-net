@@ -1,25 +1,40 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using PCRE.Internal;
 
 namespace PCRE
 {
     public sealed class PcreMatch : IPcreGroup, IPcreGroupList
     {
-        private readonly PcreGroup[] _groups;
         private readonly InternalRegex _regex;
         private readonly int _resultCode;
         private readonly uint[] _oVector;
 
+        [CanBeNull]
+        private PcreGroup[] _groups;
+
         internal PcreMatch(string subject, InternalRegex regex, ref Native.match_result result, uint[] oVector)
         {
+            // Real match
+
             Subject = subject;
             _regex = regex;
             _oVector = oVector;
-            _groups = new PcreGroup[regex.CaptureCount + 1];
 
             _resultCode = result.result_code;
+        }
+
+        internal PcreMatch(string subject, InternalRegex regex, uint[] oVector)
+        {
+            // Callout
+
+            Subject = subject;
+            _regex = regex;
+            _oVector = oVector;
+
+            _resultCode = oVector.Length / 2;
         }
 
         public int CaptureCount => _regex.CaptureCount;
@@ -59,9 +74,11 @@ namespace PCRE
             if (index < 0 || index > CaptureCount)
                 return null;
 
-            var group = _groups[index];
+            var groups = _groups ?? (_groups = new PcreGroup[_regex.CaptureCount + 1]);
+
+            var group = groups[index];
             if (group == null)
-                _groups[index] = group = CreateGroup(index);
+                groups[index] = group = CreateGroup(index);
 
             return group;
         }
@@ -73,11 +90,14 @@ namespace PCRE
             if (!isAvailable)
                 return PcreGroup.Empty;
 
-            var startOffset = GetStartOffset(index);
-            if (startOffset >= 0)
-                return new PcreGroup(Subject, startOffset, GetEndOffset(index));
+            index *= 2;
+            if (index >= _oVector.Length)
+                return PcreGroup.Empty;
 
-            return PcreGroup.Empty;
+            var startOffset = (int)_oVector[index];
+            var endOffset = (int)_oVector[index + 1];
+
+            return new PcreGroup(Subject, startOffset, endOffset);
         }
 
         private PcreGroup GetGroup(string name)
@@ -125,12 +145,6 @@ namespace PCRE
             // when the pattern contains \K in a lookahead
             return Math.Max(Index, EndIndex);
         }
-
-        private int GetStartOffset(int index)
-            => (uint)index < _oVector.Length ? (int)_oVector[2 * index] : -1;
-
-        private int GetEndOffset(int index)
-            => (uint)index < _oVector.Length ? (int)_oVector[2 * index + 1] : -1;
 
         public override string ToString() => Value;
 

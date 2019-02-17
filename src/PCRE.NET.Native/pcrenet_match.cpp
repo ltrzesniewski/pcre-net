@@ -1,6 +1,8 @@
 
 #include "pcrenet.h"
 
+typedef int (__stdcall *callout_fn)(pcre2_callout_block*, void*);
+
 typedef struct
 {
     pcre2_code* code;
@@ -13,6 +15,8 @@ typedef struct
     uint32_t heap_limit;
     uint32_t offset_limit;
     uint32_t* output_vector;
+    callout_fn callout;
+    void* callout_data;
 } pcrenet_match_input;
 
 typedef struct
@@ -20,10 +24,23 @@ typedef struct
     int32_t result_code;
 } pcrenet_match_result;
 
+typedef struct
+{
+    callout_fn callout;
+    void* data;
+} callout_data;
+
+static int callout_handler(pcre2_callout_block* block, void* data)
+{
+    const auto typedData = static_cast<callout_data*>(data);
+    return typedData->callout(block, typedData->data);
+}
+
 PCRENET_EXPORT(void, match)(const pcrenet_match_input* input, pcrenet_match_result* result)
 {
     const auto matchData = pcre2_match_data_create_from_pattern(input->code, nullptr);
     const auto context = pcre2_match_context_create(nullptr);
+    callout_data callout;
 
     if (input->match_limit)
         pcre2_set_match_limit(context, input->match_limit);
@@ -36,6 +53,12 @@ PCRENET_EXPORT(void, match)(const pcrenet_match_input* input, pcrenet_match_resu
 
     if (input->offset_limit)
         pcre2_set_offset_limit(context, input->offset_limit);
+
+    if (input->callout)
+    {
+        callout = { input->callout, input->callout_data };
+        pcre2_set_callout(context, &callout_handler, &callout);
+    }
 
     result->result_code = pcre2_match(
         input->code,

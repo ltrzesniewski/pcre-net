@@ -46,7 +46,7 @@ namespace PCRE
             if (settings == null)
                 throw new ArgumentNullException(nameof(settings));
 
-            InternalRegex = Caches.RegexCache.GetOrAdd(new RegexKey(InternalRegex.Pattern, InternalRegex.Settings));
+            InternalRegex = Caches.RegexCache.GetOrAdd(new RegexKey(pattern, settings));
         }
 
         public override string ToString() => InternalRegex.Pattern;

@@ -105,9 +105,27 @@ namespace PCRE.Internal
             return result;
         }
 
-        public PcreMatch Match(string subject, ref Native.match_input input)
+        public PcreMatch Match(string subject, PcreMatchSettings settings)
+        {
+            var input = new Native.match_input();
+            settings.FillMatchInput(ref input);
+            return Match(subject, settings, ref input);
+        }
+
+        public PcreMatch Match(string subject, PcreMatchSettings settings, int startIndex, uint additionalOptions)
+        {
+            var input = new Native.match_input();
+            settings.FillMatchInput(ref input);
+            input.start_index = (uint)startIndex;
+            input.additional_options = additionalOptions;
+            return Match(subject, settings, ref input);
+        }
+
+        private PcreMatch Match(string subject, PcreMatchSettings settings, ref Native.match_input input)
         {
             var oVector = new uint[2 * (CaptureCount + 1)];
+            Native.match_result result;
+            CalloutInterop.CalloutInteropInfo calloutInterop;
 
             fixed (char* pSubject = subject)
             fixed (uint* pOVec = &oVector[0])
@@ -117,26 +135,28 @@ namespace PCRE.Internal
                 input.subject_length = (uint)subject.Length;
                 input.output_vector = pOVec;
 
-                Native.match(ref input, out var result);
+                CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, settings.Callout);
 
-                switch (result.result_code)
-                {
-                    case PcreConstants.ERROR_NOMATCH:
-                    case PcreConstants.ERROR_PARTIAL:
-                        break;
-
-                    case PcreConstants.ERROR_CALLOUT:
-                        throw new NotImplementedException();
-
-                    default:
-                        if (result.result_code < 0)
-                            throw new PcreMatchException(Native.GetErrorMessage(result.result_code));
-
-                        break;
-                }
-
-                return new PcreMatch(subject, this, ref result, oVector);
+                Native.match(ref input, out result);
             }
+
+            switch (result.result_code)
+            {
+                case PcreConstants.ERROR_NOMATCH:
+                case PcreConstants.ERROR_PARTIAL:
+                    break;
+
+                case PcreConstants.ERROR_CALLOUT:
+                    throw new PcreCalloutException("An exception was thrown by the callout: " + calloutInterop.Exception?.Message, calloutInterop.Exception);
+
+                default:
+                    if (result.result_code < 0)
+                        throw new PcreMatchException(Native.GetErrorMessage(result.result_code));
+
+                    break;
+            }
+
+            return new PcreMatch(subject, this, ref result, oVector);
         }
     }
 }

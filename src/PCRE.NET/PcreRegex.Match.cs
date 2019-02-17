@@ -70,7 +70,7 @@ namespace PCRE
             if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
                 throw new IndexOutOfRangeException("Invalid StartIndex value");
 
-            return InternalMatch(subject, settings);
+            return InternalRegex.Match(subject, settings);
         }
 
         [Pure]
@@ -115,7 +115,7 @@ namespace PCRE
 
         private IEnumerable<PcreMatch> MatchesIterator(string subject, PcreMatchSettings settings)
         {
-            var match = InternalMatch(subject, settings);
+            var match = InternalRegex.Match(subject, settings);
             if (!match.Success)
                 yield break;
 
@@ -128,29 +128,12 @@ namespace PCRE
                 var startIndex = match.GetStartOfNextMatchIndex();
                 var options = baseOptions | (match.Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0);
 
-                match = InternalMatch(subject, settings, startIndex, options);
-
+                match = InternalRegex.Match(subject, settings, startIndex, options);
                 if (!match.Success)
                     yield break;
 
                 yield return match;
             }
-        }
-
-        private PcreMatch InternalMatch(string subject, PcreMatchSettings settings)
-        {
-            var input = new Native.match_input();
-            settings.FillMatchInput(ref input);
-            return InternalRegex.Match(subject, ref input);
-        }
-
-        private PcreMatch InternalMatch(string subject, PcreMatchSettings settings, int startIndex, uint additionalOptions)
-        {
-            var input = new Native.match_input();
-            settings.FillMatchInput(ref input);
-            input.start_index = (uint)startIndex;
-            input.additional_options = additionalOptions;
-            return InternalRegex.Match(subject, ref input);
         }
 
         [Pure]

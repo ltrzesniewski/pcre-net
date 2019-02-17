@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using PCRE.Internal;
 using PCRE.Support;
 
@@ -12,7 +13,13 @@ namespace PCRE
 
         public PcreMatchOptions AdditionalOptions { get; set; }
         public int StartIndex { get; set; }
-        public event Func<PcreCallout, PcreCalloutResult> OnCallout;
+
+        [SuppressMessage("ReSharper", "DelegateSubtraction")]
+        public event Func<PcreCallout, PcreCalloutResult> OnCallout
+        {
+            add => Callout += value;
+            remove => Callout -= value;
+        }
 
         public uint MatchLimit
         {
@@ -36,10 +43,7 @@ namespace PCRE
 
         public PcreJitStack JitStack { get; set; }
 
-        void Dummy() // TODO remove
-        {
-            OnCallout?.Invoke(null);
-        }
+        internal Func<PcreCallout, PcreCalloutResult> Callout { get; private set; }
 
         internal void FillMatchInput(ref Native.match_input input)
         {

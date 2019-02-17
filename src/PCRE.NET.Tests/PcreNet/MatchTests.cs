@@ -176,96 +176,96 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match.Mark, Is.Null);
         }
 
-//        [Test]
-//        public void should_use_callout_result()
-//        {
-//            var regex = new PcreRegex(@"(\d+)(*SKIP)(?C1):\s*(\w+)");
-//
-//            var match = regex.Match(
-//                "1542: not_this, 1764: hello",
-//                data => data.Number == 1
-//                        && int.Parse(data.Match[1].Value)%42 == 0
-//                    ? PcreCalloutResult.Pass
-//                    : PcreCalloutResult.Fail);
-//
-//            Assert.That(match[2].Value, Is.EqualTo("hello"));
-//        }
+        [Test]
+        public void should_use_callout_result()
+        {
+            var regex = new PcreRegex(@"(\d+)(*SKIP)(?C1):\s*(\w+)");
 
-//        [Test]
-//        public void should_execute_passing_callout()
-//        {
-//            const string pattern = @"(a)(*MARK:foo)(x)?(?C42)(bc)";
-//            var re = new PcreRegex(pattern);
-//
-//            var calls = 0;
-//
-//            var match = re.Match("abc", data =>
-//            {
-//                Assert.That(data.Number, Is.EqualTo(42));
-//                Assert.That(data.CurrentOffset, Is.EqualTo(1));
-//                Assert.That(data.PatternPosition, Is.EqualTo(pattern.IndexOf("(?C42)", StringComparison.Ordinal) + 6));
-//                Assert.That(data.StartOffset, Is.EqualTo(0));
-//                Assert.That(data.LastCapture, Is.EqualTo(1));
-//                Assert.That(data.MaxCapture, Is.EqualTo(2));
-//                Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
+            var match = regex.Match(
+                "1542: not_this, 1764: hello",
+                data => data.Number == 1
+                        && int.Parse(data.Match[1].Value)%42 == 0
+                    ? PcreCalloutResult.Pass
+                    : PcreCalloutResult.Fail);
+
+            Assert.That(match[2].Value, Is.EqualTo("hello"));
+        }
+
+        [Test]
+        public void should_execute_passing_callout()
+        {
+            const string pattern = @"(a)(*MARK:foo)(x)?(?C42)(bc)";
+            var re = new PcreRegex(pattern);
+
+            var calls = 0;
+
+            var match = re.Match("abc", data =>
+            {
+                Assert.That(data.Number, Is.EqualTo(42));
+                Assert.That(data.CurrentOffset, Is.EqualTo(1));
+                Assert.That(data.PatternPosition, Is.EqualTo(pattern.IndexOf("(?C42)", StringComparison.Ordinal) + 6));
+                Assert.That(data.StartOffset, Is.EqualTo(0));
+                Assert.That(data.LastCapture, Is.EqualTo(1));
+                Assert.That(data.MaxCapture, Is.EqualTo(2));
+                Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
 //                Assert.That(data.StringOffset, Is.EqualTo(0));
 //                Assert.That(data.String, Is.Null);
-//
-//                Assert.That(data.Match.Value, Is.EqualTo("a"));
-//                Assert.That(data.Match[1].Value, Is.EqualTo("a"));
-//                Assert.That(data.Match[2].Success, Is.False);
-//                Assert.That(data.Match[2].Value, Is.SameAs(string.Empty));
-//                Assert.That(data.Match[3].Success, Is.False);
-//                Assert.That(data.Match[3].Value, Is.SameAs(string.Empty));
-//
-//                Assert.That(data.Match.Mark, Is.EqualTo("foo"));
-//
-//                ++calls;
-//                return PcreCalloutResult.Pass;
-//            });
-//
-//            Assert.That(match, Is.Not.Null);
-//            Assert.That(match.Success, Is.True);
-//            Assert.That(calls, Is.EqualTo(1));
-//        }
 
-//        [Test]
-//        public void should_execute_failing_callout()
-//        {
-//            var re = new PcreRegex(@".(?C42)");
-//
-//            var first = true;
-//
-//            var match = re.Match("ab", data =>
-//            {
-//                Assert.That(data.Number, Is.EqualTo(42));
-//                if (first)
-//                {
-//                    first = false;
-//                    return PcreCalloutResult.Fail;
-//                }
-//                return PcreCalloutResult.Pass;
-//            });
-//
-//            Assert.That(match, Is.Not.Null);
-//            Assert.That(match.Success, Is.True);
-//            Assert.That(match.Value, Is.EqualTo("b"));
-//        }
+                Assert.That(data.Match.Value, Is.EqualTo("a"));
+                Assert.That(data.Match[1].Value, Is.EqualTo("a"));
+                Assert.That(data.Match[2].Success, Is.False);
+                Assert.That(data.Match[2].Value, Is.SameAs(string.Empty));
+                Assert.That(data.Match[3].Success, Is.False);
+                Assert.That(data.Match[3].Value, Is.SameAs(string.Empty));
 
-//        [Test]
-//        public void should_execute_aborting_callout()
-//        {
-//            var re = new PcreRegex(@".(?C42)");
-//
-//            var match = re.Match("ab", data =>
-//            {
-//                Assert.That(data.Number, Is.EqualTo(42));
-//                return PcreCalloutResult.Abort;
-//            });
-//
-//            Assert.That(match, Is.Not.Null);
-//            Assert.That(match.Success, Is.False);
-//        }
+                Assert.That(data.Match.Mark, Is.EqualTo("foo"));
+
+                ++calls;
+                return PcreCalloutResult.Pass;
+            });
+
+            Assert.That(match, Is.Not.Null);
+            Assert.That(match.Success, Is.True);
+            Assert.That(calls, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void should_execute_failing_callout()
+        {
+            var re = new PcreRegex(@".(?C42)");
+
+            var first = true;
+
+            var match = re.Match("ab", data =>
+            {
+                Assert.That(data.Number, Is.EqualTo(42));
+                if (first)
+                {
+                    first = false;
+                    return PcreCalloutResult.Fail;
+                }
+                return PcreCalloutResult.Pass;
+            });
+
+            Assert.That(match, Is.Not.Null);
+            Assert.That(match.Success, Is.True);
+            Assert.That(match.Value, Is.EqualTo("b"));
+        }
+
+        [Test]
+        public void should_execute_aborting_callout()
+        {
+            var re = new PcreRegex(@".(?C42)");
+
+            var match = re.Match("ab", data =>
+            {
+                Assert.That(data.Number, Is.EqualTo(42));
+                return PcreCalloutResult.Abort;
+            });
+
+            Assert.That(match, Is.Not.Null);
+            Assert.That(match.Success, Is.False);
+        }
 
         [Test]
         public void should_throw_when_callout_throws()
@@ -277,81 +277,81 @@ namespace PCRE.Tests.PcreNet
             Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
         }
 
-//        [Test]
-//        public void should_auto_callout()
-//        {
-//            var re = new PcreRegex(@"a.c", PcreOptions.AutoCallout);
-//
-//            var count = 0;
-//
-//            var match = re.Match("abc", data =>
-//            {
-//                Assert.That(data.Number, Is.EqualTo(255));
-//                ++count;
-//                return PcreCalloutResult.Pass;
-//            });
-//
-//            Assert.That(match, Is.Not.Null);
-//            Assert.That(match.Success, Is.True);
-//            Assert.That(count, Is.EqualTo(4));
-//        }
+        [Test]
+        public void should_auto_callout()
+        {
+            var re = new PcreRegex(@"a.c", PcreOptions.AutoCallout);
 
-//        [Test]
-//        public void should_provide_callout_flags()
-//        {
-//            var re = new PcreRegex(@"a(?C1)(?:(?C2)(*FAIL)|b)(?C3)");
-//
-//            var startMatchList = new List<bool>();
-//            var backtrackList = new List<bool>();
-//
-//            var match = re.Match("abc", data =>
-//            {
-//                startMatchList.Add(data.StartMatch);
-//                backtrackList.Add(data.Backtrack);
-//                return PcreCalloutResult.Pass;
-//            });
-//
-//            Assert.That(startMatchList, Is.EqualTo(new[] { true, false, false }));
-//            Assert.That(backtrackList, Is.EqualTo(new[] { false, false, true }));
-//        }
+            var count = 0;
 
-//        [Test]
-//        public void should_execute_string_callout()
-//        {
-//            const string pattern = @"(a)(*MARK:foo)(x)?(?C{bar})(bc)";
-//            var re = new PcreRegex(pattern);
-//
-//            var calls = 0;
-//
-//            var match = re.Match("abc", data =>
-//            {
-//                Assert.That(data.Number, Is.EqualTo(0));
-//                Assert.That(data.CurrentOffset, Is.EqualTo(1));
-//                Assert.That(data.PatternPosition, Is.EqualTo(pattern.IndexOf("(?C{bar})", StringComparison.Ordinal) + 9));
-//                Assert.That(data.StartOffset, Is.EqualTo(0));
-//                Assert.That(data.LastCapture, Is.EqualTo(1));
-//                Assert.That(data.MaxCapture, Is.EqualTo(2));
-//                Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
+            var match = re.Match("abc", data =>
+            {
+                Assert.That(data.Number, Is.EqualTo(255));
+                ++count;
+                return PcreCalloutResult.Pass;
+            });
+
+            Assert.That(match, Is.Not.Null);
+            Assert.That(match.Success, Is.True);
+            Assert.That(count, Is.EqualTo(4));
+        }
+
+        [Test]
+        public void should_provide_callout_flags()
+        {
+            var re = new PcreRegex(@"a(?C1)(?:(?C2)(*FAIL)|b)(?C3)");
+
+            var startMatchList = new List<bool>();
+            var backtrackList = new List<bool>();
+
+            var match = re.Match("abc", data =>
+            {
+                startMatchList.Add(data.StartMatch);
+                backtrackList.Add(data.Backtrack);
+                return PcreCalloutResult.Pass;
+            });
+
+            Assert.That(startMatchList, Is.EqualTo(new[] { true, false, false }));
+            Assert.That(backtrackList, Is.EqualTo(new[] { false, false, true }));
+        }
+
+        [Test]
+        public void should_execute_string_callout()
+        {
+            const string pattern = @"(a)(*MARK:foo)(x)?(?C{bar})(bc)";
+            var re = new PcreRegex(pattern);
+
+            var calls = 0;
+
+            var match = re.Match("abc", data =>
+            {
+                Assert.That(data.Number, Is.EqualTo(0));
+                Assert.That(data.CurrentOffset, Is.EqualTo(1));
+                Assert.That(data.PatternPosition, Is.EqualTo(pattern.IndexOf("(?C{bar})", StringComparison.Ordinal) + 9));
+                Assert.That(data.StartOffset, Is.EqualTo(0));
+                Assert.That(data.LastCapture, Is.EqualTo(1));
+                Assert.That(data.MaxCapture, Is.EqualTo(2));
+                Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
 //                Assert.That(data.StringOffset, Is.EqualTo(pattern.IndexOf("(?C{bar})", StringComparison.Ordinal) + 4));
 //                Assert.That(data.String, Is.EqualTo("bar"));
-//
-//                Assert.That(data.Match.Value, Is.EqualTo("a"));
-//                Assert.That(data.Match[1].Value, Is.EqualTo("a"));
-//                Assert.That(data.Match[2].Success, Is.False);
-//                Assert.That(data.Match[2].Value, Is.SameAs(string.Empty));
-//                Assert.That(data.Match[3].Success, Is.False);
-//                Assert.That(data.Match[3].Value, Is.SameAs(string.Empty));
-//
-//                Assert.That(data.Match.Mark, Is.EqualTo("foo"));
-//
-//                ++calls;
-//                return PcreCalloutResult.Pass;
-//            });
-//
-//            Assert.That(match, Is.Not.Null);
-//            Assert.That(match.Success, Is.True);
-//            Assert.That(calls, Is.EqualTo(1));
-//        }
+
+                Assert.That(data.Match.Value, Is.EqualTo("a"));
+                Assert.That(data.Match[1].Value, Is.EqualTo("a"));
+                Assert.That(data.Match[2].Success, Is.False);
+                Assert.That(data.Match[2].Value, Is.SameAs(string.Empty));
+                Assert.That(data.Match[3].Success, Is.False);
+                Assert.That(data.Match[3].Value, Is.SameAs(string.Empty));
+
+                Assert.That(data.Match.Mark, Is.EqualTo("foo"));
+
+                ++calls;
+                return PcreCalloutResult.Pass;
+            });
+
+            Assert.That(match, Is.Not.Null);
+            Assert.That(match.Success, Is.True);
+            Assert.That(calls, Is.EqualTo(1));
+        }
 
         [Test]
         public void should_handle_end_before_start()

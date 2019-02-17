@@ -80,12 +80,42 @@ namespace PCRE.Internal
             public uint heap_limit;
             public uint offset_limit;
             public uint* output_vector;
+            public void* callout;
+            public void* callout_data;
         }
 
         [StructLayout(LayoutKind.Sequential)]
         internal ref struct match_result
         {
             public int result_code;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal ref struct pcre2_callout_block
+        {
+            public uint version;
+
+            /* ------------------------ Version 0 ------------------------------- */
+            public uint callout_number; /* Number compiled into pattern */
+            public uint capture_top; /* Max current capture */
+            public uint capture_last; /* Most recently closed capture */
+            public UIntPtr* offset_vector; /* The offset vector */
+            public char* mark; /* Pointer to current mark or NULL */
+            public char* subject; /* The subject being matched */
+            public UIntPtr subject_length; /* The length of the subject */
+            public UIntPtr start_match; /* Offset to start of this match attempt */
+            public UIntPtr current_position; /* Where we currently are in the subject */
+            public UIntPtr pattern_position; /* Offset to next item in the pattern */
+            public UIntPtr next_item_length; /* Length of next item in the pattern */
+
+            /* ------------------- Added for Version 1 -------------------------- */
+            public UIntPtr callout_string_offset; /* Offset to string within pattern */
+            public UIntPtr callout_string_length; /* Length of string compiled into pattern */
+            public char* callout_string; /* String compiled into pattern */
+
+            /* ------------------- Added for Version 2 -------------------------- */
+            public uint callout_flags; /* See above for list */
+            /* ------------------------------------------------------------------ */
         }
     }
 }
