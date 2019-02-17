@@ -1,21 +1,23 @@
-﻿using PCRE.Wrapper;
+﻿using PCRE.Internal;
 
 namespace PCRE
 {
-    public sealed class PcreCalloutInfo
+    public sealed unsafe class PcreCalloutInfo
     {
-        private readonly CalloutInfo _info;
-
-        internal PcreCalloutInfo(CalloutInfo info)
+        internal PcreCalloutInfo(ref Native.pcre2_callout_enumerate_block info)
         {
-            _info = info;
+            Number = (int)info.callout_number;
+            String = info.callout_string != null ? new string(info.callout_string) : null;
+            NextPatternItemLength = (int)info.next_item_length;
+            PatternPosition = (int)info.pattern_position;
+            StringOffset = (int)info.callout_string_offset;
         }
 
-        public int Number => _info.Number;
-        public string String => _info.String;
+        public int Number { get; }
+        public string String { get; }
 
-        public int NextPatternItemLength => _info.NextPatternItemLength;
-        public int PatternPosition => _info.PatternPosition;
-        public int StringOffset => _info.StringOffset;
+        public int NextPatternItemLength { get; }
+        public int PatternPosition { get; }
+        public int StringOffset { get; }
     }
 }

@@ -18,8 +18,7 @@ var outputDir = MakeAbsolute(Directory(@"..\output"));
 var testDir = outputDir + @"\test";
 
 var slnFile = rootDir + @"\src\PCRE.NET.sln";
-
-var outDll = outputDir + @"\PCRE.NET.dll";
+var libProj = rootDir + @"\src\PCRE.NET\PCRE.NET.csproj";
 
 //////////////////////////////////////////////////////////////////////
 // TASKS
@@ -27,7 +26,7 @@ var outDll = outputDir + @"\PCRE.NET.dll";
 
 // --- Clean ---
 
-Task("Clean-Output")
+Task("Clean")
     .Does(() =>
     {
         Information($"Output: {outputDir}");
@@ -37,17 +36,6 @@ Task("Clean-Output")
         else
             CreateDirectory(outputDir);
     });
-
-Task("Clean-LibZ-Cache")
-    .Does(() =>
-    {
-        CleanDirectory(System.IO.Path.GetTempPath(), file => Regex.IsMatch(file.Path.FullPath, @"[/\\][0-9A-Fa-f]{32}\.dll$", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase));
-    });
-
-Task("Clean")
-    .IsDependentOn("Clean-Output")
-    .IsDependentOn("Clean-LibZ-Cache")
-;
 
 // --- Build ---
 
@@ -75,38 +63,11 @@ Task("Build-x64")
     .Does(() => RunBuild(PlatformTarget.x64));
 
 Task("Build")
+    .IsDependentOn("Clean")
     .IsDependentOn("Build-AnyCPU")
     .IsDependentOn("Build-x86")
     .IsDependentOn("Build-x64")
 ;
-
-// --- Merge ---
-
-Task("Merge")
-    .IsDependentOn("Clean")
-    .IsDependentOn("Build")
-    .Does(() => {
-        CopyFile(rootDir + $@"\src\PCRE.NET\bin\{configuration}\PCRE.NET.dll", outDll);
-        CopyFile(rootDir + $@"\src\PCRE.NET.Wrapper\bin\Win32\{configuration}\PCRE.NET.Wrapper.dll", outputDir + @"\PCRE.NET.Wrapper.x86.dll");
-        CopyFile(rootDir + $@"\src\PCRE.NET.Wrapper\bin\x64\{configuration}\PCRE.NET.Wrapper.dll", outputDir + @"\PCRE.NET.Wrapper.x64.dll");
-        CopyFile(outputDir + @"\PCRE.NET.Wrapper.x64.dll", outputDir + @"\PCRE.NET.Wrapper.dll");
-
-        StartProcess(
-            rootDir + @"\src\packages\LibZ.Bootstrap.1.1.0.2\tools\libz.exe",
-            new ProcessSettings()
-                .UseWorkingDirectory(outputDir)
-                .WithArguments(args => args
-                    .Append("inject-dll")
-                    .AppendSwitchQuoted("--assembly", outDll)
-                    .AppendSwitchQuoted("--include", outputDir + @"\PCRE.NET.Wrapper.x86.dll")
-                    .AppendSwitchQuoted("--include", outputDir + @"\PCRE.NET.Wrapper.x64.dll")
-                    .AppendSwitchQuoted("--key", rootDir + @"\src\PCRE.NET.snk")
-                    .Append("--move")
-            )
-        );
-
-        DeleteFile(outputDir + @"\PCRE.NET.Wrapper.dll");
-    });
 
 // --- Test ---
 
@@ -114,25 +75,18 @@ void RunTest(bool anyCpu)
 {
     var platform = anyCpu ? "AnyCPU" : "x86";
 
-    NUnit3(testDir + @"\PCRE.NET.Tests.dll", new NUnit3Settings {
-        Framework = "net-4.5",
+    NUnit3($@"{rootDir}\src\PCRE.NET.Tests\bin\{configuration}\net472\PCRE.NET.Tests.dll", new NUnit3Settings {
         ShadowCopy = false,
-        WorkingDirectory = testDir,
-        Work = testDir,
         X86 = !anyCpu,
         OutputFile = testDir + $@"\Test-{platform}-out.txt",
-        ErrorOutputFile = testDir + $@"\Test-{platform}-err.txt"
+        Work = testDir
     });
 }
 
 Task("Test-Prepare")
-    .IsDependentOn("Merge")
+    .IsDependentOn("Build")
     .Does(() => {
         CreateDirectory(testDir);
-        CopyFileToDirectory(outDll, testDir);
-        CopyFileToDirectory(rootDir + $@"\src\PCRE.NET.Tests\bin\{configuration}\PCRE.NET.Tests.dll", testDir);
-        CopyFileToDirectory(rootDir + $@"\src\PCRE.NET.Tests\bin\{configuration}\NUnit.Framework.dll", testDir);
-        CopyDirectory(rootDir + $@"\src\PCRE.NET.Tests\bin\{configuration}\Pcre", testDir + @"\Pcre");
     });
 
 Task("Test-AnyCPU")
@@ -152,23 +106,21 @@ Task("Test")
 
 Task("NuGet-Restore")
     .Does(() => {
-        NuGetRestore(slnFile);
+        DotNetCoreRestore(slnFile);
     });
 
 Task("NuGet-Pack")
-    .IsDependentOn("Merge")
     .Does(() => {
-        var version = System.Diagnostics.FileVersionInfo.GetVersionInfo(outDll).FileVersion;
-        version = version.Substring(0, version.LastIndexOf("."));
-
-        NuGetPack(
-            rootDir + @"\build\tools\PCRE.NET.nuspec",
-            new NuGetPackSettings {
-                OutputDirectory = outputDir,
-                BasePath = rootDir,
-                Version = version
-            }
-        );
+        MSBuild($@"{rootDir}\src\PCRE.NET\PCRE.NET.csproj", new MSBuildSettings
+        {
+            Configuration = configuration,
+            Targets = { "Pack" },
+            Properties = {
+                ["PackageOutputPath"] = new[] { outputDir.FullPath },
+                ["RequirePcreNative"] = new[] { "true" }
+            },
+            MaxCpuCount = 0
+        });
     });
 
 //////////////////////////////////////////////////////////////////////
@@ -176,6 +128,7 @@ Task("NuGet-Pack")
 //////////////////////////////////////////////////////////////////////
 
 Task("All")
+    .IsDependentOn("Build")
     .IsDependentOn("Test")
     .IsDependentOn("NuGet-Pack")
 ;

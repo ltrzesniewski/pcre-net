@@ -1,108 +1,133 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
+    <Filter Include="PCRE">
+      <UniqueIdentifier>{e0a8a3d0-c0f6-4bc9-b066-330d1753a388}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PCRE.NET">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    <Filter Include="PCRE\Sources">
+      <UniqueIdentifier>{21e023c4-93e2-49e8-a895-b7dd925d0830}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="PCRE\Headers">
+      <UniqueIdentifier>{98d93ba4-5075-41e3-b6ca-efd121a4844d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PCRE.NET\Sources">
+      <UniqueIdentifier>{3cef1e6f-3ff6-4879-8431-5d6b18aca13f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PCRE.NET\Headers">
+      <UniqueIdentifier>{9f07b79a-949a-47a7-ace3-2452d900fd6b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\PCRE\src\pcre2_xclass.c">
+      <Filter>PCRE\Sources</Filter>
+    </ClCompile>
     <ClCompile Include="..\PCRE\src\pcre2_auto_possess.c">
-      <Filter>Source Files</Filter>
+      <Filter>PCRE\Sources</Filter>
     </ClCompile>
     <ClCompile Include="..\PCRE\src\pcre2_chartables.c">
-      <Filter>Source Files</Filter>
+      <Filter>PCRE\Sources</Filter>
     </ClCompile>
     <ClCompile Include="..\PCRE\src\pcre2_compile.c">
-      <Filter>Source Files</Filter>
+      <Filter>PCRE\Sources</Filter>
     </ClCompile>
     <ClCompile Include="..\PCRE\src\pcre2_config.c">
-      <Filter>Source Files</Filter>
+      <Filter>PCRE\Sources</Filter>
     </ClCompile>
     <ClCompile Include="..\PCRE\src\pcre2_context.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\PCRE\src\pcre2_dfa_match.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\PCRE\src\pcre2_error.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\PCRE\src\pcre2_jit_compile.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\PCRE\src\pcre2_maketables.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\PCRE\src\pcre2_match.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\PCRE\src\pcre2_match_data.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\PCRE\src\pcre2_newline.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\PCRE\src\pcre2_ord2utf.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\PCRE\src\pcre2_pattern_info.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\PCRE\src\pcre2_string_utils.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\PCRE\src\pcre2_study.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\PCRE\src\pcre2_substitute.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\PCRE\src\pcre2_tables.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\PCRE\src\pcre2_ucd.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\PCRE\src\pcre2_valid_utf.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\PCRE\src\pcre2_xclass.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\PCRE\src\pcre2_find_bracket.c">
-      <Filter>Source Files</Filter>
+      <Filter>PCRE\Sources</Filter>
     </ClCompile>
     <ClCompile Include="..\PCRE\src\pcre2_convert.c">
-      <Filter>Source Files</Filter>
+      <Filter>PCRE\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\src\pcre2_dfa_match.c">
+      <Filter>PCRE\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\src\pcre2_error.c">
+      <Filter>PCRE\Sources</Filter>
     </ClCompile>
     <ClCompile Include="..\PCRE\src\pcre2_extuni.c">
-      <Filter>Source Files</Filter>
+      <Filter>PCRE\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\src\pcre2_find_bracket.c">
+      <Filter>PCRE\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\src\pcre2_jit_compile.c">
+      <Filter>PCRE\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\src\pcre2_maketables.c">
+      <Filter>PCRE\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\src\pcre2_match.c">
+      <Filter>PCRE\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\src\pcre2_match_data.c">
+      <Filter>PCRE\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\src\pcre2_newline.c">
+      <Filter>PCRE\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\src\pcre2_ord2utf.c">
+      <Filter>PCRE\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\src\pcre2_pattern_info.c">
+      <Filter>PCRE\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\src\pcre2_string_utils.c">
+      <Filter>PCRE\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\src\pcre2_study.c">
+      <Filter>PCRE\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\src\pcre2_substitute.c">
+      <Filter>PCRE\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\src\pcre2_tables.c">
+      <Filter>PCRE\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\src\pcre2_ucd.c">
+      <Filter>PCRE\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\src\pcre2_valid_utf.c">
+      <Filter>PCRE\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="pcrenet_compile.cpp">
+      <Filter>PCRE.NET\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PCRE\src\pcre2_substring.c">
+      <Filter>PCRE\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="pcrenet_match.cpp">
+      <Filter>PCRE.NET\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="pcrenet_info.cpp">
+      <Filter>PCRE.NET\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="pcrenet_convert.cpp">
+      <Filter>PCRE.NET\Sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\PCRE\src\config.h">
-      <Filter>Header Files</Filter>
+      <Filter>PCRE\Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\PCRE\src\pcre2.h">
-      <Filter>Header Files</Filter>
+      <Filter>PCRE\Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\PCRE\src\pcre2_internal.h">
-      <Filter>Header Files</Filter>
+      <Filter>PCRE\Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\PCRE\src\pcre2_intmodedep.h">
-      <Filter>Header Files</Filter>
+      <Filter>PCRE\Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\PCRE\src\pcre2_ucp.h">
-      <Filter>Header Files</Filter>
+      <Filter>PCRE\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="pcrenet.h">
+      <Filter>PCRE.NET\Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

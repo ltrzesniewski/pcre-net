@@ -1,6 +1,6 @@
 ﻿using System;
-using PCRE.Support;
-using PCRE.Wrapper;
+using System.Diagnostics.CodeAnalysis;
+using PCRE.Internal;
 
 namespace PCRE
 {
@@ -12,7 +12,13 @@ namespace PCRE
 
         public PcreMatchOptions AdditionalOptions { get; set; }
         public int StartIndex { get; set; }
-        public event Func<PcreCallout, PcreCalloutResult> OnCallout;
+
+        [SuppressMessage("ReSharper", "DelegateSubtraction")]
+        public event Func<PcreCallout, PcreCalloutResult> OnCallout
+        {
+            add => Callout += value;
+            remove => Callout -= value;
+        }
 
         public uint MatchLimit
         {
@@ -36,40 +42,17 @@ namespace PCRE
 
         public PcreJitStack JitStack { get; set; }
 
-        internal MatchContext CreateMatchContext(string subject)
+        internal Func<PcreCallout, PcreCalloutResult> Callout { get; private set; }
+
+        internal void FillMatchInput(ref Native.match_input input)
         {
-            var context = new MatchContext
-            {
-                Subject = subject,
-                StartIndex = StartIndex,
-                AdditionalOptions = AdditionalOptions.ToPatternOptions(),
-                CalloutHandler = WrapCallout(OnCallout)
-            };
-
-            if (_matchLimit != null)
-                context.MatchLimit = _matchLimit.GetValueOrDefault();
-
-            if (_depthLimit != null)
-                context.DepthLimit = _depthLimit.GetValueOrDefault();
-
-            if (_heapLimit != null)
-                context.HeapLimit = _heapLimit.GetValueOrDefault();
-
-            if (OffsetLimit != null)
-                context.OffsetLimit = OffsetLimit.GetValueOrDefault();
-
-            if (JitStack != null)
-                context.JitStack = JitStack.GetStack();
-
-            return context;
-        }
-
-        internal static Func<CalloutData, CalloutResult> WrapCallout(Func<PcreCallout, PcreCalloutResult> callout)
-        {
-            if (callout == null)
-                return null;
-
-            return data => (CalloutResult)callout(new PcreCallout(data));
+            input.additional_options = AdditionalOptions.ToPatternOptions();
+            input.start_index = (uint)StartIndex;
+            input.match_limit = _matchLimit.GetValueOrDefault();
+            input.depth_limit = _depthLimit.GetValueOrDefault();
+            input.heap_limit = _heapLimit.GetValueOrDefault();
+            input.offset_limit = OffsetLimit.GetValueOrDefault();
+            input.jit_stack = JitStack?.GetStack() ?? IntPtr.Zero;
         }
     }
 }

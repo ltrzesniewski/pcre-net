@@ -1,4 +1,4 @@
-﻿using PCRE.Wrapper;
+﻿using PCRE.Internal;
 
 namespace PCRE.Conversion
 {
@@ -10,7 +10,7 @@ namespace PCRE.Conversion
         public char SeparatorCharacter { get; set; } = '\\';
 
         public static PcreGlobConversionOptions DefaultWindows()
-        => new PcreGlobConversionOptions();
+            => new PcreGlobConversionOptions();
 
         public static PcreGlobConversionOptions DefaultUnix()
             => new PcreGlobConversionOptions
@@ -19,24 +19,22 @@ namespace PCRE.Conversion
                 SeparatorCharacter = '/'
             };
 
-        internal ConvertContext CreateContext()
+        internal void FillConvertInput(ref Native.convert_input input)
         {
-            return new ConvertContext
-            {
-                GlobEscape = EscapeCharacter,
-                GlobSeparator = SeparatorCharacter
-            };
+            input.options = GetConvertOptions();
+            input.glob_escape = EscapeCharacter;
+            input.glob_separator = SeparatorCharacter;
         }
 
-        internal ConvertOptions GetConvertOptions()
+        private uint GetConvertOptions()
         {
-            var options = ConvertOptions.Glob;
+            var options = PcreConstants.CONVERT_GLOB;
 
             if (NoWildcardSeparator)
-                options |= ConvertOptions.GlobNoWildcardSeparator;
+                options |= PcreConstants.CONVERT_GLOB_NO_WILD_SEPARATOR;
 
             if (NoStarStar)
-                options |= ConvertOptions.GlobNoStarStar;
+                options |= PcreConstants.CONVERT_GLOB_NO_STARSTAR;
 
             return options;
         }

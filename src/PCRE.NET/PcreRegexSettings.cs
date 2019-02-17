@@ -1,13 +1,10 @@
 ﻿using System;
-using PCRE.Support;
-using PCRE.Wrapper;
+using PCRE.Internal;
 
 namespace PCRE
 {
     public sealed class PcreRegexSettings
     {
-        private readonly bool _readOnly;
-
         private PcreOptions _options;
         private PcreNewLine? _newLine;
         private PcreBackslashR? _backslashR;
@@ -75,7 +72,7 @@ namespace PCRE
             }
         }
 
-        internal bool ReadOnlySettings => _readOnly;
+        internal bool ReadOnlySettings { get; }
 
         public PcreRegexSettings()
         {
@@ -94,7 +91,7 @@ namespace PCRE
             _parensLimit = settings._parensLimit;
             _maxPatternLength = settings._maxPatternLength;
             _extraCompileOptions = settings._extraCompileOptions;
-            _readOnly = readOnly;
+            ReadOnlySettings = readOnly;
         }
 
         internal bool CompareValues(PcreRegexSettings other)
@@ -109,7 +106,7 @@ namespace PCRE
 
         internal PcreRegexSettings AsReadOnly()
         {
-            if (_readOnly)
+            if (ReadOnlySettings)
                 return this;
 
             return new PcreRegexSettings(this, true);
@@ -117,34 +114,19 @@ namespace PCRE
 
         private void EnsureIsMutable()
         {
-            if (_readOnly)
+            if (ReadOnlySettings)
                 throw new InvalidOperationException("Settings of a compiled pattern cannot be changed");
         }
 
-        internal CompileContext CreateCompileContext(string pattern)
+        internal void FillCompileInput(ref Native.compile_input input)
         {
-            var context = new CompileContext(pattern)
-            {
-                Options = Options.ToPatternOptions(),
-                JitCompileOptions = Options.ToJitCompileOptions()
-            };
-
-            if (_newLine != null && _newLine != PcreNewLine.Default)
-                context.NewLine = (NewLine)_newLine;
-
-            if (_backslashR != null && _backslashR != PcreBackslashR.Default)
-                context.BackslashR = (BackslashR)_backslashR;
-
-            if (_parensLimit != null)
-                context.ParensNestLimit = _parensLimit.GetValueOrDefault();
-
-            if (_maxPatternLength != null)
-                context.MaxPatternLength = _maxPatternLength.GetValueOrDefault();
-
-            if (_extraCompileOptions != PcreExtraCompileOptions.None)
-                context.ExtraCompileOptions = (ExtraCompileOptions)_extraCompileOptions;
-
-            return context;
+            input.flags = (uint)Options.ToPatternOptions();
+            input.flags_jit = (uint)Options.ToJitCompileOptions();
+            input.new_line = (uint)_newLine.GetValueOrDefault();
+            input.bsr = (uint)_backslashR.GetValueOrDefault();
+            input.parens_nest_limit = _parensLimit.GetValueOrDefault();
+            input.max_pattern_length = _maxPatternLength.GetValueOrDefault();
+            input.compile_extra_options = (uint)_extraCompileOptions;
         }
     }
 }

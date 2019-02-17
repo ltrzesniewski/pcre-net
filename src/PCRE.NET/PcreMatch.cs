@@ -1,34 +1,55 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using PCRE.Wrapper;
+using JetBrains.Annotations;
+using PCRE.Internal;
 
 namespace PCRE
 {
-    public sealed class PcreMatch : IPcreGroup, IPcreGroupList
+    public sealed unsafe class PcreMatch : IPcreGroup, IPcreGroupList
     {
-        private readonly object _result; // See remark about JIT in PcreRegex
-        private readonly PcreGroup[] _groups;
+        private readonly InternalRegex _regex;
+        private readonly int _resultCode;
+        private readonly uint[] _oVector;
+        private readonly char* _markPtr;
 
-        internal PcreMatch(MatchData result)
+        [CanBeNull]
+        private PcreGroup[] _groups;
+
+        [CanBeNull]
+        private string _mark;
+
+        internal PcreMatch(string subject, InternalRegex regex, ref Native.match_result result, uint[] oVector)
         {
-            _result = result;
-            _groups = new PcreGroup[result.Regex.CaptureCount + 1];
+            // Real match
+
+            Subject = subject;
+            _regex = regex;
+            _oVector = oVector;
+            _markPtr = result.mark;
+
+            _resultCode = result.result_code;
         }
 
-        private MatchData InternalResult
+        internal PcreMatch(string subject, InternalRegex regex, uint[] oVector, char* mark)
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)] get { return (MatchData)_result; }
+            // Callout
+
+            Subject = subject;
+            _regex = regex;
+            _oVector = oVector;
+            _markPtr = mark;
+
+            _resultCode = oVector.Length / 2;
         }
 
-        public int CaptureCount => (int)InternalResult.Regex.CaptureCount;
+        public int CaptureCount => _regex.CaptureCount;
 
         public PcreGroup this[int index] => GetGroup(index);
 
         public PcreGroup this[string name] => GetGroup(name);
 
-        internal string Subject => InternalResult.Subject;
+        internal string Subject { get; }
 
         public int Index => this[0].Index;
 
@@ -38,13 +59,25 @@ namespace PCRE
 
         public string Value => this[0].Value;
 
-        public bool Success => InternalResult.ResultCode == MatchResultCode.Success;
+        public bool Success => _resultCode > 0;
 
-        public string Mark => InternalResult.Mark;
+        public string Mark
+        {
+            get
+            {
+                if (_mark == null)
+                {
+                    if (_markPtr != null)
+                        _mark = new string(_markPtr);
+                }
+
+                return _mark;
+            }
+        }
 
         public IPcreGroupList Groups => this;
 
-        public bool IsPartialMatch => InternalResult.ResultCode == MatchResultCode.Partial;
+        public bool IsPartialMatch => _resultCode == PcreConstants.ERROR_PARTIAL;
 
         public IEnumerator<PcreGroup> GetEnumerator() => GetAllGroups().GetEnumerator();
 
@@ -59,31 +92,35 @@ namespace PCRE
             if (index < 0 || index > CaptureCount)
                 return null;
 
-            var group = _groups[index];
+            var groups = _groups ?? (_groups = new PcreGroup[_regex.CaptureCount + 1]);
+
+            var group = groups[index];
             if (group == null)
-                _groups[index] = group = CreateGroup(index);
+                groups[index] = group = CreateGroup(index);
 
             return group;
         }
 
         private PcreGroup CreateGroup(int index)
         {
-            var result = InternalResult;
+            var isAvailable = index < _resultCode || IsPartialMatch && index == 0;
 
-            if (result.ResultCode == MatchResultCode.Partial && index != 0)
+            if (!isAvailable)
                 return PcreGroup.Empty;
 
-            var uindex = (uint)index;
-            var startOffset = result.GetStartOffset(uindex);
-            if (startOffset >= 0)
-                return new PcreGroup(result.Subject, startOffset, result.GetEndOffset(uindex));
+            index *= 2;
+            if (index >= _oVector.Length)
+                return PcreGroup.Empty;
 
-            return PcreGroup.Empty;
+            var startOffset = (int)_oVector[index];
+            var endOffset = (int)_oVector[index + 1];
+
+            return new PcreGroup(Subject, startOffset, endOffset);
         }
 
         private PcreGroup GetGroup(string name)
         {
-            var map = InternalResult.Regex.CaptureNames;
+            var map = _regex.CaptureNames;
             if (map == null)
                 return null;
 
@@ -105,7 +142,7 @@ namespace PCRE
 
         public IEnumerable<PcreGroup> GetDuplicateNamedGroups(string name)
         {
-            var map = InternalResult.Regex.CaptureNames;
+            var map = _regex.CaptureNames;
             if (map == null)
                 yield break;
 

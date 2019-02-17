@@ -1,5 +1,5 @@
 ﻿using System;
-using PCRE.Wrapper;
+using PCRE.Internal;
 
 namespace PCRE
 {
@@ -8,28 +8,39 @@ namespace PCRE
     /// </summary>
     public sealed class PcreJitStack : IDisposable
     {
-        private object _stack; // See remark about JIT in PcreRegex
+        private IntPtr _stack;
 
         public PcreJitStack(uint startSize, uint maxSize)
         {
-            _stack = new JitStack(startSize, maxSize);
+            _stack = Native.jit_stack_create(startSize, maxSize);
         }
 
-        internal JitStack GetStack()
+        ~PcreJitStack()
         {
-            if (_stack != null)
-                return (JitStack)_stack;
-
-            throw new ObjectDisposedException("The JIT stack has been disposed");
+            FreeStack();
         }
 
         public void Dispose()
         {
-            if (_stack is IDisposable disposable)
-            {
-                disposable.Dispose();
-                _stack = null;
-            }
+            FreeStack();
+            GC.SuppressFinalize(this);
+        }
+
+        private void FreeStack()
+        {
+            if (_stack == IntPtr.Zero)
+                return;
+
+            Native.jit_stack_free(_stack);
+            _stack = IntPtr.Zero;
+        }
+
+        internal IntPtr GetStack()
+        {
+            if (_stack == IntPtr.Zero)
+                throw new ObjectDisposedException("The JIT stack has been disposed");
+
+            return _stack;
         }
     }
 }

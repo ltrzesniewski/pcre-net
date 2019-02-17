@@ -1,5 +1,5 @@
 ﻿using System;
-using PCRE.Wrapper;
+using PCRE.Internal;
 
 namespace PCRE
 {
@@ -7,8 +7,8 @@ namespace PCRE
     public enum PcreExtraCompileOptions : uint
     {
         None = 0,
-        BadEscapeIsLiteral = ExtraCompileOptions.BadEscapeIsLiteral,
-        MatchWord = ExtraCompileOptions.MatchWord,
-        MatchLine = ExtraCompileOptions.MatchLine
+        BadEscapeIsLiteral = PcreConstants.EXTRA_BAD_ESCAPE_IS_LITERAL,
+        MatchWord = PcreConstants.EXTRA_MATCH_WORD,
+        MatchLine = PcreConstants.EXTRA_MATCH_LINE
     }
 }

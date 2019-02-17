@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using PCRE.Wrapper;
 
 namespace PCRE
 {
@@ -23,14 +22,6 @@ namespace PCRE
         protected PcreMatchException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-        }
-
-        internal static PcreMatchException FromException(MatchException matchException)
-        {
-            if (matchException.AttemptedMatchData != null && matchException.AttemptedMatchData.ResultCode == MatchResultCode.Callout)
-                return new PcreCalloutException(matchException.Message, matchException.InnerException);
-
-            return new PcreMatchException(matchException.Message, matchException.InnerException);
         }
     }
 

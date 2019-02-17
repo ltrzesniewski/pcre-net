@@ -1,44 +1,46 @@
 ﻿using System;
-using PCRE.Wrapper;
+using PCRE.Internal;
 
 namespace PCRE
 {
-    public static class PcreBuildInfo
+    public static unsafe class PcreBuildInfo
     {
-        public static PcreBackslashR BackslashR { get; } = (PcreBackslashR) GetConfigUInt32(ConfigKey.Bsr);
-        public static bool Jit { get; } = GetConfigBool(ConfigKey.Jit);
-        public static string JitTarget { get; } = PcreBuild.GetConfigString(ConfigKey.JitTarget);
-        public static uint LinkSize { get; } = GetConfigUInt32(ConfigKey.LinkSize);
-        public static uint MatchLimit { get; } = GetConfigUInt32(ConfigKey.MatchLimit);
-        public static PcreNewLine NewLine { get; } = (PcreNewLine) GetConfigUInt32(ConfigKey.NewLine);
-        public static uint ParensLimit { get; } = GetConfigUInt32(ConfigKey.ParensLimit);
-        public static uint DepthLimit { get; } = GetConfigUInt32(ConfigKey.DepthLimit);
-        public static bool Unicode { get; } = GetConfigBool(ConfigKey.Unicode);
-        public static string UnicodeVersion { get; } = GetConfigString(ConfigKey.UnicodeVersion);
-        public static string Version { get; } = GetConfigString(ConfigKey.Version);
-        public static uint HeapLimit { get; } = GetConfigUInt32(ConfigKey.HeapLimit);
-        public static bool NeverBackslashC { get; } = GetConfigBool(ConfigKey.NeverBackslashC);
-        public static uint CompiledWidths { get; } = GetConfigUInt32(ConfigKey.CompiledWidths);
+        public static PcreBackslashR BackslashR { get; } = (PcreBackslashR)GetConfigUInt32(PcreConstants.CONFIG_BSR);
+        public static bool Jit { get; } = GetConfigBool(PcreConstants.CONFIG_JIT);
+        public static string JitTarget { get; } = GetConfigString(PcreConstants.CONFIG_JITTARGET);
+        public static uint LinkSize { get; } = GetConfigUInt32(PcreConstants.CONFIG_LINKSIZE);
+        public static uint MatchLimit { get; } = GetConfigUInt32(PcreConstants.CONFIG_MATCHLIMIT);
+        public static PcreNewLine NewLine { get; } = (PcreNewLine)GetConfigUInt32(PcreConstants.CONFIG_NEWLINE);
+        public static uint ParensLimit { get; } = GetConfigUInt32(PcreConstants.CONFIG_PARENSLIMIT);
+        public static uint DepthLimit { get; } = GetConfigUInt32(PcreConstants.CONFIG_DEPTHLIMIT);
+        public static bool Unicode { get; } = GetConfigBool(PcreConstants.CONFIG_UNICODE);
+        public static string UnicodeVersion { get; } = GetConfigString(PcreConstants.CONFIG_UNICODE_VERSION);
+        public static string Version { get; } = GetConfigString(PcreConstants.CONFIG_VERSION);
+        public static uint HeapLimit { get; } = GetConfigUInt32(PcreConstants.CONFIG_HEAPLIMIT);
+        public static bool NeverBackslashC { get; } = GetConfigBool(PcreConstants.CONFIG_NEVER_BACKSLASH_C);
+        public static uint CompiledWidths { get; } = GetConfigUInt32(PcreConstants.CONFIG_COMPILED_WIDTHS);
 
-        private static bool GetConfigBool(ConfigKey key) 
-            => PcreBuild.GetConfigUInt32(key).GetValueOrDefault() != 0;
+        private static bool GetConfigBool(uint key)
+            => GetConfigUInt32(key) != 0;
 
-        private static uint GetConfigUInt32(ConfigKey key)
+        private static uint GetConfigUInt32(uint key)
         {
-            var value = PcreBuild.GetConfigUInt32(key);
-            if (value == null)
+            uint result;
+            var size = Native.config(key, &result);
+
+            if (size < 0)
                 throw new InvalidOperationException("Could not retrieve the configuration property: " + key);
 
-            return value.Value;
+            return result;
         }
 
-        private static string GetConfigString(ConfigKey key)
+        private static string GetConfigString(uint key)
         {
-            var value = PcreBuild.GetConfigString(key);
-            if (value == null)
-                throw new InvalidOperationException("Could not retrieve the configuration property: " + key);
-
-            return value;
+            var buffer = stackalloc char[256];
+            var messageLength = Native.config(key, buffer);
+            return messageLength >= 0
+                ? new string(buffer, 0, messageLength - 1)
+                : throw new InvalidOperationException("Could not retrieve the configuration property: " + key);
         }
     }
 }

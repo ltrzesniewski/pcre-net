@@ -1,5 +1,5 @@
 ﻿using System;
-using PCRE.Wrapper;
+using PCRE.Internal;
 
 namespace PCRE
 {
@@ -9,53 +9,53 @@ namespace PCRE
         None = 0,
 
         // Normal options
-        IgnoreCase = PatternOptions.Caseless,
-        Caseless = PatternOptions.Caseless,
+        IgnoreCase = PcreConstants.CASELESS,
+        Caseless = PcreConstants.CASELESS,
 
-        MultiLine = PatternOptions.MultiLine,
+        MultiLine = PcreConstants.MULTILINE,
 
-        Singleline = PatternOptions.DotAll,
-        DotAll = PatternOptions.DotAll,
+        Singleline = PcreConstants.DOTALL,
+        DotAll = PcreConstants.DOTALL,
 
-        ExplicitCapture = PatternOptions.NoAutoCapture,
-        NoAutoCapture = PatternOptions.NoAutoCapture,
+        ExplicitCapture = PcreConstants.NO_AUTO_CAPTURE,
+        NoAutoCapture = PcreConstants.NO_AUTO_CAPTURE,
 
-        IgnorePatternWhitespace = PatternOptions.Extended,
-        Extended = PatternOptions.Extended,
-        ExtendedMore = PatternOptions.ExtendedMore,
+        IgnorePatternWhitespace = PcreConstants.EXTENDED,
+        Extended = PcreConstants.EXTENDED,
+        ExtendedMore = PcreConstants.EXTENDED_MORE,
 
-        JavaScript = PatternOptions.AltBsUX | PatternOptions.MatchUnsetBackref,
-        AltBsUX = PatternOptions.AltBsUX,
-        MatchUnsetBackref = PatternOptions.MatchUnsetBackref,
-        Literal = PatternOptions.Literal,
+        JavaScript = PcreConstants.ALT_BSUX | PcreConstants.MATCH_UNSET_BACKREF,
+        AltBsUX = PcreConstants.ALT_BSUX,
+        MatchUnsetBackref = PcreConstants.MATCH_UNSET_BACKREF,
+        Literal = PcreConstants.LITERAL,
 
-        Unicode = PatternOptions.Ucp,
-        Ucp = PatternOptions.Ucp,
+        Unicode = PcreConstants.UCP,
+        Ucp = PcreConstants.UCP,
 
-        Anchored = PatternOptions.Anchored,
-        EndAnchored = PatternOptions.EndAnchored,
-        Ungreedy = PatternOptions.Ungreedy,
-        NotBol = PatternOptions.NotBol,
-        NotEol = PatternOptions.NotEol,
-        NotEmpty = PatternOptions.NotEmpty,
-        NotEmptyAtStart = PatternOptions.NotEmptyAtStart,
-        FirstLine = PatternOptions.FirstLine,
-        DupNames = PatternOptions.DupNames,
-        AutoCallout = PatternOptions.AutoCallout,
+        Anchored = PcreConstants.ANCHORED,
+        EndAnchored = PcreConstants.ENDANCHORED,
+        Ungreedy = PcreConstants.UNGREEDY,
+        NotBol = PcreConstants.NOTBOL,
+        NotEol = PcreConstants.NOTEOL,
+        NotEmpty = PcreConstants.NOTEMPTY,
+        NotEmptyAtStart = PcreConstants.NOTEMPTY_ATSTART,
+        FirstLine = PcreConstants.FIRSTLINE,
+        DupNames = PcreConstants.DUPNAMES,
+        AutoCallout = PcreConstants.AUTO_CALLOUT,
 
-        NoStartOptimize = PatternOptions.NoStartOptimize,
-        NoAutoPossess = PatternOptions.NoAutoPossess,
-        DollarEndOnly = PatternOptions.DollarEndOnly,
+        NoStartOptimize = PcreConstants.NO_START_OPTIMIZE,
+        NoAutoPossess = PcreConstants.NO_AUTO_POSSESS,
+        DollarEndOnly = PcreConstants.DOLLAR_ENDONLY,
 
-        AltCircumflex = PatternOptions.AltCircumflex,
-        AltVerbNames = PatternOptions.AltVerbNames,
-        AllowEmptyClass = PatternOptions.AllowEmptyClass,
-        NoDotStarAnchor = PatternOptions.NoDotStarAnchor,
+        AltCircumflex = PcreConstants.ALT_CIRCUMFLEX,
+        AltVerbNames = PcreConstants.ALT_VERBNAMES,
+        AllowEmptyClass = PcreConstants.ALLOW_EMPTY_CLASS,
+        NoDotStarAnchor = PcreConstants.NO_DOTSTAR_ANCHOR,
 
-        NoUtfCheck = PatternOptions.NoUtfCheck,
-        NeverUcp = PatternOptions.NeverUcp,
-        NeverBackslashC = PatternOptions.NeverBackslashC,
-        UseOffsetLimit = PatternOptions.UseOffsetLimit,
+        NoUtfCheck = PcreConstants.NO_UTF_CHECK,
+        NeverUcp = PcreConstants.NEVER_UCP,
+        NeverBackslashC = PcreConstants.NEVER_BACKSLASH_C,
+        UseOffsetLimit = PcreConstants.USE_OFFSET_LIMIT,
 
         // Extra options
         Compiled = 1L << 32,

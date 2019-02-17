@@ -1,11 +1,11 @@
-﻿using PCRE.Wrapper;
+﻿using PCRE.Internal;
 
 namespace PCRE
 {
     public enum PcreBackslashR
     {
         Default = 0,
-        Unicode = BackslashR.Unicode,
-        AnyCrLf = BackslashR.AnyCrLf
+        Unicode = (int)PcreConstants.BSR_UNICODE,
+        AnyCrLf = (int)PcreConstants.BSR_ANYCRLF
     }
 }

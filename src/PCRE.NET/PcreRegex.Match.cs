@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using PCRE.Wrapper;
+using PCRE.Internal;
 
 namespace PCRE
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
     public partial class PcreRegex
     {
-        // ReSharper disable IntroduceOptionalParameters.Global, MemberCanBePrivate.Global, UnusedMember.Global
-
         [Pure]
         public bool IsMatch(string subject)
             => IsMatch(subject, 0);
@@ -67,10 +69,7 @@ namespace PCRE
             if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
                 throw new IndexOutOfRangeException("Invalid StartIndex value");
 
-            using (var context = settings.CreateMatchContext(subject))
-            {
-                return new PcreMatch(ExecuteMatch(context));
-            }
+            return InternalRegex.Match(subject, settings);
         }
 
         [Pure]
@@ -115,43 +114,24 @@ namespace PCRE
 
         private IEnumerable<PcreMatch> MatchesIterator(string subject, PcreMatchSettings settings)
         {
-            using (var context = settings.CreateMatchContext(subject))
-            {
-                var result = ExecuteMatch(context);
+            var match = InternalRegex.Match(subject, settings);
+            if (!match.Success)
+                yield break;
 
-                if (result.ResultCode != MatchResultCode.Success)
+            yield return match;
+
+            var baseOptions = settings.AdditionalOptions.ToPatternOptions();
+
+            while (true)
+            {
+                var startIndex = match.GetStartOfNextMatchIndex();
+                var options = baseOptions | (match.Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0);
+
+                match = InternalRegex.Match(subject, settings, startIndex, options);
+                if (!match.Success)
                     yield break;
 
-                var match = new PcreMatch(result);
                 yield return match;
-
-                var options = context.AdditionalOptions;
-
-                while (true)
-                {
-                    context.StartIndex = match.GetStartOfNextMatchIndex();
-                    context.AdditionalOptions = options | (match.Length == 0 ? PatternOptions.NotEmptyAtStart : PatternOptions.None);
-
-                    result = ExecuteMatch(context);
-
-                    if (result.ResultCode != MatchResultCode.Success)
-                        yield break;
-
-                    match = new PcreMatch(result);
-                    yield return match;
-                }
-            }
-        }
-
-        private MatchData ExecuteMatch(MatchContext context)
-        {
-            try
-            {
-                return InternalRegex.Match(context);
-            }
-            catch (MatchException ex)
-            {
-                throw PcreMatchException.FromException(ex);
             }
         }
 
