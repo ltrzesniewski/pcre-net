@@ -72,22 +72,17 @@ namespace PCRE.Internal
             return result;
         }
 
-        public PcreMatch Match(string subject, PcreMatchSettings settings)
+        public PcreMatch Match(string subject, ref Native.match_input input)
         {
             var oVector = new uint[2 * (CaptureCount + 1)];
 
             fixed (char* pSubject = subject)
             fixed (uint* pOVec = &oVector[0])
             {
-                var input = new Native.match_input
-                {
-                    code = _code,
-                    subject = pSubject,
-                    subject_length = (uint)subject.Length,
-                    output_vector = pOVec
-                };
-
-                settings.FillMatchInput(ref input);
+                input.code = _code;
+                input.subject = pSubject;
+                input.subject_length = (uint)subject.Length;
+                input.output_vector = pOVec;
 
                 Native.match(ref input, out var result);
 

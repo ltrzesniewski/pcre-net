@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using PCRE.Internal;
+using PCRE.Support;
 
 namespace PCRE
 {
@@ -66,7 +68,7 @@ namespace PCRE
             if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
                 throw new IndexOutOfRangeException("Invalid StartIndex value");
 
-            return InternalRegex.Match(subject, settings);
+            return InternalMatch(subject, settings);
         }
 
         [Pure]
@@ -111,46 +113,43 @@ namespace PCRE
 
         private IEnumerable<PcreMatch> MatchesIterator(string subject, PcreMatchSettings settings)
         {
-            throw new NotImplementedException();
-//            using (var context = settings.CreateMatchContext(subject))
-//            {
-//                var result = ExecuteMatch(context);
-//
-//                if (result.ResultCode != MatchResultCode.Success)
-//                    yield break;
-//
-//                var match = new PcreMatch(result);
-//                yield return match;
-//
-//                var options = context.AdditionalOptions;
-//
-//                while (true)
-//                {
-//                    context.StartIndex = match.GetStartOfNextMatchIndex();
-//                    context.AdditionalOptions = options | (match.Length == 0 ? PatternOptions.NotEmptyAtStart : PatternOptions.None);
-//
-//                    result = ExecuteMatch(context);
-//
-//                    if (result.ResultCode != MatchResultCode.Success)
-//                        yield break;
-//
-//                    match = new PcreMatch(result);
-//                    yield return match;
-//                }
-//            }
+            var match = InternalMatch(subject, settings);
+            if (!match.Success)
+                yield break;
+
+            yield return match;
+
+            var baseOptions = settings.AdditionalOptions.ToPatternOptions();
+
+            while (true)
+            {
+                var startIndex = match.GetStartOfNextMatchIndex();
+                var options = baseOptions | (match.Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0);
+
+                match = InternalMatch(subject, settings, startIndex, options);
+
+                if (!match.Success)
+                    yield break;
+
+                yield return match;
+            }
         }
 
-//        private MatchData ExecuteMatch(MatchContext context)
-//        {
-//            try
-//            {
-//                return InternalRegex.Match(context);
-//            }
-//            catch (MatchException ex)
-//            {
-//                throw PcreMatchException.FromException(ex);
-//            }
-//        }
+        private PcreMatch InternalMatch(string subject, PcreMatchSettings settings)
+        {
+            var input = new Native.match_input();
+            settings.FillMatchInput(ref input);
+            return InternalRegex.Match(subject, ref input);
+        }
+
+        private PcreMatch InternalMatch(string subject, PcreMatchSettings settings, int startIndex, uint additionalOptions)
+        {
+            var input = new Native.match_input();
+            settings.FillMatchInput(ref input);
+            input.start_index = (uint)startIndex;
+            input.additional_options = additionalOptions;
+            return InternalRegex.Match(subject, ref input);
+        }
 
         [Pure]
         public static bool IsMatch(string subject, string pattern)

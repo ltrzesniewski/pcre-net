@@ -68,7 +68,9 @@ namespace PCRE
 
         private PcreGroup CreateGroup(int index)
         {
-            if (_resultCode == PcreConstants.ERROR_PARTIAL && index != 0)
+            var isAvailable = index < _resultCode || IsPartialMatch && index == 0;
+
+            if (!isAvailable)
                 return PcreGroup.Empty;
 
             var startOffset = GetStartOffset(index);

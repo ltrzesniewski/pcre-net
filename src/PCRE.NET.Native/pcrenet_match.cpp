@@ -50,9 +50,9 @@ PCRENET_EXPORT(void, match)(const pcrenet_match_input* input, pcrenet_match_resu
     if (input->output_vector)
     {
         const auto oVector = pcre2_get_ovector_pointer(matchData);
-        const auto oVectorCount = pcre2_get_ovector_count(matchData);
+        const auto itemCount = pcre2_get_ovector_count(matchData) * 2;
 
-        for (uint32_t i = 0; i < oVectorCount; ++i)
+        for (uint32_t i = 0; i < itemCount; ++i)
             input->output_vector[i] = static_cast<uint32_t>(oVector[i]);
     }
 
