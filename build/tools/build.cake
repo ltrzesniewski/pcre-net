@@ -79,7 +79,7 @@ void RunTest(bool anyCpu)
         ShadowCopy = false,
         X86 = !anyCpu,
         OutputFile = testDir + $@"\Test-{platform}-out.txt",
-        NoResults = true
+        Work = testDir
     });
 }
 
@@ -116,7 +116,8 @@ Task("NuGet-Pack")
             Configuration = configuration,
             Targets = { "Pack" },
             Properties = {
-                ["PackageOutputPath"] = new[] { outputDir.FullPath }
+                ["PackageOutputPath"] = new[] { outputDir.FullPath },
+                ["RequirePcreNative"] = new[] { "true" }
             },
             MaxCpuCount = 0
         });

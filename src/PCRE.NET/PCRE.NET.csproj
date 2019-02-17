@@ -51,8 +51,25 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll" Link="PCRE.NET.Native.x86.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" Condition="Exists('..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll')" />
-    <None Include="..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll" Link="PCRE.NET.Native.x64.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" Condition="Exists('..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll')" />
+    <Content Include="..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll"
+             Condition="Exists('..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll') or '$(RequirePcreNative)' == 'true'"
+             Link="PCRE.NET.Native.x86.dll"
+             CopyToOutputDirectory="PreserveNewest"
+             Visible="false"
+             Pack="true"
+             PackagePath="runtimes\win-x86\native\PCRE.NET.Native.dll" />
+
+    <Content Include="..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll"
+             Condition="Exists('..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll') or '$(RequirePcreNative)' == 'true'"
+             Link="PCRE.NET.Native.x64.dll"
+             CopyToOutputDirectory="PreserveNewest"
+             Visible="false"
+             Pack="true"
+             PackagePath="runtimes\win-x64\native\PCRE.NET.Native.dll" />
+
+    <Content Include="PCRE.NET.targets"
+             Pack="true"
+             PackagePath="build" />
   </ItemGroup>
 
 </Project>
