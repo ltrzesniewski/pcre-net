@@ -152,7 +152,7 @@ namespace PCRE.Tests.Pcre
 
             private static IEnumerable<ITestCaseData> GetTestCases()
             {
-                var testCasesDir = Path.Combine(Path.GetDirectoryName(typeof(PcreTests).Assembly.Location) ?? throw new InvalidOperationException(), @"Pcre\TestCases");
+                var testCasesDir = Path.Combine(Path.GetDirectoryName(typeof(PcreTests).Assembly.Location) ?? throw new InvalidOperationException(), @"Pcre", "TestCases");
 
                 for (var fileIndex = 0; fileIndex < InputFiles.GetLength(0); ++fileIndex)
                 {

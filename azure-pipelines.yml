@@ -41,7 +41,7 @@ jobs:
           configuration: Release
           command: test
           projects: src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
-          arguments: /v:m /m /p:LinuxBuild=true --runtime linux-x64
+          arguments: /v:m /m /p:LinuxBuild=true
       - task: PublishPipelineArtifact@0
         displayName: Publish Artifacts
         inputs:
