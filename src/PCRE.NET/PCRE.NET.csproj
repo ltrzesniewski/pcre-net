@@ -1,8 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>PCRE</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(LinuxBuild)' != 'true'">
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\PCRE.NET.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>

@@ -28,9 +28,20 @@ jobs:
           make
         displayName: Build Native x64
       - bash: |
-          cp $(Build.SourcesDirectory)/src/cmake-x86/PCRE.NET.Native.so $(Build.ArtifactStagingDirectory)/PCRE.NET.Native.x86.so
-          cp $(Build.SourcesDirectory)/src/cmake-x64/PCRE.NET.Native.so $(Build.ArtifactStagingDirectory)/PCRE.NET.Native.x64.so
+          cd $(Build.SourcesDirectory)
+          cp src/cmake-x86/PCRE.NET.Native.so $(Build.ArtifactStagingDirectory)/PCRE.NET.Native.x86.so
+          cp src/cmake-x64/PCRE.NET.Native.so $(Build.ArtifactStagingDirectory)/PCRE.NET.Native.x64.so
+          mkdir lib
+          cp src/cmake-x86/PCRE.NET.Native.so lib/PCRE.NET.Native.x86.so
+          cp src/cmake-x64/PCRE.NET.Native.so lib/PCRE.NET.Native.x64.so
         displayName: Copy Artifacts
+      - task: DotNetCoreCLI@2
+        displayName: Test x64
+        inputs:
+          configuration: Release
+          command: test
+          projects: src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
+          arguments: /v:m /m /p:LinuxBuild=true --runtime linux-x64
       - task: PublishPipelineArtifact@0
         displayName: Publish Artifacts
         inputs:

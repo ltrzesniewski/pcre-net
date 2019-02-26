@@ -31,6 +31,15 @@ namespace PCRE.Internal
                     ? (LibImpl)new Win64Impl()
                     : new Win32Impl();
             }
+#if LINUX
+            catch (DllNotFoundException) when (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                // Used in Linux .NET Core unit tests only
+                return Environment.Is64BitProcess
+                    ? (LibImpl)new Linux64Impl()
+                    : new Linux32Impl();
+            }
+#endif
         }
 
         public static string GetErrorMessage(int errorCode)

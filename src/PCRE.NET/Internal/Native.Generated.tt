@@ -27,7 +27,9 @@ var platforms = new[] {
     new PlatformDef("Win", "PCRE.NET.Native.dll"),
     new PlatformDef("Win32", "PCRE.NET.Native.x86.dll"),
     new PlatformDef("Win64", "PCRE.NET.Native.x64.dll"),
-    new PlatformDef("Linux", "PCRE.NET.Native.so")
+    new PlatformDef("Linux", "PCRE.NET.Native.so"),
+    new PlatformDef("Linux32", "PCRE.NET.Native.x86.so", "LINUX"),
+    new PlatformDef("Linux64", "PCRE.NET.Native.x64.so", "LINUX"),
 };
 
 #>
@@ -50,7 +52,6 @@ namespace PCRE.Internal
             => _impl.<#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => $"{p.Modifier}{p.Name}")) #>);
 
 <# } #>
-
         private abstract class LibImpl
         {
 <# foreach (var func in funcs) { #>
@@ -59,6 +60,9 @@ namespace PCRE.Internal
         }
 
 <# foreach (var platform in platforms) { #>
+<# if (platform.Condition != null) { #>
+#if <#= platform.Condition #>
+<# } #>
         [SuppressUnmanagedCodeSecurity]
         private class <#= platform.Name #>Impl : LibImpl
         {
@@ -71,6 +75,9 @@ namespace PCRE.Internal
 
 <# } #>
         }
+<# if (platform.Condition != null) { #>
+#endif
+<# } #>
 
 <# } #>
     }
@@ -154,11 +161,13 @@ private class PlatformDef
 {
     public readonly string Name;
     public readonly string LibName;
+    public readonly string Condition;
 
-    public PlatformDef(string name, string libName)
+    public PlatformDef(string name, string libName, string condition = null)
     {
         Name = name;
         LibName = libName;
+        Condition = condition;
     }
 }
 
