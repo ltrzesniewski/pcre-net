@@ -12,11 +12,27 @@ jobs:
           msbuildArguments: /t:Restore /v:m
           solution: src/PCRE.NET.sln
       - task: MSBuild@1
+        displayName: Build Native x86
+        inputs:
+          configuration: Release
+          platform: Win32
+          maximumCpuCount: true
+          msbuildArguments: /v:m
+          solution: src/PCRE.NET.Native/PCRE.NET.Native.vcxproj
+      - task: MSBuild@1
+        displayName: Build Native x64
+        inputs:
+          configuration: Release
+          platform: x64
+          maximumCpuCount: true
+          msbuildArguments: /v:m
+          solution: src/PCRE.NET.Native/PCRE.NET.Native.vcxproj
+      - task: MSBuild@1
         displayName: Build
         inputs:
           configuration: Release
           maximumCpuCount: true
-          msbuildArguments: /t:Rebuild /v:m
+          msbuildArguments: /v:m
           solution: src/PCRE.NET.sln
       - task: MSBuild@1
         displayName: NuGet Pack
@@ -26,9 +42,16 @@ jobs:
           msbuildArguments: /t:Pack /v:m /p:PackageOutputPath=$(Build.ArtifactStagingDirectory)
           solution: src/PCRE.NET/PCRE.NET.csproj
       - task: VSTest@2
-        displayName: Test
+        displayName: Test x86
         inputs:
           configuration: Release
+          platform: x86
+          searchFolder: src/PCRE.NET.Tests/bin/Release
+      - task: VSTest@2
+        displayName: Test x64
+        inputs:
+          configuration: Release
+          platform: x64
           searchFolder: src/PCRE.NET.Tests/bin/Release
       - task: PublishBuildArtifacts@1
         displayName: Publish Artifacts
