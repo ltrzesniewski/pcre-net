@@ -12,6 +12,7 @@ local-*
 /src/packages/*/
 /build/output
 /build/tools/tools
+/lib
 
 *.suo
 *.user

@@ -17,7 +17,9 @@ namespace PCRE.Internal
             {
                 var impl = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                     ? new WinImpl()
-                    : throw new PlatformNotSupportedException();
+                    : RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
+                        ? (LibImpl)new LinuxImpl()
+                        : throw new PlatformNotSupportedException();
 
                 impl.get_error_message(0, null, 0);
                 return impl;

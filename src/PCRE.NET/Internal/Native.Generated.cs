@@ -318,5 +318,88 @@ namespace PCRE.Internal
 
         }
 
+        [SuppressUnmanagedCodeSecurity]
+        private class LinuxImpl : LibImpl
+        {
+            public override int get_error_message(int errorCode, char* errorBuffer, uint bufferSize)
+                => pcrenet_get_error_message(errorCode, errorBuffer, bufferSize);
+
+            [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
+            private static extern int pcrenet_get_error_message(int errorCode, char* errorBuffer, uint bufferSize);
+
+            public override void compile(ref compile_input input, out compile_result result)
+                => pcrenet_compile(ref input, out result);
+
+            [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
+            private static extern void pcrenet_compile(ref compile_input input, out compile_result result);
+
+            public override void code_free(IntPtr code)
+                => pcrenet_code_free(code);
+
+            [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
+            private static extern void pcrenet_code_free(IntPtr code);
+
+            public override int pattern_info(IntPtr code, uint key, void* data)
+                => pcrenet_pattern_info(code, key, data);
+
+            [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
+            private static extern int pcrenet_pattern_info(IntPtr code, uint key, void* data);
+
+            public override int config(uint key, void* data)
+                => pcrenet_config(key, data);
+
+            [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
+            private static extern int pcrenet_config(uint key, void* data);
+
+            public override void match(ref match_input input, out match_result result)
+                => pcrenet_match(ref input, out result);
+
+            [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
+            private static extern void pcrenet_match(ref match_input input, out match_result result);
+
+            public override void dfa_match(ref dfa_match_input input, out match_result result)
+                => pcrenet_dfa_match(ref input, out result);
+
+            [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
+            private static extern void pcrenet_dfa_match(ref dfa_match_input input, out match_result result);
+
+            public override uint get_callout_count(IntPtr code)
+                => pcrenet_get_callout_count(code);
+
+            [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
+            private static extern uint pcrenet_get_callout_count(IntPtr code);
+
+            public override void get_callouts(IntPtr code, pcre2_callout_enumerate_block* data)
+                => pcrenet_get_callouts(code, data);
+
+            [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
+            private static extern void pcrenet_get_callouts(IntPtr code, pcre2_callout_enumerate_block* data);
+
+            public override IntPtr jit_stack_create(uint startSize, uint maxSize)
+                => pcrenet_jit_stack_create(startSize, maxSize);
+
+            [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
+            private static extern IntPtr pcrenet_jit_stack_create(uint startSize, uint maxSize);
+
+            public override void jit_stack_free(IntPtr stack)
+                => pcrenet_jit_stack_free(stack);
+
+            [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
+            private static extern void pcrenet_jit_stack_free(IntPtr stack);
+
+            public override int convert(ref convert_input input, out convert_result result)
+                => pcrenet_convert(ref input, out result);
+
+            [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
+            private static extern int pcrenet_convert(ref convert_input input, out convert_result result);
+
+            public override int convert_result_free(char* str)
+                => pcrenet_convert_result_free(str);
+
+            [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
+            private static extern int pcrenet_convert_result_free(char* str);
+
+        }
+
     }
 }

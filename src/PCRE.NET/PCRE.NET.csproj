@@ -67,6 +67,22 @@
              Pack="true"
              PackagePath="runtimes\win-x64\native\PCRE.NET.Native.dll" />
 
+    <Content Include="..\..\lib\PCRE.NET.Native.x86.so"
+             Condition="Exists('..\..\lib\PCRE.NET.Native.x86.so') or '$(RequirePcreNative)' == 'true'"
+             Link="PCRE.NET.Native.x86.so"
+             CopyToOutputDirectory="PreserveNewest"
+             Visible="false"
+             Pack="true"
+             PackagePath="runtimes\linux-x86\native\PCRE.NET.Native.so" />
+
+    <Content Include="..\..\lib\PCRE.NET.Native.x64.so"
+             Condition="Exists('..\..\lib\PCRE.NET.Native.x64.so') or '$(RequirePcreNative)' == 'true'"
+             Link="PCRE.NET.Native.x64.so"
+             CopyToOutputDirectory="PreserveNewest"
+             Visible="false"
+             Pack="true"
+             PackagePath="runtimes\linux-x64\native\PCRE.NET.Native.so" />
+
     <Content Include="PCRE.NET.targets"
              Pack="true"
              PackagePath="build" />

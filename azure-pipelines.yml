@@ -22,26 +22,34 @@ jobs:
       - bash: |
           cd $(Build.SourcesDirectory)/src/cmake-x86
           make
-        displayName: Build x86
+        displayName: Build Native x86
       - bash: |
           cd $(Build.SourcesDirectory)/src/cmake-x64
           make
-        displayName: Build x64
+        displayName: Build Native x64
+      - bash: |
+          cp $(Build.SourcesDirectory)/src/cmake-x86/PCRE.NET.Native.so $(Build.ArtifactStagingDirectory)/PCRE.NET.Native.x86.so
+          cp $(Build.SourcesDirectory)/src/cmake-x64/PCRE.NET.Native.so $(Build.ArtifactStagingDirectory)/PCRE.NET.Native.x64.so
+        displayName: Copy Artifacts
       - task: PublishPipelineArtifact@0
-        displayName: Publish x86 Artifact
+        displayName: Publish Artifacts
         inputs:
-          artifactName: PCRE.NET.Native.x86.so
-          targetPath: src/cmake-x86/PCRE.NET.Native.so
-      - task: PublishPipelineArtifact@0
-        displayName: Publish x64 Artifact
-        inputs:
-          artifactName: PCRE.NET.Native.x64.so
-          targetPath: src/cmake-x64/PCRE.NET.Native.so
+          artifactName: linux
+          targetPath: $(Build.ArtifactStagingDirectory)
 
   - job: Windows
     pool:
       vmImage: vs2017-win2016
+    dependsOn: Linux
     steps:
+      - script: |
+          mkdir lib
+        displayName: Init
+      - task: DownloadPipelineArtifact@0
+        displayName: Download Linux Artifacts
+        inputs:
+          artifactName: linux
+          targetPath: lib
       - task: MSBuild@1
         displayName: NuGet Restore
         inputs:
@@ -66,7 +74,7 @@ jobs:
           msbuildArguments: /v:m
           solution: src/PCRE.NET.Native/PCRE.NET.Native.vcxproj
       - task: MSBuild@1
-        displayName: Build
+        displayName: Build Managed
         inputs:
           configuration: Release
           maximumCpuCount: true
@@ -77,7 +85,7 @@ jobs:
         inputs:
           configuration: Release
           maximumCpuCount: true
-          msbuildArguments: /t:Pack /v:m /p:PackageOutputPath=$(Build.ArtifactStagingDirectory)
+          msbuildArguments: /t:Pack /v:m /p:RequirePcreNative=true /p:PackageOutputPath=$(Build.ArtifactStagingDirectory)
           solution: src/PCRE.NET/PCRE.NET.csproj
       - task: VSTest@2
         displayName: Test x86
