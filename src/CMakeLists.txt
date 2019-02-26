@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.12)
 project(PCRE.NET.Native)
 
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
 include_directories(PCRE/src)
 include_directories(PCRE.NET.Native)

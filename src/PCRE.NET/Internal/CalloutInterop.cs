@@ -8,7 +8,7 @@ namespace PCRE.Internal
 {
     internal static unsafe class CalloutInterop
     {
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int CalloutHandlerFunc(ref Native.pcre2_callout_block callout, void* data);
 
         private static readonly CalloutHandlerFunc _calloutHandlerDelegate = CalloutHandler; // GC root

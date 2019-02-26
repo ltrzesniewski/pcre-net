@@ -65,7 +65,7 @@ namespace PCRE.Internal
             public override <#= func.Declaration #>
                 => pcrenet_<#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => $"{p.Modifier}{p.Name}")) #>);
 
-            [DllImport("<#= platform.LibName #>")]
+            [DllImport("<#= platform.LibName #>", CallingConvention = CallingConvention.Cdecl)]
             private static extern <#= func.ReturnType #> pcrenet_<#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => p.GetPInvokeAttributes() + p.Declaration)) #>);
 
 <# } #>

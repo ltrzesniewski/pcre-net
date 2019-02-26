@@ -3,7 +3,7 @@
 #include <memory>
 #include <algorithm>
 
-typedef int (__stdcall *callout_fn)(pcre2_callout_block*, void*);
+typedef int (*callout_fn)(pcre2_callout_block*, void*);
 
 typedef struct
 {
