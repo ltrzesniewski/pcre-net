@@ -20,5 +20,21 @@ namespace PCRE.Tests.PcreNet
                 Assert.That(type.Namespace, Does.Not.Contain("Internal"));
             }
         }
+
+#if EXPECT_X86
+        [Test]
+        public void validate_platform_x86()
+        {
+            Assert.That(System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture, Is.EqualTo(System.Runtime.InteropServices.Architecture.X86));
+        }
+#endif
+
+#if EXPECT_X64
+        [Test]
+        public void validate_platform_x64()
+        {
+            Assert.That(System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture, Is.EqualTo(System.Runtime.InteropServices.Architecture.X64));
+        }
+#endif
     }
 }
