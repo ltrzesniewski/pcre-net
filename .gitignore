@@ -20,4 +20,5 @@ local-*
 *.opendb
 *.VC.db
 *.aps
+*.binlog
 Thumbs.db
