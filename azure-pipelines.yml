@@ -4,15 +4,27 @@ jobs:
     pool:
       vmImage: vs2017-win2016
     steps:
-      - script: |
-          msbuild src/PCRE.NET.sln /v:m /t:Restore
+      - task: MSBuild@1
         displayName: NuGet Restore
-      - script: |
-          msbuild src/PCRE.NET.sln /m /v:m /t:Rebuild /p:Configuration=Release
+        inputs:
+          configuration: Release
+          maximumCpuCount: true
+          msbuildArguments: /t:Restore /v:m
+          solution: src/PCRE.NET.sln
+      - task: MSBuild@1
         displayName: Build
-      - script: |
-          msbuild src/PCRE.NET/PCRE.NET.csproj /v:m /t:Pack /p:Configuration=Release /p:PackageOutputPath=$(Build.ArtifactStagingDirectory)
+        inputs:
+          configuration: Release
+          maximumCpuCount: true
+          msbuildArguments: /t:Rebuild /v:m
+          solution: src/PCRE.NET.sln
+      - task: MSBuild@1
         displayName: NuGet Pack
+        inputs:
+          configuration: Release
+          maximumCpuCount: true
+          msbuildArguments: /t:Pack /v:m /p:PackageOutputPath=$(Build.ArtifactStagingDirectory)
+          solution: src/PCRE.NET/PCRE.NET.csproj
       - task: VSTest@2
         displayName: Test
         inputs:
