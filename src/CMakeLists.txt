@@ -1,0 +1,51 @@
+cmake_minimum_required(VERSION 3.12)
+project(PCRE.NET.Native)
+
+set(CMAKE_CXX_STANDARD 14)
+
+include_directories(PCRE/src)
+include_directories(PCRE.NET.Native)
+
+add_library(PCRE.NET.Native SHARED
+        PCRE/src/config.h
+        PCRE/src/pcre2.h
+        PCRE/src/pcre2_auto_possess.c
+        PCRE/src/pcre2_chartables.c
+        PCRE/src/pcre2_compile.c
+        PCRE/src/pcre2_config.c
+        PCRE/src/pcre2_context.c
+        PCRE/src/pcre2_convert.c
+        PCRE/src/pcre2_dfa_match.c
+        PCRE/src/pcre2_error.c
+        PCRE/src/pcre2_extuni.c
+        PCRE/src/pcre2_find_bracket.c
+        PCRE/src/pcre2_internal.h
+        PCRE/src/pcre2_intmodedep.h
+        PCRE/src/pcre2_jit_compile.c
+        PCRE/src/pcre2_maketables.c
+        PCRE/src/pcre2_match.c
+        PCRE/src/pcre2_match_data.c
+        PCRE/src/pcre2_newline.c
+        PCRE/src/pcre2_ord2utf.c
+        PCRE/src/pcre2_pattern_info.c
+        PCRE/src/pcre2_string_utils.c
+        PCRE/src/pcre2_study.c
+        PCRE/src/pcre2_substitute.c
+        PCRE/src/pcre2_substring.c
+        PCRE/src/pcre2_tables.c
+        PCRE/src/pcre2_ucd.c
+        PCRE/src/pcre2_ucp.h
+        PCRE/src/pcre2_valid_utf.c
+        PCRE/src/pcre2_xclass.c
+        PCRE.NET.Native/pcrenet.h
+        PCRE.NET.Native/pcrenet_compile.cpp
+        PCRE.NET.Native/pcrenet_convert.cpp
+        PCRE.NET.Native/pcrenet_info.cpp
+        PCRE.NET.Native/pcrenet_match.cpp
+)
+
+add_compile_definitions(
+        HAVE_CONFIG_H
+        PCRE2_CODE_UNIT_WIDTH=16
+        _MBCS
+)

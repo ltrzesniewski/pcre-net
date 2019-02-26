@@ -5,6 +5,8 @@ Debug/
 Release/
 ipch/
 .vs/
+.idea/
+cmake-*
 
 /src/packages/*/
 /build/output
