@@ -1,0 +1,16 @@
+
+jobs:
+  - job: Windows
+    pool:
+      vmImage: vs2017-win2016
+    steps:
+      - task: NuGetRestore@1
+        displayName: NuGet Restore
+        inputs:
+          solution: src/PCRE.NET.sln
+      - task: MSBuild@1
+        displayName: Build
+        inputs:
+          configuration: Release
+          maximumCpuCount: true
+          solution: src/PCRE.NET.sln
