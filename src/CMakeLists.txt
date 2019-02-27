@@ -6,6 +6,10 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION true)
+endif()
+
 include_directories(PCRE/src)
 include_directories(PCRE.NET.Native)
 
