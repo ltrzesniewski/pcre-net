@@ -78,6 +78,14 @@
              Pack="true"
              PackagePath="runtimes\linux-x64\native\PCRE.NET.Native.so" />
 
+    <Content Include="..\..\lib\PCRE.NET.Native.x64.dylib"
+             Condition="Exists('..\..\lib\PCRE.NET.Native.x64.dylib') or '$(RequirePcreNative)' == 'true'"
+             Link="PCRE.NET.Native.dylib"
+             CopyToOutputDirectory="PreserveNewest"
+             Visible="false"
+             Pack="true"
+             PackagePath="runtimes\osx-x64\native\PCRE.NET.Native.dylib" />
+
     <Content Include="PCRE.NET.targets"
              Pack="true"
              PackagePath="build" />

@@ -27,7 +27,8 @@ var platforms = new[] {
     new PlatformDef("Win", "PCRE.NET.Native.dll"),
     new PlatformDef("Win32", "PCRE.NET.Native.x86.dll"),
     new PlatformDef("Win64", "PCRE.NET.Native.x64.dll"),
-    new PlatformDef("Linux", "PCRE.NET.Native.so")
+    new PlatformDef("Linux", "PCRE.NET.Native.so"),
+    new PlatformDef("OSX", "PCRE.NET.Native.dylib")
 };
 
 #>

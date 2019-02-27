@@ -35,10 +35,47 @@ jobs:
           artifactName: linux
           targetPath: $(Build.ArtifactStagingDirectory)
 
+  - job: MacOS
+    pool:
+      vmImage: macos-10.13
+    steps:
+      - bash: |
+          mkdir src/cmake-x64
+        displayName: Init
+      - task: CMake@1
+        displayName: CMake x64
+        inputs:
+          workingDirectory: src/cmake-x64
+          cmakeArgs: .. -DCMAKE_BUILD_TYPE=Release
+      - bash: |
+          cd $(Build.SourcesDirectory)/src/cmake-x64
+          make
+        displayName: Build Native x64
+      - bash: |
+          cd $(Build.SourcesDirectory)
+          cp src/cmake-x64/PCRE.NET.Native.dylib $(Build.ArtifactStagingDirectory)/PCRE.NET.Native.x64.dylib
+          mkdir lib
+          cp src/cmake-x64/PCRE.NET.Native.dylib lib/PCRE.NET.Native.x64.dylib
+        displayName: Copy Artifacts
+      - task: DotNetCoreCLI@2
+        displayName: Test x64
+        inputs:
+          configuration: Release
+          command: test
+          projects: src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
+          arguments: /v:m /m /p:LinuxBuild=true /p:ExpectPlatform=x64 --framework netcoreapp2.1
+      - task: PublishPipelineArtifact@0
+        displayName: Publish Artifacts
+        inputs:
+          artifactName: osx
+          targetPath: $(Build.ArtifactStagingDirectory)
+
   - job: Windows
     pool:
       vmImage: vs2017-win2016
-    dependsOn: Linux
+    dependsOn:
+      - Linux
+      - MacOS
     steps:
       - script: |
           mkdir lib
@@ -47,6 +84,11 @@ jobs:
         displayName: Download Linux Artifacts
         inputs:
           artifactName: linux
+          targetPath: lib
+      - task: DownloadPipelineArtifact@0
+        displayName: Download MacOS Artifacts
+        inputs:
+          artifactName: osx
           targetPath: lib
       - task: MSBuild@1
         displayName: NuGet Restore
