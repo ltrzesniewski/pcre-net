@@ -11,7 +11,7 @@ jobs:
         displayName: CMake x64
         inputs:
           workingDirectory: src/cmake-x64
-          cmakeArgs: .. -DCMAKE_BUILD_TYPE=Release
+          cmakeArgs: .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=gcc-7 -DCMAKE_CXX_COMPILER=g++-7
       - bash: |
           cd $(Build.SourcesDirectory)/src/cmake-x64
           make
