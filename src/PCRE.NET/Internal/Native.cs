@@ -35,9 +35,7 @@ namespace PCRE.Internal
             catch (DllNotFoundException) when (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 // Used in Linux .NET Core unit tests only
-                return Environment.Is64BitProcess
-                    ? (LibImpl)new Linux64Impl()
-                    : new Linux32Impl();
+                return new Linux64Impl();
             }
 #endif
         }

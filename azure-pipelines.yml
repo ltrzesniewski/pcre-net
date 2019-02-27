@@ -5,34 +5,21 @@ jobs:
       vmImage: ubuntu-16.04
     steps:
       - bash: |
-          mkdir src/cmake-x86
           mkdir src/cmake-x64
-          sudo apt-get install gcc-multilib g++-multilib
         displayName: Init
-      - task: CMake@1
-        displayName: CMake x86
-        inputs:
-          workingDirectory: src/cmake-x86
-          cmakeArgs: .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32
       - task: CMake@1
         displayName: CMake x64
         inputs:
           workingDirectory: src/cmake-x64
           cmakeArgs: .. -DCMAKE_BUILD_TYPE=Release
       - bash: |
-          cd $(Build.SourcesDirectory)/src/cmake-x86
-          make
-        displayName: Build Native x86
-      - bash: |
           cd $(Build.SourcesDirectory)/src/cmake-x64
           make
         displayName: Build Native x64
       - bash: |
           cd $(Build.SourcesDirectory)
-          cp src/cmake-x86/PCRE.NET.Native.so $(Build.ArtifactStagingDirectory)/PCRE.NET.Native.x86.so
           cp src/cmake-x64/PCRE.NET.Native.so $(Build.ArtifactStagingDirectory)/PCRE.NET.Native.x64.so
           mkdir lib
-          cp src/cmake-x86/PCRE.NET.Native.so lib/PCRE.NET.Native.x86.so
           cp src/cmake-x64/PCRE.NET.Native.so lib/PCRE.NET.Native.x64.so
         displayName: Copy Artifacts
       - task: DotNetCoreCLI@2
