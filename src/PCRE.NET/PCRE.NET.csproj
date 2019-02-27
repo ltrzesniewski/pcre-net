@@ -72,7 +72,7 @@
 
     <Content Include="..\..\lib\PCRE.NET.Native.x64.so"
              Condition="Exists('..\..\lib\PCRE.NET.Native.x64.so') or '$(RequirePcreNative)' == 'true'"
-             Link="PCRE.NET.Native.x64.so"
+             Link="PCRE.NET.Native.so"
              CopyToOutputDirectory="PreserveNewest"
              Visible="false"
              Pack="true"
