@@ -46,7 +46,8 @@ void RunBuild(PlatformTarget platform)
         Configuration = configuration,
         PlatformTarget = platform,
         Targets = { "Rebuild" },
-        MaxCpuCount = 0
+        MaxCpuCount = 0,
+        Verbosity = Verbosity.Minimal
     });
 }
 
@@ -116,11 +117,17 @@ Task("NuGet-Pack")
             Configuration = configuration,
             Targets = { "Pack" },
             Properties = {
-                ["PackageOutputPath"] = new[] { outputDir.FullPath },
-                ["RequirePcreNative"] = new[] { "true" }
+                ["PackageOutputPath"] = new[] { outputDir.FullPath }
             },
-            MaxCpuCount = 0
+            MaxCpuCount = 0,
+            Verbosity = Verbosity.Minimal
         });
+
+        Warning("");
+        Warning("==============================================================");
+        Warning("| WARNING: This build script produces a Windows-only package |");
+        Warning("==============================================================");
+        Warning("");
     });
 
 //////////////////////////////////////////////////////////////////////
