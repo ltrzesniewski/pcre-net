@@ -12,7 +12,12 @@ PCRE.NET
 
 PCRE.NET is a .NET wrapper for the [PCRE library](http://www.pcre.org/). The goal of this project is to bring most of PCRE's features for use from .NET applications with as little overhead as possible.
 
-The current version on the *master* branch is **0.8.0**, based on PCRE **10.32**. It targets .NET Standard 2.0 on Windows.
+The current version on the *master* branch is **0.9.0**, based on PCRE **10.32**. It targets .NET Standard 2.0 and supports the following systems:
+
+ - Windows x64
+ - Windows x86
+ - Linux x64
+ - macOS x64
 
 ## Features ##
 
@@ -34,7 +39,7 @@ The following regex operations are supported:
 
 Library highlights:
 
-- Works on the .NET Framework and on .NET Core on Windows (.NET Standard 2.0 target)
+- Works on the .NET Framework and on .NET Core (.NET Standard 2.0 target)
 - Support for compiled patterns (x86/x64 JIT)
 - Lazy evaluation whenever possible (for instance `PcreRegex.Matches` returns `IEnumerable<PcreMatch>`)
 - The API is similar to .NET's `System.Text.RegularExpressions`
