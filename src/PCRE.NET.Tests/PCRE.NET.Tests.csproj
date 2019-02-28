@@ -4,7 +4,7 @@
     <RootNamespace>PCRE.Tests</RootNamespace>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(LinuxBuild)' != 'true'">
+  <PropertyGroup Condition="'$(PcreNetTestBuild)' != 'true'">
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\PCRE.NET.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>

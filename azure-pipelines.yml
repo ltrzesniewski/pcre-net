@@ -29,7 +29,7 @@ jobs:
         inputs:
           command: test
           projects: src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
-          arguments: /v:m /m /p:Configuration=$(BuildConfiguration) /p:LinuxBuild=true /p:ExpectPlatform=x64 --framework netcoreapp2.1
+          arguments: /v:m /m /p:Configuration=$(BuildConfiguration) /p:PcreNetTestBuild=true /p:ExpectPlatform=x64 --framework netcoreapp2.1
       - task: PublishPipelineArtifact@0
         displayName: Publish Artifacts
         inputs:
@@ -62,7 +62,7 @@ jobs:
         inputs:
           command: test
           projects: src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
-          arguments: /v:m /m /p:Configuration=$(BuildConfiguration) /p:LinuxBuild=true /p:ExpectPlatform=x64 --framework netcoreapp2.1
+          arguments: /v:m /m /p:Configuration=$(BuildConfiguration) /p:PcreNetTestBuild=true /p:ExpectPlatform=x64 --framework netcoreapp2.1
       - task: PublishPipelineArtifact@0
         displayName: Publish Artifacts
         inputs:

@@ -1,7 +1,7 @@
 <Project>
 
-  <PropertyGroup Condition="'$(LinuxBuild)' == 'true'">
-    <DefineConstants>$(DefineConstants);LINUX</DefineConstants>
+  <PropertyGroup Condition="'$(PcreNetTestBuild)' == 'true'">
+    <DefineConstants>$(DefineConstants);TEST_BUILD</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup>
