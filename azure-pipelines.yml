@@ -10,26 +10,31 @@ jobs:
       - bash: |
           mkdir src/cmake-x64
         displayName: Init
+
       - task: CMake@1
         displayName: CMake x64
         inputs:
           workingDirectory: src/cmake-x64
           cmakeArgs: .. -DCMAKE_BUILD_TYPE=$(BuildConfiguration) -DCMAKE_C_COMPILER=gcc-7 -DCMAKE_CXX_COMPILER=g++-7
+
       - bash: |
           cd $(Build.SourcesDirectory)/src/cmake-x64
           make
         displayName: Build Native x64
+
       - bash: |
           cd $(Build.SourcesDirectory)
           mkdir lib
           cp src/cmake-x64/PCRE.NET.Native.so lib/PCRE.NET.Native.x64.so
         displayName: Copy Artifacts
+
       - task: DotNetCoreCLI@2
         displayName: Test x64
         inputs:
           command: test
           projects: src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
           arguments: /v:m /m /p:Configuration=$(BuildConfiguration) /p:PcreNetTestBuild=true /p:ExpectPlatform=x64 --framework netcoreapp2.1
+
       - task: PublishPipelineArtifact@0
         displayName: Publish Artifacts
         inputs:
@@ -43,26 +48,31 @@ jobs:
       - bash: |
           mkdir src/cmake-x64
         displayName: Init
+
       - task: CMake@1
         displayName: CMake x64
         inputs:
           workingDirectory: src/cmake-x64
           cmakeArgs: .. -DCMAKE_BUILD_TYPE=$(BuildConfiguration)
+
       - bash: |
           cd $(Build.SourcesDirectory)/src/cmake-x64
           make
         displayName: Build Native x64
+
       - bash: |
           cd $(Build.SourcesDirectory)
           mkdir lib
           cp src/cmake-x64/PCRE.NET.Native.dylib lib/PCRE.NET.Native.x64.dylib
         displayName: Copy Artifacts
+
       - task: DotNetCoreCLI@2
         displayName: Test x64
         inputs:
           command: test
           projects: src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
           arguments: /v:m /m /p:Configuration=$(BuildConfiguration) /p:PcreNetTestBuild=true /p:ExpectPlatform=x64 --framework netcoreapp2.1
+
       - task: PublishPipelineArtifact@0
         displayName: Publish Artifacts
         inputs:
@@ -79,16 +89,19 @@ jobs:
       - script: |
           mkdir lib
         displayName: Init
+
       - task: DownloadPipelineArtifact@0
         displayName: Download Linux Artifacts
         inputs:
           artifactName: linux-lib
           targetPath: lib
+
       - task: DownloadPipelineArtifact@0
         displayName: Download MacOS Artifacts
         inputs:
           artifactName: osx-lib
           targetPath: lib
+
       - task: MSBuild@1
         displayName: NuGet Restore
         inputs:
@@ -96,6 +109,7 @@ jobs:
           maximumCpuCount: true
           msbuildArguments: /t:Restore /v:m
           solution: src/PCRE.NET.sln
+
       - task: MSBuild@1
         displayName: Build Native x86
         inputs:
@@ -104,6 +118,7 @@ jobs:
           maximumCpuCount: true
           msbuildArguments: /v:m
           solution: src/PCRE.NET.Native/PCRE.NET.Native.vcxproj
+
       - task: MSBuild@1
         displayName: Build Native x64
         inputs:
@@ -112,6 +127,7 @@ jobs:
           maximumCpuCount: true
           msbuildArguments: /v:m
           solution: src/PCRE.NET.Native/PCRE.NET.Native.vcxproj
+
       - task: MSBuild@1
         displayName: Build PCRE.NET
         inputs:
@@ -119,6 +135,7 @@ jobs:
           maximumCpuCount: true
           msbuildArguments: /v:m
           solution: src/PCRE.NET/PCRE.NET.csproj
+
       - task: MSBuild@1
         displayName: NuGet Pack
         inputs:
@@ -126,6 +143,7 @@ jobs:
           maximumCpuCount: true
           msbuildArguments: /t:Pack /v:m /p:RequirePcreNative=true /p:PackageOutputPath=$(Build.ArtifactStagingDirectory)
           solution: src/PCRE.NET/PCRE.NET.csproj
+
       - task: MSBuild@1
         displayName: Build Tests x86
         inputs:
@@ -134,6 +152,7 @@ jobs:
           platform: x86
           msbuildArguments: /v:m /p:ExpectPlatform=x86
           solution: src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
+
       - task: MSBuild@1
         displayName: Build Tests x64
         inputs:
@@ -142,18 +161,21 @@ jobs:
           platform: x64
           msbuildArguments: /v:m /p:ExpectPlatform=x64
           solution: src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
+
       - task: VSTest@2
         displayName: Test x86
         inputs:
           configuration: $(BuildConfiguration)
           platform: x86
           searchFolder: src/PCRE.NET.Tests/bin/x86/$(BuildConfiguration)/net472
+
       - task: VSTest@2
         displayName: Test x64
         inputs:
           configuration: $(BuildConfiguration)
           platform: x64
           searchFolder: src/PCRE.NET.Tests/bin/x64/$(BuildConfiguration)/net472
+          
       - task: PublishBuildArtifacts@1
         displayName: Publish Artifacts
         inputs:
