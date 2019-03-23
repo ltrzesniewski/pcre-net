@@ -4,8 +4,8 @@ PCRE.NET
 
 **Perl Compatible Regular Expressions for .NET**
 
+[![Build Status](https://dev.azure.com/Lucas-Trzesniewski/PCRE.NET/_apis/build/status/PCRE.NET?branchName=master)](https://dev.azure.com/Lucas-Trzesniewski/PCRE.NET/_build/latest?definitionId=1&branchName=master)
 [![NuGet Package](https://img.shields.io/nuget/v/PCRE.NET.svg?logo=NuGet)](https://www.nuget.org/packages/PCRE.NET)
-[![Build Status](https://lucas-trzesniewski.visualstudio.com/Projects/_apis/build/status/PCRE.NET?branchName=master)](https://lucas-trzesniewski.visualstudio.com/Projects/_build/latest?definitionId=1&branchName=master)
 [![GitHub release](https://img.shields.io/github/release/ltrzesniewski/pcre-net.svg?logo=GitHub)](https://github.com/ltrzesniewski/pcre-net/releases)
 [![PCRE](https://img.shields.io/badge/pcre-v10.32-blue.svg)](http://www.pcre.org/)
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/ltrzesniewski/pcre-net/blob/master/LICENCE)
