@@ -39,7 +39,7 @@ jobs:
       - task: PublishPipelineArtifact@0
         displayName: Publish Artifacts
         inputs:
-          artifactName: native-libs
+          artifactName: linux-lib
           targetPath: lib
 
   - job: MacOS
@@ -78,7 +78,7 @@ jobs:
       - task: PublishPipelineArtifact@0
         displayName: Publish Artifacts
         inputs:
-          artifactName: native-libs
+          artifactName: osx-lib
           targetPath: lib
 
   - job: Windows
@@ -93,9 +93,15 @@ jobs:
         displayName: Init
 
       - task: DownloadPipelineArtifact@0
-        displayName: Download Native Libs
+        displayName: Download Linux Artifacts
         inputs:
-          artifactName: native-libs
+          artifactName: linux-lib
+          targetPath: lib
+
+      - task: DownloadPipelineArtifact@0
+        displayName: Download MacOS Artifacts
+        inputs:
+          artifactName: osx-lib
           targetPath: lib
 
       - task: MSBuild@1
@@ -173,7 +179,7 @@ jobs:
           platform: x64
           searchFolder: src/PCRE.NET.Tests/bin/x64/$(BuildConfiguration)/net472
           testRunTitle: Windows x64
-
+          
       - task: PublishBuildArtifacts@1
         displayName: Publish Artifacts
         inputs:
