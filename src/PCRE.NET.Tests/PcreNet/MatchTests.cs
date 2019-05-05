@@ -474,6 +474,22 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_match_script_run()
+        {
+            const string subject = "123\U0001D7CF\U0001D7D0\U0001D7D1";
+
+            var normal = PcreRegex.Match(subject, @"\d+", PcreOptions.Unicode);
+            Assert.That(normal.Success, Is.True);
+            Assert.That(normal.Index, Is.EqualTo(0));
+            Assert.That(normal.Length, Is.EqualTo(subject.Length));
+
+            var scriptRun = PcreRegex.Match(subject, @"(*script_run:\d+)", PcreOptions.Unicode);
+            Assert.That(scriptRun.Success, Is.True);
+            Assert.That(scriptRun.Index, Is.EqualTo(0));
+            Assert.That(scriptRun.Length, Is.EqualTo(3));
+        }
+
+        [Test]
         public void readme_json_example()
         {
             const string jsonPattern = @"
