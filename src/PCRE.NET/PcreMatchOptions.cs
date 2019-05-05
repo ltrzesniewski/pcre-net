@@ -21,6 +21,7 @@ namespace PCRE
         PartialHard = PcreConstants.PARTIAL_HARD,
 
         NoUtfCheck = PcreConstants.NO_UTF_CHECK,
-        NoJit = PcreConstants.NO_JIT
+        NoJit = PcreConstants.NO_JIT,
+        CopyMatchedSubject = PcreConstants.COPY_MATCHED_SUBJECT
     }
 }
