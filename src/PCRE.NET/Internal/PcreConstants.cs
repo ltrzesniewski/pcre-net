@@ -41,9 +41,12 @@ namespace PCRE.Internal
         public const uint EXTRA_BAD_ESCAPE_IS_LITERAL = 0x00000002;
         public const uint EXTRA_MATCH_WORD = 0x00000004;
         public const uint EXTRA_MATCH_LINE = 0x00000008;
+        public const uint EXTRA_ESCAPED_CR_IS_LF = 0x00000010;
+        public const uint EXTRA_ALT_BSUX = 0x00000020;
         public const uint JIT_COMPLETE = 0x00000001;
         public const uint JIT_PARTIAL_SOFT = 0x00000002;
         public const uint JIT_PARTIAL_HARD = 0x00000004;
+        public const uint JIT_INVALID_UTF = 0x00000100;
         public const uint NOTBOL = 0x00000001;
         public const uint NOTEOL = 0x00000002;
         public const uint NOTEMPTY = 0x00000004;
@@ -58,6 +61,7 @@ namespace PCRE.Internal
         public const uint SUBSTITUTE_UNKNOWN_UNSET = 0x00000800;
         public const uint SUBSTITUTE_OVERFLOW_LENGTH = 0x00001000;
         public const uint NO_JIT = 0x00002000;
+        public const uint COPY_MATCHED_SUBJECT = 0x00004000;
         public const uint CONVERT_UTF = 0x00000001;
         public const uint CONVERT_NO_UTF_CHECK = 0x00000002;
         public const uint CONVERT_POSIX_BASIC = 0x00000004;
@@ -167,6 +171,8 @@ namespace PCRE.Internal
         public const int ERROR_BAD_LITERAL_OPTIONS = 192;
         public const int ERROR_SUPPORTED_ONLY_IN_UNICODE = 193;
         public const int ERROR_INVALID_HYPHEN_IN_OPTIONS = 194;
+        public const int ERROR_ALPHA_ASSERTION_UNKNOWN = 195;
+        public const int ERROR_SCRIPT_RUN_NOT_AVAILABLE = 196;
         public const int ERROR_NOMATCH = -1;
         public const int ERROR_PARTIAL = -2;
         public const int ERROR_UTF8_ERR1 = -3;

@@ -9,6 +9,8 @@ namespace PCRE
         None = 0,
         BadEscapeIsLiteral = PcreConstants.EXTRA_BAD_ESCAPE_IS_LITERAL,
         MatchWord = PcreConstants.EXTRA_MATCH_WORD,
-        MatchLine = PcreConstants.EXTRA_MATCH_LINE
+        MatchLine = PcreConstants.EXTRA_MATCH_LINE,
+        EscapedCrIsLf = PcreConstants.EXTRA_ESCAPED_CR_IS_LF,
+        AltBsUX = PcreConstants.EXTRA_ALT_BSUX
     }
 }
