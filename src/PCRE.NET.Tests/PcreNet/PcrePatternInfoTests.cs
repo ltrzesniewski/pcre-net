@@ -62,5 +62,22 @@ namespace PCRE.Tests.PcreNet
             Assert.That(re.PatternInfo.Callouts[1].PatternPosition, Is.EqualTo(20));
             Assert.That(re.PatternInfo.Callouts[1].NextPatternItemLength, Is.EqualTo(3));
         }
+
+        [Test]
+        public void should_expose_jit_options()
+        {
+            var re = new PcreRegex(@"foo", new PcreRegexSettings { JitCompileOptions = PcreJitCompileOptions.PartialSoft });
+            Assert.That(re.PatternInfo.JitOptions, Is.EqualTo(PcreJitCompileOptions.PartialSoft));
+        }
+
+        [Test]
+        public void should_convert_jit_options()
+        {
+            var compiled = new PcreRegex(@"foo", PcreOptions.Compiled);
+            Assert.That(compiled.PatternInfo.JitOptions, Is.EqualTo(PcreJitCompileOptions.Complete));
+
+            var partial = new PcreRegex(@"foo", PcreOptions.CompiledPartial);
+            Assert.That(partial.PatternInfo.JitOptions, Is.EqualTo(PcreJitCompileOptions.PartialHard | PcreJitCompileOptions.PartialSoft));
+        }
     }
 }

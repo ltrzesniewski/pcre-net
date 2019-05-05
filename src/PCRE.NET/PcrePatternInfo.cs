@@ -17,6 +17,7 @@ namespace PCRE
         public string PatternString => _re.Pattern;
         public PcreRegexSettings Settings => _re.Settings;
         public PcreOptions Options => _re.Settings.Options;
+        public PcreJitCompileOptions JitOptions => _re.Settings.JitCompileOptions;
         public PcreOptions ArgOptions => (PcreOptions)_re.GetInfoUInt32(PcreConstants.INFO_ARGOPTIONS);
         public PcreOptions AllOptions => (PcreOptions)_re.GetInfoUInt32(PcreConstants.INFO_ALLOPTIONS);
         public PcreExtraCompileOptions ExtraOptions => (PcreExtraCompileOptions)_re.GetInfoUInt32(PcreConstants.INFO_EXTRAOPTIONS);

@@ -11,6 +11,7 @@ namespace PCRE
         private uint? _parensLimit;
         private uint? _maxPatternLength;
         private PcreExtraCompileOptions _extraCompileOptions;
+        private PcreJitCompileOptions _jitCompileOptions;
 
         public PcreOptions Options
         {
@@ -72,6 +73,16 @@ namespace PCRE
             }
         }
 
+        public PcreJitCompileOptions JitCompileOptions
+        {
+            get => _jitCompileOptions | Options.ToJitCompileOptions();
+            set
+            {
+                EnsureIsMutable();
+                _jitCompileOptions = value;
+            }
+        }
+
         internal bool ReadOnlySettings { get; }
 
         public PcreRegexSettings()
@@ -91,6 +102,8 @@ namespace PCRE
             _parensLimit = settings._parensLimit;
             _maxPatternLength = settings._maxPatternLength;
             _extraCompileOptions = settings._extraCompileOptions;
+            _jitCompileOptions= settings._jitCompileOptions;
+
             ReadOnlySettings = readOnly;
         }
 
@@ -101,7 +114,8 @@ namespace PCRE
                    && BackslashR == other.BackslashR
                    && ParensLimit == other.ParensLimit
                    && MaxPatternLength == other.MaxPatternLength
-                   && ExtraCompileOptions == other.ExtraCompileOptions;
+                   && ExtraCompileOptions == other.ExtraCompileOptions
+                   && JitCompileOptions == other.JitCompileOptions;
         }
 
         internal PcreRegexSettings AsReadOnly()
@@ -120,8 +134,8 @@ namespace PCRE
 
         internal void FillCompileInput(ref Native.compile_input input)
         {
-            input.flags = (uint)Options.ToPatternOptions();
-            input.flags_jit = (uint)Options.ToJitCompileOptions();
+            input.flags = Options.ToPatternOptions();
+            input.flags_jit = (uint)JitCompileOptions;
             input.new_line = (uint)_newLine.GetValueOrDefault();
             input.bsr = (uint)_backslashR.GetValueOrDefault();
             input.parens_nest_limit = _parensLimit.GetValueOrDefault();
