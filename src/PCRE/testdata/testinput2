@@ -2408,13 +2408,13 @@
 \= Expect no match
     cat
 
-/(\3)(\1)(a)/alt_bsux,allow_empty_class,match_unset_backref,dupnames
+/(\3)(\1)(a)/allow_empty_class,match_unset_backref,dupnames
     cat
 
 /TA]/
     The ACTA] comes
 
-/TA]/alt_bsux,allow_empty_class,match_unset_backref,dupnames
+/TA]/allow_empty_class,match_unset_backref,dupnames
     The ACTA] comes
 
 /(?2)[]a()b](abc)/
@@ -2446,25 +2446,25 @@
 
 /a[^]b/
 
-/a[]b/alt_bsux,allow_empty_class,match_unset_backref,dupnames
+/a[]b/allow_empty_class,match_unset_backref,dupnames
 \= Expect no match
     ab
 
-/a[]+b/alt_bsux,allow_empty_class,match_unset_backref,dupnames
+/a[]+b/allow_empty_class,match_unset_backref,dupnames
 \= Expect no match
     ab
 
-/a[]*+b/alt_bsux,allow_empty_class,match_unset_backref,dupnames
+/a[]*+b/allow_empty_class,match_unset_backref,dupnames
 \= Expect no match
     ab
 
-/a[^]b/alt_bsux,allow_empty_class,match_unset_backref,dupnames
+/a[^]b/allow_empty_class,match_unset_backref,dupnames
     aXb
     a\nb
 \= Expect no match
     ab
 
-/a[^]+b/alt_bsux,allow_empty_class,match_unset_backref,dupnames
+/a[^]+b/allow_empty_class,match_unset_backref,dupnames
     aXb
     a\nX\nXb
 \= Expect no match
@@ -2903,10 +2903,10 @@
     xxxxabcde\=ps
     xxxxabcde\=ph
 
-/(\3)(\1)(a)/alt_bsux,allow_empty_class,match_unset_backref,dupnames
+/(\3)(\1)(a)/allow_empty_class,match_unset_backref,dupnames
     cat
 
-/(\3)(\1)(a)/I,alt_bsux,allow_empty_class,match_unset_backref,dupnames
+/(\3)(\1)(a)/I,allow_empty_class,match_unset_backref,dupnames
     cat
 
 /(\3)(\1)(a)/I
@@ -3418,6 +3418,14 @@
     aU0041z
 \= Expect no match
     aAz
+    
+/^\u{7a}/alt_bsux
+    u{7a}
+\= Expect no match
+    zoo 
+
+/^\u{7a}/extra_alt_bsux
+    zoo 
 
 /(?(?=c)c|d)++Y/B
 
@@ -5304,9 +5312,21 @@ a)"xI
 
 /\N{\c/IB,bad_escape_is_literal
 
-/[\j\x{z}\o\gA-\Nb-\g]/B,bad_escape_is_literal
+/[\j\x{z}\o\gAb\g]/B,bad_escape_is_literal
 
 /[Q-\N]/B,bad_escape_is_literal
+
+/[\s-_]/bad_escape_is_literal
+
+/[_-\s]/bad_escape_is_literal
+
+/[\B\R\X]/B
+
+/[\B\R\X]/B,bad_escape_is_literal
+
+/[A-\BP-\RV-\X]/B
+
+/[A-\BP-\RV-\X]/B,bad_escape_is_literal
 
 # ----------------------------------------------------------------------
 
@@ -5504,5 +5524,67 @@ a)"xI
     abc 
     bbc
     xbc 
+
+/a(b)c|xyz/g,allvector,replace=<$0>
+    abcdefabcpqr\=ovector=4
+    abxyz\=ovector=4
+    abcdefxyz\=ovector=4
+    
+/a(b)c|xyz/allvector
+    abcdef\=ovector=4
+    abxyz\=ovector=4
+
+/a(b)c|xyz/g,replace=<$0>,substitute_callout
+    abcdefabcpqr
+    abxyzpqrabcxyz
+    12abc34xyz99abc55\=substitute_stop=2
+    12abc34xyz99abc55\=substitute_skip=1
+    12abc34xyz99abc55\=substitute_skip=2
+
+/a(b)c|xyz/g,replace=<$0>
+    abcdefabcpqr
+    abxyzpqrabcxyz
+    12abc34xyz\=substitute_stop=2
+    12abc34xyz\=substitute_skip=1
+
+/a(b)c|xyz/replace=<$0>
+    abcdefabcpqr
+    12abc34xyz\=substitute_skip=1
+    12abc34xyz\=substitute_stop=1
+
+/abc\rdef/
+    abc\ndef
+
+/abc\rdef\x{0d}xyz/escaped_cr_is_lf
+    abc\ndef\rxyz
+\= Expect no match     
+    abc\ndef\nxyz
+
+/(?(*ACCEPT)xxx)/
+
+/(?(*atomic:xx)xxx)/
+
+/(?(*script_run:xxx)zzz)/
+
+/foobar/
+    the foobar thing\=copy_matched_subject
+    the foobar thing\=copy_matched_subject,zero_terminate
+
+/foobar/g
+    the foobar thing foobar again\=copy_matched_subject
+
+/(*:XX)^abc/I
+
+/(*COMMIT:XX)^abc/I
+
+/(*ACCEPT:XX)^abc/I
+
+/abc/replace=xyz
+    abc\=null_context
+
+/abc/replace=xyz,substitute_callout
+    abc 
+\= Expect error message
+    abc\=null_context
 
 # End of testinput2

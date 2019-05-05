@@ -1,9 +1,11 @@
 README file for PCRE2 (Perl-compatible regular expression library)
 ------------------------------------------------------------------
 
-PCRE2 is a re-working of the original PCRE library to provide an entirely new
-API. The latest release of PCRE2 is always available in three alternative
-formats from:
+PCRE2 is a re-working of the original PCRE1 library to provide an entirely new
+API. Since its initial release in 2015, there has been further development of
+the code and it now differs from PCRE1 in more than just the API. There are new
+features and the internals have been improved. The latest release of PCRE2 is
+always available in three alternative formats from:
 
   ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre2-xxx.tar.gz
   ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre2-xxx.tar.bz2
@@ -39,13 +41,13 @@ The PCRE2 APIs
 PCRE2 is written in C, and it has its own API. There are three sets of
 functions, one for the 8-bit library, which processes strings of bytes, one for
 the 16-bit library, which processes strings of 16-bit values, and one for the
-32-bit library, which processes strings of 32-bit values. There are no C++
-wrappers.
+32-bit library, which processes strings of 32-bit values. Unlike PCRE1, there
+are no C++ wrappers.
 
 The distribution does contain a set of C wrapper functions for the 8-bit
 library that are based on the POSIX regular expression API (see the pcre2posix
-man page). These can be found in a library called libpcre2-posix. Note that
-this just provides a POSIX calling interface to PCRE2; the regular expressions
+man page). These are built into a library called libpcre2-posix. Note that this
+just provides a POSIX calling interface to PCRE2; the regular expressions
 themselves still follow Perl syntax and semantics. The POSIX API is restricted,
 and does not give full access to all of PCRE2's facilities.
 
@@ -53,20 +55,8 @@ The header file for the POSIX-style functions is called pcre2posix.h. The
 official POSIX name is regex.h, but I did not want to risk possible problems
 with existing files of that name by distributing it that way. To use PCRE2 with
 an existing program that uses the POSIX API, pcre2posix.h will have to be
-renamed or pointed at by a link.
-
-If you are using the POSIX interface to PCRE2 and there is already a POSIX
-regex library installed on your system, as well as worrying about the regex.h
-header file (as mentioned above), you must also take care when linking programs
-to ensure that they link with PCRE2's libpcre2-posix library. Otherwise they
-may pick up the POSIX functions of the same name from the other library.
-
-One way of avoiding this confusion is to compile PCRE2 with the addition of
--Dregcomp=PCRE2regcomp (and similarly for the other POSIX functions) to the
-compiler flags (CFLAGS if you are using "configure" -- see below). This has the
-effect of renaming the functions so that the names no longer clash. Of course,
-you have to do the same thing for your applications, or write them using the
-new names.
+renamed or pointed at by a link (or the program modified, of course). See the
+pcre2posix documentation for more details.
 
 
 Documentation for PCRE2
@@ -323,7 +313,11 @@ library. They are also documented in the pcre2build man page.
 . There is support for calling external programs during matching in the
   pcre2grep command, using PCRE2's callout facility with string arguments. This
   support can be disabled by adding --disable-pcre2grep-callout to the
-  "configure" command.
+  "configure" command. There are two kinds of callout: one that generates
+  output from inbuilt code, and another that calls an external program. The
+  latter has special support for Windows and VMS; otherwise it assumes the
+  existence of the fork() function. This facility can be disabled by adding
+  --disable-pcre2grep-callout-fork to the "configure" command.
 
 . The pcre2grep program currently supports only 8-bit data files, and so
   requires the 8-bit PCRE2 library. It is possible to compile pcre2grep to use
@@ -375,6 +369,15 @@ library. They are also documented in the pcre2build man page.
   If you get error messages about missing functions tgetstr, tgetent, tputs,
   tgetflag, or tgoto, this is the problem, and linking with the ncurses library
   should fix it.
+
+. The C99 standard defines formatting modifiers z and t for size_t and
+  ptrdiff_t values, respectively. By default, PCRE2 uses these modifiers in
+  environments other than Microsoft Visual Studio when __STDC_VERSION__ is
+  defined and has a value greater than or equal to 199901L (indicating C99).
+  However, there is at least one environment that claims to be C99 but does not
+  support these modifiers. If --disable-percent-zt is specified, no use is made
+  of the z or t modifiers. Instead or %td or %zu, %lu is used, with a cast for
+  size_t values.
 
 . There is a special option called --enable-fuzz-support for use by people who
   want to run fuzzing tests on PCRE2. At present this applies only to the 8-bit
@@ -789,6 +792,7 @@ The distribution should contain the files listed below.
   src/pcre2_newline.c      )
   src/pcre2_ord2utf.c      )
   src/pcre2_pattern_info.c )
+  src/pcre2_script_run.c   )
   src/pcre2_serialize.c    )
   src/pcre2_string_utils.c )
   src/pcre2_study.c        )
@@ -888,4 +892,4 @@ The distribution should contain the files listed below.
 Philip Hazel
 Email local part: ph10
 Email domain: cam.ac.uk
-Last updated: 17 June 2018
+Last updated: 16 April 2019

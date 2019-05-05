@@ -80,16 +80,20 @@
 # 2017-03-11 PH turned HEAP_MATCH_RECURSE into a NO-OP for 10.30
 # 2017-04-08 PH added HEAP_LIMIT
 # 2017-06-15 ZH added SUPPORT_JIT_SEALLOC support
-# 2018-06-19 PH added checks for stdint.h and inttypes.h
+# 2018-06-19 PH added checks for stdint.h and inttypes.h (later removed)
 # 2018-06-27 PH added Daniel's patch to increase the stack for MSVC
+# 2018-11-14 PH removed unnecessary checks for stdint.h and inttypes.h
+# 2018-11-16 PH added PCRE2GREP_SUPPORT_CALLOUT_FORK support and tidied
+# 2019-02-16 PH hacked to avoid CMP0026 policy issue (see comments below)
 
 PROJECT(PCRE2 C)
 
-# Increased minimum to 2.8.0 to support newer add_test features. Set policy
-# CMP0026 to avoid warnings for the use of LOCATION in GET_TARGET_PROPERTY.
-
+# Increased minimum to 2.8.0 to support newer add_test features.
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.0)
-CMAKE_POLICY(SET CMP0026 OLD)
+
+# Set policy CMP0026 to avoid warnings for the use of LOCATION in
+# GET_TARGET_PROPERTY. This should no longer be required.
+# CMAKE_POLICY(SET CMP0026 OLD)
 
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake) # for FindReadline.cmake
 
@@ -115,18 +119,6 @@ CHECK_INCLUDE_FILE(sys/types.h  HAVE_SYS_TYPES_H)
 CHECK_INCLUDE_FILE(unistd.h     HAVE_UNISTD_H)
 CHECK_INCLUDE_FILE(windows.h    HAVE_WINDOWS_H)
 
-IF(HAVE_INTTYPES_H)
-  SET(PCRE2_HAVE_INTTYPES_H 1)
-ELSE(HAVE_INTTYPES_H)
-  SET(PCRE2_HAVE_INTTYPES_H 0)
-ENDIF(HAVE_INTTYPES_H)
-
-IF(HAVE_STDINT_H)
-  SET(PCRE2_HAVE_STDINT_H 1)
-ELSE(HAVE_STDINT_H)
-  SET(PCRE2_HAVE_STDINT_H 0)
-ENDIF(HAVE_STDINT_H)
-
 CHECK_FUNCTION_EXISTS(bcopy     HAVE_BCOPY)
 CHECK_FUNCTION_EXISTS(memmove   HAVE_MEMMOVE)
 CHECK_FUNCTION_EXISTS(strerror  HAVE_STRERROR)
@@ -146,6 +138,8 @@ OPTION(PCRE2_BUILD_PCRE2_16 "Build 16 bit PCRE2 library" OFF)
 OPTION(PCRE2_BUILD_PCRE2_32 "Build 32 bit PCRE2 library" OFF)
 
 OPTION(PCRE2_DEBUG "Include debugging code" OFF)
+
+OPTION(PCRE2_DISABLE_PERCENT_ZT "Disable the use of %zu and %td (rarely needed)" OFF)
 
 SET(PCRE2_EBCDIC OFF CACHE BOOL
     "Use EBCDIC coding instead of ASCII. (This is rarely used outside of mainframe systems.)")
@@ -186,11 +180,14 @@ SET(PCRE2_SUPPORT_JIT OFF CACHE BOOL
 SET(PCRE2_SUPPORT_JIT_SEALLOC OFF CACHE BOOL
     "Enable SELinux compatible execmem allocator in JIT.")
 
-SET(PCRE2_SUPPORT_PCRE2GREP_JIT ON CACHE BOOL
+SET(PCRE2GREP_SUPPORT_JIT ON CACHE BOOL
     "Enable use of Just-in-time compiling in pcre2grep.")
 
-SET(PCRE2_SUPPORT_PCRE2GREP_CALLOUT ON CACHE BOOL
+SET(PCRE2GREP_SUPPORT_CALLOUT ON CACHE BOOL
     "Enable callout string support in pcre2grep.")
+
+SET(PCRE2GREP_SUPPORT_CALLOUT_FORK ON CACHE BOOL
+    "Enable callout string fork support in pcre2grep.")
 
 SET(PCRE2_SUPPORT_UNICODE ON CACHE BOOL
     "Enable support for Unicode and UTF-8/UTF-16/UTF-32 encoding.")
@@ -310,17 +307,24 @@ IF(PCRE2_SUPPORT_JIT_SEALLOC)
         SET(SLJIT_PROT_EXECUTABLE_ALLOCATOR 1)
 ENDIF(PCRE2_SUPPORT_JIT_SEALLOC)
 
-IF(PCRE2_SUPPORT_PCRE2GREP_JIT)
+IF(PCRE2GREP_SUPPORT_JIT)
         SET(SUPPORT_PCRE2GREP_JIT 1)
-ENDIF(PCRE2_SUPPORT_PCRE2GREP_JIT)
+ENDIF(PCRE2GREP_SUPPORT_JIT)
 
-IF(PCRE2_SUPPORT_PCRE2GREP_CALLOUT)
+IF(PCRE2GREP_SUPPORT_CALLOUT)
         SET(SUPPORT_PCRE2GREP_CALLOUT 1)
-ENDIF(PCRE2_SUPPORT_PCRE2GREP_CALLOUT)
+        IF(PCRE2GREP_SUPPORT_CALLOUT_FORK)
+                SET(SUPPORT_PCRE2GREP_CALLOUT_FORK 1)
+        ENDIF(PCRE2GREP_SUPPORT_CALLOUT_FORK)
+ENDIF(PCRE2GREP_SUPPORT_CALLOUT)
 
 IF(PCRE2_SUPPORT_VALGRIND)
         SET(SUPPORT_VALGRIND 1)
 ENDIF(PCRE2_SUPPORT_VALGRIND)
+
+IF(PCRE2_DISABLE_PERCENT_ZT)
+        SET(DISABLE_PERCENT_ZT 1)
+ENDIF(PCRE2_DISABLE_PERCENT_ZT)
 
 # This next one used to reference ${READLINE_LIBRARY})
 # but I was advised to add the NCURSES test as well, along with
@@ -455,6 +459,7 @@ SET(PCRE2_SOURCES
   src/pcre2_newline.c
   src/pcre2_ord2utf.c
   src/pcre2_pattern_info.c
+  src/pcre2_script_run.c
   src/pcre2_serialize.c
   src/pcre2_string_utils.c
   src/pcre2_study.c
@@ -644,14 +649,27 @@ IF(PCRE2_BUILD_TESTS)
     TARGET_LINK_LIBRARIES(pcre2_jit_test ${PCRE2_JIT_TEST_LIBS})
   ENDIF(PCRE2_SUPPORT_JIT)
 
-  # exes in Debug location tested by the RunTest shell script
+  # exes in Debug location tested by the RunTest and RunGrepTest shell scripts
   # via "make test"
 
+  # The commented out code below provokes a warning about future removal
+  # of the facility, and requires policy CMP0026 to be set to "OLD". I have
+  # got fed-up with the warnings, but my plea for help on the mailing list
+  # produced no response. So, I've hacked. The new code below seems to work on
+  # Linux.
+
+#  IF(PCRE2_BUILD_PCRE2GREP)
+#    GET_TARGET_PROPERTY(PCRE2GREP_EXE pcre2grep DEBUG_LOCATION)
+#  ENDIF(PCRE2_BUILD_PCRE2GREP)
+#
+#  GET_TARGET_PROPERTY(PCRE2TEST_EXE pcre2test DEBUG_LOCATION)
+
   IF(PCRE2_BUILD_PCRE2GREP)
-    GET_TARGET_PROPERTY(PCRE2GREP_EXE pcre2grep DEBUG_LOCATION)
+    SET(PCRE2GREP_EXE $<TARGET_FILE:pcre2grep>)
   ENDIF(PCRE2_BUILD_PCRE2GREP)
 
-  GET_TARGET_PROPERTY(PCRE2TEST_EXE pcre2test DEBUG_LOCATION)
+  SET(PCRE2TEST_EXE $<TARGET_FILE:pcre2test>)
+
 
 # =================================================
   # Write out a CTest configuration file
@@ -810,10 +828,11 @@ IF(PCRE2_SHOW_REPORT)
   MESSAGE(STATUS "  Build shared libs ............... : ${BUILD_SHARED_LIBS}")
   MESSAGE(STATUS "  Build static libs ............... : ${BUILD_STATIC_LIBS}")
   MESSAGE(STATUS "  Build pcre2grep ................. : ${PCRE2_BUILD_PCRE2GREP}")
-  MESSAGE(STATUS "  Enable JIT in pcre2grep ......... : ${PCRE2_SUPPORT_PCRE2GREP_JIT}")
-  MESSAGE(STATUS "  Enable callouts in pcre2grep .... : ${PCRE2_SUPPORT_PCRE2GREP_CALLOUT}")
+  MESSAGE(STATUS "  Enable JIT in pcre2grep ......... : ${PCRE2GREP_SUPPORT_JIT}")
+  MESSAGE(STATUS "  Enable callouts in pcre2grep .... : ${PCRE2GREP_SUPPORT_CALLOUT}")
+  MESSAGE(STATUS "  Enable callout fork in pcre2grep. : ${PCRE2GREP_SUPPORT_CALLOUT_FORK}")
   MESSAGE(STATUS "  Buffer size for pcre2grep ....... : ${PCRE2GREP_BUFSIZE}")
-  MESSAGE(STATUS "  Build tests (implies pcre2test  . : ${PCRE2_BUILD_TESTS}")
+  MESSAGE(STATUS "  Build tests (implies pcre2test .. : ${PCRE2_BUILD_TESTS}")
   MESSAGE(STATUS "               and pcre2grep)")
   IF(ZLIB_FOUND)
     MESSAGE(STATUS "  Link pcre2grep with libz ........ : ${PCRE2_SUPPORT_LIBZ}")
@@ -836,6 +855,11 @@ IF(PCRE2_SHOW_REPORT)
     MESSAGE(STATUS "  Link pcre2test with libreadline . : Library not found" )
   ENDIF(READLINE_FOUND)
   MESSAGE(STATUS "  Support Valgrind .................: ${PCRE2_SUPPORT_VALGRIND}")
+  IF(PCRE2_DISABLE_PERCENT_ZT)
+    MESSAGE(STATUS "  Use %zu and %td ..................: OFF" )
+  ELSE(PCRE2_DISABLE_PERCENT_ZT)
+    MESSAGE(STATUS "  Use %zu and %td ..................: AUTO" )
+  ENDIF(PCRE2_DISABLE_PERCENT_ZT)
 
   IF(MINGW AND NOT PCRE2_STATIC)
     MESSAGE(STATUS "  Non-standard dll names (prefix) . : ${NON_STANDARD_LIB_PREFIX}")

@@ -9,18 +9,18 @@ dnl The PCRE2_PRERELEASE feature is for identifying release candidates. It might
 dnl be defined as -RC2, for example. For real releases, it should be empty.
 
 m4_define(pcre2_major, [10])
-m4_define(pcre2_minor, [32])
+m4_define(pcre2_minor, [33])
 m4_define(pcre2_prerelease, [])
-m4_define(pcre2_date, [2018-09-10])
+m4_define(pcre2_date, [2019-04-16])
 
 # NOTE: The CMakeLists.txt file searches for the above variables in the first
 # 50 lines of this file. Please update that if the variables above are moved.
 
 # Libtool shared library interface versions (current:revision:age)
-m4_define(libpcre2_8_version,     [7:1:7])
-m4_define(libpcre2_16_version,    [7:1:7])
-m4_define(libpcre2_32_version,    [7:1:7])
-m4_define(libpcre2_posix_version, [2:1:0])
+m4_define(libpcre2_8_version,     [8:0:8])
+m4_define(libpcre2_16_version,    [8:0:8])
+m4_define(libpcre2_32_version,    [8:0:8])
+m4_define(libpcre2_posix_version, [2:2:0])
 
 AC_PREREQ(2.57)
 AC_INIT(PCRE2, pcre2_major.pcre2_minor[]pcre2_prerelease, , pcre2)
@@ -131,7 +131,7 @@ AC_ARG_ENABLE(pcre2-32,
               , enable_pcre2_32=unset)
 AC_SUBST(enable_pcre2_32)
 
-# Handle --dnable-debug (disabled by default)
+# Handle --enable-debug (disabled by default)
 AC_ARG_ENABLE(debug,
               AS_HELP_STRING([--enable-debug],
                              [enable debugging code]),
@@ -146,12 +146,15 @@ AC_ARG_ENABLE(jit,
 # This code enables JIT if the hardware supports it.
 if test "$enable_jit" = "auto"; then
   AC_LANG(C)
+  SAVE_CPPFLAGS=$CPPFLAGS
+  CPPFLAGS=-I$srcdir
   AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
   #define SLJIT_CONFIG_AUTO 1
   #include "src/sljit/sljitConfigInternal.h"
   #if (defined SLJIT_CONFIG_UNSUPPORTED && SLJIT_CONFIG_UNSUPPORTED)
   #error unsupported
   #endif]])], enable_jit=yes, enable_jit=no)
+  CPPFLAGS=$SAVE_CPPFLAGS
   echo checking for JIT support on this hardware... $enable_jit
 fi
 
@@ -172,6 +175,12 @@ AC_ARG_ENABLE(pcre2grep-callout,
               AS_HELP_STRING([--disable-pcre2grep-callout],
                              [disable callout script support in pcre2grep]),
               , enable_pcre2grep_callout=yes)
+
+# Handle --disable-pcre2grep-callout-fork (enabled by default)
+AC_ARG_ENABLE(pcre2grep-callout-fork,
+              AS_HELP_STRING([--disable-pcre2grep-callout-fork],
+                             [disable callout script fork support in pcre2grep]),
+              , enable_pcre2grep_callout_fork=yes)
 
 # Handle --enable-rebuild-chartables
 AC_ARG_ENABLE(rebuild-chartables,
@@ -343,6 +352,12 @@ AC_ARG_ENABLE(stack-for-recursion,,
 #                              [don't use stack recursion when matching]),
 #               , enable_stack_for_recursion=yes)
 
+# Handle --disable-percent_zt (set as "auto" by default)
+AC_ARG_ENABLE(percent-zt,
+              AS_HELP_STRING([--disable-percent-zt],
+                             [disable the use of z and t formatting modifiers]),
+              , enable_percent_zt=auto)
+
 # Set the default value for pcre2-8
 if test "x$enable_pcre2_8" = "xunset"
 then
@@ -450,11 +465,6 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h sys/types.h sys/stat.h dirent.h)
 AC_CHECK_HEADERS([windows.h], [HAVE_WINDOWS_H=1])
 AC_CHECK_HEADERS([sys/wait.h], [HAVE_SYS_WAIT_H=1])
-
-AC_CHECK_HEADERS([stdint.h], [PCRE2_HAVE_STDINT_H=1], [PCRE2_HAVE_STDINT_H=0])
-AC_CHECK_HEADERS([inttypes.h], [PCRE2_HAVE_INTTYPES_H=1], [PCRE2_HAVE_INTTYPES_H=0])
-AC_SUBST([PCRE2_HAVE_STDINT_H])
-AC_SUBST([PCRE2_HAVE_INTTYPES_H])
 
 # Conditional compilation
 AM_CONDITIONAL(WITH_PCRE2_8, test "x$enable_pcre2_8" = "xyes")
@@ -592,6 +602,14 @@ if test "$enable_debug" = "yes"; then
     Define to any value to include debugging code.])
 fi
 
+if test "$enable_percent_zt" = "no"; then
+  AC_DEFINE([DISABLE_PERCENT_ZT], [], [
+    Define to any value to disable the use of the z and t modifiers in
+    formatting settings such as %zu or %td (this is rarely needed).])
+else
+  enable_percent_zt=auto
+fi
+
 # Unless running under Windows, JIT support requires pthreads.
 
 if test "$enable_jit" = "yes"; then
@@ -621,13 +639,21 @@ if test "$enable_pcre2grep_jit" = "yes"; then
 fi
 
 if test "$enable_pcre2grep_callout" = "yes"; then
-  if test "$HAVE_WINDOWS_H" != "1"; then
-    if test "$HAVE_SYS_WAIT_H" != "1"; then
-      AC_MSG_ERROR([Callout script support needs sys/wait.h.])
+  if test "$enable_pcre2grep_callout_fork" = "yes"; then
+    if test "$HAVE_WINDOWS_H" != "1"; then
+      if test "$HAVE_SYS_WAIT_H" != "1"; then
+        AC_MSG_ERROR([Callout script support needs sys/wait.h.])
+      fi
     fi
+    AC_DEFINE([SUPPORT_PCRE2GREP_CALLOUT_FORK], [], [
+      Define to any value to enable fork support in pcre2grep callout scripts.
+      This will have no effect unless SUPPORT_PCRE2GREP_CALLOUT is also
+      defined.])
   fi
   AC_DEFINE([SUPPORT_PCRE2GREP_CALLOUT], [], [
     Define to any value to enable callout script support in pcre2grep.])
+else
+  enable_pcre2grep_callout_fork="no"
 fi
 
 if test "$enable_unicode" = "yes"; then
@@ -1029,6 +1055,7 @@ $PACKAGE-$VERSION configuration summary:
     Build static libs .................. : ${enable_static}
     Use JIT in pcre2grep ............... : ${enable_pcre2grep_jit}
     Enable callouts in pcre2grep ....... : ${enable_pcre2grep_callout}
+    Enable fork in pcre2grep callouts .. : ${enable_pcre2grep_callout_fork}
     Initial buffer size for pcre2grep .. : ${with_pcre2grep_bufsize}
     Maximum buffer size for pcre2grep .. : ${with_pcre2grep_max_bufsize}
     Link pcre2grep with libz ........... : ${enable_pcre2grep_libz}
@@ -1038,6 +1065,7 @@ $PACKAGE-$VERSION configuration summary:
     Valgrind support ................... : ${enable_valgrind}
     Code coverage ...................... : ${enable_coverage}
     Fuzzer support ..................... : ${enable_fuzz_support}
+    Use %zu and %td .................... : ${enable_percent_zt}
 
 EOF
 

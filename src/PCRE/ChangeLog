@@ -2,8 +2,164 @@ Change Log for PCRE2
 --------------------
 
 
-Version 10.32-RC1 10-September-2018
------------------------------------
+Version 10.33 16-April-2019
+---------------------------
+
+1. Added "allvector" to pcre2test to make it easy to check the part of the
+ovector that shouldn't be changed, in particular after substitute and failed or
+partial matches.
+
+2. Fix subject buffer overread in JIT when UTF is disabled and \X or \R has
+a greater than 1 fixed quantifier. This issue was found by Yunho Kim.
+
+3. Added support for callouts from pcre2_substitute(). After 10.33-RC1, but
+prior to release, fixed a bug that caused a crash if pcre2_substitute() was
+called with a NULL match context.
+
+4. The POSIX functions are now all called pcre2_regcomp() etc., with wrapper
+functions that use the standard POSIX names. However, in pcre2posix.h the POSIX
+names are defined as macros. This should help avoid linking with the wrong
+library in some environments while still exporting the POSIX names for
+pre-existing programs that use them. (The Debian alternative names are also
+defined as macros, but not documented.)
+
+5. Fix an xclass matching issue in JIT.
+
+6. Implement PCRE2_EXTRA_ESCAPED_CR_IS_LF (see Bugzilla 2315).
+
+7. Implement the Perl 5.28 experimental alphabetic names for atomic groups and
+lookaround assertions, for example, (*pla:...) and (*atomic:...). These are
+characterized by a lower case letter following (* and to simplify coding for
+this, the character tables created by pcre2_maketables() were updated to add a
+new "is lower case letter" bit. At the same time, the now unused "is
+hexadecimal digit" bit was removed. The default tables in
+src/pcre2_chartables.c.dist are updated.
+
+8. Implement the new Perl "script run" features (*script_run:...) and
+(*atomic_script_run:...) aka (*sr:...) and (*asr:...).
+
+9. Fixed two typos in change 22 for 10.21, which added special handling for
+ranges such as a-z in EBCDIC environments. The original code probably never
+worked, though there were no bug reports.
+
+10. Implement PCRE2_COPY_MATCHED_SUBJECT for pcre2_match() (including JIT via
+pcre2_match()) and pcre2_dfa_match(), but *not* the pcre2_jit_match() fast
+path. Also, when a match fails, set the subject field in the match data to NULL
+for tidiness - none of the substring extractors should reference this after
+match failure.
+
+11. If a pattern started with a subroutine call that had a quantifier with a
+minimum of zero, an incorrect "match must start with this character" could be
+recorded. Example: /(?&xxx)*ABC(?<xxx>XYZ)/ would (incorrectly) expect 'A' to
+be the first character of a match.
+
+12. The heap limit checking code in pcre2_dfa_match() could suffer from
+overflow if the heap limit was set very large. This could cause incorrect "heap
+limit exceeded" errors.
+
+13. Add "kibibytes" to the heap limit output from pcre2test -C to make the
+units clear.
+
+14. Add a call to pcre2_jit_free_unused_memory() in pcre2grep, for tidiness.
+
+15. Updated the VMS-specific code in pcre2test on the advice of a VMS user.
+
+16. Removed the unnecessary inclusion of stdint.h (or inttypes.h) from
+pcre2_internal.h as it is now included by pcre2.h. Also, change 17 for 10.32
+below was unnecessarily complicated, as inttypes.h is a Standard C header,
+which is defined to be a superset of stdint.h. Instead of conditionally
+including stdint.h or inttypes.h, pcre2.h now unconditionally includes
+inttypes.h. This supports environments that do not have stdint.h but do have
+inttypes.h, which are known to exist. A note in the autotools documentation
+says (November 2018) that there are none known that are the other way round.
+
+17. Added --disable-percent-zt to "configure" (and equivalent to CMake) to
+forcibly disable the use of %zu and %td in formatting strings because there is
+at least one version of VMS that claims to be C99 but does not support these
+modifiers.
+
+18. Added --disable-pcre2grep-callout-fork, which restricts the callout support
+in pcre2grep to the inbuilt echo facility. This may be useful in environments
+that do not support fork().
+
+19. Fix two instances of <= 0 being applied to unsigned integers (the VMS
+compiler complains).
+
+20. Added "fork" support for VMS to pcre2grep, for running an external program
+via a string callout.
+
+21. Improve MAP_JIT flag usage on MacOS. Patch by Rich Siegel.
+
+22. If a pattern started with (*MARK), (*COMMIT), (*PRUNE), (*SKIP), or (*THEN)
+followed by ^ it was not recognized as anchored.
+
+23. The RunGrepTest script used to cut out the test of NUL characters for
+Solaris and MacOS as printf and sed can't handle them. It seems that the *BSD
+systems can't either. I've inverted the test so that only those OS that are
+known to work (currently only Linux) try to run this test.
+
+24. Some tests in RunGrepTest appended to testtrygrep from two different file
+descriptors instead of redirecting stderr to stdout. This worked on Linux, but
+it was reported not to on other systems, causing the tests to fail.
+
+25. In the RunTest script, make the test for stack setting use the same value
+for the stack as it needs for -bigstack.
+
+26. Insert a cast in pcre2_dfa_match.c to suppress a compiler warning.
+
+26. With PCRE2_EXTRA_BAD_ESCAPE_IS_LITERAL set, escape sequences such as \s
+which are valid in character classes, but not as the end of ranges, were being
+treated as literals. An example is [_-\s] (but not [\s-_] because that gave an
+error at the *start* of a range). Now an "invalid range" error is given
+independently of PCRE2_EXTRA_BAD_ESCAPE_IS_LITERAL.
+
+27. Related to 26 above, PCRE2_BAD_ESCAPE_IS_LITERAL was affecting known escape
+sequences such as \eX when they appeared invalidly in a character class. Now
+the option applies only to unrecognized or malformed escape sequences.
+
+28. Fix word boundary in JIT compiler. Patch by Mike Munday.
+
+29. The pcre2_dfa_match() function was incorrectly handling conditional version
+tests such as (?(VERSION>=0)...) when the version test was true. Incorrect
+processing or a crash could result.
+
+30. When PCRE2_UTF is set, allow non-ASCII letters and decimal digits in group
+names, as Perl does. There was a small bug in this new code, found by
+ClusterFuzz 12950, fixed before release.
+
+31. Implemented PCRE2_EXTRA_ALT_BSUX to support ECMAScript 6's \u{hhh}
+construct.
+
+32. Compile \p{Any} to be the same as . in DOTALL mode, so that it benefits
+from auto-anchoring if \p{Any}* starts a pattern.
+
+33. Compile invalid UTF check in JIT test when only pcre32 is enabled.
+
+34. For some time now, CMake has been warning about the setting of policy
+CMP0026 to "OLD" in CmakeLists.txt, and hinting that the feature might be
+removed in a future version. A request for CMake expertise on the list produced
+no result, so I have now hacked CMakeLists.txt along the lines of some changes
+I found on the Internet. The new code no longer needs the policy setting, and
+it appears to work fine on Linux.
+
+35. Setting --enable-jit=auto for an out-of-tree build failed because the
+source directory wasn't in the search path for AC_TRY_COMPILE always. Patch
+from Ross Burton.
+
+36. Disable SSE2 JIT optimizations in x86 CPUs when SSE2 is not available.
+Patch by Guillem Jover.
+
+37. Changed expressions such as 1<<10 to 1u<<10 in many places because compiler
+warnings were reported.
+
+38. Using the clang compiler with sanitizing options causes runtime complaints
+about truncation for statments such as x = ~x when x is an 8-bit value; it
+seems to compute ~x as a 32-bit value. Changing such statements to x = 255 ^ x
+gets rid of the warnings. There were also two missing casts in pcre2test.
+
+
+Version 10.32 10-September-2018
+-------------------------------
 
 1. When matching using the the REG_STARTEND feature of the POSIX API with a
 non-zero starting offset, unset capturing groups with lower numbers than a

@@ -606,8 +606,10 @@ for a description of the effects of these options.
   /s  dotall                    set PCRE2_DOTALL
       dupnames                  set PCRE2_DUPNAMES
       endanchored               set PCRE2_ENDANCHORED
+      escaped_cr_is_lf          set PCRE2_EXTRA_ESCAPED_CR_IS_LF
   /x  extended                  set PCRE2_EXTENDED
   /xx extended_more             set PCRE2_EXTENDED_MORE
+      extra_alt_bsux            set PCRE2_EXTRA_ALT_BSUX
       firstline                 set PCRE2_FIRSTLINE
       literal                   set PCRE2_LITERAL
       match_line                set PCRE2_EXTRA_MATCH_LINE
@@ -715,14 +717,14 @@ information is obtained from the <b>pcre2_pattern_info()</b> function. Here are
 some typical examples:
 <pre>
     re&#62; /(?i)(^a|^b)/m,info
-  Capturing subpattern count = 1
+  Capture group count = 1
   Compile options: multiline
   Overall options: caseless multiline
   First code unit at start or follows newline
   Subject length lower bound = 1
 
     re&#62; /(?i)abc/info
-  Capturing subpattern count = 0
+  Capture group count = 0
   Compile options: &#60;none&#62;
   Overall options: caseless
   First code unit = 'a' (caseless)
@@ -1041,6 +1043,7 @@ process.
       aftertext                  show text after match
       allaftertext               show text after captures
       allcaptures                show all captures
+      allvector                  show the entire ovector
       allusedtext                show all consulted text
       altglobal                  alternative global matching
   /g  global                     global matching
@@ -1048,8 +1051,11 @@ process.
       mark                       show mark values
       replace=&#60;string&#62;           specify a replacement string
       startchar                  show starting character when relevant
+      substitute_callout         use substitution callouts
       substitute_extended        use PCRE2_SUBSTITUTE_EXTENDED
+      substitute_skip=&#60;n&#62;        skip substitution number n
       substitute_overflow_length use PCRE2_SUBSTITUTE_OVERFLOW_LENGTH
+      substitute_stop=&#60;n&#62;        skip substitution number n and greater
       substitute_unknown_unset   use PCRE2_SUBSTITUTE_UNKNOWN_UNSET
       substitute_unset_empty     use PCRE2_SUBSTITUTE_UNSET_EMPTY
 </pre>
@@ -1185,6 +1191,7 @@ pattern.
       aftertext                  show text after match
       allaftertext               show text after captures
       allcaptures                show all captures
+      allvector                  show the entire ovector
       allusedtext                show all consulted text (non-JIT only)
       altglobal                  alternative global matching
       callout_capture            show captures at callout time
@@ -1214,8 +1221,11 @@ pattern.
       replace=&#60;string&#62;           specify a replacement string
       startchar                  show startchar when relevant
       startoffset=&#60;n&#62;            same as offset=&#60;n&#62;
+      substitute_callout         use substitution callouts
       substitute_extedded        use PCRE2_SUBSTITUTE_EXTENDED
+      substitute_skip=&#60;n&#62;        skip substitution number n
       substitute_overflow_length use PCRE2_SUBSTITUTE_OVERFLOW_LENGTH
+      substitute_stop=&#60;n&#62;        skip substitution number n and greater
       substitute_unknown_unset   use PCRE2_SUBSTITUTE_UNKNOWN_UNSET
       substitute_unset_empty     use PCRE2_SUBSTITUTE_UNSET_EMPTY
       zero_terminate             pass the subject as zero-terminated
@@ -1281,10 +1291,28 @@ captured parentheses be output after a match. By default, only those up to the
 highest one actually used in the match are output (corresponding to the return
 code from <b>pcre2_match()</b>). Groups that did not take part in the match
 are output as "&#60;unset&#62;". This modifier is not relevant for DFA matching (which
-does no capturing); it is ignored, with a warning message, if present.
+does no capturing) and does not apply when <b>replace</b> is specified; it is
+ignored, with a warning message, if present.
 </P>
 <br><b>
-Testing callouts
+Showing the entire ovector, for all outcomes
+</b><br>
+<P>
+The <b>allvector</b> modifier requests that the entire ovector be shown,
+whatever the outcome of the match. Compare <b>allcaptures</b>, which shows only
+up to the maximum number of capture groups for the pattern, and then only for a
+successful complete non-DFA match. This modifier, which acts after any match
+result, and also for DFA matching, provides a means of checking that there are
+no unexpected modifications to ovector fields. Before each match attempt, the
+ovector is filled with a special value, and if this is found in both elements
+of a capturing pair, "&#60;unchanged&#62;" is output. After a successful match, this
+applies to all groups after the maximum capture group for the pattern. In other
+cases it applies to the entire ovector. After a partial match, the first two
+elements are the only ones that should be set. After a DFA match, the amount of
+ovector that is used depends on the number of matches that were found.
+</P>
+<br><b>
+Testing pattern callouts
 </b><br>
 <P>
 A callout function is supplied when <b>pcre2test</b> calls the library matching
@@ -1292,6 +1320,9 @@ functions, unless <b>callout_none</b> is specified. Its behaviour can be
 controlled by various modifiers listed above whose names begin with
 <b>callout_</b>. Details are given in the section entitled "Callouts"
 <a href="#callouts">below.</a>
+Testing callouts from <b>pcre2_substitute()</b> is decribed separately in
+"Testing the substitution function"
+<a href="#substitution">below.</a>
 </P>
 <br><b>
 Finding all matches in a string
@@ -1323,8 +1354,8 @@ Testing substring extraction functions
 <P>
 The <b>copy</b> and <b>get</b> modifiers can be used to test the
 <b>pcre2_substring_copy_xxx()</b> and <b>pcre2_substring_get_xxx()</b> functions.
-They can be given more than once, and each can specify a group name or number,
-for example:
+They can be given more than once, and each can specify a capture group name or
+number, for example:
 <pre>
    abcd\=copy=1,copy=3,get=G1
 </pre>
@@ -1343,7 +1374,7 @@ instead of a colon. This is in addition to the normal full list. The string
 length (that is, the return from the extraction function) is given in
 parentheses after each substring, followed by the name when the extraction was
 by name.
-</P>
+<a name="substitution"></a></P>
 <br><b>
 Testing the substitution function
 </b><br>
@@ -1401,10 +1432,10 @@ The default action of <b>pcre2_substitute()</b> is to return
 PCRE2_ERROR_NOMEMORY when the output buffer is too small. However, if the
 PCRE2_SUBSTITUTE_OVERFLOW_LENGTH option is set (by using the
 <b>substitute_overflow_length</b> modifier), <b>pcre2_substitute()</b> continues
-to go through the motions of matching and substituting, in order to compute the
-size of buffer that is required. When this happens, <b>pcre2test</b> shows the
-required buffer length (which includes space for the trailing zero) as part of
-the error message. For example:
+to go through the motions of matching and substituting (but not doing any
+callouts), in order to compute the size of buffer that is required. When this
+happens, <b>pcre2test</b> shows the required buffer length (which includes space
+for the trailing zero) as part of the error message. For example:
 <pre>
   /abc/substitute_overflow_length
       123abc123\=replace=[9]XYZ
@@ -1413,6 +1444,49 @@ the error message. For example:
 A replacement string is ignored with POSIX and DFA matching. Specifying partial
 matching provokes an error return ("bad option value") from
 <b>pcre2_substitute()</b>.
+</P>
+<br><b>
+Testing substitute callouts
+</b><br>
+<P>
+If the <b>substitute_callout</b> modifier is set, a substitution callout
+function is set up. The <b>null_context</b> modifier must not be set, because
+the address of the callout function is passed in a match context. When the
+callout function is called (after each substitution), details of the the input
+and output strings are output. For example:
+<pre>
+  /abc/g,replace=&#60;$0&#62;,substitute_callout
+      abcdefabcpqr
+   1(1) Old 0 3 "abc" New 0 5 "&#60;abc&#62;"
+   2(1) Old 6 9 "abc" New 8 13 "&#60;abc&#62;"
+   2: &#60;abc&#62;def&#60;abc&#62;pqr
+</pre>
+The first number on each callout line is the count of matches. The
+parenthesized number is the number of pairs that are set in the ovector (that
+is, one more than the number of capturing groups that were set). Then are
+listed the offsets of the old substring, its contents, and the same for the
+replacement.
+</P>
+<P>
+By default, the substitution callout function returns zero, which accepts the
+replacement and causes matching to continue if /g was used. Two further
+modifiers can be used to test other return values. If <b>substitute_skip</b> is
+set to a value greater than zero the callout function returns +1 for the match
+of that number, and similarly <b>substitute_stop</b> returns -1. These cause the
+replacement to be rejected, and -1 causes no further matching to take place. If
+either of them are set, <b>substitute_callout</b> is assumed. For example:
+<pre>
+  /abc/g,replace=&#60;$0&#62;,substitute_skip=1
+      abcdefabcpqr
+   1(1) Old 0 3 "abc" New 0 5 "&#60;abc&#62; SKIPPED"
+   2(1) Old 6 9 "abc" New 6 11 "&#60;abc&#62;"
+   2: abcdef&#60;abc&#62;pqr
+      abcdefabcpqr\=substitute_stop=1
+   1(1) Old 0 3 "abc" New 0 5 "&#60;abc&#62; STOPPED"
+   1: abcdefabcpqr
+</pre>
+If both are set for the same number, stop takes precedence. Only a single skip
+or stop is supported, which is sufficient for testing that the feature works.
 </P>
 <br><b>
 Setting the JIT stack size
@@ -1554,11 +1628,11 @@ Passing a NULL context
 </b><br>
 <P>
 Normally, <b>pcre2test</b> passes a context block to <b>pcre2_match()</b>,
-<b>pcre2_dfa_match()</b> or <b>pcre2_jit_match()</b>. If the <b>null_context</b>
-modifier is set, however, NULL is passed. This is for testing that the matching
-functions behave correctly in this case (they use default values). This
-modifier cannot be used with the <b>find_limits</b> modifier or when testing the
-substitution function.
+<b>pcre2_dfa_match()</b>, <b>pcre2_jit_match()</b> or <b>pcre2_substitute()</b>.
+If the <b>null_context</b> modifier is set, however, NULL is passed. This is for
+testing that the matching and substitution functions behave correctly in this
+case (they use default values). This modifier cannot be used with the
+<b>find_limits</b> or <b>substitute_callout</b> modifiers.
 </P>
 <br><a name="SEC12" href="#TOC1">THE ALTERNATIVE MATCHING FUNCTION</a><br>
 <P>
@@ -2004,9 +2078,9 @@ Cambridge, England.
 </P>
 <br><a name="SEC21" href="#TOC1">REVISION</a><br>
 <P>
-Last updated: 21 July 2018
+Last updated: 11 March 2019
 <br>
-Copyright &copy; 1997-2018 University of Cambridge.
+Copyright &copy; 1997-2019 University of Cambridge.
 <br>
 <p>
 Return to the <a href="index.html">PCRE2 index page</a>.

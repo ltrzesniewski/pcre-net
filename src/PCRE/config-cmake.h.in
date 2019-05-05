@@ -18,6 +18,7 @@
 #cmakedefine SUPPORT_PCRE2_16 1
 #cmakedefine SUPPORT_PCRE2_32 1
 #cmakedefine PCRE2_DEBUG 1
+#cmakedefine DISABLE_PERCENT_ZT 1
 
 #cmakedefine SUPPORT_LIBBZ2 1
 #cmakedefine SUPPORT_LIBEDIT 1
@@ -27,6 +28,8 @@
 #cmakedefine SUPPORT_JIT 1
 #cmakedefine SLJIT_PROT_EXECUTABLE_ALLOCATOR 1
 #cmakedefine SUPPORT_PCRE2GREP_JIT 1
+#cmakedefine SUPPORT_PCRE2GREP_CALLOUT 1
+#cmakedefine SUPPORT_PCRE2GREP_CALLOUT_FORK 1
 #cmakedefine SUPPORT_UNICODE 1
 #cmakedefine SUPPORT_VALGRIND 1
 

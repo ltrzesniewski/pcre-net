@@ -2317,5 +2317,167 @@
 
 /[^\x{100}-\x{ffff}]*[\x80-\xff]/i,utf
     \x{99}\x{99}\x{99}
+    
+# Script run tests
+
+/^(*script_run:.{4})/utf
+    abcd                               Latin x4
+    \x{2e80}\x{2fa1d}\x{3041}\x{30a1}  Han Han Hiragana Katakana
+    \x{3041}\x{30a1}\x{3007}\x{3007}   Hiragana Katakana Han Han
+    \x{30a1}\x{3041}\x{3007}\x{3007}   Katakana Hiragana Han Han
+    \x{1100}\x{2e80}\x{2e80}\x{1101}   Hangul Han Han Hangul
+    \x{2e80}\x{3105}\x{2e80}\x{3105}   Han Bopomofo Han Bopomofo
+    \x{02ea}\x{2e80}\x{2e80}\x{3105}   Bopomofo-Sk Han Han Bopomofo
+    \x{3105}\x{2e80}\x{2e80}\x{3105}   Bopomofo Han Han Bopomofo
+    \x{0300}cd!                        Inherited Latin Latin Common
+    \x{0391}12\x{03a9}                 Greek Common-digits Greek 
+    \x{0400}12\x{fe2f}                 Cyrillic Common-digits Cyrillic
+    \x{0531}12\x{fb17}                 Armenian Common-digits Armenian
+    \x{0591}12\x{fb4f}                 Hebrew Common-digits Hebrew
+    \x{0600}12\x{1eef1}                Arabic Common-digits Arabic
+    \x{0600}\x{0660}\x{0669}\x{1eef1}  Arabic Arabic-digits Arabic
+    \x{0700}12\x{086a}                 Syriac Common-digits Syriac
+    \x{1200}12\x{ab2e}                 Ethiopic Common-digits Ethiopic
+    \x{1680}12\x{169c}                 Ogham Common-digits Ogham
+    \x{3041}12\x{3041}                 Hiragana Common-digits Hiragana
+    \x{0980}\x{09e6}\x{09e7}\x{0993}   Bengali Bengali-digits Bengali
+    !cde                               Common Latin Latin Latin
+    A..B                               Latin Common Common Latin 
+    0abc                               Ascii-digit Latin Latin Latin
+    1\x{0700}\x{0700}\x{0700}          Ascii-digit Syriac x 3
+    \x{1A80}\x{1A80}\x{1a40}\x{1a41}   Tai Tham Hora digits, letters
+\= Expect no match
+    a\x{370}bcd                        Latin Greek Latin Latin
+    \x{1100}\x{02ea}\x{02ea}\x{02ea}   Hangul Bopomofo x3
+    \x{02ea}\x{02ea}\x{02ea}\x{1100}   Bopomofo x3 Hangul
+    \x{1100}\x{2e80}\x{3041}\x{1101}   Hangul Han Hiragana Hangul
+    \x{0391}\x{09e6}\x{09e7}\x{03a9}   Greek Bengali digits Greek 
+    \x{0600}7\x{0669}\x{1eef1}         Arabic ascii-digit Arabic-digit Arabic
+    \x{0600}\x{0669}7\x{1eef1}         Arabic Arabic-digit ascii-digit Arabic
+    A5\x{ff19}B                        Latin Common-ascii/notascii-digits Latin 
+    \x{0300}cd\x{0391}                 Inherited Latin Latin Greek
+    !cd\x{0391}                        Common Latin Latin Greek
+    \x{1A80}\x{1A90}\x{1a40}\x{1a41}   Tai Tham Hora digit, Tham digit, letters
+    A\x{1d7ce}\x{1d7ff}B               Common fancy-common-2-sets-digits Common
+    \x{2e80}\x{3105}\x{2e80}\x{30a1}   Han Bopomofo Han Katakana
+    
+/^(*sr:.{4}|..)/utf
+    \x{2e80}\x{3105}\x{2e80}\x{30a1}   Han Bopomofo Han Katakana
+
+/^(*atomic_script_run:.{4}|..)/utf
+\= Expect no match
+    \x{2e80}\x{3105}\x{2e80}\x{30a1}   Han Bopomofo Han Katakana
+
+/^(*asr:.*)/utf
+\= Expect no match
+    \x{2e80}\x{3105}\x{2e80}\x{30a1}   Han Bopomofo Han Katakana
+
+/^(?>(*sr:.*))/utf
+    \x{2e80}\x{3105}\x{2e80}\x{30a1}   Han Bopomofo Han Katakana
+
+/^(*sr:.*)/utf
+    \x{2e80}\x{3105}\x{2e80}\x{30a1}   Han Bopomofo Han Katakana
+    \x{10fffd}\x{10fffd}\x{10fffd}     Private use (Unknown)
+
+/^(*sr:\x{2e80}*)/utf
+    \x{2e80}\x{2e80}\x{3105}           Han Han Bopomofo
+
+/^(*sr:\x{2e80}*)\x{2e80}/utf
+    \x{2e80}\x{2e80}\x{3105}           Han Han Bopomofo
+    
+/^(*sr:.*)Test/utf
+    Test script run on an empty string
+
+/^(*sr:(.{2})){2}/utf
+    \x{0600}7\x{0669}\x{1eef1}         Arabic ascii-digit Arabic-digit Arabic
+    \x{1A80}\x{1A80}\x{1a40}\x{1a41}   Tai Tham Hora digits, letters
+    \x{1A80}\x{1a40}\x{1A90}\x{1a41}   Tai Tham Hora digit, letter, Tham digit, letter
+\= Expect no match
+    \x{1100}\x{2e80}\x{3041}\x{1101}   Hangul Han Hiragana Hangul
+    
+/^(*sr:\S*)/utf
+    \x{1cf4}\x{20f0}\x{900}\x{11305}   [Dev,Gran,Kan] [Dev,Gran,Lat] Dev Gran
+    \x{1cf4}\x{20f0}\x{11305}\x{900}   [Dev,Gran,Kan] [Dev,Gran,Lat] Gran Dev
+    \x{1cf4}\x{20f0}\x{900}ABC         [Dev,Gran,Kan] [Dev,Gran,Lat] Dev Lat
+    \x{1cf4}\x{20f0}ABC                [Dev,Gran,Kan] [Dev,Gran,Lat] Lat
+    \x{20f0}ABC                        [Dev,Gran,Lat] Lat
+    XYZ\x{20f0}ABC                     Lat [Dev,Gran,Lat] Lat
+    \x{a36}\x{a33}\x{900}              [Dev,...] [Dev,...] Dev  
+    \x{3001}\x{2e80}\x{3041}\x{30a1}   [Bopo, Han, etc] Han Hira Kata
+    \x{3001}\x{30a1}\x{2e80}\x{3041}   [Bopo, Han, etc] Kata Han Hira
+    \x{3001}\x{3105}\x{2e80}\x{1101}   [Bopo, Han, etc] Bopomofo Han Hangul
+    \x{3105}\x{3001}\x{2e80}\x{1101}   Bopomofo [Bopo, Han, etc] Han Hangul
+    \x{3031}\x{3041}\x{30a1}\x{2e80}   [Hira Kata] Hira Kata Han
+    \x{060c}\x{06d4}\x{0600}\x{10d00}\x{0700}  [Arab Rohg Syrc Thaa] [Arab Rohg] Arab Rohg Syrc
+    \x{060c}\x{06d4}\x{0700}\x{0600}\x{10d00}  [Arab Rohg Syrc Thaa] [Arab Rohg] Syrc Arab Rohg
+    \x{2e80}\x{3041}\x{3001}\x{3031}\x{2e80}   Han Hira [Bopo, Han, etc] [Hira Kata] Han
+
+/(?<!)(*sr:)/
+
+/(?<!X(*sr:B)C)/
+
+/(?<=abc(?=X(*sr:BCY)Z)XBCYZ)./
+    abcXBCYZ!
+
+/(?<=abc(?=X(*sr:BXY)CCC)XBXYCCC)./
+   abcXBXYCCC!
+
+/^(*sr:\S*)/utf
+    \x{10d00}\x{10d00}\x{06d4}     Rohingya Rohingya Arabic-full-stop
+    \x{06d4}\x{10d00}\x{10d00}     Arabic-full-stop Rohingya Rohingya
+    \x{10d00}\x{10d00}\x{0363}     Rohingya Rohingya Inherited-extend-Latin
+    \x{0363}\x{10d00}\x{10d00}     Inherited-extend-Latin Rohingya Rohingya
+    AB\x{0363}                     Latin Latin Inherited-extend-Latin
+    \x{0363}AB                     Inherited-extend-Latin Latin Latin
+    AB\x{1cf7}                     Latin Latin Common-extended-Beng
+    \x{1cf7}AB                     Common-extend-Beng Latin Latin
+    \x{1cf7}\x{0993}               Common-extend-Beng Bengali
+    A\x{1abe}BC                    Test enclosing mark
+    \x{0370}\x{1abe}\x{0371}       Which can occur with any script (Greek here)
+    \x{3001}\x{adf9}\x{3001}       [.. Hangul ..] Hangul [.. Hangul ..]
+    \x{3400}\x{3001}XXX            Han [Han etc.]
+    \x{3400}\x{1cd5}               Han [Bengali Devanagari]
+    \x{ac01}\x{3400}               Hangul [.. Hangul ..]
+    \x{ac01}\x{1cd5}               Hangul [Bengali Devanagari]
+    \x{102e0}\x{06d4}\x{1ee4d}     [Arabic Coptic] [Arab Rohingya] Arabic
+    \x{102e0}\x{06d4}\x{2cc9}      [Arabic Coptic] [Arab Rohingya] Coptic
+    \x{102e0}\x{06d4}\x{10d30}     [Arabic Coptic] [Arab Rohingya] Rohingya
+    
+# Test loop breaking for empty string match
+
+/^(*sr:A|)*BCD/utf
+    AABCD
+    ABCD
+    BCD 
+    
+# The use of (*ACCEPT) breaks script run checking 
+
+/^(*sr:.*(*ACCEPT)ZZ)/utf
+    \x{1100}\x{2e80}\x{3041}\x{1101}   Hangul Han Hiragana Hangul
+
+# ------- 
+
+# Test group names containing non-ASCII letters and digits
+
+/(?'ABáC'...)\g{ABáC}/utf
+    abcabcdefg
+
+/(?'XʰABC'...)/utf
+    xyzpq
+
+/(?'XאABC'...)/utf
+    12345
+
+/(?'XᾈABC'...)/utf
+    %^&*(...
+
+/(?'𐨐ABC'...)/utf
+    abcde
+
+/^(?'אABC'...)(?&אABC)(?P=אABC)/utf
+    123123123456
+
+/^(?'אABC'...)(?&אABC)/utf
+    123123123456
 
 # End of testinput4

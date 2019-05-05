@@ -832,17 +832,25 @@ USING PCRE2'S CALLOUT FACILITY
 
        pcre2grep  has,  by  default,  support for calling external programs or
        scripts or echoing specific strings during matching by  making  use  of
-       PCRE2's  callout  facility.  However, this support can be disabled when
-       pcre2grep is built. You can find out whether your  binary  has  support
-       for  callouts  by  running it with the --help option. If the support is
-       not enabled, all callouts in patterns are ignored by pcre2grep.
+       PCRE2's  callout  facility.  However, this support can be completely or
+       partially disabled when pcre2grep is built. You can  find  out  whether
+       your  binary  has  support  for  callouts by running it with the --help
+       option. If callout support is completely disabled, all callouts in pat-
+       terns are ignored by pcre2grep.  If the facility is partially disabled,
+       calling external programs is not supported, and callouts  that  request
+       it are ignored.
 
-       A callout in a PCRE2 pattern is of the form (?C<arg>) where  the  argu-
-       ment  is either a number or a quoted string (see the pcre2callout docu-
-       mentation for details). Numbered callouts  are  ignored  by  pcre2grep;
+       A  callout  in a PCRE2 pattern is of the form (?C<arg>) where the argu-
+       ment is either a number or a quoted string (see the pcre2callout  docu-
+       mentation  for  details).  Numbered  callouts are ignored by pcre2grep;
        only callouts with string arguments are useful.
 
    Calling external programs or scripts
+
+       This facility can be independently disabled when pcre2grep is built. It
+       is  supported for Windows, where a call to _spawnvp() is used, for VMS,
+       where lib$spawn() is used, and  for  any  other  Unix-like  environment
+       where fork() and execv() are available.
 
        If the callout string does not start with a pipe (vertical bar) charac-
        ter, it is parsed into a list of substrings separated by  pipe  charac-
@@ -873,27 +881,27 @@ USING PCRE2'S CALLOUT FACILITY
            Arg1: [1] [234] [4] Arg2: |1| ()
            12345
 
-       The parameters for the execv() system call that is used to run the pro-
-       gram or script are zero-terminated strings. This means that binary zero
-       characters  in the callout argument will cause premature termination of
-       their substrings, and therefore  should  not  be  present.  Any  syntax
-       errors  in  the  string  (for example, a dollar not followed by another
-       character) cause the callout to be  ignored.  If  running  the  program
-       fails for any reason (including the non-existence of the executable), a
-       local matching failure occurs and the matcher backtracks in the  normal
-       way.
+       The  parameters  for the system call that is used to run the program or
+       script are zero-terminated strings. This means that binary zero charac-
+       ters  in the callout argument will cause premature termination of their
+       substrings, and therefore should not be present. Any syntax  errors  in
+       the  string  (for  example, a dollar not followed by another character)
+       cause the callout to be ignored. If running the program fails  for  any
+       reason  (including the non-existence of the executable), a local match-
+       ing failure occurs and the matcher backtracks in the normal way.
 
    Echoing a specific string
 
-       If  the callout string starts with a pipe (vertical bar) character, the
-       rest of the string is written to the output, having been passed through
-       the  same escape processing as text from the --output option. This pro-
-       vides a simple echoing facility that avoids calling an external program
-       or  script. No terminator is added to the string, so if you want a new-
-       line, you must include  it  explicitly.   Matching  continues  normally
-       after  the string is output. If you want to see only the callout output
-       but not any output from an actual match, you should  end  the  relevant
-       pattern with (*FAIL).
+       This facility is always available, provided that callouts were not com-
+       pletely disabled when pcre2grep was built. If the callout string starts
+       with a pipe (vertical bar) character, the rest of the string is written
+       to the output, having been passed through the same escape processing as
+       text from the --output option. This provides a simple echoing  facility
+       that  avoids  calling  an  external program or script. No terminator is
+       added to the string, so if you want a  newline,  you  must  include  it
+       explicitly.  Matching continues normally after the string is output. If
+       you want to see only the callout output but  not  any  output  from  an
+       actual match, you should end the relevant pattern with (*FAIL).
 
 
 MATCHING ERRORS
@@ -940,5 +948,5 @@ AUTHOR
 
 REVISION
 
-       Last updated: 24 February 2018
+       Last updated: 24 November 2018
        Copyright (c) 1997-2018 University of Cambridge.
