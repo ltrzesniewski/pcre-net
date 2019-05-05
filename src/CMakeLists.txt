@@ -36,6 +36,7 @@ add_library(PCRE.NET.Native SHARED
         PCRE/src/pcre2_newline.c
         PCRE/src/pcre2_ord2utf.c
         PCRE/src/pcre2_pattern_info.c
+        PCRE/src/pcre2_script_run.c
         PCRE/src/pcre2_string_utils.c
         PCRE/src/pcre2_study.c
         PCRE/src/pcre2_substitute.c
