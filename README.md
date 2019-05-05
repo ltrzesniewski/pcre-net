@@ -7,12 +7,12 @@ PCRE.NET
 [![Build Status](https://dev.azure.com/Lucas-Trzesniewski/PCRE.NET/_apis/build/status/PCRE.NET?branchName=master)](https://dev.azure.com/Lucas-Trzesniewski/PCRE.NET/_build/latest?definitionId=1&branchName=master)
 [![NuGet Package](https://img.shields.io/nuget/v/PCRE.NET.svg?logo=NuGet)](https://www.nuget.org/packages/PCRE.NET)
 [![GitHub release](https://img.shields.io/github/release/ltrzesniewski/pcre-net.svg?logo=GitHub)](https://github.com/ltrzesniewski/pcre-net/releases)
-[![PCRE](https://img.shields.io/badge/pcre-v10.32-blue.svg)](http://www.pcre.org/)
+[![PCRE](https://img.shields.io/badge/pcre-v10.33-blue.svg)](http://www.pcre.org/)
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/ltrzesniewski/pcre-net/blob/master/LICENCE)
 
 PCRE.NET is a .NET wrapper for the [PCRE library](http://www.pcre.org/). The goal of this project is to bring most of PCRE's features for use from .NET applications with as little overhead as possible.
 
-The current version on the *master* branch is **0.9.0**, based on PCRE **10.32**. It targets .NET Standard 2.0 and supports the following systems:
+The current version on the *master* branch is **0.10.0**, based on PCRE **10.33**. It targets .NET Standard 2.0 and supports the following systems:
 
  - Windows x64
  - Windows x86
