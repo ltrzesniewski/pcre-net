@@ -23,6 +23,12 @@ namespace PCRE.Internal
             var parts = new List<ReplacementPart>();
             var idx = 0;
 
+            if (placeholderIndex > 0)
+            {
+                idx = placeholderIndex;
+                parts.Add(new LiteralPart(replacementPattern, 0, idx));
+            }
+
             while (true)
             {
                 if (idx >= replacementPattern.Length)
