@@ -25,6 +25,42 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_replace_indexed_groups_with_braces()
+        {
+            var re = new PcreRegex(@"a+(?<grp>b+)", PcreOptions.IgnoreCase);
+            var result = re.Replace("foo aabb bar aaabbab baz", "<${1}>");
+
+            Assert.That(result, Is.EqualTo("foo <bb> bar <bb><b> baz"));
+        }
+
+        [Test]
+        public void should_replace_indexed_groups_without_braces()
+        {
+            var re = new PcreRegex(@"a+(?<grp>b+)", PcreOptions.IgnoreCase);
+            var result = re.Replace("foo aabb bar aaabbab baz", "<$1>");
+
+            Assert.That(result, Is.EqualTo("foo <bb> bar <bb><b> baz"));
+        }
+
+        [Test]
+        public void should_replace_indexed_groups_with_braces_at_end_of_pattern()
+        {
+            var re = new PcreRegex(@"a+(?<grp>b+)", PcreOptions.IgnoreCase);
+            var result = re.Replace("foo aabb bar aaabbab baz", "#${1}");
+
+            Assert.That(result, Is.EqualTo("foo #bb bar #bb#b baz"));
+        }
+
+        [Test]
+        public void should_replace_indexed_groups_without_braces_at_end_of_pattern()
+        {
+            var re = new PcreRegex(@"a+(?<grp>b+)", PcreOptions.IgnoreCase);
+            var result = re.Replace("foo aabb bar aaabbab baz", "#$1");
+
+            Assert.That(result, Is.EqualTo("foo #bb bar #bb#b baz"));
+        }
+
+        [Test]
         public void should_replace_named_groups()
         {
             var re = new PcreRegex(@"a+(?<grp>b+)", PcreOptions.IgnoreCase);

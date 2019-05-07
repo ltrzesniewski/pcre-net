@@ -106,15 +106,11 @@ namespace PCRE.Internal
 
                             var fallback = new LiteralPart(replacementPattern, startIdx - 1, idx - startIdx + 1);
 
-                            if (idx < replacementPattern.Length)
+                            var groupIndexString = replacementPattern.Substring(startIdx, idx - startIdx);
+                            if (int.TryParse(groupIndexString, NumberStyles.None, CultureInfo.InvariantCulture, out var groupIndex))
                             {
-                                var groupIndexString = replacementPattern.Substring(startIdx, idx - startIdx);
-                                int groupIndex;
-                                if (Int32.TryParse(groupIndexString, NumberStyles.None, CultureInfo.InvariantCulture, out groupIndex))
-                                {
-                                    parts.Add(new IndexedGroupPart(groupIndex, fallback));
-                                    break;
-                                }
+                                parts.Add(new IndexedGroupPart(groupIndex, fallback));
+                                break;
                             }
 
                             parts.Add(fallback);
@@ -174,10 +170,10 @@ namespace PCRE.Internal
                 _length = length;
             }
 
-            public override void Append(PcreMatch match, StringBuilder sb) 
+            public override void Append(PcreMatch match, StringBuilder sb)
                 => sb.Append(_text, _startIndex, _length);
 
-            public override string ToString() 
+            public override string ToString()
                 => $"Literal: {_text.Substring(_startIndex, _length)}";
         }
 
@@ -243,7 +239,7 @@ namespace PCRE.Internal
                     sb.Append(match.Subject, group.Index, group.Length);
             }
 
-            public override string ToString() 
+            public override string ToString()
                 => $"Group: {_name}";
         }
 
@@ -251,10 +247,10 @@ namespace PCRE.Internal
         {
             public static readonly PreMatchPart Instance = new PreMatchPart();
 
-            public override void Append(PcreMatch match, StringBuilder sb) 
+            public override void Append(PcreMatch match, StringBuilder sb)
                 => sb.Append(match.Subject, 0, match.Index);
 
-            public override string ToString() 
+            public override string ToString()
                 => "Pre match";
         }
 
@@ -268,7 +264,7 @@ namespace PCRE.Internal
                 sb.Append(match.Subject, endOfMatch, match.Subject.Length - endOfMatch);
             }
 
-            public override string ToString() 
+            public override string ToString()
                 => "Post match";
         }
 
@@ -276,10 +272,10 @@ namespace PCRE.Internal
         {
             public static readonly FullInputPart Instance = new FullInputPart();
 
-            public override void Append(PcreMatch match, StringBuilder sb) 
+            public override void Append(PcreMatch match, StringBuilder sb)
                 => sb.Append(match.Subject);
 
-            public override string ToString() 
+            public override string ToString()
                 => "Full input";
         }
 
@@ -300,7 +296,7 @@ namespace PCRE.Internal
                 }
             }
 
-            public override string ToString() 
+            public override string ToString()
                 => "Last matched group";
         }
     }
