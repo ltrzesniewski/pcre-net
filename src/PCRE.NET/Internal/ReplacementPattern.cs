@@ -25,14 +25,14 @@ namespace PCRE.Internal
 
             while (true)
             {
-                if (idx == replacementPattern.Length)
+                if (idx >= replacementPattern.Length)
                     break;
 
                 if (replacementPattern[idx] == '$')
                 {
                     ++idx;
 
-                    if (idx == replacementPattern.Length)
+                    if (idx >= replacementPattern.Length)
                     {
                         parts.Add(LiteralPart.Dollar);
                         break;
