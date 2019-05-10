@@ -9,9 +9,4 @@
     <DefineConstants Condition="'$(ExpectPlatform)' == 'x64'">$(DefineConstants);EXPECT_X64</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="$(ContinuousIntegrationBuild)">
-    <PackageVersion Condition="'$(PackageVersion)' == ''">$(Version)</PackageVersion>
-    <PackageVersion Condition="'$(TF_BUILD)' != '' and '$(BUILD_SOURCEBRANCH)' != '' and !$(BUILD_SOURCEBRANCH.StartsWith('refs/tags/'))">$(PackageVersion)-pre$(BUILD_BUILDID)</PackageVersion>
-  </PropertyGroup>
-
 </Project>
