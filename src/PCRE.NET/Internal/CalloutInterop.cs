@@ -76,8 +76,7 @@ namespace PCRE.Internal
         {
             Ldarg(nameof(value));
             Conv_U();
-            Ret();
-            throw IL.Unreachable();
+            return IL.ReturnPointer();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
