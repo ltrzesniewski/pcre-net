@@ -25,7 +25,7 @@
 
   <ItemGroup>
     <PackageReference Include="Fody" Version="4.2.1" PrivateAssets="all" />
-    <PackageReference Include="InlineIL.Fody" Version="1.1.2" PrivateAssets="all" />
+    <PackageReference Include="InlineIL.Fody" Version="1.2.0" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
