@@ -1,12 +1,19 @@
 
 variables:
   BuildConfiguration: Release
+  NetCoreSdkVersion: 2.2.x
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
 
 jobs:
   - job: Linux
     pool:
       vmImage: ubuntu-16.04
     steps:
+      - task: DotNetCoreInstaller@1
+        displayName: Install .NET Core SDK
+        inputs:
+          version: $(NetCoreSdkVersion)
+
       - bash: |
           mkdir src/cmake-x64
         displayName: Init
@@ -46,6 +53,11 @@ jobs:
     pool:
       vmImage: macos-10.13
     steps:
+      - task: DotNetCoreInstaller@1
+        displayName: Install .NET Core SDK
+        inputs:
+          version: $(NetCoreSdkVersion)
+
       - bash: |
           mkdir src/cmake-x64
         displayName: Init
@@ -88,6 +100,11 @@ jobs:
       - Linux
       - MacOS
     steps:
+      - task: DotNetCoreInstaller@1
+        displayName: Install .NET Core SDK
+        inputs:
+          version: $(NetCoreSdkVersion)
+
       - script: |
           mkdir lib
         displayName: Init
@@ -179,7 +196,7 @@ jobs:
           platform: x64
           searchFolder: src/PCRE.NET.Tests/bin/x64/$(BuildConfiguration)/net472
           testRunTitle: Windows x64
-          
+
       - task: PublishBuildArtifacts@1
         displayName: Publish Artifacts
         inputs:
