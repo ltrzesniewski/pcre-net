@@ -29,7 +29,7 @@ namespace PCRE.Internal
             }
         }
 
-        public static void Prepare(string subject, InternalRegex regex, ref Native.match_input input, out CalloutInteropInfo interopInfo, Func<PcreCallout, PcreCalloutResult> callout)
+        public static void Prepare(string subject, InternalRegex regex, ref Native.match_input input, out CalloutInteropInfo interopInfo, Func<PcreCallout, PcreCalloutResult>? callout)
         {
             if (callout != null)
             {
@@ -50,7 +50,7 @@ namespace PCRE.Internal
             }
         }
 
-        public static void Prepare(string subject, InternalRegex regex, ref Native.dfa_match_input input, out CalloutInteropInfo interopInfo, Func<PcreCallout, PcreCalloutResult> callout)
+        public static void Prepare(string subject, InternalRegex regex, ref Native.dfa_match_input input, out CalloutInteropInfo interopInfo, Func<PcreCallout, PcreCalloutResult>? callout)
         {
             if (callout != null)
             {

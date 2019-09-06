@@ -39,7 +39,7 @@ namespace PCRE.Tests.Pcre
         [TestCase(@"\x{000A}z", ExpectedResult = "\nz")]
         public string should_unescape_group(string input)
         {
-            return input.UnescapeGroup();
+            return input.UnescapeGroup()!;
         }
     }
 }

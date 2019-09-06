@@ -22,13 +22,13 @@ namespace PCRE.Tests.PcreNet.Dfa
             Assert.That(matches[1].Count, Is.EqualTo(2));
             Assert.That(matches[2].Count, Is.EqualTo(1));
 
-            Assert.That(matches[0].LongestMatch.Value, Is.EqualTo("<something> <something else> <something further>"));
-            Assert.That(matches[1].LongestMatch.Value, Is.EqualTo("<something else> <something further>"));
-            Assert.That(matches[2].LongestMatch.Value, Is.EqualTo("<something further>"));
+            Assert.That(matches[0].LongestMatch!.Value, Is.EqualTo("<something> <something else> <something further>"));
+            Assert.That(matches[1].LongestMatch!.Value, Is.EqualTo("<something else> <something further>"));
+            Assert.That(matches[2].LongestMatch!.Value, Is.EqualTo("<something further>"));
 
-            Assert.That(matches[0].ShortestMatch.Value, Is.EqualTo("<something>"));
-            Assert.That(matches[1].ShortestMatch.Value, Is.EqualTo("<something else>"));
-            Assert.That(matches[2].ShortestMatch.Value, Is.EqualTo("<something further>"));
+            Assert.That(matches[0].ShortestMatch!.Value, Is.EqualTo("<something>"));
+            Assert.That(matches[1].ShortestMatch!.Value, Is.EqualTo("<something else>"));
+            Assert.That(matches[2].ShortestMatch!.Value, Is.EqualTo("<something further>"));
         }
     }
 }

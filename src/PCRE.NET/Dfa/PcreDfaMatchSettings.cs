@@ -19,7 +19,7 @@ namespace PCRE.Dfa
             remove => Callout -= value;
         }
 
-        internal Func<PcreCallout, PcreCalloutResult> Callout { get; private set; }
+        internal Func<PcreCallout, PcreCalloutResult>? Callout { get; private set; }
 
         internal void FillMatchInput(ref Native.dfa_match_input input)
         {

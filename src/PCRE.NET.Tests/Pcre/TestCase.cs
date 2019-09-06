@@ -4,12 +4,12 @@ namespace PCRE.Tests.Pcre
 {
     public class TestCase
     {
-        public TestPattern Pattern { get; set; }
-        public IList<string> SubjectLines { get; }
+        public TestPattern Pattern { get; }
+        public IList<string> SubjectLines { get; } = new List<string>();
 
-        public TestCase()
+        public TestCase(TestPattern pattern)
         {
-            SubjectLines = new List<string>();
+            Pattern = pattern;
         }
 
         public override string ToString() => Pattern?.ToString() ?? "???";

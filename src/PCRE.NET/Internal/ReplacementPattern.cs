@@ -188,9 +188,9 @@ namespace PCRE.Internal
             public static readonly IndexedGroupPart FullMatch = new IndexedGroupPart(0, null);
 
             private readonly int _index;
-            private readonly ReplacementPart _fallback;
+            private readonly ReplacementPart? _fallback;
 
-            public IndexedGroupPart(int index, ReplacementPart fallback)
+            public IndexedGroupPart(int index, ReplacementPart? fallback)
             {
                 _index = index;
                 _fallback = fallback;

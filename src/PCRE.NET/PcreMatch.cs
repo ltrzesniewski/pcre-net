@@ -13,11 +13,9 @@ namespace PCRE
         private readonly uint[] _oVector;
         private readonly char* _markPtr;
 
-        [CanBeNull]
-        private PcreGroup[] _groups;
+        private PcreGroup?[]? _groups;
 
-        [CanBeNull]
-        private string _mark;
+        private string? _mark;
 
         internal PcreMatch(string subject, InternalRegex regex, ref Native.match_result result, uint[] oVector)
         {
@@ -45,23 +43,24 @@ namespace PCRE
 
         public int CaptureCount => _regex.CaptureCount;
 
-        public PcreGroup this[int index] => GetGroup(index);
+        public PcreGroup? this[int index] => GetGroup(index);
+        PcreGroup IReadOnlyList<PcreGroup>.this[int index] => this[index]!;
 
-        public PcreGroup this[string name] => GetGroup(name);
+        public PcreGroup? this[string name] => GetGroup(name);
 
         internal string Subject { get; }
 
-        public int Index => this[0].Index;
+        public int Index => this[0]!.Index;
 
-        public int EndIndex => this[0].EndIndex;
+        public int EndIndex => this[0]!.EndIndex;
 
-        public int Length => this[0].Length;
+        public int Length => this[0]!.Length;
 
-        public string Value => this[0].Value;
+        public string Value => this[0]!.Value;
 
         public bool Success => _resultCode > 0;
 
-        public string Mark
+        public string? Mark
         {
             get
             {
@@ -84,15 +83,15 @@ namespace PCRE
         private IEnumerable<PcreGroup> GetAllGroups()
         {
             for (var i = 0; i <= CaptureCount; ++i)
-                yield return this[i];
+                yield return this[i]!;
         }
 
-        private PcreGroup GetGroup(int index)
+        private PcreGroup? GetGroup(int index)
         {
             if (index < 0 || index > CaptureCount)
                 return null;
 
-            var groups = _groups ?? (_groups = new PcreGroup[_regex.CaptureCount + 1]);
+            var groups = _groups ??= new PcreGroup[_regex.CaptureCount + 1];
 
             var group = groups[index];
             if (group == null)
@@ -118,7 +117,7 @@ namespace PCRE
             return new PcreGroup(Subject, startOffset, endOffset);
         }
 
-        private PcreGroup GetGroup(string name)
+        private PcreGroup? GetGroup(string name)
         {
             var map = _regex.CaptureNames;
             if (map == null)

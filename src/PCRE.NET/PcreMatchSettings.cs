@@ -40,9 +40,9 @@ namespace PCRE
 
         public uint? OffsetLimit { get; set; }
 
-        public PcreJitStack JitStack { get; set; }
+        public PcreJitStack? JitStack { get; set; }
 
-        internal Func<PcreCallout, PcreCalloutResult> Callout { get; private set; }
+        internal Func<PcreCallout, PcreCalloutResult>? Callout { get; private set; }
 
         internal void FillMatchInput(ref Native.match_input input)
         {

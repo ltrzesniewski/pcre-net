@@ -44,13 +44,14 @@ namespace PCRE
             if (count == 0)
                 return subject;
 
-            StringBuilder sb = null;
+            StringBuilder? sb = null;
             var position = 0;
 
             foreach (var match in Matches(subject, startIndex))
             {
                 if (sb == null)
                     sb = new StringBuilder((int)(subject.Length * 1.2));
+
                 sb.Append(subject, position, match.Index - position);
                 sb.Append(replacementFunc(match));
                 position = match.GetStartOfNextMatchIndex();

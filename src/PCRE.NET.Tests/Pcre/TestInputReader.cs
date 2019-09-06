@@ -15,14 +15,10 @@ namespace PCRE.Tests.Pcre
             while (true)
             {
                 var pattern = ReadNextPattern();
-
-                if (pattern == null)
+                if (pattern is null)
                     yield break;
 
-                var testCase = new TestCase
-                {
-                    Pattern = pattern,
-                };
+                var testCase = new TestCase(pattern);
 
                 while (true)
                 {

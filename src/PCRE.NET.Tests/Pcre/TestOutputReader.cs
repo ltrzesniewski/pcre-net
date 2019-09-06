@@ -18,17 +18,13 @@ namespace PCRE.Tests.Pcre
             while (true)
             {
                 var pattern = ReadNextPattern();
-
-                if (pattern == null)
+                if (pattern is null)
                     yield break;
 
-                var testOutput = new TestOutput
-                {
-                    Pattern = pattern
-                };
+                var testOutput = new TestOutput(pattern);
 
-                ExpectedResult currentResult = null;
-                ExpectedMatch currentMatch = null;
+                ExpectedResult? currentResult = null;
+                ExpectedMatch? currentMatch = null;
 
                 while (true)
                 {
@@ -111,11 +107,7 @@ namespace PCRE.Tests.Pcre
                         }
                     }
 
-                    currentResult = new ExpectedResult
-                    {
-                        SubjectLine = line.Trim()
-                    };
-
+                    currentResult = new ExpectedResult(line.Trim());
                     currentMatch = null;
 
                     testOutput.ExpectedResults.Add(currentResult);

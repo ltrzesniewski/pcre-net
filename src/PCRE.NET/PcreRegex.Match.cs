@@ -44,7 +44,7 @@ namespace PCRE
         public PcreMatch Match(string subject, int startIndex, Func<PcreCallout, PcreCalloutResult> onCallout)
             => Match(subject, startIndex, PcreMatchOptions.None, onCallout);
 
-        public PcreMatch Match(string subject, int startIndex, PcreMatchOptions options, Func<PcreCallout, PcreCalloutResult> onCallout)
+        public PcreMatch Match(string subject, int startIndex, PcreMatchOptions options, Func<PcreCallout, PcreCalloutResult>? onCallout)
         {
             var settings = new PcreMatchSettings
             {
@@ -81,7 +81,7 @@ namespace PCRE
             => Matches(subject, startIndex, null);
 
         [Pure]
-        public IEnumerable<PcreMatch> Matches(string subject, int startIndex, Func<PcreCallout, PcreCalloutResult> onCallout)
+        public IEnumerable<PcreMatch> Matches(string subject, int startIndex, Func<PcreCallout, PcreCalloutResult>? onCallout)
         {
             if (subject == null)
                 throw new ArgumentNullException(nameof(subject));

@@ -3,7 +3,8 @@
   <PropertyGroup>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningLevel>4</WarningLevel>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>8.0</LangVersion>
+    <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Prefer32Bit>false</Prefer32Bit>
     <DefaultItemExcludes>$(DefaultItemExcludes);*.DotSettings;*.ncrunchproject</DefaultItemExcludes>
@@ -27,6 +28,7 @@
   <ItemGroup Condition="'$(MSBuildProjectName)' != 'PCRE.NET.Native'">
     <PackageReference Include="JetBrains.Annotations" Version="2019.1.3" PrivateAssets="all" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19367-01" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Net.Compilers" Version="3.2.1" PrivateAssets="all" Condition="'$(TF_BUILD)' != ''" />
   </ItemGroup>
 
 </Project>

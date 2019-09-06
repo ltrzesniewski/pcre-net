@@ -4,6 +4,6 @@ namespace PCRE
 {
     public interface IPcreGroupList : IReadOnlyList<PcreGroup>
     {
-        PcreGroup this[string name] { get; }
+        PcreGroup? this[string name] { get; }
     }
 }

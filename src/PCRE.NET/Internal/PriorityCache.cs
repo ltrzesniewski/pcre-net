@@ -12,9 +12,9 @@ namespace PCRE.Internal
         private readonly IEqualityComparer<TKey> _keyComparer;
         private readonly LinkedList<CacheItem> _cache = new LinkedList<CacheItem>();
         private int _cacheSize;
-        private object _head;
+        private object? _head;
 
-        public PriorityCache(int cacheSize, Func<TKey, TValue> valueFactory, IEqualityComparer<TKey> keyComparer = null)
+        public PriorityCache(int cacheSize, Func<TKey, TValue> valueFactory, IEqualityComparer<TKey>? keyComparer = null)
         {
             _valueFactory = valueFactory;
             _keyComparer = keyComparer ?? EqualityComparer<TKey>.Default;
@@ -57,7 +57,7 @@ namespace PCRE.Internal
         {
             var keyHash = _keyComparer.GetHashCode(key);
 
-            var head = (CacheItem)Volatile.Read(ref _head);
+            var head = (CacheItem?)Volatile.Read(ref _head);
             if (head != null && head.KeyHashCode == keyHash && _keyComparer.Equals(head.Key, key))
                 return head.Value;
 

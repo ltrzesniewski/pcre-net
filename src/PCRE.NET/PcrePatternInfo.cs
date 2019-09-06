@@ -7,7 +7,7 @@ namespace PCRE
     public sealed class PcrePatternInfo
     {
         private readonly InternalRegex _re;
-        private IReadOnlyList<PcreCalloutInfo> _callouts;
+        private IReadOnlyList<PcreCalloutInfo>? _callouts;
 
         internal PcrePatternInfo(InternalRegex re)
         {
@@ -43,7 +43,7 @@ namespace PCRE
         public uint LastCodeType => _re.GetInfoUInt32(PcreConstants.INFO_LASTCODETYPE);
         public uint LastCodeUnit => _re.GetInfoUInt32(PcreConstants.INFO_LASTCODEUNIT);
 
-        public IReadOnlyList<PcreCalloutInfo> Callouts => _callouts ?? (_callouts = _re.GetCallouts());
+        public IReadOnlyList<PcreCalloutInfo> Callouts => _callouts ??= _re.GetCallouts();
 
         public IEnumerable<int> GetGroupIndexesByName(string name)
         {

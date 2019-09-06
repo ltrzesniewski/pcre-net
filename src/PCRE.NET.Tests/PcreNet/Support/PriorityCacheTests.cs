@@ -8,7 +8,7 @@ namespace PCRE.Tests.PcreNet.Support
     [TestFixture]
     public class PriorityCacheTests
     {
-        private PriorityCache<int, string> _cache;
+        private PriorityCache<int, string> _cache = new PriorityCache<int, string>(0, _ => "");
 
         [SetUp]
         public void Setup()

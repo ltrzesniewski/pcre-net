@@ -4,12 +4,12 @@ namespace PCRE.Tests.Pcre
 {
     public class ExpectedResult
     {
-        public string SubjectLine { get; set; }
-        public IList<ExpectedMatch> Matches { get; set; }
+        public string SubjectLine { get; }
+        public IList<ExpectedMatch> Matches { get; } = new List<ExpectedMatch>();
 
-        public ExpectedResult()
+        public ExpectedResult(string subjectLine)
         {
-            Matches = new List<ExpectedMatch>();
+            SubjectLine = subjectLine;
         }
 
         public override string ToString() => SubjectLine;

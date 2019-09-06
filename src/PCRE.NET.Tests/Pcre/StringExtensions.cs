@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace PCRE.Tests.Pcre
 {
     public static class StringExtensions
     {
-        public static string Escape(this string str)
+        [return: NotNullIfNotNull("str")]
+        public static string? Escape(this string? str)
         {
             if (str == null)
                 return null;
@@ -27,9 +29,6 @@ namespace PCRE.Tests.Pcre
 
         public static string UnescapeSubject(this string str)
         {
-            if (str == null)
-                return null;
-
             var sb = new StringBuilder();
 
             for (var i = 0; i < str.Length; ++i)
@@ -108,7 +107,8 @@ namespace PCRE.Tests.Pcre
             return sb.ToString();
         }
 
-        public static string UnescapeGroup(this string str)
+        [return: NotNullIfNotNull("str")]
+        public static string? UnescapeGroup(this string? str)
         {
             if (str == null)
                 return null;

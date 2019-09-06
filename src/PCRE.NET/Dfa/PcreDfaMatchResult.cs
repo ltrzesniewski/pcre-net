@@ -9,7 +9,7 @@ namespace PCRE.Dfa
     {
         private readonly uint[] _oVector;
         private readonly int _resultCode;
-        private readonly PcreDfaMatch[] _matches;
+        private readonly PcreDfaMatch?[] _matches;
 
         internal string Subject { get; }
 
@@ -30,7 +30,7 @@ namespace PCRE.Dfa
                 _matches = Array.Empty<PcreDfaMatch>();
         }
 
-        private PcreDfaMatch GetMatch(int index)
+        private PcreDfaMatch? GetMatch(int index)
         {
             if (index < 0 || index >= Count)
                 return null;
@@ -42,7 +42,7 @@ namespace PCRE.Dfa
             return match;
         }
 
-        private PcreDfaMatch CreateMatch(int index)
+        private PcreDfaMatch? CreateMatch(int index)
         {
             index *= 2;
             if (index >= _oVector.Length)
@@ -57,13 +57,14 @@ namespace PCRE.Dfa
         private IEnumerable<PcreDfaMatch> GetMatches()
         {
             for (var i = 0; i < Count; ++i)
-                yield return GetMatch(i);
+                yield return GetMatch(i)!;
         }
 
         public IEnumerator<PcreDfaMatch> GetEnumerator() => GetMatches().GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public PcreDfaMatch this[int index] => GetMatch(index);
+        public PcreDfaMatch? this[int index] => GetMatch(index);
+        PcreDfaMatch IReadOnlyList<PcreDfaMatch>.this[int index] => this[index]!;
 
         public int Count => _matches.Length;
 
@@ -71,9 +72,9 @@ namespace PCRE.Dfa
 
         public int Index => LongestMatch?.Index ?? -1;
 
-        public PcreDfaMatch LongestMatch => GetMatch(0);
+        public PcreDfaMatch? LongestMatch => GetMatch(0);
 
-        public PcreDfaMatch ShortestMatch => GetMatch(Count - 1);
+        public PcreDfaMatch? ShortestMatch => GetMatch(Count - 1);
 
         public override string ToString()
         {

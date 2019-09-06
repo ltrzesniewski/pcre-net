@@ -14,7 +14,7 @@ namespace PCRE
         {
         }
 
-        public PcreMatchException(string message, Exception innerException)
+        public PcreMatchException(string message, Exception? innerException)
             : base(message, innerException)
         {
         }
@@ -36,7 +36,7 @@ namespace PCRE
         {
         }
 
-        public PcreCalloutException(string message, Exception innerException)
+        public PcreCalloutException(string message, Exception? innerException)
             : base(message, innerException)
         {
         }

@@ -19,16 +19,16 @@ namespace PCRE.Tests.PcreNet.Dfa
             Assert.That(result.Index, Is.EqualTo(8));
 
             Assert.That(result.LongestMatch, Is.Not.Null);
-            Assert.That(result.LongestMatch.Value, Is.EqualTo("<something> <something else> <something further>"));
+            Assert.That(result.LongestMatch!.Value, Is.EqualTo("<something> <something else> <something further>"));
 
             Assert.That(result.LongestMatch, Is.SameAs(result[0]));
             Assert.That(result.ShortestMatch, Is.SameAs(result[2]));
 
             Assert.That(result.ShortestMatch, Is.Not.Null);
-            Assert.That(result.ShortestMatch.Value, Is.EqualTo("<something>"));
+            Assert.That(result.ShortestMatch!.Value, Is.EqualTo("<something>"));
 
             Assert.That(result[1], Is.Not.Null);
-            Assert.That(result[1].Value, Is.EqualTo("<something> <something else>"));
+            Assert.That(result[1]!.Value, Is.EqualTo("<something> <something else>"));
 
             Assert.That(result[3], Is.Null);
         }
@@ -46,7 +46,7 @@ namespace PCRE.Tests.PcreNet.Dfa
             Assert.That(result.Index, Is.EqualTo(8));
 
             Assert.That(result.ShortestMatch, Is.Not.Null);
-            Assert.That(result.ShortestMatch.Value, Is.EqualTo("<something>"));
+            Assert.That(result.ShortestMatch!.Value, Is.EqualTo("<something>"));
         }
 
         [Test]
@@ -65,10 +65,10 @@ namespace PCRE.Tests.PcreNet.Dfa
             Assert.That(result.Index, Is.EqualTo(8));
 
             Assert.That(result.LongestMatch, Is.Not.Null);
-            Assert.That(result.LongestMatch.Value, Is.EqualTo("<something> <something else> <something further>"));
+            Assert.That(result.LongestMatch!.Value, Is.EqualTo("<something> <something else> <something further>"));
 
             Assert.That(result.ShortestMatch, Is.Not.Null);
-            Assert.That(result.ShortestMatch.Value, Is.EqualTo("<something> <something else>"));
+            Assert.That(result.ShortestMatch!.Value, Is.EqualTo("<something> <something else>"));
         }
 
         [Test]
@@ -84,10 +84,10 @@ namespace PCRE.Tests.PcreNet.Dfa
             Assert.That(result.Index, Is.EqualTo(20));
 
             Assert.That(result.LongestMatch, Is.Not.Null);
-            Assert.That(result.LongestMatch.Value, Is.EqualTo("<something else> <something further>"));
+            Assert.That(result.LongestMatch!.Value, Is.EqualTo("<something else> <something further>"));
 
             Assert.That(result.ShortestMatch, Is.Not.Null);
-            Assert.That(result.ShortestMatch.Value, Is.EqualTo("<something else>"));
+            Assert.That(result.ShortestMatch!.Value, Is.EqualTo("<something else>"));
         }
 
         [Test]
@@ -100,8 +100,8 @@ namespace PCRE.Tests.PcreNet.Dfa
             var result = re.Dfa.Match("This is <something> <something else> <something further> no more", settings);
 
             Assert.That(result.Count, Is.EqualTo(2));
-            Assert.That(result.LongestMatch.Value, Is.EqualTo("<something> <something else> <something further>"));
-            Assert.That(result.ShortestMatch.Value, Is.EqualTo("<something>"));
+            Assert.That(result.LongestMatch!.Value, Is.EqualTo("<something> <something else> <something further>"));
+            Assert.That(result.ShortestMatch!.Value, Is.EqualTo("<something>"));
         }
     }
 }

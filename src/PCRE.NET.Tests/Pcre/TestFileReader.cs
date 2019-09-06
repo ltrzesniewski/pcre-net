@@ -8,7 +8,7 @@ namespace PCRE.Tests.Pcre
     {
         private readonly TextReader _reader;
         private int _lineNumber;
-        private string _lastReadLine;
+        private string? _lastReadLine;
 
         protected TestFileReader(Stream inputStream)
         {
@@ -27,7 +27,7 @@ namespace PCRE.Tests.Pcre
             return _lastReadLine;
         }
 
-        protected TestPattern ReadNextPattern()
+        protected TestPattern? ReadNextPattern()
         {
             while (true)
             {
@@ -72,13 +72,12 @@ namespace PCRE.Tests.Pcre
                             }
                             else
                             {
-                                var result = new TestPattern
-                                {
-                                    FullString = fullString.ToString(),
-                                    Pattern = pattern.ToString(),
-                                    OptionsString = line.Substring(i + 1),
-                                    LineNumber = lineNumber
-                                };
+                                var result = new TestPattern(
+                                    fullString.ToString(),
+                                    pattern.ToString(),
+                                    line.Substring(i + 1),
+                                    lineNumber
+                                );
 
                                 ParseOptions(result);
 
@@ -191,7 +190,7 @@ namespace PCRE.Tests.Pcre
                         break;
 
                     case "replace":
-                        pattern.ReplaceWith = value;
+                        pattern.ReplaceWith = value ?? throw new InvalidOperationException("Missing replacement");
                         break;
 
                     case "info":
@@ -272,9 +271,7 @@ namespace PCRE.Tests.Pcre
             }
         }
 
-        protected InvalidOperationException InvalidInputException(string message, Exception innerException = null)
-        {
-            return new InvalidOperationException($"{message} at line {_lineNumber}: {_lastReadLine}", innerException);
-        }
+        protected InvalidOperationException InvalidInputException(string message, Exception? innerException = null)
+            => new InvalidOperationException($"{message} at line {_lineNumber}: {_lastReadLine}", innerException);
     }
 }
