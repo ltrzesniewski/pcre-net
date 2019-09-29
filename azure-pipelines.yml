@@ -2,6 +2,8 @@
 variables:
   BuildConfiguration: Release
   NetCoreSdkVersion: 3.x
+  WindowsTestTarget: net48
+  UnixTestTarget: netcoreapp3.0
 
 jobs:
   - job: Linux
@@ -39,7 +41,7 @@ jobs:
         inputs:
           command: test
           projects: src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
-          arguments: /v:m /m /p:Configuration=$(BuildConfiguration) /p:PcreNetTestBuild=true /p:ExpectPlatform=x64 --framework netcoreapp2.1
+          arguments: /v:m /m /p:Configuration=$(BuildConfiguration) /p:PcreNetTestBuild=true /p:ExpectPlatform=x64 --framework $(UnixTestTarget)
           testRunTitle: Linux
 
       - task: PublishPipelineArtifact@0
@@ -83,7 +85,7 @@ jobs:
         inputs:
           command: test
           projects: src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
-          arguments: /v:m /m /p:Configuration=$(BuildConfiguration) /p:PcreNetTestBuild=true /p:ExpectPlatform=x64 --framework netcoreapp2.1
+          arguments: /v:m /m /p:Configuration=$(BuildConfiguration) /p:PcreNetTestBuild=true /p:ExpectPlatform=x64 --framework $(UnixTestTarget)
           testRunTitle: MacOS
 
       - task: PublishPipelineArtifact@0
@@ -185,7 +187,7 @@ jobs:
         inputs:
           configuration: $(BuildConfiguration)
           platform: x86
-          searchFolder: src/PCRE.NET.Tests/bin/x86/$(BuildConfiguration)/net472
+          searchFolder: src/PCRE.NET.Tests/bin/x86/$(BuildConfiguration)/$(WindowsTestTarget)
           testRunTitle: Windows x86
 
       - task: VSTest@2
@@ -193,7 +195,7 @@ jobs:
         inputs:
           configuration: $(BuildConfiguration)
           platform: x64
-          searchFolder: src/PCRE.NET.Tests/bin/x64/$(BuildConfiguration)/net472
+          searchFolder: src/PCRE.NET.Tests/bin/x64/$(BuildConfiguration)/$(WindowsTestTarget)
           testRunTitle: Windows x64
 
       - task: PublishBuildArtifacts@1
