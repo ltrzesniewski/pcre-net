@@ -1,8 +1,7 @@
 
 variables:
   BuildConfiguration: Release
-  NetCoreSdkVersion: 2.2.x
-  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  NetCoreSdkVersion: 3.x
 
 jobs:
   - job: Linux
