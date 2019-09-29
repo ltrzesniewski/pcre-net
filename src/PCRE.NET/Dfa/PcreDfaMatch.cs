@@ -21,7 +21,7 @@ namespace PCRE.Dfa
 
         public int Length => EndIndex > Index ? EndIndex - Index : 0;
 
-        public string Value => _value ?? (_value = _subject.Substring(Index, Length));
+        public string Value => _value ??= _subject.Substring(Index, Length);
 
         public bool Success => Index >= 0;
 

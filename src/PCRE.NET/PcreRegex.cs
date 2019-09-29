@@ -13,7 +13,7 @@ namespace PCRE
         private PcrePatternInfo _info;
         private PcreDfaRegex _dfa;
 
-        public PcrePatternInfo PatternInfo => _info ?? (_info = new PcrePatternInfo(InternalRegex));
+        public PcrePatternInfo PatternInfo => _info ??= new PcrePatternInfo(InternalRegex);
 
         internal InternalRegex InternalRegex { get; }
 
@@ -25,7 +25,7 @@ namespace PCRE
             set => Caches.CacheSize = value;
         }
 
-        public PcreDfaRegex Dfa => _dfa ?? (_dfa = new PcreDfaRegex(InternalRegex));
+        public PcreDfaRegex Dfa => _dfa ??= new PcreDfaRegex(InternalRegex);
 
         [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
         public PcreRegex(string pattern)

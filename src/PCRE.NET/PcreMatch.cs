@@ -92,7 +92,7 @@ namespace PCRE
             if (index < 0 || index > CaptureCount)
                 return null;
 
-            var groups = _groups ?? (_groups = new PcreGroup[_regex.CaptureCount + 1]);
+            var groups = _groups ??= new PcreGroup[_regex.CaptureCount + 1];
 
             var group = groups[index];
             if (group == null)

@@ -37,7 +37,7 @@ namespace PCRE
 
         public int Number { get; }
 
-        public PcreMatch Match => _match ?? (_match = new PcreMatch(_subject, _regex, _oVector, _markPtr));
+        public PcreMatch Match => _match ??= new PcreMatch(_subject, _regex, _oVector, _markPtr);
 
         public int StartOffset { get; }
         public int CurrentOffset { get; }
@@ -49,7 +49,7 @@ namespace PCRE
         public int StringOffset => Info.StringOffset;
         public string String => Info.String;
 
-        public PcreCalloutInfo Info => _info ?? (_info = _regex.GetCalloutInfoByPatternPosition(PatternPosition));
+        public PcreCalloutInfo Info => _info ??= _regex.GetCalloutInfoByPatternPosition(PatternPosition);
 
         public bool StartMatch => (_flags & PcreConstants.CALLOUT_STARTMATCH) != 0;
         public bool Backtrack => (_flags & PcreConstants.CALLOUT_BACKTRACK) != 0;
