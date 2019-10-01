@@ -120,7 +120,7 @@ namespace PCRE
 
             yield return match;
 
-            var baseOptions = settings.AdditionalOptions.ToPatternOptions();
+            var baseOptions = settings.AdditionalOptions.ToPatternOptions() | PcreConstants.NO_UTF_CHECK;
 
             while (true)
             {
