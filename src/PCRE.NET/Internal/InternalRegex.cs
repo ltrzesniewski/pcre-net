@@ -148,7 +148,7 @@ namespace PCRE.Internal
             return new PcreMatch(subject, this, ref result, oVector);
         }
 
-        public PcreDfaMatchResult DfaMatch(string subject, PcreDfaMatchSettings settings, int startIndex)
+        public PcreDfaMatchResult DfaMatch(string subject, PcreDfaMatchSettings settings, int startIndex, uint additionalOptions)
         {
             var input = new Native.dfa_match_input();
             settings.FillMatchInput(ref input);
@@ -165,6 +165,7 @@ namespace PCRE.Internal
                 input.subject_length = (uint)subject.Length;
                 input.output_vector = pOVec;
                 input.start_index = (uint)startIndex;
+                input.additional_options = additionalOptions;
 
                 CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, settings.Callout);
 

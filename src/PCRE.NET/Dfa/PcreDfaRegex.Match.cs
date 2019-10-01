@@ -49,7 +49,7 @@ namespace PCRE.Dfa
             if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
                 throw new IndexOutOfRangeException("Invalid StartIndex value");
 
-            return _regex.DfaMatch(subject, settings, settings.StartIndex);
+            return _regex.DfaMatch(subject, settings, settings.StartIndex, ((PcreMatchOptions)settings.AdditionalOptions).ToPatternOptions());
         }
 
         [Pure]
@@ -84,15 +84,19 @@ namespace PCRE.Dfa
 
         private IEnumerable<PcreDfaMatchResult> MatchesIterator(string subject, PcreDfaMatchSettings settings)
         {
-            var match = _regex.DfaMatch(subject, settings, settings.StartIndex);
+            var additionalOptions = ((PcreMatchOptions)settings.AdditionalOptions).ToPatternOptions();
+
+            var match = _regex.DfaMatch(subject, settings, settings.StartIndex, additionalOptions);
             if (!match.Success)
                 yield break;
 
             yield return match;
 
+            additionalOptions |= PcreConstants.NO_UTF_CHECK;
+
             while (true)
             {
-                match = _regex.DfaMatch(subject, settings, match.Index + 1);
+                match = _regex.DfaMatch(subject, settings, match.Index + 1, additionalOptions);
                 if (!match.Success)
                     yield break;
 
