@@ -108,24 +108,11 @@ namespace PCRE.Internal
             return result;
         }
 
-        public PcreMatch Match(string subject, PcreMatchSettings settings)
-        {
-            var input = new Native.match_input();
-            settings.FillMatchInput(ref input);
-            return Match(subject, settings, ref input);
-        }
-
         public PcreMatch Match(string subject, PcreMatchSettings settings, int startIndex, uint additionalOptions)
         {
             var input = new Native.match_input();
             settings.FillMatchInput(ref input);
-            input.start_index = (uint)startIndex;
-            input.additional_options = additionalOptions;
-            return Match(subject, settings, ref input);
-        }
 
-        private PcreMatch Match(string subject, PcreMatchSettings settings, ref Native.match_input input)
-        {
             var oVector = new uint[2 * (CaptureCount + 1)];
             Native.match_result result;
             CalloutInterop.CalloutInteropInfo calloutInterop;
@@ -137,6 +124,8 @@ namespace PCRE.Internal
                 input.subject = pSubject;
                 input.subject_length = (uint)subject.Length;
                 input.output_vector = pOVec;
+                input.start_index = (uint)startIndex;
+                input.additional_options = additionalOptions;
 
                 CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, settings.Callout);
 

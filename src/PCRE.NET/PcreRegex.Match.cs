@@ -69,7 +69,7 @@ namespace PCRE
             if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
                 throw new IndexOutOfRangeException("Invalid StartIndex value");
 
-            return InternalRegex.Match(subject, settings);
+            return InternalRegex.Match(subject, settings, settings.StartIndex, settings.AdditionalOptions.ToPatternOptions());
         }
 
         [Pure]
@@ -114,7 +114,7 @@ namespace PCRE
 
         private IEnumerable<PcreMatch> MatchesIterator(string subject, PcreMatchSettings settings)
         {
-            var match = InternalRegex.Match(subject, settings);
+            var match = InternalRegex.Match(subject, settings, settings.StartIndex, settings.AdditionalOptions.ToPatternOptions());
             if (!match.Success)
                 yield break;
 
