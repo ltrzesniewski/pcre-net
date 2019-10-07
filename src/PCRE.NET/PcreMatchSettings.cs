@@ -6,7 +6,7 @@ namespace PCRE
 {
     public sealed class PcreMatchSettings
     {
-        internal static PcreMatchSettings Default { get; } = new PcreMatchSettings();
+        private static readonly PcreMatchSettings _defaultSettings = new PcreMatchSettings();
 
         private uint? _matchLimit;
         private uint? _depthLimit;
@@ -45,6 +45,23 @@ namespace PCRE
         public PcreJitStack JitStack { get; set; }
 
         internal Func<PcreCallout, PcreCalloutResult> Callout { get; private set; }
+
+        internal static PcreMatchSettings GetSettings(int startIndex, PcreMatchOptions additionalOptions, Func<PcreCallout, PcreCalloutResult> onCallout)
+        {
+            if (startIndex == 0 && additionalOptions == PcreMatchOptions.None && onCallout == null)
+                return _defaultSettings;
+
+            var settings = new PcreMatchSettings
+            {
+                StartIndex = startIndex,
+                AdditionalOptions = additionalOptions
+            };
+
+            if (onCallout != null)
+                settings.OnCallout += onCallout;
+
+            return settings;
+        }
 
         internal void FillMatchInput(ref Native.match_input input)
         {

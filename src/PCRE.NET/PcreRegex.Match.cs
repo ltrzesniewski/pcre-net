@@ -45,7 +45,7 @@ namespace PCRE
             => Match(subject, startIndex, PcreMatchOptions.None, onCallout);
 
         public PcreMatch Match(string subject, int startIndex, PcreMatchOptions options, Func<PcreCallout, PcreCalloutResult> onCallout)
-            => Match(subject, GetMatchSettings(startIndex, options, onCallout));
+            => Match(subject, PcreMatchSettings.GetSettings(startIndex, options, onCallout));
 
         public PcreMatch Match(string subject, PcreMatchSettings settings)
         {
@@ -75,7 +75,7 @@ namespace PCRE
             if (subject == null)
                 throw new ArgumentNullException(nameof(subject));
 
-            return Matches(subject, GetMatchSettings(startIndex, PcreMatchOptions.None, onCallout));
+            return Matches(subject, PcreMatchSettings.GetSettings(startIndex, PcreMatchOptions.None, onCallout));
         }
 
         [Pure]
@@ -91,23 +91,6 @@ namespace PCRE
                 throw new IndexOutOfRangeException("Invalid StartIndex value");
 
             return MatchesIterator(subject, settings);
-        }
-
-        private static PcreMatchSettings GetMatchSettings(int startIndex, PcreMatchOptions additionalOptions, Func<PcreCallout, PcreCalloutResult> onCallout)
-        {
-            if (startIndex == 0 && additionalOptions == PcreMatchOptions.None && onCallout == null)
-                return PcreMatchSettings.Default;
-
-            var settings = new PcreMatchSettings
-            {
-                StartIndex = startIndex,
-                AdditionalOptions = additionalOptions
-            };
-
-            if (onCallout != null)
-                settings.OnCallout += onCallout;
-
-            return settings;
         }
 
         private IEnumerable<PcreMatch> MatchesIterator(string subject, PcreMatchSettings settings)

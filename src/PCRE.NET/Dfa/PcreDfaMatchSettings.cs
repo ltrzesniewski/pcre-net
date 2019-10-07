@@ -6,7 +6,7 @@ namespace PCRE.Dfa
 {
     public sealed class PcreDfaMatchSettings
     {
-        internal static PcreDfaMatchSettings Default { get; } = new PcreDfaMatchSettings();
+        private static readonly PcreDfaMatchSettings _defaultSettings = new PcreDfaMatchSettings();
 
         public PcreDfaMatchOptions AdditionalOptions { get; set; }
         public int StartIndex { get; set; }
@@ -22,6 +22,18 @@ namespace PCRE.Dfa
         }
 
         internal Func<PcreCallout, PcreCalloutResult> Callout { get; private set; }
+
+        internal static PcreDfaMatchSettings GetSettings(int startIndex, PcreDfaMatchOptions options)
+        {
+            if (startIndex == 0 && options == PcreDfaMatchOptions.None)
+                return _defaultSettings;
+
+            return new PcreDfaMatchSettings
+            {
+                StartIndex = startIndex,
+                AdditionalOptions = options
+            };
+        }
 
         internal void FillMatchInput(ref Native.dfa_match_input input)
         {
