@@ -30,5 +30,21 @@ namespace PCRE.Tests.PcreNet.Dfa
             Assert.That(matches[1].ShortestMatch.Value, Is.EqualTo("<something else>"));
             Assert.That(matches[2].ShortestMatch.Value, Is.EqualTo("<something further>"));
         }
+
+        [Test]
+        public void should_not_start_a_match_inside_a_surrogate_pair()
+        {
+            var re = new PcreRegex(@".");
+            var matches = re.Dfa.Matches("foo\uD83D\uDE0Ebar").ToList();
+
+            Assert.That(matches.Count, Is.EqualTo(7));
+
+            Assert.That(matches[3].ShortestMatch.Index, Is.EqualTo(3));
+            Assert.That(matches[3].ShortestMatch.Length, Is.EqualTo(2));
+
+            Assert.That(matches[4].ShortestMatch.Index, Is.EqualTo(5));
+            Assert.That(matches[4].ShortestMatch.Length, Is.EqualTo(1));
+            Assert.That(matches[4].ShortestMatch.Value, Is.EqualTo("b"));
+        }
     }
 }

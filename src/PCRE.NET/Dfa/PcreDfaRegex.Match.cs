@@ -96,7 +96,11 @@ namespace PCRE.Dfa
 
             while (true)
             {
-                match = _regex.DfaMatch(subject, settings, match.Index + 1, additionalOptions);
+                var nextIndex = match.Index + 1;
+                if (nextIndex < subject.Length && char.IsLowSurrogate(subject[nextIndex]))
+                    ++nextIndex;
+
+                match = _regex.DfaMatch(subject, settings, nextIndex, additionalOptions);
                 if (!match.Success)
                     yield break;
 
