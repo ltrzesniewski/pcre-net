@@ -28,15 +28,7 @@ namespace PCRE.Dfa
 
         [Pure]
         public PcreDfaMatchResult Match(string subject, int startIndex, PcreDfaMatchOptions options)
-        {
-            var settings = new PcreDfaMatchSettings
-            {
-                AdditionalOptions = options,
-                StartIndex = startIndex
-            };
-
-            return Match(subject, settings);
-        }
+            => Match(subject, GetMatchSettings(startIndex, options));
 
         public PcreDfaMatchResult Match(string subject, PcreDfaMatchSettings settings)
         {
@@ -58,14 +50,7 @@ namespace PCRE.Dfa
 
         [Pure]
         public IEnumerable<PcreDfaMatchResult> Matches(string subject, int startIndex)
-        {
-            var settings = new PcreDfaMatchSettings
-            {
-                StartIndex = startIndex
-            };
-
-            return Matches(subject, settings);
-        }
+            => Matches(subject, GetMatchSettings(startIndex, PcreDfaMatchOptions.None));
 
         [Pure]
         public IEnumerable<PcreDfaMatchResult> Matches(string subject, PcreDfaMatchSettings settings)
@@ -80,6 +65,18 @@ namespace PCRE.Dfa
                 throw new IndexOutOfRangeException("Invalid StartIndex value");
 
             return MatchesIterator(subject, settings);
+        }
+
+        private static PcreDfaMatchSettings GetMatchSettings(int startIndex, PcreDfaMatchOptions options)
+        {
+            if (startIndex == 0 && options == PcreDfaMatchOptions.None)
+                return PcreDfaMatchSettings.Default;
+
+            return new PcreDfaMatchSettings
+            {
+                StartIndex = startIndex,
+                AdditionalOptions = options
+            };
         }
 
         private IEnumerable<PcreDfaMatchResult> MatchesIterator(string subject, PcreDfaMatchSettings settings)

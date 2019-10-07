@@ -6,6 +6,8 @@ namespace PCRE.Dfa
 {
     public sealed class PcreDfaMatchSettings
     {
+        internal static PcreDfaMatchSettings Default { get; } = new PcreDfaMatchSettings();
+
         public PcreDfaMatchOptions AdditionalOptions { get; set; }
         public int StartIndex { get; set; }
 
