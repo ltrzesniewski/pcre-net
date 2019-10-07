@@ -97,6 +97,10 @@ namespace PCRE.Dfa
             while (true)
             {
                 var nextIndex = match.Index + 1;
+
+                if (nextIndex > subject.Length)
+                    yield break;
+
                 if (nextIndex < subject.Length && char.IsLowSurrogate(subject[nextIndex]))
                     ++nextIndex;
 

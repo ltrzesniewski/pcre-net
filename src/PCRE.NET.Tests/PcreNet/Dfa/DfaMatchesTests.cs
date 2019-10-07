@@ -46,5 +46,15 @@ namespace PCRE.Tests.PcreNet.Dfa
             Assert.That(matches[4].ShortestMatch.Length, Is.EqualTo(1));
             Assert.That(matches[4].ShortestMatch.Value, Is.EqualTo("b"));
         }
+
+        [Test]
+        public void should_match_empty_pattern()
+        {
+            var re = new PcreRegex(@"");
+            var matches = re.Dfa.Matches("foo").ToList();
+
+            Assert.That(matches.Count, Is.EqualTo(4));
+            Assert.That(matches.Select(i => i.LongestMatch.Length), Is.All.Zero);
+        }
     }
 }
