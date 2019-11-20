@@ -40,7 +40,7 @@ PCRENET_EXPORT(void, substitute)(const pcrenet_substitute_input* input, pcrenet_
         &outputBufferSize
     );
 
-    if (result->result_code == PCRE2_ERROR_NOMEMORY && outputBufferSize < std::numeric_limits<int32_t>::max())
+    if (result->result_code == PCRE2_ERROR_NOMEMORY && outputBufferSize < static_cast<PCRE2_SIZE>(std::numeric_limits<int32_t>::max()))
     {
         result->result = new uint16_t[outputBufferSize];
 
