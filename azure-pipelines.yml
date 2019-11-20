@@ -1,7 +1,7 @@
 
 variables:
   BuildConfiguration: Release
-  NetCoreSdkVersion: 3.x
+  NetCoreSdkVersion: 3.0.x
   WindowsTestTarget: net48
   UnixTestTarget: netcoreapp3.0
 
