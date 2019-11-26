@@ -876,7 +876,7 @@ Partial match: abc
  0: def
    
 /(?<=foo)bar/
-   foob\=ps,offset=2
+   foob\=ps,offset=2,allusedtext
 Partial match: foob
                <<<
    foobar...\=ps,dfa_restart,offset=4
@@ -6803,9 +6803,10 @@ Partial match: dogs
     xyzabc123pqr
 Failed: error -42: pattern contains an item that is not supported for DFA matching
     
-/(?<=abc)123/
+/(?<=abc)123/allusedtext
     xyzabc123pqr 
- 0: 123
+ 0: abc123
+    <<<   
     xyzabc12\=ps
 Partial match: abc12
                <<<
@@ -6813,9 +6814,10 @@ Partial match: abc12
 Partial match: abc12
                <<<
 
-/\babc\b/
+/\babc\b/allusedtext
     +++abc+++
- 0: abc
+ 0: +abc+
+    <   >
     +++ab\=ps
 Partial match: +ab
                <
@@ -6845,7 +6847,6 @@ No match
 /(abc|def|xyz)/I,no_start_optimize
 Capture group count = 1
 Options: no_start_optimize
-Subject length lower bound = 0
     terhjk;abcdaadsfe
  0: abc
     the quick xyz brown fox
@@ -6933,7 +6934,7 @@ Failed: error -42: pattern contains an item that is not supported for DFA matchi
     ac
 Failed: error -42: pattern contains an item that is not supported for DFA matching
 
-/(?<=abc)def/
+/(?<=abc)def/allusedtext
     abc\=ph
 Partial match: abc
                <<<
@@ -7807,5 +7808,91 @@ No match
 \= Expect no match
     0
 No match
+
+/(?<=pqr)abc(?=xyz)/
+    123pqrabcxy\=ps,allusedtext
+Partial match: pqrabcxy
+               <<<
+    123pqrabcxyz\=ps,allusedtext
+ 0: pqrabcxyz
+    <<<   >>>
+
+/(?>a+b)/
+    aaaa\=ps
+Partial match: aaaa
+    aaaab\=ps
+ 0: aaaab
+    
+/(abc)(?1)/
+    abca\=ps
+Partial match: abca
+    abcabc\=ps
+ 0: abcabc
+
+/(?(?=abc).*|Z)/
+    ab\=ps
+Partial match: ab
+    abcxyz\=ps
+ 0: abcxyz
+
+/(abc)++x/
+    abcab\=ps
+Partial match: abcab
+    abc\=ps 
+Partial match: abc
+    ab\=ps
+Partial match: ab
+    abcx  
+ 0: abcx
+
+/\z/
+    abc\=ph 
+Partial match: 
+    abc\=ps 
+ 0: 
+   
+/\Z/
+    abc\=ph 
+Partial match: 
+    abc\=ps 
+ 0: 
+    abc\n\=ph
+Partial match: \x0a
+    abc\n\=ps
+ 0: 
+
+/c*+(?<=[bc])/
+    abc\=ph
+Partial match: c
+    ab\=ph
+Partial match: 
+    abc\=ps
+ 0: c
+    ab\=ps
+ 0: 
+
+/c++(?<=[bc])/
+    abc\=ph
+Partial match: c
+    ab\=ph
+Partial match: 
+
+/(?<=(?=.(?<=x)))/
+    abx
+ 0: 
+    ab\=ph
+Partial match: 
+    bxyz 
+ 0: 
+    xyz
+ 0: 
+
+/(?![ab]).*/
+    ab\=ph
+Partial match: 
+
+/c*+/
+    ab\=ph,offset=2
+Partial match: 
 
 # End of testinput6

@@ -1,6 +1,6 @@
 # This set of tests is for features that are compatible with all versions of
 # Perl >= 5.10, in non-UTF mode. It should run clean for the 8-bit, 16-bit, and
-# 32-bit PCRE libraries, and also using the perltest.pl script.
+# 32-bit PCRE libraries, and also using the perltest.sh script.
     
 #forbid_utf
 #newline_default lf any anycrlf
@@ -6342,5 +6342,48 @@ ef) x/x,mark
 
 /(?&word)*  \. (?<word> \w+ )/xi
     pokus.hokus
+
+/a(?(?=(*:2)b).)/mark
+    abc
+    acb     
+
+/a(?(?!(*:2)b).)/mark
+    acb
+    abc     
+
+/(?:a|ab){1}+c/
+\= Expect no match
+    abc
+
+/(a|ab){1}+c/
+    abc
+    
+/(a+){1}+a/
+\= Expect no match
+    aaaa
+
+/(?(DEFINE)(a|ab))(?1){1}+c/
+    abc    
+
+/(?:a|(?=b)|.)*\z/
+    abc
+    
+/(?:a|(?=b)|.)*/
+    abc 
+    
+/(?<=a(*SKIP)x)|c/
+    abcd
+    
+/(?<=a(*SKIP)x)|d/
+    abcd
+ 
+/(?<=(?=.(?<=x)))/aftertext
+    abx
+
+/(?<=(?=(?<=a)))b/
+    ab
+
+/^(?<A>a)(?(<A>)b)((?<=b).*)$/
+    abc
 
 # End of testinput1 

@@ -8,7 +8,7 @@
 # * Put printf arguments in single, not double quotes to avoid unwanted
 #     escaping.
 # * Use \0 for binary zero in printf, not \x0, for the benefit of older
-#     versions.
+#     versions (and use octal for other special values).
 
 # Set the C locale, so that sort(1) behaves predictably.
 
@@ -653,6 +653,13 @@ printf 'ABC\0XYZ\nABCDEF\nDEFABC\n' >testtemp2grep
 $valgrind $vjs $pcre2grep -a -f testtemp1grep testtemp2grep >>testtrygrep
 echo "RC=$?" >>testtrygrep
 
+echo "---------------------------- Test 127 -----------------------------" >>testtrygrep
+(cd $srcdir; $valgrind $vjs $pcre2grep -o --om-capture=0 'pattern()()()()' testdata/grepinput) >>testtrygrep
+echo "RC=$?" >>testtrygrep
+
+echo "---------------------------- Test 128 -----------------------------" >>testtrygrep
+(cd $srcdir; $valgrind $vjs $pcre2grep -o1 --om-capture=0 'pattern()()()()' testdata/grepinput) >>testtrygrep 2>&1
+echo "RC=$?" >>testtrygrep
 
 # Now compare the results.
 
@@ -675,6 +682,16 @@ if [ $utf8 -ne 0 ] ; then
 
   echo "---------------------------- Test U3 ------------------------------" >>testtrygrep
   (cd $srcdir; $valgrind $vjs $pcre2grep --line-offsets -u --newline=any '(?<=\K\x{17f})' ./testdata/grepinput8) >>testtrygrep
+  echo "RC=$?" >>testtrygrep
+
+  echo "---------------------------- Test U4 ------------------------------" >>testtrygrep
+  printf 'A\341\200\200\200CD\342\200\200Z\n' >testtemp1grep
+  (cd $srcdir; $valgrind $vjs $pcre2grep -u -o '....' $builddir/testtemp1grep) >>testtrygrep 2>&1
+  echo "RC=$?" >>testtrygrep
+
+  echo "---------------------------- Test U5 ------------------------------" >>testtrygrep
+  printf 'A\341\200\200\200CD\342\200\200Z\n' >testtemp1grep
+  (cd $srcdir; $valgrind $vjs $pcre2grep -U -o '....' $builddir/testtemp1grep) >>testtrygrep
   echo "RC=$?" >>testtrygrep
 
   $cf $srcdir/testdata/grepoutput8 testtrygrep

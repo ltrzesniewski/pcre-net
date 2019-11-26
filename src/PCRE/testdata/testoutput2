@@ -816,7 +816,7 @@ Capture group count = 1
 Max back reference = 1
 Compile options: <none>
 Overall options: anchored
-Starting code units: a 
+First code unit = 'a'
 Subject length lower bound = 4
 \= Expect no match
     aaaa
@@ -1480,7 +1480,7 @@ Subject length lower bound = 2
 Capture group count = 0
 First code unit = 'a'
 Last code unit = 'a'
-Subject length lower bound = 1
+Subject length lower bound = 2
 
 /(?=a)a.*/I
 Capture group count = 0
@@ -2252,7 +2252,7 @@ Failed: error 115 at offset 5: reference to non-existent subpattern
 Capture group count = 271
 Max back reference = 270
 Starting code units: 0 1 2 3 4 5 6 7 8 9 
-Subject length lower bound = 0
+Subject length lower bound = 1
      1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200 201 202 203 204 205 206 207 208 209 210 211 212 213 214 215 216 217 218 219 220 221 222 223 224 225 226 227 228 229 230 231 232 233 234 235 236 237 238 239 240 241 242 243 244 245 246 247 248 249 250 251 252 253 254 255 256 257 258 259 260 261 262 263 264 265 266 267 268 269 ABC ABC\=ovector=300
  0: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200 201 202 203 204 205 206 207 208 209 210 211 212 213 214 215 216 217 218 219 220 221 222 223 224 225 226 227 228 229 230 231 232 233 234 235 236 237 238 239 240 241 242 243 244 245 246 247 248 249 250 251 252 253 254 255 256 257 258 259 260 261 262 263 264 265 266 267 268 269 ABC ABC
  1: 1 
@@ -3406,7 +3406,7 @@ Subject length lower bound = 2
 Capture group count = 0
 May match empty string
 First code unit = 'a'
-Subject length lower bound = 0
+Subject length lower bound = 1
 
 /(?=abc).xyz/Ii
 Capture group count = 0
@@ -3425,7 +3425,7 @@ Subject length lower bound = 4
 Capture group count = 0
 May match empty string
 First code unit = 'a'
-Subject length lower bound = 0
+Subject length lower bound = 1
 
 /(?=.)a/I
 Capture group count = 0
@@ -3436,7 +3436,7 @@ Subject length lower bound = 1
 Capture group count = 1
 First code unit = 'a'
 Last code unit = 'a'
-Subject length lower bound = 1
+Subject length lower bound = 2
 
 /((?=abcda)ab)/I
 Capture group count = 1
@@ -6492,6 +6492,8 @@ Subject length lower bound = 2
  0: aaaA5
     aaaa5
  0: aaaa5
+    a5 
+ 0: a5
 
 /(a*|b*)[cd]/I
 Capture group count = 1
@@ -9369,21 +9371,17 @@ Partial match: abc12
     xyzabc123pqr
  0: 123
     xyzabc12\=ps
-Partial match: abc12
-               <<<
+Partial match: 12
     xyzabc12\=ph
-Partial match: abc12
-               <<<
+Partial match: 12
 
 /\babc\b/
     +++abc+++
  0: abc
     +++ab\=ps
-Partial match: +ab
-               <
+Partial match: ab
     +++ab\=ph
-Partial match: +ab
-               <
+Partial match: ab
 
 /(?&word)(?&element)(?(DEFINE)(?<element><[^m][^>]>[^<])(?<word>\w*+))/B
 ------------------------------------------------------------------
@@ -10401,8 +10399,7 @@ No match
 
 /(?<=abc)def/
     abc\=ph
-Partial match: abc
-               <<<
+Partial match: 
 
 /abc$/
     abc
@@ -10780,7 +10777,7 @@ Capture group count = 0
 Options: caseless
 First code unit = 'a' (caseless)
 Last code unit = 'a' (caseless)
-Subject length lower bound = 1
+Subject length lower bound = 2
 
 /(abc)\1+/
 
@@ -11122,7 +11119,7 @@ Matched, but too many substrings
 ------------------------------------------------------------------
         Bra
         Brazero
-        AssertB
+        Assert back
         Reverse
         CBra 1
         abc
@@ -11229,7 +11226,7 @@ Subject length lower bound = 0
 /a(*SKIP)c|b(*ACCEPT)cd(*ACCEPT)|x/I
 Capture group count = 0
 Starting code units: a b x 
-Subject length lower bound = 0
+Subject length lower bound = 1
     ax
  0: x
 
@@ -11246,6 +11243,7 @@ No match
 
 /(*ACCEPT)a/I,aftertext
 Capture group count = 0
+May match empty string
 Subject length lower bound = 0
     bax
  0: 
@@ -11254,7 +11252,7 @@ Subject length lower bound = 0
 /z(*ACCEPT)a/I,aftertext
 Capture group count = 0
 First code unit = 'z'
-Subject length lower bound = 0
+Subject length lower bound = 1
     baxzbx
  0: z
  0+ bx
@@ -11959,11 +11957,9 @@ Callout 2: last capture = 0
 
 /(?<=123)(*MARK:xx)abc/mark
     xxxx123a\=ph
-Partial match, mark=xx: 123a
-                        <<<
+Partial match, mark=xx: a
     xxxx123a\=ps
-Partial match, mark=xx: 123a
-                        <<<
+Partial match, mark=xx: a
 
 /123\Kabc/startchar
     xxxx123a\=ph
@@ -13353,7 +13349,7 @@ Failed: error 144 at offset 5: subpattern name must start with a non-digit
         Ket
         red
         \b
-        AssertB
+        Assert back
         Reverse
         \w
         Ket
@@ -13410,7 +13406,7 @@ Failed: error 133 at offset 7: parentheses are too deeply nested (stack check)
         Once
         \s*+
         Ket
-        AssertB
+        Assert back
         Reverse
         \w
         Ket
@@ -13572,7 +13568,6 @@ Subject length lower bound = 4
 /abcd/I,no_start_optimize
 Capture group count = 0
 Options: no_start_optimize
-Subject length lower bound = 0
 
 /(|ab)*?d/I
 Capture group count = 1
@@ -13588,7 +13583,6 @@ Subject length lower bound = 1
 /(|ab)*?d/I,no_start_optimize
 Capture group count = 1
 Options: no_start_optimize
-Subject length lower bound = 0
    abd
  0: abd
  1: ab
@@ -14609,7 +14603,7 @@ Subject length lower bound = 65535
 Capture group count = 1
 Max back reference = 1
 Starting code units: a b 
-Subject length lower bound = 0
+Subject length lower bound = 1
 
 /(?|(aaa)|(b))(?1)/I
 Capture group count = 1
@@ -14627,7 +14621,7 @@ Max back reference = 1
 Named capture groups:
   a   1
 Starting code units: a b 
-Subject length lower bound = 0
+Subject length lower bound = 1
 
 /(?|(?'a'aaa)|(?'a'b))(?'a'cccc)\k'a'/I,dupnames
 Capture group count = 2
@@ -14638,7 +14632,7 @@ Named capture groups:
 Options: dupnames
 Starting code units: a b 
 Last code unit = 'c'
-Subject length lower bound = 0
+Subject length lower bound = 5
 
 /ab{3cd/
     ab{3cd
@@ -14811,7 +14805,7 @@ No match
 /abcd/null_context
     abcd\=null_context
  0: abcd
-\= Expect error
+\= Expect error - not allowed together
     abcd\=null_context,find_limits
 ** Not allowed together: find_limits null_context
     abcd\=allusedtext,startchar
@@ -16436,7 +16430,7 @@ Capture group count = 1
 Max back reference = 1
 First code unit = 'a'
 Last code unit = 'b'
-Subject length lower bound = 1
+Subject length lower bound = 2
     ab
  0: ab
  1: a
@@ -16628,7 +16622,7 @@ No match
 /(?<=(?=.){4,5}x)/B
 ------------------------------------------------------------------
         Bra
-        AssertB
+        Assert back
         Reverse
         Assert
         Any
@@ -16920,6 +16914,7 @@ Subject length lower bound = 3
 
 /(*ACCEPT:XX)^abc/I
 Capture group count = 0
+May match empty string
 Subject length lower bound = 0
 
 /abc/replace=xyz
@@ -16933,6 +16928,512 @@ Subject length lower bound = 0
 \= Expect error message
     abc\=null_context
 ** Replacement callouts are not supported with null_context.
+
+/\[()]{65535}()/expand
+Failed: error 197 at offset 131071: too many capturing groups (maximum 65535)
+
+/\[()]{65535}(?<A>)/expand
+Failed: error 197 at offset 131075: too many capturing groups (maximum 65535)
+
+/a(?:(*ACCEPT))??bc/
+    abc
+ 0: abc
+    axy
+ 0: a
+
+/a(*ACCEPT)??bc/
+    abc
+ 0: abc
+    axy
+ 0: a
+
+/a(*ACCEPT:XX)??bc/mark
+    abc
+ 0: abc
+    axy
+ 0: a
+MK: XX
+
+/(*:\)?/
+Failed: error 109 at offset 5: quantifier does not follow a repeatable item
+
+/(*:\Q \E){5}/alt_verbnames
+Failed: error 109 at offset 11: quantifier does not follow a repeatable item
+
+/(?=abc)/I
+Capture group count = 0
+May match empty string
+First code unit = 'a'
+Last code unit = 'c'
+Subject length lower bound = 2
+
+/(?|(X)|(XY))\1abc/I
+Capture group count = 1
+Max back reference = 1
+First code unit = 'X'
+Last code unit = 'c'
+Subject length lower bound = 4
+
+/(?|(a)|(bcde))(c)\2/I
+Capture group count = 2
+Max back reference = 2
+Starting code units: a b 
+Last code unit = 'c'
+Subject length lower bound = 3
+
+/(?|(a)|(bcde))(c)\1/I
+Capture group count = 2
+Max back reference = 1
+Starting code units: a b 
+Last code unit = 'c'
+Subject length lower bound = 2
+
+/(?|(?'A'a)|(?'A'bcde))(?'B'c)\k'B'(?'A')/I,dupnames
+Capture group count = 3
+Max back reference = 2
+Named capture groups:
+  A   1
+  A   3
+  B   2
+Options: dupnames
+Starting code units: a b 
+Last code unit = 'c'
+Subject length lower bound = 3
+
+/(?|(?'A'a)|(?'A'bcde))(?'B'c)\k'A'(?'A')/I,dupnames
+Capture group count = 3
+Max back reference = 3
+Named capture groups:
+  A   1
+  A   3
+  B   2
+Options: dupnames
+Starting code units: a b 
+Last code unit = 'c'
+Subject length lower bound = 2
+
+/((a|)+)+Z/I
+Capture group count = 2
+Starting code units: Z a 
+Last code unit = 'Z'
+Subject length lower bound = 1
+
+/((?=a))[abcd]/I
+Capture group count = 1
+First code unit = 'a'
+Subject length lower bound = 1
+
+/A(?:(*ACCEPT))?B/info
+Capture group count = 0
+First code unit = 'A'
+Subject length lower bound = 1
+
+/(A(*ACCEPT)??B)C/
+    ABC
+ 0: ABC
+ 1: AB
+    AXY 
+ 0: A
+ 1: A
+
+/(?<=(?<=a)b)c.*/I
+Capture group count = 0
+Max lookbehind = 1
+First code unit = 'c'
+Subject length lower bound = 1
+    abc\=ph
+Partial match: c
+\= Expect no match
+    xbc\=ph
+No match
+
+/(?<=ab)c.*/I
+Capture group count = 0
+Max lookbehind = 2
+First code unit = 'c'
+Subject length lower bound = 1
+    abc\=ph
+Partial match: c
+\= Expect no match
+    xbc\=ph
+No match
+
+/(?<=a(?<=a|a)c)/I
+Capture group count = 0
+Max lookbehind = 2
+May match empty string
+Subject length lower bound = 0
+
+/(?<=a(?<=a|ba)c)/I
+Capture group count = 0
+Max lookbehind = 2
+May match empty string
+Subject length lower bound = 0
+
+/(?<=(?<=a)b)(?<!abcd)/I
+Capture group count = 0
+Max lookbehind = 4
+May match empty string
+Subject length lower bound = 0
+
+/(?<=(?<=a)b)(?<!abcd)(?<=(?<=a)bcde)/I
+Capture group count = 0
+Max lookbehind = 4
+May match empty string
+Subject length lower bound = 0
+
+# Addition overflow
+/( {32742} {42})(?<!\1{65481})/
+Failed: error 187 at offset 15: lookbehind assertion is too long
+
+# Multiplication overflow
+/(X{65535})(?<=\1{32770})/
+Failed: error 187 at offset 10: lookbehind assertion is too long
+
+# ---- Non-atomic assertion tests ----
+
+# Expect error: not allowed as a condition
+/(?(*napla:xx)bc)/
+Failed: error 198 at offset 9: atomic assertion expected after (?( or (?(?C)
+
+/\A(*pla:.*\b(\w++))(?>.*?\b\1\b){3}/
+    word1 word3 word1 word2 word3 word2 word2 word1 word3 word4
+No match
+
+/\A(*napla:.*\b(\w++))(?>.*?\b\1\b){3}/
+    word1 word3 word1 word2 word3 word2 word2 word1 word3 word4
+ 0: word1 word3 word1 word2 word3 word2 word2 word1 word3
+ 1: word3
+
+/(*plb:(.)..|(.)...)(\1|\2)/
+    abcdb\=offset=4 
+ 0: b
+ 1: b
+ 2: <unset>
+ 3: b
+    abcda\=offset=4 
+No match
+
+/(*naplb:(.)..|(.)...)(\1|\2)/
+    abcdb\=offset=4 
+ 0: b
+ 1: b
+ 2: <unset>
+ 3: b
+    abcda\=offset=4 
+ 0: a
+ 1: <unset>
+ 2: a
+ 3: a
+    
+/(*non_atomic_positive_lookahead:ab)/B
+------------------------------------------------------------------
+        Bra
+        Non-atomic assert
+        ab
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+ 
+/(*non_atomic_positive_lookbehind:ab)/B 
+------------------------------------------------------------------
+        Bra
+        Non-atomic assert back
+        Reverse
+        ab
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+
+/(*pla:ab+)/B
+------------------------------------------------------------------
+        Bra
+        Assert
+        a
+        b++
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+
+/(*napla:ab+)/B
+------------------------------------------------------------------
+        Bra
+        Non-atomic assert
+        a
+        b+
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+
+/(*napla:)+/
+
+/(*naplb:)+/
+
+/(*napla:^x|^y)/I
+Capture group count = 0
+May match empty string
+Compile options: <none>
+Overall options: anchored
+Starting code units: x y 
+Subject length lower bound = 1
+
+/(*napla:abc|abd)/I
+Capture group count = 0
+May match empty string
+First code unit = 'a'
+Subject length lower bound = 1
+
+/(*napla:a|(.)(*ACCEPT)zz)\1../
+    abcd
+ 0: abc
+ 1: a
+    
+/(*napla:a(*ACCEPT)zz|(.))\1../
+    abcd
+ 0: bcd
+ 1: b
+    
+/(*napla:a|(*COMMIT)(.))\1\1/
+    aabc
+ 0: aa
+ 1: a
+\= Expect no match     
+    abbc   
+No match
+
+/(*napla:a|(.))\1\1/
+    aabc
+ 0: aa
+ 1: a
+    abbc   
+ 0: bb
+ 1: b
+
+# ----
+
+# Expect error (recursion => not fixed length)
+/(\2)((?=(?<=\1)))/
+Failed: error 125 at offset 8: lookbehind assertion is not fixed length
+
+/c*+(?<=[bc])/
+    abc\=ph
+Partial match: c
+    ab\=ph
+Partial match: 
+    abc\=ps
+ 0: c
+    ab\=ps
+ 0: 
+
+/c++(?<=[bc])/
+    abc\=ph
+Partial match: c
+    ab\=ph
+Partial match: 
+
+/(?<=(?=.(?<=x)))/
+    abx
+ 0: 
+    ab\=ph
+Partial match: 
+    bxyz 
+ 0: 
+    xyz
+ 0: 
+    
+/\z/
+   abc\=ph
+Partial match: 
+   abc\=ps 
+ 0: 
+   
+/\Z/
+   abc\=ph
+Partial match: 
+   abc\=ps 
+ 0: 
+   abc\n\=ph
+Partial match: \x0a
+   abc\n\=ps
+ 0: 
+
+/(?![ab]).*/
+    ab\=ph
+Partial match: 
+
+/c*+/
+    ab\=ph,offset=2
+Partial match: 
+
+/\A\s*(a|(?:[^`]{28500}){4})/I
+Capture group count = 1
+Max lookbehind = 1
+Compile options: <none>
+Overall options: anchored
+Subject length lower bound = 1
+    a
+ 0: a
+ 1: a
+
+/\A\s*((?:[^`]{28500}){4})/I
+Capture group count = 1
+Max lookbehind = 1
+Compile options: <none>
+Overall options: anchored
+Subject length lower bound = 65535
+
+/\A\s*((?:[^`]{28500}){4}|a)/I
+Capture group count = 1
+Max lookbehind = 1
+Compile options: <none>
+Overall options: anchored
+Subject length lower bound = 1
+    a
+ 0: a
+ 1: a
+
+/(?<A>a)(?(<A>)b)((?<=b).*)/B
+------------------------------------------------------------------
+        Bra
+        CBra 1
+        a
+        Ket
+        Cond
+      1 Cond ref
+        b
+        Ket
+        CBra 2
+        Assert back
+        Reverse
+        b
+        Ket
+        Any*+
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+
+/(?(1)b)((?<=b).*)/B
+------------------------------------------------------------------
+        Bra
+        Cond
+      1 Cond ref
+        b
+        Ket
+        CBra 1
+        Assert back
+        Reverse
+        b
+        Ket
+        Any*+
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+
+/(?(R1)b)((?<=b).*)/B
+------------------------------------------------------------------
+        Bra
+        Cond
+        Cond recurse 1
+        b
+        Ket
+        CBra 1
+        Assert back
+        Reverse
+        b
+        Ket
+        Any*+
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+
+/(?(DEFINE)b)((?<=b).*)/B
+------------------------------------------------------------------
+        Bra
+        Cond
+        Cond false
+        b
+        Ket
+        CBra 1
+        Assert back
+        Reverse
+        b
+        Ket
+        Any*+
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+
+/(?(VERSION=10.4)b)((?<=b).*)/B
+------------------------------------------------------------------
+        Bra
+        Cond
+        Cond false
+        b
+        Ket
+        CBra 1
+        Assert back
+        Reverse
+        b
+        Ket
+        Any*+
+        Ket
+        Ket
+        End
+------------------------------------------------------------------
+
+/[aA]b[cC]/IB
+------------------------------------------------------------------
+        Bra
+     /i a
+        b
+     /i c
+        Ket
+        End
+------------------------------------------------------------------
+Capture group count = 0
+First code unit = 'a' (caseless)
+Last code unit = 'c' (caseless)
+Subject length lower bound = 3
+
+/[cc]abcd/I
+Capture group count = 0
+First code unit = 'c'
+Last code unit = 'd'
+Subject length lower bound = 5
+
+/[Cc]abcd/I
+Capture group count = 0
+First code unit = 'C' (caseless)
+Last code unit = 'd'
+Subject length lower bound = 5
+
+/[c]abcd/I
+Capture group count = 0
+First code unit = 'c'
+Last code unit = 'd'
+Subject length lower bound = 5
+
+/(?:c|C)abcd/I
+Capture group count = 0
+First code unit = 'C' (caseless)
+Last code unit = 'd'
+Subject length lower bound = 5
+
+/(a)?a/I
+Capture group count = 1
+Starting code units: a 
+Last code unit = 'a'
+Subject length lower bound = 1
+    manm
+ 0: a
 
 # End of testinput2
 Error -70: PCRE2_ERROR_BADDATA (unknown error number)

@@ -196,6 +196,8 @@ static struct regression_test_case regression_test_cases[] = {
 	{ CMUP, A, 0, 0, "\xf0\x90\x90\xa8{2}", "\xf0\x90\x90\x80#\xf0\x90\x90\xa8\xf0\x90\x90\x80" },
 	{ CMUP, A, 0, 0, "\xe1\xbd\xb8\xe1\xbf\xb8", "\xe1\xbf\xb8\xe1\xbd\xb8" },
 	{ M, A, 0, 0, "[3-57-9]", "5" },
+	{ PCRE2_AUTO_CALLOUT, A, 0, 0, "12345678901234567890123456789012345678901234567890123456789012345678901234567890",
+		"12345678901234567890123456789012345678901234567890123456789012345678901234567890" },
 
 	/* Assertions. */
 	{ MU, A, 0, 0, "\\b[^A]", "A_B#" },
@@ -1770,7 +1772,7 @@ static int regression_tests(void)
 	}
 }
 
-#if defined SUPPORT_UNICODE && (defined SUPPORT_PCRE2_8 || defined SUPPORT_PCRE2_16 || defined SUPPORT_PCRE2_32)
+#if defined SUPPORT_UNICODE
 
 static int check_invalid_utf_result(int pattern_index, const char *type, int result,
 	int match_start, int match_end, PCRE2_SIZE *ovector)
@@ -1803,7 +1805,7 @@ static int check_invalid_utf_result(int pattern_index, const char *type, int res
 	return 0;
 }
 
-#endif /* SUPPORT_UNICODE && (SUPPORT_PCRE2_8 || SUPPORT_PCRE2_16 || SUPPORT_PCRE2_32) */
+#endif /* SUPPORT_UNICODE */
 
 #if defined SUPPORT_UNICODE && defined SUPPORT_PCRE2_8
 
@@ -1864,53 +1866,52 @@ static struct invalid_utf8_regression_test_case invalid_utf8_regression_test_cas
 	{ UDA, CI, 0, 0, 0, 0, 1, { ".", NULL }, "\x7f" },
 
 	{ UDA, CPI, 4, 0, 0, 4, 4, { "\\B", NULL }, "\xf4\x8f\xbf\xbf#" },
-	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "\xf4\xa0\x80\x80#" },
-	{ UDA, CPI, 4, 1, 0, -1, -1, { "\\B", "\\b" }, "\xf4\x8f\xbf\xbf#" },
+	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "\xf4\xa0\x80\x80\xf4\xa0\x80\x80" },
+	{ UDA, CPI, 4, 1, 1, -1, -1, { "\\B", "\\b" }, "\xf4\x8f\xbf\xbf\xf4\x8f\xbf\xbf" },
 	{ UDA, CPI, 4, 0, 0, 4, 4, { "\\B", NULL }, "#\xef\xbf\xbf#" },
 	{ UDA, CPI, 4, 0, 0, 4, 4, { "\\B", NULL }, "#\xe0\xa0\x80#" },
 	{ UDA, CPI, 4, 0, 0, 4, 4, { "\\B", NULL }, "\xf0\x90\x80\x80#" },
 	{ UDA, CPI, 4, 0, 0, 4, 4, { "\\B", NULL }, "\xf3\xbf\xbf\xbf#" },
-	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "\xf0\x8f\xbf\xbf#" },
-	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "\xf5\x80\x80\x80#" },
-	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "\xf4\x90\x80\x80#" },
-	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "\xf4\x8f\xbf\xff#" },
-	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "\xf4\x8f\xff\xbf#" },
-	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "\xef\x80\x80\x80#" },
-	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "\x80\x80\x80\x80#" },
-	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "#\xe0\x9f\xbf#" },
-	{ UDA, CPI, 4, 2, 0, -1, -1, { "\\B", "\\b" }, "#\xe0\xa0\x80#" },
-	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "#\xf0\x80\x80#" },
-	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "#\xed\xa0\x80#" },
+	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "\xf0\x8f\xbf\xbf\xf0\x8f\xbf\xbf" },
+	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "\xf5\x80\x80\x80\xf5\x80\x80\x80" },
+	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "\xf4\x90\x80\x80\xf4\x90\x80\x80" },
+	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "\xf4\x8f\xbf\xff\xf4\x8f\xbf\xff" },
+	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "\xf4\x8f\xff\xbf\xf4\x8f\xff\xbf" },
+	{ UDA, CPI, 4, 0, 1, -1, -1, { "\\B", "\\b" }, "\xef\x80\x80\x80\xef\x80\x80" },
+	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "\x80\x80\x80\x80\x80\x80\x80\x80" },
+	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "#\xe0\x9f\xbf\xe0\x9f\xbf#" },
+	{ UDA, CPI, 4, 2, 2, -1, -1, { "\\B", "\\b" }, "#\xe0\xa0\x80\xe0\xa0\x80#" },
+	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "#\xf0\x80\x80\xf0\x80\x80#" },
+	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "#\xed\xa0\x80\xed\xa0\x80#" },
 	{ UDA, CPI, 4, 0, 0, 4, 4, { "\\B", NULL }, "##\xdf\xbf#" },
 	{ UDA, CPI, 4, 2, 0, 2, 2, { "\\B", NULL }, "##\xdf\xbf#" },
 	{ UDA, CPI, 4, 0, 0, 4, 4, { "\\B", NULL }, "##\xc2\x80#" },
 	{ UDA, CPI, 4, 2, 0, 2, 2, { "\\B", NULL }, "##\xc2\x80#" },
-	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "##\xc1\xbf#" },
-	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "##\xdf\xc0#" },
-	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "##\xe0\x80#" },
-	{ UDA, CPI, 4, 2, 0, -1, -1, { "\\B", "\\b" }, "##\xe0\x80#" },
+	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "##\xc1\xbf\xc1\xbf##" },
+	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "##\xdf\xc0\xdf\xc0##" },
+	{ UDA, CPI, 4, 0, 0, -1, -1, { "\\B", "\\b" }, "##\xe0\x80\xe0\x80##" },
 
 	{ UDA, CPI, 3, 0, 0, 3, 3, { "\\B", NULL }, "\xef\xbf\xbf#" },
 	{ UDA, CPI, 3, 0, 0, 3, 3, { "\\B", NULL }, "\xe0\xa0\x80#" },
-	{ UDA, CPI, 3, 0, 0, -1, -1, { "\\B", "\\b" }, "\xe0\x9f\xbf#" },
-	{ UDA, CPI, 3, 1, 0, -1, -1, { "\\B", "\\b" }, "\xef\xbf\xbf#" },
-	{ UDA, CPI, 3, 0, 0, -1, -1, { "\\B", "\\b" }, "\xdf\x80\x80#" },
-	{ UDA, CPI, 3, 0, 0, -1, -1, { "\\B", "\\b" }, "\xef\xbf\xff#" },
-	{ UDA, CPI, 3, 0, 0, -1, -1, { "\\B", "\\b" }, "\xef\xff\xbf#" },
-	{ UDA, CPI, 3, 0, 0, -1, -1, { "\\B", "\\b" }, "\xed\xbf\xbf#" },
+	{ UDA, CPI, 3, 0, 0, -1, -1, { "\\B", "\\b" }, "\xe0\x9f\xbf\xe0\x9f\xbf" },
+	{ UDA, CPI, 3, 1, 1, -1, -1, { "\\B", "\\b" }, "\xef\xbf\xbf\xef\xbf\xbf" },
+	{ UDA, CPI, 3, 0, 1, -1, -1, { "\\B", "\\b" }, "\xdf\x80\x80\xdf\x80" },
+	{ UDA, CPI, 3, 0, 0, -1, -1, { "\\B", "\\b" }, "\xef\xbf\xff\xef\xbf\xff" },
+	{ UDA, CPI, 3, 0, 0, -1, -1, { "\\B", "\\b" }, "\xef\xff\xbf\xef\xff\xbf" },
+	{ UDA, CPI, 3, 0, 0, -1, -1, { "\\B", "\\b" }, "\xed\xbf\xbf\xed\xbf\xbf" },
 
 	{ UDA, CPI, 2, 0, 0, 2, 2, { "\\B", NULL }, "\xdf\xbf#" },
 	{ UDA, CPI, 2, 0, 0, 2, 2, { "\\B", NULL }, "\xc2\x80#" },
-	{ UDA, CPI, 2, 1, 0, -1, -1, { "\\B", "\\b" }, "\xdf\xbf#" },
-	{ UDA, CPI, 2, 0, 0, -1, -1, { "\\B", "\\b" }, "\xc1\xbf#" },
-	{ UDA, CPI, 2, 0, 0, -1, -1, { "\\B", "\\b" }, "\xe0\x80#" },
-	{ UDA, CPI, 2, 0, 0, -1, -1, { "\\B", "\\b" }, "\xdf\xff#" },
-	{ UDA, CPI, 2, 0, 0, -1, -1, { "\\B", "\\b" }, "\xff\xbf#" },
+	{ UDA, CPI, 2, 1, 1, -1, -1, { "\\B", "\\b" }, "\xdf\xbf\xdf\xbf" },
+	{ UDA, CPI, 2, 0, 0, -1, -1, { "\\B", "\\b" }, "\xc1\xbf\xc1\xbf" },
+	{ UDA, CPI, 2, 0, 0, -1, -1, { "\\B", "\\b" }, "\xe0\x80\xe0\x80" },
+	{ UDA, CPI, 2, 0, 0, -1, -1, { "\\B", "\\b" }, "\xdf\xff\xdf\xff" },
+	{ UDA, CPI, 2, 0, 0, -1, -1, { "\\B", "\\b" }, "\xff\xbf\xff\xbf" },
 
 	{ UDA, CPI, 1, 0, 0, 1, 1, { "\\B", NULL }, "\x7f#" },
 	{ UDA, CPI, 1, 0, 0, 1, 1, { "\\B", NULL }, "\x01#" },
-	{ UDA, CPI, 1, 0, 0, -1, -1, { "\\B", "\\b" }, "\x80#" },
-	{ UDA, CPI, 1, 0, 0, -1, -1, { "\\B", "\\b" }, "\x80#" },
+	{ UDA, CPI, 1, 0, 0, -1, -1, { "\\B", "\\b" }, "\x80\x80" },
+	{ UDA, CPI, 1, 0, 0, -1, -1, { "\\B", "\\b" }, "\xb0\xb0" },
 
 	{ UDA | PCRE2_CASELESS, CPI, 0, 0, 0, 0, 2, { "(.)\\1", NULL }, "aA" },
 	{ UDA | PCRE2_CASELESS, CPI, 0, 0, 0, -1, -1, { "(.)\\1", NULL }, "a\xff" },
@@ -2107,10 +2108,10 @@ static PCRE2_UCHAR16 nothashmark16[] = { '[', '^', '#', ']', 0 };
 static PCRE2_UCHAR16 afternl16[] = { '^', '\\', 'W', 0 };
 static PCRE2_UCHAR16 generic16[] = { '#', 0xd800, 0xdc00, '#', 0 };
 static PCRE2_UCHAR16 test16_1[] = { 0xd7ff, 0xe000, 0xffff, 0x01, '#', 0 };
-static PCRE2_UCHAR16 test16_2[] = { 0xd800, 0xdc00, '#', 0 };
-static PCRE2_UCHAR16 test16_3[] = { 0xdbff, 0xdfff, '#', 0 };
-static PCRE2_UCHAR16 test16_4[] = { 0xd800, 0xdbff, '#', 0 };
-static PCRE2_UCHAR16 test16_5[] = { '#', 0xd800, '#', 0 };
+static PCRE2_UCHAR16 test16_2[] = { 0xd800, 0xdc00, 0xd800, 0xdc00, 0 };
+static PCRE2_UCHAR16 test16_3[] = { 0xdbff, 0xdfff, 0xdbff, 0xdfff, 0 };
+static PCRE2_UCHAR16 test16_4[] = { 0xd800, 0xdbff, 0xd800, 0xdbff, 0 };
+static PCRE2_UCHAR16 test16_5[] = { '#', 0xd800, 0xdc00, '#', 0 };
 static PCRE2_UCHAR16 test16_6[] = { 'a', 'A', 0xdc28, 0 };
 static PCRE2_UCHAR16 test16_7[] = { 0xd801, 0xdc00, 0xd801, 0xdc28, 0 };
 static PCRE2_UCHAR16 test16_8[] = { '#', 0xd800, 0xdc00, 0 };
@@ -2125,10 +2126,10 @@ static struct invalid_utf16_regression_test_case invalid_utf16_regression_test_c
 	{ UDA, CI, 2, 0, 0, 2, 3, { allany16, NULL }, test16_1 },
 	{ UDA, CI, 3, 0, 0, 3, 4, { allany16, NULL }, test16_1 },
 	{ UDA, CI, 0, 0, 0, 0, 2, { allany16, NULL }, test16_2 },
-	{ UDA, CI, 0, 0, 2, -1, -1, { allany16, NULL }, test16_2 },
+	{ UDA, CI, 0, 0, 3, -1, -1, { allany16, NULL }, test16_2 },
 	{ UDA, CI, 1, 0, 0, -1, -1, { allany16, NULL }, test16_2 },
 	{ UDA, CI, 0, 0, 0, 0, 2, { allany16, NULL }, test16_3 },
-	{ UDA, CI, 0, 0, 2, -1, -1, { allany16, NULL }, test16_3 },
+	{ UDA, CI, 0, 0, 3, -1, -1, { allany16, NULL }, test16_3 },
 	{ UDA, CI, 1, 0, 0, -1, -1, { allany16, NULL }, test16_3 },
 
 	{ UDA, CPI, 1, 0, 0, 1, 1, { non_word_boundary16, NULL }, test16_1 },
@@ -2137,8 +2138,8 @@ static struct invalid_utf16_regression_test_case invalid_utf16_regression_test_c
 	{ UDA, CPI, 4, 0, 0, 4, 4, { non_word_boundary16, NULL }, test16_1 },
 	{ UDA, CPI, 2, 0, 0, 2, 2, { non_word_boundary16, NULL }, test16_2 },
 	{ UDA, CPI, 2, 0, 0, 2, 2, { non_word_boundary16, NULL }, test16_3 },
-	{ UDA, CPI, 2, 1, 0, -1, -1, { non_word_boundary16, word_boundary16 }, test16_2 },
-	{ UDA, CPI, 2, 1, 0, -1, -1, { non_word_boundary16, word_boundary16 }, test16_3 },
+	{ UDA, CPI, 2, 1, 1, -1, -1, { non_word_boundary16, word_boundary16 }, test16_2 },
+	{ UDA, CPI, 2, 1, 1, -1, -1, { non_word_boundary16, word_boundary16 }, test16_3 },
 	{ UDA, CPI, 2, 0, 0, -1, -1, { non_word_boundary16, word_boundary16 }, test16_4 },
 	{ UDA, CPI, 2, 0, 0, -1, -1, { non_word_boundary16, word_boundary16 }, test16_5 },
 
@@ -2313,32 +2314,45 @@ static PCRE2_UCHAR32 backreference32[] = { '(', '.', ')', '\\', '1', 0 };
 static PCRE2_UCHAR32 grapheme32[] = { '\\', 'X', 0 };
 static PCRE2_UCHAR32 nothashmark32[] = { '[', '^', '#', ']', 0 };
 static PCRE2_UCHAR32 afternl32[] = { '^', '\\', 'W', 0 };
-static PCRE2_UCHAR32 test32_1[] = { 0x10ffff, 0x10ffff, 0x110000, 0x10ffff, 0 };
-static PCRE2_UCHAR32 test32_2[] = { 'a', 'A', 0x110000, 0 };
-static PCRE2_UCHAR32 test32_3[] = { '#', 0x10ffff, 0x110000, 0 };
-static PCRE2_UCHAR32 test32_4[] = { ' ', 0x2028, '#', 0 };
-static PCRE2_UCHAR32 test32_5[] = { ' ', 0x110000, 0x2028, '#', 0 };
+static PCRE2_UCHAR32 test32_1[] = { 0x10ffff, 0x10ffff, 0x110000, 0x110000, 0x10ffff, 0 };
+static PCRE2_UCHAR32 test32_2[] = { 0xd7ff, 0xe000, 0xd800, 0xdfff, 0xe000, 0xdfff, 0xd800, 0 };
+static PCRE2_UCHAR32 test32_3[] = { 'a', 'A', 0x110000, 0 };
+static PCRE2_UCHAR32 test32_4[] = { '#', 0x10ffff, 0x110000, 0 };
+static PCRE2_UCHAR32 test32_5[] = { ' ', 0x2028, '#', 0 };
+static PCRE2_UCHAR32 test32_6[] = { ' ', 0x110000, 0x2028, '#', 0 };
 
 static struct invalid_utf32_regression_test_case invalid_utf32_regression_test_cases[] = {
 	{ UDA, CI, 0, 0, 0, 0, 1, { allany32, NULL }, test32_1 },
 	{ UDA, CI, 2, 0, 0, -1, -1, { allany32, NULL }, test32_1 },
+	{ UDA, CI, 0, 0, 0, 0, 1, { allany32, NULL }, test32_2 },
+	{ UDA, CI, 1, 0, 0, 1, 2, { allany32, NULL }, test32_2 },
+	{ UDA, CI, 2, 0, 0, -1, -1, { allany32, NULL }, test32_2 },
+	{ UDA, CI, 3, 0, 0, -1, -1, { allany32, NULL }, test32_2 },
 
 	{ UDA, CPI, 1, 0, 0, 1, 1, { non_word_boundary32, NULL }, test32_1 },
-	{ UDA, CPI, 2, 0, 0, -1, -1, { non_word_boundary32, word_boundary32 }, test32_1 },
 	{ UDA, CPI, 3, 0, 0, -1, -1, { non_word_boundary32, word_boundary32 }, test32_1 },
+	{ UDA, CPI, 1, 0, 0, 1, 1, { non_word_boundary32, NULL }, test32_2 },
+	{ UDA, CPI, 3, 0, 0, -1, -1, { non_word_boundary32, word_boundary32 }, test32_2 },
+	{ UDA, CPI, 6, 0, 0, -1, -1, { non_word_boundary32, word_boundary32 }, test32_2 },
 
-	{ UDA | PCRE2_CASELESS, CPI, 0, 0, 0, 0, 2, { backreference32, NULL }, test32_2 },
-	{ UDA | PCRE2_CASELESS, CPI, 1, 0, 0, -1, -1, { backreference32, NULL }, test32_2 },
+	{ UDA | PCRE2_CASELESS, CPI, 0, 0, 0, 0, 2, { backreference32, NULL }, test32_3 },
+	{ UDA | PCRE2_CASELESS, CPI, 1, 0, 0, -1, -1, { backreference32, NULL }, test32_3 },
 
 	{ UDA, CPI, 0, 0, 0, 0, 1, { grapheme32, NULL }, test32_1 },
 	{ UDA, CPI, 2, 0, 0, -1, -1, { grapheme32, NULL }, test32_1 },
+	{ UDA, CPI, 1, 0, 0, 1, 2, { grapheme32, NULL }, test32_2 },
+	{ UDA, CPI, 2, 0, 0, -1, -1, { grapheme32, NULL }, test32_2 },
+	{ UDA, CPI, 3, 0, 0, -1, -1, { grapheme32, NULL }, test32_2 },
+	{ UDA, CPI, 4, 0, 0, 4, 5, { grapheme32, NULL }, test32_2 },
 
-	{ UDA, CPI, 0, 0, 0, -1, -1, { nothashmark32, NULL }, test32_3 },
-	{ UDA, CPI, 1, 0, 0, 1, 2, { nothashmark32, NULL }, test32_3 },
-	{ UDA, CPI, 2, 0, 0, -1, -1, { nothashmark32, NULL }, test32_3 },
+	{ UDA, CPI, 0, 0, 0, -1, -1, { nothashmark32, NULL }, test32_4 },
+	{ UDA, CPI, 1, 0, 0, 1, 2, { nothashmark32, NULL }, test32_4 },
+	{ UDA, CPI, 2, 0, 0, -1, -1, { nothashmark32, NULL }, test32_4 },
+	{ UDA, CPI, 1, 0, 0, 1, 2, { nothashmark32, NULL }, test32_2 },
+	{ UDA, CPI, 2, 0, 0, -1, -1, { nothashmark32, NULL }, test32_2 },
 
-	{ PCRE2_UTF | PCRE2_MULTILINE, CI, 1, 0, 0, 2, 3, { afternl32, NULL }, test32_4 },
-	{ PCRE2_UTF | PCRE2_MULTILINE, CI, 1, 0, 0, 3, 4, { afternl32, NULL }, test32_5 },
+	{ PCRE2_UTF | PCRE2_MULTILINE, CI, 1, 0, 0, 2, 3, { afternl32, NULL }, test32_5 },
+	{ PCRE2_UTF | PCRE2_MULTILINE, CI, 1, 0, 0, 3, 4, { afternl32, NULL }, test32_6 },
 
 	{ 0, 0, 0, 0, 0, 0, 0, { NULL, NULL }, NULL }
 };

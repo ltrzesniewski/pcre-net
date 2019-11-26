@@ -474,7 +474,6 @@ Subject length lower bound = 0
 Capture group count = 0
 Compile options: no_start_optimize utf
 Overall options: anchored no_start_optimize utf
-Subject length lower bound = 0
 
 /()()()()()()()()()()
  ()()()()()()()()()()
@@ -4018,7 +4017,7 @@ MK: a\x{12345}b\x{09}(d)c
 ------------------------------------------------------------------
         Bra
         \b
-        AssertB
+        Assert back
         Reverse
         prop Xwd
         Ket
@@ -4197,7 +4196,7 @@ Failed: error 125 at offset 2: lookbehind assertion is not fixed length
 ------------------------------------------------------------------
         Bra
         ^
-        AssertB not
+        Assert back not
         Assert
         \x{10385c}
         Ket
@@ -4829,7 +4828,7 @@ MK: ABC
 /(?<!)(*sr:)/B
 ------------------------------------------------------------------
         Bra
-        AssertB not
+        Assert back not
         Ket
         Script run
         Ket
@@ -4840,7 +4839,7 @@ MK: ABC
 /(?<=abc(?=X(*sr:BXY)CCC)XBXYCCC)./B
 ------------------------------------------------------------------
         Bra
-        AssertB
+        Assert back
         Reverse
         abc
         Assert
@@ -4894,6 +4893,12 @@ MK: ABC
  0: \x{1d7ce}\x{1d7cf},,
     A\x{1d7ce}BC           Latin fancy-common-digit Latin Latin
  0: A\x{1d7ce}BC
+    
+# Some Unicode 12.1.0 new script characters
+
+/\p{Elymaic}\p{Nandinagari}\p{Nyiakeng_Puachue_Hmong}\p{Wancho}/utf
+    \x{10fe5}\x{119AC}\x{1E10E}\x{1E2D1} 
+ 0: \x{10fe5}\x{119ac}\x{1e10e}\x{1e2d1}
 
 # ------- 
 
