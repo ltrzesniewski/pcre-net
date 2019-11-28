@@ -102,36 +102,15 @@ namespace PCRE
             yield return match;
 
             var baseOptions = settings.AdditionalOptions.ToPatternOptions() | PcreConstants.NO_UTF_CHECK;
-            var forceAdvance = false;
 
             while (true)
             {
                 var startIndex = match.GetStartOfNextMatchIndex();
-                var forceNonEmptyMatch = match.Length == 0;
-
-                if (forceAdvance)
-                {
-                    forceAdvance = false;
-
-                    if (startIndex == match.Index)
-                    {
-                        ++startIndex;
-                        forceNonEmptyMatch = false;
-                    }
-                }
-
-                var options = baseOptions | (forceNonEmptyMatch ? PcreConstants.NOTEMPTY_ATSTART : 0);
+                var options = baseOptions | (match.Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0);
 
                 match = InternalRegex.Match(subject, settings, startIndex, options);
                 if (!match.Success)
                     yield break;
-
-                if (forceNonEmptyMatch && match.Length == 0 && match.Index == startIndex)
-                {
-                    // Unexpectedly got an empty match twice at the same position :'(
-                    forceAdvance = true;
-                    continue;
-                }
 
                 yield return match;
             }
