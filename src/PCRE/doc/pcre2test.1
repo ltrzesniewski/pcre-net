@@ -1,4 +1,4 @@
-.TH PCRE2TEST 1 "11 March 2019" "PCRE 10.33"
+.TH PCRE2TEST 1 "30 July 2019" "PCRE 10.34"
 .SH NAME
 pcre2test - a program for testing Perl-compatible regular expressions.
 .SH SYNOPSIS
@@ -202,10 +202,16 @@ compiled pattern is given after compilation.
 Behave as if each pattern line has the \fBjit\fP modifier; after successful
 compilation, each pattern is passed to the just-in-time compiler, if available.
 .TP 10
+\fB-jitfast\fP
+Behave as if each pattern line has the \fBjitfast\fP modifier; after
+successful compilation, each pattern is passed to the just-in-time compiler, if
+available, and each subject line is passed directly to the JIT matcher via its
+"fast path".
+.TP 10
 \fB-jitverify\fP
 Behave as if each pattern line has the \fBjitverify\fP modifier; after
 successful compilation, each pattern is passed to the just-in-time compiler, if
-available, and the use of JIT is verified.
+available, and the use of JIT for matching is verified.
 .TP 10
 \fB-LM\fP
 List modifiers: write a list of available pattern and subject modifiers to the
@@ -572,6 +578,7 @@ for a description of the effects of these options.
       firstline                 set PCRE2_FIRSTLINE
       literal                   set PCRE2_LITERAL
       match_line                set PCRE2_EXTRA_MATCH_LINE
+      match_invalid_utf         set PCRE2_MATCH_INVALID_UTF
       match_unset_backref       set PCRE2_MATCH_UNSET_BACKREF
       match_word                set PCRE2_EXTRA_MATCH_WORD
   /m  multiline                 set PCRE2_MULTILINE
@@ -694,7 +701,9 @@ options, the line is omitted. "First code unit" is where any match must start;
 if there is more than one they are listed as "starting code units". "Last code
 unit" is the last literal code unit that must be present in any match. This is
 not necessarily the last character. These lines are omitted if no starting or
-ending code units are recorded.
+ending code units are recorded. The subject length line is omitted when
+\fBno_start_optimize\fP is set because the minimum length is not calculated
+when it can never be used.
 .P
 The \fBframesize\fP modifier shows the size, in bytes, of the storage frames
 used by \fBpcre2_match()\fP for handling backtracking. The size depends on the
@@ -1217,22 +1226,27 @@ well as the main matched substring. In each case the remainder is output on the
 following line with a plus character following the capture number.
 .P
 The \fBallusedtext\fP modifier requests that all the text that was consulted
-during a successful pattern match by the interpreter should be shown. This
-feature is not supported for JIT matching, and if requested with JIT it is
-ignored (with a warning message). Setting this modifier affects the output if
-there is a lookbehind at the start of a match, or a lookahead at the end, or if
-\eK is used in the pattern. Characters that precede or follow the start and end
-of the actual match are indicated in the output by '<' or '>' characters
-underneath them. Here is an example:
+during a successful pattern match by the interpreter should be shown, for both
+full and partial matches. This feature is not supported for JIT matching, and
+if requested with JIT it is ignored (with a warning message). Setting this
+modifier affects the output if there is a lookbehind at the start of a match,
+or, for a complete match, a lookahead at the end, or if \eK is used in the
+pattern. Characters that precede or follow the start and end of the actual
+match are indicated in the output by '<' or '>' characters underneath them.
+Here is an example:
 .sp
     re> /(?<=pqr)abc(?=xyz)/
   data> 123pqrabcxyz456\e=allusedtext
    0: pqrabcxyz
       <<<   >>>
+  data> 123pqrabcxy\e=ph,allusedtext
+  Partial match: pqrabcxy
+                 <<<
 .sp
-This shows that the matched string is "abc", with the preceding and following
-strings "pqr" and "xyz" having been consulted during the match (when processing
-the assertions).
+The first, complete match shows that the matched string is "abc", with the
+preceding and following strings "pqr" and "xyz" having been consulted during
+the match (when processing the assertions). The partial match can indicate only
+the preceding string.
 .P
 The \fBstartchar\fP modifier requests that the starting character for the match
 be indicated, if it is different to the start of the matched string. The only
@@ -1745,7 +1759,7 @@ restart the match with additional subject data by means of the
 \fBdfa_restart\fP modifier. For example:
 .sp
     re> /^\ed?\ed(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\ed\ed$/
-  data> 23ja\e=P,dfa
+  data> 23ja\e=ps,dfa
   Partial match: 23ja
   data> n05\e=dfa,dfa_restart
    0: n05
@@ -2059,6 +2073,6 @@ Cambridge, England.
 .rs
 .sp
 .nf
-Last updated: 11 March 2019
+Last updated: 30 July 2019
 Copyright (c) 1997-2019 University of Cambridge.
 .fi

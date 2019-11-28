@@ -170,7 +170,9 @@ commented out the original, but kept it around just in case. */
 #endif
 
 /* VC and older compilers don't support %td or %zu, and even some that claim to
-be C99 don't support it (hence DISABLE_PERCENT_ZT). */
+be C99 don't support it (hence DISABLE_PERCENT_ZT). There are some non-C99
+environments where %lu gives a warning with 32-bit pointers. As there doesn't
+seem to be an easy way round this, just live with it (the cases are rare). */
 
 #if defined(_MSC_VER) || !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L || defined(DISABLE_PERCENT_ZT)
 #define PTR_FORM "lu"
@@ -211,6 +213,12 @@ be C99 don't support it (hence DISABLE_PERCENT_ZT). */
 #define PATSTACKSIZE 20           /* Pattern stack for save/restore testing */
 #define REPLACE_MODSIZE 100       /* Field for reading 8-bit replacement */
 #define VERSION_SIZE 64           /* Size of buffer for the version strings */
+
+/* Default JIT compile options */
+
+#define JIT_DEFAULT (PCRE2_JIT_COMPLETE|\
+                     PCRE2_JIT_PARTIAL_SOFT|\
+                     PCRE2_JIT_PARTIAL_HARD)
 
 /* Make sure the buffer into which replacement strings are copied is big enough
 to hold them as 32-bit code units. */
@@ -664,6 +672,7 @@ static modstruct modlist[] = {
   { "literal",                    MOD_PAT,  MOD_OPT, PCRE2_LITERAL,              PO(options) },
   { "locale",                     MOD_PAT,  MOD_STR, LOCALESIZE,                 PO(locale) },
   { "mark",                       MOD_PNDP, MOD_CTL, CTL_MARK,                   PO(control) },
+  { "match_invalid_utf",          MOD_PAT,  MOD_OPT, PCRE2_MATCH_INVALID_UTF,    PO(options) },
   { "match_limit",                MOD_CTM,  MOD_INT, 0,                          MO(match_limit) },
   { "match_line",                 MOD_CTC,  MOD_OPT, PCRE2_EXTRA_MATCH_LINE,     CO(extra_options) },
   { "match_unset_backref",        MOD_PAT,  MOD_OPT, PCRE2_MATCH_UNSET_BACKREF,  PO(options) },
@@ -3262,6 +3271,11 @@ return 0;
 
 
 
+/* This function is no longer used. Keep it around for a while, just in case it
+needs to be re-instated. */
+
+#ifdef NEVERNEVERNEVER
+
 /*************************************************
 *         Move back by so many characters        *
 *************************************************/
@@ -3306,6 +3320,7 @@ else  /* 16-bit mode */
   return pp - (PCRE2_SPTR16)subject;
   }
 }
+#endif  /* NEVERNEVERNEVER */
 
 
 
@@ -4136,7 +4151,7 @@ static void
 show_compile_options(uint32_t options, const char *before, const char *after)
 {
 if (options == 0) fprintf(outfile, "%s <none>%s", before, after);
-else fprintf(outfile, "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
+else fprintf(outfile, "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
   before,
   ((options & PCRE2_ALT_BSUX) != 0)? " alt_bsux" : "",
   ((options & PCRE2_ALT_CIRCUMFLEX) != 0)? " alt_circumflex" : "",
@@ -4153,6 +4168,7 @@ else fprintf(outfile, "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%
   ((options & PCRE2_EXTENDED_MORE) != 0)? " extended_more" : "",
   ((options & PCRE2_FIRSTLINE) != 0)? " firstline" : "",
   ((options & PCRE2_LITERAL) != 0)? " literal" : "",
+  ((options & PCRE2_MATCH_INVALID_UTF) != 0)? " match_invalid_utf" : "",
   ((options & PCRE2_MATCH_UNSET_BACKREF) != 0)? " match_unset_backref" : "",
   ((options & PCRE2_MULTILINE) != 0)? " multiline" : "",
   ((options & PCRE2_NEVER_BACKSLASH_C) != 0)? " never_backslash_c" : "",
@@ -4696,7 +4712,8 @@ if ((pat_patctl.control & CTL_INFO) != 0)
       }
     }
 
-  fprintf(outfile, "Subject length lower bound = %d\n", minlength);
+  if ((FLD(compiled_code, overall_options) & PCRE2_NO_START_OPTIMIZE) == 0)
+    fprintf(outfile, "Subject length lower bound = %d\n", minlength);
 
   if (pat_patctl.jit != 0 && (pat_patctl.control & CTL_JITVERIFY) != 0)
     {
@@ -4867,7 +4884,7 @@ switch(cmd)
   case CMD_PATTERN:
   (void)decode_modifiers(argptr, CTX_DEFPAT, &def_patctl, NULL);
   if (def_patctl.jit == 0 && (def_patctl.control & CTL_JITVERIFY) != 0)
-    def_patctl.jit = 7;
+    def_patctl.jit = JIT_DEFAULT;
   break;
 
   /* Set default subject modifiers */
@@ -5114,7 +5131,11 @@ patlen = p - buffer - 2;
 /* Look for modifiers and options after the final delimiter. */
 
 if (!decode_modifiers(p, CTX_PAT, &pat_patctl, NULL)) return PR_SKIP;
-utf = (pat_patctl.options & PCRE2_UTF) != 0;
+
+/* Note that the match_invalid_utf option also sets utf when passed to
+pcre2_compile(). */
+
+utf = (pat_patctl.options & (PCRE2_UTF|PCRE2_MATCH_INVALID_UTF)) != 0;
 
 /* The utf8_input modifier is not allowed in 8-bit mode, and is mutually
 exclusive with the utf modifier. */
@@ -5161,7 +5182,7 @@ specified. */
 
 if (pat_patctl.jit == 0 &&
     (pat_patctl.control & (CTL_JITVERIFY|CTL_JITFAST)) != 0)
-  pat_patctl.jit = 7;
+  pat_patctl.jit = JIT_DEFAULT;
 
 /* Now copy the pattern to pbuffer8 for use in 8-bit testing and for reflecting
 in callouts. Convert from hex if requested (literal strings in quotes may be
@@ -5744,6 +5765,7 @@ if (TEST(compiled_code, !=, NULL) && pat_patctl.jit != 0)
     {
     int i;
     clock_t time_taken = 0;
+
     for (i = 0; i < timeit; i++)
       {
       clock_t start_time;
@@ -5752,7 +5774,7 @@ if (TEST(compiled_code, !=, NULL) && pat_patctl.jit != 0)
         pat_patctl.options|use_forbid_utf, &errorcode, &erroroffset,
         use_pat_context);
       start_time = clock();
-      PCRE2_JIT_COMPILE(jitrc,compiled_code, pat_patctl.jit);
+      PCRE2_JIT_COMPILE(jitrc, compiled_code, pat_patctl.jit);
       time_taken += clock() - start_time;
       }
     total_jit_compile_time += time_taken;
@@ -7747,13 +7769,21 @@ for (gmatched = 0;; gmatched++)
     }    /* End of handling a successful match */
 
   /* There was a partial match. The value of ovector[0] is the bumpalong point,
-  that is, startchar, not any \K point that might have been passed. */
+  that is, startchar, not any \K point that might have been passed. When JIT is
+  not in use, "allusedtext" may be set, in which case we indicate the leftmost
+  consulted character. */
 
   else if (capcount == PCRE2_ERROR_PARTIAL)
     {
-    PCRE2_SIZE poffset;
+    PCRE2_SIZE leftchar;
     int backlength;
     int rubriclength = 0;
+
+    if ((dat_datctl.control & CTL_ALLUSEDTEXT) != 0)
+      {
+      leftchar = FLD(match_data, leftchar);
+      }
+    else leftchar = ovector[0];
 
     fprintf(outfile, "Partial match");
     if ((dat_datctl.control & CTL_MARK) != 0 &&
@@ -7767,8 +7797,7 @@ for (gmatched = 0;; gmatched++)
     fprintf(outfile, ": ");
     rubriclength += 15;
 
-    poffset = backchars(pp, ovector[0], maxlookbehind, utf);
-    PCHARS(backlength, pp, poffset, ovector[0] - poffset, utf, outfile);
+    PCHARS(backlength, pp, leftchar, ovector[0] - leftchar, utf, outfile);
     PCHARSV(pp, ovector[0], ulen - ovector[0], utf, outfile);
 
     if ((pat_patctl.control & CTL_JITVERIFY) != 0 && jit_was_used)
@@ -8051,7 +8080,7 @@ Returns:     nothing
 static void
 print_newline_config(uint32_t optval, BOOL isc)
 {
-if (!isc) printf("  Newline sequence is ");
+if (!isc) printf("  Default newline sequence is ");
 if (optval < sizeof(newlines)/sizeof(char *))
   printf("%s\n", newlines[optval]);
 else
@@ -8107,6 +8136,7 @@ printf("  -error <n,m,..>  show messages for error numbers, then exit\n");
 printf("  -help         show usage information\n");
 printf("  -i            set default pattern modifier 'info'\n");
 printf("  -jit          set default pattern modifier 'jit'\n");
+printf("  -jitfast      set default pattern modifier 'jitfast'\n");
 printf("  -jitverify    set default pattern modifier 'jitverify'\n");
 printf("  -LM           list pattern and subject modifiers, then exit\n");
 printf("  -q            quiet: do not output PCRE2 version number at start\n");
@@ -8276,6 +8306,15 @@ printf("  Default heap limit = %d kibibytes\n", optval);
 printf("  Default match limit = %d\n", optval);
 (void)PCRE2_CONFIG(PCRE2_CONFIG_DEPTHLIMIT, &optval);
 printf("  Default depth limit = %d\n", optval);
+
+#if defined SUPPORT_LIBREADLINE
+printf("  pcre2test has libreadline support\n");
+#elif defined SUPPORT_LIBEDIT
+printf("  pcre2test has libedit support\n");
+#else
+printf("  pcre2test has neither libreadline nor libedit support\n");
+#endif
+
 return 0;
 }
 
@@ -8612,13 +8651,15 @@ while (argc > 1 && argv[op][0] == '-' && argv[op][1] != 0)
   else if (strcmp(arg, "-d") == 0)   def_patctl.control |= CTL_DEBUG;
   else if (strcmp(arg, "-dfa") == 0) def_datctl.control |= CTL_DFA;
   else if (strcmp(arg, "-i") == 0)   def_patctl.control |= CTL_INFO;
-  else if (strcmp(arg, "-jit") == 0 || strcmp(arg, "-jitverify") == 0)
+  else if (strcmp(arg, "-jit") == 0 || strcmp(arg, "-jitverify") == 0 ||
+           strcmp(arg, "-jitfast") == 0)
     {
-    if (arg[4] != 0) def_patctl.control |= CTL_JITVERIFY;
-    def_patctl.jit = 7;  /* full & partial */
+    if (arg[4] == 'v') def_patctl.control |= CTL_JITVERIFY;
+      else if (arg[4] == 'f') def_patctl.control |= CTL_JITFAST;
+    def_patctl.jit = JIT_DEFAULT;  /* full & partial */
 #ifndef SUPPORT_JIT
     fprintf(stderr, "** Warning: JIT support is not available: "
-                    "-jit[verify] calls functions that do nothing.\n");
+                    "-jit[fast|verify] calls functions that do nothing.\n");
 #endif
     }
 
@@ -8631,6 +8672,11 @@ while (argc > 1 && argv[op][0] == '-' && argv[op][1] != 0)
     showtotaltimes = arg[1] == 'T';
     if (argc > 2 && (uli = strtoul(argv[op+1], &endptr, 10), *endptr == 0))
       {
+      if (uli == 0)
+        {
+        fprintf(stderr, "** Argument for %s must not be zero\n", arg);
+        exit(1);
+        }
       if (U32OVERFLOW(uli))
         {
         fprintf(stderr, "** Argument for %s is too big\n", arg);
@@ -8788,8 +8834,8 @@ least 128 code units, because it is used for retrieving error messages. */
   }  /* End of -error handling */
 
 /* Initialize things that cannot be done until we know which test mode we are
-running in. Exercise the general context copying function, which is not
-otherwise used. */
+running in. Exercise the general context copying and match data size functions,
+which are not otherwise used. */
 
 code_unit_size = test_mode/8;
 max_oveccount = DEFAULT_OVECCOUNT;
@@ -8811,7 +8857,9 @@ max_oveccount = DEFAULT_OVECCOUNT;
   (void)G(pcre2_set_compile_extra_options_,BITS)(G(pat_context,BITS), 0); \
   (void)G(pcre2_set_max_pattern_length_,BITS)(G(pat_context,BITS), 0); \
   (void)G(pcre2_set_offset_limit_,BITS)(G(dat_context,BITS), 0); \
-  (void)G(pcre2_set_recursion_memory_management_,BITS)(G(dat_context,BITS), my_malloc, my_free, NULL)
+  (void)G(pcre2_set_recursion_memory_management_,BITS)(G(dat_context,BITS), my_malloc, my_free, NULL); \
+  (void)G(pcre2_get_match_data_size_,BITS)(G(match_data,BITS))
+
 
 /* Call the appropriate functions for the current mode, and exercise some
 functions that are not otherwise called. */

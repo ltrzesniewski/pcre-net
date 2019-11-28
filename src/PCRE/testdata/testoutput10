@@ -1,7 +1,7 @@
 # This set of tests is for UTF-8 support and Unicode property support, with
 # relevance only for the 8-bit library.
 
-# The next 4 patterns have UTF-8 errors
+# The next 5 patterns have UTF-8 errors
 
 /[Ã]/utf
 Failed: error -8 at offset 1: UTF-8 error: byte 2 top bits not 0x80
@@ -13,6 +13,9 @@ Failed: error -3 at offset 0: UTF-8 error: 1 byte missing at end
 Failed: error -8 at offset 0: UTF-8 error: byte 2 top bits not 0x80
 
 /Ã‚‚‚‚‚‚‚‚Ã/utf
+Failed: error -22 at offset 2: UTF-8 error: isolated byte with 0x80 bit set
+
+/Ã‚‚‚‚‚‚‚‚Ã/match_invalid_utf
 Failed: error -22 at offset 2: UTF-8 error: isolated byte with 0x80 bit set
 
 # Now test subjects
@@ -1253,11 +1256,7 @@ Subject length lower bound = 1
 ------------------------------------------------------------------
 Capture group count = 0
 Options: utf
-Starting code units: Z \xc4 \xc5 \xc6 \xc7 \xc8 \xc9 \xca \xcb \xcc \xcd 
-  \xce \xcf \xd0 \xd1 \xd2 \xd3 \xd4 \xd5 \xd6 \xd7 \xd8 \xd9 \xda \xdb \xdc 
-  \xdd \xde \xdf \xe0 \xe1 \xe2 \xe3 \xe4 \xe5 \xe6 \xe7 \xe8 \xe9 \xea \xeb 
-  \xec \xed \xee \xef \xf0 \xf1 \xf2 \xf3 \xf4 \xf5 \xf6 \xf7 \xf8 \xf9 \xfa 
-  \xfb \xfc \xfd \xfe \xff 
+Starting code units: Z \xc4 
 Subject length lower bound = 1
     Z\x{100}
  0: Z
@@ -1275,11 +1274,7 @@ Subject length lower bound = 1
 ------------------------------------------------------------------
 Capture group count = 0
 Options: utf
-Starting code units: z { | } ~ \x7f \xc2 \xc3 \xc4 \xc5 \xc6 \xc7 \xc8 \xc9 
-  \xca \xcb \xcc \xcd \xce \xcf \xd0 \xd1 \xd2 \xd3 \xd4 \xd5 \xd6 \xd7 \xd8 
-  \xd9 \xda \xdb \xdc \xdd \xde \xdf \xe0 \xe1 \xe2 \xe3 \xe4 \xe5 \xe6 \xe7 
-  \xe8 \xe9 \xea \xeb \xec \xed \xee \xef \xf0 \xf1 \xf2 \xf3 \xf4 \xf5 \xf6 
-  \xf7 \xf8 \xf9 \xfa \xfb \xfc \xfd \xfe \xff 
+Starting code units: z { | } ~ \x7f \xc2 \xc3 \xc4 
 Subject length lower bound = 1
 
 /[z\Qa-d]Ä€\E]/IB,utf
@@ -1291,11 +1286,7 @@ Subject length lower bound = 1
 ------------------------------------------------------------------
 Capture group count = 0
 Options: utf
-Starting code units: - ] a d z \xc4 \xc5 \xc6 \xc7 \xc8 \xc9 \xca \xcb \xcc 
-  \xcd \xce \xcf \xd0 \xd1 \xd2 \xd3 \xd4 \xd5 \xd6 \xd7 \xd8 \xd9 \xda \xdb 
-  \xdc \xdd \xde \xdf \xe0 \xe1 \xe2 \xe3 \xe4 \xe5 \xe6 \xe7 \xe8 \xe9 \xea 
-  \xeb \xec \xed \xee \xef \xf0 \xf1 \xf2 \xf3 \xf4 \xf5 \xf6 \xf7 \xf8 \xf9 
-  \xfa \xfb \xfc \xfd \xfe \xff 
+Starting code units: - ] a d z \xc4 
 Subject length lower bound = 1
     \x{100}
  0: \x{100}
@@ -1316,11 +1307,7 @@ Subject length lower bound = 1
 ------------------------------------------------------------------
 Capture group count = 1
 Options: utf
-Starting code units: a b \xc4 \xc5 \xc6 \xc7 \xc8 \xc9 \xca \xcb \xcc \xcd 
-  \xce \xcf \xd0 \xd1 \xd2 \xd3 \xd4 \xd5 \xd6 \xd7 \xd8 \xd9 \xda \xdb \xdc 
-  \xdd \xde \xdf \xe0 \xe1 \xe2 \xe3 \xe4 \xe5 \xe6 \xe7 \xe8 \xe9 \xea \xeb 
-  \xec \xed \xee \xef \xf0 \xf1 \xf2 \xf3 \xf4 \xf5 \xf6 \xf7 \xf8 \xf9 \xfa 
-  \xfb \xfc \xfd \xfe \xff 
+Starting code units: a b \xc4 
 Last code unit = 'z'
 Subject length lower bound = 7
 
@@ -1437,11 +1424,7 @@ Subject length lower bound = 1
 ------------------------------------------------------------------
 Capture group count = 0
 Options: caseless utf
-Starting code units: \xc4 \xc5 \xc6 \xc7 \xc8 \xc9 \xca \xcb \xcc \xcd \xce 
-  \xcf \xd0 \xd1 \xd2 \xd3 \xd4 \xd5 \xd6 \xd7 \xd8 \xd9 \xda \xdb \xdc \xdd 
-  \xde \xdf \xe0 \xe1 \xe2 \xe3 \xe4 \xe5 \xe6 \xe7 \xe8 \xe9 \xea \xeb \xec 
-  \xed \xee \xef \xf0 \xf1 \xf2 \xf3 \xf4 \xf5 \xf6 \xf7 \xf8 \xf9 \xfa \xfb 
-  \xfc \xfd \xfe \xff 
+Starting code units: \xc4 
 Subject length lower bound = 1
     \x{104}
  0: \x{104}
@@ -1464,11 +1447,7 @@ No match
 ------------------------------------------------------------------
 Capture group count = 0
 Options: caseless utf
-Starting code units: Z z { | } ~ \x7f \xc2 \xc3 \xc4 \xc5 \xc6 \xc7 \xc8 
-  \xc9 \xca \xcb \xcc \xcd \xce \xcf \xd0 \xd1 \xd2 \xd3 \xd4 \xd5 \xd6 \xd7 
-  \xd8 \xd9 \xda \xdb \xdc \xdd \xde \xdf \xe0 \xe1 \xe2 \xe3 \xe4 \xe5 \xe6 
-  \xe7 \xe8 \xe9 \xea \xeb \xec \xed \xee \xef \xf0 \xf1 \xf2 \xf3 \xf4 \xf5 
-  \xf6 \xf7 \xf8 \xf9 \xfa \xfb \xfc \xfd \xfe \xff 
+Starting code units: Z z { | } ~ \x7f \xc2 \xc3 \xc4 \xc5 \xce \xe1 \xe2 
 Subject length lower bound = 1
     Z
  0: Z
@@ -1505,11 +1484,7 @@ No match
 ------------------------------------------------------------------
 Capture group count = 0
 Options: caseless utf
-Starting code units: Z z { | } ~ \x7f \xc2 \xc3 \xc4 \xc5 \xc6 \xc7 \xc8 
-  \xc9 \xca \xcb \xcc \xcd \xce \xcf \xd0 \xd1 \xd2 \xd3 \xd4 \xd5 \xd6 \xd7 
-  \xd8 \xd9 \xda \xdb \xdc \xdd \xde \xdf \xe0 \xe1 \xe2 \xe3 \xe4 \xe5 \xe6 
-  \xe7 \xe8 \xe9 \xea \xeb \xec \xed \xee \xef \xf0 \xf1 \xf2 \xf3 \xf4 \xf5 
-  \xf6 \xf7 \xf8 \xf9 \xfa \xfb \xfc \xfd \xfe \xff 
+Starting code units: Z z { | } ~ \x7f \xc2 \xc3 \xc4 \xc5 \xce \xe1 \xe2 
 Subject length lower bound = 1
 
 /\x{3a3}B/IBi,utf
@@ -1650,5 +1625,192 @@ Failed: error 142 at offset 4: syntax error in subpattern name (missing terminat
 
 /(?(Ã¡/utf
 Failed: error 142 at offset 5: syntax error in subpattern name (missing terminator?)
+
+# Invalid UTF-8 tests
+
+/.../g,match_invalid_utf
+    abcd\x80wxzy\x80pqrs
+ 0: abc
+ 0: wxz
+ 0: pqr
+    abcd\x{80}wxzy\x80pqrs
+ 0: abc
+ 0: d\x{80}w
+ 0: xzy
+ 0: pqr
+
+/abc/match_invalid_utf
+    ab\x80ab\=ph
+Partial match: ab
+\= Expect no match
+    ab\x80cdef\=ph
+No match
+
+/ab$/match_invalid_utf
+    ab\x80cdeab
+ 0: ab
+\= Expect no match
+    ab\x80cde
+No match
+
+/.../g,match_invalid_utf
+    abcd\x{80}wxzy\x80pqrs
+ 0: abc
+ 0: d\x{80}w
+ 0: xzy
+ 0: pqr
+
+/(?<=x)../g,match_invalid_utf
+    abcd\x{80}wxzy\x80pqrs
+ 0: zy
+    abcd\x{80}wxzy\x80xpqrs
+ 0: zy
+ 0: pq
+    
+/X$/match_invalid_utf
+\= Expect no match
+    X\xc4
+No match
+    
+/(?<=..)X/match_invalid_utf,aftertext
+    AB\x80AQXYZ
+ 0: X
+ 0+ YZ
+    AB\x80AQXYZ\=offset=5
+ 0: X
+ 0+ YZ
+    AB\x80\x80AXYZXC\=offset=5
+ 0: X
+ 0+ C
+\= Expect no match
+    AB\x80XYZ
+No match
+    AB\x80XYZ\=offset=3 
+No match
+    AB\xfeXYZ
+No match
+    AB\xffXYZ\=offset=3 
+No match
+    AB\x80AXYZ
+No match
+    AB\x80AXYZ\=offset=4
+No match
+    AB\x80\x80AXYZ\=offset=5
+No match
+
+/.../match_invalid_utf
+    AB\xc4CCC
+ 0: CCC
+\= Expect no match
+    A\x{d800}B
+No match
+    A\x{110000}B
+No match
+    A\xc4B  
+No match
+
+/\bX/match_invalid_utf
+    A\x80X
+ 0: X
+
+/\BX/match_invalid_utf
+\= Expect no match
+    A\x80X
+No match
+    
+/(?<=...)X/match_invalid_utf
+    AAA\x80BBBXYZ 
+ 0: X
+\= Expect no match
+    AAA\x80BXYZ 
+No match
+    AAA\x80BBXYZ 
+No match
+
+# -------------------------------------
+
+/(*UTF)(?=\x{123})/I
+Capture group count = 0
+May match empty string
+Compile options: <none>
+Overall options: utf
+First code unit = \xc4
+Last code unit = \xa3
+Subject length lower bound = 1
+
+/[\x{c1}\x{e1}]X[\x{145}\x{146}]/I,utf
+Capture group count = 0
+Options: utf
+Starting code units: \xc3 
+Last code unit = 'X'
+Subject length lower bound = 3
+
+/[ó¿¾Ÿ,]/BI,utf
+------------------------------------------------------------------
+        Bra
+        [,\x{fff9f}]
+        Ket
+        End
+------------------------------------------------------------------
+Capture group count = 0
+Options: utf
+Starting code units: , \xf3 
+Subject length lower bound = 1
+
+/[\x{fff4}-\x{ffff8}]/I,utf
+Capture group count = 0
+Options: utf
+Starting code units: \xef \xf0 \xf1 \xf2 \xf3 
+Subject length lower bound = 1
+
+/[\x{fff4}-\x{afff8}\x{10ffff}]/I,utf
+Capture group count = 0
+Options: utf
+Starting code units: \xef \xf0 \xf1 \xf2 \xf4 
+Subject length lower bound = 1
+
+/[\xff\x{ffff}]/I,utf
+Capture group count = 0
+Options: utf
+Starting code units: \xc3 \xef 
+Subject length lower bound = 1
+
+/[\xff\x{ff}]/I,utf
+Capture group count = 0
+Options: utf
+Starting code units: \xc3 
+Subject length lower bound = 1
+
+/[\xff\x{ff}]/I
+Capture group count = 0
+Starting code units: \xff 
+Subject length lower bound = 1
+
+/[Ss]/I
+Capture group count = 0
+First code unit = 'S' (caseless)
+Subject length lower bound = 1
+
+/[Ss]/I,utf
+Capture group count = 0
+Options: utf
+Starting code units: S s 
+Subject length lower bound = 1
+
+/(?:\x{ff}|\x{3000})/I,utf
+Capture group count = 0
+Options: utf
+Starting code units: \xc3 \xe3 
+Subject length lower bound = 1
+
+/x/utf
+    abxyz
+ 0: x
+    \x80\=startchar
+Failed: error -22: UTF-8 error: isolated byte with 0x80 bit set at offset 0
+    abc\x80\=startchar
+Failed: error -22: UTF-8 error: isolated byte with 0x80 bit set at offset 3
+    abc\x80\=startchar,offset=3
+Error -36 (bad UTF-8 offset)
 
 # End of testinput10

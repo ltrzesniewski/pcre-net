@@ -4012,4 +4012,20 @@ No match
  0: 123123
  1: 123
 
+/\X*/
+    \xF3aaa\xE4\xEA\xEB\xFEa
+ 0: \xf3aaa\xe4\xea\xeb\xfea
+
+/Я/i,utf
+    \x{42f} 
+ 0: \x{42f}
+    \x{44f} 
+ 0: \x{44f}
+
+/(?=Я)/i,utf
+    \x{42f} 
+ 0: 
+    \x{44f} 
+ 0: 
+
 # End of testinput4

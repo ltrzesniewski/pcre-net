@@ -1,4 +1,4 @@
-.TH PCRE2SYNTAX 3 "11 February 2019" "PCRE2 10.33"
+.TH PCRE2SYNTAX 3 "29 July 2019" "PCRE2 10.34"
 .SH NAME
 PCRE2 - Perl-compatible regular expressions (revised API)
 .SH "PCRE2 REGULAR EXPRESSION SYNTAX SUMMARY"
@@ -204,6 +204,7 @@ Dogra,
 Duployan,
 Egyptian_Hieroglyphs,
 Elbasan,
+Elymaic,
 Ethiopic,
 Georgian,
 Glagolitic,
@@ -261,10 +262,12 @@ Mro,
 Multani,
 Myanmar,
 Nabataean,
+Nandinagari,
 New_Tai_Lue,
 Newa,
 Nko,
 Nushu,
+Nyakeng_Puachue_Hmong,
 Ogham,
 Ol_Chiki,
 Old_Hungarian,
@@ -315,6 +318,7 @@ Tifinagh,
 Tirhuta,
 Ugaritic,
 Vai,
+Wancho,
 Warang_Citi,
 Yi,
 Zanabazar_Square.
@@ -522,6 +526,18 @@ setting with a similar syntax.
 Each top-level branch of a lookbehind must be of a fixed length.
 .
 .
+.SH "NON-ATOMIC LOOKAROUND ASSERTIONS"
+.rs
+.sp
+These assertions are specific to PCRE2 and are not Perl-compatible.
+.sp
+  (*napla:...)
+  (*non_atomic_positive_lookahead:...)
+.sp
+  (*naplb:...)
+  (*non_atomic_positive_lookbehind:...)
+.
+.
 .SH "SCRIPT RUNS"
 .rs
 .sp
@@ -654,6 +670,6 @@ Cambridge, England.
 .rs
 .sp
 .nf
-Last updated: 11 February 2019
+Last updated: 29 July 2019
 Copyright (c) 1997-2019 University of Cambridge.
 .fi

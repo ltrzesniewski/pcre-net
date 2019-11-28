@@ -1625,6 +1625,7 @@
 /^a*A\d/IBi
     aaaA5
     aaaa5
+    a5 
 
 /(a*|b*)[cd]/I
 
@@ -4584,7 +4585,7 @@ B)x/alt_verbnames,mark
 
 /abcd/null_context
     abcd\=null_context
-\= Expect error
+\= Expect error - not allowed together
     abcd\=null_context,find_limits
     abcd\=allusedtext,startchar
 
@@ -5586,5 +5587,189 @@ a)"xI
     abc 
 \= Expect error message
     abc\=null_context
+
+/\[()]{65535}()/expand
+
+/\[()]{65535}(?<A>)/expand
+
+/a(?:(*ACCEPT))??bc/
+    abc
+    axy
+
+/a(*ACCEPT)??bc/
+    abc
+    axy
+
+/a(*ACCEPT:XX)??bc/mark
+    abc
+    axy
+
+/(*:\)?/
+
+/(*:\Q \E){5}/alt_verbnames
+
+/(?=abc)/I
+
+/(?|(X)|(XY))\1abc/I
+
+/(?|(a)|(bcde))(c)\2/I
+
+/(?|(a)|(bcde))(c)\1/I
+
+/(?|(?'A'a)|(?'A'bcde))(?'B'c)\k'B'(?'A')/I,dupnames
+
+/(?|(?'A'a)|(?'A'bcde))(?'B'c)\k'A'(?'A')/I,dupnames
+
+/((a|)+)+Z/I
+
+/((?=a))[abcd]/I
+
+/A(?:(*ACCEPT))?B/info
+
+/(A(*ACCEPT)??B)C/
+    ABC
+    AXY 
+
+/(?<=(?<=a)b)c.*/I
+    abc\=ph
+\= Expect no match
+    xbc\=ph
+
+/(?<=ab)c.*/I
+    abc\=ph
+\= Expect no match
+    xbc\=ph
+
+/(?<=a(?<=a|a)c)/I
+
+/(?<=a(?<=a|ba)c)/I
+
+/(?<=(?<=a)b)(?<!abcd)/I
+
+/(?<=(?<=a)b)(?<!abcd)(?<=(?<=a)bcde)/I
+
+# Addition overflow
+/( {32742} {42})(?<!\1{65481})/
+
+# Multiplication overflow
+/(X{65535})(?<=\1{32770})/
+
+# ---- Non-atomic assertion tests ----
+
+# Expect error: not allowed as a condition
+/(?(*napla:xx)bc)/
+
+/\A(*pla:.*\b(\w++))(?>.*?\b\1\b){3}/
+    word1 word3 word1 word2 word3 word2 word2 word1 word3 word4
+
+/\A(*napla:.*\b(\w++))(?>.*?\b\1\b){3}/
+    word1 word3 word1 word2 word3 word2 word2 word1 word3 word4
+
+/(*plb:(.)..|(.)...)(\1|\2)/
+    abcdb\=offset=4 
+    abcda\=offset=4 
+
+/(*naplb:(.)..|(.)...)(\1|\2)/
+    abcdb\=offset=4 
+    abcda\=offset=4 
+    
+/(*non_atomic_positive_lookahead:ab)/B
+ 
+/(*non_atomic_positive_lookbehind:ab)/B 
+
+/(*pla:ab+)/B
+
+/(*napla:ab+)/B
+
+/(*napla:)+/
+
+/(*naplb:)+/
+
+/(*napla:^x|^y)/I
+
+/(*napla:abc|abd)/I
+
+/(*napla:a|(.)(*ACCEPT)zz)\1../
+    abcd
+    
+/(*napla:a(*ACCEPT)zz|(.))\1../
+    abcd
+    
+/(*napla:a|(*COMMIT)(.))\1\1/
+    aabc
+\= Expect no match     
+    abbc   
+
+/(*napla:a|(.))\1\1/
+    aabc
+    abbc   
+
+# ----
+
+# Expect error (recursion => not fixed length)
+/(\2)((?=(?<=\1)))/
+
+/c*+(?<=[bc])/
+    abc\=ph
+    ab\=ph
+    abc\=ps
+    ab\=ps
+
+/c++(?<=[bc])/
+    abc\=ph
+    ab\=ph
+
+/(?<=(?=.(?<=x)))/
+    abx
+    ab\=ph
+    bxyz 
+    xyz
+    
+/\z/
+   abc\=ph
+   abc\=ps 
+   
+/\Z/
+   abc\=ph
+   abc\=ps 
+   abc\n\=ph
+   abc\n\=ps
+
+/(?![ab]).*/
+    ab\=ph
+
+/c*+/
+    ab\=ph,offset=2
+
+/\A\s*(a|(?:[^`]{28500}){4})/I
+    a
+
+/\A\s*((?:[^`]{28500}){4})/I
+
+/\A\s*((?:[^`]{28500}){4}|a)/I
+    a
+
+/(?<A>a)(?(<A>)b)((?<=b).*)/B
+
+/(?(1)b)((?<=b).*)/B
+
+/(?(R1)b)((?<=b).*)/B
+
+/(?(DEFINE)b)((?<=b).*)/B
+
+/(?(VERSION=10.4)b)((?<=b).*)/B
+
+/[aA]b[cC]/IB
+
+/[cc]abcd/I
+
+/[Cc]abcd/I
+
+/[c]abcd/I
+
+/(?:c|C)abcd/I
+
+/(a)?a/I
+    manm
 
 # End of testinput2

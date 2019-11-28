@@ -31,6 +31,7 @@ namespace PCRE
 
         Unicode = PcreConstants.UCP,
         Ucp = PcreConstants.UCP,
+        MatchInvalidUtf = PcreConstants.MATCH_INVALID_UTF,
 
         Anchored = PcreConstants.ANCHORED,
         EndAnchored = PcreConstants.ENDANCHORED,

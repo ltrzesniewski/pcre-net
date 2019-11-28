@@ -685,20 +685,32 @@ otherwise empty line. This option is mutually exclusive with <b>--output</b>,
 <P>
 <b>-o</b><i>number</i>, <b>--only-matching</b>=<i>number</i>
 Show only the part of the line that matched the capturing parentheses of the
-given number. Up to 32 capturing parentheses are supported, and -o0 is
-equivalent to <b>-o</b> without a number. Because these options can be given
-without an argument (see above), if an argument is present, it must be given in
-the same shell item, for example, -o3 or --only-matching=2. The comments given
-for the non-argument case above also apply to this option. If the specified
-capturing parentheses do not exist in the pattern, or were not set in the
-match, nothing is output unless the file name or line number are being output.
+given number. Up to 50 capturing parentheses are supported by default. This
+limit can be changed via the <b>--om-capture</b> option. A pattern may contain
+any number of capturing parentheses, but only those whose number is within the
+limit can be accessed by <b>-o</b>. An error occurs if the number specified by
+<b>-o</b> is greater than the limit.
+<br>
+<br>
+-o0 is the same as <b>-o</b> without a number. Because these options can be
+given without an argument (see above), if an argument is present, it must be
+given in the same shell item, for example, -o3 or --only-matching=2. The
+comments given for the non-argument case above also apply to this option. If
+the specified capturing parentheses do not exist in the pattern, or were not
+set in the match, nothing is output unless the file name or line number are
+being output.
 <br>
 <br>
 If this option is given multiple times, multiple substrings are output for each
 match, in the order the options are given, and all on one line. For example,
 -o3 -o1 -o3 causes the substrings matched by capturing parentheses 3 and 1 and
 then 3 again to be output. By default, there is no separator (but see the next
-option).
+but one option).
+</P>
+<P>
+<b>--om-capture</b>=<i>number</i>
+Set the number of capturing parentheses that can be accessed by <b>-o</b>. The
+default is 50.
 </P>
 <P>
 <b>--om-separator</b>=<i>text</i>
@@ -741,11 +753,20 @@ ignored when used with <b>-L</b> (list files without matches), because the grand
 total would always be zero.
 </P>
 <P>
-<b>-u</b>, <b>--utf-8</b>
+<b>-u</b>, <b>--utf</b>
 Operate in UTF-8 mode. This option is available only if PCRE2 has been compiled
 with UTF-8 support. All patterns (including those for any <b>--exclude</b> and
 <b>--include</b> options) and all subject lines that are scanned must be valid
 strings of UTF-8 characters.
+</P>
+<P>
+<b>-U</b>, <b>--utf-allow-invalid</b>
+As <b>--utf</b>, but in addition subject lines may contain invalid UTF-8 code
+unit sequences. These can never form part of any pattern match. This facility
+allows valid UTF-8 strings to be sought in executable or other binary files.
+For more details about matching in non-valid UTF-8 strings, see the
+<a href="pcre2unicode.html"><b>pcre2unicode</b>(3)</a>
+documentation.
 </P>
 <P>
 <b>-V</b>, <b>--version</b>
@@ -806,9 +827,9 @@ as in the GNU <b>grep</b> program. Any long option of the form
 <b>--file-offsets</b>, <b>--heap-limit</b>, <b>--include-dir</b>,
 <b>--line-offsets</b>, <b>--locale</b>, <b>--match-limit</b>, <b>-M</b>,
 <b>--multiline</b>, <b>-N</b>, <b>--newline</b>, <b>--om-separator</b>,
-<b>--output</b>, <b>-u</b>, and <b>--utf-8</b> options are specific to
-<b>pcre2grep</b>, as is the use of the <b>--only-matching</b> option with a
-capturing parentheses number.
+<b>--output</b>, <b>-u</b>, <b>--utf</b>, <b>-U</b>, and <b>--utf-allow-invalid</b>
+options are specific to <b>pcre2grep</b>, as is the use of the
+<b>--only-matching</b> option with a capturing parentheses number.
 </P>
 <P>
 Although most of the common options work the same way, a few are different in
@@ -971,9 +992,9 @@ Cambridge, England.
 </P>
 <br><a name="SEC16" href="#TOC1">REVISION</a><br>
 <P>
-Last updated: 24 November 2018
+Last updated: 15 June 2019
 <br>
-Copyright &copy; 1997-2018 University of Cambridge.
+Copyright &copy; 1997-2019 University of Cambridge.
 <br>
 <p>
 Return to the <a href="index.html">PCRE2 index page</a>.

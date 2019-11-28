@@ -37,6 +37,7 @@ namespace PCRE.Internal
         public const uint USE_OFFSET_LIMIT = 0x00800000;
         public const uint EXTENDED_MORE = 0x01000000;
         public const uint LITERAL = 0x02000000;
+        public const uint MATCH_INVALID_UTF = 0x04000000;
         public const uint EXTRA_ALLOW_SURROGATE_ESCAPES = 0x00000001;
         public const uint EXTRA_BAD_ESCAPE_IS_LITERAL = 0x00000002;
         public const uint EXTRA_MATCH_WORD = 0x00000004;
@@ -173,6 +174,8 @@ namespace PCRE.Internal
         public const int ERROR_INVALID_HYPHEN_IN_OPTIONS = 194;
         public const int ERROR_ALPHA_ASSERTION_UNKNOWN = 195;
         public const int ERROR_SCRIPT_RUN_NOT_AVAILABLE = 196;
+        public const int ERROR_TOO_MANY_CAPTURES = 197;
+        public const int ERROR_CONDITION_ATOMIC_ASSERTION_EXPECTED = 198;
         public const int ERROR_NOMATCH = -1;
         public const int ERROR_PARTIAL = -2;
         public const int ERROR_UTF8_ERR1 = -3;
@@ -238,6 +241,7 @@ namespace PCRE.Internal
         public const int ERROR_HEAPLIMIT = -63;
         public const int ERROR_CONVERT_SYNTAX = -64;
         public const int ERROR_INTERNAL_DUPMATCH = -65;
+        public const int ERROR_DFA_UINVALID_UTF = -66;
         public const uint INFO_ALLOPTIONS = 0;
         public const uint INFO_ARGOPTIONS = 1;
         public const uint INFO_BACKREFMAX = 2;
