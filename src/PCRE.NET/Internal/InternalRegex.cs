@@ -137,6 +137,37 @@ namespace PCRE.Internal
             return new PcreMatch(subject, this, ref result, oVector);
         }
 
+        public PcreRefMatch Match(ReadOnlySpan<char> subject, PcreMatchSettings settings, int startIndex, uint additionalOptions)
+        {
+            var input = new Native.match_input();
+            settings.FillMatchInput(ref input);
+
+            var oVector = new uint[2 * (CaptureCount + 1)];
+            Native.match_result result;
+            CalloutInterop.CalloutInteropInfo calloutInterop;
+
+            fixed (char* pSubject = subject)
+            fixed (uint* pOVec = &oVector[0])
+            {
+                input.code = _code;
+                input.subject = pSubject;
+                input.subject_length = (uint)subject.Length;
+                input.output_vector = pOVec;
+                input.start_index = (uint)startIndex;
+                input.additional_options = additionalOptions;
+
+                // TODO callouts
+                //CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, settings.Callout);
+                calloutInterop = default;
+
+                Native.match(ref input, out result);
+            }
+
+            AfterMatch(result, ref calloutInterop);
+
+            return new PcreRefMatch(subject, this, ref result, oVector);
+        }
+
         public PcreDfaMatchResult DfaMatch(string subject, PcreDfaMatchSettings settings, int startIndex, uint additionalOptions)
         {
             var input = new Native.dfa_match_input();
