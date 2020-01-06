@@ -22,6 +22,13 @@ namespace PCRE
             remove => Callout -= value;
         }
 
+        [SuppressMessage("ReSharper", "DelegateSubtraction")]
+        public event PcreRefCalloutFunc OnRefCallout
+        {
+            add => RefCallout += value;
+            remove => RefCallout -= value;
+        }
+
         public uint MatchLimit
         {
             get => _matchLimit ?? PcreBuildInfo.MatchLimit;
@@ -45,6 +52,7 @@ namespace PCRE
         public PcreJitStack JitStack { get; set; }
 
         internal Func<PcreCallout, PcreCalloutResult> Callout { get; private set; }
+        internal PcreRefCalloutFunc RefCallout { get; private set; }
 
         internal static PcreMatchSettings GetSettings(int startIndex, PcreMatchOptions additionalOptions, Func<PcreCallout, PcreCalloutResult> onCallout)
         {
@@ -59,6 +67,23 @@ namespace PCRE
 
             if (onCallout != null)
                 settings.OnCallout += onCallout;
+
+            return settings;
+        }
+
+        internal static PcreMatchSettings GetSettings(int startIndex, PcreMatchOptions additionalOptions, PcreRefCalloutFunc onCallout)
+        {
+            if (startIndex == 0 && additionalOptions == PcreMatchOptions.None && onCallout == null)
+                return Default;
+
+            var settings = new PcreMatchSettings
+            {
+                StartIndex = startIndex,
+                AdditionalOptions = additionalOptions
+            };
+
+            if (onCallout != null)
+                settings.OnRefCallout += onCallout;
 
             return settings;
         }

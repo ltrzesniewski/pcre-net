@@ -12,27 +12,27 @@ namespace PCRE
         private PcreMatch _match;
         private PcreCalloutInfo _info;
 
-        internal PcreCallout(string subject, InternalRegex regex, ref Native.pcre2_callout_block callout)
+        internal PcreCallout(string subject, InternalRegex regex, Native.pcre2_callout_block* callout)
         {
             _subject = subject;
             _regex = regex;
-            _flags = callout.callout_flags;
+            _flags = callout->callout_flags;
 
-            Number = (int)callout.callout_number;
-            StartOffset = (int)callout.start_match;
-            CurrentOffset = (int)callout.current_position;
-            MaxCapture = (int)callout.capture_top;
-            LastCapture = (int)callout.capture_last;
-            PatternPosition = (int)callout.pattern_position;
-            NextPatternItemLength = (int)callout.next_item_length;
-            _markPtr = callout.mark;
+            Number = (int)callout->callout_number;
+            StartOffset = (int)callout->start_match;
+            CurrentOffset = (int)callout->current_position;
+            MaxCapture = (int)callout->capture_top;
+            LastCapture = (int)callout->capture_last;
+            PatternPosition = (int)callout->pattern_position;
+            NextPatternItemLength = (int)callout->next_item_length;
+            _markPtr = callout->mark;
 
-            _oVector = new uint[callout.capture_top * 2];
-            _oVector[0] = (uint)callout.start_match;
-            _oVector[1] = (uint)callout.current_position;
+            _oVector = new uint[callout->capture_top * 2];
+            _oVector[0] = (uint)callout->start_match;
+            _oVector[1] = (uint)callout->current_position;
 
             for (var i = 2; i < _oVector.Length; ++i)
-                _oVector[i] = callout.offset_vector[i].ToUInt32();
+                _oVector[i] = callout->offset_vector[i].ToUInt32();
         }
 
         public int Number { get; }

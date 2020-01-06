@@ -1,10 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
-using JetBrains.Annotations;
 using PCRE.Internal;
 
 namespace PCRE
@@ -27,6 +23,18 @@ namespace PCRE
             _markPtr = result.mark;
 
             _resultCode = result.result_code;
+        }
+
+        internal PcreRefMatch(ReadOnlySpan<char> subject, InternalRegex regex, uint[] oVector, char* mark)
+        {
+            // Callout
+
+            Subject = subject;
+            _regex = regex;
+            _oVector = oVector;
+            _markPtr = mark;
+
+            _resultCode = oVector.Length / 2;
         }
 
         public int CaptureCount => _regex.CaptureCount;

@@ -156,9 +156,7 @@ namespace PCRE.Internal
                 input.start_index = (uint)startIndex;
                 input.additional_options = additionalOptions;
 
-                // TODO callouts
-                //CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, settings.Callout);
-                calloutInterop = default;
+                CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, settings.RefCallout);
 
                 Native.match(ref input, out result);
             }
