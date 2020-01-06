@@ -1,12 +1,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 using PCRE.Internal;
 
 namespace PCRE
 {
+    [DebuggerTypeProxy(typeof(DebugProxy))]
     public unsafe ref struct PcreRefMatch
     {
         private readonly InternalRegex _regex;
@@ -147,6 +150,25 @@ namespace PCRE
 
             public bool MoveNext()
                 => ++_index <= _match.CaptureCount;
+        }
+
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+        internal class DebugProxy
+        {
+            public bool Success { get; }
+            public string Value { get; }
+
+            public PcreRefGroup.DebugProxy[] Groups { get; }
+
+            public DebugProxy(PcreRefMatch match)
+            {
+                Success = match.Success;
+                Value = Success ? match.Value.ToString() : null;
+
+                Groups = new PcreRefGroup.DebugProxy[match.CaptureCount + 1];
+                for (var i = 0; i <= match.CaptureCount; ++i)
+                    Groups[i] = new PcreRefGroup.DebugProxy(match[i]);
+            }
         }
     }
 }

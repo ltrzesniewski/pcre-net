@@ -6,7 +6,7 @@ namespace PCRE
 {
     public sealed class PcreMatchSettings
     {
-        private static readonly PcreMatchSettings _defaultSettings = new PcreMatchSettings();
+        internal static PcreMatchSettings Default { get; } = new PcreMatchSettings();
 
         private uint? _matchLimit;
         private uint? _depthLimit;
@@ -49,7 +49,7 @@ namespace PCRE
         internal static PcreMatchSettings GetSettings(int startIndex, PcreMatchOptions additionalOptions, Func<PcreCallout, PcreCalloutResult> onCallout)
         {
             if (startIndex == 0 && additionalOptions == PcreMatchOptions.None && onCallout == null)
-                return _defaultSettings;
+                return Default;
 
             var settings = new PcreMatchSettings
             {

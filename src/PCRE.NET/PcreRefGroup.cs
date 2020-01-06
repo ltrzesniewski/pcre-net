@@ -1,7 +1,9 @@
 using System;
+using System.Diagnostics;
 
 namespace PCRE
 {
+    [DebuggerTypeProxy(typeof(DebugProxy))]
     public ref struct PcreRefGroup
     {
         private readonly ReadOnlySpan<char> _subject;
@@ -18,12 +20,26 @@ namespace PCRE
 
         public int Length => EndIndex > Index ? EndIndex - Index : 0;
 
-        public ReadOnlySpan<char> Value => _subject.Slice(Index, Length);
+        public ReadOnlySpan<char> Value => Index < 0 ? default : _subject.Slice(Index, Length);
 
-        public bool Success => _subject != default;
+        public bool Success => _subject != default && Index >= 0;
 
         public static implicit operator string(PcreRefGroup group) => group.Value.ToString();
 
         public override string ToString() => Value.ToString();
+
+        internal class DebugProxy
+        {
+            public bool Success { get; }
+            public string Value { get; }
+
+            public DebugProxy(PcreRefGroup group)
+            {
+                Success = group.Success;
+                Value = Success ? group.Value.ToString() : null;
+            }
+
+            public override string ToString() => Value ?? "<no match>";
+        }
     }
 }

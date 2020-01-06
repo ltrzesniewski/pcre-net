@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using NUnit.Framework;
 
@@ -23,11 +24,33 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match.Length, Is.EqualTo(8));
 
             Assert.That(match[1], Is.Not.Null);
+            Assert.That(match[1].Success, Is.True);
             Assert.That(match[1].Value, Is.EqualTo("bb"));
             Assert.That(match[1].Index, Is.EqualTo(6));
             Assert.That(match[1].Length, Is.EqualTo(2));
 
             Assert.That(match.Groups[1], Is.SameAs(match[1]));
+        }
+
+        [Test]
+        public void should_match_pattern_ref()
+        {
+            var re = new PcreRegex(@"a+(b+)c+");
+            var match = re.Match("xxxaaabbccczzz".AsSpan());
+
+            Assert.That(match.Success, Is.True);
+            Assert.That(match.CaptureCount, Is.EqualTo(1));
+            Assert.That(match.Value.ToString(), Is.EqualTo("aaabbccc"));
+            Assert.That(match.Index, Is.EqualTo(3));
+            Assert.That(match.EndIndex, Is.EqualTo(11));
+            Assert.That(match.Length, Is.EqualTo(8));
+
+            Assert.That(match[1].Success, Is.True);
+            Assert.That(match[1].Value.ToString(), Is.EqualTo("bb"));
+            Assert.That(match[1].Index, Is.EqualTo(6));
+            Assert.That(match[1].Length, Is.EqualTo(2));
+
+            Assert.That(match[2].Success, Is.False);
         }
 
         [Test]
@@ -60,6 +83,38 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match[3].Value, Is.EqualTo("dd"));
             Assert.That(match[3].Index, Is.EqualTo(8));
             Assert.That(match[3].Length, Is.EqualTo(2));
+
+            Assert.That(match[4], Is.Null);
+        }
+
+        [Test]
+        public void should_support_multiple_groups_ref()
+        {
+            var re = new PcreRegex(@"a+(b+)(c+)?(d+)e+");
+            var match = re.Match("xxxaaabbddeeezzz".AsSpan());
+
+            Assert.That(match.Success, Is.True);
+            Assert.That(match.CaptureCount, Is.EqualTo(3));
+            Assert.That(match.Value.ToString(), Is.EqualTo("aaabbddeee"));
+            Assert.That(match.Index, Is.EqualTo(3));
+            Assert.That(match.Length, Is.EqualTo(10));
+
+            Assert.That(match[1].Success, Is.True);
+            Assert.That(match[1].Value.ToString(), Is.EqualTo("bb"));
+            Assert.That(match[1].Index, Is.EqualTo(6));
+            Assert.That(match[1].Length, Is.EqualTo(2));
+
+            Assert.That(match[2].Success, Is.False);
+            Assert.That(match[2].Value.ToString(), Is.SameAs(string.Empty));
+            Assert.That(match[2].Index, Is.EqualTo(-1));
+            Assert.That(match[2].Length, Is.EqualTo(0));
+
+            Assert.That(match[3].Success, Is.True);
+            Assert.That(match[3].Value.ToString(), Is.EqualTo("dd"));
+            Assert.That(match[3].Index, Is.EqualTo(8));
+            Assert.That(match[3].Length, Is.EqualTo(2));
+
+            Assert.That(match[4].Success, Is.False);
         }
 
         [Test]
@@ -69,6 +124,15 @@ namespace PCRE.Tests.PcreNet
             var match = re.Match("xxa", 3);
 
             Assert.That(match, Is.Not.Null);
+            Assert.That(match.Success, Is.True);
+        }
+
+        [Test]
+        public void should_match_starting_at_end_of_string_ref()
+        {
+            var re = new PcreRegex(@"(?<=a)");
+            var match = re.Match("xxa".AsSpan(), 3);
+
             Assert.That(match.Success, Is.True);
         }
 
@@ -102,6 +166,36 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match["dees"].Value, Is.EqualTo("dd"));
             Assert.That(match["dees"].Index, Is.EqualTo(11));
             Assert.That(match["dees"].Length, Is.EqualTo(2));
+
+            Assert.That(match["nope"], Is.Null);
+        }
+
+        [Test]
+        public void should_handle_named_groups_ref()
+        {
+            var re = new PcreRegex(@"a+(?<bees>b+)(c+)(?<dees>d+)e+");
+
+            var match = re.Match("xxxaaabbcccddeeezzz".AsSpan());
+
+            Assert.That(match.Success, Is.True);
+            Assert.That(match.CaptureCount, Is.EqualTo(3));
+            Assert.That(match.Value.ToString(), Is.EqualTo("aaabbcccddeee"));
+            Assert.That(match.Index, Is.EqualTo(3));
+            Assert.That(match.Length, Is.EqualTo(13));
+
+            Assert.That(match["bees"].Value.ToString(), Is.EqualTo("bb"));
+            Assert.That(match["bees"].Index, Is.EqualTo(6));
+            Assert.That(match["bees"].Length, Is.EqualTo(2));
+
+            Assert.That(match[2].Value.ToString(), Is.EqualTo("ccc"));
+            Assert.That(match[2].Index, Is.EqualTo(8));
+            Assert.That(match[2].Length, Is.EqualTo(3));
+
+            Assert.That(match["dees"].Value.ToString(), Is.EqualTo("dd"));
+            Assert.That(match["dees"].Index, Is.EqualTo(11));
+            Assert.That(match["dees"].Length, Is.EqualTo(2));
+
+            Assert.That(match["nope"].Success, Is.False);
         }
 
         [Test]
@@ -128,6 +222,26 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_handle_case_sensitive_group_names_ref()
+        {
+            var re = new PcreRegex(@"a+(?<grp>b+)(?<GRP>c+)(?<GrP>d+)e+");
+
+            var match = re.Match("xxxaaabbcccddeeezzz".AsSpan());
+
+            Assert.That(match["grp"].Value.ToString(), Is.EqualTo("bb"));
+            Assert.That(match["grp"].Index, Is.EqualTo(6));
+            Assert.That(match["grp"].Length, Is.EqualTo(2));
+
+            Assert.That(match["GRP"].Value.ToString(), Is.EqualTo("ccc"));
+            Assert.That(match["GRP"].Index, Is.EqualTo(8));
+            Assert.That(match["GRP"].Length, Is.EqualTo(3));
+
+            Assert.That(match["GrP"].Value.ToString(), Is.EqualTo("dd"));
+            Assert.That(match["GrP"].Index, Is.EqualTo(11));
+            Assert.That(match["GrP"].Length, Is.EqualTo(2));
+        }
+
+        [Test]
         public void should_allow_duplicate_names()
         {
             var re = new PcreRegex(@"(?<g>a)?(?<g>b)?(?<g>c)?", PcreOptions.DupNames);
@@ -137,14 +251,14 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match.Success, Is.True);
             Assert.That(match["g"].Value, Is.EqualTo("b"));
 
-            Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo(new[] {false, true, false}));
+            Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo(new[] { false, true, false }));
 
             match = re.Match("bc");
             Assert.That(match, Is.Not.Null);
             Assert.That(match.Success, Is.True);
             Assert.That(match["g"].Value, Is.EqualTo("b"));
 
-            Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo(new[] {false, true, true}));
+            Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo(new[] { false, true, true }));
         }
 
         [Test]
@@ -157,7 +271,7 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match.Success, Is.True);
             Assert.That(match["g"].Value, Is.EqualTo("b"));
 
-            Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo(new[] {false, true, true}));
+            Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo(new[] { false, true, true }));
         }
 
         [Test]
@@ -177,6 +291,20 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_return_marks_ref()
+        {
+            var re = new PcreRegex(@"a(?:(*MARK:foo)b(*MARK:bar)|c)");
+            var match = re.Match("ab".AsSpan());
+
+            Assert.That(match.Success, Is.True);
+            Assert.That(match.Mark.ToString(), Is.EqualTo("bar"));
+
+            match = re.Match("ac".AsSpan());
+            Assert.That(match.Success, Is.True);
+            Assert.That(match.Mark.ToString(), Is.EqualTo(string.Empty));
+        }
+
+        [Test]
         public void should_use_callout_result()
         {
             var regex = new PcreRegex(@"(\d+)(*SKIP)(?C1):\s*(\w+)");
@@ -184,7 +312,7 @@ namespace PCRE.Tests.PcreNet
             var match = regex.Match(
                 "1542: not_this, 1764: hello",
                 data => data.Number == 1
-                        && int.Parse(data.Match[1].Value)%42 == 0
+                        && int.Parse(data.Match[1].Value) % 42 == 0
                     ? PcreCalloutResult.Pass
                     : PcreCalloutResult.Fail);
 
@@ -244,6 +372,7 @@ namespace PCRE.Tests.PcreNet
                     first = false;
                     return PcreCalloutResult.Fail;
                 }
+
                 return PcreCalloutResult.Pass;
             });
 
@@ -304,7 +433,7 @@ namespace PCRE.Tests.PcreNet
             var startMatchList = new List<bool>();
             var backtrackList = new List<bool>();
 
-            var match = re.Match("abc", data =>
+            re.Match("abc", data =>
             {
                 startMatchList.Add(data.StartMatch);
                 backtrackList.Add(data.Backtrack);
@@ -369,6 +498,20 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_handle_end_before_start_ref()
+        {
+            var re = new PcreRegex(@"(?=a+\K)");
+
+            var match = re.Match("aaa".AsSpan());
+
+            Assert.That(match.Success, Is.True);
+            Assert.That(match.Index, Is.EqualTo(3));
+            Assert.That(match.EndIndex, Is.EqualTo(0));
+            Assert.That(match.Length, Is.EqualTo(0));
+            Assert.That(match.Value.ToString(), Is.EqualTo(string.Empty));
+        }
+
+        [Test]
         public void should_handle_additional_options()
         {
             var re = new PcreRegex(@"bar");
@@ -383,6 +526,20 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_handle_additional_options_ref()
+        {
+            var re = new PcreRegex(@"bar");
+
+            var match = re.Match("foobar".AsSpan(), PcreMatchOptions.None);
+
+            Assert.That(match.Success, Is.True);
+
+            match = re.Match("foobar".AsSpan(), PcreMatchOptions.Anchored);
+
+            Assert.That(match.Success, Is.False);
+        }
+
+        [Test]
         public void should_handle_extra_options()
         {
             var re = new PcreRegex(@"bar", new PcreRegexSettings(PcreOptions.Literal)
@@ -392,6 +549,18 @@ namespace PCRE.Tests.PcreNet
 
             Assert.That(re.IsMatch("foo bar baz"), Is.True);
             Assert.That(re.IsMatch("foobar baz"), Is.False);
+        }
+
+        [Test]
+        public void should_handle_extra_options_ref()
+        {
+            var re = new PcreRegex(@"bar", new PcreRegexSettings(PcreOptions.Literal)
+            {
+                ExtraCompileOptions = PcreExtraCompileOptions.MatchWord
+            });
+
+            Assert.That(re.IsMatch("foo bar baz".AsSpan()), Is.True);
+            Assert.That(re.IsMatch("foobar baz".AsSpan()), Is.False);
         }
 
         [Test]
@@ -412,12 +581,44 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        [TestCase(PcreMatchOptions.PartialSoft)]
+        [TestCase(PcreMatchOptions.PartialHard)]
+        public void should_match_partially_ref(PcreMatchOptions options)
+        {
+            var re = new PcreRegex(@"(?<=abc)123");
+
+            var match = re.Match("xyzabc12".AsSpan(), options);
+
+            Assert.That(match.Success, Is.False);
+            Assert.That(match.IsPartialMatch, Is.True);
+            Assert.That(match.Index, Is.EqualTo(6));
+            Assert.That(match.EndIndex, Is.EqualTo(8));
+            Assert.That(match.Length, Is.EqualTo(2));
+            Assert.That(match.Value.ToString(), Is.EqualTo("12"));
+        }
+
+        [Test]
         public void should_differentiate_soft_and_hard_partial_matching()
         {
             var re = new PcreRegex(@"dog(sbody)?");
 
             var softMatch = re.Match("dog", PcreMatchOptions.PartialSoft);
             var hardMatch = re.Match("dog", PcreMatchOptions.PartialHard);
+
+            Assert.That(softMatch.Success, Is.True);
+            Assert.That(softMatch.IsPartialMatch, Is.False);
+
+            Assert.That(hardMatch.Success, Is.False);
+            Assert.That(hardMatch.IsPartialMatch, Is.True);
+        }
+
+        [Test]
+        public void should_differentiate_soft_and_hard_partial_matching_ref()
+        {
+            var re = new PcreRegex(@"dog(sbody)?");
+
+            var softMatch = re.Match("dog".AsSpan(), PcreMatchOptions.PartialSoft);
+            var hardMatch = re.Match("dog".AsSpan(), PcreMatchOptions.PartialHard);
 
             Assert.That(softMatch.Success, Is.True);
             Assert.That(softMatch.IsPartialMatch, Is.False);
@@ -435,10 +636,20 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        [SuppressMessage("ReSharper", "ReturnValueOfPureMethodIsNotUsed")]
         public void should_check_subject_utf_validity()
         {
             var re = new PcreRegex(@"A");
             var ex = Assert.Throws<PcreMatchException>(() => re.Match("A\uD800B"));
+            Assert.That(ex.Message, Contains.Substring("invalid low surrogate"));
+        }
+
+        [Test]
+        [SuppressMessage("ReSharper", "ReturnValueOfPureMethodIsNotUsed")]
+        public void should_check_subject_utf_validity_ref()
+        {
+            var re = new PcreRegex(@"A");
+            var ex = Assert.Throws<PcreMatchException>(() => re.Match("A\uD800B".AsSpan()));
             Assert.That(ex.Message, Contains.Substring("invalid low surrogate"));
         }
 
@@ -464,10 +675,41 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_handle_offset_limit_ref()
+        {
+            var re = new PcreRegex(@"bar", PcreOptions.UseOffsetLimit);
+
+            var match = re.Match("foobar".AsSpan());
+            Assert.That(match.Success, Is.True);
+
+            match = re.Match("foobar".AsSpan(), new PcreMatchSettings
+            {
+                OffsetLimit = 3
+            });
+            Assert.That(match.Success, Is.True);
+
+            match = re.Match("foobar".AsSpan(), new PcreMatchSettings
+            {
+                OffsetLimit = 2
+            });
+            Assert.That(match.Success, Is.False);
+        }
+
+        [Test]
         public void should_detect_invalid_offset_limit_usage()
         {
             var re = new PcreRegex(@"bar");
             Assert.Throws<PcreMatchException>(() => re.Match("foobar", new PcreMatchSettings
+            {
+                OffsetLimit = 3
+            }));
+        }
+
+        [Test]
+        public void should_detect_invalid_offset_limit_usage_ref()
+        {
+            var re = new PcreRegex(@"bar");
+            Assert.Throws<PcreMatchException>(() => re.Match("foobar".AsSpan(), new PcreMatchSettings
             {
                 OffsetLimit = 3
             }));
@@ -484,6 +726,22 @@ namespace PCRE.Tests.PcreNet
             Assert.That(normal.Length, Is.EqualTo(subject.Length));
 
             var scriptRun = PcreRegex.Match(subject, @"(*script_run:\d+)", PcreOptions.Unicode);
+            Assert.That(scriptRun.Success, Is.True);
+            Assert.That(scriptRun.Index, Is.EqualTo(0));
+            Assert.That(scriptRun.Length, Is.EqualTo(3));
+        }
+
+        [Test]
+        public void should_match_script_run_ref()
+        {
+            const string subject = "123\U0001D7CF\U0001D7D0\U0001D7D1";
+
+            var normal = new PcreRegex(@"\d+", PcreOptions.Unicode).Match(subject.AsSpan());
+            Assert.That(normal.Success, Is.True);
+            Assert.That(normal.Index, Is.EqualTo(0));
+            Assert.That(normal.Length, Is.EqualTo(subject.Length));
+
+            var scriptRun = new PcreRegex(@"(*script_run:\d+)", PcreOptions.Unicode).Match(subject.AsSpan());
             Assert.That(scriptRun.Success, Is.True);
             Assert.That(scriptRun.Index, Is.EqualTo(0));
             Assert.That(scriptRun.Length, Is.EqualTo(3));
@@ -543,9 +801,8 @@ namespace PCRE.Tests.PcreNet
                 ""baz"": true
             }";
 
-            var isValidJson = regex.IsMatch(subject);
-
-            Assert.That(isValidJson, Is.True);
+            Assert.That(regex.IsMatch(subject), Is.True);
+            Assert.That(regex.IsMatch(subject.AsSpan()), Is.True);
         }
     }
 }
