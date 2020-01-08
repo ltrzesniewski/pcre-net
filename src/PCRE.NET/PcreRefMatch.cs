@@ -6,7 +6,7 @@ using PCRE.Internal;
 namespace PCRE
 {
     [DebuggerTypeProxy(typeof(DebugProxy))]
-    public unsafe ref struct PcreRefMatch
+    public readonly unsafe ref struct PcreRefMatch
     {
         private readonly InternalRegex _regex;
         private readonly int _resultCode;
@@ -116,23 +116,17 @@ namespace PCRE
             return default;
         }
 
-        // TODO
-        // public IEnumerable<PcreGroup> GetDuplicateNamedGroups(string name)
-        // {
-        //     var map = _regex.CaptureNames;
-        //     if (map == null)
-        //         yield break;
-        //
-        //     if (!map.TryGetValue(name, out var indexes))
-        //         yield break;
-        //
-        //     foreach (var index in indexes)
-        //     {
-        //         var group = GetGroup(index);
-        //         if (group != null)
-        //             yield return group;
-        //     }
-        // }
+        public DuplicateNamedGroupEnumerable GetDuplicateNamedGroups(string name)
+        {
+            var map = _regex.CaptureNames;
+            if (map == null)
+                return default;
+
+            if (!map.TryGetValue(name, out var indexes))
+                return default;
+
+            return new DuplicateNamedGroupEnumerable(this, indexes);
+        }
 
         internal int GetStartOfNextMatchIndex()
         {
@@ -158,6 +152,49 @@ namespace PCRE
 
             public bool MoveNext()
                 => ++_index <= _match.CaptureCount;
+        }
+
+        public readonly ref struct DuplicateNamedGroupEnumerable
+        {
+            private readonly PcreRefMatch _match;
+            private readonly int[] _groupIndexes;
+
+            internal DuplicateNamedGroupEnumerable(PcreRefMatch match, int[] groupIndexes)
+            {
+                _match = match;
+                _groupIndexes = groupIndexes;
+            }
+
+            public DuplicateNamedGroupEnumerator GetEnumerator()
+                => new DuplicateNamedGroupEnumerator(_match, _groupIndexes);
+        }
+
+        public ref struct DuplicateNamedGroupEnumerator
+        {
+            private readonly PcreRefMatch _match;
+            private readonly int[] _groupIndexes;
+            private int _index;
+
+            internal DuplicateNamedGroupEnumerator(PcreRefMatch match, int[] groupIndexes)
+            {
+                _match = match;
+                _groupIndexes = groupIndexes;
+                _index = -1;
+            }
+
+            public PcreRefGroup Current => _match.GetGroup(_groupIndexes[_index]);
+
+            public bool MoveNext()
+            {
+                if (_groupIndexes is null)
+                    return false;
+
+                if (_index + 1 >= _groupIndexes.Length)
+                    return false;
+
+                ++_index;
+                return true;
+            }
         }
 
         [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]

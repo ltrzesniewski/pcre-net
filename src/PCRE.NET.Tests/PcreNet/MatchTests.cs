@@ -262,6 +262,24 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_allow_duplicate_names_ref()
+        {
+            var re = new PcreRegex(@"(?<g>a)?(?<g>b)?(?<g>c)?", PcreOptions.DupNames);
+            var match = re.Match("b".AsSpan());
+
+            Assert.That(match.Success, Is.True);
+            Assert.That(match["g"].Value.ToString(), Is.EqualTo("b"));
+
+            Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo(new[] { false, true, false }));
+
+            match = re.Match("bc".AsSpan());
+            Assert.That(match.Success, Is.True);
+            Assert.That(match["g"].Value.ToString(), Is.EqualTo("b"));
+
+            Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo(new[] { false, true, true }));
+        }
+
+        [Test]
         public void should_detect_duplicate_names()
         {
             var re = new PcreRegex(@"(?J)(?<g>a)?(?<g>b)?(?<g>c)?");
@@ -272,6 +290,28 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match["g"].Value, Is.EqualTo("b"));
 
             Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo(new[] { false, true, true }));
+        }
+
+        [Test]
+        public void should_detect_duplicate_names_ref()
+        {
+            var re = new PcreRegex(@"(?J)(?<g>a)?(?<g>b)?(?<g>c)?");
+
+            var match = re.Match("bc".AsSpan());
+            Assert.That(match.Success, Is.True);
+            Assert.That(match["g"].Value.ToString(), Is.EqualTo("b"));
+
+            Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo(new[] { false, true, true }));
+        }
+
+        private static List<bool> GetDuplicateNamedGroupsSuccesses(PcreRefMatch match, string groupName)
+        {
+            var result = new List<bool>();
+
+            foreach (var group in match.GetDuplicateNamedGroups(groupName))
+                result.Add(group.Success);
+
+            return result;
         }
 
         [Test]

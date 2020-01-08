@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace PCRE
 {
     [DebuggerTypeProxy(typeof(DebugProxy))]
-    public ref struct PcreRefGroup
+    public readonly ref struct PcreRefGroup
     {
         private readonly ReadOnlySpan<char> _subject;
 
