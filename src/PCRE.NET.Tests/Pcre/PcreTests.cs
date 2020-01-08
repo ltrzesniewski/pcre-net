@@ -13,28 +13,23 @@ namespace PCRE.Tests.Pcre
     {
         [Test]
         [TestCaseSource(typeof(PcreTestsSource))]
-        public void should_pass_pcre_test_suite(TestCase testCase, TestOutput expectedResult)
+        public void should_pass_pcre_test_suite(TestCase testCase)
         {
-            Console.WriteLine("TEST CASE: Input line {0}, output line {1}", testCase.Pattern.LineNumber, expectedResult.Pattern.LineNumber);
-            Console.WriteLine(testCase.Pattern.FullString.Trim());
-            Console.WriteLine();
+            Assert.That(testCase.ExpectedResult.Pattern, Is.EqualTo(testCase.Input.Pattern));
 
-            Assert.That(expectedResult.Pattern, Is.EqualTo(testCase.Pattern));
+            var testInput = testCase.Input;
+            var expectedResult = testCase.ExpectedResult;
 
-            RunTest(testCase, expectedResult, PcreOptions.None);
-            RunTest(testCase, expectedResult, PcreOptions.Compiled | PcreOptions.CompiledPartial);
-        }
+            var options = testCase.Jit
+                ? PcreOptions.Compiled | PcreOptions.CompiledPartial
+                : PcreOptions.None;
 
-        private static void RunTest(TestCase testCase, TestOutput expectedResult, PcreOptions options)
-        {
-            var pattern = testCase.Pattern;
+            var pattern = testInput.Pattern;
 
             if (pattern.NotSupported)
                 Assert.Inconclusive("Feature not supported");
 
             options = (options | pattern.PatternOptions) & ~pattern.ResetOptionBits;
-
-            Console.WriteLine("Options: {0}", options);
 
             PcreRegex regex;
             try
@@ -55,11 +50,9 @@ namespace PCRE.Tests.Pcre
 
             using (jitStack)
             {
-                for (var line = 0; line < testCase.SubjectLines.Count; ++line)
+                for (var line = 0; line < testInput.SubjectLines.Count; ++line)
                 {
-                    Console.WriteLine("  Subject #{0}: {1}", line, testCase.SubjectLines[line]);
-
-                    var subject = testCase.SubjectLines[line];
+                    var subject = testInput.SubjectLines[line];
                     var expected = expectedResult.ExpectedResults[line];
 
                     Assert.That(expected.SubjectLine, Is.EqualTo(subject));
@@ -98,9 +91,6 @@ namespace PCRE.Tests.Pcre
                     }
                 }
             }
-
-            Console.WriteLine("OK");
-            Console.WriteLine();
         }
 
         private static void CompareGroups(TestPattern pattern, PcreMatch actualMatch, ExpectedMatch expectedMatch)
@@ -116,8 +106,6 @@ namespace PCRE.Tests.Pcre
                 var expectedGroup = groupIndex < expectedGroups.Count
                     ? expectedGroups[groupIndex]
                     : ExpectedGroup.Unset;
-
-                Console.WriteLine("    Group #{0}: {1}", groupIndex, expectedGroup.Value);
 
                 Assert.That(actualGroup.Success, Is.EqualTo(expectedGroup.IsMatch));
 
@@ -163,21 +151,28 @@ namespace PCRE.Tests.Pcre
                     using (var inputReader = new TestInputReader(inputFs))
                     using (var outputReader = new TestOutputReader(outputFs))
                     {
-                        var tests = inputReader.ReadTestCases().Zip(outputReader.ReadTestOutputs(), (i, o) => new
+                        var tests = inputReader.ReadTestInputs().Zip(outputReader.ReadTestOutputs(), (i, o) => new
                         {
-                            testCase = i,
+                            input = i,
                             expectedResult = o
                         });
 
-                        foreach (var test in tests)
-                        {
-                            var testCase = new TestCaseData(test.testCase, test.expectedResult)
+                        var testCases =
+                            from test in tests
+                            from jit in new[] { false, true }
+                            let testCase = new TestCase
+                            {
+                                Input = test.input,
+                                ExpectedResult = test.expectedResult,
+                                Jit = jit
+                            }
+                            select new TestCaseData(testCase)
                                 .SetCategory(testFileName)
-                                .SetName($"{testFileName} line {test.testCase.Pattern.LineNumber:0000}")
-                                .SetDescription(test.testCase.Pattern.Pattern);
+                                .SetName($"PCRE {testFileName} line {testCase.Input.Pattern.LineNumber:0000}, {(jit ? "JIT" : "Interpreted")}")
+                                .SetDescription(testCase.Input.Pattern.Pattern);
 
+                        foreach (var testCase in testCases)
                             yield return testCase;
-                        }
                     }
                 }
             }

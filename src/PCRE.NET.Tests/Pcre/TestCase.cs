@@ -1,17 +1,12 @@
-﻿using System.Collections.Generic;
-
 namespace PCRE.Tests.Pcre
 {
     public class TestCase
     {
-        public TestPattern Pattern { get; set; }
-        public IList<string> SubjectLines { get; }
+        public TestInput Input { get; set; }
+        public TestOutput ExpectedResult { get; set; }
 
-        public TestCase()
-        {
-            SubjectLines = new List<string>();
-        }
+        public bool Jit { get; set; }
 
-        public override string ToString() => Pattern?.ToString() ?? "???";
+        public override string ToString() => Input.ToString();
     }
 }

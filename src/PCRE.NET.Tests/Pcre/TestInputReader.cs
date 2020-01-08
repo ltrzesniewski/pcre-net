@@ -10,7 +10,7 @@ namespace PCRE.Tests.Pcre
         {
         }
 
-        public IEnumerable<TestCase> ReadTestCases()
+        public IEnumerable<TestInput> ReadTestInputs()
         {
             while (true)
             {
@@ -19,7 +19,7 @@ namespace PCRE.Tests.Pcre
                 if (pattern == null)
                     yield break;
 
-                var testCase = new TestCase
+                var testCase = new TestInput
                 {
                     Pattern = pattern,
                 };
