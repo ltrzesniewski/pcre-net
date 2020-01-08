@@ -113,7 +113,7 @@ namespace PCRE
             => Matches(subject, PcreMatchSettings.Default);
 
         [Pure]
-        public RefMatchEnumerator Matches(ReadOnlySpan<char> subject)
+        public RefMatchEnumerable Matches(ReadOnlySpan<char> subject)
             => Matches(subject, PcreMatchSettings.Default);
 
         [Pure]
@@ -121,7 +121,7 @@ namespace PCRE
             => Matches(subject, startIndex, null);
 
         [Pure]
-        public RefMatchEnumerator Matches(ReadOnlySpan<char> subject, int startIndex)
+        public RefMatchEnumerable Matches(ReadOnlySpan<char> subject, int startIndex)
             => Matches(subject, startIndex, null);
 
         [Pure]
@@ -134,7 +134,7 @@ namespace PCRE
         }
 
         [Pure]
-        public RefMatchEnumerator Matches(ReadOnlySpan<char> subject, int startIndex, PcreRefCalloutFunc onCallout)
+        public RefMatchEnumerable Matches(ReadOnlySpan<char> subject, int startIndex, PcreRefCalloutFunc onCallout)
         {
             if (subject == null)
                 throw new ArgumentNullException(nameof(subject));
@@ -158,7 +158,7 @@ namespace PCRE
         }
 
         [Pure]
-        public RefMatchEnumerator Matches(ReadOnlySpan<char> subject, PcreMatchSettings settings)
+        public RefMatchEnumerable Matches(ReadOnlySpan<char> subject, PcreMatchSettings settings)
         {
             if (settings == null)
                 throw new ArgumentNullException(nameof(settings));
@@ -166,7 +166,7 @@ namespace PCRE
             if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
                 throw new IndexOutOfRangeException("Invalid StartIndex value");
 
-            return new RefMatchEnumerator(InternalRegex, subject, settings);
+            return new RefMatchEnumerable(InternalRegex, subject, settings);
         }
 
         private IEnumerable<PcreMatch> MatchesIterator(string subject, PcreMatchSettings settings)
@@ -228,6 +228,33 @@ namespace PCRE
         public static IEnumerable<PcreMatch> Matches(string subject, string pattern, PcreOptions options, int startIndex)
             => new PcreRegex(pattern, options).Matches(subject, startIndex);
 
+        public readonly ref struct RefMatchEnumerable
+        {
+            private readonly ReadOnlySpan<char> _subject;
+            private readonly PcreMatchSettings _settings;
+            private readonly InternalRegex _regex;
+
+            internal RefMatchEnumerable(InternalRegex regex, ReadOnlySpan<char> subject, PcreMatchSettings settings)
+            {
+                _regex = regex;
+                _subject = subject;
+                _settings = settings;
+            }
+
+            public RefMatchEnumerator GetEnumerator()
+                => new RefMatchEnumerator(_regex, _subject, _settings);
+
+            public List<T> ToList<T>(PcreRefMatch.Func<T> selector)
+            {
+                var result = new List<T>();
+
+                foreach (var item in this)
+                    result.Add(selector(item));
+
+                return result;
+            }
+        }
+
         public ref struct RefMatchEnumerator
         {
             private readonly ReadOnlySpan<char> _subject;
@@ -243,7 +270,7 @@ namespace PCRE
                 _match = default;
             }
 
-            public PcreRefMatch Current => _match;
+            public readonly PcreRefMatch Current => _match;
 
             public bool MoveNext()
             {

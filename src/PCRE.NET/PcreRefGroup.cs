@@ -8,6 +8,8 @@ namespace PCRE
     {
         private readonly ReadOnlySpan<char> _subject;
 
+        public delegate T Func<out T>(PcreRefGroup group);
+
         internal PcreRefGroup(ReadOnlySpan<char> subject, int startOffset, int endOffset)
         {
             _subject = subject;

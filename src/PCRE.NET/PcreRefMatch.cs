@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using PCRE.Internal;
@@ -12,6 +13,8 @@ namespace PCRE
         private readonly int _resultCode;
         private readonly uint[] _oVector;
         private readonly char* _markPtr;
+
+        public delegate T Func<out T>(PcreRefMatch match);
 
         internal PcreRefMatch(ReadOnlySpan<char> subject, InternalRegex regex, ref Native.match_result result, uint[] oVector)
         {
@@ -37,7 +40,7 @@ namespace PCRE
             _resultCode = oVector.Length / 2;
         }
 
-        public int CaptureCount => _regex.CaptureCount;
+        public int CaptureCount => _regex?.CaptureCount ?? 0;
 
         public PcreRefGroup this[int index] => GetGroup(index);
 
@@ -71,9 +74,11 @@ namespace PCRE
             }
         }
 
+        public GroupList Groups => new GroupList(this);
+
         public bool IsPartialMatch => _resultCode == PcreConstants.ERROR_PARTIAL;
 
-        public Enumerator GetEnumerator() => new Enumerator(this);
+        public GroupEnumerator GetEnumerator() => new GroupEnumerator(this);
 
         private PcreRefGroup GetGroup(int index)
         {
@@ -96,7 +101,7 @@ namespace PCRE
 
         private PcreRefGroup GetGroup(string name)
         {
-            var map = _regex.CaptureNames;
+            var map = _regex?.CaptureNames;
             if (map == null)
                 return default;
 
@@ -118,7 +123,7 @@ namespace PCRE
 
         public DuplicateNamedGroupEnumerable GetDuplicateNamedGroups(string name)
         {
-            var map = _regex.CaptureNames;
+            var map = _regex?.CaptureNames;
             if (map == null)
                 return default;
 
@@ -137,12 +142,38 @@ namespace PCRE
 
         public override string ToString() => Value.ToString();
 
-        public ref struct Enumerator
+        public readonly ref struct GroupList
+        {
+            private readonly PcreRefMatch _match;
+
+            internal GroupList(PcreRefMatch match)
+                => _match = match;
+
+            public int Count => _match._regex?.CaptureCount + 1 ?? 0;
+
+            public GroupEnumerator GetEnumerator()
+                => new GroupEnumerator(_match);
+
+            public PcreRefGroup this[int index] => _match[index];
+            public PcreRefGroup this[string name] => _match[name];
+
+            public List<T> ToList<T>(PcreRefGroup.Func<T> selector)
+            {
+                var result = new List<T>();
+
+                foreach (var item in this)
+                    result.Add(selector(item));
+
+                return result;
+            }
+        }
+
+        public ref struct GroupEnumerator
         {
             private readonly PcreRefMatch _match;
             private int _index;
 
-            internal Enumerator(PcreRefMatch match)
+            internal GroupEnumerator(PcreRefMatch match)
             {
                 _match = match;
                 _index = -1;
@@ -167,6 +198,16 @@ namespace PCRE
 
             public DuplicateNamedGroupEnumerator GetEnumerator()
                 => new DuplicateNamedGroupEnumerator(_match, _groupIndexes);
+
+            public List<T> ToList<T>(PcreRefGroup.Func<T> selector)
+            {
+                var result = new List<T>();
+
+                foreach (var item in this)
+                    result.Add(selector(item));
+
+                return result;
+            }
         }
 
         public ref struct DuplicateNamedGroupEnumerator
@@ -182,7 +223,7 @@ namespace PCRE
                 _index = -1;
             }
 
-            public PcreRefGroup Current => _match.GetGroup(_groupIndexes[_index]);
+            public readonly PcreRefGroup Current => _match.GetGroup(_groupIndexes[_index]);
 
             public bool MoveNext()
             {
