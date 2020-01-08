@@ -156,6 +156,9 @@ namespace PCRE.Internal
                 input.start_index = (uint)startIndex;
                 input.additional_options = additionalOptions;
 
+                if (input.subject == (char*)0 && input.subject_length == 0)
+                    input.subject = (char*)1; // PCRE doesn't like null subjects, even if the length is zero
+
                 CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, settings.RefCallout);
 
                 Native.match(ref input, out result);

@@ -13,17 +13,28 @@ namespace PCRE.Tests.Pcre
     {
         [Test]
         [TestCaseSource(typeof(PcreTestsSource))]
+        [Parallelizable(ParallelScope.All)]
         public void should_pass_pcre_test_suite(TestCase testCase)
         {
             Assert.That(testCase.ExpectedResult.Pattern, Is.EqualTo(testCase.Input.Pattern));
-
-            var testInput = testCase.Input;
-            var expectedResult = testCase.ExpectedResult;
 
             var options = testCase.Jit
                 ? PcreOptions.Compiled | PcreOptions.CompiledPartial
                 : PcreOptions.None;
 
+            try
+            {
+                RunTest(testCase.Input, testCase.ExpectedResult, options, testCase.Span);
+            }
+            catch
+            {
+                Console.WriteLine($"PATTERN: {testCase.TestFile}:line {testCase.Input.Pattern.LineNumber}");
+                throw;
+            }
+        }
+
+        private static void RunTest(TestInput testInput, TestOutput expectedResult, PcreOptions options, bool span)
+        {
             var pattern = testInput.Pattern;
 
             if (pattern.NotSupported)
@@ -69,25 +80,53 @@ namespace PCRE.Tests.Pcre
                         JitStack = jitStack
                     };
 
-                    var matches = regex
-                        .Matches(subject, matchSettings)
-                        .Take(pattern.AllMatches ? int.MaxValue : 1)
-                        .ToList();
-
-                    Assert.That(matches.Count, Is.EqualTo(expected.Matches.Count));
-
-                    for (var matchIndex = 0; matchIndex < matches.Count; ++matchIndex)
+                    if (span)
                     {
-                        var actualMatch = matches[matchIndex];
-                        var expectedMatch = expected.Matches[matchIndex];
+                        var matchCount = 0;
 
-                        CompareGroups(pattern, actualMatch, expectedMatch);
+                        foreach (var actualMatch in regex.Matches(subject.AsSpan(), matchSettings))
+                        {
+                            Assert.That(matchCount, Is.LessThan(expected.Matches.Count));
 
-                        if (pattern.ExtractMarks)
-                            CompareMark(actualMatch, expectedMatch);
+                            var expectedMatch = expected.Matches[matchCount];
+                            ++matchCount;
 
-                        if (pattern.GetRemainingString)
-                            CompareRemainingString(actualMatch, expectedMatch);
+                            CompareGroups(pattern, actualMatch, expectedMatch);
+
+                            if (pattern.ExtractMarks)
+                                CompareMark(actualMatch, expectedMatch);
+
+                            if (pattern.GetRemainingString)
+                                CompareRemainingString(actualMatch, expectedMatch);
+
+                            if (!pattern.AllMatches)
+                                break;
+                        }
+
+                        Assert.That(matchCount, Is.EqualTo(expected.Matches.Count));
+                    }
+                    else
+                    {
+                        var matches = regex
+                            .Matches(subject, matchSettings)
+                            .Take(pattern.AllMatches ? int.MaxValue : 1)
+                            .ToList();
+
+                        Assert.That(matches.Count, Is.EqualTo(expected.Matches.Count));
+
+                        for (var matchIndex = 0; matchIndex < matches.Count; ++matchIndex)
+                        {
+                            var actualMatch = matches[matchIndex];
+                            var expectedMatch = expected.Matches[matchIndex];
+
+                            CompareGroups(pattern, actualMatch, expectedMatch);
+
+                            if (pattern.ExtractMarks)
+                                CompareMark(actualMatch, expectedMatch);
+
+                            if (pattern.GetRemainingString)
+                                CompareRemainingString(actualMatch, expectedMatch);
+                        }
                     }
                 }
             }
@@ -120,15 +159,43 @@ namespace PCRE.Tests.Pcre
             }
         }
 
-        private static void CompareMark(PcreMatch actualMatch, ExpectedMatch expectedMatch)
+        private static void CompareGroups(TestPattern pattern, PcreRefMatch actualMatch, ExpectedMatch expectedMatch)
         {
-            Assert.That(actualMatch.Mark, Is.EqualTo(expectedMatch.Mark.UnescapeGroup()));
+            var expectedGroups = expectedMatch.Groups.ToList();
+
+            Assert.That(actualMatch.Groups.Count, Is.GreaterThanOrEqualTo(expectedGroups.Count));
+
+            for (var groupIndex = 0; groupIndex < actualMatch.Groups.Count; ++groupIndex)
+            {
+                var actualGroup = actualMatch.Groups[groupIndex];
+                var expectedGroup = groupIndex < expectedGroups.Count
+                    ? expectedGroups[groupIndex]
+                    : ExpectedGroup.Unset;
+
+                Assert.That(actualGroup.Success, Is.EqualTo(expectedGroup.IsMatch));
+
+                if (expectedGroup.IsMatch)
+                {
+                    var expectedValue = pattern.SubjectLiteral
+                        ? expectedGroup.Value
+                        : expectedGroup.Value.UnescapeGroup();
+
+                    Assert.That(actualGroup.Value.ToString(), Is.EqualTo(expectedValue));
+                }
+            }
         }
 
+        private static void CompareMark(PcreMatch actualMatch, ExpectedMatch expectedMatch)
+            => Assert.That(actualMatch.Mark, Is.EqualTo(expectedMatch.Mark.UnescapeGroup()));
+
+        private static void CompareMark(PcreRefMatch actualMatch, ExpectedMatch expectedMatch)
+            => Assert.That(actualMatch.Mark.ToString(), Is.EqualTo(expectedMatch.Mark.UnescapeGroup() ?? string.Empty));
+
         private static void CompareRemainingString(PcreMatch actualMatch, ExpectedMatch expectedMatch)
-        {
-            Assert.That(actualMatch.Subject.Substring(actualMatch.Index + actualMatch.Length), Is.EqualTo(expectedMatch.RemainingString.UnescapeGroup()));
-        }
+            => Assert.That(actualMatch.Subject.Substring(actualMatch.Index + actualMatch.Length), Is.EqualTo(expectedMatch.RemainingString.UnescapeGroup()));
+
+        private static void CompareRemainingString(PcreRefMatch actualMatch, ExpectedMatch expectedMatch)
+            => Assert.That(actualMatch.Subject.Slice(actualMatch.Index + actualMatch.Length).ToString(), Is.EqualTo(expectedMatch.RemainingString.UnescapeGroup()));
 
         private class PcreTestsSource : IEnumerable<ITestCaseData>
         {
@@ -145,8 +212,9 @@ namespace PCRE.Tests.Pcre
                 for (var fileIndex = 0; fileIndex < InputFiles.GetLength(0); ++fileIndex)
                 {
                     var testFileName = InputFiles[fileIndex, 0];
+                    var testFilePath = Path.Combine(testCasesDir, testFileName);
 
-                    using (var inputFs = File.OpenRead(Path.Combine(testCasesDir, testFileName)))
+                    using (var inputFs = File.OpenRead(testFilePath))
                     using (var outputFs = File.OpenRead(Path.Combine(testCasesDir, InputFiles[fileIndex, 1])))
                     using (var inputReader = new TestInputReader(inputFs))
                     using (var outputReader = new TestOutputReader(outputFs))
@@ -160,15 +228,18 @@ namespace PCRE.Tests.Pcre
                         var testCases =
                             from test in tests
                             from jit in new[] { false, true }
+                            from span in new[] { false, true }
                             let testCase = new TestCase
                             {
+                                TestFile = testFilePath,
                                 Input = test.input,
                                 ExpectedResult = test.expectedResult,
-                                Jit = jit
+                                Jit = jit,
+                                Span = span
                             }
                             select new TestCaseData(testCase)
                                 .SetCategory(testFileName)
-                                .SetName($"PCRE {testFileName} line {testCase.Input.Pattern.LineNumber:0000}, {(jit ? "JIT" : "Interpreted")}")
+                                .SetName($"PCRE {testFileName}, Line {testCase.Input.Pattern.LineNumber:0000}, {(jit ? "JIT" : "Interpreted")}, {(span ? "Span" : "String")}")
                                 .SetDescription(testCase.Input.Pattern.Pattern);
 
                         foreach (var testCase in testCases)
