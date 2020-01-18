@@ -113,7 +113,7 @@ namespace PCRE.Internal
             var input = new Native.match_input();
             settings.FillMatchInput(ref input);
 
-            var oVector = new uint[2 * (CaptureCount + 1)];
+            var oVector = CreateNfaOVector();
             Native.match_result result;
             CalloutInterop.CalloutInteropInfo calloutInterop;
 
@@ -137,25 +137,7 @@ namespace PCRE.Internal
             return new PcreMatch(subject, this, ref result, oVector);
         }
 
-        public PcreRefMatch Match(ReadOnlySpan<char> subject, PcreMatchSettings settings, int startIndex, uint additionalOptions)
-            => Match(
-                subject,
-                settings,
-                new uint[2 * (CaptureCount + 1)],
-                startIndex,
-                additionalOptions
-            );
-
-        public PcreRefMatch NextMatch(in PcreRefMatch match, PcreMatchSettings settings, int startIndex, uint additionalOptions)
-            => Match(
-                match.Subject,
-                settings,
-                match.OVector,
-                startIndex,
-                additionalOptions
-            );
-
-        private PcreRefMatch Match(ReadOnlySpan<char> subject, PcreMatchSettings settings, uint[] oVector, int startIndex, uint additionalOptions)
+        public PcreRefMatch Match(ReadOnlySpan<char> subject, PcreMatchSettings settings, uint[] oVector, int startIndex, uint additionalOptions)
         {
             var input = new Native.match_input();
             settings.FillMatchInput(ref input);
@@ -233,6 +215,9 @@ namespace PCRE.Internal
                     break;
             }
         }
+
+        public uint[] CreateNfaOVector()
+            => new uint[2 * (CaptureCount + 1)];
 
         public IReadOnlyList<PcreCalloutInfo> GetCallouts()
         {

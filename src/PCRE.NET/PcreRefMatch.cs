@@ -47,7 +47,6 @@ namespace PCRE
         public PcreRefGroup this[string name] => GetGroup(name);
 
         internal ReadOnlySpan<char> Subject { get; }
-        internal uint[] OVector => _oVector;
 
         public int Index => this[0].Index;
 
@@ -139,9 +138,10 @@ namespace PCRE
             if (!Success)
                 return;
 
-            this = _regex.NextMatch(
-                this,
+            this = _regex.Match(
+                Subject,
                 settings,
+                _oVector,
                 GetStartOfNextMatchIndex(),
                 settings.AdditionalOptions.ToPatternOptions() | PcreConstants.NO_UTF_CHECK | (Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0)
             );
