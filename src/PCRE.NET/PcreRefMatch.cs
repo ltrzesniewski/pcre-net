@@ -7,11 +7,11 @@ using PCRE.Internal;
 namespace PCRE
 {
     [DebuggerTypeProxy(typeof(DebugProxy))]
-    public readonly unsafe ref struct PcreRefMatch
+    public unsafe ref struct PcreRefMatch
     {
         private readonly InternalRegex _regex;
-        private readonly int _resultCode;
         private readonly uint[] _oVector;
+        private readonly int _resultCode;
         private readonly char* _markPtr;
 
         public delegate T Func<out T>(PcreRefMatch match);
@@ -47,6 +47,7 @@ namespace PCRE
         public PcreRefGroup this[string name] => GetGroup(name);
 
         internal ReadOnlySpan<char> Subject { get; }
+        internal uint[] OVector => _oVector;
 
         public int Index => this[0].Index;
 
@@ -133,7 +134,20 @@ namespace PCRE
             return new DuplicateNamedGroupEnumerable(this, indexes);
         }
 
-        internal int GetStartOfNextMatchIndex()
+        internal void NextMatch(PcreMatchSettings settings)
+        {
+            if (!Success)
+                return;
+
+            this = _regex.NextMatch(
+                this,
+                settings,
+                GetStartOfNextMatchIndex(),
+                settings.AdditionalOptions.ToPatternOptions() | PcreConstants.NO_UTF_CHECK | (Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0)
+            );
+        }
+
+        private int GetStartOfNextMatchIndex()
         {
             // It's possible to have EndIndex < Index
             // when the pattern contains \K in a lookahead

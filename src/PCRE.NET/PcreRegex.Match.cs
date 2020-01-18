@@ -278,14 +278,16 @@ namespace PCRE
                     return false;
 
                 if (!_match.Success)
-                    return Match(_settings.StartIndex, 0);
+                {
+                    _match = _regex.Match(_subject, _settings, _settings.StartIndex, _settings.AdditionalOptions.ToPatternOptions());
+                    if (_match.Success)
+                        return true;
 
-                return Match(_match.GetStartOfNextMatchIndex(), PcreConstants.NO_UTF_CHECK | (_match.Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0));
-            }
+                    _regex = null;
+                    return false;
+                }
 
-            private bool Match(int startIndex, uint additionalOptions)
-            {
-                _match = _regex.Match(_subject, _settings, startIndex, _settings.AdditionalOptions.ToPatternOptions() | additionalOptions);
+                _match.NextMatch(_settings);
                 if (_match.Success)
                     return true;
 

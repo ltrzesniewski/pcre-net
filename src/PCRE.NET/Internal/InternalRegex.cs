@@ -138,11 +138,28 @@ namespace PCRE.Internal
         }
 
         public PcreRefMatch Match(ReadOnlySpan<char> subject, PcreMatchSettings settings, int startIndex, uint additionalOptions)
+            => Match(
+                subject,
+                settings,
+                new uint[2 * (CaptureCount + 1)],
+                startIndex,
+                additionalOptions
+            );
+
+        public PcreRefMatch NextMatch(in PcreRefMatch match, PcreMatchSettings settings, int startIndex, uint additionalOptions)
+            => Match(
+                match.Subject,
+                settings,
+                match.OVector,
+                startIndex,
+                additionalOptions
+            );
+
+        private PcreRefMatch Match(ReadOnlySpan<char> subject, PcreMatchSettings settings, uint[] oVector, int startIndex, uint additionalOptions)
         {
             var input = new Native.match_input();
             settings.FillMatchInput(ref input);
 
-            var oVector = new uint[2 * (CaptureCount + 1)];
             Native.match_result result;
             CalloutInterop.CalloutInteropInfo calloutInterop;
 
