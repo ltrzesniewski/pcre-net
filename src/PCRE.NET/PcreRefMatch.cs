@@ -40,25 +40,25 @@ namespace PCRE
             _resultCode = oVector.Length / 2;
         }
 
-        public int CaptureCount => _regex?.CaptureCount ?? 0;
+        public readonly int CaptureCount => _regex?.CaptureCount ?? 0;
 
-        public PcreRefGroup this[int index] => GetGroup(index);
+        public readonly PcreRefGroup this[int index] => GetGroup(index);
 
-        public PcreRefGroup this[string name] => GetGroup(name);
+        public readonly PcreRefGroup this[string name] => GetGroup(name);
 
         internal ReadOnlySpan<char> Subject { get; }
 
-        public int Index => this[0].Index;
+        public readonly int Index => this[0].Index;
 
-        public int EndIndex => this[0].EndIndex;
+        public readonly int EndIndex => this[0].EndIndex;
 
-        public int Length => this[0].Length;
+        public readonly int Length => this[0].Length;
 
-        public ReadOnlySpan<char> Value => this[0].Value;
+        public readonly ReadOnlySpan<char> Value => this[0].Value;
 
-        public bool Success => _resultCode > 0;
+        public readonly bool Success => _resultCode > 0;
 
-        public ReadOnlySpan<char> Mark
+        public readonly ReadOnlySpan<char> Mark
         {
             get
             {
@@ -74,13 +74,13 @@ namespace PCRE
             }
         }
 
-        public GroupList Groups => new GroupList(this);
+        public readonly GroupList Groups => new GroupList(this);
 
-        public bool IsPartialMatch => _resultCode == PcreConstants.ERROR_PARTIAL;
+        public readonly bool IsPartialMatch => _resultCode == PcreConstants.ERROR_PARTIAL;
 
-        public GroupEnumerator GetEnumerator() => new GroupEnumerator(this);
+        public readonly GroupEnumerator GetEnumerator() => new GroupEnumerator(this);
 
-        private PcreRefGroup GetGroup(int index)
+        private readonly PcreRefGroup GetGroup(int index)
         {
             if (index < 0 || index > CaptureCount)
                 return default;
@@ -99,7 +99,7 @@ namespace PCRE
             return new PcreRefGroup(Subject, startOffset, endOffset);
         }
 
-        private PcreRefGroup GetGroup(string name)
+        private readonly PcreRefGroup GetGroup(string name)
         {
             var map = _regex?.CaptureNames;
             if (map == null)
@@ -121,7 +121,7 @@ namespace PCRE
             return default;
         }
 
-        public DuplicateNamedGroupEnumerable GetDuplicateNamedGroups(string name)
+        public readonly DuplicateNamedGroupEnumerable GetDuplicateNamedGroups(string name)
         {
             var map = _regex?.CaptureNames;
             if (map == null)
@@ -147,14 +147,14 @@ namespace PCRE
             );
         }
 
-        private int GetStartOfNextMatchIndex()
+        private readonly int GetStartOfNextMatchIndex()
         {
             // It's possible to have EndIndex < Index
             // when the pattern contains \K in a lookahead
             return Math.Max(Index, EndIndex);
         }
 
-        public override string ToString() => Value.ToString();
+        public override readonly string ToString() => Value.ToString();
 
         public readonly ref struct GroupList
         {
