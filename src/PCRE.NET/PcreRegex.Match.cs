@@ -105,7 +105,10 @@ namespace PCRE
             if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
                 throw new IndexOutOfRangeException("Invalid StartIndex value");
 
-            return InternalRegex.Match(subject, settings, InternalRegex.CreateNfaOVector(), settings.StartIndex, settings.AdditionalOptions.ToPatternOptions());
+            var match = InternalRegex.CreateRefMatch();
+            match.FirstMatch(subject, settings);
+
+            return match;
         }
 
         [Pure]
@@ -277,17 +280,16 @@ namespace PCRE
                 if (_regex == null)
                     return false;
 
-                if (!_match.Success)
+                if (!_match.IsInitialized)
                 {
-                    _match = _regex.Match(_subject, _settings, _regex.CreateNfaOVector(), _settings.StartIndex, _settings.AdditionalOptions.ToPatternOptions());
-                    if (_match.Success)
-                        return true;
-
-                    _regex = null;
-                    return false;
+                    _match = _regex.CreateRefMatch();
+                    _match.FirstMatch(_subject, _settings);
+                }
+                else
+                {
+                    _match.NextMatch(_settings);
                 }
 
-                _match.NextMatch(_settings);
                 if (_match.Success)
                     return true;
 

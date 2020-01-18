@@ -137,7 +137,10 @@ namespace PCRE.Internal
             return new PcreMatch(subject, this, ref result, oVector);
         }
 
-        public PcreRefMatch Match(ReadOnlySpan<char> subject, PcreMatchSettings settings, uint[] oVector, int startIndex, uint additionalOptions)
+        public PcreRefMatch CreateRefMatch()
+            => new PcreRefMatch(this, CreateNfaOVector());
+
+        public void Match(ref PcreRefMatch match, ReadOnlySpan<char> subject, PcreMatchSettings settings, int startIndex, uint additionalOptions)
         {
             var input = new Native.match_input();
             settings.FillMatchInput(ref input);
@@ -146,7 +149,7 @@ namespace PCRE.Internal
             CalloutInterop.CalloutInteropInfo calloutInterop;
 
             fixed (char* pSubject = subject)
-            fixed (uint* pOVec = &oVector[0])
+            fixed (uint* pOVec = &match.OutputVector[0])
             {
                 input.code = _code;
                 input.subject = pSubject;
@@ -165,7 +168,7 @@ namespace PCRE.Internal
 
             AfterMatch(result, ref calloutInterop);
 
-            return new PcreRefMatch(subject, this, ref result, oVector);
+            match.Update(subject, result);
         }
 
         public PcreDfaMatchResult DfaMatch(string subject, PcreDfaMatchSettings settings, int startIndex, uint additionalOptions)
@@ -216,7 +219,7 @@ namespace PCRE.Internal
             }
         }
 
-        public uint[] CreateNfaOVector()
+        private uint[] CreateNfaOVector()
             => new uint[2 * (CaptureCount + 1)];
 
         public IReadOnlyList<PcreCalloutInfo> GetCallouts()

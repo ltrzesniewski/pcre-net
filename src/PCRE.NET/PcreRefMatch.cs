@@ -11,21 +11,21 @@ namespace PCRE
     {
         private readonly InternalRegex _regex;
         private readonly uint[] _oVector;
-        private readonly int _resultCode;
-        private readonly char* _markPtr;
+        private int _resultCode;
+        private char* _markPtr;
 
         public delegate T Func<out T>(PcreRefMatch match);
 
-        internal PcreRefMatch(ReadOnlySpan<char> subject, InternalRegex regex, ref Native.match_result result, uint[] oVector)
+        internal PcreRefMatch(InternalRegex regex, uint[] oVector)
         {
-            // Real match
+            // Empty match
 
-            Subject = subject;
             _regex = regex;
             _oVector = oVector;
-            _markPtr = result.mark;
 
-            _resultCode = result.result_code;
+            Subject = default;
+            _markPtr = null;
+            _resultCode = 0;
         }
 
         internal PcreRefMatch(ReadOnlySpan<char> subject, InternalRegex regex, uint[] oVector, char* mark)
@@ -46,7 +46,9 @@ namespace PCRE
 
         public readonly PcreRefGroup this[string name] => GetGroup(name);
 
-        internal ReadOnlySpan<char> Subject { get; }
+        internal ReadOnlySpan<char> Subject { get; private set; }
+        internal uint[] OutputVector => _oVector;
+        internal bool IsInitialized => _regex != null;
 
         public readonly int Index => this[0].Index;
 
@@ -133,18 +135,33 @@ namespace PCRE
             return new DuplicateNamedGroupEnumerable(this, indexes);
         }
 
+        internal void FirstMatch(ReadOnlySpan<char> subject, PcreMatchSettings settings)
+        {
+            _regex.Match(
+                ref this,
+                subject,
+                settings,
+                settings.StartIndex,
+                settings.AdditionalOptions.ToPatternOptions()
+            );
+        }
+
         internal void NextMatch(PcreMatchSettings settings)
         {
-            if (!Success)
-                return;
-
-            this = _regex.Match(
+            _regex.Match(
+                ref this,
                 Subject,
                 settings,
-                _oVector,
                 GetStartOfNextMatchIndex(),
                 settings.AdditionalOptions.ToPatternOptions() | PcreConstants.NO_UTF_CHECK | (Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0)
             );
+        }
+
+        internal void Update(ReadOnlySpan<char> subject, Native.match_result result)
+        {
+            Subject = subject;
+            _markPtr = result.mark;
+            _resultCode = result.result_code;
         }
 
         private readonly int GetStartOfNextMatchIndex()
