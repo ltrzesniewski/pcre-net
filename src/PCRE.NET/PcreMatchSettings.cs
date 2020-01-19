@@ -15,20 +15,6 @@ namespace PCRE
         public PcreMatchOptions AdditionalOptions { get; set; }
         public int StartIndex { get; set; }
 
-        [SuppressMessage("ReSharper", "DelegateSubtraction")]
-        public event Func<PcreCallout, PcreCalloutResult> OnCallout
-        {
-            add => Callout += value;
-            remove => Callout -= value;
-        }
-
-        [SuppressMessage("ReSharper", "DelegateSubtraction")]
-        public event PcreRefCalloutFunc OnRefCallout
-        {
-            add => RefCallout += value;
-            remove => RefCallout -= value;
-        }
-
         public uint MatchLimit
         {
             get => _matchLimit ?? PcreBuildInfo.MatchLimit;
@@ -54,9 +40,21 @@ namespace PCRE
         internal Func<PcreCallout, PcreCalloutResult> Callout { get; private set; }
         internal PcreRefCalloutFunc RefCallout { get; private set; }
 
-        internal static PcreMatchSettings GetSettings(int startIndex, PcreMatchOptions additionalOptions, Func<PcreCallout, PcreCalloutResult> onCallout)
+        public void SetCallout(Func<PcreCallout, PcreCalloutResult> callout)
         {
-            if (startIndex == 0 && additionalOptions == PcreMatchOptions.None && onCallout == null)
+            Callout = callout;
+            RefCallout = null;
+        }
+
+        public void SetCallout(PcreRefCalloutFunc callout)
+        {
+            Callout = null;
+            RefCallout = callout;
+        }
+
+        internal static PcreMatchSettings GetSettings(int startIndex, PcreMatchOptions additionalOptions, Func<PcreCallout, PcreCalloutResult> callout)
+        {
+            if (startIndex == 0 && additionalOptions == PcreMatchOptions.None && callout == null)
                 return Default;
 
             var settings = new PcreMatchSettings
@@ -65,15 +63,14 @@ namespace PCRE
                 AdditionalOptions = additionalOptions
             };
 
-            if (onCallout != null)
-                settings.OnCallout += onCallout;
+            settings.SetCallout(callout);
 
             return settings;
         }
 
-        internal static PcreMatchSettings GetSettings(int startIndex, PcreMatchOptions additionalOptions, PcreRefCalloutFunc onCallout)
+        internal static PcreMatchSettings GetSettings(int startIndex, PcreMatchOptions additionalOptions, PcreRefCalloutFunc callout)
         {
-            if (startIndex == 0 && additionalOptions == PcreMatchOptions.None && onCallout == null)
+            if (startIndex == 0 && additionalOptions == PcreMatchOptions.None && callout == null)
                 return Default;
 
             var settings = new PcreMatchSettings
@@ -82,8 +79,7 @@ namespace PCRE
                 AdditionalOptions = additionalOptions
             };
 
-            if (onCallout != null)
-                settings.OnRefCallout += onCallout;
+            settings.SetCallout(callout);
 
             return settings;
         }
