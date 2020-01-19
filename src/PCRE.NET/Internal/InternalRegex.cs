@@ -16,6 +16,9 @@ namespace PCRE.Internal
         public Dictionary<string, int[]> CaptureNames { get; }
         public int CaptureCount { get; }
 
+        public int OutputVectorSize => 2 * (CaptureCount + 1);
+        public bool CanStackAllocOutputVector => CaptureCount < 32;
+
         public InternalRegex(string pattern, PcreRegexSettings settings)
         {
             Pattern = pattern;
@@ -113,7 +116,7 @@ namespace PCRE.Internal
             var input = new Native.match_input();
             settings.FillMatchInput(ref input);
 
-            var oVector = CreateNfaOVector();
+            var oVector = new uint[OutputVectorSize];
             Native.match_result result;
             CalloutInterop.CalloutInteropInfo calloutInterop;
 
@@ -138,7 +141,15 @@ namespace PCRE.Internal
         }
 
         public PcreRefMatch CreateRefMatch()
-            => new PcreRefMatch(this, CreateNfaOVector());
+            => new PcreRefMatch(this, new uint[OutputVectorSize]);
+
+        public PcreRefMatch CreateRefMatch(Span<uint> oVector)
+        {
+            if (oVector.Length < OutputVectorSize)
+                throw new InvalidOperationException("Output vector size too small");
+
+            return new PcreRefMatch(this, oVector);
+        }
 
         public void Match(ref PcreRefMatch match, ReadOnlySpan<char> subject, PcreMatchSettings settings, int startIndex, uint additionalOptions)
         {
@@ -149,7 +160,7 @@ namespace PCRE.Internal
             CalloutInterop.CalloutInteropInfo calloutInterop;
 
             fixed (char* pSubject = subject)
-            fixed (uint* pOVec = &match.OutputVector[0])
+            fixed (uint* pOVec = match.OutputVector)
             {
                 input.code = _code;
                 input.subject = pSubject;
@@ -218,9 +229,6 @@ namespace PCRE.Internal
                     break;
             }
         }
-
-        private uint[] CreateNfaOVector()
-            => new uint[2 * (CaptureCount + 1)];
 
         public IReadOnlyList<PcreCalloutInfo> GetCallouts()
         {

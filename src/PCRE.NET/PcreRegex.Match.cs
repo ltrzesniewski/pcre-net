@@ -25,7 +25,19 @@ namespace PCRE
 
         [Pure]
         public bool IsMatch(ReadOnlySpan<char> subject, int startIndex)
-            => Match(subject, startIndex).Success;
+        {
+            if (startIndex < 0 || startIndex > subject.Length)
+                throw new IndexOutOfRangeException("Invalid StartIndex value");
+
+            var outputVector = InternalRegex.CanStackAllocOutputVector
+                ? stackalloc uint[InternalRegex.OutputVectorSize]
+                : new uint[InternalRegex.OutputVectorSize];
+
+            var match = InternalRegex.CreateRefMatch(outputVector);
+            match.FirstMatch(subject, PcreMatchSettings.Default, startIndex);
+
+            return match.Success;
+        }
 
         [Pure]
         public PcreMatch Match(string subject)
@@ -106,7 +118,7 @@ namespace PCRE
                 throw new IndexOutOfRangeException("Invalid StartIndex value");
 
             var match = InternalRegex.CreateRefMatch();
-            match.FirstMatch(subject, settings);
+            match.FirstMatch(subject, settings, settings.StartIndex);
 
             return match;
         }
@@ -283,7 +295,7 @@ namespace PCRE
                 if (!_match.IsInitialized)
                 {
                     _match = _regex.CreateRefMatch();
-                    _match.FirstMatch(_subject, _settings);
+                    _match.FirstMatch(_subject, _settings, _settings.StartIndex);
                 }
                 else
                 {

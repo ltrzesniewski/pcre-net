@@ -10,13 +10,13 @@ namespace PCRE
     public unsafe ref struct PcreRefMatch
     {
         private readonly InternalRegex _regex;
-        private readonly uint[] _oVector;
+        private readonly ReadOnlySpan<uint> _oVector;
         private int _resultCode;
         private char* _markPtr;
 
         public delegate T Func<out T>(PcreRefMatch match);
 
-        internal PcreRefMatch(InternalRegex regex, uint[] oVector)
+        internal PcreRefMatch(InternalRegex regex, ReadOnlySpan<uint> oVector)
         {
             // Empty match
 
@@ -28,7 +28,7 @@ namespace PCRE
             _resultCode = 0;
         }
 
-        internal PcreRefMatch(ReadOnlySpan<char> subject, InternalRegex regex, uint[] oVector, char* mark)
+        internal PcreRefMatch(ReadOnlySpan<char> subject, InternalRegex regex, ReadOnlySpan<uint> oVector, char* mark)
         {
             // Callout
 
@@ -47,8 +47,8 @@ namespace PCRE
         public readonly PcreRefGroup this[string name] => GetGroup(name);
 
         internal ReadOnlySpan<char> Subject { get; private set; }
-        internal uint[] OutputVector => _oVector;
-        internal bool IsInitialized => _regex != null;
+        internal readonly ReadOnlySpan<uint> OutputVector => _oVector;
+        internal readonly bool IsInitialized => _regex != null;
 
         public readonly int Index => this[0].Index;
 
@@ -135,13 +135,13 @@ namespace PCRE
             return new DuplicateNamedGroupEnumerable(this, indexes);
         }
 
-        internal void FirstMatch(ReadOnlySpan<char> subject, PcreMatchSettings settings)
+        internal void FirstMatch(ReadOnlySpan<char> subject, PcreMatchSettings settings, int startIndex)
         {
             _regex.Match(
                 ref this,
                 subject,
                 settings,
-                settings.StartIndex,
+                startIndex,
                 settings.AdditionalOptions.ToPatternOptions()
             );
         }
