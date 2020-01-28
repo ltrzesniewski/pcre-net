@@ -16,6 +16,9 @@ namespace PCRE.Internal
         public Dictionary<string, int[]> CaptureNames { get; }
         public int CaptureCount { get; }
 
+        public int OutputVectorSize => 2 * (CaptureCount + 1);
+        public bool CanStackAllocOutputVector => CaptureCount < 32;
+
         public InternalRegex(string pattern, PcreRegexSettings settings)
         {
             Pattern = pattern;
@@ -113,7 +116,7 @@ namespace PCRE.Internal
             var input = new Native.match_input();
             settings.FillMatchInput(ref input);
 
-            var oVector = new uint[2 * (CaptureCount + 1)];
+            var oVector = new uint[OutputVectorSize];
             Native.match_result result;
             CalloutInterop.CalloutInteropInfo calloutInterop;
 
@@ -135,6 +138,48 @@ namespace PCRE.Internal
             AfterMatch(result, ref calloutInterop);
 
             return new PcreMatch(subject, this, ref result, oVector);
+        }
+
+        public PcreRefMatch CreateRefMatch()
+            => new PcreRefMatch(this, new uint[OutputVectorSize]);
+
+        public PcreRefMatch CreateRefMatch(Span<uint> oVector)
+        {
+            if (oVector.Length < OutputVectorSize)
+                throw new InvalidOperationException("Output vector size too small");
+
+            return new PcreRefMatch(this, oVector);
+        }
+
+        public void Match(ref PcreRefMatch match, ReadOnlySpan<char> subject, PcreMatchSettings settings, int startIndex, uint additionalOptions)
+        {
+            var input = new Native.match_input();
+            settings.FillMatchInput(ref input);
+
+            Native.match_result result;
+            CalloutInterop.CalloutInteropInfo calloutInterop;
+
+            fixed (char* pSubject = subject)
+            fixed (uint* pOVec = match.OutputVector)
+            {
+                input.code = _code;
+                input.subject = pSubject;
+                input.subject_length = (uint)subject.Length;
+                input.output_vector = pOVec;
+                input.start_index = (uint)startIndex;
+                input.additional_options = additionalOptions;
+
+                if (input.subject == (char*)0 && input.subject_length == 0)
+                    input.subject = (char*)1; // PCRE doesn't like null subjects, even if the length is zero
+
+                CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, settings.RefCallout);
+
+                Native.match(ref input, out result);
+            }
+
+            AfterMatch(result, ref calloutInterop);
+
+            match.Update(subject, result);
         }
 
         public PcreDfaMatchResult DfaMatch(string subject, PcreDfaMatchSettings settings, int startIndex, uint additionalOptions)
