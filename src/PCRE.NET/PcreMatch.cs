@@ -46,19 +46,15 @@ namespace PCRE
         public int CaptureCount => _regex.CaptureCount;
 
         public PcreGroup this[int index] => GetGroup(index);
-
         public PcreGroup this[string name] => GetGroup(name);
 
         internal string Subject { get; }
 
         public int Index => this[0].Index;
-
         public int EndIndex => this[0].EndIndex;
-
         public int Length => this[0].Length;
 
         public string Value => this[0].Value;
-
         public bool Success => _resultCode > 0;
 
         public string Mark

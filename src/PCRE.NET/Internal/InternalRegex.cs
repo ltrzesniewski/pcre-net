@@ -211,7 +211,7 @@ namespace PCRE.Internal
             return new PcreDfaMatchResult(subject, ref result, oVector);
         }
 
-        private static void AfterMatch(Native.match_result result, ref CalloutInterop.CalloutInteropInfo calloutInterop)
+        private static void AfterMatch(in Native.match_result result, ref CalloutInterop.CalloutInteropInfo calloutInterop)
         {
             switch (result.result_code)
             {

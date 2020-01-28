@@ -43,7 +43,6 @@ namespace PCRE
         public readonly int CaptureCount => _regex?.CaptureCount ?? 0;
 
         public readonly PcreRefGroup this[int index] => GetGroup(index);
-
         public readonly PcreRefGroup this[string name] => GetGroup(name);
 
         internal ReadOnlySpan<char> Subject { get; private set; }
@@ -51,14 +50,11 @@ namespace PCRE
         internal readonly bool IsInitialized => _regex != null;
 
         public readonly int Index => this[0].Index;
-
         public readonly int EndIndex => this[0].EndIndex;
-
         public readonly int Length => this[0].Length;
 
-        public readonly ReadOnlySpan<char> Value => this[0].Value;
-
         public readonly bool Success => _resultCode > 0;
+        public readonly ReadOnlySpan<char> Value => this[0].Value;
 
         public readonly ReadOnlySpan<char> Mark
         {
@@ -157,7 +153,7 @@ namespace PCRE
             );
         }
 
-        internal void Update(ReadOnlySpan<char> subject, Native.match_result result)
+        internal void Update(ReadOnlySpan<char> subject, in Native.match_result result)
         {
             Subject = subject;
             _markPtr = result.mark;
@@ -190,7 +186,7 @@ namespace PCRE
 
             public List<T> ToList<T>(PcreRefGroup.Func<T> selector)
             {
-                var result = new List<T>();
+                var result = new List<T>(Count);
 
                 foreach (var item in this)
                     result.Add(selector(item));
@@ -232,7 +228,7 @@ namespace PCRE
 
             public List<T> ToList<T>(PcreRefGroup.Func<T> selector)
             {
-                var result = new List<T>();
+                var result = new List<T>(_groupIndexes?.Length ?? 0);
 
                 foreach (var item in this)
                     result.Add(selector(item));
