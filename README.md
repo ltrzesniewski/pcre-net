@@ -12,7 +12,7 @@ PCRE.NET
 
 PCRE.NET is a .NET wrapper for the [PCRE library](http://www.pcre.org/). The goal of this project is to bring most of PCRE's features for use from .NET applications with as little overhead as possible.
 
-The current version is **0.11.0**, based on PCRE **10.34** (patched r1190). It targets .NET Standard 2.0 and supports the following systems:
+The current version is **0.12.0**, based on PCRE **10.34** (patched r1190). It targets .NET Standard 2.0 and supports the following systems:
 
  - Windows x64
  - Windows x86
@@ -46,6 +46,7 @@ Library highlights:
 - Callout support (numbered and string-based)
 - Mark retrieval support
 - Conversion from POSIX BRE, POSIX ERE and glob patterns (`PcreConvert` class)
+- Additional API for `ReadOnlySpan<char>` matching, based on `ref struct` types
 
 ## Example usage ##
 
