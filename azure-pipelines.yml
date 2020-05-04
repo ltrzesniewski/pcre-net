@@ -3,14 +3,14 @@ variables:
   BuildConfiguration: Release
   NetCoreSdkVersion: 3.1.x
   WindowsTestTarget: net48
-  UnixTestTarget: netcoreapp3.0
+  UnixTestTarget: netcoreapp3.1
 
 jobs:
   - job: Linux
     pool:
       vmImage: ubuntu-16.04
     steps:
-      - task: DotNetCoreInstaller@1
+      - task: UseDotNet@2
         displayName: Install .NET Core SDK
         inputs:
           version: $(NetCoreSdkVersion)
@@ -44,7 +44,7 @@ jobs:
           arguments: /v:m /m /p:Configuration=$(BuildConfiguration) /p:PcreNetTestBuild=true /p:ExpectPlatform=x64 --framework $(UnixTestTarget)
           testRunTitle: Linux
 
-      - task: PublishPipelineArtifact@0
+      - task: PublishPipelineArtifact@1
         displayName: Publish Artifacts
         inputs:
           artifactName: linux-lib
@@ -54,7 +54,7 @@ jobs:
     pool:
       vmImage: macos-10.13
     steps:
-      - task: DotNetCoreInstaller@1
+      - task: UseDotNet@2
         displayName: Install .NET Core SDK
         inputs:
           version: $(NetCoreSdkVersion)
@@ -88,7 +88,7 @@ jobs:
           arguments: /v:m /m /p:Configuration=$(BuildConfiguration) /p:PcreNetTestBuild=true /p:ExpectPlatform=x64 --framework $(UnixTestTarget)
           testRunTitle: MacOS
 
-      - task: PublishPipelineArtifact@0
+      - task: PublishPipelineArtifact@1
         displayName: Publish Artifacts
         inputs:
           artifactName: osx-lib
@@ -101,7 +101,7 @@ jobs:
       - Linux
       - MacOS
     steps:
-      - task: DotNetCoreInstaller@1
+      - task: UseDotNet@2
         displayName: Install .NET Core SDK
         inputs:
           version: $(NetCoreSdkVersion)
@@ -110,13 +110,13 @@ jobs:
           mkdir lib
         displayName: Init
 
-      - task: DownloadPipelineArtifact@0
+      - task: DownloadPipelineArtifact@2
         displayName: Download Linux Artifacts
         inputs:
           artifactName: linux-lib
           targetPath: lib
 
-      - task: DownloadPipelineArtifact@0
+      - task: DownloadPipelineArtifact@2
         displayName: Download MacOS Artifacts
         inputs:
           artifactName: osx-lib
