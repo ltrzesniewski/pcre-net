@@ -63,6 +63,9 @@ namespace PCRE.Internal
         public const uint SUBSTITUTE_OVERFLOW_LENGTH = 0x00001000;
         public const uint NO_JIT = 0x00002000;
         public const uint COPY_MATCHED_SUBJECT = 0x00004000;
+        public const uint SUBSTITUTE_LITERAL = 0x00008000;
+        public const uint SUBSTITUTE_MATCHED = 0x00010000;
+        public const uint SUBSTITUTE_REPLACEMENT_ONLY = 0x00020000;
         public const uint CONVERT_UTF = 0x00000001;
         public const uint CONVERT_NO_UTF_CHECK = 0x00000002;
         public const uint CONVERT_POSIX_BASIC = 0x00000004;
@@ -283,6 +286,7 @@ namespace PCRE.Internal
         public const uint CONFIG_HEAPLIMIT = 12;
         public const uint CONFIG_NEVER_BACKSLASH_C = 13;
         public const uint CONFIG_COMPILED_WIDTHS = 14;
+        public const uint CONFIG_TABLES_LENGTH = 15;
         public const uint CALLOUT_STARTMATCH = 0x00000001;
         public const uint CALLOUT_BACKTRACK = 0x00000002;
     }

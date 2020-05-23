@@ -19,6 +19,7 @@ namespace PCRE
         public static uint HeapLimit { get; } = GetConfigUInt32(PcreConstants.CONFIG_HEAPLIMIT);
         public static bool NeverBackslashC { get; } = GetConfigBool(PcreConstants.CONFIG_NEVER_BACKSLASH_C);
         public static uint CompiledWidths { get; } = GetConfigUInt32(PcreConstants.CONFIG_COMPILED_WIDTHS);
+        public static uint TablesLength { get; } = GetConfigUInt32(PcreConstants.CONFIG_TABLES_LENGTH);
 
         private static bool GetConfigBool(uint key)
             => GetConfigUInt32(key) != 0;
