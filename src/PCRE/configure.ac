@@ -9,18 +9,18 @@ dnl The PCRE2_PRERELEASE feature is for identifying release candidates. It might
 dnl be defined as -RC2, for example. For real releases, it should be empty.
 
 m4_define(pcre2_major, [10])
-m4_define(pcre2_minor, [34])
+m4_define(pcre2_minor, [35])
 m4_define(pcre2_prerelease, [])
-m4_define(pcre2_date, [2019-11-21])
+m4_define(pcre2_date, [2020-05-09])
+
+# Libtool shared library interface versions (current:revision:age)
+m4_define(libpcre2_8_version,     [10:0:10])
+m4_define(libpcre2_16_version,    [10:0:10])
+m4_define(libpcre2_32_version,    [10:0:10])
+m4_define(libpcre2_posix_version, [2:3:0])
 
 # NOTE: The CMakeLists.txt file searches for the above variables in the first
 # 50 lines of this file. Please update that if the variables above are moved.
-
-# Libtool shared library interface versions (current:revision:age)
-m4_define(libpcre2_8_version,     [9:0:9])
-m4_define(libpcre2_16_version,    [9:0:9])
-m4_define(libpcre2_32_version,    [9:0:9])
-m4_define(libpcre2_posix_version, [2:3:0])
 
 AC_PREREQ(2.57)
 AC_INIT(PCRE2, pcre2_major.pcre2_minor[]pcre2_prerelease, , pcre2)
@@ -71,6 +71,24 @@ AC_PROG_LN_S
 # Check for GCC visibility feature
 
 PCRE2_VISIBILITY
+
+# Check for Clang __attribute__((uninitialized)) feature
+
+AC_MSG_CHECKING([for __attribute__((uninitialized))])
+AC_LANG_PUSH([C])
+tmp_CFLAGS=$CFLAGS
+CFLAGS="$CFLAGS -Werror"
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,
+                   [[char buf[128] __attribute__((uninitialized));(void)buf]])],
+                   [pcre2_cc_cv_attribute_uninitialized=yes],
+                   [pcre2_cc_cv_attribute_uninitialized=no])
+AC_MSG_RESULT([$pcre2_cc_cv_attribute_uninitialized])
+if test "$pcre2_cc_cv_attribute_uninitialized" = yes; then
+  AC_DEFINE([HAVE_ATTRIBUTE_UNINITIALIZED], 1, [Define this if your compiler
+             supports __attribute__((uninitialized))])
+fi
+CFLAGS=$tmp_CFLAGS
+AC_LANG_POP([C])
 
 # Versioning
 
@@ -158,11 +176,18 @@ if test "$enable_jit" = "auto"; then
   echo checking for JIT support on this hardware... $enable_jit
 fi
 
-# Handle --enable-jit-sealloc (disabled by default)
-AC_ARG_ENABLE(jit-sealloc,
-              AS_HELP_STRING([--enable-jit-sealloc],
-                             [enable SELinux compatible execmem allocator in JIT (experimental)]),
-              , enable_jit_sealloc=no)
+# Handle --enable-jit-sealloc (disabled by default and only experimental)
+case $host_os in
+  linux* | netbsd*)
+    AC_ARG_ENABLE(jit-sealloc,
+      AS_HELP_STRING([--enable-jit-sealloc],
+        [enable SELinux compatible execmem allocator in JIT (experimental)]),
+        ,enable_jit_sealloc=no)
+    ;;
+  *)
+    enable_jit_sealloc=unsupported
+    ;;
+esac
 
 # Handle --disable-pcre2grep-jit (enabled by default)
 AC_ARG_ENABLE(pcre2grep-jit,
@@ -489,7 +514,7 @@ AC_TYPE_SIZE_T
 
 # Checks for library functions.
 
-AC_CHECK_FUNCS(bcopy memmove strerror mkostemp secure_getenv)
+AC_CHECK_FUNCS(bcopy memfd_create memmove mkostemp secure_getenv strerror)
 
 # Check for the availability of libz (aka zlib)
 

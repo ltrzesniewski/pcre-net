@@ -10112,4 +10112,78 @@ No match
  1: a
  2: c
 
+/^(a\1?){4}$/
+    aaaa
+ 0: aaaa
+ 1: a
+    aaaaaa
+ 0: aaaaaa
+ 1: aa
+
+/^((\1+)|\d)+133X$/
+    111133X
+ 0: 111133X
+ 1: 11
+ 2: 11
+
+/^(?=.*(?=(([A-Z]).*(?(1)\1)))(?!.+\2)){26}/i
+    The quick brown fox jumps over the lazy dog.
+ 0: 
+ 1: quick brown fox jumps over the lazy dog.
+ 2: q
+    Jackdaws love my big sphinx of quartz.
+ 0: 
+ 1: Jackdaws love my big sphinx of quartz.
+ 2: J
+    Pack my box with five dozen liquor jugs.
+ 0: 
+ 1: Pack my box with five dozen liquor jugs.
+ 2: P
+\= Expect no match
+    The quick brown fox jumps over the lazy cat.
+No match
+    Hackdaws love my big sphinx of quartz.
+No match
+    Pack my fox with five dozen liquor jugs.
+No match
+
+/^(?>.*?([A-Z])(?!.*\1)){26}/i
+    The quick brown fox jumps over the lazy dog.
+ 0: The quick brown fox jumps over the lazy dog
+ 1: g
+    Jackdaws love my big sphinx of quartz.
+ 0: Jackdaws love my big sphinx of quartz
+ 1: z
+    Pack my box with five dozen liquor jugs.
+ 0: Pack my box with five dozen liquor jugs
+ 1: s
+\= Expect no match
+    The quick brown fox jumps over the lazy cat.
+No match
+    Hackdaws love my big sphinx of quartz.
+No match
+    Pack my fox with five dozen liquor jugs.
+No match
+
+"(?<=X(?(DEFINE)(A)))X(*F)"
+\= Expect no match
+    AXYZ
+No match
+
+"(?<=X(?(DEFINE)(A)))."
+    AXYZ
+ 0: Y
+
+"(?<=X(?(DEFINE)(.*))Y)."
+    AXYZ
+ 0: Z
+
+"(?<=X(?(DEFINE)(Y))(?1))."
+    AXYZ
+ 0: Z
+
+"(?(DEFINE)(?<foo>bar))(?<![-a-z0-9])word"
+    word
+ 0: word
+
 # End of testinput1 

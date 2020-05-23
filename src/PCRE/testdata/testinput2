@@ -324,16 +324,7 @@
 \= Expect no match
     fooabar
 
-# This one is here because Perl behaves differently; see also the following.
-
-/^(a\1?){4}$/I
-\= Expect no match
-    aaaa
-    aaaaaa
-
-# Perl does not fail these two for the final subjects. Neither did PCRE until
-# release 8.01. The problem is in backtracking into a subpattern that contains
-# a recursive reference to itself. PCRE has now made these into atomic patterns.
+# Perl does not fail these two for the final subjects.
 
 /^(xa|=?\1a){2}$/
     xa=xaa
@@ -4592,6 +4583,12 @@ B)x/alt_verbnames,mark
 /abcd/replace=w\rx\x82y\o{333}z(\Q12\$34$$\x34\E5$$),substitute_extended
     abcd
 
+/abcd/replace=w\rx\x82y\o{333}z(\Q12\$34$$\x34\E5$$),substitute_extended,substitute_literal
+    >>abcd<<
+    
+/abcd/g,replace=\$1$2\,substitute_literal
+    XabcdYabcdZ
+
 /a(bc)(DE)/replace=a\u$1\U$1\E$1\l$2\L$2\Eab\Uab\LYZ\EDone,substitute_extended
     abcDE
 
@@ -4603,6 +4600,7 @@ B)x/alt_verbnames,mark
     ac
     ab\=replace=${1:+$1\:$1:$2}
     ac\=replace=${1:+$1\:$1:$2}
+    >>ac<<\=replace=${1:+$1\:$1:$2},substitute_literal
 
 /a(?:(b)|(c))/substitute_extended,replace=X${1:-1:-1}X${2:-2:-2}
     ab
@@ -4642,6 +4640,13 @@ B)x/alt_verbnames,mark
 
 /(aa)(BB)/substitute_extended,replace=\U$1\L$2\E$1..\U$1\l$2$1
     aaBB
+    
+/abcd/replace=wxyz,substitute_matched
+    abcd
+    pqrs 
+
+/abcd/g
+    >abcd1234abcd5678<\=replace=wxyz,substitute_matched
 
 /^(o(\1{72}{\"{\\{00000059079}\d*){74}}){19}/I
 
@@ -5665,11 +5670,18 @@ a)"xI
 /\A(*napla:.*\b(\w++))(?>.*?\b\1\b){3}/
     word1 word3 word1 word2 word3 word2 word2 word1 word3 word4
 
+/\A(?*.*\b(\w++))(?>.*?\b\1\b){3}/
+    word1 word3 word1 word2 word3 word2 word2 word1 word3 word4
+
 /(*plb:(.)..|(.)...)(\1|\2)/
     abcdb\=offset=4 
     abcda\=offset=4 
 
 /(*naplb:(.)..|(.)...)(\1|\2)/
+    abcdb\=offset=4 
+    abcda\=offset=4 
+    
+/(?<*(.)..|(.)...)(\1|\2)/
     abcdb\=offset=4 
     abcda\=offset=4 
     
@@ -5771,5 +5783,85 @@ a)"xI
 
 /(a)?a/I
     manm
+
+/^(?|(\*)(*napla:\S*_(\2?+.+))|(\w)(?=\S*_(\2?+\1)))+_\2$/
+    *abc_12345abc
+
+/^(?|(\*)(*napla:\S*_(\3?+.+))|(\w)(?=\S*_((\2?+\1))))+_\2$/
+    *abc_12345abc
+
+/^((\1+)(?C)|\d)+133X$/
+    111133X\=callout_capture
+
+/abc/replace=xyz,substitute_replacement_only
+    123abc456
+
+/a(?<ONE>b)c(?<TWO>d)e/g,replace=X$ONE+${TWO}Z,substitute_replacement_only
+    "abcde-abcde-"
+     
+/a(b)c|xyz/g,replace=<$0>,substitute_callout,substitute_replacement_only
+    abcdefabcpqr                
+    abxyzpqrabcxyz              
+    12abc34xyz99abc55\=substitute_stop=2                          
+    12abc34xyz99abc55\=substitute_skip=1
+    12abc34xyz99abc55\=substitute_skip=2
+
+/a(..)d/replace=>$1<,substitute_matched
+    xyzabcdxyzabcdxyz
+    xyzabcdxyzabcdxyz\=ovector=2
+\= Expect error     
+    xyzabcdxyzabcdxyz\=ovector=1
+
+/a(..)d/g,replace=>$1<,substitute_matched
+    xyzabcdxyzabcdxyz
+    xyzabcdxyzabcdxyz\=ovector=2
+\= Expect error     
+    xyzabcdxyzabcdxyz\=ovector=1
+    xyzabcdxyzabcdxyz\=ovector=1,substitute_unset_empty
+
+/55|a(..)d/g,replace=>$1<,substitute_matched
+    xyz55abcdxyzabcdxyz\=ovector=2,substitute_unset_empty
+\= Expect error     
+    xyz55abcdxyzabcdxyz\=ovector=2
+
+/55|a(..)d/replace=>$1<,substitute_matched
+    xyz55abcdxyzabcdxyz\=ovector=2,substitute_unset_empty
+
+/55|a(..)d/replace=>$1<
+    xyz55abcdxyzabcdxyz\=ovector=2,substitute_unset_empty
+
+/55|a(..)d/g,replace=>$1<
+    xyz55abcdxyzabcdxyz\=ovector=2,substitute_unset_empty
+
+# Expect non-fixed-length error
+
+"(?<=X(?(DEFINE)(.*))(?1))."
+
+/\sxxx\s/tables=1
+\= Expect no match
+    AB\x{85}xxx\x{a0}XYZ
+
+/\sxxx\s/tables=2
+    AB\x{85}xxx\x{a0}XYZ
+
+/^\w+/tables=2
+    École
+
+/^\w+/tables=3
+    École
+
+#loadtables ./testdata/testbtables
+
+/^\w+/tables=3
+    École
+
+/"(*MARK:>" 00 "<).."/hex,mark,no_start_optimize
+    AB
+    A\=ph 
+\= Expect no match
+    A
+
+/"(*MARK:>" 00 "<).(?C1)."/hex,mark,no_start_optimize
+    AB
 
 # End of testinput2

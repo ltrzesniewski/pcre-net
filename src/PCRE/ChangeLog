@@ -1,10 +1,127 @@
 Change Log for PCRE2
 --------------------
 
-Version 10.35
--------------
+Version 10.35 09-May-2020
+---------------------------
 
 1. Use PCRE2_MATCH_EMPTY flag to detect empty matches in JIT.
+
+2. Fix ARMv5 JIT improper handling of labels right after a constant pool.
+
+3. A JIT bug is fixed which allowed to read the fields of the compiled
+pattern before its existence is checked.
+
+4. Back in the PCRE1 day, capturing groups that contained recursive back
+references to themselves were made atomic (version 8.01, change 18) because
+after the end a repeated group, the captured substrings had their values from
+the final repetition, not from an earlier repetition that might be the
+destination of a backtrack. This feature was documented, and was carried over
+into PCRE2. However, it has now been realized that the major refactoring that
+was done for 10.30 has made this atomicizing unnecessary, and it is confusing
+when users are unaware of it, making some patterns appear not to be working as
+expected. Capture values of recursive back references in repeated groups are
+now correctly backtracked, so this unnecessary restriction has been removed.
+
+5. Added PCRE2_SUBSTITUTE_LITERAL.
+
+6. Avoid some VS compiler warnings.
+
+7. Added PCRE2_SUBSTITUTE_MATCHED.
+
+8. Added (?* and (?<* as synonms for (*napla: and (*naplb: to match another
+regex engine. The Perl regex folks are aware of this usage and have made a note
+about it.
+
+9. When an assertion is repeated, PCRE2 used to limit the maximum repetition to
+1, believing that repeating an assertion is pointless. However, if a positive
+assertion contains capturing groups, repetition can be useful. In any case, an
+assertion could always be wrapped in a repeated group. The only restriction
+that is now imposed is that an unlimited maximum is changed to one more than
+the minimum.
+
+10. Fix *THEN verbs in lookahead assertions in JIT.
+
+11. Added PCRE2_SUBSTITUTE_REPLACEMENT_ONLY.
+
+12. The JIT stack should be freed when the low-level stack allocation fails.
+
+13. In pcre2grep, if the final line in a scanned file is output but does not
+end with a newline sequence, add a newline according to the --newline setting.
+
+14. (?(DEFINE)...) groups were not being handled correctly when checking for
+the fixed length of a lookbehind assertion. Such a group within a lookbehind
+should be skipped, as it does not contribute to the length of the group.
+Instead, the (DEFINE) group was being processed, and if at the end of the
+lookbehind, that end was not correctly recognized. Errors such as "lookbehind
+assertion is not fixed length" and also "internal error: bad code value in
+parsed_skip()" could result.
+
+15. Put a limit of 1000 on recursive calls in pcre2_study() when searching
+nested groups for starting code units, in order to avoid stack overflow issues.
+If the limit is reached, it just gives up trying for this optimization.
+
+16. The control verb chain list must always be restored when exiting from a
+recurse function in JIT.
+
+17. Fix a crash which occurs when the character type of an invalid UTF
+character is decoded in JIT.
+
+18. Changes in many areas of the code so that when Unicode is supported and
+PCRE2_UCP is set without PCRE2_UTF, Unicode character properties are used for
+upper/lower case computations on characters whose code points are greater than
+127.
+
+19. The function for checking UTF-16 validity was returning an incorrect offset
+for the start of the error when a high surrogate was not followed by a valid
+low surrogate. This caused incorrect behaviour, for example when
+PCRE2_MATCH_INVALID_UTF was set and a match started immediately following the
+invalid high surrogate, such as /aa/ matching "\x{d800}aa".
+
+20. If a DEFINE group immediately preceded a lookbehind assertion, the pattern
+could be mis-compiled and therefore not match correctly. This is the example
+that found this: /(?(DEFINE)(?<foo>bar))(?<![-a-z0-9])word/ which failed to
+match "word" because the "move back" value was set to zero.
+
+21. Following a request from a user, some extensions and tidies to the
+character tables handling have been done:
+
+  (a) The dftables auxiliary program is renamed pcre2_dftables, but it is still
+  not installed for public use.
+
+  (b) There is now a -b option for pcre2_dftables, which causes the tables to
+  be written in binary. There is also a -help option.
+
+  (c) PCRE2_CONFIG_TABLES_LENGTH is added to pcre2_config() so that an
+  application that wants to save tables in binary knows how long they are.
+
+22. Changed setting of CMAKE_MODULE_PATH in CMakeLists.txt from SET to
+LIST(APPEND...) to allow a setting from the command line to be included.
+
+23. Updated to Unicode 13.0.0.
+
+24. CMake build now checks for secure_getenv() and strerror(). Patch by Carlo.
+
+25. Avoid using [-1] as a suffix in pcre2test because it can provoke a compiler
+warning.
+
+26. Added tests for __attribute__((uninitialized)) to both the configure and
+CMake build files, and then applied this attribute to the variable called
+stack_frames_vector[] in pcre2_match(). When implemented, this disables
+automatic initialization (a facility in clang), which can take time on big
+variables.
+
+27. Updated CMakeLists.txt (patches by Uwe Korn) to add support for
+pcre2-config, the libpcre*.pc files, SOVERSION, VERSION and the
+MACHO_*_VERSIONS settings for CMake builds.
+
+28. Another patch to CMakeLists.txt to check for mkostemp (configure already
+does). Patch by Carlo Marcelo Arenas Belon.
+
+29. Check for the existence of memfd_create in both CMake and configure
+configurations. Patch by Carlo Marcelo Arenas Belon.
+
+30. Restrict the configuration setting for the SELinux compatible execmem
+allocator (change 10.30/44) to Linux and NetBSD.
 
 
 Version 10.34 21-November-2019

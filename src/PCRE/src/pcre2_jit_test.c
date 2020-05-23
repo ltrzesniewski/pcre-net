@@ -860,6 +860,8 @@ static struct regression_test_case regression_test_cases[] = {
 	{ MU, A, 0, 0, "(?(?!a(*THEN)b)ad|add)", "add" },
 	{ MU, A, 0, 0 | F_NOMATCH, "(?(?=a)a(*THEN)b|ad)", "ad" },
 	{ MU, A, 0, 0, "(?!(?(?=a)ab|b(*THEN)d))bn|bnn", "bnn" },
+	{ MU, A, 0, 0, "(?=(*THEN: ))* ", " " },
+	{ MU, A, 0, 0, "a(*THEN)(?R) |", "a" },
 
 	/* Recurse and control verbs. */
 	{ MU, A, 0, 0, "(a(*ACCEPT)b){0}a(?1)b", "aacaabb" },
@@ -1354,10 +1356,11 @@ static int regression_tests(void)
 				ovector8_1[i] = -2;
 			for (i = 0; i < OVECTOR_SIZE * 2; ++i)
 				ovector8_2[i] = -2;
+			pcre2_set_match_limit_8(mcontext8, 10000000);
 		}
 		if (re8) {
 			return_value8[1] = pcre2_match_8(re8, (PCRE2_SPTR8)current->input, strlen(current->input),
-				current->start_offset & OFFSET_MASK, current->match_options, mdata8_2, NULL);
+				current->start_offset & OFFSET_MASK, current->match_options, mdata8_2, mcontext8);
 
 			if (pcre2_jit_compile_8(re8, jit_compile_mode)) {
 				printf("\n8 bit: JIT compiler does not support \"%s\"\n", current->pattern);
@@ -1393,6 +1396,7 @@ static int regression_tests(void)
 				ovector16_1[i] = -2;
 			for (i = 0; i < OVECTOR_SIZE * 2; ++i)
 				ovector16_2[i] = -2;
+			pcre2_set_match_limit_16(mcontext16, 10000000);
 		}
 		if (re16) {
 			if ((current->compile_options & PCRE2_UTF) || (current->start_offset & F_FORCECONV))
@@ -1401,7 +1405,7 @@ static int regression_tests(void)
 				length16 = copy_char8_to_char16((PCRE2_SPTR8)current->input, regtest_buf16, REGTEST_MAX_LENGTH16);
 
 			return_value16[1] = pcre2_match_16(re16, regtest_buf16, length16,
-				current->start_offset & OFFSET_MASK, current->match_options, mdata16_2, NULL);
+				current->start_offset & OFFSET_MASK, current->match_options, mdata16_2, mcontext16);
 
 			if (pcre2_jit_compile_16(re16, jit_compile_mode)) {
 				printf("\n16 bit: JIT compiler does not support \"%s\"\n", current->pattern);
@@ -1437,6 +1441,7 @@ static int regression_tests(void)
 				ovector32_1[i] = -2;
 			for (i = 0; i < OVECTOR_SIZE * 2; ++i)
 				ovector32_2[i] = -2;
+			pcre2_set_match_limit_32(mcontext32, 10000000);
 		}
 		if (re32) {
 			if ((current->compile_options & PCRE2_UTF) || (current->start_offset & F_FORCECONV))
@@ -1445,7 +1450,7 @@ static int regression_tests(void)
 				length32 = copy_char8_to_char32((PCRE2_SPTR8)current->input, regtest_buf32, REGTEST_MAX_LENGTH32);
 
 			return_value32[1] = pcre2_match_32(re32, regtest_buf32, length32,
-				current->start_offset & OFFSET_MASK, current->match_options, mdata32_2, NULL);
+				current->start_offset & OFFSET_MASK, current->match_options, mdata32_2, mcontext32);
 
 			if (pcre2_jit_compile_32(re32, jit_compile_mode)) {
 				printf("\n32 bit: JIT compiler does not support \"%s\"\n", current->pattern);
@@ -1962,6 +1967,8 @@ static struct invalid_utf8_regression_test_case invalid_utf8_regression_test_cas
 	{ PCRE2_UTF | PCRE2_NO_START_OPTIMIZE, CI, 0, 0, 0, 7, 11, { "#\xc7\x85#", NULL }, "\x80\x80#\xc7\x80\x80\x80#\xc7\x85#" },
 	{ PCRE2_UTF, CI, 0, 0, 0, 4, 8, { "#\xc7\x85#", NULL }, "\x80\x80#\xc7#\xc7\x85#" },
 	{ PCRE2_UTF, CI, 0, 0, 0, 7, 11, { "#\xc7\x85#", NULL }, "\x80\x80#\xc7\x80\x80\x80#\xc7\x85#" },
+
+	{ PCRE2_UTF | PCRE2_UCP, CI, 0, 0, 0, -1, -1, { "[\\s]", NULL }, "\xed\xa0\x80" },
 
 	/* These two are not invalid UTF tests, but this infrastructure fits better for them. */
 	{ 0, PCRE2_JIT_COMPLETE, 0, 0, 1, -1, -1, { "\\X{2}", NULL }, "\r\n\n" },

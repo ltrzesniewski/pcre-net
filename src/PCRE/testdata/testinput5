@@ -2081,7 +2081,6 @@
     \x{655} 
     
 /^\p{Common}/utf
-    \x{589}
     \x{60c}
     \x{61f}  
     \x{964}
@@ -2158,6 +2157,11 @@
 /\p{Elymaic}\p{Nandinagari}\p{Nyiakeng_Puachue_Hmong}\p{Wancho}/utf
     \x{10fe5}\x{119AC}\x{1E10E}\x{1E2D1} 
 
+# Some Unicode 13.0.0 new script characters
+
+/\p{Chorasmian}\p{Dives_Akuru}\p{Khitan_Small_Script}\p{Yezidi}/utf
+    \x{10FB0}\x{11900}\x{18B00}\x{10E80}
+
 # ------- 
 
 # Test reference and errors in non-ASCII characters in group names
@@ -2179,4 +2183,9 @@
 
 /\p{Any}*xyz/I
 
+/(|ß)7/caseless,ucp
+
+/(\xc1)\1/i,ucp
+    \xc1\xe1\=no_jit
+    
 # End of testinput5
