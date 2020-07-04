@@ -1,0 +1,47 @@
+
+name: Build
+on: [push, pull_request]
+
+env:
+  BUILD_DOTNET_VERSION: 3.1.x
+  BUILD_CONFIGURATION: Release
+  BUILD_WINDOWS_TEST_TARGET: net48
+  BUILD_UNIX_TEST_TARGET: netcoreapp3.1
+
+jobs:
+  linux:
+    name: Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.BUILD_DOTNET_VERSION }}
+
+      - name: CMake x64
+        run: |
+          mkdir src/cmake-x64
+          cd src/cmake-x64
+          cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_CONFIGURATION }}
+      
+      - name: Build Native x64
+        run: |
+          cd src/cmake-x64
+          make
+
+      - name: Copy Native Lib
+        run: |
+          mkdir lib
+          cp src/cmake-x64/PCRE.NET.Native.so lib/PCRE.NET.Native.x64.so
+
+      - name: Test x64
+        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj /v:m /m /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:PcreNetTestBuild=true /p:ExpectPlatform=x64 --framework ${{ env.BUILD_UNIX_TEST_TARGET }}
+
+      - name: Upload Native Lib
+        uses: actions/upload-artifact@v2
+        with:
+          name: lib-linux
+          path: lib/PCRE.NET.Native.x64.so
