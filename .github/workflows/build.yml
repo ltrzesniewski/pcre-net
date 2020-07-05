@@ -39,7 +39,7 @@ jobs:
           cp src/cmake-x64/PCRE.NET.Native.so lib/PCRE.NET.Native.x64.so
 
       - name: Test x64
-        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj /v:m /m /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:PcreNetTestBuild=true /p:ExpectPlatform=x64 --framework ${{ env.BUILD_UNIX_TEST_TARGET }}
+        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_UNIX_TEST_TARGET }} -p:PcreNetTestBuild=true -p:ExpectPlatform=x64
 
       - name: Upload Native Lib
         uses: actions/upload-artifact@v2
@@ -76,7 +76,7 @@ jobs:
           cp src/cmake-x64/PCRE.NET.Native.dylib lib/PCRE.NET.Native.x64.dylib
 
       - name: Test x64
-        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj /v:m /m /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:PcreNetTestBuild=true /p:ExpectPlatform=x64 --framework ${{ env.BUILD_UNIX_TEST_TARGET }}
+        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_UNIX_TEST_TARGET }} -p:PcreNetTestBuild=true -p:ExpectPlatform=x64
 
       - name: Upload Native Lib
         uses: actions/upload-artifact@v2
@@ -105,6 +105,9 @@ jobs:
         with:
           dotnet-version: ${{ env.BUILD_DOTNET_VERSION }}
 
+      - name: Setup Environment
+        run: echo '::set-env name=BUILD_COMMON_MSBUILD_ARGS::/v:m /m /p:Configuration=${{ env.BUILD_CONFIGURATION }}'
+
       - name: Download Linux Lib
         uses: actions/download-artifact@v2
         with:
@@ -117,26 +120,34 @@ jobs:
           name: lib-macos
           path: lib
 
+      - name: Delete Native Lib Artifacts
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: |
+            lib-linux
+            lib-macos
+          failOnError: false
+
       - name: NuGet Restore
-        run: msbuild src/PCRE.NET.sln /v:m /m /t:Restore /p:Configuration=${{ env.BUILD_CONFIGURATION }}
+        run: msbuild src/PCRE.NET.sln ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /t:Restore 
 
       - name: Build Native x86
-        run: msbuild src/PCRE.NET.Native/PCRE.NET.Native.vcxproj /v:m /m /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:Platform=Win32
+        run: msbuild src/PCRE.NET.Native/PCRE.NET.Native.vcxproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:Platform=Win32
 
       - name: Build Native x64
-        run: msbuild src/PCRE.NET.Native/PCRE.NET.Native.vcxproj /v:m /m /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:Platform=x64
+        run: msbuild src/PCRE.NET.Native/PCRE.NET.Native.vcxproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:Platform=x64
 
       - name: Build PCRE.NET
-        run: msbuild src/PCRE.NET/PCRE.NET.csproj /v:m /m /p:Configuration=${{ env.BUILD_CONFIGURATION }}
+        run: msbuild src/PCRE.NET/PCRE.NET.csproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:RequirePcreNative=true
 
       - name: NuGet Pack
-        run: msbuild src/PCRE.NET/PCRE.NET.csproj /v:m /m /t:Pack /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:RequirePcreNative=true
+        run: msbuild src/PCRE.NET/PCRE.NET.csproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /t:Pack /p:RequirePcreNative=true
 
       - name: Build Tests x86
-        run: msbuild src/PCRE.NET.Tests/PCRE.NET.Tests.csproj /v:m /m /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:Platform=x86 /p:ExpectPlatform=x86
+        run: msbuild src/PCRE.NET.Tests/PCRE.NET.Tests.csproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:Platform=x86 /p:ExpectPlatform=x86
 
       - name: Build Tests x64
-        run: msbuild src/PCRE.NET.Tests/PCRE.NET.Tests.csproj /v:m /m /p:Configuration=${{ env.BUILD_CONFIGURATION }} /p:Platform=x64 /p:ExpectPlatform=x64
+        run: msbuild src/PCRE.NET.Tests/PCRE.NET.Tests.csproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:Platform=x64 /p:ExpectPlatform=x64
 
       - name: Test x86
         run: vstest.console src/PCRE.NET.Tests/bin/x86/${{ env.BUILD_CONFIGURATION }}/${{ env.BUILD_WINDOWS_TEST_TARGET }}/PCRE.NET.Tests.dll /Platform:x86
