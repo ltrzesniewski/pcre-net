@@ -94,19 +94,19 @@
     <ClCompile Include="..\PCRE\src\pcre2_valid_utf.c">
       <Filter>PCRE\Sources</Filter>
     </ClCompile>
-    <ClCompile Include="pcrenet_compile.cpp">
+    <ClCompile Include="pcrenet_compile.c">
       <Filter>PCRE.NET\Sources</Filter>
     </ClCompile>
     <ClCompile Include="..\PCRE\src\pcre2_substring.c">
       <Filter>PCRE\Sources</Filter>
     </ClCompile>
-    <ClCompile Include="pcrenet_match.cpp">
+    <ClCompile Include="pcrenet_match.c">
       <Filter>PCRE.NET\Sources</Filter>
     </ClCompile>
-    <ClCompile Include="pcrenet_info.cpp">
+    <ClCompile Include="pcrenet_info.c">
       <Filter>PCRE.NET\Sources</Filter>
     </ClCompile>
-    <ClCompile Include="pcrenet_convert.cpp">
+    <ClCompile Include="pcrenet_convert.c">
       <Filter>PCRE.NET\Sources</Filter>
     </ClCompile>
     <ClCompile Include="..\PCRE\src\pcre2_script_run.c">

@@ -1,7 +1,5 @@
 
 #include "pcrenet.h"
-#include <memory>
-#include <algorithm>
 
 typedef int (*callout_fn)(pcre2_callout_block*, void*);
 
@@ -50,14 +48,14 @@ typedef struct
 
 static int callout_handler(pcre2_callout_block* block, void* data)
 {
-    const auto typedData = static_cast<callout_data*>(data);
+    const callout_data* typedData = (callout_data*)data;
     return typedData->callout(block, typedData->data);
 }
 
 PCRENET_EXPORT(void, match)(const pcrenet_match_input* input, pcrenet_match_result* result)
 {
-    const auto matchData = pcre2_match_data_create_from_pattern(input->code, nullptr);
-    const auto context = pcre2_match_context_create(nullptr);
+    pcre2_match_data* matchData = pcre2_match_data_create_from_pattern(input->code, NULL);
+    pcre2_match_context* context = pcre2_match_context_create(NULL);
     callout_data callout;
 
     if (input->match_limit)
@@ -74,12 +72,13 @@ PCRENET_EXPORT(void, match)(const pcrenet_match_input* input, pcrenet_match_resu
 
     if (input->callout)
     {
-        callout = { input->callout, input->callout_data };
+        callout.callout = input->callout;
+        callout.data = input->callout_data;
         pcre2_set_callout(context, &callout_handler, &callout);
     }
 
     if (input->jit_stack)
-        pcre2_jit_stack_assign(context, nullptr, input->jit_stack);
+        pcre2_jit_stack_assign(context, NULL, input->jit_stack);
 
     result->result_code = pcre2_match(
         input->code,
@@ -93,11 +92,11 @@ PCRENET_EXPORT(void, match)(const pcrenet_match_input* input, pcrenet_match_resu
 
     if (input->output_vector)
     {
-        const auto oVector = pcre2_get_ovector_pointer(matchData);
-        const auto itemCount = pcre2_get_ovector_count(matchData) * 2;
+        PCRE2_SIZE* oVector = pcre2_get_ovector_pointer(matchData);
+        const uint32_t itemCount = pcre2_get_ovector_count(matchData) * 2;
 
         for (uint32_t i = 0; i < itemCount; ++i)
-            input->output_vector[i] = static_cast<uint32_t>(oVector[i]);
+            input->output_vector[i] = (uint32_t)oVector[i];
     }
 
     result->mark = pcre2_get_mark(matchData);
@@ -108,18 +107,19 @@ PCRENET_EXPORT(void, match)(const pcrenet_match_input* input, pcrenet_match_resu
 
 PCRENET_EXPORT(void, dfa_match)(const pcrenet_dfa_match_input* input, pcrenet_match_result* result)
 {
-    const auto matchData = pcre2_match_data_create(input->max_results, nullptr);
-    const auto context = pcre2_match_context_create(nullptr);
+    pcre2_match_data* matchData = pcre2_match_data_create(input->max_results, NULL);
+    pcre2_match_context* context = pcre2_match_context_create(NULL);
     callout_data callout;
 
     if (input->callout)
     {
-        callout = { input->callout, input->callout_data };
+        callout.callout = input->callout;
+        callout.data = input->callout_data;
         pcre2_set_callout(context, &callout_handler, &callout);
     }
 
-    const auto workspaceSize = std::max(20u, input->workspace_size);
-    auto workspace = std::make_unique<int[]>(workspaceSize);
+    const int workspaceSize = 20u > input->workspace_size ? 20u : input->workspace_size;
+    int* workspace = malloc(workspaceSize * sizeof(int));;
 
     result->result_code = pcre2_dfa_match(
         input->code,
@@ -129,19 +129,20 @@ PCRENET_EXPORT(void, dfa_match)(const pcrenet_dfa_match_input* input, pcrenet_ma
         input->additional_options,
         matchData,
         context,
-        workspace.get(),
+        workspace,
         workspaceSize
     );
 
     if (input->output_vector)
     {
-        const auto oVector = pcre2_get_ovector_pointer(matchData);
-        const auto itemCount = pcre2_get_ovector_count(matchData) * 2;
+        PCRE2_SIZE* oVector = pcre2_get_ovector_pointer(matchData);
+        const uint32_t itemCount = pcre2_get_ovector_count(matchData) * 2;
 
         for (uint32_t i = 0; i < itemCount; ++i)
-            input->output_vector[i] = static_cast<uint32_t>(oVector[i]);
+            input->output_vector[i] = (uint32_t)oVector[i];
     }
 
+    free(workspace);
     pcre2_match_context_free(context);
     pcre2_match_data_free(matchData);
 }

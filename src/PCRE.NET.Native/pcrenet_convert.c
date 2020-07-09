@@ -18,15 +18,15 @@ typedef struct
 
 PCRENET_EXPORT(int32_t, convert)(convert_input* input, convert_result* result)
 {
-    const auto context = pcre2_convert_context_create(nullptr);
+    pcre2_convert_context* context = pcre2_convert_context_create(NULL);
 
     pcre2_set_glob_escape(context, input->glob_escape);
     pcre2_set_glob_separator(context, input->glob_separator);
 
-    PCRE2_UCHAR* buffer = nullptr;
+    PCRE2_UCHAR* buffer = NULL;
     PCRE2_SIZE bufferLength = 0;
 
-    const auto errorCode = pcre2_pattern_convert(
+    const int errorCode = pcre2_pattern_convert(
         input->pattern,
         input->pattern_length,
         input->options,

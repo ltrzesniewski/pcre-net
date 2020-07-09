@@ -1,7 +1,7 @@
 
 #include "pcrenet.h"
 
-static_assert(sizeof(uint32_t) <= sizeof(PCRE2_SIZE), "Parameter size must fit into PCRE2_SIZE");
+c_static_assert(sizeof(uint32_t) <= sizeof(PCRE2_SIZE), "Parameter size must fit into PCRE2_SIZE");
 
 typedef struct
 {
@@ -29,14 +29,14 @@ typedef struct
 
 PCRENET_EXPORT(void, compile)(const pcrenet_compile_input* input, pcrenet_compile_result* result)
 {
-    const auto context = pcre2_compile_context_create(nullptr);
+    pcre2_compile_context* context = pcre2_compile_context_create(NULL);
 
     if (input->new_line)
         pcre2_set_newline(context, input->new_line);
-    
+
     if (input->bsr)
         pcre2_set_bsr(context, input->bsr);
-    
+
     if (input->parens_nest_limit)
         pcre2_set_parens_nest_limit(context, input->parens_nest_limit);
 

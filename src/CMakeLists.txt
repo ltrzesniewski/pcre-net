@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(PCRE.NET.Native)
+project(PCRE.NET.Native C)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
@@ -51,10 +51,10 @@ add_library(PCRE.NET.Native SHARED
         PCRE/src/pcre2_valid_utf.c
         PCRE/src/pcre2_xclass.c
         PCRE.NET.Native/pcrenet.h
-        PCRE.NET.Native/pcrenet_compile.cpp
-        PCRE.NET.Native/pcrenet_convert.cpp
-        PCRE.NET.Native/pcrenet_info.cpp
-        PCRE.NET.Native/pcrenet_match.cpp
+        PCRE.NET.Native/pcrenet_compile.c
+        PCRE.NET.Native/pcrenet_convert.c
+        PCRE.NET.Native/pcrenet_info.c
+        PCRE.NET.Native/pcrenet_match.c
 )
 
 add_compile_definitions(
