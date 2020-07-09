@@ -45,10 +45,10 @@
     <ClCompile Include="..\PCRE\src\pcre2_ucd.c" />
     <ClCompile Include="..\PCRE\src\pcre2_valid_utf.c" />
     <ClCompile Include="..\PCRE\src\pcre2_xclass.c" />
-    <ClCompile Include="pcrenet_compile.cpp" />
-    <ClCompile Include="pcrenet_convert.cpp" />
-    <ClCompile Include="pcrenet_match.cpp" />
-    <ClCompile Include="pcrenet_info.cpp" />
+    <ClCompile Include="pcrenet_compile.c" />
+    <ClCompile Include="pcrenet_convert.c" />
+    <ClCompile Include="pcrenet_match.c" />
+    <ClCompile Include="pcrenet_info.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\PCRE\src\config.h" />
