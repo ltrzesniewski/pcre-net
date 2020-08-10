@@ -35,7 +35,7 @@ namespace PCRE
                     _oVector[1] = (uint)_callout->current_position;
 
                     for (var i = 2; i < _oVector.Length; ++i)
-                        _oVector[i] = _callout->offset_vector[i].ToUInt32();
+                        _oVector[i] = (uint)_callout->offset_vector[i].ToPointer();
                 }
 
                 return new PcreRefMatch(_subject, _regex, _oVector, _callout->mark);

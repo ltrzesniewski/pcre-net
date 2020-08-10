@@ -32,7 +32,7 @@ namespace PCRE
             _oVector[1] = (uint)callout->current_position;
 
             for (var i = 2; i < _oVector.Length; ++i)
-                _oVector[i] = callout->offset_vector[i].ToUInt32();
+                _oVector[i] = (uint)callout->offset_vector[i].ToPointer();
         }
 
         public int Number { get; }

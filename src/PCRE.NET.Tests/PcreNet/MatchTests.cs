@@ -118,6 +118,56 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_support_unmatched_groups_before_matched_groups()
+        {
+            var re = new PcreRegex(@"(a|(z))(bc)");
+            var match = re.Match("abc");
+
+            Assert.That(match.Success, Is.True);
+            Assert.That(match.CaptureCount, Is.EqualTo(3));
+
+            Assert.That(match[1].Success, Is.True);
+            Assert.That(match[1].Index, Is.EqualTo(0));
+            Assert.That(match[1].EndIndex, Is.EqualTo(1));
+            Assert.That(match[1].Value, Is.EqualTo("a"));
+
+            Assert.That(match[2].Success, Is.False);
+            Assert.That(match[2].Index, Is.EqualTo(-1));
+            Assert.That(match[2].EndIndex, Is.EqualTo(-1));
+            Assert.That(match[2].Value, Is.SameAs(string.Empty));
+
+            Assert.That(match[3].Success, Is.True);
+            Assert.That(match[3].Index, Is.EqualTo(1));
+            Assert.That(match[3].Length, Is.EqualTo(2));
+            Assert.That(match[3].Value, Is.EqualTo("bc"));
+        }
+
+        [Test]
+        public void should_support_unmatched_groups_before_matched_groups_ref()
+        {
+            var re = new PcreRegex(@"(a|(z))(bc)");
+            var match = re.Match("abc".AsSpan());
+
+            Assert.That(match.Success, Is.True);
+            Assert.That(match.CaptureCount, Is.EqualTo(3));
+
+            Assert.That(match[1].Success, Is.True);
+            Assert.That(match[1].Index, Is.EqualTo(0));
+            Assert.That(match[1].EndIndex, Is.EqualTo(1));
+            Assert.That(match[1].Value.ToString(), Is.EqualTo("a"));
+
+            Assert.That(match[2].Success, Is.False);
+            Assert.That(match[2].Index, Is.EqualTo(-1));
+            Assert.That(match[2].EndIndex, Is.EqualTo(-1));
+            Assert.That(match[2].Value.ToString(), Is.SameAs(string.Empty));
+
+            Assert.That(match[3].Success, Is.True);
+            Assert.That(match[3].Index, Is.EqualTo(1));
+            Assert.That(match[3].Length, Is.EqualTo(2));
+            Assert.That(match[3].Value.ToString(), Is.EqualTo("bc"));
+        }
+
+        [Test]
         public void should_match_starting_at_end_of_string()
         {
             var re = new PcreRegex(@"(?<=a)");
@@ -692,6 +742,66 @@ namespace PCRE.Tests.PcreNet
             });
 
             Assert.That(match.Success, Is.True);
+            Assert.That(calls, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void should_support_unmatched_groups_before_matched_groups_in_callout()
+        {
+            var re = new PcreRegex(@"(a|(z))(bc)(?C42)");
+            var calls = 0;
+
+            re.Match("abc", data =>
+            {
+                Assert.That(data.Match[1].Success, Is.True);
+                Assert.That(data.Match[1].Index, Is.EqualTo(0));
+                Assert.That(data.Match[1].Length, Is.EqualTo(1));
+                Assert.That(data.Match[1].Value, Is.EqualTo("a"));
+
+                Assert.That(data.Match[2].Success, Is.False);
+                Assert.That(data.Match[2].Index, Is.EqualTo(-1));
+                Assert.That(data.Match[2].EndIndex, Is.EqualTo(-1));
+                Assert.That(data.Match[2].Value, Is.SameAs(string.Empty));
+
+                Assert.That(data.Match[3].Success, Is.True);
+                Assert.That(data.Match[3].Index, Is.EqualTo(1));
+                Assert.That(data.Match[3].Length, Is.EqualTo(2));
+                Assert.That(data.Match[3].Value, Is.EqualTo("bc"));
+
+                ++calls;
+                return PcreCalloutResult.Pass;
+            });
+
+            Assert.That(calls, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void should_support_unmatched_groups_before_matched_groups_in_callout_ref()
+        {
+            var re = new PcreRegex(@"(a|(z))(bc)(?C42)");
+            var calls = 0;
+
+            re.Match("abc".AsSpan(), data =>
+            {
+                Assert.That(data.Match[1].Success, Is.True);
+                Assert.That(data.Match[1].Index, Is.EqualTo(0));
+                Assert.That(data.Match[1].Length, Is.EqualTo(1));
+                Assert.That(data.Match[1].Value.ToString(), Is.EqualTo("a"));
+
+                Assert.That(data.Match[2].Success, Is.False);
+                Assert.That(data.Match[2].Index, Is.EqualTo(-1));
+                Assert.That(data.Match[2].EndIndex, Is.EqualTo(-1));
+                Assert.That(data.Match[2].Value.ToString(), Is.SameAs(string.Empty));
+
+                Assert.That(data.Match[3].Success, Is.True);
+                Assert.That(data.Match[3].Index, Is.EqualTo(1));
+                Assert.That(data.Match[3].Length, Is.EqualTo(2));
+                Assert.That(data.Match[3].Value.ToString(), Is.EqualTo("bc"));
+
+                ++calls;
+                return PcreCalloutResult.Pass;
+            });
+
             Assert.That(calls, Is.EqualTo(1));
         }
 

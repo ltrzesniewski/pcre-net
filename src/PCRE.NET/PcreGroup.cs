@@ -5,6 +5,7 @@
         private readonly string _subject;
         private string _value;
 
+        // The offsets match the truncated value of PCRE2_UNSET
         internal static readonly PcreGroup Empty = new PcreGroup(string.Empty, -1, -1);
 
         internal PcreGroup(string subject, int startOffset, int endOffset)
