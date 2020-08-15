@@ -72,9 +72,8 @@ namespace PCRE.Tests.Pcre
                             }
                             else
                             {
-                                var result = new TestPattern
+                                var result = new TestPattern(fullString.ToString())
                                 {
-                                    FullString = fullString.ToString(),
                                     Pattern = pattern.ToString(),
                                     OptionsString = line.Substring(i + 1),
                                     LineNumber = lineNumber

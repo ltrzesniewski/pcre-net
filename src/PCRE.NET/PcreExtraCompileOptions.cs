@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using PCRE.Internal;
 
 namespace PCRE
 {
     [Flags]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum PcreExtraCompileOptions : uint
     {
         None = 0,

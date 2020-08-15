@@ -6,6 +6,7 @@
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/SPACE_WITHIN_SINGLE_LINE_ARRAY_INITIALIZER_BRACES/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/WRAP_LINES/@EntryValue">False</s:Boolean>
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/XmlDocFormatter/IndentTagContent/@EntryValue">ZeroIndent</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=PrivateConstants/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="_" Suffix="" Style="aaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=PrivateStaticReadonly/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="_" Suffix="" Style="aaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/UserRules/=026329bb_002Dce8b_002D4a1a_002D85cb_002Dd548fc1b1c7d/@EntryIndexedValue">&lt;Policy&gt;&lt;Descriptor Staticness="Static, Instance" AccessRightKinds="Public" Description="Test methods"&gt;&lt;ElementKinds&gt;&lt;Kind Name="TEST_TYPE" /&gt;&lt;Kind Name="TEST_MEMBER" /&gt;&lt;/ElementKinds&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="False" Prefix="" Suffix="" Style="aaBb_aaBb" /&gt;&lt;/Policy&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/JavaScriptNaming/UserRules/=JS_005FBLOCK_005FSCOPE_005FCONSTANT/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb" /&gt;</s:String>
@@ -66,6 +67,8 @@
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=PCRE_000D/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=pcre_000D/@EntryIndexedValue">False</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Pcre_000D/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Singleline/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Ungreedy/@EntryIndexedValue">True</s:Boolean>
 	
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=_000D/@EntryIndexedValue">False</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=pcre_000D/@EntryIndexRemoved">True</s:Boolean>

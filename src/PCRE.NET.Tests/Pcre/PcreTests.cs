@@ -199,7 +199,7 @@ namespace PCRE.Tests.Pcre
 
         private class PcreTestsSource : IEnumerable<ITestCaseData>
         {
-            private static readonly string[,] InputFiles =
+            private static string[,] InputFiles { get; } =
             {
                 { "testinput1", "testoutput1" }
                 //{ "testinput2", "testoutput2" }

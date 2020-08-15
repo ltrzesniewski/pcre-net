@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using InlineIL;
@@ -66,6 +67,7 @@ namespace PCRE.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [SuppressMessage("ReSharper", "EntityNameCapturedOnly.Local")]
         private static void* ToPointer(this ref CalloutInteropInfo value)
         {
             Ldarg(nameof(value));

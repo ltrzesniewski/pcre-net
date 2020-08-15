@@ -4,7 +4,7 @@ namespace PCRE.Tests.Pcre
 {
     public sealed class TestPattern : IEquatable<TestPattern>
     {
-        public string FullString { get; set; }
+        public string FullString { get; }
 
         public string Pattern { get; set; }
         public string OptionsString { get; set; }
@@ -26,20 +26,21 @@ namespace PCRE.Tests.Pcre
 
         public uint JitStack { get; set; }
 
-        public override bool Equals(object obj)
+        public TestPattern(string fullString)
         {
-            return Equals(obj as TestPattern);
+            FullString = fullString;
         }
+
+        public override bool Equals(object obj)
+            => Equals(obj as TestPattern);
 
         public bool Equals(TestPattern other)
-        {
-            return other != null && string.Equals(FullString, other.FullString);
-        }
+            => other != null && string.Equals(FullString, other.FullString);
 
-        public override int GetHashCode() => FullString?.GetHashCode() ?? 0;
+        public override int GetHashCode()
+            => FullString?.GetHashCode() ?? 0;
 
         public static bool operator ==(TestPattern left, TestPattern right) => Equals(left, right);
-
         public static bool operator !=(TestPattern left, TestPattern right) => !Equals(left, right);
 
         public override string ToString() => FullString ?? "???";
