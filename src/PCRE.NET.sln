@@ -19,6 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2183A203
 		..\README.md = ..\README.md
 		..\azure-pipelines.yml = ..\azure-pipelines.yml
 		CMakeLists.txt = CMakeLists.txt
+		..\.github\workflows\build.yml = ..\.github\workflows\build.yml
 	EndProjectSection
 EndProject
 Global
