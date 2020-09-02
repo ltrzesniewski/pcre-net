@@ -3,7 +3,7 @@ name: Build
 on: [push, pull_request]
 
 env:
-  BUILD_DOTNET_VERSION: 3.1.302
+  BUILD_DOTNET_VERSION: 3.1.x
   BUILD_CONFIGURATION: Release
   BUILD_WINDOWS_TEST_TARGET: net48
   BUILD_UNIX_TEST_TARGET: netcoreapp3.1
