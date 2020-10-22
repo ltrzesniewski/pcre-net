@@ -106,7 +106,8 @@ jobs:
           dotnet-version: ${{ env.BUILD_DOTNET_VERSION }}
 
       - name: Setup Environment
-        run: echo '::set-env name=BUILD_COMMON_MSBUILD_ARGS::/v:m /m /p:Configuration=${{ env.BUILD_CONFIGURATION }}'
+        run: echo 'BUILD_COMMON_MSBUILD_ARGS=/v:m /m /p:Configuration=${{ env.BUILD_CONFIGURATION }}' >> $GITHUB_ENV
+        shell: bash
 
       - name: Download Linux Lib
         uses: actions/download-artifact@v2
