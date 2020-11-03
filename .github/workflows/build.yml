@@ -98,7 +98,7 @@ jobs:
         uses: microsoft/setup-msbuild@v1
 
       - name: Setup VSTest
-        uses: darenm/Setup-VSTest@v1.1
+        uses: darenm/Setup-VSTest@v1.1.1
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
