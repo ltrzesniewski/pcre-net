@@ -9,14 +9,14 @@ dnl The PCRE2_PRERELEASE feature is for identifying release candidates. It might
 dnl be defined as -RC2, for example. For real releases, it should be empty.
 
 m4_define(pcre2_major, [10])
-m4_define(pcre2_minor, [35])
-m4_define(pcre2_prerelease, [])
-m4_define(pcre2_date, [2020-05-09])
+m4_define(pcre2_minor, [36])
+m4_define(pcre2_prerelease, [-RC1])
+m4_define(pcre2_date, [2020-11-05])
 
 # Libtool shared library interface versions (current:revision:age)
-m4_define(libpcre2_8_version,     [10:0:10])
-m4_define(libpcre2_16_version,    [10:0:10])
-m4_define(libpcre2_32_version,    [10:0:10])
+m4_define(libpcre2_8_version,     [10:1:10])
+m4_define(libpcre2_16_version,    [10:1:10])
+m4_define(libpcre2_32_version,    [10:1:10])
 m4_define(libpcre2_posix_version, [2:3:0])
 
 # NOTE: The CMakeLists.txt file searches for the above variables in the first
@@ -1006,7 +1006,27 @@ fi # enable_coverage
 
 AM_CONDITIONAL([WITH_GCOV],[test "x$enable_coverage" = "xyes"])
 
+AC_MSG_CHECKING([whether Intel CET is enabled])
+AC_LANG_PUSH([C])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,
+                   [[#ifndef __CET__
+# error CET is not enabled
+#endif]])],
+                   [pcre2_cc_cv_intel_cet_enabled=yes],
+                   [pcre2_cc_cv_intel_cet_enabled=no])
+AC_MSG_RESULT([$pcre2_cc_cv_intel_cet_enabled])
+if test "$pcre2_cc_cv_intel_cet_enabled" = yes; then
+  CET_CFLAGS="-mshstk"
+  AC_SUBST([CET_CFLAGS])
+fi
+AC_LANG_POP([C])
+
+# LIB_POSTFIX is used by CMakeLists.txt for Windows debug builds.
+# Pass empty LIB_POSTFIX to *.pc files and pcre2-config here.
+AC_SUBST(LIB_POSTFIX)
+
 # Produce these files, in addition to config.h.
+
 AC_CONFIG_FILES(
 	Makefile
 	libpcre2-8.pc

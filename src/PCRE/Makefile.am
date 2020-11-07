@@ -391,6 +391,7 @@ nodist_libpcre2_8_la_SOURCES = \
 libpcre2_8_la_CFLAGS = \
   -DPCRE2_CODE_UNIT_WIDTH=8 \
   $(VISIBILITY_CFLAGS) \
+  $(CET_CFLAGS) \
   $(AM_CFLAGS)
 libpcre2_8_la_LIBADD =
 endif # WITH_PCRE2_8
@@ -404,6 +405,7 @@ nodist_libpcre2_16_la_SOURCES = \
 libpcre2_16_la_CFLAGS = \
   -DPCRE2_CODE_UNIT_WIDTH=16 \
   $(VISIBILITY_CFLAGS) \
+  $(CET_CFLAGS) \
   $(AM_CFLAGS)
 libpcre2_16_la_LIBADD =
 endif # WITH_PCRE2_16
@@ -417,6 +419,7 @@ nodist_libpcre2_32_la_SOURCES = \
 libpcre2_32_la_CFLAGS = \
   -DPCRE2_CODE_UNIT_WIDTH=32 \
   $(VISIBILITY_CFLAGS) \
+  $(CET_CFLAGS) \
   $(AM_CFLAGS)
 libpcre2_32_la_LIBADD =
 endif # WITH_PCRE2_32
@@ -445,15 +448,15 @@ EXTRA_DIST += \
   src/sljit/sljitNativePPC_32.c \
   src/sljit/sljitNativePPC_64.c \
   src/sljit/sljitNativePPC_common.c \
+  src/sljit/sljitNativeS390X.c \
   src/sljit/sljitNativeSPARC_32.c \
   src/sljit/sljitNativeSPARC_common.c \
-  src/sljit/sljitNativeTILEGX-encoder.c \
-  src/sljit/sljitNativeTILEGX_64.c \
   src/sljit/sljitNativeX86_32.c \
   src/sljit/sljitNativeX86_64.c \
   src/sljit/sljitNativeX86_common.c \
   src/sljit/sljitProtExecAllocator.c \
-  src/sljit/sljitUtils.c
+  src/sljit/sljitUtils.c \
+  src/sljit/sljitWXExecAllocator.c
 
 # Some of the JIT sources are also in separate files that are #included.
 

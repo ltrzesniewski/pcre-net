@@ -661,6 +661,26 @@ echo "---------------------------- Test 128 -----------------------------" >>tes
 (cd $srcdir; $valgrind $vjs $pcre2grep -o1 --om-capture=0 'pattern()()()()' testdata/grepinput) >>testtrygrep 2>&1
 echo "RC=$?" >>testtrygrep
 
+echo "---------------------------- Test 129 -----------------------------" >>testtrygrep
+(cd $srcdir; $valgrind $vjs $pcre2grep -m 2 'fox' testdata/grepinput) >>testtrygrep 2>&1
+echo "RC=$?" >>testtrygrep
+
+echo "---------------------------- Test 130 -----------------------------" >>testtrygrep
+(cd $srcdir; $valgrind $vjs $pcre2grep -o -m2 'fox' testdata/grepinput) >>testtrygrep 2>&1
+echo "RC=$?" >>testtrygrep
+
+echo "---------------------------- Test 131 -----------------------------" >>testtrygrep
+(cd $srcdir; $valgrind $vjs $pcre2grep -oc -m2 'fox' testdata/grepinput) >>testtrygrep 2>&1
+echo "RC=$?" >>testtrygrep
+
+echo "---------------------------- Test 132 -----------------------------" >>testtrygrep
+(cd $srcdir; $valgrind $vjs $pcre2grep -m1 -A3 '^match'; echo '---'; head -1) <$srcdir/testdata/grepinput >>testtrygrep 2>&1
+echo "RC=$?" >>testtrygrep
+
+echo "---------------------------- Test 133 -----------------------------" >>testtrygrep
+(cd $srcdir; $valgrind $vjs $pcre2grep -m1 -O '=$x{41}$x423$o{103}$o1045=' 'fox') <$srcdir/testdata/grepinputv >>testtrygrep 2>&1
+echo "RC=$?" >>testtrygrep
+
 # Now compare the results.
 
 $cf $srcdir/testdata/grepoutput testtrygrep
@@ -692,6 +712,10 @@ if [ $utf8 -ne 0 ] ; then
   echo "---------------------------- Test U5 ------------------------------" >>testtrygrep
   printf 'A\341\200\200\200CD\342\200\200Z\n' >testtemp1grep
   (cd $srcdir; $valgrind $vjs $pcre2grep -U -o '....' $builddir/testtemp1grep) >>testtrygrep
+  echo "RC=$?" >>testtrygrep
+
+  echo "---------------------------- Test U6 -----------------------------" >>testtrygrep
+  (cd $srcdir; $valgrind $vjs $pcre2grep -u -m1 -O '=$x{1d3}$o{744}=' 'fox') <$srcdir/testdata/grepinputv >>testtrygrep 2>&1
   echo "RC=$?" >>testtrygrep
 
   $cf $srcdir/testdata/grepoutput8 testtrygrep
@@ -733,22 +757,20 @@ $valgrind $vjs $pcre2grep -n --newline=anycrlf "^(abc|def|ghi|jkl)" testNinputgr
 
 # It seems impossible to handle NUL characters easily in many operating
 # systems, including Solaris (aka SunOS), where the version of sed explicitly
-# doesn't like them, and also MacOS (Darwin), OpenBSD, FreeBSD, and NetBSD. So
-# now we run this test only on OS that are known to work. For the rest, we
-# fudge the output so that the comparison works.
+# doesn't like them, and also MacOS (Darwin), OpenBSD, FreeBSD, NetBSD, and
+# some Linux distributions like Alpine, even when using GNU sed, so test for
+# a usable sed and fudge the output so that the comparison works when sed
+# doesn't.
 
 printf '%c--------------------------- Test N7 ------------------------------\r\n' - >>testtrygrep
-uname=`uname`
-case $uname in
-  Linux)
-    printf 'abc\0def' >testNinputgrep
-    $valgrind $vjs $pcre2grep -na --newline=nul "^(abc|def)" testNinputgrep | sed 's/\x00/ZERO/g' >>testtrygrep
-    echo "" >>testtrygrep
-    ;;
-  *)
-    echo '1:abcZERO2:defZERO' >>testtrygrep
-    ;;
-esac
+Z=$(printf '\0' | sed 's/\x00/Z/g')
+if [ "$Z" = "Z" ]; then
+  printf 'abc\0def' >testNinputgrep
+  $valgrind $vjs $pcre2grep -na --newline=nul "^(abc|def)" testNinputgrep | sed 's/\x00/ZERO/g' >>testtrygrep
+  echo "" >>testtrygrep
+else
+  echo '1:abcZERO2:defZERO' >>testtrygrep
+fi
 
 $cf $srcdir/testdata/grepoutputN testtrygrep
 if [ $? != 0 ] ; then exit 1; fi
@@ -764,6 +786,7 @@ if $valgrind $vjs $pcre2grep --help | $valgrind $vjs $pcre2grep -q 'callout scri
   $valgrind $vjs $pcre2grep '(T)(..(.))()()()()()()()(..)(?C"/bin/echo|Arg1: [$11] [${11}]")' $srcdir/testdata/grepinputv >>testtrygrep
   $valgrind $vjs $pcre2grep '(T)(?C"|$0:$1$n")' $srcdir/testdata/grepinputv >>testtrygrep
   $valgrind $vjs $pcre2grep '(T)(?C"|$1$n")(*F)' $srcdir/testdata/grepinputv >>testtrygrep
+  $valgrind $vjs $pcre2grep -m1 '(T)(?C"|$0:$1:$x{41}$o{101}$n")' $srcdir/testdata/grepinputv >>testtrygrep
 
   if $valgrind $vjs $pcre2grep --help | $valgrind $vjs $pcre2grep -q 'Non-fork callout scripts in patterns are supported'; then
     $cf $srcdir/testdata/grepoutputCN testtrygrep
