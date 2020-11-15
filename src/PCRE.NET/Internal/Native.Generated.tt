@@ -122,7 +122,7 @@ private class FuncDef
 {
     public string ReturnType;
     public string Name;
-    public readonly List<FuncParamDef> Parameters = new List<FuncParamDef>();
+    public readonly List<FuncParamDef> Parameters = new();
 
     public string Declaration => $"{ReturnType} {Name}({ParametersDeclaration})";
     public string ParametersDeclaration => string.Join(", ", Parameters.Select(p => p.Declaration));
@@ -141,7 +141,7 @@ private class FuncParamDef
         switch (Type)
         {
             case "string":
-                return $"[In, MarshalAs(UnmanagedType.LPStr)] ";
+                return "[In, MarshalAs(UnmanagedType.LPStr)] ";
 
             default:
                 return string.Empty;

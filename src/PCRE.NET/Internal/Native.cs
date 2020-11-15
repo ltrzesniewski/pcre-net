@@ -120,18 +120,18 @@ namespace PCRE.Internal
             public uint callout_number; /* Number compiled into pattern */
             public uint capture_top; /* Max current capture */
             public uint capture_last; /* Most recently closed capture */
-            public UIntPtr* offset_vector; /* The offset vector */
+            public nuint* offset_vector; /* The offset vector */
             public char* mark; /* Pointer to current mark or NULL */
             public char* subject; /* The subject being matched */
-            public UIntPtr subject_length; /* The length of the subject */
-            public UIntPtr start_match; /* Offset to start of this match attempt */
-            public UIntPtr current_position; /* Where we currently are in the subject */
-            public UIntPtr pattern_position; /* Offset to next item in the pattern */
-            public UIntPtr next_item_length; /* Length of next item in the pattern */
+            public nuint subject_length; /* The length of the subject */
+            public nuint start_match; /* Offset to start of this match attempt */
+            public nuint current_position; /* Where we currently are in the subject */
+            public nuint pattern_position; /* Offset to next item in the pattern */
+            public nuint next_item_length; /* Length of next item in the pattern */
 
             /* ------------------- Added for Version 1 -------------------------- */
-            public UIntPtr callout_string_offset; /* Offset to string within pattern */
-            public UIntPtr callout_string_length; /* Length of string compiled into pattern */
+            public nuint callout_string_offset; /* Offset to string within pattern */
+            public nuint callout_string_length; /* Length of string compiled into pattern */
             public char* callout_string; /* String compiled into pattern */
 
             /* ------------------- Added for Version 2 -------------------------- */
@@ -145,11 +145,11 @@ namespace PCRE.Internal
             public uint version; /* Identifies version of block */
 
             /* ------------------------ Version 0 ------------------------------- */
-            public UIntPtr pattern_position; /* Offset to next item in the pattern */
-            public UIntPtr next_item_length; /* Length of next item in the pattern */
+            public nuint pattern_position; /* Offset to next item in the pattern */
+            public nuint next_item_length; /* Length of next item in the pattern */
             public uint callout_number; /* Number compiled into pattern */
-            public UIntPtr callout_string_offset; /* Offset to string within pattern */
-            public UIntPtr callout_string_length; /* Length of string compiled into pattern */
+            public nuint callout_string_offset; /* Offset to string within pattern */
+            public nuint callout_string_length; /* Length of string compiled into pattern */
 
             public char* callout_string; /* String compiled into pattern */
             /* ------------------------------------------------------------------ */

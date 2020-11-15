@@ -6,7 +6,7 @@ namespace PCRE.Dfa
 {
     public sealed class PcreDfaMatchSettings
     {
-        private static readonly PcreDfaMatchSettings _defaultSettings = new PcreDfaMatchSettings();
+        private static readonly PcreDfaMatchSettings _defaultSettings = new();
 
         public PcreDfaMatchOptions AdditionalOptions { get; set; }
         public int StartIndex { get; set; }

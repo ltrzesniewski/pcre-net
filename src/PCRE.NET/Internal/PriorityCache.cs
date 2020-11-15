@@ -10,7 +10,7 @@ namespace PCRE.Internal
     {
         private readonly Func<TKey, TValue> _valueFactory;
         private readonly IEqualityComparer<TKey> _keyComparer;
-        private readonly LinkedList<CacheItem> _cache = new LinkedList<CacheItem>();
+        private readonly LinkedList<CacheItem> _cache = new();
         private int _cacheSize;
         private object _head;
 

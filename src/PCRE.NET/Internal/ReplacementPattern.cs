@@ -13,12 +13,12 @@ namespace PCRE.Internal
                 throw new ArgumentNullException(nameof(replacementPattern));
 
             if (replacementPattern.Length == 0)
-                return match => string.Empty;
+                return _ => string.Empty;
 
             var placeholderIndex = replacementPattern.IndexOf('$');
 
             if (placeholderIndex < 0)
-                return match => replacementPattern;
+                return _ => replacementPattern;
 
             var parts = new List<ReplacementPart>();
             var idx = 0;
@@ -156,7 +156,7 @@ namespace PCRE.Internal
 
         private sealed class LiteralPart : ReplacementPart
         {
-            public static readonly LiteralPart Dollar = new LiteralPart("$");
+            public static readonly LiteralPart Dollar = new("$");
 
             private readonly string _text;
             private readonly int _startIndex;
@@ -185,7 +185,7 @@ namespace PCRE.Internal
 
         private sealed class IndexedGroupPart : ReplacementPart
         {
-            public static readonly IndexedGroupPart FullMatch = new IndexedGroupPart(0, null);
+            public static readonly IndexedGroupPart FullMatch = new(0, null);
 
             private readonly int _index;
             private readonly ReplacementPart _fallback;
@@ -251,7 +251,7 @@ namespace PCRE.Internal
 
         private sealed class PreMatchPart : ReplacementPart
         {
-            public static readonly PreMatchPart Instance = new PreMatchPart();
+            public static readonly PreMatchPart Instance = new();
 
             public override void Append(PcreMatch match, StringBuilder sb)
                 => sb.Append(match.Subject, 0, match.Index);
@@ -262,7 +262,7 @@ namespace PCRE.Internal
 
         private sealed class PostMatchPart : ReplacementPart
         {
-            public static readonly PostMatchPart Instance = new PostMatchPart();
+            public static readonly PostMatchPart Instance = new();
 
             public override void Append(PcreMatch match, StringBuilder sb)
             {
@@ -276,7 +276,7 @@ namespace PCRE.Internal
 
         private sealed class FullInputPart : ReplacementPart
         {
-            public static readonly FullInputPart Instance = new FullInputPart();
+            public static readonly FullInputPart Instance = new();
 
             public override void Append(PcreMatch match, StringBuilder sb)
                 => sb.Append(match.Subject);
@@ -287,7 +287,7 @@ namespace PCRE.Internal
 
         private sealed class LastMatchedGroupPart : ReplacementPart
         {
-            public static readonly LastMatchedGroupPart Instance = new LastMatchedGroupPart();
+            public static readonly LastMatchedGroupPart Instance = new();
 
             public override void Append(PcreMatch match, StringBuilder sb)
             {

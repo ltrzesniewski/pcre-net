@@ -5,7 +5,7 @@ namespace PCRE
 {
     public sealed class PcreMatchSettings
     {
-        internal static PcreMatchSettings Default { get; } = new PcreMatchSettings();
+        internal static PcreMatchSettings Default { get; } = new();
 
         private uint? _matchLimit;
         private uint? _depthLimit;
