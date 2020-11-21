@@ -1,9 +1,9 @@
 
 variables:
   BuildConfiguration: Release
-  NetCoreSdkVersion: 3.1.x
+  NetCoreSdkVersion: 5.0.x
   WindowsTestTarget: net48
-  UnixTestTarget: netcoreapp3.1
+  UnixTestTarget: net5.0
 
 jobs:
   - job: Linux

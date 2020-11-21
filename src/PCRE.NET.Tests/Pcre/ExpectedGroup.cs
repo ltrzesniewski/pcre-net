@@ -2,7 +2,7 @@ namespace PCRE.Tests.Pcre
 {
     public class ExpectedGroup
     {
-        public static readonly ExpectedGroup Unset = new ExpectedGroup();
+        public static readonly ExpectedGroup Unset = new();
 
         public bool IsMatch { get; }
         public string Value { get; }

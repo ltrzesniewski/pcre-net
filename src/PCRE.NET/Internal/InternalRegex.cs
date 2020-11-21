@@ -100,9 +100,9 @@ namespace PCRE.Internal
             return result;
         }
 
-        public UIntPtr GetInfoNativeInt(uint key)
+        public nuint GetInfoNativeInt(uint key)
         {
-            UIntPtr result;
+            nuint result;
             var errorCode = Native.pattern_info(_code, key, &result);
 
             if (errorCode != 0)
