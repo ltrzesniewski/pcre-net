@@ -1071,6 +1071,13 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_fix_issue_22()
+        {
+            var regex = new PcreRegex(@"[\w]*[CA]X*B", PcreOptions.Compiled);
+            Assert.That(regex.IsMatch("ABC"), Is.True);
+        }
+
+        [Test]
         public void readme_json_example()
         {
             const string jsonPattern = @"
