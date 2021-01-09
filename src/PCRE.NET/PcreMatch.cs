@@ -116,11 +116,7 @@ namespace PCRE
 
         private PcreGroup GetGroup(string name)
         {
-            var map = _regex.CaptureNames;
-            if (map == null)
-                return null;
-
-            if (!map.TryGetValue(name, out var indexes))
+            if (!_regex.CaptureNames.TryGetValue(name, out var indexes))
                 return null;
 
             if (indexes.Length == 1)
@@ -138,11 +134,7 @@ namespace PCRE
 
         public IEnumerable<PcreGroup> GetDuplicateNamedGroups(string name)
         {
-            var map = _regex.CaptureNames;
-            if (map == null)
-                yield break;
-
-            if (!map.TryGetValue(name, out var indexes))
+            if (!_regex.CaptureNames.TryGetValue(name, out var indexes))
                 yield break;
 
             foreach (var index in indexes)

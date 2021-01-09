@@ -99,11 +99,10 @@ namespace PCRE
 
         private readonly PcreRefGroup GetGroup(string name)
         {
-            var map = _regex?.CaptureNames;
-            if (map == null)
+            if (_regex == null)
                 return default;
 
-            if (!map.TryGetValue(name, out var indexes))
+            if (!_regex.CaptureNames.TryGetValue(name, out var indexes))
                 return default;
 
             if (indexes.Length == 1)
@@ -121,11 +120,10 @@ namespace PCRE
 
         public readonly DuplicateNamedGroupEnumerable GetDuplicateNamedGroups(string name)
         {
-            var map = _regex?.CaptureNames;
-            if (map == null)
+            if (_regex == null)
                 return default;
 
-            if (!map.TryGetValue(name, out var indexes))
+            if (!_regex.CaptureNames.TryGetValue(name, out var indexes))
                 return default;
 
             return new DuplicateNamedGroupEnumerable(this, indexes);

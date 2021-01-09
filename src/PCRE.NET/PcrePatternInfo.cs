@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using PCRE.Internal;
 
@@ -48,17 +49,7 @@ namespace PCRE
 
         public IReadOnlyList<string> GroupNames => _groupNames ??= _re.CaptureNames.OrderBy(i => i.Value.Min()).Select(i => i.Key).ToList().AsReadOnly();
 
-        public IEnumerable<int> GetGroupIndexesByName(string name)
-        {
-            var map = _re.CaptureNames;
-            if (map == null)
-                yield break;
-
-            if (!map.TryGetValue(name, out var indexes))
-                yield break;
-
-            foreach (var index in indexes)
-                yield return index;
-        }
+        public IReadOnlyList<int> GetGroupIndexesByName(string name)
+            => _re.CaptureNames.TryGetValue(name, out var indexes) ? indexes : Array.Empty<int>();
     }
 }
