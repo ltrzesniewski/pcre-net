@@ -2,8 +2,8 @@
 {
     public sealed class PcreGroup : IPcreGroup
     {
-        private readonly string _subject;
-        private string _value;
+        private readonly string? _subject;
+        private string? _value;
 
         // The offsets match the truncated value of PCRE2_UNSET
         internal static readonly PcreGroup Empty = new(string.Empty, -1, -1);
@@ -24,11 +24,11 @@
 
         public int Length => EndIndex > Index ? EndIndex - Index : 0;
 
-        public string Value => _value ??= _subject.Substring(Index, Length);
+        public string Value => _value ??= _subject!.Substring(Index, Length);
 
         public bool Success => Index >= 0;
 
-        public static implicit operator string(PcreGroup group) => group?.Value;
+        public static implicit operator string(PcreGroup group) => group.Value;
 
         public override string ToString() => Value;
     }

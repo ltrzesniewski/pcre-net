@@ -8,6 +8,8 @@ using System;
 using System.Runtime.InteropServices;
 using System.Security;
 
+#nullable enable
+
 namespace PCRE.Internal
 {
     unsafe partial class Native

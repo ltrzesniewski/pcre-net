@@ -9,7 +9,7 @@ namespace PCRE
     [DebuggerTypeProxy(typeof(DebugProxy))]
     public unsafe ref struct PcreRefMatch
     {
-        private readonly InternalRegex _regex;
+        private readonly InternalRegex? _regex;
         private readonly ReadOnlySpan<uint> _oVector;
         private int _resultCode;
         private char* _markPtr;
@@ -131,7 +131,7 @@ namespace PCRE
 
         internal void FirstMatch(ReadOnlySpan<char> subject, PcreMatchSettings settings, int startIndex)
         {
-            _regex.Match(
+            _regex!.Match(
                 ref this,
                 subject,
                 settings,
@@ -142,7 +142,7 @@ namespace PCRE
 
         internal void NextMatch(PcreMatchSettings settings)
         {
-            _regex.Match(
+            _regex!.Match(
                 ref this,
                 Subject,
                 settings,
@@ -267,7 +267,7 @@ namespace PCRE
         internal class DebugProxy
         {
             public bool Success { get; }
-            public string Value { get; }
+            public string? Value { get; }
 
             public PcreRefGroup.DebugProxy[] Groups { get; }
 

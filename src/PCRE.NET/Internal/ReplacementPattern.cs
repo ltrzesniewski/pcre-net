@@ -188,9 +188,9 @@ namespace PCRE.Internal
             public static readonly IndexedGroupPart FullMatch = new(0, null);
 
             private readonly int _index;
-            private readonly ReplacementPart _fallback;
+            private readonly ReplacementPart? _fallback;
 
-            public IndexedGroupPart(int index, ReplacementPart fallback)
+            public IndexedGroupPart(int index, ReplacementPart? fallback)
             {
                 _index = index;
                 _fallback = fallback;
@@ -198,16 +198,15 @@ namespace PCRE.Internal
 
             public override void Append(PcreMatch match, StringBuilder sb)
             {
-                var group = match[_index];
-
-                if (group == null)
+                if (match.TryGetGroup(_index, out var group))
+                {
+                    if (group.Success)
+                        sb.Append(match.Subject, group.Index, group.Length);
+                }
+                else
                 {
                     _fallback?.Append(match, sb);
-                    return;
                 }
-
-                if (group.Success)
-                    sb.Append(match.Subject, group.Index, group.Length);
             }
 
             public override string ToString()
@@ -220,9 +219,9 @@ namespace PCRE.Internal
         {
             private readonly string _name;
             private readonly int _index;
-            private readonly ReplacementPart _fallback;
+            private readonly ReplacementPart? _fallback;
 
-            public NamedGroupPart(string name, ReplacementPart fallback)
+            public NamedGroupPart(string name, ReplacementPart? fallback)
             {
                 _name = name;
                 _fallback = fallback;
@@ -233,16 +232,15 @@ namespace PCRE.Internal
 
             public override void Append(PcreMatch match, StringBuilder sb)
             {
-                var group = match[_name] ?? match[_index];
-
-                if (group == null)
+                if (match.TryGetGroup(_name, out var group) || match.TryGetGroup(_index, out group))
+                {
+                    if (group.Success)
+                        sb.Append(match.Subject, group.Index, group.Length);
+                }
+                else
                 {
                     _fallback?.Append(match, sb);
-                    return;
                 }
-
-                if (group.Success)
-                    sb.Append(match.Subject, group.Index, group.Length);
             }
 
             public override string ToString()
@@ -293,8 +291,7 @@ namespace PCRE.Internal
             {
                 for (var i = match.CaptureCount; i > 0; --i)
                 {
-                    var group = match[i];
-                    if (group != null && group.Success)
+                    if (match.TryGetGroup(i, out var group) && group.Success)
                     {
                         sb.Append(match.Subject, group.Index, group.Length);
                         return;

@@ -8,7 +8,7 @@ namespace PCRE.Internal
     internal sealed unsafe class InternalRegex : IDisposable
     {
         private IntPtr _code;
-        private Dictionary<int, PcreCalloutInfo> _calloutInfoByPatternPosition;
+        private Dictionary<int, PcreCalloutInfo>? _calloutInfoByPatternPosition;
 
         public string Pattern { get; }
         public PcreRegexSettings Settings { get; }
@@ -267,7 +267,10 @@ namespace PCRE.Internal
                 _calloutInfoByPatternPosition = dict;
             }
 
-            return _calloutInfoByPatternPosition.TryGetValue(patternPosition, out var result) ? result : null;
+            if (_calloutInfoByPatternPosition.TryGetValue(patternPosition, out var result))
+                return result;
+
+            throw new InvalidOperationException($"Could not retrieve callout info at position {patternPosition}");
         }
     }
 }

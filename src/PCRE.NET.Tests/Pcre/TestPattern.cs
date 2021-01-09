@@ -19,30 +19,33 @@ namespace PCRE.Tests.Pcre
         public bool HexEncoding { get; set; }
         public bool IncludeInfo { get; set; }
 
-        public string ReplaceWith { get; set; }
+        public string? ReplaceWith { get; set; }
         public bool SubjectLiteral { get; set; }
 
         public bool NotSupported { get; set; }
 
         public uint JitStack { get; set; }
 
-        public TestPattern(string fullString)
+        public TestPattern(string fullString, string pattern, string optionsString, int lineNumber)
         {
             FullString = fullString;
+            Pattern = pattern;
+            OptionsString = optionsString;
+            LineNumber = lineNumber;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => Equals(obj as TestPattern);
 
-        public bool Equals(TestPattern other)
+        public bool Equals(TestPattern? other)
             => other != null && string.Equals(FullString, other.FullString);
 
         public override int GetHashCode()
             => FullString?.GetHashCode() ?? 0;
 
-        public static bool operator ==(TestPattern left, TestPattern right) => Equals(left, right);
-        public static bool operator !=(TestPattern left, TestPattern right) => !Equals(left, right);
+        public static bool operator ==(TestPattern? left, TestPattern? right) => Equals(left, right);
+        public static bool operator !=(TestPattern? left, TestPattern? right) => !Equals(left, right);
 
-        public override string ToString() => FullString ?? "???";
+        public override string ToString() => FullString;
     }
 }

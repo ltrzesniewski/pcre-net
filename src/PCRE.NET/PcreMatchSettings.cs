@@ -34,24 +34,24 @@ namespace PCRE
 
         public uint? OffsetLimit { get; set; }
 
-        public PcreJitStack JitStack { get; set; }
+        public PcreJitStack? JitStack { get; set; }
 
-        internal Func<PcreCallout, PcreCalloutResult> Callout { get; private set; }
-        internal PcreRefCalloutFunc RefCallout { get; private set; }
+        internal Func<PcreCallout, PcreCalloutResult>? Callout { get; private set; }
+        internal PcreRefCalloutFunc? RefCallout { get; private set; }
 
-        public void SetCallout(Func<PcreCallout, PcreCalloutResult> callout)
+        public void SetCallout(Func<PcreCallout, PcreCalloutResult>? callout)
         {
             Callout = callout;
             RefCallout = null;
         }
 
-        public void SetCallout(PcreRefCalloutFunc callout)
+        public void SetCallout(PcreRefCalloutFunc? callout)
         {
             Callout = null;
             RefCallout = callout;
         }
 
-        internal static PcreMatchSettings GetSettings(int startIndex, PcreMatchOptions additionalOptions, Func<PcreCallout, PcreCalloutResult> callout)
+        internal static PcreMatchSettings GetSettings(int startIndex, PcreMatchOptions additionalOptions, Func<PcreCallout, PcreCalloutResult>? callout)
         {
             if (startIndex == 0 && additionalOptions == PcreMatchOptions.None && callout == null)
                 return Default;
@@ -67,7 +67,7 @@ namespace PCRE
             return settings;
         }
 
-        internal static PcreMatchSettings GetSettings(int startIndex, PcreMatchOptions additionalOptions, PcreRefCalloutFunc callout)
+        internal static PcreMatchSettings GetSettings(int startIndex, PcreMatchOptions additionalOptions, PcreRefCalloutFunc? callout)
         {
             if (startIndex == 0 && additionalOptions == PcreMatchOptions.None && callout == null)
                 return Default;

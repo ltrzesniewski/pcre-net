@@ -10,8 +10,8 @@ namespace PCRE
     [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
     public sealed partial class PcreRegex
     {
-        private PcrePatternInfo _info;
-        private PcreDfaRegex _dfa;
+        private PcrePatternInfo? _info;
+        private PcreDfaRegex? _dfa;
 
         public PcrePatternInfo PatternInfo => _info ??= new PcrePatternInfo(InternalRegex);
 

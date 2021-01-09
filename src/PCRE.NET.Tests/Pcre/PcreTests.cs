@@ -186,16 +186,16 @@ namespace PCRE.Tests.Pcre
         }
 
         private static void CompareMark(PcreMatch actualMatch, ExpectedMatch expectedMatch)
-            => Assert.That(actualMatch.Mark, Is.EqualTo(expectedMatch.Mark.UnescapeGroup()));
+            => Assert.That(actualMatch.Mark, Is.EqualTo(expectedMatch.Mark?.UnescapeGroup()));
 
         private static void CompareMark(PcreRefMatch actualMatch, ExpectedMatch expectedMatch)
-            => Assert.That(actualMatch.Mark.ToString(), Is.EqualTo(expectedMatch.Mark.UnescapeGroup() ?? string.Empty));
+            => Assert.That(actualMatch.Mark.ToString(), Is.EqualTo(expectedMatch.Mark?.UnescapeGroup() ?? string.Empty));
 
         private static void CompareRemainingString(PcreMatch actualMatch, ExpectedMatch expectedMatch)
-            => Assert.That(actualMatch.Subject.Substring(actualMatch.Index + actualMatch.Length), Is.EqualTo(expectedMatch.RemainingString.UnescapeGroup()));
+            => Assert.That(actualMatch.Subject.Substring(actualMatch.Index + actualMatch.Length), Is.EqualTo(expectedMatch.RemainingString?.UnescapeGroup()));
 
         private static void CompareRemainingString(PcreRefMatch actualMatch, ExpectedMatch expectedMatch)
-            => Assert.That(actualMatch.Subject.Slice(actualMatch.Index + actualMatch.Length).ToString(), Is.EqualTo(expectedMatch.RemainingString.UnescapeGroup()));
+            => Assert.That(actualMatch.Subject.Slice(actualMatch.Index + actualMatch.Length).ToString(), Is.EqualTo(expectedMatch.RemainingString?.UnescapeGroup()));
 
         private class PcreTestsSource : IEnumerable<ITestCaseData>
         {
@@ -229,14 +229,7 @@ namespace PCRE.Tests.Pcre
                             from test in tests
                             from jit in new[] { false, true }
                             from span in new[] { false, true }
-                            let testCase = new TestCase
-                            {
-                                TestFile = testFilePath,
-                                Input = test.input,
-                                ExpectedResult = test.expectedResult,
-                                Jit = jit,
-                                Span = span
-                            }
+                            let testCase = new TestCase(testFilePath, test.input, test.expectedResult, jit, span)
                             select new TestCaseData(testCase)
                                 .SetCategory(testFileName)
                                 .SetName($"PCRE {testFileName}, Line {testCase.Input.Pattern.LineNumber:0000}, {(jit ? "JIT" : "Interpreted")}, {(span ? "Span" : "String")}")

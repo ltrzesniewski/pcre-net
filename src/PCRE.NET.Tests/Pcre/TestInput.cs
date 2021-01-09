@@ -4,14 +4,14 @@ namespace PCRE.Tests.Pcre
 {
     public class TestInput
     {
-        public TestPattern Pattern { get; set; }
-        public IList<string> SubjectLines { get; }
+        public TestPattern Pattern { get; }
+        public IList<string> SubjectLines { get; } = new List<string>();
 
-        public TestInput()
+        public TestInput(TestPattern pattern)
         {
-            SubjectLines = new List<string>();
+            Pattern = pattern;
         }
 
-        public override string ToString() => Pattern?.ToString() ?? "???";
+        public override string ToString() => Pattern.ToString();
     }
 }

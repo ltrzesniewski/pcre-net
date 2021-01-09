@@ -9,8 +9,8 @@ namespace PCRE
         private readonly uint _flags;
         private readonly uint[] _oVector;
         private readonly char* _markPtr;
-        private PcreMatch _match;
-        private PcreCalloutInfo _info;
+        private PcreMatch? _match;
+        private PcreCalloutInfo? _info;
 
         internal PcreCallout(string subject, InternalRegex regex, Native.pcre2_callout_block* callout)
         {
@@ -47,7 +47,7 @@ namespace PCRE
 
         public int NextPatternItemLength { get; }
         public int StringOffset => Info.StringOffset;
-        public string String => Info.String;
+        public string? String => Info.String;
 
         public PcreCalloutInfo Info => _info ??= _regex.GetCalloutInfoByPatternPosition(PatternPosition);
 

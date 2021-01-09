@@ -19,10 +19,7 @@ namespace PCRE.Tests.Pcre
                 if (pattern == null)
                     yield break;
 
-                var testCase = new TestInput
-                {
-                    Pattern = pattern,
-                };
+                var testCase = new TestInput(pattern);
 
                 while (true)
                 {
@@ -31,7 +28,7 @@ namespace PCRE.Tests.Pcre
                     if (string.IsNullOrWhiteSpace(line))
                         break;
 
-                    if (line.StartsWith("\\="))
+                    if (line!.StartsWith("\\="))
                         continue;
 
                     line = line.Trim();

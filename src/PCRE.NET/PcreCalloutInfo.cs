@@ -14,7 +14,7 @@ namespace PCRE
         }
 
         public int Number { get; }
-        public string String { get; }
+        public string? String { get; }
 
         public int NextPatternItemLength { get; }
         public int PatternPosition { get; }

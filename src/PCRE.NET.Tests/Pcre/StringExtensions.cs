@@ -7,9 +7,6 @@ namespace PCRE.Tests.Pcre
     {
         public static string Escape(this string str)
         {
-            if (str == null)
-                return null;
-
             var sb = new StringBuilder();
 
             foreach (var c in str)
@@ -27,9 +24,6 @@ namespace PCRE.Tests.Pcre
 
         public static string UnescapeSubject(this string str)
         {
-            if (str == null)
-                return null;
-
             var sb = new StringBuilder();
 
             for (var i = 0; i < str.Length; ++i)
@@ -110,9 +104,6 @@ namespace PCRE.Tests.Pcre
 
         public static string UnescapeGroup(this string str)
         {
-            if (str == null)
-                return null;
-
             var sb = new StringBuilder();
 
             for (var i = 0; i < str.Length; ++i)
@@ -168,6 +159,7 @@ namespace PCRE.Tests.Pcre
                     return;
                 }
             }
+
             sb.Append((char)Convert.ToUInt16(str.Substring(i + 1, 1), 16));
             ++i;
         }

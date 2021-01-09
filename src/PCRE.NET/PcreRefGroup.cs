@@ -33,7 +33,7 @@ namespace PCRE
         internal class DebugProxy
         {
             public bool Success { get; }
-            public string Value { get; }
+            public string? Value { get; }
 
             public DebugProxy(PcreRefGroup group)
             {

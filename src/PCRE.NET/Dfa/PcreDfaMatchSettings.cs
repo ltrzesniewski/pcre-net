@@ -15,13 +15,13 @@ namespace PCRE.Dfa
         public uint WorkspaceSize { get; set; } = 128;
 
         [SuppressMessage("ReSharper", "DelegateSubtraction")]
-        public event Func<PcreCallout, PcreCalloutResult> OnCallout
+        public event Func<PcreCallout, PcreCalloutResult>? OnCallout
         {
             add => Callout += value;
             remove => Callout -= value;
         }
 
-        internal Func<PcreCallout, PcreCalloutResult> Callout { get; private set; }
+        internal Func<PcreCallout, PcreCalloutResult>? Callout { get; private set; }
 
         internal static PcreDfaMatchSettings GetSettings(int startIndex, PcreDfaMatchOptions options)
         {

@@ -84,7 +84,11 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match[3].Index, Is.EqualTo(8));
             Assert.That(match[3].Length, Is.EqualTo(2));
 
-            Assert.That(match[4], Is.Null);
+            Assert.That(match[4], Is.Not.Null);
+            Assert.That(match[4].Success, Is.False);
+            Assert.That(match[4].Value, Is.SameAs(string.Empty));
+            Assert.That(match[4].Index, Is.EqualTo(-1));
+            Assert.That(match[4].Length, Is.EqualTo(0));
         }
 
         [Test]
@@ -217,7 +221,10 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match["dees"].Index, Is.EqualTo(11));
             Assert.That(match["dees"].Length, Is.EqualTo(2));
 
-            Assert.That(match["nope"], Is.Null);
+            Assert.That(match["nope"], Is.Not.Null);
+            Assert.That(match["nope"].Value, Is.SameAs(string.Empty));
+            Assert.That(match["nope"].Index, Is.EqualTo(-1));
+            Assert.That(match["nope"].Length, Is.EqualTo(0));
         }
 
         [Test]

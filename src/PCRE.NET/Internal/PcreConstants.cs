@@ -4,6 +4,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+#nullable enable
+
 namespace PCRE.Internal
 {
     internal static class PcreConstants

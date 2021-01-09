@@ -9,7 +9,7 @@ namespace PCRE.Dfa
     {
         private readonly uint[] _oVector;
         private readonly int _resultCode;
-        private readonly PcreDfaMatch[] _matches;
+        private readonly PcreDfaMatch?[] _matches;
 
         internal string Subject { get; }
 
@@ -23,17 +23,17 @@ namespace PCRE.Dfa
             _resultCode = result.result_code;
 
             if (_resultCode > 0)
-                _matches = new PcreDfaMatch[_resultCode];
+                _matches = new PcreDfaMatch?[_resultCode];
             else if (_resultCode == 0)
-                _matches = new PcreDfaMatch[_oVector.Length / 2];
+                _matches = new PcreDfaMatch?[_oVector.Length / 2];
             else
-                _matches = Array.Empty<PcreDfaMatch>();
+                _matches = Array.Empty<PcreDfaMatch?>();
         }
 
         private PcreDfaMatch GetMatch(int index)
         {
             if (index < 0 || index >= Count)
-                return null;
+                return PcreDfaMatch.Empty;
 
             var match = _matches[index];
             if (match == null)
@@ -46,7 +46,7 @@ namespace PCRE.Dfa
         {
             index *= 2;
             if (index >= _oVector.Length)
-                return null;
+                return PcreDfaMatch.Empty;
 
             var startOffset = (int)_oVector[index];
             var endOffset = (int)_oVector[index + 1];
@@ -69,16 +69,13 @@ namespace PCRE.Dfa
 
         public bool Success => _resultCode >= 0;
 
-        public int Index => LongestMatch?.Index ?? -1;
+        public int Index => LongestMatch.Index;
 
         public PcreDfaMatch LongestMatch => GetMatch(0);
 
         public PcreDfaMatch ShortestMatch => GetMatch(Count - 1);
 
         public override string ToString()
-        {
-            var match = LongestMatch;
-            return match != null ? match.Value : string.Empty;
-        }
+            => LongestMatch.Value;
     }
 }

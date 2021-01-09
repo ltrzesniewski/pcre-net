@@ -4,17 +4,17 @@ namespace PCRE.Tests.Pcre
 {
     public class TestOutput
     {
-        public TestPattern Pattern { get; set; }
-        public IList<ExpectedResult> ExpectedResults { get; }
+        public TestPattern Pattern { get; }
+        public IList<ExpectedResult> ExpectedResults { get; } = new List<ExpectedResult>();
 
-        public TestOutput()
+        public TestOutput(TestPattern pattern)
         {
-            ExpectedResults = new List<ExpectedResult>();
+            Pattern = pattern;
         }
 
         public override string ToString()
         {
-            return Pattern?.ToString() ?? "???";
+            return Pattern.ToString();
         }
     }
 }

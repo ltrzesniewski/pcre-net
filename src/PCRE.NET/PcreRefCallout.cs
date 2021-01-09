@@ -11,7 +11,7 @@ namespace PCRE
         private readonly InternalRegex _regex;
         private readonly Native.pcre2_callout_block* _callout;
 
-        private uint[] _oVector;
+        private uint[]? _oVector;
 
         internal PcreRefCallout(ReadOnlySpan<char> subject, InternalRegex regex, Native.pcre2_callout_block* callout)
         {
@@ -50,7 +50,7 @@ namespace PCRE
 
         public readonly int NextPatternItemLength => (int)_callout->next_item_length;
         public readonly int StringOffset => Info.StringOffset;
-        public readonly string String => Info.String;
+        public readonly string? String => Info.String;
 
         public readonly PcreCalloutInfo Info => _regex.GetCalloutInfoByPatternPosition(PatternPosition);
 

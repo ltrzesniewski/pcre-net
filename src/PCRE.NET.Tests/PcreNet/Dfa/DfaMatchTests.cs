@@ -30,7 +30,10 @@ namespace PCRE.Tests.PcreNet.Dfa
             Assert.That(result[1], Is.Not.Null);
             Assert.That(result[1].Value, Is.EqualTo("<something> <something else>"));
 
-            Assert.That(result[3], Is.Null);
+            Assert.That(result[3], Is.Not.Null);
+            Assert.That(result[3].Value, Is.SameAs(string.Empty));
+            Assert.That(result[3].Index, Is.EqualTo(-1));
+            Assert.That(result[3].Length, Is.EqualTo(0));
         }
 
         [Test]

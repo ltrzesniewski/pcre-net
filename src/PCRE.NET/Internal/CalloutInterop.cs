@@ -18,7 +18,7 @@ namespace PCRE.Internal
         private static int CalloutHandler(Native.pcre2_callout_block* callout, void* data)
             => ToInteropInfo(data).Call(callout);
 
-        public static void Prepare(string subject, InternalRegex regex, ref Native.match_input input, out CalloutInteropInfo interopInfo, Func<PcreCallout, PcreCalloutResult> callout)
+        public static void Prepare(string subject, InternalRegex regex, ref Native.match_input input, out CalloutInteropInfo interopInfo, Func<PcreCallout, PcreCalloutResult>? callout)
         {
             if (callout != null)
             {
@@ -34,7 +34,7 @@ namespace PCRE.Internal
             }
         }
 
-        public static void Prepare(ReadOnlySpan<char> subject, InternalRegex regex, ref Native.match_input input, out CalloutInteropInfo interopInfo, PcreRefCalloutFunc callout)
+        public static void Prepare(ReadOnlySpan<char> subject, InternalRegex regex, ref Native.match_input input, out CalloutInteropInfo interopInfo, PcreRefCalloutFunc? callout)
         {
             if (callout != null)
             {
@@ -50,7 +50,7 @@ namespace PCRE.Internal
             }
         }
 
-        public static void Prepare(string subject, InternalRegex regex, ref Native.dfa_match_input input, out CalloutInteropInfo interopInfo, Func<PcreCallout, PcreCalloutResult> callout)
+        public static void Prepare(string subject, InternalRegex regex, ref Native.dfa_match_input input, out CalloutInteropInfo interopInfo, Func<PcreCallout, PcreCalloutResult>? callout)
         {
             if (callout != null)
             {
@@ -93,11 +93,11 @@ namespace PCRE.Internal
 
         public ref struct CalloutInteropInfo
         {
-            private readonly string _subject;
+            private readonly string? _subject;
             private readonly ReadOnlySpan<char> _subjectSpan;
             private readonly InternalRegex _regex;
             private readonly Delegate _callout;
-            public Exception Exception { get; private set; }
+            public Exception? Exception { get; private set; }
 
             public CalloutInteropInfo(string subject, InternalRegex regex, Func<PcreCallout, PcreCalloutResult> callout)
             {

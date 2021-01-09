@@ -22,13 +22,10 @@ namespace PCRE.Tests.Pcre
                 if (pattern == null)
                     yield break;
 
-                var testOutput = new TestOutput
-                {
-                    Pattern = pattern
-                };
+                var testOutput = new TestOutput(pattern);
 
-                ExpectedResult currentResult = null;
-                ExpectedMatch currentMatch = null;
+                ExpectedResult? currentResult = null;
+                ExpectedMatch? currentMatch = null;
 
                 while (true)
                 {
@@ -46,7 +43,7 @@ namespace PCRE.Tests.Pcre
                     if (string.IsNullOrWhiteSpace(line))
                         break;
 
-                    if (line.StartsWith("\\="))
+                    if (line!.StartsWith("\\="))
                         continue;
 
                     if (pattern.ReplaceWith != null) // Not supported yet
@@ -111,11 +108,7 @@ namespace PCRE.Tests.Pcre
                         }
                     }
 
-                    currentResult = new ExpectedResult
-                    {
-                        SubjectLine = line.Trim()
-                    };
-
+                    currentResult = new ExpectedResult(line.Trim());
                     currentMatch = null;
 
                     testOutput.ExpectedResults.Add(currentResult);
