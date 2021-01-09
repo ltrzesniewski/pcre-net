@@ -40,7 +40,10 @@ namespace PCRE.Internal
                 _code = result.code;
 
                 if (_code == IntPtr.Zero || result.error_code != 0)
+                {
+                    Dispose();
                     throw new ArgumentException($"Invalid pattern '{pattern}': {Native.GetErrorMessage(result.error_code)} at offset {result.error_offset}");
+                }
             }
 
             CaptureCount = (int)result.capture_count;
