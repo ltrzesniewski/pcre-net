@@ -25,6 +25,19 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        [TestCase(@"a", new string[0])]
+        [TestCase(@"(a)", new string[0])]
+        [TestCase(@"(?<foo>a)", new[] { "foo" })]
+        [TestCase(@"(?<zzz>a)(?<aaa>b)", new[] { "zzz", "aaa" })]
+        [TestCase(@"(?J)(?<foo>a)(?<foo>b)", new[] { "foo" })]
+        [TestCase(@"(?|(?<foo>a)|(?<foo>b))", new[] { "foo" })]
+        public void should_return_group_names(string pattern, string[] expected)
+        {
+            var re = new PcreRegex(pattern);
+            Assert.That(re.PatternInfo.GroupNames, Is.EqualTo(expected));
+        }
+
+        [Test]
         [TestCase(@"a", 1)]
         [TestCase(@"(a)(b)", 2)]
         [TestCase(@"a{3,5}b", 4)]
