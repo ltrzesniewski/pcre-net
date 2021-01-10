@@ -6,40 +6,39 @@ namespace PCRE
     [DebuggerTypeProxy(typeof(DebugProxy))]
     public readonly ref struct PcreRefGroup
     {
-        private const int _emptyFlag = -1;
-        private const int _undefinedFlag = -2;
-
         private readonly ReadOnlySpan<char> _subject;
-        private readonly int _indexOrFlag;
-        private readonly int _endIndexOrFlag;
+
+        // Indices are offset by 1. 0 means undefined group. -1 means empty group.
+        private readonly int _indexWithOffset;
+        private readonly int _endIndexWithOffset;
 
         public delegate T Func<out T>(PcreRefGroup group);
 
-        internal static PcreRefGroup Empty => new(_emptyFlag);
-        internal static PcreRefGroup Undefined => new(_undefinedFlag);
+        internal static PcreRefGroup Empty => new(-1);
+        internal static PcreRefGroup Undefined => default;
 
         internal PcreRefGroup(ReadOnlySpan<char> subject, int startOffset, int endOffset)
         {
             _subject = subject;
-            _indexOrFlag = startOffset;
-            _endIndexOrFlag = endOffset;
+            _indexWithOffset = startOffset >= 0 ? startOffset + 1 : -1;
+            _endIndexWithOffset = endOffset >= 0 ? endOffset + 1 : -1;
         }
 
         private PcreRefGroup(int flag)
         {
             _subject = default;
-            _indexOrFlag = _endIndexOrFlag = flag;
+            _indexWithOffset = _endIndexWithOffset = flag;
         }
 
-        public int Index => _indexOrFlag >= _emptyFlag ? _indexOrFlag : _emptyFlag;
-        public int EndIndex => _endIndexOrFlag >= _emptyFlag ? _endIndexOrFlag : _emptyFlag;
+        public int Index => _indexWithOffset > 0 ? _indexWithOffset - 1 : -1;
+        public int EndIndex => _endIndexWithOffset > 0 ? _endIndexWithOffset - 1 : -1;
 
-        public int Length => _endIndexOrFlag > _indexOrFlag ? _endIndexOrFlag - _indexOrFlag : 0;
+        public int Length => _endIndexWithOffset > _indexWithOffset ? _endIndexWithOffset - _indexWithOffset : 0;
 
-        public ReadOnlySpan<char> Value => _indexOrFlag < 0 ? default : _subject.Slice(_indexOrFlag, Length);
+        public ReadOnlySpan<char> Value => _indexWithOffset > 0 ? _subject.Slice(_indexWithOffset - 1, Length) : default;
 
-        public bool Success => _indexOrFlag >= 0;
-        public bool IsDefined => _indexOrFlag != _undefinedFlag;
+        public bool Success => _indexWithOffset > 0;
+        public bool IsDefined => _indexWithOffset != 0;
 
         public static implicit operator string(PcreRefGroup group) => group.Value.ToString();
 

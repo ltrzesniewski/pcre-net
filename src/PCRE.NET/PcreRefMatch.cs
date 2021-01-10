@@ -107,6 +107,9 @@ namespace PCRE
                 return PcreRefGroup.Empty;
 
             var startOffset = (int)_oVector[index];
+            if (startOffset < 0)
+                return PcreRefGroup.Empty;
+
             var endOffset = (int)_oVector[index + 1];
 
             return new PcreRefGroup(Subject, startOffset, endOffset);

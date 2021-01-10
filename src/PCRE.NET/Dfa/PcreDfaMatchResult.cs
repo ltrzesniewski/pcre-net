@@ -49,6 +49,9 @@ namespace PCRE.Dfa
                 return PcreDfaMatch.Empty;
 
             var startOffset = (int)_oVector[index];
+            if (startOffset < 0)
+                return PcreDfaMatch.Empty;
+
             var endOffset = (int)_oVector[index + 1];
 
             return new PcreDfaMatch(Subject, startOffset, endOffset);
