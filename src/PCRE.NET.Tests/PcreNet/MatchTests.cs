@@ -93,6 +93,12 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match[4].Value, Is.SameAs(string.Empty));
             Assert.That(match[4].Index, Is.EqualTo(-1));
             Assert.That(match[4].Length, Is.EqualTo(0));
+
+            Assert.That(match.TryGetGroup(1, out var group), Is.True);
+            Assert.That(group, Is.SameAs(match[1]));
+
+            Assert.That(match.TryGetGroup(4, out group), Is.False);
+            Assert.That(group, Is.Null);
         }
 
         [Test]
@@ -108,21 +114,42 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match.Length, Is.EqualTo(10));
 
             Assert.That(match[1].Success, Is.True);
+            Assert.That(match[1].IsDefined, Is.True);
             Assert.That(match[1].Value.ToString(), Is.EqualTo("bb"));
             Assert.That(match[1].Index, Is.EqualTo(6));
             Assert.That(match[1].Length, Is.EqualTo(2));
 
             Assert.That(match[2].Success, Is.False);
+            Assert.That(match[2].IsDefined, Is.True);
             Assert.That(match[2].Value.ToString(), Is.SameAs(string.Empty));
             Assert.That(match[2].Index, Is.EqualTo(-1));
             Assert.That(match[2].Length, Is.EqualTo(0));
 
             Assert.That(match[3].Success, Is.True);
+            Assert.That(match[3].IsDefined, Is.True);
             Assert.That(match[3].Value.ToString(), Is.EqualTo("dd"));
             Assert.That(match[3].Index, Is.EqualTo(8));
             Assert.That(match[3].Length, Is.EqualTo(2));
 
             Assert.That(match[4].Success, Is.False);
+            Assert.That(match[4].IsDefined, Is.False);
+            Assert.That(match[4].Value.ToString(), Is.SameAs(string.Empty));
+            Assert.That(match[4].Index, Is.EqualTo(-1));
+            Assert.That(match[4].Length, Is.EqualTo(0));
+
+            Assert.That(match.TryGetGroup(1, out var group), Is.True);
+            Assert.That(group.Success, Is.True);
+            Assert.That(group.IsDefined, Is.True);
+            Assert.That(group.Value.ToString(), Is.EqualTo("bb"));
+            Assert.That(group.Index, Is.EqualTo(6));
+            Assert.That(group.Length, Is.EqualTo(2));
+
+            Assert.That(match.TryGetGroup(4, out group), Is.False);
+            Assert.That(group.Success, Is.False);
+            Assert.That(group.IsDefined, Is.False);
+            Assert.That(group.Value.ToString(), Is.SameAs(string.Empty));
+            Assert.That(group.Index, Is.EqualTo(-1));
+            Assert.That(group.Length, Is.EqualTo(0));
         }
 
         [Test]
@@ -209,6 +236,8 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match.Length, Is.EqualTo(13));
 
             Assert.That(match["bees"], Is.Not.Null);
+            Assert.That(match["bees"].Success, Is.True);
+            Assert.That(match["bees"].IsDefined, Is.True);
             Assert.That(match["bees"].Value, Is.EqualTo("bb"));
             Assert.That(match["bees"].Index, Is.EqualTo(6));
             Assert.That(match["bees"].Length, Is.EqualTo(2));
@@ -221,14 +250,24 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match[2].Length, Is.EqualTo(3));
 
             Assert.That(match["dees"], Is.Not.Null);
+            Assert.That(match["dees"].Success, Is.True);
+            Assert.That(match["dees"].IsDefined, Is.True);
             Assert.That(match["dees"].Value, Is.EqualTo("dd"));
             Assert.That(match["dees"].Index, Is.EqualTo(11));
             Assert.That(match["dees"].Length, Is.EqualTo(2));
 
             Assert.That(match["nope"], Is.Not.Null);
+            Assert.That(match["nope"].Success, Is.False);
+            Assert.That(match["nope"].IsDefined, Is.False);
             Assert.That(match["nope"].Value, Is.SameAs(string.Empty));
             Assert.That(match["nope"].Index, Is.EqualTo(-1));
             Assert.That(match["nope"].Length, Is.EqualTo(0));
+
+            Assert.That(match.TryGetGroup("bees", out var group), Is.True);
+            Assert.That(group, Is.SameAs(match["bees"]));
+
+            Assert.That(match.TryGetGroup("nope", out group), Is.False);
+            Assert.That(group, Is.Null);
         }
 
         [Test]
@@ -244,6 +283,8 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match.Index, Is.EqualTo(3));
             Assert.That(match.Length, Is.EqualTo(13));
 
+            Assert.That(match["bees"].Success, Is.True);
+            Assert.That(match["bees"].IsDefined, Is.True);
             Assert.That(match["bees"].Value.ToString(), Is.EqualTo("bb"));
             Assert.That(match["bees"].Index, Is.EqualTo(6));
             Assert.That(match["bees"].Length, Is.EqualTo(2));
@@ -252,11 +293,31 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match[2].Index, Is.EqualTo(8));
             Assert.That(match[2].Length, Is.EqualTo(3));
 
+            Assert.That(match["dees"].Success, Is.True);
+            Assert.That(match["dees"].IsDefined, Is.True);
             Assert.That(match["dees"].Value.ToString(), Is.EqualTo("dd"));
             Assert.That(match["dees"].Index, Is.EqualTo(11));
             Assert.That(match["dees"].Length, Is.EqualTo(2));
 
             Assert.That(match["nope"].Success, Is.False);
+            Assert.That(match["nope"].IsDefined, Is.False);
+            Assert.That(match["nope"].Value.ToString(), Is.SameAs(string.Empty));
+            Assert.That(match["nope"].Index, Is.EqualTo(-1));
+            Assert.That(match["nope"].Length, Is.EqualTo(0));
+
+            Assert.That(match.TryGetGroup("bees", out var group), Is.True);
+            Assert.That(group.Success, Is.True);
+            Assert.That(group.IsDefined, Is.True);
+            Assert.That(group.Value.ToString(), Is.EqualTo("bb"));
+            Assert.That(group.Index, Is.EqualTo(6));
+            Assert.That(group.Length, Is.EqualTo(2));
+
+            Assert.That(match.TryGetGroup("nope", out group), Is.False);
+            Assert.That(group.Success, Is.False);
+            Assert.That(group.IsDefined, Is.False);
+            Assert.That(group.Value.ToString(), Is.SameAs(string.Empty));
+            Assert.That(group.Index, Is.EqualTo(-1));
+            Assert.That(group.Length, Is.EqualTo(0));
         }
 
         [Test]

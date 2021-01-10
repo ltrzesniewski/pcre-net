@@ -78,18 +78,33 @@ namespace PCRE
 
         public readonly GroupEnumerator GetEnumerator() => new GroupEnumerator(this);
 
+        public bool TryGetGroup(int index, [MaybeNullWhen(false)] out PcreRefGroup result)
+        {
+            result = GetGroup(index);
+            return result.IsDefined;
+        }
+
+        public bool TryGetGroup(string name, [MaybeNullWhen(false)] out PcreRefGroup result)
+        {
+            result = GetGroup(name);
+            return result.IsDefined;
+        }
+
         private readonly PcreRefGroup GetGroup(int index)
         {
-            if (index < 0 || index > CaptureCount)
-                return default;
+            if (_regex == null)
+                return PcreRefGroup.Undefined;
+
+            if (index < 0 || index > _regex.CaptureCount)
+                return PcreRefGroup.Undefined;
 
             var isAvailable = index < _resultCode || IsPartialMatch && index == 0;
             if (!isAvailable)
-                return default;
+                return PcreRefGroup.Empty;
 
             index *= 2;
             if (index >= _oVector.Length)
-                return default;
+                return PcreRefGroup.Empty;
 
             var startOffset = (int)_oVector[index];
             var endOffset = (int)_oVector[index + 1];
@@ -100,10 +115,10 @@ namespace PCRE
         private readonly PcreRefGroup GetGroup(string name)
         {
             if (_regex == null)
-                return default;
+                return PcreRefGroup.Undefined;
 
             if (!_regex.CaptureNames.TryGetValue(name, out var indexes))
-                return default;
+                return PcreRefGroup.Undefined;
 
             if (indexes.Length == 1)
                 return GetGroup(indexes[0]);
@@ -115,7 +130,7 @@ namespace PCRE
                     return group;
             }
 
-            return default;
+            return PcreRefGroup.Empty;
         }
 
         public readonly DuplicateNamedGroupEnumerable GetDuplicateNamedGroups(string name)
@@ -213,7 +228,7 @@ namespace PCRE
         public readonly ref struct DuplicateNamedGroupEnumerable
         {
             private readonly PcreRefMatch _match;
-            private readonly int[] _groupIndexes;
+            private readonly int[]? _groupIndexes;
 
             internal DuplicateNamedGroupEnumerable(PcreRefMatch match, int[] groupIndexes)
             {
@@ -238,17 +253,17 @@ namespace PCRE
         public ref struct DuplicateNamedGroupEnumerator
         {
             private readonly PcreRefMatch _match;
-            private readonly int[] _groupIndexes;
+            private readonly int[]? _groupIndexes;
             private int _index;
 
-            internal DuplicateNamedGroupEnumerator(PcreRefMatch match, int[] groupIndexes)
+            internal DuplicateNamedGroupEnumerator(PcreRefMatch match, int[]? groupIndexes)
             {
                 _match = match;
                 _groupIndexes = groupIndexes;
                 _index = -1;
             }
 
-            public readonly PcreRefGroup Current => _match.GetGroup(_groupIndexes[_index]);
+            public readonly PcreRefGroup Current => _groupIndexes != null ? _match.GetGroup(_groupIndexes[_index]) : PcreRefGroup.Undefined;
 
             public bool MoveNext()
             {
@@ -280,6 +295,8 @@ namespace PCRE
                 for (var i = 0; i <= match.CaptureCount; ++i)
                     Groups[i] = new PcreRefGroup.DebugProxy(match[i]);
             }
+
+            public override string ToString() => Value ?? "<no match>";
         }
     }
 }
