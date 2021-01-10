@@ -7,6 +7,7 @@
 
         // The offsets match the truncated value of PCRE2_UNSET
         internal static readonly PcreGroup Empty = new(string.Empty, -1, -1);
+        internal static readonly PcreGroup Undefined = new(string.Empty, -1, -1);
 
         internal PcreGroup(string subject, int startOffset, int endOffset)
         {
@@ -27,6 +28,7 @@
         public string Value => _value ??= _subject!.Substring(Index, Length);
 
         public bool Success => Index >= 0;
+        public bool IsDefined => !ReferenceEquals(this, Undefined);
 
         public static implicit operator string(PcreGroup group) => group.Value;
 

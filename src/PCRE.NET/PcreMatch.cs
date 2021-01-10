@@ -42,8 +42,8 @@ namespace PCRE
 
         public int CaptureCount => _regex.CaptureCount;
 
-        public PcreGroup this[int index] => GetGroup(index) ?? PcreGroup.Empty;
-        public PcreGroup this[string name] => GetGroup(name) ?? PcreGroup.Empty;
+        public PcreGroup this[int index] => GetGroup(index) ?? PcreGroup.Undefined;
+        public PcreGroup this[string name] => GetGroup(name) ?? PcreGroup.Undefined;
 
         internal string Subject { get; }
 
