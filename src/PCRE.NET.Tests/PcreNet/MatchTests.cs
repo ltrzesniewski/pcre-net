@@ -1143,6 +1143,50 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_match_empty_string()
+        {
+            var re = new PcreRegex(string.Empty);
+            var match = re.Match(string.Empty);
+
+            Assert.That(match, Is.Not.Null);
+            Assert.That(match.Success, Is.True);
+            Assert.That(match.CaptureCount, Is.EqualTo(0));
+            Assert.That(match.Value, Is.EqualTo(string.Empty));
+            Assert.That(match.Index, Is.EqualTo(0));
+            Assert.That(match.EndIndex, Is.EqualTo(0));
+            Assert.That(match.Length, Is.EqualTo(0));
+
+            Assert.That(match[0], Is.Not.Null);
+            Assert.That(match[0].Success, Is.True);
+            Assert.That(match[0].IsDefined, Is.True);
+            Assert.That(match[0].Value, Is.EqualTo(string.Empty));
+            Assert.That(match[0].Index, Is.EqualTo(0));
+            Assert.That(match[0].EndIndex, Is.EqualTo(0));
+            Assert.That(match[0].Length, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void should_match_empty_string_ref()
+        {
+            var re = new PcreRegex(string.Empty);
+            var match = re.Match(default(ReadOnlySpan<char>));
+
+            Assert.That(match.Success, Is.True);
+            Assert.That(match.CaptureCount, Is.EqualTo(0));
+            Assert.That(match.Value.ToString(), Is.SameAs(string.Empty));
+            Assert.That(match.Index, Is.EqualTo(0));
+            Assert.That(match.EndIndex, Is.EqualTo(0));
+            Assert.That(match.Length, Is.EqualTo(0));
+
+            Assert.That(match[0].Success, Is.True);
+            Assert.That(match[0].IsDefined, Is.True);
+            Assert.That(match[0].Value.ToString(), Is.SameAs(string.Empty));
+            Assert.That(match[0].Index, Is.EqualTo(0));
+            Assert.That(match[0].EndIndex, Is.EqualTo(0));
+            Assert.That(match[0].Length, Is.EqualTo(0));
+        }
+
+        [Test]
         public void should_fix_issue_22()
         {
             var regex = new PcreRegex(@"[\w]*[CA]X*B", PcreOptions.Compiled);

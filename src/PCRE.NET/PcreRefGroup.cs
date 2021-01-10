@@ -38,7 +38,7 @@ namespace PCRE
 
         public ReadOnlySpan<char> Value => _indexOrFlag < 0 ? default : _subject.Slice(_indexOrFlag, Length);
 
-        public bool Success => _subject != default && _indexOrFlag >= 0;
+        public bool Success => _indexOrFlag >= 0;
         public bool IsDefined => _indexOrFlag != _undefinedFlag;
 
         public static implicit operator string(PcreRefGroup group) => group.Value.ToString();
