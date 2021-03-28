@@ -30,7 +30,7 @@ namespace PCRE.Internal
             {
                 // Used in the .NET Framework, and in .NET Core unit tests
                 return Environment.Is64BitProcess
-                    ? (LibImpl)new Win64Impl()
+                    ? new Win64Impl()
                     : new Win32Impl();
             }
         }
@@ -38,7 +38,7 @@ namespace PCRE.Internal
         public static string GetErrorMessage(int errorCode)
         {
             const int bufferSize = 256;
-            var buffer = stackalloc char[256];
+            var buffer = stackalloc char[bufferSize];
             var messageLength = get_error_message(errorCode, buffer, bufferSize);
             return messageLength >= 0
                 ? new string(buffer, 0, messageLength)

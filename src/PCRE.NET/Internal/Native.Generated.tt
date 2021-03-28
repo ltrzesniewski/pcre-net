@@ -61,7 +61,7 @@ namespace PCRE.Internal
 
 <# foreach (var platform in platforms) { #>
         [SuppressUnmanagedCodeSecurity]
-        private class <#= platform.Name #>Impl : LibImpl
+        private sealed class <#= platform.Name #>Impl : LibImpl
         {
 <# foreach (var func in funcs) { #>
             public override <#= func.Declaration #>
@@ -78,7 +78,7 @@ namespace PCRE.Internal
 }
 <#+
 
-private IEnumerable<FuncDef> ParseFuncs(string funcs)
+private static IEnumerable<FuncDef> ParseFuncs(string funcs)
 {
     var funcsRe = new Regex(
         @"

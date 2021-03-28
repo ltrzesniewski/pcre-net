@@ -652,7 +652,7 @@ namespace PCRE.Tests.PcreNet
         {
             var re = new PcreRegex(@".(?C42)");
 
-            var ex = Assert.Throws<PcreCalloutException>(() => re.Match("ab", data => { throw new DivideByZeroException("test"); }));
+            var ex = Assert.Throws<PcreCalloutException>(() => re.Match("ab", _ => throw new DivideByZeroException("test")))!;
 
             Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
         }
@@ -662,7 +662,7 @@ namespace PCRE.Tests.PcreNet
         {
             var re = new PcreRegex(@".(?C42)");
 
-            var ex = Assert.Throws<PcreCalloutException>(() => re.Match("ab".AsSpan(), data => { throw new DivideByZeroException("test"); }));
+            var ex = Assert.Throws<PcreCalloutException>(() => re.Match("ab".AsSpan(), _ => throw new DivideByZeroException("test")))!;
 
             Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
         }
@@ -1026,7 +1026,7 @@ namespace PCRE.Tests.PcreNet
         public void should_check_pattern_utf_validity()
         {
             // ReSharper disable once ObjectCreationAsStatement
-            var ex = Assert.Throws<ArgumentException>(() => new PcreRegex("A\uD800B"));
+            var ex = Assert.Throws<ArgumentException>(() => new PcreRegex("A\uD800B"))!;
             Assert.That(ex.Message, Contains.Substring("invalid low surrogate"));
         }
 
@@ -1035,7 +1035,7 @@ namespace PCRE.Tests.PcreNet
         public void should_check_subject_utf_validity()
         {
             var re = new PcreRegex(@"A");
-            var ex = Assert.Throws<PcreMatchException>(() => re.Match("A\uD800B"));
+            var ex = Assert.Throws<PcreMatchException>(() => re.Match("A\uD800B"))!;
             Assert.That(ex.Message, Contains.Substring("invalid low surrogate"));
         }
 
@@ -1044,7 +1044,7 @@ namespace PCRE.Tests.PcreNet
         public void should_check_subject_utf_validity_ref()
         {
             var re = new PcreRegex(@"A");
-            var ex = Assert.Throws<PcreMatchException>(() => re.Match("A\uD800B".AsSpan()));
+            var ex = Assert.Throws<PcreMatchException>(() => re.Match("A\uD800B".AsSpan()))!;
             Assert.That(ex.Message, Contains.Substring("invalid low surrogate"));
         }
 

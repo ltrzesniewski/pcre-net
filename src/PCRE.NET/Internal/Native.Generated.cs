@@ -71,7 +71,7 @@ namespace PCRE.Internal
         }
 
         [SuppressUnmanagedCodeSecurity]
-        private class WinImpl : LibImpl
+        private sealed class WinImpl : LibImpl
         {
             public override int get_error_message(int errorCode, char* errorBuffer, uint bufferSize)
                 => pcrenet_get_error_message(errorCode, errorBuffer, bufferSize);
@@ -154,7 +154,7 @@ namespace PCRE.Internal
         }
 
         [SuppressUnmanagedCodeSecurity]
-        private class Win32Impl : LibImpl
+        private sealed class Win32Impl : LibImpl
         {
             public override int get_error_message(int errorCode, char* errorBuffer, uint bufferSize)
                 => pcrenet_get_error_message(errorCode, errorBuffer, bufferSize);
@@ -237,7 +237,7 @@ namespace PCRE.Internal
         }
 
         [SuppressUnmanagedCodeSecurity]
-        private class Win64Impl : LibImpl
+        private sealed class Win64Impl : LibImpl
         {
             public override int get_error_message(int errorCode, char* errorBuffer, uint bufferSize)
                 => pcrenet_get_error_message(errorCode, errorBuffer, bufferSize);
@@ -320,7 +320,7 @@ namespace PCRE.Internal
         }
 
         [SuppressUnmanagedCodeSecurity]
-        private class LinuxImpl : LibImpl
+        private sealed class LinuxImpl : LibImpl
         {
             public override int get_error_message(int errorCode, char* errorBuffer, uint bufferSize)
                 => pcrenet_get_error_message(errorCode, errorBuffer, bufferSize);
@@ -403,7 +403,7 @@ namespace PCRE.Internal
         }
 
         [SuppressUnmanagedCodeSecurity]
-        private class OSXImpl : LibImpl
+        private sealed class OSXImpl : LibImpl
         {
             public override int get_error_message(int errorCode, char* errorBuffer, uint bufferSize)
                 => pcrenet_get_error_message(errorCode, errorBuffer, bufferSize);
