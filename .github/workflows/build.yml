@@ -129,6 +129,9 @@ jobs:
             lib-macos
           failOnError: false
 
+      - name: Clear NuGet Cache
+        run: dotnet nuget locals all --clear
+
       - name: NuGet Restore
         run: msbuild src/PCRE.NET.sln ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /t:Restore
 
