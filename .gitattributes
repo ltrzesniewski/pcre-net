@@ -1,4 +1,4 @@
 
 # GitHub Linguist
-src/PCRE/* linguist-vendored
-src/PCRE/doc/* linguist-documentation
+src/PCRE/** linguist-vendored
+src/PCRE/doc/** linguist-documentation
