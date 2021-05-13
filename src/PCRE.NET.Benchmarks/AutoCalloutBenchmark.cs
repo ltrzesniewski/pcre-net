@@ -1,10 +1,8 @@
 ﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Jobs;
 
 namespace PCRE.NET.Benchmarks
 {
-    [SimpleJob(RuntimeMoniker.Net48)]
-    [SimpleJob(RuntimeMoniker.NetCoreApp50, baseline: true)]
+    [Config(typeof(NetCoreAndStandardConfig))]
     public class AutoCalloutBenchmark
     {
         private const string _subjectString = "foo baz bar foobar";
