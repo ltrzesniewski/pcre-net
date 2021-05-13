@@ -17,7 +17,7 @@ namespace PCRE.Internal
             => Pattern == other.Pattern
                && Settings.CompareValues(other.Settings);
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => obj is RegexKey key && Equals(key);
 
         public override int GetHashCode()

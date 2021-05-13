@@ -1,4 +1,21 @@
-﻿// ReSharper disable CheckNamespace
+﻿#if NETCOREAPP
+
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+
+[assembly: TypeForwardedTo(typeof(AllowNullAttribute))]
+[assembly: TypeForwardedTo(typeof(DisallowNullAttribute))]
+[assembly: TypeForwardedTo(typeof(DoesNotReturnAttribute))]
+[assembly: TypeForwardedTo(typeof(DoesNotReturnIfAttribute))]
+[assembly: TypeForwardedTo(typeof(MaybeNullAttribute))]
+[assembly: TypeForwardedTo(typeof(MaybeNullWhenAttribute))]
+[assembly: TypeForwardedTo(typeof(NotNullAttribute))]
+[assembly: TypeForwardedTo(typeof(NotNullIfNotNullAttribute))]
+[assembly: TypeForwardedTo(typeof(NotNullWhenAttribute))]
+
+#else
+
+// ReSharper disable CheckNamespace
 namespace System.Diagnostics.CodeAnalysis
 {
     [AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property)]
@@ -70,3 +87,5 @@ namespace System.Diagnostics.CodeAnalysis
         public bool ReturnValue { get; }
     }
 }
+
+#endif
