@@ -21,6 +21,7 @@
     <PackageProjectUrl>https://github.com/ltrzesniewski/pcre-net</PackageProjectUrl>
     <Description>PCRE.NET is a .NET wrapper for the PCRE library. The goal of this project is to bring most of PCRE's features for use from .NET applications with as little overhead as possible.</Description>
     <PackageTags>PCRE.NET;PCRE;Perl;Regex;Regexp;Regular-Expressions;Text</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -84,6 +85,8 @@
              PackagePath="runtimes\osx-x64\native\PCRE.NET.Native.dylib" />
 
     <Content Include="PCRE.NET.targets" Pack="true" PackagePath="build" />
+
+    <Content Include="../NuGetReadme.md" Pack="true" PackagePath="/README.md" Visible="false" />
   </ItemGroup>
 
 </Project>
