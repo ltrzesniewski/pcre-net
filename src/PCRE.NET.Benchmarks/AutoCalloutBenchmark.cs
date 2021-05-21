@@ -2,7 +2,7 @@
 
 namespace PCRE.NET.Benchmarks
 {
-    [Config(typeof(NetCoreAndStandardConfig))]
+    [Config(typeof(NetCoreStandardConfig))]
     public class AutoCalloutBenchmark
     {
         private const string _subjectString = "foo baz bar foobar";
