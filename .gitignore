@@ -6,6 +6,7 @@ Release/
 ipch/
 .vs/
 .idea/
+BenchmarkDotNet.Artifacts/
 cmake-*
 local-*
 
