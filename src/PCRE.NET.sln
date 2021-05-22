@@ -22,6 +22,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2183A203
 		NuGetReadme.md = NuGetReadme.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCRE.NET.Benchmarks", "PCRE.NET.Benchmarks\PCRE.NET.Benchmarks.csproj", "{865E5DBA-AE97-4CDC-AD8F-8BCBCA542565}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -68,6 +70,18 @@ Global
 		{CB0EC78A-B7FB-423F-8ABB-0984A9D7B3BA}.Release|x64.Build.0 = Release|x64
 		{CB0EC78A-B7FB-423F-8ABB-0984A9D7B3BA}.Release|x86.ActiveCfg = Release|Win32
 		{CB0EC78A-B7FB-423F-8ABB-0984A9D7B3BA}.Release|x86.Build.0 = Release|Win32
+		{865E5DBA-AE97-4CDC-AD8F-8BCBCA542565}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{865E5DBA-AE97-4CDC-AD8F-8BCBCA542565}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{865E5DBA-AE97-4CDC-AD8F-8BCBCA542565}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{865E5DBA-AE97-4CDC-AD8F-8BCBCA542565}.Debug|x64.Build.0 = Debug|Any CPU
+		{865E5DBA-AE97-4CDC-AD8F-8BCBCA542565}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{865E5DBA-AE97-4CDC-AD8F-8BCBCA542565}.Debug|x86.Build.0 = Debug|Any CPU
+		{865E5DBA-AE97-4CDC-AD8F-8BCBCA542565}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{865E5DBA-AE97-4CDC-AD8F-8BCBCA542565}.Release|Any CPU.Build.0 = Release|Any CPU
+		{865E5DBA-AE97-4CDC-AD8F-8BCBCA542565}.Release|x64.ActiveCfg = Release|Any CPU
+		{865E5DBA-AE97-4CDC-AD8F-8BCBCA542565}.Release|x64.Build.0 = Release|Any CPU
+		{865E5DBA-AE97-4CDC-AD8F-8BCBCA542565}.Release|x86.ActiveCfg = Release|Any CPU
+		{865E5DBA-AE97-4CDC-AD8F-8BCBCA542565}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -7,6 +7,7 @@ using System.Threading;
 namespace PCRE.Internal
 {
     internal class PriorityCache<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
+        where TKey : notnull
     {
         private readonly Func<TKey, TValue> _valueFactory;
         private readonly IEqualityComparer<TKey> _keyComparer;

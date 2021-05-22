@@ -9,6 +9,13 @@ namespace PCRE.Internal
 {
     internal static unsafe class CalloutInterop
     {
+#if NETCOREAPP
+        private static readonly delegate* unmanaged[Cdecl]<Native.pcre2_callout_block*, void*, int> _calloutHandlerFnPtr = &CalloutHandler;
+
+        [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+        private static int CalloutHandler(Native.pcre2_callout_block* callout, void* data)
+            => ToInteropInfo(data).Call(callout);
+#else
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int CalloutHandlerFunc(Native.pcre2_callout_block* callout, void* data);
 
@@ -17,6 +24,7 @@ namespace PCRE.Internal
 
         private static int CalloutHandler(Native.pcre2_callout_block* callout, void* data)
             => ToInteropInfo(data).Call(callout);
+#endif
 
         public static void Prepare(string subject, InternalRegex regex, ref Native.match_input input, out CalloutInteropInfo interopInfo, Func<PcreCallout, PcreCalloutResult>? callout)
         {
@@ -29,7 +37,7 @@ namespace PCRE.Internal
             }
             else
             {
-                interopInfo = default;
+                SkipInitInteropInfo(out interopInfo);
                 input.callout = null;
             }
         }
@@ -45,7 +53,7 @@ namespace PCRE.Internal
             }
             else
             {
-                interopInfo = default;
+                SkipInitInteropInfo(out interopInfo);
                 input.callout = null;
             }
         }
@@ -61,7 +69,7 @@ namespace PCRE.Internal
             }
             else
             {
-                interopInfo = default;
+                SkipInitInteropInfo(out interopInfo);
                 input.callout = null;
             }
         }
@@ -78,6 +86,11 @@ namespace PCRE.Internal
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static ref CalloutInteropInfo ToInteropInfo(void* data)
         {
+#if NETCOREAPP
+            IL.Push(data);
+            Ret();
+            throw IL.Unreachable();
+#else
             // Roundtrip via a local to avoid type mismatch on return that the JIT inliner chokes on.
             IL.DeclareLocals(
                 false,
@@ -87,6 +100,14 @@ namespace PCRE.Internal
             IL.Push(data);
             Stloc("local");
             Ldloc("local");
+            Ret();
+            throw IL.Unreachable();
+#endif
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void SkipInitInteropInfo(out CalloutInteropInfo value)
+        {
             Ret();
             throw IL.Unreachable();
         }
