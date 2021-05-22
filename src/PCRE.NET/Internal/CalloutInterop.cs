@@ -149,8 +149,12 @@ namespace PCRE.Internal
                     }
                     else
                     {
+                        var outputVector = callout->capture_top <= InternalRegex.MaxStackAllocCaptureCount
+                            ? stackalloc uint[(int)callout->capture_top * 2]
+                            : Span<uint>.Empty;
+
                         var func = (PcreRefCalloutFunc)_callout;
-                        return (int)func(new PcreRefCallout(_subjectSpan, _regex, callout));
+                        return (int)func(new PcreRefCallout(_subjectSpan, _regex, callout, outputVector));
                     }
                 }
                 catch (Exception ex)

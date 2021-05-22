@@ -11,15 +11,16 @@ namespace PCRE
         private readonly InternalRegex _regex;
         private readonly Native.pcre2_callout_block* _callout;
 
-        private uint[]? _oVector;
+        private Span<uint> _oVector;
+        private bool _oVectorInitialized;
 
-        internal PcreRefCallout(ReadOnlySpan<char> subject, InternalRegex regex, Native.pcre2_callout_block* callout)
+        internal PcreRefCallout(ReadOnlySpan<char> subject, InternalRegex regex, Native.pcre2_callout_block* callout, Span<uint> outputVector)
         {
             _subject = subject;
             _regex = regex;
             _callout = callout;
-
-            _oVector = null;
+            _oVector = outputVector;
+            _oVectorInitialized = false;
         }
 
         public readonly int Number => (int)_callout->callout_number;
@@ -28,14 +29,18 @@ namespace PCRE
         {
             get
             {
-                if (_oVector == null)
+                if (!_oVectorInitialized)
                 {
-                    _oVector = new uint[_callout->capture_top * 2];
+                    if (_oVector.Length == 0)
+                        _oVector = new uint[_callout->capture_top * 2];
+
                     _oVector[0] = (uint)_callout->start_match;
                     _oVector[1] = (uint)_callout->current_position;
 
                     for (var i = 2; i < _oVector.Length; ++i)
                         _oVector[i] = (uint)_callout->offset_vector[i];
+
+                    _oVectorInitialized = true;
                 }
 
                 return new PcreRefMatch(_subject, _regex, _oVector, _callout->mark);

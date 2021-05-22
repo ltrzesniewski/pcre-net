@@ -7,6 +7,8 @@ namespace PCRE.Internal
 {
     internal sealed unsafe class InternalRegex : IDisposable
     {
+        internal const int MaxStackAllocCaptureCount = 32;
+
         private IntPtr _code;
         private Dictionary<int, PcreCalloutInfo>? _calloutInfoByPatternPosition;
 
@@ -17,7 +19,7 @@ namespace PCRE.Internal
         public int CaptureCount { get; }
 
         public int OutputVectorSize => 2 * (CaptureCount + 1);
-        public bool CanStackAllocOutputVector => CaptureCount < 32;
+        public bool CanStackAllocOutputVector => CaptureCount <= MaxStackAllocCaptureCount;
 
         public InternalRegex(string pattern, PcreRegexSettings settings)
         {

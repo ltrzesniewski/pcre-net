@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text;
 using NUnit.Framework;
+using PCRE.Internal;
 
 namespace PCRE.Tests.PcreNet
 {
@@ -871,6 +873,33 @@ namespace PCRE.Tests.PcreNet
                 Assert.That(data.Match[3].Value.ToString(), Is.EqualTo("bc"));
 
                 ++calls;
+                return PcreCalloutResult.Pass;
+            });
+
+            Assert.That(calls, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void should_handle_callouts_with_many_captures_ref()
+        {
+            var sb = new StringBuilder();
+            const int length = InternalRegex.MaxStackAllocCaptureCount * 2;
+
+            for (var i = 0; i < length; ++i)
+                sb.Append("(a)");
+
+            sb.Append("(?C)");
+
+            var re = new PcreRegex(sb.ToString());
+            var calls = 0;
+            var subject = new string('a', length);
+
+            re.Match(subject.AsSpan(), data =>
+            {
+                ++calls;
+                Assert.That(data.Match.Length, Is.EqualTo(length));
+                Assert.That(data.Match.Groups[1].Value.ToString(), Is.EqualTo("a"));
+                Assert.That(data.Match.Groups[length].Value.ToString(), Is.EqualTo("a"));
                 return PcreCalloutResult.Pass;
             });
 
