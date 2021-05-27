@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
+using InlineIL;
 using PCRE.Internal;
+using static InlineIL.IL.Emit;
 
 namespace PCRE.Conversion
 {
@@ -16,7 +19,7 @@ namespace PCRE.Conversion
             if (pattern == null) throw new ArgumentNullException(nameof(pattern));
             if (options == null) throw new ArgumentNullException(nameof(options));
 
-            var input = new Native.convert_input();
+            SkipInitConvertInput(out var input);
             options.FillConvertInput(ref input);
 
             return Convert(pattern, ref input);
@@ -26,10 +29,8 @@ namespace PCRE.Conversion
         {
             if (pattern == null) throw new ArgumentNullException(nameof(pattern));
 
-            var input = new Native.convert_input
-            {
-                options = options
-            };
+            SkipInitConvertInput(out var input);
+            input.options = options;
 
             return Convert(pattern, ref input);
         }
@@ -57,6 +58,13 @@ namespace PCRE.Conversion
                         Native.convert_result_free(result.output);
                 }
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void SkipInitConvertInput(out Native.convert_input input)
+        {
+            Ret();
+            throw IL.Unreachable();
         }
     }
 }
