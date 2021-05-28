@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.15.0</Version>
+    <Version>0.16.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(NCrunch)' == '1'">
