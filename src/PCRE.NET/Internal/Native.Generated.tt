@@ -7,15 +7,15 @@
 <#
 
 var funcs = ParseFuncs(@"
-    int get_error_message(int errorCode, char* errorBuffer, uint bufferSize);
+    int get_error_message(int errorCode, char* errorBuffer, uint bufferSize) no-gc;
     void compile(ref compile_input input, out compile_result result);
     void code_free(IntPtr code);
-    int pattern_info(IntPtr code, uint key, void* data);
-    int config(uint key, void* data);
+    int pattern_info(IntPtr code, uint key, void* data) no-gc;
+    int config(uint key, void* data) no-gc;
     void match(ref match_input input, out match_result result);
     void dfa_match(ref dfa_match_input input, out match_result result);
-    uint get_callout_count(IntPtr code);
-    void get_callouts(IntPtr code, pcre2_callout_enumerate_block* data);
+    uint get_callout_count(IntPtr code) no-gc;
+    void get_callouts(IntPtr code, pcre2_callout_enumerate_block* data) no-gc;
     IntPtr jit_stack_create(uint startSize, uint maxSize);
     void jit_stack_free(IntPtr stack);
     int convert(ref convert_input input, out convert_result result);
@@ -67,6 +67,11 @@ namespace PCRE.Internal
             public override <#= func.Declaration #>
                 => pcrenet_<#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => $"{p.Modifier}{p.Name}")) #>);
 
+<# if (func.SuppressGCTransition) { #>
+#if NETCOREAPP
+            [SuppressGCTransition]
+#endif
+<# } #>
             [DllImport("<#= platform.LibName #>", CallingConvention = CallingConvention.Cdecl)]
             private static extern <#= func.ReturnType #> pcrenet_<#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => p.GetPInvokeAttributes() + p.Declaration)) #>);
 
@@ -89,7 +94,9 @@ private static IEnumerable<FuncDef> ParseFuncs(string funcs)
                 (?<paramType>\S+) \s+ (?<paramName>\w+) \s*
                 (?(?=,),|(?=\)))
             )*
-            \) \s* ;
+            \) \s*
+            (?<nogc>no-gc)?
+            \s* ;
         ",
         RegexOptions.IgnorePatternWhitespace | RegexOptions.CultureInvariant
     );
@@ -99,7 +106,8 @@ private static IEnumerable<FuncDef> ParseFuncs(string funcs)
         var def = new FuncDef
         {
             ReturnType = match.Groups["returnType"].Value,
-            Name = match.Groups["funcName"].Value
+            Name = match.Groups["funcName"].Value,
+            SuppressGCTransition = match.Groups["nogc"].Success
         };
 
         var paramTypes = match.Groups["paramType"].Captures.Cast<Capture>().Select(i => i.Value).ToList();
@@ -125,6 +133,7 @@ private class FuncDef
     public string ReturnType;
     public string Name;
     public readonly List<FuncParamDef> Parameters = new();
+    public bool SuppressGCTransition;
 
     public string Declaration => $"{ReturnType} {Name}({ParametersDeclaration})";
     public string ParametersDeclaration => string.Join(", ", Parameters.Select(p => p.Declaration));
