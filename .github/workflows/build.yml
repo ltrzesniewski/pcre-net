@@ -136,7 +136,7 @@ jobs:
           failOnError: false
 
       - name: NuGet Restore
-        run: msbuild src/PCRE.NET.sln ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /t:Restore
+        run: dotnet restore src/PCRE.NET.sln
 
       - name: Build Native x86
         run: msbuild src/PCRE.NET.Native/PCRE.NET.Native.vcxproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:Platform=Win32
@@ -145,10 +145,10 @@ jobs:
         run: msbuild src/PCRE.NET.Native/PCRE.NET.Native.vcxproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:Platform=x64
 
       - name: Build PCRE.NET
-        run: dotnet msbuild src/PCRE.NET/PCRE.NET.csproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:RequirePcreNative=true
+        run: dotnet build --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore src/PCRE.NET/PCRE.NET.csproj -p:RequirePcreNative=true
 
       - name: NuGet Pack
-        run: dotnet msbuild src/PCRE.NET/PCRE.NET.csproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /t:Pack /p:RequirePcreNative=true
+        run: dotnet pack --configuration ${{ env.BUILD_CONFIGURATION }} --no-build src/PCRE.NET/PCRE.NET.csproj -p:RequirePcreNative=true
 
       - name: Build Tests x86
         run: msbuild src/PCRE.NET.Tests/PCRE.NET.Tests.csproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:Platform=x86 /p:ExpectPlatform=x86
