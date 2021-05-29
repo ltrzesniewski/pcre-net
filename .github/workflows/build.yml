@@ -162,6 +162,9 @@ jobs:
       - name: Test x64
         run: vstest.console src/PCRE.NET.Tests/bin/x64/${{ env.BUILD_CONFIGURATION }}/${{ env.BUILD_WINDOWS_TEST_TARGET }}/PCRE.NET.Tests.dll /Platform:x64
 
+      - name: Test .NET
+        run: dotnet test --configuration ${{ env.BUILD_CONFIGURATION }} src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
+
       - name: Upload NuGet
         uses: actions/upload-artifact@v2
         with:
