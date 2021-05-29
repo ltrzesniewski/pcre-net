@@ -242,7 +242,9 @@ namespace PCRE.Internal
             if (calloutCount == 0)
                 return Array.Empty<PcreCalloutInfo>();
 
-            var data = new Native.pcre2_callout_enumerate_block[calloutCount];
+            var data = calloutCount <= 16
+                ? stackalloc Native.pcre2_callout_enumerate_block[(int)calloutCount]
+                : new Native.pcre2_callout_enumerate_block[calloutCount];
 
             fixed (Native.pcre2_callout_enumerate_block* pData = &data[0])
             {

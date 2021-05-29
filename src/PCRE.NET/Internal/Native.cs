@@ -156,7 +156,7 @@ namespace PCRE.Internal
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        internal struct convert_input
+        internal ref struct convert_input
         {
             public char* pattern;
             public uint pattern_length;
@@ -166,7 +166,7 @@ namespace PCRE.Internal
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        internal struct convert_result
+        internal ref struct convert_result
         {
             public char* output;
             public uint output_length;
