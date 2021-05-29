@@ -1,4 +1,5 @@
-﻿using PCRE.Internal;
+﻿using System;
+using PCRE.Internal;
 
 namespace PCRE
 {
@@ -7,7 +8,7 @@ namespace PCRE
         internal PcreCalloutInfo(ref Native.pcre2_callout_enumerate_block info)
         {
             Number = (int)info.callout_number;
-            String = info.callout_string != null ? new string(info.callout_string) : null;
+            String = info.callout_string != IntPtr.Zero ? new string((char*)info.callout_string) : null;
             NextPatternItemLength = (int)info.next_item_length;
             PatternPosition = (int)info.pattern_position;
             StringOffset = (int)info.callout_string_offset;

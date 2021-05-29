@@ -151,7 +151,7 @@ namespace PCRE.Internal
             public nuint callout_string_offset; /* Offset to string within pattern */
             public nuint callout_string_length; /* Length of string compiled into pattern */
 
-            public char* callout_string; /* String compiled into pattern */
+            public IntPtr callout_string; /* String compiled into pattern */
             /* ------------------------------------------------------------------ */
         }
 
