@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading;
-using InlineIL;
 using PCRE.Dfa;
-using static InlineIL.IL.Emit;
 
 namespace PCRE.Internal
 {
@@ -33,7 +30,9 @@ namespace PCRE.Internal
 
             fixed (char* pPattern = pattern)
             {
-                SkipInitCompileInput(out var input);
+                Native.compile_input input;
+                _ = &input;
+
                 input.pattern = pPattern;
                 input.pattern_length = (uint)pattern.Length;
 
@@ -119,7 +118,9 @@ namespace PCRE.Internal
 
         public PcreMatch Match(string subject, PcreMatchSettings settings, int startIndex, uint additionalOptions)
         {
-            SkipInitMatchInput(out var input);
+            Native.match_input input;
+            _ = &input;
+
             settings.FillMatchInput(ref input);
 
             var oVector = new uint[OutputVectorSize];
@@ -159,7 +160,9 @@ namespace PCRE.Internal
 
         public void Match(ref PcreRefMatch match, ReadOnlySpan<char> subject, PcreMatchSettings settings, int startIndex, uint additionalOptions)
         {
-            SkipInitMatchInput(out var input);
+            Native.match_input input;
+            _ = &input;
+
             settings.FillMatchInput(ref input);
 
             Native.match_result result;
@@ -190,7 +193,9 @@ namespace PCRE.Internal
 
         public PcreDfaMatchResult DfaMatch(string subject, PcreDfaMatchSettings settings, int startIndex, uint additionalOptions)
         {
-            SkipInitDfaMatchInput(out var input);
+            Native.dfa_match_input input;
+            _ = &input;
+
             settings.FillMatchInput(ref input);
 
             var oVector = new uint[2 * Math.Max(1, settings.MaxResults)];
@@ -276,27 +281,6 @@ namespace PCRE.Internal
                 return result;
 
             throw new InvalidOperationException($"Could not retrieve callout info at position {patternPosition}");
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void SkipInitCompileInput(out Native.compile_input input)
-        {
-            Ret();
-            throw IL.Unreachable();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void SkipInitMatchInput(out Native.match_input input)
-        {
-            Ret();
-            throw IL.Unreachable();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void SkipInitDfaMatchInput(out Native.dfa_match_input input)
-        {
-            Ret();
-            throw IL.Unreachable();
         }
     }
 }
