@@ -41,7 +41,7 @@ namespace PCRE.Tests.Pcre
             => other != null && string.Equals(FullString, other.FullString);
 
         public override int GetHashCode()
-            => FullString?.GetHashCode() ?? 0;
+            => FullString.GetHashCode();
 
         public static bool operator ==(TestPattern? left, TestPattern? right) => Equals(left, right);
         public static bool operator !=(TestPattern? left, TestPattern? right) => !Equals(left, right);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using NUnit.Framework;
 
@@ -106,7 +107,7 @@ namespace PCRE.Tests.PcreNet
         public void should_match_from_index_ref()
         {
             var re = new PcreRegex(@"a");
-            var matches = re.Matches("foo bar baz".AsSpan(), 6).ToList(m => true);
+            var matches = re.Matches("foo bar baz".AsSpan(), 6).ToList(_ => true);
 
             Assert.That(matches, Has.Count.EqualTo(1));
         }
@@ -124,7 +125,7 @@ namespace PCRE.Tests.PcreNet
         public void should_match_starting_at_end_of_string_ref()
         {
             var re = new PcreRegex(@"(?<=a)");
-            var matches = re.Matches("xxa".AsSpan(), 3).ToList(m => true);
+            var matches = re.Matches("xxa".AsSpan(), 3).ToList(_ => true);
 
             Assert.That(matches, Has.Count.EqualTo(1));
         }
@@ -173,6 +174,7 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        [SuppressMessage("ReSharper", "ParameterOnlyUsedForPreconditionCheck.Local")]
         public void should_report_callout_exception()
         {
             var re = new PcreRegex(@"a(?C1)");
@@ -197,6 +199,7 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        [SuppressMessage("ReSharper", "ParameterOnlyUsedForPreconditionCheck.Local")]
         public void should_report_callout_exception_ref()
         {
             var re = new PcreRegex(@"a(?C1)");
@@ -211,7 +214,7 @@ namespace PCRE.Tests.PcreNet
                         throw new InvalidOperationException("Simulated exception");
 
                     return PcreCalloutResult.Pass;
-                }).ToList(i =>
+                }).ToList(_ =>
                 {
                     ++resultCount;
                     return true;
