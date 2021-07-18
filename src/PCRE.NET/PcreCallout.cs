@@ -1,4 +1,5 @@
-﻿using PCRE.Internal;
+﻿using System.Diagnostics.CodeAnalysis;
+using PCRE.Internal;
 
 namespace PCRE
 {
@@ -47,6 +48,8 @@ namespace PCRE
 
         public int NextPatternItemLength { get; }
         public int StringOffset => Info.StringOffset;
+
+        [SuppressMessage("Naming", "CA1720")]
         public string? String => Info.String;
 
         public PcreCalloutInfo Info => _info ??= _regex.GetCalloutInfoByPatternPosition(PatternPosition);

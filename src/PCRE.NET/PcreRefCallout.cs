@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using PCRE.Internal;
 
 namespace PCRE
@@ -55,6 +56,8 @@ namespace PCRE
 
         public readonly int NextPatternItemLength => (int)_callout->next_item_length;
         public readonly int StringOffset => Info.StringOffset;
+
+        [SuppressMessage("Naming", "CA1720")]
         public readonly string? String => Info.String;
 
         public readonly PcreCalloutInfo Info => _regex.GetCalloutInfoByPatternPosition(PatternPosition);

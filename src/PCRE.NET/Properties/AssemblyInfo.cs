@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 #if TEST_BUILD
 [assembly: InternalsVisibleTo("PCRE.NET.Tests")]
@@ -7,3 +8,7 @@
 #endif
 
 [module: SkipLocalsInit]
+
+[assembly: SuppressMessage("Microsoft.Design", "CA1014")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1028")]
+[assembly: SuppressMessage("Microsoft.Design", "CA1034")]
