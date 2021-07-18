@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using PCRE.Internal;
 
 namespace PCRE
@@ -15,6 +16,8 @@ namespace PCRE
         }
 
         public int Number { get; }
+
+        [SuppressMessage("Naming", "CA1720")]
         public string? String { get; }
 
         public int NextPatternItemLength { get; }

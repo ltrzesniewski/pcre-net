@@ -24,7 +24,11 @@ namespace PCRE.Internal
         {
             unchecked
             {
+#if NETCOREAPP
+                return Pattern?.GetHashCode(StringComparison.Ordinal) ?? 0;
+#else
                 return Pattern?.GetHashCode() ?? 0;
+#endif
             }
         }
 

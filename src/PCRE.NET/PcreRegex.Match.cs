@@ -27,7 +27,7 @@ namespace PCRE
         public bool IsMatch(ReadOnlySpan<char> subject, int startIndex)
         {
             if (startIndex < 0 || startIndex > subject.Length)
-                throw new IndexOutOfRangeException("Invalid StartIndex value");
+                throw new ArgumentOutOfRangeException(nameof(startIndex), "Invalid StartIndex value");
 
             var outputVector = InternalRegex.CanStackAllocOutputVector
                 ? stackalloc uint[InternalRegex.OutputVectorSize]
@@ -104,7 +104,7 @@ namespace PCRE
                 throw new ArgumentNullException(nameof(settings));
 
             if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
-                throw new IndexOutOfRangeException("Invalid StartIndex value");
+                throw new ArgumentException("Invalid StartIndex value");
 
             return InternalRegex.Match(subject, settings, settings.StartIndex, settings.AdditionalOptions.ToPatternOptions());
         }
@@ -115,7 +115,7 @@ namespace PCRE
                 throw new ArgumentNullException(nameof(settings));
 
             if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
-                throw new IndexOutOfRangeException("Invalid StartIndex value");
+                throw new ArgumentException("Invalid StartIndex value");
 
             var match = InternalRegex.CreateRefMatch();
             match.FirstMatch(subject, settings, settings.StartIndex);
@@ -167,7 +167,7 @@ namespace PCRE
                 throw new ArgumentNullException(nameof(settings));
 
             if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
-                throw new IndexOutOfRangeException("Invalid StartIndex value");
+                throw new ArgumentException("Invalid StartIndex value");
 
             return MatchesIterator(subject, settings);
         }
@@ -179,7 +179,7 @@ namespace PCRE
                 throw new ArgumentNullException(nameof(settings));
 
             if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
-                throw new IndexOutOfRangeException("Invalid StartIndex value");
+                throw new ArgumentException("Invalid StartIndex value");
 
             return new RefMatchEnumerable(InternalRegex, subject, settings);
         }
@@ -259,6 +259,8 @@ namespace PCRE
             public RefMatchEnumerator GetEnumerator()
                 => new RefMatchEnumerator(_regex, _subject, _settings);
 
+            [SuppressMessage("Microsoft.Design", "CA1002")]
+            [SuppressMessage("Microsoft.Design", "CA1062")]
             public List<T> ToList<T>(PcreRefMatch.Func<T> selector)
             {
                 var result = new List<T>();

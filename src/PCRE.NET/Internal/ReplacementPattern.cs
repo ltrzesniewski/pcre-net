@@ -15,7 +15,11 @@ namespace PCRE.Internal
             if (replacementPattern.Length == 0)
                 return _ => string.Empty;
 
+#if NETCOREAPP
+            var placeholderIndex = replacementPattern.IndexOf('$', StringComparison.Ordinal);
+#else
             var placeholderIndex = replacementPattern.IndexOf('$');
+#endif
 
             if (placeholderIndex < 0)
                 return _ => replacementPattern;

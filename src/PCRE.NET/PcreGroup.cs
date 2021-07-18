@@ -1,4 +1,6 @@
-﻿namespace PCRE
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace PCRE
 {
     public sealed class PcreGroup : IPcreGroup
     {
@@ -30,7 +32,8 @@
         public bool Success => Index >= 0;
         public bool IsDefined => !ReferenceEquals(this, Undefined);
 
-        public static implicit operator string(PcreGroup group) => group.Value;
+        [return: NotNullIfNotNull("group")]
+        public static implicit operator string?(PcreGroup? group) => group?.Value;
 
         public override string ToString() => Value;
     }

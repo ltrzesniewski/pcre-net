@@ -7,6 +7,7 @@ namespace PCRE.Internal
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global")]
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("Security", "CA5392")]
     internal static unsafe partial class Native
     {
         private static readonly LibImpl _impl = GetLibImpl();

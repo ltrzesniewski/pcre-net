@@ -15,6 +15,8 @@ namespace PCRE.Dfa
         public uint WorkspaceSize { get; set; } = 128;
 
         [SuppressMessage("ReSharper", "DelegateSubtraction")]
+        [SuppressMessage("Microsoft.Design", "CA1003")]
+        [SuppressMessage("Microsoft.Design", "CA1030")]
         public event Func<PcreCallout, PcreCalloutResult>? OnCallout
         {
             add => Callout += value;

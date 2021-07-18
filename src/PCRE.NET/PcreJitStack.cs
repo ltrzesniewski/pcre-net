@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using PCRE.Internal;
 
 namespace PCRE
@@ -6,6 +7,7 @@ namespace PCRE
     /// <summary>
     /// JIT stack for advanced usage scenarios. Only use from a single thread at a time.
     /// </summary>
+    [SuppressMessage("Naming", "CA1711")]
     public sealed class PcreJitStack : IDisposable
     {
         private IntPtr _stack;

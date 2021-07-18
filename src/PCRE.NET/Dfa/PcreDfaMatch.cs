@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace PCRE.Dfa
 {
     public sealed class PcreDfaMatch : IPcreGroup
@@ -27,7 +29,8 @@ namespace PCRE.Dfa
 
         public bool Success => Index >= 0;
 
-        public static implicit operator string(PcreDfaMatch group) => group.Value;
+        [return: NotNullIfNotNull("group")]
+        public static implicit operator string?(PcreDfaMatch? group) => group?.Value;
 
         public override string ToString() => Value;
     }

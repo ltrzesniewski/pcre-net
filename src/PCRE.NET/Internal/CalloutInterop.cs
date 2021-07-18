@@ -106,6 +106,7 @@ namespace PCRE.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [SuppressMessage("Usage", "CA1801")]
         private static void SkipInitInteropInfo(out CalloutInteropInfo value)
         {
             Ret();
@@ -138,6 +139,7 @@ namespace PCRE.Internal
                 Exception = null;
             }
 
+            [SuppressMessage("Microsoft.Design", "CA1031")]
             public int Call(Native.pcre2_callout_block* callout)
             {
                 try

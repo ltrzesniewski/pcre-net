@@ -200,6 +200,8 @@ namespace PCRE
             public PcreRefGroup this[int index] => _match[index];
             public PcreRefGroup this[string name] => _match[name];
 
+            [SuppressMessage("Microsoft.Design", "CA1002")]
+            [SuppressMessage("Microsoft.Design", "CA1062")]
             public List<T> ToList<T>(PcreRefGroup.Func<T> selector)
             {
                 var result = new List<T>(Count);
@@ -242,6 +244,8 @@ namespace PCRE
             public DuplicateNamedGroupEnumerator GetEnumerator()
                 => new DuplicateNamedGroupEnumerator(_match, _groupIndexes);
 
+            [SuppressMessage("Microsoft.Design", "CA1002")]
+            [SuppressMessage("Microsoft.Design", "CA1062")]
             public List<T> ToList<T>(PcreRefGroup.Func<T> selector)
             {
                 var result = new List<T>(_groupIndexes?.Length ?? 0);

@@ -6,6 +6,7 @@ namespace PCRE
 {
     [Flags]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
+    [SuppressMessage("Microsoft.Design", "CA1069")]
     public enum PcreOptions : long
     {
         None = 0,

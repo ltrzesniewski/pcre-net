@@ -39,7 +39,7 @@ namespace PCRE.Dfa
                 throw new ArgumentNullException(nameof(settings));
 
             if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
-                throw new IndexOutOfRangeException("Invalid StartIndex value");
+                throw new ArgumentException("Invalid StartIndex value");
 
             return _regex.DfaMatch(subject, settings, settings.StartIndex, ((PcreMatchOptions)settings.AdditionalOptions).ToPatternOptions());
         }
@@ -62,7 +62,7 @@ namespace PCRE.Dfa
                 throw new ArgumentNullException(nameof(settings));
 
             if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
-                throw new IndexOutOfRangeException("Invalid StartIndex value");
+                throw new ArgumentException("Invalid StartIndex value");
 
             return MatchesIterator(subject, settings);
         }
