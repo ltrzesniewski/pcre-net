@@ -10,6 +10,7 @@ namespace PCRE.Internal
     [SuppressMessage("Security", "CA5392")]
     internal static unsafe partial class Native
     {
+#if !NETCOREAPP
         private static readonly LibImpl _impl = GetLibImpl();
 
         private static LibImpl GetLibImpl()
@@ -29,12 +30,13 @@ namespace PCRE.Internal
             }
             catch (DllNotFoundException) when (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                // Used in the .NET Framework, and in .NET Core unit tests
+                // Used in the .NET Framework
                 return Environment.Is64BitProcess
                     ? new Win64Impl()
                     : new Win32Impl();
             }
         }
+#endif
 
         public static string GetErrorMessage(int errorCode)
         {

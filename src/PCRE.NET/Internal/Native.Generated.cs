@@ -14,6 +14,54 @@ namespace PCRE.Internal
 {
     unsafe partial class Native
     {
+#if NETCOREAPP
+
+        [SuppressGCTransition]
+        [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_get_error_message", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int get_error_message(int errorCode, char* errorBuffer, uint bufferSize);
+
+        [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_compile", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void compile(ref compile_input input, out compile_result result);
+
+        [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_code_free", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void code_free(IntPtr code);
+
+        [SuppressGCTransition]
+        [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_pattern_info", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int pattern_info(IntPtr code, uint key, void* data);
+
+        [SuppressGCTransition]
+        [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_config", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int config(uint key, void* data);
+
+        [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_match", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void match(ref match_input input, out match_result result);
+
+        [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_dfa_match", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void dfa_match(ref dfa_match_input input, out match_result result);
+
+        [SuppressGCTransition]
+        [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_get_callout_count", CallingConvention = CallingConvention.Cdecl)]
+        public static extern uint get_callout_count(IntPtr code);
+
+        [SuppressGCTransition]
+        [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_get_callouts", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void get_callouts(IntPtr code, pcre2_callout_enumerate_block* data);
+
+        [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_jit_stack_create", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr jit_stack_create(uint startSize, uint maxSize);
+
+        [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_jit_stack_free", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void jit_stack_free(IntPtr stack);
+
+        [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_convert", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int convert(ref convert_input input, out convert_result result);
+
+        [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_convert_result_free", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int convert_result_free(char* str);
+
+#else
+
         public static int get_error_message(int errorCode, char* errorBuffer, uint bufferSize)
             => _impl.get_error_message(errorCode, errorBuffer, bufferSize);
 
@@ -76,9 +124,6 @@ namespace PCRE.Internal
             public override int get_error_message(int errorCode, char* errorBuffer, uint bufferSize)
                 => pcrenet_get_error_message(errorCode, errorBuffer, bufferSize);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_get_error_message(int errorCode, char* errorBuffer, uint bufferSize);
 
@@ -97,18 +142,12 @@ namespace PCRE.Internal
             public override int pattern_info(IntPtr code, uint key, void* data)
                 => pcrenet_pattern_info(code, key, data);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_pattern_info(IntPtr code, uint key, void* data);
 
             public override int config(uint key, void* data)
                 => pcrenet_config(key, data);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_config(uint key, void* data);
 
@@ -127,18 +166,12 @@ namespace PCRE.Internal
             public override uint get_callout_count(IntPtr code)
                 => pcrenet_get_callout_count(code);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern uint pcrenet_get_callout_count(IntPtr code);
 
             public override void get_callouts(IntPtr code, pcre2_callout_enumerate_block* data)
                 => pcrenet_get_callouts(code, data);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern void pcrenet_get_callouts(IntPtr code, pcre2_callout_enumerate_block* data);
 
@@ -174,9 +207,6 @@ namespace PCRE.Internal
             public override int get_error_message(int errorCode, char* errorBuffer, uint bufferSize)
                 => pcrenet_get_error_message(errorCode, errorBuffer, bufferSize);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_get_error_message(int errorCode, char* errorBuffer, uint bufferSize);
 
@@ -195,18 +225,12 @@ namespace PCRE.Internal
             public override int pattern_info(IntPtr code, uint key, void* data)
                 => pcrenet_pattern_info(code, key, data);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_pattern_info(IntPtr code, uint key, void* data);
 
             public override int config(uint key, void* data)
                 => pcrenet_config(key, data);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_config(uint key, void* data);
 
@@ -225,18 +249,12 @@ namespace PCRE.Internal
             public override uint get_callout_count(IntPtr code)
                 => pcrenet_get_callout_count(code);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern uint pcrenet_get_callout_count(IntPtr code);
 
             public override void get_callouts(IntPtr code, pcre2_callout_enumerate_block* data)
                 => pcrenet_get_callouts(code, data);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern void pcrenet_get_callouts(IntPtr code, pcre2_callout_enumerate_block* data);
 
@@ -272,9 +290,6 @@ namespace PCRE.Internal
             public override int get_error_message(int errorCode, char* errorBuffer, uint bufferSize)
                 => pcrenet_get_error_message(errorCode, errorBuffer, bufferSize);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_get_error_message(int errorCode, char* errorBuffer, uint bufferSize);
 
@@ -293,18 +308,12 @@ namespace PCRE.Internal
             public override int pattern_info(IntPtr code, uint key, void* data)
                 => pcrenet_pattern_info(code, key, data);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_pattern_info(IntPtr code, uint key, void* data);
 
             public override int config(uint key, void* data)
                 => pcrenet_config(key, data);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_config(uint key, void* data);
 
@@ -323,18 +332,12 @@ namespace PCRE.Internal
             public override uint get_callout_count(IntPtr code)
                 => pcrenet_get_callout_count(code);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern uint pcrenet_get_callout_count(IntPtr code);
 
             public override void get_callouts(IntPtr code, pcre2_callout_enumerate_block* data)
                 => pcrenet_get_callouts(code, data);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern void pcrenet_get_callouts(IntPtr code, pcre2_callout_enumerate_block* data);
 
@@ -370,9 +373,6 @@ namespace PCRE.Internal
             public override int get_error_message(int errorCode, char* errorBuffer, uint bufferSize)
                 => pcrenet_get_error_message(errorCode, errorBuffer, bufferSize);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_get_error_message(int errorCode, char* errorBuffer, uint bufferSize);
 
@@ -391,18 +391,12 @@ namespace PCRE.Internal
             public override int pattern_info(IntPtr code, uint key, void* data)
                 => pcrenet_pattern_info(code, key, data);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_pattern_info(IntPtr code, uint key, void* data);
 
             public override int config(uint key, void* data)
                 => pcrenet_config(key, data);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_config(uint key, void* data);
 
@@ -421,18 +415,12 @@ namespace PCRE.Internal
             public override uint get_callout_count(IntPtr code)
                 => pcrenet_get_callout_count(code);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
             private static extern uint pcrenet_get_callout_count(IntPtr code);
 
             public override void get_callouts(IntPtr code, pcre2_callout_enumerate_block* data)
                 => pcrenet_get_callouts(code, data);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
             private static extern void pcrenet_get_callouts(IntPtr code, pcre2_callout_enumerate_block* data);
 
@@ -468,9 +456,6 @@ namespace PCRE.Internal
             public override int get_error_message(int errorCode, char* errorBuffer, uint bufferSize)
                 => pcrenet_get_error_message(errorCode, errorBuffer, bufferSize);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.dylib", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_get_error_message(int errorCode, char* errorBuffer, uint bufferSize);
 
@@ -489,18 +474,12 @@ namespace PCRE.Internal
             public override int pattern_info(IntPtr code, uint key, void* data)
                 => pcrenet_pattern_info(code, key, data);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.dylib", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_pattern_info(IntPtr code, uint key, void* data);
 
             public override int config(uint key, void* data)
                 => pcrenet_config(key, data);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.dylib", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_config(uint key, void* data);
 
@@ -519,18 +498,12 @@ namespace PCRE.Internal
             public override uint get_callout_count(IntPtr code)
                 => pcrenet_get_callout_count(code);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.dylib", CallingConvention = CallingConvention.Cdecl)]
             private static extern uint pcrenet_get_callout_count(IntPtr code);
 
             public override void get_callouts(IntPtr code, pcre2_callout_enumerate_block* data)
                 => pcrenet_get_callouts(code, data);
 
-#if NETCOREAPP
-            [SuppressGCTransition]
-#endif
             [DllImport("PCRE.NET.Native.dylib", CallingConvention = CallingConvention.Cdecl)]
             private static extern void pcrenet_get_callouts(IntPtr code, pcre2_callout_enumerate_block* data);
 
@@ -560,5 +533,6 @@ namespace PCRE.Internal
 
         }
 
+#endif
     }
 }
