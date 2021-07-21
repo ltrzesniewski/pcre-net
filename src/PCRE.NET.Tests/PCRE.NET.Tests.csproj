@@ -23,18 +23,4 @@
     <None Include="..\PCRE\testdata\test*" Link="Pcre/TestCases/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll"
-             Condition="Exists('..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll') and '$(TargetFrameworkIdentifier)' == '.NETCoreApp' and '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X86'"
-             Link="PCRE.NET.Native.dll"
-             CopyToOutputDirectory="PreserveNewest"
-             Visible="false" />
-
-    <Content Include="..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll"
-             Condition="Exists('..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll') and '$(TargetFrameworkIdentifier)' == '.NETCoreApp' and '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X64'"
-             Link="PCRE.NET.Native.dll"
-             CopyToOutputDirectory="PreserveNewest"
-             Visible="false" />
-  </ItemGroup>
-
 </Project>

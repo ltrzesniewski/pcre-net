@@ -169,10 +169,10 @@ jobs:
         run: vstest.console src/PCRE.NET.Tests/bin/x64/${{ env.BUILD_CONFIGURATION }}/${{ env.BUILD_WINDOWS_TEST_TARGET }}/PCRE.NET.Tests.dll /Platform:x64
 
       - name: Test .NET x64
-        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} -p:ExpectPlatform=x64
+        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }}
 
       - name: Test .NET Standard x64
-        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} -p:ExpectPlatform=x64 -p:ForceNetStandard=true
+        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} -p:ForceNetStandard=true
 
       - name: Upload NuGet
         uses: actions/upload-artifact@v2

@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
-    <TargetFramework Condition="'$(ForceNetStandard)' == 'true'">netstandard2.0</TargetFramework>
+    <!--suppress MsbuildTargetFrameworkTagInspection -->
+    <TargetFrameworks Condition="'$(ForceNetStandard)' == 'true'">netstandard2.0</TargetFrameworks>
     <RootNamespace>PCRE</RootNamespace>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
   </PropertyGroup>
@@ -69,6 +70,18 @@
              Visible="false"
              Pack="true"
              PackagePath="runtimes\win-x64\native\PCRE.NET.Native.dll" />
+
+    <Content Include="..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll"
+             Condition="Exists('..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll') and '$(TargetFrameworkIdentifier)' == '.NETCoreApp' and '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X86'"
+             Link="PCRE.NET.Native.dll"
+             CopyToOutputDirectory="PreserveNewest"
+             Visible="false" />
+
+    <Content Include="..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll"
+             Condition="Exists('..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll') and '$(TargetFrameworkIdentifier)' == '.NETCoreApp' and '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X64'"
+             Link="PCRE.NET.Native.dll"
+             CopyToOutputDirectory="PreserveNewest"
+             Visible="false" />
 
     <Content Include="..\..\lib\PCRE.NET.Native.x64.so"
              Condition="Exists('..\..\lib\PCRE.NET.Native.x64.so') or '$(RequirePcreNative)' == 'true'"
