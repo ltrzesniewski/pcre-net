@@ -56,7 +56,7 @@ namespace PCRE.Conversion
                 finally
                 {
                     if (result.output != null)
-                        _ = Native.convert_result_free(result.output);
+                        Native.convert_result_free(result.output);
                 }
             }
         }

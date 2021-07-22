@@ -58,7 +58,7 @@ namespace PCRE.Internal
         public static extern int convert(ref convert_input input, out convert_result result);
 
         [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_convert_result_free", CallingConvention = CallingConvention.Cdecl)]
-        public static extern int convert_result_free(char* str);
+        public static extern void convert_result_free(char* str);
 
 #else
 
@@ -98,7 +98,7 @@ namespace PCRE.Internal
         public static int convert(ref convert_input input, out convert_result result)
             => _impl.convert(ref input, out result);
 
-        public static int convert_result_free(char* str)
+        public static void convert_result_free(char* str)
             => _impl.convert_result_free(str);
 
         private abstract class LibImpl
@@ -115,7 +115,7 @@ namespace PCRE.Internal
             public abstract IntPtr jit_stack_create(uint startSize, uint maxSize);
             public abstract void jit_stack_free(IntPtr stack);
             public abstract int convert(ref convert_input input, out convert_result result);
-            public abstract int convert_result_free(char* str);
+            public abstract void convert_result_free(char* str);
         }
 
         [SuppressUnmanagedCodeSecurity]
@@ -193,11 +193,11 @@ namespace PCRE.Internal
             [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_convert(ref convert_input input, out convert_result result);
 
-            public override int convert_result_free(char* str)
+            public override void convert_result_free(char* str)
                 => pcrenet_convert_result_free(str);
 
             [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
-            private static extern int pcrenet_convert_result_free(char* str);
+            private static extern void pcrenet_convert_result_free(char* str);
 
         }
 
@@ -276,11 +276,11 @@ namespace PCRE.Internal
             [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_convert(ref convert_input input, out convert_result result);
 
-            public override int convert_result_free(char* str)
+            public override void convert_result_free(char* str)
                 => pcrenet_convert_result_free(str);
 
             [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
-            private static extern int pcrenet_convert_result_free(char* str);
+            private static extern void pcrenet_convert_result_free(char* str);
 
         }
 
@@ -359,11 +359,11 @@ namespace PCRE.Internal
             [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_convert(ref convert_input input, out convert_result result);
 
-            public override int convert_result_free(char* str)
+            public override void convert_result_free(char* str)
                 => pcrenet_convert_result_free(str);
 
             [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
-            private static extern int pcrenet_convert_result_free(char* str);
+            private static extern void pcrenet_convert_result_free(char* str);
 
         }
 
@@ -442,11 +442,11 @@ namespace PCRE.Internal
             [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_convert(ref convert_input input, out convert_result result);
 
-            public override int convert_result_free(char* str)
+            public override void convert_result_free(char* str)
                 => pcrenet_convert_result_free(str);
 
             [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
-            private static extern int pcrenet_convert_result_free(char* str);
+            private static extern void pcrenet_convert_result_free(char* str);
 
         }
 
@@ -525,11 +525,11 @@ namespace PCRE.Internal
             [DllImport("PCRE.NET.Native.dylib", CallingConvention = CallingConvention.Cdecl)]
             private static extern int pcrenet_convert(ref convert_input input, out convert_result result);
 
-            public override int convert_result_free(char* str)
+            public override void convert_result_free(char* str)
                 => pcrenet_convert_result_free(str);
 
             [DllImport("PCRE.NET.Native.dylib", CallingConvention = CallingConvention.Cdecl)]
-            private static extern int pcrenet_convert_result_free(char* str);
+            private static extern void pcrenet_convert_result_free(char* str);
 
         }
 

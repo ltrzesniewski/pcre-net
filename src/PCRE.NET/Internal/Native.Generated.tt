@@ -19,7 +19,7 @@ var funcs = ParseFuncs(@"
     IntPtr jit_stack_create(uint startSize, uint maxSize);
     void jit_stack_free(IntPtr stack);
     int convert(ref convert_input input, out convert_result result);
-    int convert_result_free(char* str);
+    void convert_result_free(char* str);
 ").ToList();
 
 const string libName = "PCRE.NET.Native";
