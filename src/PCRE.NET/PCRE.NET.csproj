@@ -57,54 +57,54 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll"
-             Condition="Exists('..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll') or '$(RequirePcreNative)' == 'true'"
-             Link="PCRE.NET.Native.x86.dll"
-             CopyToOutputDirectory="PreserveNewest"
-             Visible="false"
-             Pack="true"
-             PackagePath="runtimes\win-x86\native\PCRE.NET.Native.dll" />
+    <None Include="..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll"
+          Condition="Exists('..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll') or '$(RequirePcreNative)' == 'true'"
+          Link="PCRE.NET.Native.x86.dll"
+          CopyToOutputDirectory="PreserveNewest"
+          Visible="false"
+          Pack="true"
+          PackagePath="runtimes\win-x86\native\PCRE.NET.Native.dll" />
 
-    <Content Include="..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll"
-             Condition="Exists('..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll') or '$(RequirePcreNative)' == 'true'"
-             Link="PCRE.NET.Native.x64.dll"
-             CopyToOutputDirectory="PreserveNewest"
-             Visible="false"
-             Pack="true"
-             PackagePath="runtimes\win-x64\native\PCRE.NET.Native.dll" />
+    <None Include="..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll"
+          Condition="Exists('..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll') or '$(RequirePcreNative)' == 'true'"
+          Link="PCRE.NET.Native.x64.dll"
+          CopyToOutputDirectory="PreserveNewest"
+          Visible="false"
+          Pack="true"
+          PackagePath="runtimes\win-x64\native\PCRE.NET.Native.dll" />
 
-    <Content Include="..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll"
-             Condition="Exists('..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll') and '$(TargetFrameworkIdentifier)' == '.NETCoreApp' and '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X86'"
-             Link="PCRE.NET.Native.dll"
-             CopyToOutputDirectory="PreserveNewest"
-             Visible="false" />
+    <None Include="..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll"
+          Condition="Exists('..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll') and '$(TargetFrameworkIdentifier)' == '.NETCoreApp' and '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X86'"
+          Link="PCRE.NET.Native.dll"
+          CopyToOutputDirectory="PreserveNewest"
+          Visible="false" />
 
-    <Content Include="..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll"
-             Condition="Exists('..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll') and '$(TargetFrameworkIdentifier)' == '.NETCoreApp' and '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X64'"
-             Link="PCRE.NET.Native.dll"
-             CopyToOutputDirectory="PreserveNewest"
-             Visible="false" />
+    <None Include="..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll"
+          Condition="Exists('..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll') and '$(TargetFrameworkIdentifier)' == '.NETCoreApp' and '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X64'"
+          Link="PCRE.NET.Native.dll"
+          CopyToOutputDirectory="PreserveNewest"
+          Visible="false" />
 
-    <Content Include="..\..\lib\PCRE.NET.Native.x64.so"
-             Condition="Exists('..\..\lib\PCRE.NET.Native.x64.so') or '$(RequirePcreNative)' == 'true'"
-             Link="PCRE.NET.Native.so"
-             CopyToOutputDirectory="PreserveNewest"
-             Visible="false"
-             Pack="true"
-             PackagePath="runtimes\linux-x64\native\PCRE.NET.Native.so" />
+    <None Include="..\..\lib\PCRE.NET.Native.x64.so"
+          Condition="Exists('..\..\lib\PCRE.NET.Native.x64.so') or '$(RequirePcreNative)' == 'true'"
+          Link="PCRE.NET.Native.so"
+          CopyToOutputDirectory="PreserveNewest"
+          Visible="false"
+          Pack="true"
+          PackagePath="runtimes\linux-x64\native\PCRE.NET.Native.so" />
 
-    <Content Include="..\..\lib\PCRE.NET.Native.x64.dylib"
-             Condition="Exists('..\..\lib\PCRE.NET.Native.x64.dylib') or '$(RequirePcreNative)' == 'true'"
-             Link="PCRE.NET.Native.dylib"
-             CopyToOutputDirectory="PreserveNewest"
-             Visible="false"
-             Pack="true"
-             PackagePath="runtimes\osx-x64\native\PCRE.NET.Native.dylib" />
+    <None Include="..\..\lib\PCRE.NET.Native.x64.dylib"
+          Condition="Exists('..\..\lib\PCRE.NET.Native.x64.dylib') or '$(RequirePcreNative)' == 'true'"
+          Link="PCRE.NET.Native.dylib"
+          CopyToOutputDirectory="PreserveNewest"
+          Visible="false"
+          Pack="true"
+          PackagePath="runtimes\osx-x64\native\PCRE.NET.Native.dylib" />
 
-    <Content Include="PCRE.NET.targets" Pack="true" PackagePath="build" />
+    <None Include="PCRE.NET.targets" Pack="true" PackagePath="build" />
 
-    <Content Include="../../icon.png" Pack="true" PackagePath="/" Visible="false" />
-    <Content Include="../NuGetReadme.md" Pack="true" PackagePath="/README.md" Visible="false" />
+    <None Include="../../icon.png" Pack="true" PackagePath="/" Visible="false" />
+    <None Include="../NuGetReadme.md" Pack="true" PackagePath="/README.md" Visible="false" />
   </ItemGroup>
 
 </Project>
