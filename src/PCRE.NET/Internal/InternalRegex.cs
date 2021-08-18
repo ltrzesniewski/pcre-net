@@ -38,7 +38,7 @@ namespace PCRE.Internal
 
                 Settings.FillCompileInput(ref input);
 
-                Native.compile(ref input, out result);
+                Native.compile(&input, &result);
                 _code = result.code;
 
                 if (_code == IntPtr.Zero || result.error_code != 0)
@@ -139,7 +139,7 @@ namespace PCRE.Internal
 
                 CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, settings.Callout);
 
-                Native.match(ref input, out result);
+                Native.match(&input, &result);
             }
 
             AfterMatch(result, ref calloutInterop);
@@ -183,7 +183,7 @@ namespace PCRE.Internal
 
                 CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, settings.RefCallout);
 
-                Native.match(ref input, out result);
+                Native.match(&input, &result);
             }
 
             AfterMatch(result, ref calloutInterop);
@@ -214,7 +214,7 @@ namespace PCRE.Internal
 
                 CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, settings.Callout);
 
-                Native.dfa_match(ref input, out result);
+                Native.dfa_match(&input, &result);
             }
 
             AfterMatch(result, ref calloutInterop);

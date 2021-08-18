@@ -21,7 +21,7 @@ namespace PCRE.Conversion
 
             options.FillConvertInput(ref input);
 
-            return Convert(pattern, ref input);
+            return Convert(pattern, &input);
         }
 
         private static string BasicConvert(string pattern, uint options)
@@ -29,22 +29,21 @@ namespace PCRE.Conversion
             if (pattern == null) throw new ArgumentNullException(nameof(pattern));
 
             Native.convert_input input;
-            _ = &input;
-
             input.options = options;
 
-            return Convert(pattern, ref input);
+            return Convert(pattern, &input);
         }
 
-        private static string Convert(string pattern, ref Native.convert_input input)
+        private static string Convert(string pattern, Native.convert_input* input)
         {
             fixed (char* pPattern = pattern)
             {
-                input.pattern = pPattern;
-                input.pattern_length = (uint)pattern.Length;
-                input.options |= PcreConstants.CONVERT_UTF;
+                input->pattern = pPattern;
+                input->pattern_length = (uint)pattern.Length;
+                input->options |= PcreConstants.CONVERT_UTF;
 
-                var errorCode = Native.convert(ref input, out var result);
+                Native.convert_result result;
+                var errorCode = Native.convert(input, &result);
 
                 try
                 {
