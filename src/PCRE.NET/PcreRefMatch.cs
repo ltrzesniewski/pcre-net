@@ -78,13 +78,13 @@ namespace PCRE
 
         public readonly GroupEnumerator GetEnumerator() => new GroupEnumerator(this);
 
-        public bool TryGetGroup(int index, out PcreRefGroup result)
+        public readonly bool TryGetGroup(int index, out PcreRefGroup result)
         {
             result = GetGroup(index);
             return result.IsDefined;
         }
 
-        public bool TryGetGroup(string name, out PcreRefGroup result)
+        public readonly bool TryGetGroup(string name, out PcreRefGroup result)
         {
             result = GetGroup(name);
             return result.IsDefined;
@@ -227,7 +227,7 @@ namespace PCRE
                 _index = -1;
             }
 
-            public PcreRefGroup Current => _match[_index];
+            public readonly PcreRefGroup Current => _match[_index];
 
             public bool MoveNext()
                 => ++_index <= _match.CaptureCount;
