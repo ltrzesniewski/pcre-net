@@ -11,6 +11,7 @@ namespace PCRE.Internal
 
         private IntPtr _code;
         private Dictionary<int, PcreCalloutInfo>? _calloutInfoByPatternPosition;
+        private PcreMatch? _noMatch;
 
         public string Pattern { get; }
         public PcreRegexSettings Settings { get; }
@@ -123,7 +124,12 @@ namespace PCRE.Internal
 
             settings.FillMatchInput(ref input);
 
-            var oVector = new uint[OutputVectorSize];
+            var oVectorArray = default(uint[]);
+
+            var oVector = CanStackAllocOutputVector
+                ? stackalloc uint[OutputVectorSize]
+                : oVectorArray = new uint[OutputVectorSize];
+
             Native.match_result result;
             CalloutInterop.CalloutInteropInfo calloutInterop;
 
@@ -144,7 +150,11 @@ namespace PCRE.Internal
 
             AfterMatch(result, ref calloutInterop);
 
-            return new PcreMatch(subject, this, ref result, oVector);
+            if (result.result_code == PcreConstants.ERROR_NOMATCH)
+                return _noMatch ??= new PcreMatch(this);
+
+            oVectorArray ??= oVector.ToArray();
+            return new PcreMatch(subject, this, ref result, oVectorArray);
         }
 
         public PcreRefMatch CreateRefMatch()

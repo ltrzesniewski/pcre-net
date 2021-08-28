@@ -16,6 +16,16 @@ namespace PCRE
         private PcreGroup?[]? _groups;
         private string? _mark;
 
+        internal PcreMatch(InternalRegex regex)
+        {
+            // No match
+
+            Subject = string.Empty;
+            _regex = regex;
+            _oVector = Array.Empty<uint>();
+            _resultCode = PcreConstants.ERROR_NOMATCH;
+        }
+
         internal PcreMatch(string subject, InternalRegex regex, ref Native.match_result result, uint[] oVector)
         {
             // Real match
@@ -94,10 +104,18 @@ namespace PCRE
             if (index < 0 || index > CaptureCount)
                 return null;
 
-            var groups = _groups ??= new PcreGroup?[_regex.CaptureCount + 1];
+            var groups = _groups;
+
+            if (groups is null)
+            {
+                if (_oVector.Length == 0)
+                    return PcreGroup.Empty; // No match
+
+                groups = _groups = new PcreGroup?[_regex.CaptureCount + 1];
+            }
 
             var group = groups[index];
-            if (group == null)
+            if (group is null)
                 groups[index] = group = CreateGroup(index);
 
             return group;
