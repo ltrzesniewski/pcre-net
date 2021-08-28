@@ -186,6 +186,19 @@ namespace PCRE
             return Math.Max(Index, EndIndex);
         }
 
+        /// <summary>
+        /// Creates a copy that won't get modified.
+        /// </summary>
+        public readonly PcreRefMatch Copy()
+        {
+            var copy = this;
+
+            if (_oVector.Length != 0)
+                copy._oVector = _oVector.ToArray();
+
+            return copy;
+        }
+
         public override readonly string ToString() => Value.ToString();
 
         public readonly ref struct GroupList
