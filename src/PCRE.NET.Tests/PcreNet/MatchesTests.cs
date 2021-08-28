@@ -6,6 +6,8 @@ using NUnit.Framework;
 namespace PCRE.Tests.PcreNet
 {
     [TestFixture]
+    [SuppressMessage("ReSharper", "ArrangeDefaultValueWhenTypeNotEvident")]
+    [SuppressMessage("ReSharper", "ReturnValueOfPureMethodIsNotUsed")]
     public class MatchesTests
     {
         [Test]
@@ -193,7 +195,6 @@ namespace PCRE.Tests.PcreNet
                 return i;
             });
 
-            // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
             Assert.Throws<PcreCalloutException>(() => seq.ToList());
             Assert.That(resultCount, Is.EqualTo(2));
         }
@@ -222,6 +223,45 @@ namespace PCRE.Tests.PcreNet
             });
 
             Assert.That(resultCount, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void should_throw_on_null_subject()
+        {
+            var re = new PcreRegex("a");
+            Assert.Throws<ArgumentNullException>(() => re.Matches(default(string)!));
+        }
+
+        [Test]
+        public void should_throw_on_null_settings()
+        {
+            var re = new PcreRegex("a");
+            Assert.Throws<ArgumentNullException>(() => re.Matches("a", default(PcreMatchSettings)!));
+        }
+
+        [Test]
+        public void should_throw_on_null_settings_ref()
+        {
+            var re = new PcreRegex("a");
+            Assert.Throws<ArgumentNullException>(() => re.Matches("a".AsSpan(), default(PcreMatchSettings)!));
+        }
+
+        [Test]
+        [TestCase(-1)]
+        [TestCase(2)]
+        public void should_throw_on_invalid_start_index(int startIndex)
+        {
+            var re = new PcreRegex(@"a");
+            Assert.Throws<ArgumentOutOfRangeException>(() => re.Matches("a", startIndex));
+        }
+
+        [Test]
+        [TestCase(-1)]
+        [TestCase(2)]
+        public void should_throw_on_invalid_start_index_ref(int startIndex)
+        {
+            var re = new PcreRegex(@"a");
+            Assert.Throws<ArgumentOutOfRangeException>(() => re.Matches("a".AsSpan(), startIndex));
         }
 
         [Test]

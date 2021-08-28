@@ -9,6 +9,8 @@ using PCRE.Internal;
 namespace PCRE.Tests.PcreNet
 {
     [TestFixture]
+    [SuppressMessage("ReSharper", "ArrangeDefaultValueWhenTypeNotEvident")]
+    [SuppressMessage("ReSharper", "ReturnValueOfPureMethodIsNotUsed")]
     public class MatchTests
     {
         [Test]
@@ -429,14 +431,7 @@ namespace PCRE.Tests.PcreNet
         }
 
         private static List<bool> GetDuplicateNamedGroupsSuccesses(PcreRefMatch match, string groupName)
-        {
-            var result = new List<bool>();
-
-            foreach (var group in match.GetDuplicateNamedGroups(groupName))
-                result.Add(group.Success);
-
-            return result;
-        }
+            => match.GetDuplicateNamedGroups(groupName).ToList(i => i.Success);
 
         [Test]
         public void should_return_marks()
@@ -1229,10 +1224,95 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_return_singleton_for_no_match()
+        {
+            var re = new PcreRegex("foo");
+            var matchA = re.Match("bar");
+            var matchB = re.Match("baz");
+
+            Assert.That(matchB, Is.SameAs(matchA));
+        }
+
+        [Test]
+        public void should_not_allocate_output_vector_for_no_match_ref()
+        {
+            var re = new PcreRegex("foo");
+            var match = re.Match("bar".AsSpan());
+
+            Assert.That(match.OutputVector.Length, Is.Zero);
+        }
+
+        [Test]
         public void should_fix_issue_22()
         {
             var regex = new PcreRegex(@"[\w]*[CA]X*B", PcreOptions.Compiled);
             Assert.That(regex.IsMatch("ABC"), Is.True);
+        }
+
+        [Test]
+        public void should_throw_on_null_subject()
+        {
+            var re = new PcreRegex("a");
+            Assert.Throws<ArgumentNullException>(() => re.Match(default(string)!));
+        }
+
+        [Test]
+        public void should_throw_on_null_settings()
+        {
+            var re = new PcreRegex("a");
+            Assert.Throws<ArgumentNullException>(() => re.Match("a", default(PcreMatchSettings)!));
+        }
+
+        [Test]
+        public void should_throw_on_null_settings_ref()
+        {
+            var re = new PcreRegex("a");
+            Assert.Throws<ArgumentNullException>(() => re.Match("a".AsSpan(), default(PcreMatchSettings)!));
+        }
+
+        [Test]
+        [TestCase(-1)]
+        [TestCase(2)]
+        public void should_throw_on_invalid_start_index(int startIndex)
+        {
+            var re = new PcreRegex(@"a");
+            Assert.Throws<ArgumentOutOfRangeException>(() => re.Match("a", startIndex));
+        }
+
+        [Test]
+        [TestCase(-1)]
+        [TestCase(2)]
+        public void should_throw_on_invalid_start_index_ref(int startIndex)
+        {
+            var re = new PcreRegex(@"a");
+            Assert.Throws<ArgumentOutOfRangeException>(() => re.Match("a".AsSpan(), startIndex));
+        }
+
+        [Test]
+        public void should_return_matched_string()
+        {
+            var re = new PcreRegex(".");
+            var match = re.Match("ab");
+
+            Assert.That(match.ToString(), Is.EqualTo("a"));
+        }
+
+        [Test]
+        public void should_return_matched_string_from_group()
+        {
+            var re = new PcreRegex(".");
+            var match = re.Match("ab");
+
+            Assert.That(match[0].ToString(), Is.EqualTo("a"));
+        }
+
+        [Test]
+        public void should_cast_group_to_string()
+        {
+            var re = new PcreRegex(".");
+            var match = re.Match("ab");
+
+            Assert.That((string)match[0], Is.EqualTo("a"));
         }
 
         [Test]

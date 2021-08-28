@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
 
 namespace PCRE.Tests.PcreNet
 {
     [TestFixture]
+    [SuppressMessage("ReSharper", "ReturnValueOfPureMethodIsNotUsed")]
     public class IsMatchTests
     {
         [Test]
@@ -145,6 +147,24 @@ namespace PCRE.Tests.PcreNet
             var re = new PcreRegex(@"(?<=a)");
             Assert.That(re.IsMatch("xxa", 3), Is.True);
             Assert.That(re.IsMatch("xxa".AsSpan(), 3), Is.True);
+        }
+
+        [Test]
+        [TestCase(-1)]
+        [TestCase(2)]
+        public void should_throw_on_invalid_start_index(int startIndex)
+        {
+            var re = new PcreRegex(@"a");
+            Assert.Throws<ArgumentOutOfRangeException>(() => re.IsMatch("a", startIndex));
+        }
+
+        [Test]
+        [TestCase(-1)]
+        [TestCase(2)]
+        public void should_throw_on_invalid_start_index_ref(int startIndex)
+        {
+            var re = new PcreRegex(@"a");
+            Assert.Throws<ArgumentOutOfRangeException>(() => re.IsMatch("a".AsSpan(), startIndex));
         }
     }
 }

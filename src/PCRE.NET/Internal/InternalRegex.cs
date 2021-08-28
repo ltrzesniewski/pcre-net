@@ -162,8 +162,8 @@ namespace PCRE.Internal
 
         public PcreRefMatch CreateRefMatch(Span<uint> oVector)
         {
-            if (oVector.Length < OutputVectorSize)
-                throw new InvalidOperationException("Output vector size too small");
+            if (oVector.Length != OutputVectorSize)
+                throw new InvalidOperationException("Unexpected output vector size");
 
             return new PcreRefMatch(this, oVector);
         }

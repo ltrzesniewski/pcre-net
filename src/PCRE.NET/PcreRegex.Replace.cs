@@ -57,6 +57,7 @@ namespace PCRE
                 if (--count == 0)
                     break;
             }
+
             if (sb == null)
                 return subject;
 

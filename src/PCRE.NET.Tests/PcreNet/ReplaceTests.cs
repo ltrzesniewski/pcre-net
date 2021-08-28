@@ -1,9 +1,13 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using NUnit.Framework;
 
 namespace PCRE.Tests.PcreNet
 {
     [TestFixture]
+    [SuppressMessage("ReSharper", "ArrangeDefaultValueWhenTypeNotEvident")]
+    [SuppressMessage("ReSharper", "ReturnValueOfPureMethodIsNotUsed")]
     public class ReplaceTests
     {
         [Test]
@@ -195,6 +199,39 @@ namespace PCRE.Tests.PcreNet
         {
             var re = new PcreRegex(@"(?=a+b\K)");
             return re.Replace("aabab", replacement);
+        }
+
+        [Test]
+        public void should_return_same_string_when_no_replacement_is_made()
+        {
+            var re = new PcreRegex("foo");
+            var subject = "bar";
+
+            Assert.That(re.Replace(subject, "baz"), Is.SameAs(subject));
+        }
+
+        [Test]
+        public void should_throw_on_null_subject()
+        {
+            var re = new PcreRegex("foo");
+
+            Assert.Throws<ArgumentNullException>(() => re.Replace(default(string)!, "a"));
+        }
+
+        [Test]
+        public void should_throw_on_null_replacement_string()
+        {
+            var re = new PcreRegex("foo");
+
+            Assert.Throws<ArgumentNullException>(() => re.Replace("a", default(string)!));
+        }
+
+        [Test]
+        public void should_throw_on_null_replacement_func()
+        {
+            var re = new PcreRegex("foo");
+
+            Assert.Throws<ArgumentNullException>(() => re.Replace("a", default(Func<PcreMatch, string>)!));
         }
 
         [Test]
