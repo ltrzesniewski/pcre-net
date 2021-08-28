@@ -10,7 +10,7 @@ namespace PCRE
     public unsafe ref struct PcreRefMatch
     {
         private readonly InternalRegex? _regex;
-        private readonly ReadOnlySpan<uint> _oVector;
+        private ReadOnlySpan<uint> _oVector; // Can be empty when there is no match
         private int _resultCode;
         private char* _markPtr;
 
@@ -169,11 +169,14 @@ namespace PCRE
             );
         }
 
-        internal void Update(ReadOnlySpan<char> subject, in Native.match_result result)
+        internal void Update(ReadOnlySpan<char> subject, in Native.match_result result, uint[]? outputVector)
         {
             Subject = subject;
             _markPtr = result.mark;
             _resultCode = result.result_code;
+
+            if (outputVector != null)
+                _oVector = outputVector;
         }
 
         private readonly int GetStartOfNextMatchIndex()

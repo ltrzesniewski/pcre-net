@@ -124,14 +124,14 @@ namespace PCRE.Internal
 
             settings.FillMatchInput(ref input);
 
+            Native.match_result result;
+            CalloutInterop.CalloutInteropInfo calloutInterop;
+
             var oVectorArray = default(uint[]);
 
             var oVector = CanStackAllocOutputVector
                 ? stackalloc uint[OutputVectorSize]
                 : oVectorArray = new uint[OutputVectorSize];
-
-            Native.match_result result;
-            CalloutInterop.CalloutInteropInfo calloutInterop;
 
             fixed (char* pSubject = subject)
             fixed (uint* pOVec = &oVector[0])
@@ -158,7 +158,7 @@ namespace PCRE.Internal
         }
 
         public PcreRefMatch CreateRefMatch()
-            => new PcreRefMatch(this, new uint[OutputVectorSize]);
+            => new PcreRefMatch(this, ReadOnlySpan<uint>.Empty);
 
         public PcreRefMatch CreateRefMatch(Span<uint> oVector)
         {
@@ -178,8 +178,16 @@ namespace PCRE.Internal
             Native.match_result result;
             CalloutInterop.CalloutInteropInfo calloutInterop;
 
+            var oVectorArray = default(uint[]);
+
+            var oVector = match.OutputVector.Length == OutputVectorSize
+                ? match.OutputVector
+                : CanStackAllocOutputVector
+                    ? stackalloc uint[OutputVectorSize]
+                    : oVectorArray = new uint[OutputVectorSize];
+
             fixed (char* pSubject = subject)
-            fixed (uint* pOVec = match.OutputVector)
+            fixed (uint* pOVec = &oVector[0])
             {
                 input.code = _code;
                 input.subject = pSubject;
@@ -198,7 +206,10 @@ namespace PCRE.Internal
 
             AfterMatch(result, ref calloutInterop);
 
-            match.Update(subject, result);
+            if (result.result_code != PcreConstants.ERROR_NOMATCH && oVector != match.OutputVector)
+                oVectorArray ??= oVector.ToArray();
+
+            match.Update(subject, result, oVectorArray);
         }
 
         public PcreDfaMatchResult DfaMatch(string subject, PcreDfaMatchSettings settings, int startIndex, uint additionalOptions)
