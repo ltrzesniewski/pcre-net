@@ -180,11 +180,9 @@ namespace PCRE.Internal
 
             var oVectorArray = default(uint[]);
 
-            var oVector = match.OutputVector.Length == OutputVectorSize
-                ? match.OutputVector
-                : CanStackAllocOutputVector
-                    ? stackalloc uint[OutputVectorSize]
-                    : oVectorArray = new uint[OutputVectorSize];
+            var oVector = CanStackAllocOutputVector
+                ? stackalloc uint[OutputVectorSize]
+                : oVectorArray = new uint[OutputVectorSize];
 
             fixed (char* pSubject = subject)
             fixed (uint* pOVec = &oVector[0])
@@ -206,7 +204,7 @@ namespace PCRE.Internal
 
             AfterMatch(result, ref calloutInterop);
 
-            if (result.result_code != PcreConstants.ERROR_NOMATCH && oVector != match.OutputVector)
+            if (result.result_code != PcreConstants.ERROR_NOMATCH)
                 oVectorArray ??= oVector.ToArray();
 
             match.Update(subject, result, oVectorArray);
