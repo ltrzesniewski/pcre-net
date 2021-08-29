@@ -116,7 +116,12 @@ namespace PCRE.Internal
 
                             var fallback = new LiteralPart(replacementPattern, startIdx - 1, idx - startIdx + 1);
 
+#if NETCOREAPP
+                            var groupIndexString = replacementPattern.AsSpan(startIdx, idx - startIdx);
+#else
                             var groupIndexString = replacementPattern.Substring(startIdx, idx - startIdx);
+#endif
+
                             if (int.TryParse(groupIndexString, NumberStyles.None, CultureInfo.InvariantCulture, out var groupIndex))
                             {
                                 parts.Add(new IndexedGroupPart(groupIndex, fallback));
