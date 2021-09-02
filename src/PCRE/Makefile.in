@@ -1258,10 +1258,10 @@ EXTRA_DIST = m4/ax_pthread.m4 m4/pcre2_visibility.m4 \
 	testdata/testoutput25 testdata/testoutputEBC \
 	testdata/valgrind-jit.supp testdata/wintestinput3 \
 	testdata/wintestoutput3 perltest.sh src/pcre2demo.c \
-	cmake/COPYING-CMAKE-SCRIPTS \
+	cmake/COPYING-CMAKE-SCRIPTS cmake/FindEditline.cmake \
 	cmake/FindPackageHandleStandardArgs.cmake \
-	cmake/FindReadline.cmake cmake/FindEditline.cmake \
-	CMakeLists.txt config-cmake.h.in
+	cmake/FindReadline.cmake cmake/pcre2-config-version.cmake.in \
+	cmake/pcre2-config.cmake.in CMakeLists.txt config-cmake.h.in
 
 # These are the header files we'll install. We do not distribute pcre2.h
 # because it is generated from pcre2.h.in.

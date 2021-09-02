@@ -1,4 +1,4 @@
-.TH PCRE2PATTERN 3 "06 October 2020" "PCRE2 10.35"
+.TH PCRE2PATTERN 3 "3o0 August 2021" "PCRE2 10.38"
 .SH NAME
 PCRE2 - Perl-compatible regular expressions (revised API)
 .SH "PCRE2 REGULAR EXPRESSION DETAILS"
@@ -741,7 +741,7 @@ Unicode support is not needed for these characters to be recognized.
 .P
 It is possible to restrict \eR to match only CR, LF, or CRLF (instead of the
 complete set of Unicode line endings) by setting the option PCRE2_BSR_ANYCRLF
-at compile time. (BSR is an abbrevation for "backslash R".) This can be made
+at compile time. (BSR is an abbreviation for "backslash R".) This can be made
 the default when PCRE2 is built; if this is the case, the other behaviour can
 be requested via the PCRE2_BSR_UNICODE option. It is also possible to specify
 these settings by starting a pattern string with one of the following
@@ -1082,7 +1082,7 @@ additional characters according to the following rules for ending a cluster:
 3. Do not break Hangul (a Korean script) syllable sequences. Hangul characters
 are of five types: L, V, T, LV, and LVT. An L character may be followed by an
 L, V, LV, or LVT character; an LV or V character may be followed by a V or T
-character; an LVT or T character may be follwed only by a T character.
+character; an LVT or T character may be followed only by a T character.
 .P
 4. Do not end before extending characters or spacing marks or the "zero-width
 joiner" character. Characters with the "mark" property always have the
@@ -1168,9 +1168,11 @@ For example, when the pattern
 .sp
 matches "foobar", the first substring is still set to "foo".
 .P
-Perl used to document that the use of \eK within lookaround assertions is "not
-well defined", but from version 5.32.0 Perl does not support this usage at all.
-In PCRE2, \eK is acted upon when it occurs inside positive assertions, but is
+From version 5.32.0 Perl forbids the use of \eK in lookaround assertions. From
+release 10.38 PCRE2 also forbids this by default. However, the
+PCRE2_EXTRA_ALLOW_LOOKAROUND_BSK option can be used when calling
+\fBpcre2_compile()\fP to re-enable the previous behaviour. When this option is
+set, \eK is acted upon when it occurs inside positive assertions, but is
 ignored in negative assertions. Note that when a pattern such as (?=ab\eK)
 matches, the reported start of the match can be greater than the end of the
 match. Using \eK in a lookbehind assertion at the start of a pattern can also
@@ -3658,7 +3660,7 @@ successful match if there is a later mismatch. Consider:
 .sp
 If the subject is "aaaac...", after the first match attempt fails (starting at
 the first character in the string), the starting point skips on to start the
-next attempt at "c". Note that a possessive quantifer does not have the same
+next attempt at "c". Note that a possessive quantifier does not have the same
 effect as this example; although it would suppress backtracking during the
 first match attempt, the second attempt would start at the second character
 instead of skipping on to "c".
@@ -3889,7 +3891,7 @@ there is a backtrack at the outer level.
 .sp
 .nf
 Philip Hazel
-University Computing Service
+Retired from University Computing Service
 Cambridge, England.
 .fi
 .
@@ -3898,6 +3900,6 @@ Cambridge, England.
 .rs
 .sp
 .nf
-Last updated: 06 October 2020
-Copyright (c) 1997-2020 University of Cambridge.
+Last updated: 30 August 2021
+Copyright (c) 1997-2021 University of Cambridge.
 .fi

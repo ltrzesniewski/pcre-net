@@ -1236,15 +1236,16 @@ start:
 
 return: current number of iterators enhanced with fast fail
 */
-static int detect_early_fail(compiler_common *common, PCRE2_SPTR cc, int *private_data_start, sljit_s32 depth, int start)
+static int detect_early_fail(compiler_common *common, PCRE2_SPTR cc, int *private_data_start,
+   sljit_s32 depth, int start, BOOL fast_forward_allowed)
 {
 PCRE2_SPTR begin = cc;
 PCRE2_SPTR next_alt;
 PCRE2_SPTR end;
 PCRE2_SPTR accelerated_start;
+BOOL prev_fast_forward_allowed;
 int result = 0;
 int count;
-BOOL fast_forward_allowed = TRUE;
 
 SLJIT_ASSERT(*cc == OP_ONCE || *cc == OP_BRA || *cc == OP_CBRA);
 SLJIT_ASSERT(*cc != OP_CBRA || common->optimized_cbracket[GET2(cc, 1 + LINK_SIZE)] != 0);
@@ -1476,6 +1477,7 @@ do
       case OP_CBRA:
       end = cc + GET(cc, 1);
 
+      prev_fast_forward_allowed = fast_forward_allowed;
       fast_forward_allowed = FALSE;
       if (depth >= 4)
         break;
@@ -1484,7 +1486,7 @@ do
       if (*end != OP_KET || (*cc == OP_CBRA && common->optimized_cbracket[GET2(cc, 1 + LINK_SIZE)] == 0))
         break;
 
-      count = detect_early_fail(common, cc, private_data_start, depth + 1, count);
+      count = detect_early_fail(common, cc, private_data_start, depth + 1, count, prev_fast_forward_allowed);
 
       if (PRIVATE_DATA(cc) != 0)
         common->private_data_ptrs[begin - common->start] = 1;
@@ -5806,7 +5808,7 @@ static BOOL check_fast_forward_char_pair_simd(compiler_common *common, fast_forw
       while (j < i)
         {
         b_pri = chars[j].last_count;
-        if (b_pri > 2 && (sljit_u32)a_pri + b_pri >= max_pri)
+        if (b_pri > 2 && a_pri + b_pri >= max_pri)
           {
           b1 = chars[j].chars[0];
           b2 = chars[j].chars[1];
@@ -8135,7 +8137,7 @@ switch(type)
     }
   else
     OP2(SLJIT_AND32 | SLJIT_SET_Z, SLJIT_UNUSED, 0, SLJIT_MEM1(ARGUMENTS), SLJIT_OFFSETOF(jit_arguments, options), SLJIT_IMM, PCRE2_NOTEOL);
-  add_jump(compiler, backtracks, JUMP(SLJIT_NOT_ZERO32));
+  add_jump(compiler, backtracks, JUMP(SLJIT_NOT_ZERO));
 
   if (!common->endonly)
     compile_simple_assertion_matchingpath(common, OP_EODN, cc, backtracks);
@@ -8155,7 +8157,7 @@ switch(type)
     }
   else
     OP2(SLJIT_AND32 | SLJIT_SET_Z, SLJIT_UNUSED, 0, SLJIT_MEM1(ARGUMENTS), SLJIT_OFFSETOF(jit_arguments, options), SLJIT_IMM, PCRE2_NOTEOL);
-  add_jump(compiler, backtracks, JUMP(SLJIT_NOT_ZERO32));
+  add_jump(compiler, backtracks, JUMP(SLJIT_NOT_ZERO));
   check_partial(common, FALSE);
   jump[0] = JUMP(SLJIT_JUMP);
   JUMPHERE(jump[1]);
@@ -8195,14 +8197,14 @@ switch(type)
     OP1(SLJIT_MOV, TMP1, 0, SLJIT_MEM1(TMP2), SLJIT_OFFSETOF(jit_arguments, begin));
     add_jump(compiler, backtracks, CMP(SLJIT_GREATER, STR_PTR, 0, TMP1, 0));
     OP2(SLJIT_AND32 | SLJIT_SET_Z, SLJIT_UNUSED, 0, SLJIT_MEM1(TMP2), SLJIT_OFFSETOF(jit_arguments, options), SLJIT_IMM, PCRE2_NOTBOL);
-    add_jump(compiler, backtracks, JUMP(SLJIT_NOT_ZERO32));
+    add_jump(compiler, backtracks, JUMP(SLJIT_NOT_ZERO));
     }
   else
     {
     OP1(SLJIT_MOV, TMP1, 0, SLJIT_MEM1(ARGUMENTS), SLJIT_OFFSETOF(jit_arguments, begin));
     add_jump(compiler, backtracks, CMP(SLJIT_GREATER, STR_PTR, 0, TMP1, 0));
     OP2(SLJIT_AND32 | SLJIT_SET_Z, SLJIT_UNUSED, 0, SLJIT_MEM1(ARGUMENTS), SLJIT_OFFSETOF(jit_arguments, options), SLJIT_IMM, PCRE2_NOTBOL);
-    add_jump(compiler, backtracks, JUMP(SLJIT_NOT_ZERO32));
+    add_jump(compiler, backtracks, JUMP(SLJIT_NOT_ZERO));
     }
   return cc;
 
@@ -8221,7 +8223,7 @@ switch(type)
     jump[1] = CMP(SLJIT_GREATER, STR_PTR, 0, TMP2, 0);
     OP2(SLJIT_AND32 | SLJIT_SET_Z, SLJIT_UNUSED, 0, SLJIT_MEM1(ARGUMENTS), SLJIT_OFFSETOF(jit_arguments, options), SLJIT_IMM, PCRE2_NOTBOL);
     }
-  add_jump(compiler, backtracks, JUMP(SLJIT_NOT_ZERO32));
+  add_jump(compiler, backtracks, JUMP(SLJIT_NOT_ZERO));
   jump[0] = JUMP(SLJIT_JUMP);
   JUMPHERE(jump[1]);
 
@@ -9575,11 +9577,11 @@ free_stack(common, callout_arg_size);
 
 /* Check return value. */
 OP2(SLJIT_SUB32 | SLJIT_SET_Z | SLJIT_SET_SIG_GREATER, SLJIT_UNUSED, 0, SLJIT_RETURN_REG, 0, SLJIT_IMM, 0);
-add_jump(compiler, &backtrack->topbacktracks, JUMP(SLJIT_SIG_GREATER32));
+add_jump(compiler, &backtrack->topbacktracks, JUMP(SLJIT_SIG_GREATER));
 if (common->abort_label == NULL)
-  add_jump(compiler, &common->abort, JUMP(SLJIT_NOT_EQUAL32) /* SIG_LESS */);
+  add_jump(compiler, &common->abort, JUMP(SLJIT_NOT_EQUAL) /* SIG_LESS */);
 else
-  JUMPTO(SLJIT_NOT_EQUAL32 /* SIG_LESS */, common->abort_label);
+  JUMPTO(SLJIT_NOT_EQUAL /* SIG_LESS */, common->abort_label);
 return cc + callout_length;
 }
 
@@ -13657,7 +13659,7 @@ memset(common->private_data_ptrs, 0, total_length * sizeof(sljit_s32));
 private_data_size = common->cbra_ptr + (re->top_bracket + 1) * sizeof(sljit_sw);
 
 if ((re->overall_options & PCRE2_ANCHORED) == 0 && (re->overall_options & PCRE2_NO_START_OPTIMIZE) == 0 && !common->has_skip_in_assert_back)
-  detect_early_fail(common, common->start, &private_data_size, 0, 0);
+  detect_early_fail(common, common->start, &private_data_size, 0, 0, TRUE);
 
 set_private_data_ptrs(common, &private_data_size, ccend);
 
