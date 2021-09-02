@@ -46,6 +46,7 @@ namespace PCRE.Internal
         public const uint EXTRA_MATCH_LINE = 0x00000008;
         public const uint EXTRA_ESCAPED_CR_IS_LF = 0x00000010;
         public const uint EXTRA_ALT_BSUX = 0x00000020;
+        public const uint EXTRA_ALLOW_LOOKAROUND_BSK = 0x00000040;
         public const uint JIT_COMPLETE = 0x00000001;
         public const uint JIT_PARTIAL_SOFT = 0x00000002;
         public const uint JIT_PARTIAL_HARD = 0x00000004;
@@ -181,6 +182,7 @@ namespace PCRE.Internal
         public const int ERROR_SCRIPT_RUN_NOT_AVAILABLE = 196;
         public const int ERROR_TOO_MANY_CAPTURES = 197;
         public const int ERROR_CONDITION_ATOMIC_ASSERTION_EXPECTED = 198;
+        public const int ERROR_BACKSLASH_K_IN_LOOKAROUND = 199;
         public const int ERROR_NOMATCH = -1;
         public const int ERROR_PARTIAL = -2;
         public const int ERROR_UTF8_ERR1 = -3;

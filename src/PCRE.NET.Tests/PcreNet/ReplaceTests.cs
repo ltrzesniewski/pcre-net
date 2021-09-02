@@ -197,7 +197,7 @@ namespace PCRE.Tests.PcreNet
         [TestCase("$&", ExpectedResult = "aabab")]
         public string should_handle_backslash_k_in_lookahead(string replacement)
         {
-            var re = new PcreRegex(@"(?=a+b\K)");
+            var re = new PcreRegex(@"(?=a+b\K)", new PcreRegexSettings { ExtraCompileOptions = PcreExtraCompileOptions.AllowLookaroundBsK });
             return re.Replace("aabab", replacement);
         }
 

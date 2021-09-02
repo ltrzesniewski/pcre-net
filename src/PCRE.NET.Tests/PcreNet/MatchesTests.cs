@@ -135,7 +135,7 @@ namespace PCRE.Tests.PcreNet
         [Test]
         public void should_handle_end_before_start()
         {
-            var re = new PcreRegex(@"(?=a+b\K)");
+            var re = new PcreRegex(@"(?=a+b\K)", new PcreRegexSettings { ExtraCompileOptions = PcreExtraCompileOptions.AllowLookaroundBsK });
             var matches = re.Matches("aaabab").ToList();
 
             Assert.That(matches, Has.Count.EqualTo(2));
@@ -156,7 +156,7 @@ namespace PCRE.Tests.PcreNet
         [Test]
         public void should_handle_end_before_start_ref()
         {
-            var re = new PcreRegex(@"(?=a+b\K)");
+            var re = new PcreRegex(@"(?=a+b\K)", new PcreRegexSettings { ExtraCompileOptions = PcreExtraCompileOptions.AllowLookaroundBsK });
             var matches = re.Matches("aaabab".AsSpan())
                 .ToList(m => (Value: m.Value.ToString(), m.Index, m.EndIndex, m.Length, Groups: m.Groups.ToList(g => (Value: g.Value.ToString(), g.Index, g.Length))));
 

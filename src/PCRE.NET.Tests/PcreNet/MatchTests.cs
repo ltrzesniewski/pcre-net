@@ -904,7 +904,7 @@ namespace PCRE.Tests.PcreNet
         [Test]
         public void should_handle_end_before_start()
         {
-            var re = new PcreRegex(@"(?=a+\K)");
+            var re = new PcreRegex(@"(?=a+\K)", new PcreRegexSettings { ExtraCompileOptions = PcreExtraCompileOptions.AllowLookaroundBsK });
 
             var match = re.Match("aaa");
 
@@ -919,7 +919,7 @@ namespace PCRE.Tests.PcreNet
         [Test]
         public void should_handle_end_before_start_ref()
         {
-            var re = new PcreRegex(@"(?=a+\K)");
+            var re = new PcreRegex(@"(?=a+\K)", new PcreRegexSettings { ExtraCompileOptions = PcreExtraCompileOptions.AllowLookaroundBsK });
 
             var match = re.Match("aaa".AsSpan());
 

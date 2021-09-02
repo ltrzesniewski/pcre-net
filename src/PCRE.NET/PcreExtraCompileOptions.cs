@@ -13,6 +13,7 @@ namespace PCRE
         MatchWord = PcreConstants.EXTRA_MATCH_WORD,
         MatchLine = PcreConstants.EXTRA_MATCH_LINE,
         EscapedCrIsLf = PcreConstants.EXTRA_ESCAPED_CR_IS_LF,
-        AltBsUX = PcreConstants.EXTRA_ALT_BSUX
+        AltBsUX = PcreConstants.EXTRA_ALT_BSUX,
+        AllowLookaroundBsK = PcreConstants.EXTRA_ALLOW_LOOKAROUND_BSK
     }
 }
