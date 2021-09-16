@@ -24,7 +24,7 @@ namespace PCRE.Tests.Pcre
 
             try
             {
-                RunTest(testCase.Input, testCase.ExpectedResult, options, testCase.Span);
+                RunTest(testCase.Input, testCase.ExpectedResult, options, testCase.ApiKind);
             }
             catch
             {
@@ -33,7 +33,7 @@ namespace PCRE.Tests.Pcre
             }
         }
 
-        private static void RunTest(TestInput testInput, TestOutput expectedResult, PcreOptions options, bool span)
+        private static void RunTest(TestInput testInput, TestOutput expectedResult, PcreOptions options, ApiKind apiKind)
         {
             var pattern = testInput.Pattern;
 
@@ -80,52 +80,87 @@ namespace PCRE.Tests.Pcre
                         JitStack = jitStack
                     };
 
-                    if (span)
+                    switch (apiKind)
                     {
-                        var matchCount = 0;
-
-                        foreach (var actualMatch in regex.Matches(subject.AsSpan(), matchSettings))
+                        case ApiKind.String:
                         {
-                            Assert.That(matchCount, Is.LessThan(expected.Matches.Count));
+                            var matches = regex
+                                .Matches(subject, matchSettings)
+                                .Take(pattern.AllMatches ? int.MaxValue : 1)
+                                .ToList();
 
-                            var expectedMatch = expected.Matches[matchCount];
-                            ++matchCount;
+                            Assert.That(matches.Count, Is.EqualTo(expected.Matches.Count));
 
-                            CompareGroups(pattern, actualMatch, expectedMatch);
+                            for (var matchIndex = 0; matchIndex < matches.Count; ++matchIndex)
+                            {
+                                var actualMatch = matches[matchIndex];
+                                var expectedMatch = expected.Matches[matchIndex];
 
-                            if (pattern.ExtractMarks)
-                                CompareMark(actualMatch, expectedMatch);
+                                CompareGroups(pattern, actualMatch, expectedMatch);
 
-                            if (pattern.GetRemainingString)
-                                CompareRemainingString(actualMatch, expectedMatch);
+                                if (pattern.ExtractMarks)
+                                    CompareMark(actualMatch, expectedMatch);
 
-                            if (!pattern.AllMatches)
-                                break;
+                                if (pattern.GetRemainingString)
+                                    CompareRemainingString(actualMatch, expectedMatch);
+                            }
+
+                            break;
                         }
 
-                        Assert.That(matchCount, Is.EqualTo(expected.Matches.Count));
-                    }
-                    else
-                    {
-                        var matches = regex
-                            .Matches(subject, matchSettings)
-                            .Take(pattern.AllMatches ? int.MaxValue : 1)
-                            .ToList();
-
-                        Assert.That(matches.Count, Is.EqualTo(expected.Matches.Count));
-
-                        for (var matchIndex = 0; matchIndex < matches.Count; ++matchIndex)
+                        case ApiKind.Span:
                         {
-                            var actualMatch = matches[matchIndex];
-                            var expectedMatch = expected.Matches[matchIndex];
+                            var matchCount = 0;
 
-                            CompareGroups(pattern, actualMatch, expectedMatch);
+                            foreach (var actualMatch in regex.Matches(subject.AsSpan(), matchSettings))
+                            {
+                                Assert.That(matchCount, Is.LessThan(expected.Matches.Count));
 
-                            if (pattern.ExtractMarks)
-                                CompareMark(actualMatch, expectedMatch);
+                                var expectedMatch = expected.Matches[matchCount];
+                                ++matchCount;
 
-                            if (pattern.GetRemainingString)
-                                CompareRemainingString(actualMatch, expectedMatch);
+                                CompareGroups(pattern, actualMatch, expectedMatch);
+
+                                if (pattern.ExtractMarks)
+                                    CompareMark(actualMatch, expectedMatch);
+
+                                if (pattern.GetRemainingString)
+                                    CompareRemainingString(actualMatch, expectedMatch);
+
+                                if (!pattern.AllMatches)
+                                    break;
+                            }
+
+                            Assert.That(matchCount, Is.EqualTo(expected.Matches.Count));
+                            break;
+                        }
+
+                        case ApiKind.MatchBuffer:
+                        {
+                            var matchCount = 0;
+                            var buffer = regex.CreateMatchBuffer();
+
+                            foreach (var actualMatch in buffer.Matches(subject.AsSpan(), matchSettings))
+                            {
+                                Assert.That(matchCount, Is.LessThan(expected.Matches.Count));
+
+                                var expectedMatch = expected.Matches[matchCount];
+                                ++matchCount;
+
+                                CompareGroups(pattern, actualMatch, expectedMatch);
+
+                                if (pattern.ExtractMarks)
+                                    CompareMark(actualMatch, expectedMatch);
+
+                                if (pattern.GetRemainingString)
+                                    CompareRemainingString(actualMatch, expectedMatch);
+
+                                if (!pattern.AllMatches)
+                                    break;
+                            }
+
+                            Assert.That(matchCount, Is.EqualTo(expected.Matches.Count));
+                            break;
                         }
                     }
                 }
@@ -228,11 +263,11 @@ namespace PCRE.Tests.Pcre
                         var testCases =
                             from test in tests
                             from jit in new[] { false, true }
-                            from span in new[] { false, true }
-                            let testCase = new TestCase(testFilePath, test.input, test.expectedResult, jit, span)
+                            from apiKind in new[] { ApiKind.String, ApiKind.Span, ApiKind.MatchBuffer }
+                            let testCase = new TestCase(testFilePath, test.input, test.expectedResult, jit, apiKind)
                             select new TestCaseData(testCase)
                                 .SetCategory(testFileName)
-                                .SetName($"PCRE {testFileName}, Line {testCase.Input.Pattern.LineNumber:0000}, {(jit ? "JIT" : "Interpreted")}, {(span ? "Span" : "String")}")
+                                .SetName($"PCRE {testFileName}, Line {testCase.Input.Pattern.LineNumber:0000}, {(jit ? "JIT" : "Interpreted")}, {apiKind}")
                                 .SetDescription(testCase.Input.Pattern.Pattern);
 
                         foreach (var testCase in testCases)
