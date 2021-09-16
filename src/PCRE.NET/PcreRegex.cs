@@ -48,6 +48,10 @@ namespace PCRE
             InternalRegex = Caches.RegexCache.GetOrAdd(new RegexKey(pattern, settings));
         }
 
-        public override string ToString() => InternalRegex.Pattern;
+        public PcreMatchBuffer CreateMatchBuffer()
+            => new(InternalRegex);
+
+        public override string ToString()
+            => InternalRegex.Pattern;
     }
 }

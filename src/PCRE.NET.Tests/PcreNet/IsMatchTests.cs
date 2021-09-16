@@ -47,8 +47,10 @@ namespace PCRE.Tests.PcreNet
         {
             Assert.That(new PcreRegex(pattern).IsMatch(subject), Is.True);
             Assert.That(new PcreRegex(pattern).IsMatch(subject.AsSpan()), Is.True);
+            Assert.That(new PcreRegex(pattern).CreateMatchBuffer().IsMatch(subject.AsSpan()), Is.True);
             Assert.That(new PcreRegex(pattern, PcreOptions.Compiled).IsMatch(subject), Is.True);
             Assert.That(new PcreRegex(pattern, PcreOptions.Compiled).IsMatch(subject.AsSpan()), Is.True);
+            Assert.That(new PcreRegex(pattern, PcreOptions.Compiled).CreateMatchBuffer().IsMatch(subject.AsSpan()), Is.True);
         }
 
         [Test]
@@ -58,8 +60,10 @@ namespace PCRE.Tests.PcreNet
         {
             Assert.That(new PcreRegex(pattern).IsMatch(subject), Is.False);
             Assert.That(new PcreRegex(pattern).IsMatch(subject.AsSpan()), Is.False);
+            Assert.That(new PcreRegex(pattern).CreateMatchBuffer().IsMatch(subject.AsSpan()), Is.False);
             Assert.That(new PcreRegex(pattern, PcreOptions.Compiled).IsMatch(subject), Is.False);
             Assert.That(new PcreRegex(pattern, PcreOptions.Compiled).IsMatch(subject.AsSpan()), Is.False);
+            Assert.That(new PcreRegex(pattern, PcreOptions.Compiled).CreateMatchBuffer().IsMatch(subject.AsSpan()), Is.False);
         }
 
         [Test]
@@ -68,10 +72,12 @@ namespace PCRE.Tests.PcreNet
             var re = new PcreRegex("aBc");
             Assert.That(re.IsMatch("Abc"), Is.False);
             Assert.That(re.IsMatch("Abc".AsSpan()), Is.False);
+            Assert.That(re.CreateMatchBuffer().IsMatch("Abc".AsSpan()), Is.False);
 
             re = new PcreRegex("aBc", PcreOptions.IgnoreCase);
             Assert.That(re.IsMatch("Abc"), Is.True);
             Assert.That(re.IsMatch("Abc".AsSpan()), Is.True);
+            Assert.That(re.CreateMatchBuffer().IsMatch("Abc".AsSpan()), Is.True);
         }
 
         [Test]
@@ -80,10 +86,12 @@ namespace PCRE.Tests.PcreNet
             var re = new PcreRegex("^a b$");
             Assert.That(re.IsMatch("ab"), Is.False);
             Assert.That(re.IsMatch("ab".AsSpan()), Is.False);
+            Assert.That(re.CreateMatchBuffer().IsMatch("ab".AsSpan()), Is.False);
 
             re = new PcreRegex("^a b$", PcreOptions.IgnorePatternWhitespace);
             Assert.That(re.IsMatch("ab"), Is.True);
             Assert.That(re.IsMatch("ab".AsSpan()), Is.True);
+            Assert.That(re.CreateMatchBuffer().IsMatch("ab".AsSpan()), Is.True);
         }
 
         [Test]
@@ -92,10 +100,12 @@ namespace PCRE.Tests.PcreNet
             var re = new PcreRegex("^a.*b$");
             Assert.That(re.IsMatch("a\r\nb"), Is.False);
             Assert.That(re.IsMatch("a\r\nb".AsSpan()), Is.False);
+            Assert.That(re.CreateMatchBuffer().IsMatch("a\r\nb".AsSpan()), Is.False);
 
             re = new PcreRegex("^a.*b$", PcreOptions.Singleline);
             Assert.That(re.IsMatch("a\r\nb"), Is.True);
             Assert.That(re.IsMatch("a\r\nb".AsSpan()), Is.True);
+            Assert.That(re.CreateMatchBuffer().IsMatch("a\r\nb".AsSpan()), Is.True);
         }
 
         [Test]
@@ -104,10 +114,12 @@ namespace PCRE.Tests.PcreNet
             var re = new PcreRegex("^aaa$");
             Assert.That(re.IsMatch("aaa\r\nbbb"), Is.False);
             Assert.That(re.IsMatch("aaa\r\nbbb".AsSpan()), Is.False);
+            Assert.That(re.CreateMatchBuffer().IsMatch("aaa\r\nbbb".AsSpan()), Is.False);
 
             re = new PcreRegex("^aaa$", PcreOptions.MultiLine);
             Assert.That(re.IsMatch("aaa\r\nbbb"), Is.True);
             Assert.That(re.IsMatch("aaa\r\nbbb".AsSpan()), Is.True);
+            Assert.That(re.CreateMatchBuffer().IsMatch("aaa\r\nbbb".AsSpan()), Is.True);
         }
 
         [Test]
@@ -116,6 +128,7 @@ namespace PCRE.Tests.PcreNet
             var re = new PcreRegex(@"^\U$", PcreOptions.JavaScript);
             Assert.That(re.IsMatch("U"), Is.True);
             Assert.That(re.IsMatch("U".AsSpan()), Is.True);
+            Assert.That(re.CreateMatchBuffer().IsMatch("U".AsSpan()), Is.True);
 
             // ReSharper disable once ObjectCreationAsStatement
             Assert.Throws<ArgumentException>(() => new PcreRegex(@"^\U$"));
@@ -127,10 +140,12 @@ namespace PCRE.Tests.PcreNet
             var re = new PcreRegex(@"^\w$");
             Assert.That(re.IsMatch("à"), Is.False);
             Assert.That(re.IsMatch("à".AsSpan()), Is.False);
+            Assert.That(re.CreateMatchBuffer().IsMatch("à".AsSpan()), Is.False);
 
             re = new PcreRegex(@"^\w$", PcreOptions.Unicode);
             Assert.That(re.IsMatch("à"), Is.True);
             Assert.That(re.IsMatch("à".AsSpan()), Is.True);
+            Assert.That(re.CreateMatchBuffer().IsMatch("à".AsSpan()), Is.True);
         }
 
         [Test]
@@ -139,6 +154,7 @@ namespace PCRE.Tests.PcreNet
             var re = new PcreRegex(@"a");
             Assert.That(re.IsMatch("foobar", 5), Is.False);
             Assert.That(re.IsMatch("foobar".AsSpan(), 5), Is.False);
+            Assert.That(re.CreateMatchBuffer().IsMatch("foobar".AsSpan(), 5), Is.False);
         }
 
         [Test]
@@ -147,6 +163,7 @@ namespace PCRE.Tests.PcreNet
             var re = new PcreRegex(@"(?<=a)");
             Assert.That(re.IsMatch("xxa", 3), Is.True);
             Assert.That(re.IsMatch("xxa".AsSpan(), 3), Is.True);
+            Assert.That(re.CreateMatchBuffer().IsMatch("xxa".AsSpan(), 3), Is.True);
         }
 
         [Test]
@@ -165,6 +182,16 @@ namespace PCRE.Tests.PcreNet
         {
             var re = new PcreRegex(@"a");
             Assert.Throws<ArgumentOutOfRangeException>(() => re.IsMatch("a".AsSpan(), startIndex));
+        }
+
+        [Test]
+        [TestCase(-1)]
+        [TestCase(2)]
+        public void should_throw_on_invalid_start_index_buf(int startIndex)
+        {
+            var re = new PcreRegex(@"a");
+            var buffer = re.CreateMatchBuffer();
+            Assert.Throws<ArgumentOutOfRangeException>(() => buffer.IsMatch("a".AsSpan(), startIndex));
         }
     }
 }
