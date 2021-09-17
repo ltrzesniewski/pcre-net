@@ -147,7 +147,12 @@ namespace PCRE
             return new DuplicateNamedGroupEnumerable(this, indexes);
         }
 
-        internal void FirstMatch(ReadOnlySpan<char> subject, PcreMatchSettings settings, int startIndex, uint options, PcreRefCalloutFunc? callout)
+        internal void FirstMatch(ReadOnlySpan<char> subject,
+                                 PcreMatchSettings settings,
+                                 int startIndex,
+                                 uint options,
+                                 PcreRefCalloutFunc? callout,
+                                 uint[]? calloutOutputVector)
         {
             _regex!.Match(
                 ref this,
@@ -155,11 +160,15 @@ namespace PCRE
                 settings,
                 startIndex,
                 options,
-                callout
+                callout,
+                calloutOutputVector
             );
         }
 
-        internal void NextMatch(PcreMatchSettings settings, uint options, PcreRefCalloutFunc? callout)
+        internal void NextMatch(PcreMatchSettings settings,
+                                uint options,
+                                PcreRefCalloutFunc? callout,
+                                uint[]? calloutOutputVector)
         {
             _regex!.Match(
                 ref this,
@@ -167,7 +176,8 @@ namespace PCRE
                 settings,
                 GetStartOfNextMatchIndex(),
                 options | PcreConstants.NO_UTF_CHECK | (Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0),
-                callout
+                callout,
+                calloutOutputVector
             );
         }
 

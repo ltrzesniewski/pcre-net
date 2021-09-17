@@ -8,11 +8,13 @@ namespace PCRE
     {
         private readonly InternalRegex _regex;
         internal readonly uint[] OutputVector;
+        internal readonly uint[] CalloutOutputVector;
 
         internal PcreMatchBuffer(InternalRegex regex)
         {
             _regex = regex;
             OutputVector = new uint[regex.OutputVectorSize];
+            CalloutOutputVector = new uint[regex.OutputVectorSize];
         }
 
         [Pure]
@@ -60,7 +62,7 @@ namespace PCRE
                 throw new ArgumentOutOfRangeException("Invalid StartIndex value", default(Exception));
 
             var match = _regex.CreateRefMatch(OutputVector);
-            match.FirstMatch(subject, settings, startIndex, options.ToPatternOptions(), onCallout);
+            match.FirstMatch(subject, settings, startIndex, options.ToPatternOptions(), onCallout, CalloutOutputVector);
 
             return match;
         }
@@ -101,7 +103,12 @@ namespace PCRE
             private readonly PcreMatchSettings _settings;
             private readonly PcreMatchBuffer _buffer;
 
-            internal RefMatchEnumerable(PcreMatchBuffer buffer, ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFunc? callout, PcreMatchSettings settings)
+            internal RefMatchEnumerable(PcreMatchBuffer buffer,
+                                        ReadOnlySpan<char> subject,
+                                        int startIndex,
+                                        PcreMatchOptions options,
+                                        PcreRefCalloutFunc? callout,
+                                        PcreMatchSettings settings)
             {
                 _buffer = buffer;
                 _subject = subject;
@@ -125,7 +132,12 @@ namespace PCRE
             private PcreMatchBuffer? _buffer;
             private PcreRefMatch _match;
 
-            internal RefMatchEnumerator(PcreMatchBuffer buffer, ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFunc? callout, PcreMatchSettings settings)
+            internal RefMatchEnumerator(PcreMatchBuffer buffer,
+                                        ReadOnlySpan<char> subject,
+                                        int startIndex,
+                                        PcreMatchOptions options,
+                                        PcreRefCalloutFunc? callout,
+                                        PcreMatchSettings settings)
             {
                 _buffer = buffer;
                 _subject = subject;
@@ -146,11 +158,11 @@ namespace PCRE
                 if (!_match.IsInitialized)
                 {
                     _match = _buffer._regex.CreateRefMatch(_buffer.OutputVector);
-                    _match.FirstMatch(_subject, _settings, _startIndex, _options.ToPatternOptions(), _callout);
+                    _match.FirstMatch(_subject, _settings, _startIndex, _options.ToPatternOptions(), _callout, _buffer.CalloutOutputVector);
                 }
                 else
                 {
-                    _match.NextMatch(_settings, _options.ToPatternOptions(), _callout);
+                    _match.NextMatch(_settings, _options.ToPatternOptions(), _callout, _buffer.CalloutOutputVector);
                 }
 
                 if (_match.Success)

@@ -12,7 +12,7 @@ namespace PCRE
         private readonly InternalRegex _regex;
         private readonly Native.pcre2_callout_block* _callout;
 
-        private Span<uint> _oVector;
+        internal Span<uint> OutputVector;
         private bool _oVectorInitialized;
 
         internal PcreRefCallout(ReadOnlySpan<char> subject, InternalRegex regex, Native.pcre2_callout_block* callout, Span<uint> outputVector)
@@ -20,7 +20,7 @@ namespace PCRE
             _subject = subject;
             _regex = regex;
             _callout = callout;
-            _oVector = outputVector;
+            OutputVector = outputVector;
             _oVectorInitialized = false;
         }
 
@@ -32,19 +32,19 @@ namespace PCRE
             {
                 if (!_oVectorInitialized)
                 {
-                    if (_oVector.Length == 0)
-                        _oVector = new uint[_callout->capture_top * 2];
+                    if (OutputVector.Length == 0)
+                        OutputVector = new uint[_callout->capture_top * 2];
 
-                    _oVector[0] = (uint)_callout->start_match;
-                    _oVector[1] = (uint)_callout->current_position;
+                    OutputVector[0] = (uint)_callout->start_match;
+                    OutputVector[1] = (uint)_callout->current_position;
 
-                    for (var i = 2; i < _oVector.Length; ++i)
-                        _oVector[i] = (uint)_callout->offset_vector[i];
+                    for (var i = 2; i < OutputVector.Length; ++i)
+                        OutputVector[i] = (uint)_callout->offset_vector[i];
 
                     _oVectorInitialized = true;
                 }
 
-                return new PcreRefMatch(_subject, _regex, _oVector, _callout->mark);
+                return new PcreRefMatch(_subject, _regex, OutputVector, _callout->mark);
             }
         }
 
