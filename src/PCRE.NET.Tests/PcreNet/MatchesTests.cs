@@ -41,7 +41,7 @@ namespace PCRE.Tests.PcreNet
         {
             var re = new PcreRegex(@"a(b)a");
             var matches = re.Matches("foo aba bar aba baz".AsSpan())
-                .ToList(m => (Value: m.Value.ToString(), m.Index, m.Length, Groups: m.Groups.ToList(g => (Value: g.Value.ToString(), g.Index, g.Length))));
+                            .ToList(m => (Value: m.Value.ToString(), m.Index, m.Length, Groups: m.Groups.ToList(g => (Value: g.Value.ToString(), g.Index, g.Length))));
 
             Assert.That(matches, Has.Count.EqualTo(2));
 
@@ -67,7 +67,7 @@ namespace PCRE.Tests.PcreNet
         {
             var re = new PcreRegex(@"a(b)a");
             var matches = re.CreateMatchBuffer().Matches("foo aba bar aba baz".AsSpan())
-                .ToList(m => (Value: m.Value.ToString(), m.Index, m.Length, Groups: m.Groups.ToList(g => (Value: g.Value.ToString(), g.Index, g.Length))));
+                            .ToList(m => (Value: m.Value.ToString(), m.Index, m.Length, Groups: m.Groups.ToList(g => (Value: g.Value.ToString(), g.Index, g.Length))));
 
             Assert.That(matches, Has.Count.EqualTo(2));
 
@@ -110,7 +110,7 @@ namespace PCRE.Tests.PcreNet
         {
             var re = new PcreRegex(@"(?=(a))");
             var matches = re.Matches("aaabbaa".AsSpan())
-                .ToList(m => (Value: m.Value.ToString(), m.Index, m.Length, Groups: m.Groups.ToList(g => (Value: g.Value.ToString(), g.Index, g.Length))));
+                            .ToList(m => (Value: m.Value.ToString(), m.Index, m.Length, Groups: m.Groups.ToList(g => (Value: g.Value.ToString(), g.Index, g.Length))));
 
             Assert.That(matches, Has.Count.EqualTo(5));
 
@@ -128,7 +128,7 @@ namespace PCRE.Tests.PcreNet
         {
             var re = new PcreRegex(@"(?=(a))");
             var matches = re.CreateMatchBuffer().Matches("aaabbaa".AsSpan())
-                .ToList(m => (Value: m.Value.ToString(), m.Index, m.Length, Groups: m.Groups.ToList(g => (Value: g.Value.ToString(), g.Index, g.Length))));
+                            .ToList(m => (Value: m.Value.ToString(), m.Index, m.Length, Groups: m.Groups.ToList(g => (Value: g.Value.ToString(), g.Index, g.Length))));
 
             Assert.That(matches, Has.Count.EqualTo(5));
 
@@ -221,7 +221,7 @@ namespace PCRE.Tests.PcreNet
         {
             var re = new PcreRegex(@"(?=a+b\K)", new PcreRegexSettings { ExtraCompileOptions = PcreExtraCompileOptions.AllowLookaroundBsK });
             var matches = re.Matches("aaabab".AsSpan())
-                .ToList(m => (Value: m.Value.ToString(), m.Index, m.EndIndex, m.Length, Groups: m.Groups.ToList(g => (Value: g.Value.ToString(), g.Index, g.Length))));
+                            .ToList(m => (Value: m.Value.ToString(), m.Index, m.EndIndex, m.Length, Groups: m.Groups.ToList(g => (Value: g.Value.ToString(), g.Index, g.Length))));
 
             Assert.That(matches, Has.Count.EqualTo(2));
 
@@ -243,7 +243,7 @@ namespace PCRE.Tests.PcreNet
         {
             var re = new PcreRegex(@"(?=a+b\K)", new PcreRegexSettings { ExtraCompileOptions = PcreExtraCompileOptions.AllowLookaroundBsK });
             var matches = re.CreateMatchBuffer().Matches("aaabab".AsSpan())
-                .ToList(m => (Value: m.Value.ToString(), m.Index, m.EndIndex, m.Length, Groups: m.Groups.ToList(g => (Value: g.Value.ToString(), g.Index, g.Length))));
+                            .ToList(m => (Value: m.Value.ToString(), m.Index, m.EndIndex, m.Length, Groups: m.Groups.ToList(g => (Value: g.Value.ToString(), g.Index, g.Length))));
 
             Assert.That(matches, Has.Count.EqualTo(2));
 
@@ -348,14 +348,14 @@ namespace PCRE.Tests.PcreNet
         public void should_throw_on_null_settings()
         {
             var re = new PcreRegex("a");
-            Assert.Throws<ArgumentNullException>(() => re.Matches("a", default(PcreMatchSettings)!));
+            Assert.Throws<ArgumentNullException>(() => re.Matches("a", 0, PcreMatchOptions.None, null, default(PcreMatchSettings)!));
         }
 
         [Test]
         public void should_throw_on_null_settings_ref()
         {
             var re = new PcreRegex("a");
-            Assert.Throws<ArgumentNullException>(() => re.Matches("a".AsSpan(), default(PcreMatchSettings)!));
+            Assert.Throws<ArgumentNullException>(() => re.Matches("a".AsSpan(), 0, PcreMatchOptions.None, null, default(PcreMatchSettings)!));
         }
 
         [Test]
@@ -363,7 +363,7 @@ namespace PCRE.Tests.PcreNet
         {
             var re = new PcreRegex("a");
             var buffer = re.CreateMatchBuffer();
-            Assert.Throws<ArgumentNullException>(() => buffer.Matches("a".AsSpan(), default(PcreMatchSettings)!));
+            Assert.Throws<ArgumentNullException>(() => buffer.Matches("a".AsSpan(), 0, PcreMatchOptions.None, null, default(PcreMatchSettings)!));
         }
 
         [Test]
@@ -398,8 +398,8 @@ namespace PCRE.Tests.PcreNet
         public void readme_backtracking_verbs_example()
         {
             var matches = PcreRegex.Matches("(foo) bar (baz) 42", @"\(\w+\)(*SKIP)(*FAIL)|\w+")
-                .Select(m => m.Value)
-                .ToList();
+                                   .Select(m => m.Value)
+                                   .ToList();
 
             Assert.That(matches, Is.EqualTo(new[] { "bar", "42" }));
         }

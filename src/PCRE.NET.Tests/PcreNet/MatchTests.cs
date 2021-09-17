@@ -1621,13 +1621,13 @@ namespace PCRE.Tests.PcreNet
             var match = re.Match("foobar");
             Assert.That(match.Success, Is.True);
 
-            match = re.Match("foobar", new PcreMatchSettings
+            match = re.Match("foobar", 0, PcreMatchOptions.None, null, new PcreMatchSettings
             {
                 OffsetLimit = 3
             });
             Assert.That(match.Success, Is.True);
 
-            match = re.Match("foobar", new PcreMatchSettings
+            match = re.Match("foobar", 0, PcreMatchOptions.None, null, new PcreMatchSettings
             {
                 OffsetLimit = 2
             });
@@ -1642,13 +1642,13 @@ namespace PCRE.Tests.PcreNet
             var match = re.Match("foobar".AsSpan());
             Assert.That(match.Success, Is.True);
 
-            match = re.Match("foobar".AsSpan(), new PcreMatchSettings
+            match = re.Match("foobar".AsSpan(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
             {
                 OffsetLimit = 3
             });
             Assert.That(match.Success, Is.True);
 
-            match = re.Match("foobar".AsSpan(), new PcreMatchSettings
+            match = re.Match("foobar".AsSpan(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
             {
                 OffsetLimit = 2
             });
@@ -1664,13 +1664,13 @@ namespace PCRE.Tests.PcreNet
             var match = buffer.Match("foobar".AsSpan());
             Assert.That(match.Success, Is.True);
 
-            match = buffer.Match("foobar".AsSpan(), new PcreMatchSettings
+            match = buffer.Match("foobar".AsSpan(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
             {
                 OffsetLimit = 3
             });
             Assert.That(match.Success, Is.True);
 
-            match = buffer.Match("foobar".AsSpan(), new PcreMatchSettings
+            match = buffer.Match("foobar".AsSpan(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
             {
                 OffsetLimit = 2
             });
@@ -1681,7 +1681,7 @@ namespace PCRE.Tests.PcreNet
         public void should_detect_invalid_offset_limit_usage()
         {
             var re = new PcreRegex(@"bar");
-            Assert.Throws<PcreMatchException>(() => re.Match("foobar", new PcreMatchSettings
+            Assert.Throws<PcreMatchException>(() => re.Match("foobar", 0, PcreMatchOptions.None, null, new PcreMatchSettings
             {
                 OffsetLimit = 3
             }));
@@ -1691,7 +1691,7 @@ namespace PCRE.Tests.PcreNet
         public void should_detect_invalid_offset_limit_usage_ref()
         {
             var re = new PcreRegex(@"bar");
-            Assert.Throws<PcreMatchException>(() => re.Match("foobar".AsSpan(), new PcreMatchSettings
+            Assert.Throws<PcreMatchException>(() => re.Match("foobar".AsSpan(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
             {
                 OffsetLimit = 3
             }));
@@ -1703,7 +1703,7 @@ namespace PCRE.Tests.PcreNet
             var re = new PcreRegex(@"bar");
             var buffer = re.CreateMatchBuffer();
 
-            Assert.Throws<PcreMatchException>(() => buffer.Match("foobar".AsSpan(), new PcreMatchSettings
+            Assert.Throws<PcreMatchException>(() => buffer.Match("foobar".AsSpan(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
             {
                 OffsetLimit = 3
             }));
@@ -1883,14 +1883,14 @@ namespace PCRE.Tests.PcreNet
         public void should_throw_on_null_settings()
         {
             var re = new PcreRegex("a");
-            Assert.Throws<ArgumentNullException>(() => re.Match("a", default(PcreMatchSettings)!));
+            Assert.Throws<ArgumentNullException>(() => re.Match("a", 0, PcreMatchOptions.None, null, default(PcreMatchSettings)!));
         }
 
         [Test]
         public void should_throw_on_null_settings_ref()
         {
             var re = new PcreRegex("a");
-            Assert.Throws<ArgumentNullException>(() => re.Match("a".AsSpan(), default(PcreMatchSettings)!));
+            Assert.Throws<ArgumentNullException>(() => re.Match("a".AsSpan(), 0, PcreMatchOptions.None, null, default(PcreMatchSettings)!));
         }
 
         [Test]
@@ -1898,7 +1898,7 @@ namespace PCRE.Tests.PcreNet
         {
             var re = new PcreRegex("a");
             var buffer = re.CreateMatchBuffer();
-            Assert.Throws<ArgumentNullException>(() => buffer.Match("a".AsSpan(), default(PcreMatchSettings)!));
+            Assert.Throws<ArgumentNullException>(() => buffer.Match("a".AsSpan(), 0, PcreMatchOptions.None, null, default(PcreMatchSettings)!));
         }
 
         [Test]

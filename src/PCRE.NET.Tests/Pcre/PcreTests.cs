@@ -84,10 +84,9 @@ namespace PCRE.Tests.Pcre
                     {
                         case ApiKind.String:
                         {
-                            var matches = regex
-                                .Matches(subject, matchSettings)
-                                .Take(pattern.AllMatches ? int.MaxValue : 1)
-                                .ToList();
+                            var matches = regex.Matches(subject, 0, PcreMatchOptions.None, null, matchSettings)
+                                               .Take(pattern.AllMatches ? int.MaxValue : 1)
+                                               .ToList();
 
                             Assert.That(matches.Count, Is.EqualTo(expected.Matches.Count));
 
@@ -112,7 +111,7 @@ namespace PCRE.Tests.Pcre
                         {
                             var matchCount = 0;
 
-                            foreach (var actualMatch in regex.Matches(subject.AsSpan(), matchSettings))
+                            foreach (var actualMatch in regex.Matches(subject.AsSpan(), 0, PcreMatchOptions.None, null, matchSettings))
                             {
                                 Assert.That(matchCount, Is.LessThan(expected.Matches.Count));
 
@@ -140,7 +139,7 @@ namespace PCRE.Tests.Pcre
                             var matchCount = 0;
                             var buffer = regex.CreateMatchBuffer();
 
-                            foreach (var actualMatch in buffer.Matches(subject.AsSpan(), matchSettings))
+                            foreach (var actualMatch in buffer.Matches(subject.AsSpan(), 0, PcreMatchOptions.None, null, matchSettings))
                             {
                                 Assert.That(matchCount, Is.LessThan(expected.Matches.Count));
 
@@ -266,9 +265,9 @@ namespace PCRE.Tests.Pcre
                             from apiKind in new[] { ApiKind.String, ApiKind.Span, ApiKind.MatchBuffer }
                             let testCase = new TestCase(testFilePath, test.input, test.expectedResult, jit, apiKind)
                             select new TestCaseData(testCase)
-                                .SetCategory(testFileName)
-                                .SetName($"PCRE {testFileName}, Line {testCase.Input.Pattern.LineNumber:0000}, {(jit ? "JIT" : "Interpreted")}, {apiKind}")
-                                .SetDescription(testCase.Input.Pattern.Pattern);
+                                   .SetCategory(testFileName)
+                                   .SetName($"PCRE {testFileName}, Line {testCase.Input.Pattern.LineNumber:0000}, {(jit ? "JIT" : "Interpreted")}, {apiKind}")
+                                   .SetDescription(testCase.Input.Pattern.Pattern);
 
                         foreach (var testCase in testCases)
                             yield return testCase;

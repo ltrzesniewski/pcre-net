@@ -117,7 +117,7 @@ namespace PCRE.Internal
             return result;
         }
 
-        public PcreMatch Match(string subject, PcreMatchSettings settings, int startIndex, uint additionalOptions)
+        public PcreMatch Match(string subject, PcreMatchSettings settings, int startIndex, uint additionalOptions, Func<PcreCallout, PcreCalloutResult>? callout)
         {
             Native.match_input input;
             _ = &input;
@@ -143,7 +143,7 @@ namespace PCRE.Internal
                 input.start_index = (uint)startIndex;
                 input.additional_options = additionalOptions;
 
-                CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, settings.Callout);
+                CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout);
 
                 Native.match(&input, &result);
             }
@@ -168,7 +168,7 @@ namespace PCRE.Internal
             return new PcreRefMatch(this, oVector);
         }
 
-        public void Match(ref PcreRefMatch match, ReadOnlySpan<char> subject, PcreMatchSettings settings, int startIndex, uint additionalOptions)
+        public void Match(ref PcreRefMatch match, ReadOnlySpan<char> subject, PcreMatchSettings settings, int startIndex, uint additionalOptions, PcreRefCalloutFunc? callout)
         {
             Native.match_input input;
             _ = &input;
@@ -199,7 +199,7 @@ namespace PCRE.Internal
                 if (input.subject == default && input.subject_length == 0)
                     input.subject = (char*)1; // PCRE doesn't like null subjects, even if the length is zero
 
-                CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, settings.RefCallout);
+                CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout);
 
                 Native.match(&input, &result);
             }

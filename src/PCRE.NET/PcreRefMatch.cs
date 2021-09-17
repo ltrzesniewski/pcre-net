@@ -147,25 +147,27 @@ namespace PCRE
             return new DuplicateNamedGroupEnumerable(this, indexes);
         }
 
-        internal void FirstMatch(ReadOnlySpan<char> subject, PcreMatchSettings settings, int startIndex)
+        internal void FirstMatch(ReadOnlySpan<char> subject, PcreMatchSettings settings, int startIndex, uint options, PcreRefCalloutFunc? callout)
         {
             _regex!.Match(
                 ref this,
                 subject,
                 settings,
                 startIndex,
-                settings.AdditionalOptions.ToPatternOptions()
+                options,
+                callout
             );
         }
 
-        internal void NextMatch(PcreMatchSettings settings)
+        internal void NextMatch(PcreMatchSettings settings, uint options, PcreRefCalloutFunc? callout)
         {
             _regex!.Match(
                 ref this,
                 Subject,
                 settings,
                 GetStartOfNextMatchIndex(),
-                settings.AdditionalOptions.ToPatternOptions() | PcreConstants.NO_UTF_CHECK | (Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0)
+                options | PcreConstants.NO_UTF_CHECK | (Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0),
+                callout
             );
         }
 
