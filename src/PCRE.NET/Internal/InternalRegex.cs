@@ -295,7 +295,7 @@ namespace PCRE.Internal
             return result.AsReadOnly();
         }
 
-        public PcreCalloutInfo GetCalloutInfoByPatternPosition(int patternPosition)
+        public PcreCalloutInfo? TryGetCalloutInfoByPatternPosition(int patternPosition)
         {
             if (_calloutInfoByPatternPosition == null)
             {
@@ -308,10 +308,10 @@ namespace PCRE.Internal
                 _calloutInfoByPatternPosition = dict;
             }
 
-            if (_calloutInfoByPatternPosition.TryGetValue(patternPosition, out var result))
-                return result;
-
-            throw new InvalidOperationException($"Could not retrieve callout info at position {patternPosition}");
+            return _calloutInfoByPatternPosition.TryGetValue(patternPosition, out var result) ? result : null;
         }
+
+        public PcreCalloutInfo GetCalloutInfoByPatternPosition(int patternPosition)
+            => TryGetCalloutInfoByPatternPosition(patternPosition) ?? throw new InvalidOperationException($"Could not retrieve callout info at position {patternPosition}");
     }
 }

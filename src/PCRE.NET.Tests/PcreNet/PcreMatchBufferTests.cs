@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 using NUnit.Framework;
+using PCRE.Internal;
 
 namespace PCRE.Tests.PcreNet
 {
@@ -47,6 +49,52 @@ namespace PCRE.Tests.PcreNet
             });
 
             Assert.That(match.Success, Is.True);
+        }
+
+        [Test]
+        [Parallelizable(ParallelScope.None)]
+        public void should_not_allocate()
+        {
+            var regexBuilder = new StringBuilder();
+            var subjectBuilder = new StringBuilder();
+
+            regexBuilder.Append("(?<char>.)");
+
+            for (var i = 0; i < 2 * InternalRegex.MaxStackAllocCaptureCount; ++i)
+            {
+                regexBuilder.Append(@"(?C{before})(.)(?C{after})");
+                subjectBuilder.Append("foobar");
+            }
+
+            var re = new PcreRegex(regexBuilder.ToString(), PcreOptions.Compiled);
+            var buffer = re.CreateMatchBuffer();
+            var subject = subjectBuilder.ToString().AsSpan();
+
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true);
+            var gcCountBefore = GC.CollectionCount(0);
+
+            for (var i = 0; i < 10000; ++i)
+            {
+                var matches = buffer.Matches(subject, 0, PcreMatchOptions.None, static data =>
+                {
+                    _ = data.Match.Groups["char"].Value;
+                    _ = data.Match.Groups[data.Match.Groups.Count - 1].Value;
+                    _ = data.String;
+
+                    return PcreCalloutResult.Pass;
+                });
+
+                foreach (var match in matches)
+                {
+                    _ = match.Value;
+                    _ = match.Groups["char"].Value;
+                    _ = match.Groups[match.Groups.Count - 1].Value;
+                }
+            }
+
+            var gcCountAfter = GC.CollectionCount(0);
+
+            Assert.That(gcCountAfter - gcCountBefore, Is.Zero);
         }
     }
 }

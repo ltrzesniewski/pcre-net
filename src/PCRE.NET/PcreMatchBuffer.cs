@@ -19,6 +19,8 @@ namespace PCRE
 
             OutputVector = new uint[regex.OutputVectorSize];
             CalloutOutputVector = new uint[regex.OutputVectorSize];
+
+            _regex.TryGetCalloutInfoByPatternPosition(0); // Make sure callout info is initialized
         }
 
         [Pure]
