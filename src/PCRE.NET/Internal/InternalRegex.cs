@@ -162,12 +162,14 @@ namespace PCRE.Internal
         }
 
         public PcreRefMatch CreateRefMatch()
-            => new PcreRefMatch(this, ReadOnlySpan<uint>.Empty);
+            => new(this, Span<uint>.Empty);
 
         public PcreRefMatch CreateRefMatch(Span<uint> oVector)
         {
+#if DEBUG
             if (oVector.Length != OutputVectorSize)
                 throw new InvalidOperationException("Unexpected output vector size");
+#endif
 
             return new PcreRefMatch(this, oVector);
         }

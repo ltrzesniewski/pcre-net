@@ -10,31 +10,31 @@ namespace PCRE
     public unsafe ref struct PcreRefMatch
     {
         private readonly InternalRegex? _regex;
-        private ReadOnlySpan<uint> _oVector; // Can be empty when there is no match
+        internal Span<uint> OutputVector; // Can be empty when there is no match
         private int _resultCode;
         private char* _markPtr;
 
         public delegate T Func<out T>(PcreRefMatch match);
 
-        internal PcreRefMatch(InternalRegex regex, ReadOnlySpan<uint> oVector)
+        internal PcreRefMatch(InternalRegex regex, Span<uint> oVector)
         {
             // Empty match
 
             _regex = regex;
-            _oVector = oVector;
+            OutputVector = oVector;
 
             Subject = default;
             _markPtr = null;
             _resultCode = 0;
         }
 
-        internal PcreRefMatch(ReadOnlySpan<char> subject, InternalRegex regex, ReadOnlySpan<uint> oVector, char* mark)
+        internal PcreRefMatch(ReadOnlySpan<char> subject, InternalRegex regex, Span<uint> oVector, char* mark)
         {
             // Callout
 
             Subject = subject;
             _regex = regex;
-            _oVector = oVector;
+            OutputVector = oVector;
             _markPtr = mark;
 
             _resultCode = oVector.Length / 2;
@@ -45,8 +45,7 @@ namespace PCRE
         public readonly PcreRefGroup this[int index] => GetGroup(index);
         public readonly PcreRefGroup this[string name] => GetGroup(name);
 
-        internal ReadOnlySpan<char> Subject { get; private set; }
-        internal readonly ReadOnlySpan<uint> OutputVector => _oVector;
+        internal ReadOnlySpan<char> Subject;
         internal readonly bool IsInitialized => _regex != null;
 
         public readonly int Index => this[0].Index;
@@ -72,11 +71,11 @@ namespace PCRE
             }
         }
 
-        public readonly GroupList Groups => new GroupList(this);
+        public readonly GroupList Groups => new(this);
 
         public readonly bool IsPartialMatch => _resultCode == PcreConstants.ERROR_PARTIAL;
 
-        public readonly GroupEnumerator GetEnumerator() => new GroupEnumerator(this);
+        public readonly GroupEnumerator GetEnumerator() => new(this);
 
         public readonly bool TryGetGroup(int index, out PcreRefGroup result)
         {
@@ -103,14 +102,14 @@ namespace PCRE
                 return PcreRefGroup.Empty;
 
             index *= 2;
-            if (index >= _oVector.Length)
+            if (index >= OutputVector.Length)
                 return PcreRefGroup.Empty;
 
-            var startOffset = (int)_oVector[index];
+            var startOffset = (int)OutputVector[index];
             if (startOffset < 0)
                 return PcreRefGroup.Empty;
 
-            var endOffset = (int)_oVector[index + 1];
+            var endOffset = (int)OutputVector[index + 1];
 
             return new PcreRefGroup(Subject, startOffset, endOffset);
         }
@@ -188,7 +187,7 @@ namespace PCRE
             _resultCode = result.result_code;
 
             if (outputVector != null)
-                _oVector = outputVector;
+                OutputVector = outputVector;
         }
 
         private readonly int GetStartOfNextMatchIndex()
@@ -205,13 +204,14 @@ namespace PCRE
         {
             var copy = this;
 
-            if (_oVector.Length != 0)
-                copy._oVector = _oVector.ToArray();
+            if (OutputVector.Length != 0)
+                copy.OutputVector = OutputVector.ToArray();
 
             return copy;
         }
 
-        public override readonly string ToString() => Value.ToString();
+        public override readonly string ToString()
+            => Value.ToString();
 
         public readonly ref struct GroupList
         {
@@ -223,7 +223,7 @@ namespace PCRE
             public int Count => _match._regex?.CaptureCount + 1 ?? 0;
 
             public GroupEnumerator GetEnumerator()
-                => new GroupEnumerator(_match);
+                => new(_match);
 
             public PcreRefGroup this[int index] => _match[index];
             public PcreRefGroup this[string name] => _match[name];
@@ -270,7 +270,7 @@ namespace PCRE
             }
 
             public DuplicateNamedGroupEnumerator GetEnumerator()
-                => new DuplicateNamedGroupEnumerator(_match, _groupIndexes);
+                => new(_match, _groupIndexes);
 
             [SuppressMessage("Microsoft.Design", "CA1002")]
             [SuppressMessage("Microsoft.Design", "CA1062")]
