@@ -1659,21 +1659,17 @@ namespace PCRE.Tests.PcreNet
         public void should_handle_offset_limit_buf()
         {
             var re = new PcreRegex(@"bar", PcreOptions.UseOffsetLimit);
-            var buffer = re.CreateMatchBuffer();
 
+            var buffer = re.CreateMatchBuffer();
             var match = buffer.Match("foobar".AsSpan());
             Assert.That(match.Success, Is.True);
 
-            match = buffer.Match("foobar".AsSpan(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
-            {
-                OffsetLimit = 3
-            });
+            buffer = re.CreateMatchBuffer(new PcreMatchSettings { OffsetLimit = 3 });
+            match = buffer.Match("foobar".AsSpan());
             Assert.That(match.Success, Is.True);
 
-            match = buffer.Match("foobar".AsSpan(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
-            {
-                OffsetLimit = 2
-            });
+            buffer = re.CreateMatchBuffer(new PcreMatchSettings { OffsetLimit = 2 });
+            match = buffer.Match("foobar".AsSpan());
             Assert.That(match.Success, Is.False);
         }
 
@@ -1701,12 +1697,12 @@ namespace PCRE.Tests.PcreNet
         public void should_detect_invalid_offset_limit_usage_buf()
         {
             var re = new PcreRegex(@"bar");
-            var buffer = re.CreateMatchBuffer();
-
-            Assert.Throws<PcreMatchException>(() => buffer.Match("foobar".AsSpan(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
+            var buffer = re.CreateMatchBuffer(new PcreMatchSettings
             {
                 OffsetLimit = 3
-            }));
+            });
+
+            Assert.Throws<PcreMatchException>(() => buffer.Match("foobar".AsSpan()));
         }
 
         [Test]
@@ -1891,14 +1887,6 @@ namespace PCRE.Tests.PcreNet
         {
             var re = new PcreRegex("a");
             Assert.Throws<ArgumentNullException>(() => re.Match("a".AsSpan(), 0, PcreMatchOptions.None, null, default(PcreMatchSettings)!));
-        }
-
-        [Test]
-        public void should_throw_on_null_settings_buf()
-        {
-            var re = new PcreRegex("a");
-            var buffer = re.CreateMatchBuffer();
-            Assert.Throws<ArgumentNullException>(() => buffer.Match("a".AsSpan(), 0, PcreMatchOptions.None, null, default(PcreMatchSettings)!));
         }
 
         [Test]

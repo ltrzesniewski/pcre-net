@@ -49,7 +49,10 @@ namespace PCRE
         }
 
         public PcreMatchBuffer CreateMatchBuffer()
-            => new(InternalRegex);
+            => new(InternalRegex, PcreMatchSettings.Default);
+
+        public PcreMatchBuffer CreateMatchBuffer(PcreMatchSettings settings)
+            => new(InternalRegex, settings ?? throw new ArgumentNullException(nameof(settings)));
 
         public override string ToString()
             => InternalRegex.Pattern;

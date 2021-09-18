@@ -359,14 +359,6 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
-        public void should_throw_on_null_settings_buf()
-        {
-            var re = new PcreRegex("a");
-            var buffer = re.CreateMatchBuffer();
-            Assert.Throws<ArgumentNullException>(() => buffer.Matches("a".AsSpan(), 0, PcreMatchOptions.None, null, default(PcreMatchSettings)!));
-        }
-
-        [Test]
         [TestCase(-1)]
         [TestCase(2)]
         public void should_throw_on_invalid_start_index(int startIndex)
