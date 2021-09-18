@@ -52,7 +52,8 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
-        [Parallelizable(ParallelScope.None)]
+        [Explicit]
+        [NonParallelizable]
         public void should_not_allocate()
         {
             var regexBuilder = new StringBuilder();

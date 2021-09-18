@@ -44,6 +44,9 @@ jobs:
       - name: Test .NET Standard x64
         run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_UNIX_TEST_TARGET }} -p:PcreNetTestBuild=true -p:ExpectPlatform=x64 -p:ForceNetStandard=true
 
+      - name: Test Allocations
+        run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_UNIX_TEST_TARGET }} -- --allocations
+
       - name: Upload Native Lib
         uses: actions/upload-artifact@v2
         with:
@@ -83,6 +86,9 @@ jobs:
 
       - name: Test .NET Standard x64
         run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_UNIX_TEST_TARGET }} -p:PcreNetTestBuild=true -p:ExpectPlatform=x64 -p:ForceNetStandard=true
+
+      - name: Test Allocations
+        run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_UNIX_TEST_TARGET }} -- --allocations
 
       - name: Upload Native Lib
         uses: actions/upload-artifact@v2
@@ -173,6 +179,12 @@ jobs:
 
       - name: Test .NET Standard x64
         run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} -p:ForceNetStandard=true
+
+      - name: Test Allocations .NET Framework x64
+        run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_WINDOWS_TEST_TARGET }} -- --allocations
+
+      - name: Test Allocations .NET x64
+        run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_UNIX_TEST_TARGET }} -- --allocations
 
       - name: Upload NuGet
         uses: actions/upload-artifact@v2
