@@ -150,7 +150,7 @@ namespace PCRE
         internal void FirstMatch(ReadOnlySpan<char> subject,
                                  PcreMatchSettings settings,
                                  int startIndex,
-                                 uint options,
+                                 PcreMatchOptions options,
                                  PcreRefCalloutFunc? callout,
                                  uint[]? calloutOutputVector)
         {
@@ -159,14 +159,14 @@ namespace PCRE
                 subject,
                 settings,
                 startIndex,
-                options,
+                options.ToPatternOptions(),
                 callout,
                 calloutOutputVector
             );
         }
 
         internal void NextMatch(PcreMatchSettings settings,
-                                uint options,
+                                PcreMatchOptions options,
                                 PcreRefCalloutFunc? callout,
                                 uint[]? calloutOutputVector)
         {
@@ -175,7 +175,7 @@ namespace PCRE
                 Subject,
                 settings,
                 GetStartOfNextMatchIndex(),
-                options | PcreConstants.NO_UTF_CHECK | (Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0),
+                options.ToPatternOptions() | PcreConstants.NO_UTF_CHECK | (Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0),
                 callout,
                 calloutOutputVector
             );

@@ -60,7 +60,7 @@ namespace PCRE
                 throw new ArgumentOutOfRangeException("Invalid StartIndex value", default(Exception));
 
             var match = _regex.CreateRefMatch(OutputVector);
-            match.FirstMatch(subject, _settings, startIndex, options.ToPatternOptions(), onCallout, CalloutOutputVector);
+            match.FirstMatch(subject, _settings, startIndex, options, onCallout, CalloutOutputVector);
 
             return match;
         }
@@ -147,11 +147,11 @@ namespace PCRE
                 if (!_match.IsInitialized)
                 {
                     _match = _buffer._regex.CreateRefMatch(_buffer.OutputVector);
-                    _match.FirstMatch(_subject, _buffer._settings, _startIndex, _options.ToPatternOptions(), _callout, _buffer.CalloutOutputVector);
+                    _match.FirstMatch(_subject, _buffer._settings, _startIndex, _options, _callout, _buffer.CalloutOutputVector);
                 }
                 else
                 {
-                    _match.NextMatch(_buffer._settings, _options.ToPatternOptions(), _callout, _buffer.CalloutOutputVector);
+                    _match.NextMatch(_buffer._settings, _options, _callout, _buffer.CalloutOutputVector);
                 }
 
                 if (_match.Success)

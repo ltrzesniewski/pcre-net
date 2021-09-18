@@ -118,7 +118,7 @@ namespace PCRE
                 throw new ArgumentOutOfRangeException("Invalid StartIndex value", default(Exception));
 
             var match = InternalRegex.CreateRefMatch();
-            match.FirstMatch(subject, settings, startIndex, options.ToPatternOptions(), onCallout, null);
+            match.FirstMatch(subject, settings, startIndex, options, onCallout, null);
 
             return match;
         }
@@ -308,11 +308,11 @@ namespace PCRE
                 if (!_match.IsInitialized)
                 {
                     _match = _regex.CreateRefMatch();
-                    _match.FirstMatch(_subject, _settings, _startIndex, _options.ToPatternOptions(), _callout, null);
+                    _match.FirstMatch(_subject, _settings, _startIndex, _options, _callout, null);
                 }
                 else
                 {
-                    _match.NextMatch(_settings, _options.ToPatternOptions(), _callout, null);
+                    _match.NextMatch(_settings, _options, _callout, null);
                 }
 
                 if (_match.Success)
