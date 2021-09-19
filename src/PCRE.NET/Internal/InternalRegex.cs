@@ -117,7 +117,11 @@ namespace PCRE.Internal
             return result;
         }
 
-        public PcreMatch Match(string subject, PcreMatchSettings settings, int startIndex, uint additionalOptions)
+        public PcreMatch Match(string subject,
+                               PcreMatchSettings settings,
+                               int startIndex,
+                               uint additionalOptions,
+                               Func<PcreCallout, PcreCalloutResult>? callout)
         {
             Native.match_input input;
             _ = &input;
@@ -143,7 +147,7 @@ namespace PCRE.Internal
                 input.start_index = (uint)startIndex;
                 input.additional_options = additionalOptions;
 
-                CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, settings.Callout);
+                CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout);
 
                 Native.match(&input, &result);
             }
@@ -158,17 +162,25 @@ namespace PCRE.Internal
         }
 
         public PcreRefMatch CreateRefMatch()
-            => new PcreRefMatch(this, ReadOnlySpan<uint>.Empty);
+            => new(this, Span<uint>.Empty);
 
         public PcreRefMatch CreateRefMatch(Span<uint> oVector)
         {
+#if DEBUG
             if (oVector.Length != OutputVectorSize)
                 throw new InvalidOperationException("Unexpected output vector size");
+#endif
 
             return new PcreRefMatch(this, oVector);
         }
 
-        public void Match(ref PcreRefMatch match, ReadOnlySpan<char> subject, PcreMatchSettings settings, int startIndex, uint additionalOptions)
+        public void Match(ref PcreRefMatch match,
+                          ReadOnlySpan<char> subject,
+                          PcreMatchSettings settings,
+                          int startIndex,
+                          uint additionalOptions,
+                          PcreRefCalloutFunc? callout,
+                          uint[]? calloutOutputVector)
         {
             Native.match_input input;
             _ = &input;
@@ -199,7 +211,7 @@ namespace PCRE.Internal
                 if (input.subject == default && input.subject_length == 0)
                     input.subject = (char*)1; // PCRE doesn't like null subjects, even if the length is zero
 
-                CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, settings.RefCallout);
+                CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout, calloutOutputVector);
 
                 Native.match(&input, &result);
             }
@@ -285,7 +297,7 @@ namespace PCRE.Internal
             return result.AsReadOnly();
         }
 
-        public PcreCalloutInfo GetCalloutInfoByPatternPosition(int patternPosition)
+        public PcreCalloutInfo? TryGetCalloutInfoByPatternPosition(int patternPosition)
         {
             if (_calloutInfoByPatternPosition == null)
             {
@@ -298,10 +310,10 @@ namespace PCRE.Internal
                 _calloutInfoByPatternPosition = dict;
             }
 
-            if (_calloutInfoByPatternPosition.TryGetValue(patternPosition, out var result))
-                return result;
-
-            throw new InvalidOperationException($"Could not retrieve callout info at position {patternPosition}");
+            return _calloutInfoByPatternPosition.TryGetValue(patternPosition, out var result) ? result : null;
         }
+
+        public PcreCalloutInfo GetCalloutInfoByPatternPosition(int patternPosition)
+            => TryGetCalloutInfoByPatternPosition(patternPosition) ?? throw new InvalidOperationException($"Could not retrieve callout info at position {patternPosition}");
     }
 }

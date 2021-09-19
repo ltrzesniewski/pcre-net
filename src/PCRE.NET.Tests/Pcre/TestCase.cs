@@ -8,17 +8,24 @@ namespace PCRE.Tests.Pcre
         public TestOutput ExpectedResult { get; }
 
         public bool Jit { get; }
-        public bool Span { get; }
+        public ApiKind ApiKind { get; }
 
-        public TestCase(string testFile, TestInput input, TestOutput expectedResult, bool jit, bool span)
+        public TestCase(string testFile, TestInput input, TestOutput expectedResult, bool jit, ApiKind apiKind)
         {
             TestFile = testFile;
             Input = input;
             ExpectedResult = expectedResult;
             Jit = jit;
-            Span = span;
+            ApiKind = apiKind;
         }
 
         public override string ToString() => Input.ToString();
+    }
+
+    public enum ApiKind
+    {
+        String,
+        Span,
+        MatchBuffer
     }
 }

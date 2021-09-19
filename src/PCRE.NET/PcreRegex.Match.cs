@@ -13,7 +13,7 @@ namespace PCRE
     {
         [Pure]
         public bool IsMatch(string subject)
-            => IsMatch(subject, 0);
+            => IsMatch(subject.AsSpan(), 0);
 
         [Pure]
         public bool IsMatch(ReadOnlySpan<char> subject)
@@ -34,68 +34,68 @@ namespace PCRE
                 : new uint[InternalRegex.OutputVectorSize];
 
             var match = InternalRegex.CreateRefMatch(outputVector);
-            match.FirstMatch(subject, PcreMatchSettings.Default, startIndex);
+            match.FirstMatch(subject, PcreMatchSettings.Default, startIndex, 0, null, null);
 
             return match.Success;
         }
 
         [Pure]
         public PcreMatch Match(string subject)
-            => Match(subject, PcreMatchSettings.Default);
+            => Match(subject, 0, PcreMatchOptions.None, null, PcreMatchSettings.Default);
 
         [Pure]
         public PcreRefMatch Match(ReadOnlySpan<char> subject)
-            => Match(subject, PcreMatchSettings.Default);
+            => Match(subject, 0, PcreMatchOptions.None, null, PcreMatchSettings.Default);
 
         [Pure]
         public PcreMatch Match(string subject, PcreMatchOptions options)
-            => Match(subject, 0, options, null);
+            => Match(subject, 0, options, null, PcreMatchSettings.Default);
 
         [Pure]
         public PcreRefMatch Match(ReadOnlySpan<char> subject, PcreMatchOptions options)
-            => Match(subject, 0, options, null);
+            => Match(subject, 0, options, null, PcreMatchSettings.Default);
 
         [Pure]
         public PcreMatch Match(string subject, int startIndex)
-            => Match(subject, startIndex, PcreMatchOptions.None, null);
+            => Match(subject, startIndex, PcreMatchOptions.None, null, PcreMatchSettings.Default);
 
         [Pure]
         public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex)
-            => Match(subject, startIndex, PcreMatchOptions.None, null);
+            => Match(subject, startIndex, PcreMatchOptions.None, null, PcreMatchSettings.Default);
 
         [Pure]
         public PcreMatch Match(string subject, int startIndex, PcreMatchOptions options)
-            => Match(subject, startIndex, options, null);
+            => Match(subject, startIndex, options, null, PcreMatchSettings.Default);
 
         [Pure]
         public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options)
-            => Match(subject, startIndex, options, null);
+            => Match(subject, startIndex, options, null, PcreMatchSettings.Default);
 
         public PcreMatch Match(string subject, Func<PcreCallout, PcreCalloutResult>? onCallout)
-            => Match(subject, 0, PcreMatchOptions.None, onCallout);
+            => Match(subject, 0, PcreMatchOptions.None, onCallout, PcreMatchSettings.Default);
 
         public PcreRefMatch Match(ReadOnlySpan<char> subject, PcreRefCalloutFunc? onCallout)
-            => Match(subject, 0, PcreMatchOptions.None, onCallout);
+            => Match(subject, 0, PcreMatchOptions.None, onCallout, PcreMatchSettings.Default);
 
         public PcreMatch Match(string subject, PcreMatchOptions options, Func<PcreCallout, PcreCalloutResult>? onCallout)
-            => Match(subject, 0, options, onCallout);
+            => Match(subject, 0, options, onCallout, PcreMatchSettings.Default);
 
         public PcreRefMatch Match(ReadOnlySpan<char> subject, PcreMatchOptions options, PcreRefCalloutFunc? onCallout)
-            => Match(subject, 0, options, onCallout);
+            => Match(subject, 0, options, onCallout, PcreMatchSettings.Default);
 
         public PcreMatch Match(string subject, int startIndex, Func<PcreCallout, PcreCalloutResult>? onCallout)
-            => Match(subject, startIndex, PcreMatchOptions.None, onCallout);
+            => Match(subject, startIndex, PcreMatchOptions.None, onCallout, PcreMatchSettings.Default);
 
         public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex, PcreRefCalloutFunc? onCallout)
-            => Match(subject, startIndex, PcreMatchOptions.None, onCallout);
+            => Match(subject, startIndex, PcreMatchOptions.None, onCallout, PcreMatchSettings.Default);
 
         public PcreMatch Match(string subject, int startIndex, PcreMatchOptions options, Func<PcreCallout, PcreCalloutResult>? onCallout)
-            => Match(subject, PcreMatchSettings.GetSettings(startIndex, options, onCallout));
+            => Match(subject, startIndex, options, onCallout, PcreMatchSettings.Default);
 
         public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFunc? onCallout)
-            => Match(subject, PcreMatchSettings.GetSettings(startIndex, options, onCallout));
+            => Match(subject, startIndex, options, onCallout, PcreMatchSettings.Default);
 
-        public PcreMatch Match(string subject, PcreMatchSettings settings)
+        public PcreMatch Match(string subject, int startIndex, PcreMatchOptions options, Func<PcreCallout, PcreCalloutResult>? onCallout, PcreMatchSettings settings)
         {
             if (subject == null)
                 throw new ArgumentNullException(nameof(subject));
@@ -103,52 +103,52 @@ namespace PCRE
             if (settings == null)
                 throw new ArgumentNullException(nameof(settings));
 
-            if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
+            if (startIndex < 0 || startIndex > subject.Length)
                 throw new ArgumentOutOfRangeException("Invalid StartIndex value", default(Exception));
 
-            return InternalRegex.Match(subject, settings, settings.StartIndex, settings.AdditionalOptions.ToPatternOptions());
+            return InternalRegex.Match(subject, settings, startIndex, options.ToPatternOptions(), onCallout);
         }
 
-        public PcreRefMatch Match(ReadOnlySpan<char> subject, PcreMatchSettings settings)
+        public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFunc? onCallout, PcreMatchSettings settings)
         {
             if (settings == null)
                 throw new ArgumentNullException(nameof(settings));
 
-            if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
+            if (startIndex < 0 || startIndex > subject.Length)
                 throw new ArgumentOutOfRangeException("Invalid StartIndex value", default(Exception));
 
             var match = InternalRegex.CreateRefMatch();
-            match.FirstMatch(subject, settings, settings.StartIndex);
+            match.FirstMatch(subject, settings, startIndex, options, onCallout, null);
 
             return match;
         }
 
         [Pure]
         public IEnumerable<PcreMatch> Matches(string subject)
-            => Matches(subject, PcreMatchSettings.Default);
+            => Matches(subject, 0, PcreMatchOptions.None, null, PcreMatchSettings.Default);
 
         [Pure]
         public RefMatchEnumerable Matches(ReadOnlySpan<char> subject)
-            => Matches(subject, PcreMatchSettings.Default);
+            => Matches(subject, 0, PcreMatchOptions.None, null, PcreMatchSettings.Default);
 
         [Pure]
         public IEnumerable<PcreMatch> Matches(string subject, int startIndex)
-            => Matches(subject, startIndex, null);
+            => Matches(subject, startIndex, PcreMatchOptions.None, null, PcreMatchSettings.Default);
 
         [Pure]
         public RefMatchEnumerable Matches(ReadOnlySpan<char> subject, int startIndex)
-            => Matches(subject, startIndex, null);
+            => Matches(subject, startIndex, PcreMatchOptions.None, null, PcreMatchSettings.Default);
 
         [Pure]
         public IEnumerable<PcreMatch> Matches(string subject, int startIndex, Func<PcreCallout, PcreCalloutResult>? onCallout)
-            => Matches(subject, PcreMatchSettings.GetSettings(startIndex, PcreMatchOptions.None, onCallout));
+            => Matches(subject, startIndex, PcreMatchOptions.None, onCallout, PcreMatchSettings.Default);
 
         [Pure]
         public RefMatchEnumerable Matches(ReadOnlySpan<char> subject, int startIndex, PcreRefCalloutFunc? onCallout)
-            => Matches(subject, PcreMatchSettings.GetSettings(startIndex, PcreMatchOptions.None, onCallout));
+            => Matches(subject, startIndex, PcreMatchOptions.None, onCallout, PcreMatchSettings.Default);
 
         [Pure]
-        public IEnumerable<PcreMatch> Matches(string subject, PcreMatchSettings settings)
+        public IEnumerable<PcreMatch> Matches(string subject, int startIndex, PcreMatchOptions options, Func<PcreCallout, PcreCalloutResult>? onCallout, PcreMatchSettings settings)
         {
             if (subject == null)
                 throw new ArgumentNullException(nameof(subject));
@@ -156,40 +156,39 @@ namespace PCRE
             if (settings == null)
                 throw new ArgumentNullException(nameof(settings));
 
-            if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
+            if (startIndex < 0 || startIndex > subject.Length)
                 throw new ArgumentOutOfRangeException("Invalid StartIndex value", default(Exception));
 
-            return MatchesIterator(subject, settings);
+            return MatchesIterator(subject, startIndex, options, onCallout, settings);
         }
 
         [Pure]
-        public RefMatchEnumerable Matches(ReadOnlySpan<char> subject, PcreMatchSettings settings)
+        public RefMatchEnumerable Matches(ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFunc? onCallout, PcreMatchSettings settings)
         {
             if (settings == null)
                 throw new ArgumentNullException(nameof(settings));
 
-            if (settings.StartIndex < 0 || settings.StartIndex > subject.Length)
+            if (startIndex < 0 || startIndex > subject.Length)
                 throw new ArgumentOutOfRangeException("Invalid StartIndex value", default(Exception));
 
-            return new RefMatchEnumerable(InternalRegex, subject, settings);
+            return new RefMatchEnumerable(InternalRegex, subject, startIndex, options, onCallout, settings);
         }
 
-        private IEnumerable<PcreMatch> MatchesIterator(string subject, PcreMatchSettings settings)
+        private IEnumerable<PcreMatch> MatchesIterator(string subject, int startIndex, PcreMatchOptions options, Func<PcreCallout, PcreCalloutResult>? onCallout, PcreMatchSettings settings)
         {
-            var match = InternalRegex.Match(subject, settings, settings.StartIndex, settings.AdditionalOptions.ToPatternOptions());
+            var match = InternalRegex.Match(subject, settings, startIndex, options.ToPatternOptions(), onCallout);
             if (!match.Success)
                 yield break;
 
             yield return match;
 
-            var baseOptions = settings.AdditionalOptions.ToPatternOptions() | PcreConstants.NO_UTF_CHECK;
+            var baseOptions = options.ToPatternOptions() | PcreConstants.NO_UTF_CHECK;
 
             while (true)
             {
-                var startIndex = match.GetStartOfNextMatchIndex();
-                var options = baseOptions | (match.Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0);
+                var nextOptions = baseOptions | (match.Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0);
 
-                match = InternalRegex.Match(subject, settings, startIndex, options);
+                match = InternalRegex.Match(subject, settings, match.GetStartOfNextMatchIndex(), nextOptions, onCallout);
                 if (!match.Success)
                     yield break;
 
@@ -236,18 +235,29 @@ namespace PCRE
         public readonly ref struct RefMatchEnumerable
         {
             private readonly ReadOnlySpan<char> _subject;
+            private readonly int _startIndex;
+            private readonly PcreMatchOptions _options;
+            private readonly PcreRefCalloutFunc? _callout;
             private readonly PcreMatchSettings _settings;
             private readonly InternalRegex _regex;
 
-            internal RefMatchEnumerable(InternalRegex regex, ReadOnlySpan<char> subject, PcreMatchSettings settings)
+            internal RefMatchEnumerable(InternalRegex regex,
+                                        ReadOnlySpan<char> subject,
+                                        int startIndex,
+                                        PcreMatchOptions options,
+                                        PcreRefCalloutFunc? callout,
+                                        PcreMatchSettings settings)
             {
                 _regex = regex;
                 _subject = subject;
+                _startIndex = startIndex;
+                _options = options;
+                _callout = callout;
                 _settings = settings;
             }
 
             public RefMatchEnumerator GetEnumerator()
-                => new RefMatchEnumerator(_regex, _subject, _settings);
+                => new(_regex, _subject, _startIndex, _options, _callout, _settings);
 
             [SuppressMessage("Microsoft.Design", "CA1002")]
             [SuppressMessage("Microsoft.Design", "CA1062")]
@@ -265,14 +275,25 @@ namespace PCRE
         public ref struct RefMatchEnumerator
         {
             private readonly ReadOnlySpan<char> _subject;
+            private readonly int _startIndex;
+            private readonly PcreMatchOptions _options;
+            private readonly PcreRefCalloutFunc? _callout;
             private readonly PcreMatchSettings _settings;
             private InternalRegex? _regex;
             private PcreRefMatch _match;
 
-            internal RefMatchEnumerator(InternalRegex regex, ReadOnlySpan<char> subject, PcreMatchSettings settings)
+            internal RefMatchEnumerator(InternalRegex regex,
+                                        ReadOnlySpan<char> subject,
+                                        int startIndex,
+                                        PcreMatchOptions options,
+                                        PcreRefCalloutFunc? callout,
+                                        PcreMatchSettings settings)
             {
                 _regex = regex;
                 _subject = subject;
+                _startIndex = startIndex;
+                _options = options;
+                _callout = callout;
                 _settings = settings;
                 _match = default;
             }
@@ -287,11 +308,11 @@ namespace PCRE
                 if (!_match.IsInitialized)
                 {
                     _match = _regex.CreateRefMatch();
-                    _match.FirstMatch(_subject, _settings, _settings.StartIndex);
+                    _match.FirstMatch(_subject, _settings, _startIndex, _options, _callout, null);
                 }
                 else
                 {
-                    _match.NextMatch(_settings);
+                    _match.NextMatch(_settings, _options, _callout, null);
                 }
 
                 if (_match.Success)

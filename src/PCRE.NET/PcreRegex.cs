@@ -48,6 +48,13 @@ namespace PCRE
             InternalRegex = Caches.RegexCache.GetOrAdd(new RegexKey(pattern, settings));
         }
 
-        public override string ToString() => InternalRegex.Pattern;
+        public PcreMatchBuffer CreateMatchBuffer()
+            => new(InternalRegex, PcreMatchSettings.Default);
+
+        public PcreMatchBuffer CreateMatchBuffer(PcreMatchSettings settings)
+            => new(InternalRegex, settings ?? throw new ArgumentNullException(nameof(settings)));
+
+        public override string ToString()
+            => InternalRegex.Pattern;
     }
 }

@@ -42,11 +42,16 @@ namespace PCRE.Internal
             }
         }
 
-        public static void Prepare(ReadOnlySpan<char> subject, InternalRegex regex, ref Native.match_input input, out CalloutInteropInfo interopInfo, PcreRefCalloutFunc? callout)
+        public static void Prepare(ReadOnlySpan<char> subject,
+                                   InternalRegex regex,
+                                   ref Native.match_input input,
+                                   out CalloutInteropInfo interopInfo,
+                                   PcreRefCalloutFunc? callout,
+                                   uint[]? calloutOutputVector)
         {
             if (callout != null)
             {
-                interopInfo = new CalloutInteropInfo(subject, regex, callout);
+                interopInfo = new CalloutInteropInfo(subject, regex, callout, calloutOutputVector);
 
                 input.callout = _calloutHandlerFnPtr;
                 input.callout_data = interopInfo.ToPointer();
@@ -58,7 +63,11 @@ namespace PCRE.Internal
             }
         }
 
-        public static void Prepare(string subject, InternalRegex regex, ref Native.dfa_match_input input, out CalloutInteropInfo interopInfo, Func<PcreCallout, PcreCalloutResult>? callout)
+        public static void Prepare(string subject,
+                                   InternalRegex regex,
+                                   ref Native.dfa_match_input input,
+                                   out CalloutInteropInfo interopInfo,
+                                   Func<PcreCallout, PcreCalloutResult>? callout)
         {
             if (callout != null)
             {
@@ -119,6 +128,7 @@ namespace PCRE.Internal
             private readonly ReadOnlySpan<char> _subjectSpan;
             private readonly InternalRegex _regex;
             private readonly Delegate _callout;
+            private readonly uint[]? _outputVector;
             public Exception? Exception { get; private set; }
 
             public CalloutInteropInfo(string subject, InternalRegex regex, Func<PcreCallout, PcreCalloutResult> callout)
@@ -127,15 +137,17 @@ namespace PCRE.Internal
                 _subjectSpan = default;
                 _regex = regex;
                 _callout = callout;
+                _outputVector = null;
                 Exception = null;
             }
 
-            public CalloutInteropInfo(ReadOnlySpan<char> subject, InternalRegex regex, PcreRefCalloutFunc callout)
+            public CalloutInteropInfo(ReadOnlySpan<char> subject, InternalRegex regex, PcreRefCalloutFunc callout, uint[]? outputVector)
             {
                 _subject = null;
                 _subjectSpan = subject;
                 _regex = regex;
                 _callout = callout;
+                _outputVector = outputVector;
                 Exception = null;
             }
 
@@ -151,9 +163,11 @@ namespace PCRE.Internal
                     }
                     else
                     {
-                        var outputVector = callout->capture_top <= InternalRegex.MaxStackAllocCaptureCount
-                            ? stackalloc uint[(int)callout->capture_top * 2]
-                            : Span<uint>.Empty;
+                        var outputVector = _outputVector ?? (
+                            callout->capture_top <= InternalRegex.MaxStackAllocCaptureCount
+                                ? stackalloc uint[(int)callout->capture_top * 2]
+                                : Span<uint>.Empty
+                        );
 
                         var func = (PcreRefCalloutFunc)_callout;
                         return (int)func(new PcreRefCallout(_subjectSpan, _regex, callout, outputVector));
