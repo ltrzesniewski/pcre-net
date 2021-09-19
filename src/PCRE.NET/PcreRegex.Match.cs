@@ -312,7 +312,7 @@ namespace PCRE
                 }
                 else
                 {
-                    _match.NextMatch(_settings, _options, _callout, null);
+                    _match.NextMatch(_settings, _options, _callout, null, false);
                 }
 
                 if (_match.Success)

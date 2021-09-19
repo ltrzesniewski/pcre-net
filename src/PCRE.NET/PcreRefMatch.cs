@@ -167,14 +167,21 @@ namespace PCRE
         internal void NextMatch(PcreMatchSettings settings,
                                 PcreMatchOptions options,
                                 PcreRefCalloutFunc? callout,
-                                uint[]? calloutOutputVector)
+                                uint[]? calloutOutputVector,
+                                bool reuseOutputVector)
         {
+            var startOfNextMatchIndex = GetStartOfNextMatchIndex();
+            var nextOptions = options.ToPatternOptions() | PcreConstants.NO_UTF_CHECK | (Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0);
+
+            if (!reuseOutputVector)
+                OutputVector = Span<uint>.Empty;
+
             _regex!.Match(
                 ref this,
                 Subject,
                 settings,
-                GetStartOfNextMatchIndex(),
-                options.ToPatternOptions() | PcreConstants.NO_UTF_CHECK | (Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0),
+                startOfNextMatchIndex,
+                nextOptions,
                 callout,
                 calloutOutputVector
             );
@@ -195,19 +202,6 @@ namespace PCRE
             // It's possible to have EndIndex < Index
             // when the pattern contains \K in a lookahead
             return Math.Max(Index, EndIndex);
-        }
-
-        /// <summary>
-        /// Creates a copy that won't get modified.
-        /// </summary>
-        public readonly PcreRefMatch Copy()
-        {
-            var copy = this;
-
-            if (OutputVector.Length != 0)
-                copy.OutputVector = OutputVector.ToArray();
-
-            return copy;
         }
 
         public override readonly string ToString()

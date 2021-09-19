@@ -153,7 +153,7 @@ namespace PCRE
                 }
                 else
                 {
-                    _match.NextMatch(_buffer._settings, _options, _callout, _buffer.CalloutOutputVector);
+                    _match.NextMatch(_buffer._settings, _options, _callout, _buffer.CalloutOutputVector, true);
                 }
 
                 if (_match.Success)

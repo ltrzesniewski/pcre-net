@@ -107,26 +107,6 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
-        public void should_reuse_ref_match_output_vector()
-        {
-            var re = new PcreRegex(".");
-            var enumerator = re.Matches("ab".AsSpan()).GetEnumerator();
-
-            Assert.That(enumerator.MoveNext(), Is.True);
-
-            var match = enumerator.Current;
-            var copy = match;
-
-            Assert.That(match.Value.ToString(), Is.EqualTo("a"));
-            Assert.That(copy.Value.ToString(), Is.EqualTo("a"));
-
-            Assert.That(enumerator.MoveNext(), Is.True);
-
-            Assert.That(match.Value.ToString(), Is.EqualTo("b"));
-            Assert.That(copy.Value.ToString(), Is.EqualTo("b"));
-        }
-
-        [Test]
         public void should_copy_ref_match()
         {
             var re = new PcreRegex(".");
@@ -134,15 +114,14 @@ namespace PCRE.Tests.PcreNet
 
             Assert.That(enumerator.MoveNext(), Is.True);
 
-            var match = enumerator.Current;
-            var copy = match.Copy();
+            var copy = enumerator.Current;
 
-            Assert.That(match.Value.ToString(), Is.EqualTo("a"));
+            Assert.That(enumerator.Current.Value.ToString(), Is.EqualTo("a"));
             Assert.That(copy.Value.ToString(), Is.EqualTo("a"));
 
             Assert.That(enumerator.MoveNext(), Is.True);
 
-            Assert.That(match.Value.ToString(), Is.EqualTo("b"));
+            Assert.That(enumerator.Current.Value.ToString(), Is.EqualTo("b"));
             Assert.That(copy.Value.ToString(), Is.EqualTo("a"));
         }
 
