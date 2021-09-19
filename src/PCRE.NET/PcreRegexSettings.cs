@@ -129,7 +129,7 @@ namespace PCRE
         private void EnsureIsMutable()
         {
             if (ReadOnlySettings)
-                throw new InvalidOperationException("Settings of a compiled pattern cannot be changed");
+                throw new InvalidOperationException("Settings of a compiled pattern cannot be changed.");
         }
 
         internal void FillCompileInput(ref Native.compile_input input)

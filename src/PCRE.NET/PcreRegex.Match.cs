@@ -27,7 +27,7 @@ namespace PCRE
         public bool IsMatch(ReadOnlySpan<char> subject, int startIndex)
         {
             if (startIndex < 0 || startIndex > subject.Length)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), "Invalid StartIndex value");
+                throw new ArgumentOutOfRangeException(nameof(startIndex), "Invalid start index.");
 
             var outputVector = InternalRegex.CanStackAllocOutputVector
                 ? stackalloc uint[InternalRegex.OutputVectorSize]
@@ -104,7 +104,7 @@ namespace PCRE
                 throw new ArgumentNullException(nameof(settings));
 
             if (startIndex < 0 || startIndex > subject.Length)
-                throw new ArgumentOutOfRangeException("Invalid StartIndex value", default(Exception));
+                throw new ArgumentOutOfRangeException("Invalid start index.", default(Exception));
 
             return InternalRegex.Match(subject, settings, startIndex, options.ToPatternOptions(), onCallout);
         }
@@ -115,7 +115,7 @@ namespace PCRE
                 throw new ArgumentNullException(nameof(settings));
 
             if (startIndex < 0 || startIndex > subject.Length)
-                throw new ArgumentOutOfRangeException("Invalid StartIndex value", default(Exception));
+                throw new ArgumentOutOfRangeException("Invalid start index.", default(Exception));
 
             var match = InternalRegex.CreateRefMatch();
             match.FirstMatch(subject, settings, startIndex, options, onCallout, null);
@@ -157,7 +157,7 @@ namespace PCRE
                 throw new ArgumentNullException(nameof(settings));
 
             if (startIndex < 0 || startIndex > subject.Length)
-                throw new ArgumentOutOfRangeException("Invalid StartIndex value", default(Exception));
+                throw new ArgumentOutOfRangeException("Invalid start index.", default(Exception));
 
             return MatchesIterator(subject, startIndex, options, onCallout, settings);
         }
@@ -169,7 +169,7 @@ namespace PCRE
                 throw new ArgumentNullException(nameof(settings));
 
             if (startIndex < 0 || startIndex > subject.Length)
-                throw new ArgumentOutOfRangeException("Invalid StartIndex value", default(Exception));
+                throw new ArgumentOutOfRangeException("Invalid start index.", default(Exception));
 
             return new RefMatchEnumerable(InternalRegex, subject, startIndex, options, onCallout, settings);
         }

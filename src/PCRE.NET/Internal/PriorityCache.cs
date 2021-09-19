@@ -28,7 +28,7 @@ namespace PCRE.Internal
             set
             {
                 if (value < 0)
-                    throw new ArgumentException("Invalid cache size");
+                    throw new ArgumentException("Invalid cache size.");
 
                 lock (_cache)
                 {

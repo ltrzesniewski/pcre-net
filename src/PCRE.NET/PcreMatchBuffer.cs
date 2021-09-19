@@ -59,7 +59,7 @@ namespace PCRE
         public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFunc? onCallout)
         {
             if (startIndex < 0 || startIndex > subject.Length)
-                throw new ArgumentOutOfRangeException("Invalid StartIndex value", default(Exception));
+                throw new ArgumentOutOfRangeException("Invalid start index.", default(Exception));
 
             var match = _regex.CreateRefMatch(OutputVector);
             match.FirstMatch(subject, _settings, startIndex, options, onCallout, CalloutOutputVector);
@@ -83,7 +83,7 @@ namespace PCRE
         public RefMatchEnumerable Matches(ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFunc? onCallout)
         {
             if (startIndex < 0 || startIndex > subject.Length)
-                throw new ArgumentOutOfRangeException("Invalid StartIndex value", default(Exception));
+                throw new ArgumentOutOfRangeException("Invalid start index.", default(Exception));
 
             return new RefMatchEnumerable(this, subject, startIndex, options, onCallout);
         }

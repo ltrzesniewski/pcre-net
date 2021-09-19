@@ -45,7 +45,7 @@ namespace PCRE.Internal
                 if (_code == IntPtr.Zero || result.error_code != 0)
                 {
                     Dispose();
-                    throw new ArgumentException($"Invalid pattern '{pattern}': {Native.GetErrorMessage(result.error_code)} at offset {result.error_offset}");
+                    throw new ArgumentException($"Invalid pattern '{pattern}': {Native.GetErrorMessage(result.error_code)} at offset {result.error_offset}.");
                 }
             }
 
@@ -168,7 +168,7 @@ namespace PCRE.Internal
         {
 #if DEBUG
             if (oVector.Length != OutputVectorSize)
-                throw new InvalidOperationException("Unexpected output vector size");
+                throw new InvalidOperationException("Unexpected output vector size.");
 #endif
 
             return new PcreRefMatch(this, oVector);
@@ -314,6 +314,6 @@ namespace PCRE.Internal
         }
 
         public PcreCalloutInfo GetCalloutInfoByPatternPosition(int patternPosition)
-            => TryGetCalloutInfoByPatternPosition(patternPosition) ?? throw new InvalidOperationException($"Could not retrieve callout info at position {patternPosition}");
+            => TryGetCalloutInfoByPatternPosition(patternPosition) ?? throw new InvalidOperationException($"Could not retrieve callout info at position {patternPosition}.");
     }
 }
