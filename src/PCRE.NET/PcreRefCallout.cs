@@ -32,8 +32,9 @@ namespace PCRE
             {
                 if (!_oVectorInitialized)
                 {
-                    if (OutputVector.Length == 0)
-                        OutputVector = new uint[_callout->capture_top * 2];
+                    OutputVector = OutputVector.Length == 0
+                        ? new uint[_callout->capture_top * 2]
+                        : OutputVector.Slice(0, (int)_callout->capture_top * 2);
 
                     OutputVector[0] = (uint)_callout->start_match;
                     OutputVector[1] = (uint)_callout->current_position;
