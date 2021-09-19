@@ -37,16 +37,19 @@ The following regex operations are supported:
   - `regexInstance.Dfa.Match`
 - Partial matching (when the subject is too short to match the pattern)
 
+The following API types are available:
+
+- A `string` API similar to .NET's `System.Text.RegularExpressions`
+- A `ReadOnlySpan<char>` API, based on `ref struct` types
+- A zero-allocation API (`regex.CreateMatchBuffer()`) that also works on `ReadOnlySpan<char>`
+
 Library highlights:
 
-- Works on the .NET Framework and on .NET Core (.NET Standard 2.0 target)
 - Support for compiled patterns (x86/x64 JIT)
-- Lazy evaluation whenever possible (for instance `PcreRegex.Matches` returns `IEnumerable<PcreMatch>`)
-- The API is similar to .NET's `System.Text.RegularExpressions`
+- Support for partial matching
 - Callout support (numbered and string-based)
 - Mark retrieval support
 - Conversion from POSIX BRE, POSIX ERE and glob patterns (`PcreConvert` class)
-- Additional API for `ReadOnlySpan<char>` matching, based on `ref struct` types
 
 ## Example usage ##
 
