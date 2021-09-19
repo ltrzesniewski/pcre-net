@@ -1042,6 +1042,24 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_get_info_for_auto_callouts()
+        {
+            var re = new PcreRegex(@"a.c", PcreOptions.AutoCallout);
+
+            var count = 0;
+
+            var match = re.Match("abc", data =>
+            {
+                ++count;
+                Assert.That(data.Info, Is.Not.Null);
+                return PcreCalloutResult.Pass;
+            });
+
+            Assert.That(match.Success, Is.True);
+            Assert.That(count, Is.EqualTo(4));
+        }
+
+        [Test]
         public void should_provide_callout_flags()
         {
             var re = new PcreRegex(@"a(?C1)(?:(?C2)(*FAIL)|b)(?C3)");
