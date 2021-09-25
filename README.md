@@ -12,7 +12,7 @@ PCRE.NET
 
 PCRE.NET is a .NET wrapper for the [PCRE library](http://www.pcre.org/). The goal of this project is to bring most of PCRE's features for use from .NET applications with as little overhead as possible.
 
-The current version is **0.17.0-pre1**, based on PCRE **10.38-RC1**. It supports the following systems:
+The current version is **0.17.0-pre2**, based on PCRE **10.38-RC1**. It supports the following systems:
 
  - Windows x64
  - Windows x86
