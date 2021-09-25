@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using PCRE.Internal;
 
@@ -6,6 +7,7 @@ namespace PCRE.NET.Benchmarks
 {
     internal static class AllocationTest
     {
+        [SuppressMessage("ReSharper", "UseIndexFromEndExpression")]
         public static bool TestAllocations()
         {
             var regexBuilder = new StringBuilder();
@@ -21,15 +23,37 @@ namespace PCRE.NET.Benchmarks
 
             var re = new PcreRegex(regexBuilder.ToString(), PcreOptions.Compiled);
             var buffer = re.CreateMatchBuffer();
-            var subject = subjectBuilder.ToString().AsSpan();
+            var subject = subjectBuilder.ToString();
+            var matchCount = 0;
+
+            for (var i = 0; i < 10; ++i)
+                Iteration();
 
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true);
             var gcCountBefore = GC.CollectionCount(0);
-            var matchCount = 0;
+            var bytesBefore = GetAllocatedBytes();
 
-            for (var i = 0; i < 10000; ++i)
+            for (var i = 0; i < 25000; ++i)
+                Iteration();
+
+            var bytesAfter = GetAllocatedBytes();
+            var gcCountAfter = GC.CollectionCount(0);
+
+            var allocatedBytes = bytesAfter - bytesBefore;
+            var gcCount = gcCountAfter - gcCountBefore;
+
+#if NETCOREAPP
+            Console.WriteLine($"Allocated bytes: {allocatedBytes}");
+#endif
+
+            Console.WriteLine($"GC count: {gcCount}");
+            Console.WriteLine($"Match count: {matchCount}");
+
+            return allocatedBytes == 0 && gcCount == 0;
+
+            void Iteration()
             {
-                var matches = buffer.Matches(subject, 0, PcreMatchOptions.None, static data =>
+                var matches = buffer.Matches(subject.AsSpan(), 0, PcreMatchOptions.None, static data =>
                 {
                     _ = data.Match.Groups["char"].Value;
                     _ = data.Match.Groups[data.Match.Groups.Count - 1].Value;
@@ -46,14 +70,13 @@ namespace PCRE.NET.Benchmarks
                     ++matchCount;
                 }
             }
-
-            var gcCountAfter = GC.CollectionCount(0);
-            var gcCount = gcCountAfter - gcCountBefore;
-
-            Console.WriteLine($"GC count: {gcCount}");
-            Console.WriteLine($"Match count: {matchCount}");
-
-            return gcCount == 0;
         }
+
+        private static long GetAllocatedBytes()
+#if NETCOREAPP
+            => GC.GetAllocatedBytesForCurrentThread();
+#else
+            => 0;
+#endif
     }
 }
