@@ -40,9 +40,12 @@ namespace PCRE
         internal IntPtr GetStack()
         {
             if (_stack == IntPtr.Zero)
-                throw new ObjectDisposedException("The JIT stack has been disposed.");
+                ThrowDisposed();
 
             return _stack;
         }
+
+        private static void ThrowDisposed()
+            => throw new ObjectDisposedException("The JIT stack has been disposed.");
     }
 }

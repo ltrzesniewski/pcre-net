@@ -61,8 +61,8 @@ namespace PCRE
 
         public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFunc? onCallout)
         {
-            if (startIndex < 0 || startIndex > subject.Length)
-                throw new ArgumentOutOfRangeException("Invalid start index.", default(Exception));
+            if (unchecked((uint)startIndex) > subject.Length)
+                ThrowInvalidStartIndex();
 
             if (Interlocked.CompareExchange(ref _matchInProgress, 1, 0) != 0)
                 ThrowMatchInProgress();
@@ -95,14 +95,17 @@ namespace PCRE
         [Pure]
         public RefMatchEnumerable Matches(ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFunc? onCallout)
         {
-            if (startIndex < 0 || startIndex > subject.Length)
-                throw new ArgumentOutOfRangeException("Invalid start index.", default(Exception));
+            if (unchecked((uint)startIndex) > subject.Length)
+                ThrowInvalidStartIndex();
 
             return new RefMatchEnumerable(this, subject, startIndex, options, onCallout);
         }
 
         public override string ToString()
             => _regex.Pattern;
+
+        private static void ThrowInvalidStartIndex()
+            => throw new ArgumentOutOfRangeException("Invalid start index.", default(Exception));
 
         private static void ThrowMatchInProgress()
             => throw new InvalidOperationException("A match operation is already in progress on this buffer.");
