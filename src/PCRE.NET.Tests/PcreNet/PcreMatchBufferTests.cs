@@ -51,11 +51,13 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match.Success, Is.True);
         }
 
+#if NETCOREAPP
+
         [Test]
-        [Explicit]
-        [NonParallelizable]
         public void should_not_allocate()
         {
+            // This is a simplified version of AllocationTest
+
             var regexBuilder = new StringBuilder();
             var subjectBuilder = new StringBuilder();
 
@@ -69,17 +71,26 @@ namespace PCRE.Tests.PcreNet
 
             var re = new PcreRegex(regexBuilder.ToString(), PcreOptions.Compiled);
             var buffer = re.CreateMatchBuffer();
-            var subject = subjectBuilder.ToString().AsSpan();
+            var subject = subjectBuilder.ToString();
 
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true);
-            var gcCountBefore = GC.CollectionCount(0);
+            for (var i = 0; i < 10; ++i)
+                Iteration();
+
+            var bytesBefore = GC.GetAllocatedBytesForCurrentThread();
 
             for (var i = 0; i < 10000; ++i)
+                Iteration();
+
+            var bytesAfter = GC.GetAllocatedBytesForCurrentThread();
+
+            Assert.That(bytesAfter - bytesBefore, Is.Zero);
+
+            void Iteration()
             {
                 var matches = buffer.Matches(subject, 0, PcreMatchOptions.None, static data =>
                 {
                     _ = data.Match.Groups["char"].Value;
-                    _ = data.Match.Groups[data.Match.Groups.Count - 1].Value;
+                    _ = data.Match.Groups[^1].Value;
                     _ = data.String;
 
                     return PcreCalloutResult.Pass;
@@ -89,13 +100,11 @@ namespace PCRE.Tests.PcreNet
                 {
                     _ = match.Value;
                     _ = match.Groups["char"].Value;
-                    _ = match.Groups[match.Groups.Count - 1].Value;
+                    _ = match.Groups[^1].Value;
                 }
             }
-
-            var gcCountAfter = GC.CollectionCount(0);
-
-            Assert.That(gcCountAfter - gcCountBefore, Is.Zero);
         }
+
+#endif
     }
 }
