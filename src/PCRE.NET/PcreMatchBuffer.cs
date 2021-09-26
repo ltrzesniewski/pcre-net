@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
+using System.Threading;
 using PCRE.Internal;
 
 namespace PCRE
@@ -11,6 +12,8 @@ namespace PCRE
 
         internal readonly uint[] OutputVector;
         internal readonly uint[] CalloutOutputVector;
+
+        private int _matchInProgress;
 
         internal PcreMatchBuffer(InternalRegex regex, PcreMatchSettings settings)
         {
@@ -61,10 +64,20 @@ namespace PCRE
             if (startIndex < 0 || startIndex > subject.Length)
                 throw new ArgumentOutOfRangeException("Invalid start index.", default(Exception));
 
-            var match = _regex.CreateRefMatch(OutputVector);
-            match.FirstMatch(subject, _settings, startIndex, options, onCallout, CalloutOutputVector);
+            if (Interlocked.CompareExchange(ref _matchInProgress, 1, 0) != 0)
+                ThrowMatchInProgress();
 
-            return match;
+            try
+            {
+                var match = _regex.CreateRefMatch(OutputVector);
+                match.FirstMatch(subject, _settings, startIndex, options, onCallout, CalloutOutputVector);
+
+                return match;
+            }
+            finally
+            {
+                Volatile.Write(ref _matchInProgress, 0);
+            }
         }
 
         [Pure]
@@ -90,6 +103,9 @@ namespace PCRE
 
         public override string ToString()
             => _regex.Pattern;
+
+        private static void ThrowMatchInProgress()
+            => throw new InvalidOperationException("A match operation is already in progress on this buffer.");
 
         public readonly ref struct RefMatchEnumerable
         {
@@ -146,14 +162,24 @@ namespace PCRE
                 if (_buffer == null)
                     return false;
 
-                if (!_match.IsInitialized)
+                if (Interlocked.CompareExchange(ref _buffer._matchInProgress, 1, 0) != 0)
+                    ThrowMatchInProgress();
+
+                try
                 {
-                    _match = _buffer._regex.CreateRefMatch(_buffer.OutputVector);
-                    _match.FirstMatch(_subject, _buffer._settings, _startIndex, _options, _callout, _buffer.CalloutOutputVector);
+                    if (!_match.IsInitialized)
+                    {
+                        _match = _buffer._regex.CreateRefMatch(_buffer.OutputVector);
+                        _match.FirstMatch(_subject, _buffer._settings, _startIndex, _options, _callout, _buffer.CalloutOutputVector);
+                    }
+                    else
+                    {
+                        _match.NextMatch(_buffer._settings, _options, _callout, _buffer.CalloutOutputVector, true);
+                    }
                 }
-                else
+                finally
                 {
-                    _match.NextMatch(_buffer._settings, _options, _callout, _buffer.CalloutOutputVector, true);
+                    Volatile.Write(ref _buffer._matchInProgress, 0);
                 }
 
                 if (_match.Success)
