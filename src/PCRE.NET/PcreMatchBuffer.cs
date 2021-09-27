@@ -61,7 +61,7 @@ namespace PCRE
 
         public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFunc? onCallout)
         {
-            if (unchecked((uint)startIndex) > subject.Length)
+            if (unchecked((uint)startIndex > (uint)subject.Length))
                 ThrowInvalidStartIndex();
 
             if (Interlocked.CompareExchange(ref _matchInProgress, 1, 0) != 0)
@@ -95,7 +95,7 @@ namespace PCRE
         [Pure]
         public RefMatchEnumerable Matches(ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFunc? onCallout)
         {
-            if (unchecked((uint)startIndex) > subject.Length)
+            if (unchecked((uint)startIndex > (uint)subject.Length))
                 ThrowInvalidStartIndex();
 
             return new RefMatchEnumerable(this, subject, startIndex, options, onCallout);

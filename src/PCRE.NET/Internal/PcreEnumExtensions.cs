@@ -1,10 +1,14 @@
-﻿namespace PCRE.Internal
+﻿using System.Runtime.CompilerServices;
+
+namespace PCRE.Internal
 {
     internal static class PcreEnumExtensions
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static uint ToPatternOptions(this PcreOptions options)
             => (uint)((long)options & 0xFFFFFFFF) | PcreConstants.UTF;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static uint ToPatternOptions(this PcreMatchOptions options)
             => (uint)((long)options & 0xFFFFFFFF);
 

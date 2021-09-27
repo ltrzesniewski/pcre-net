@@ -26,7 +26,7 @@ namespace PCRE
         [Pure]
         public bool IsMatch(ReadOnlySpan<char> subject, int startIndex)
         {
-            if (unchecked((uint)startIndex) > subject.Length)
+            if (unchecked((uint)startIndex > (uint)subject.Length))
                 ThrowInvalidStartIndex();
 
             var outputVector = InternalRegex.CanStackAllocOutputVector
@@ -103,7 +103,7 @@ namespace PCRE
             if (settings == null)
                 throw new ArgumentNullException(nameof(settings));
 
-            if (unchecked((uint)startIndex) > subject.Length)
+            if (unchecked((uint)startIndex > (uint)subject.Length))
                 ThrowInvalidStartIndex();
 
             return InternalRegex.Match(subject, settings, startIndex, options.ToPatternOptions(), onCallout);
@@ -114,7 +114,7 @@ namespace PCRE
             if (settings == null)
                 throw new ArgumentNullException(nameof(settings));
 
-            if (unchecked((uint)startIndex) > subject.Length)
+            if (unchecked((uint)startIndex > (uint)subject.Length))
                 ThrowInvalidStartIndex();
 
             var match = InternalRegex.CreateRefMatch();
@@ -156,7 +156,7 @@ namespace PCRE
             if (settings == null)
                 throw new ArgumentNullException(nameof(settings));
 
-            if (unchecked((uint)startIndex) > subject.Length)
+            if (unchecked((uint)startIndex > (uint)subject.Length))
                 ThrowInvalidStartIndex();
 
             return MatchesIterator(subject, startIndex, options, onCallout, settings);
@@ -168,7 +168,7 @@ namespace PCRE
             if (settings == null)
                 throw new ArgumentNullException(nameof(settings));
 
-            if (unchecked((uint)startIndex) > subject.Length)
+            if (unchecked((uint)startIndex > (uint)subject.Length))
                 ThrowInvalidStartIndex();
 
             return new RefMatchEnumerable(InternalRegex, subject, startIndex, options, onCallout, settings);
