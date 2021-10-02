@@ -9,6 +9,9 @@ namespace PCRE
     [SuppressMessage("Microsoft.Design", "CA1069")]
     public enum PcreOptions : long
     {
+        /// <summary>
+        /// No additional options.
+        /// </summary>
         None = 0,
 
         // --- Synonyms for compatibility with the .NET Regex class ---
@@ -264,6 +267,7 @@ namespace PCRE
         /// If this bit is set, the pattern is forced to be "anchored", that is, it is constrained to match only at the first matching point in the string that is being searched (the "subject string").
         /// This effect can also be achieved by appropriate constructs in the pattern itself, which is the only way to do it in Perl.
         /// </remarks>
+        /// <seealso cref="PcreMatchOptions.Anchored"/>
         Anchored = PcreConstants.ANCHORED,
 
         /// <summary>
@@ -292,6 +296,7 @@ namespace PCRE
         /// Other parallel matches, which are necessarily substrings of the first one, must obviously end before the end of the subject.
         /// </para>
         /// </remarks>
+        /// <seealso cref="PcreMatchOptions.EndAnchored"/>
         EndAnchored = PcreConstants.ENDANCHORED,
 
         /// <summary>
@@ -302,58 +307,6 @@ namespace PCRE
         /// It is not compatible with Perl. It can also be set by a <c>(?U)</c> option setting within the pattern.
         /// </remarks>
         Ungreedy = PcreConstants.UNGREEDY,
-
-        /// <summary>
-        /// <c>PCRE2_NOTBOL</c> - Don't treat the first character of the subject string as a beginning of line.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// This option specifies that first character of the subject string is not the beginning of a line, so the circumflex metacharacter should not match before it.
-        /// </para>
-        /// <para>
-        /// Setting this without having set <c>PCRE2_MULTILINE</c> at compile time causes circumflex never to match.
-        /// This option affects only the behaviour of the circumflex metacharacter. It does not affect <c>\A</c>.
-        /// </para>
-        /// </remarks>
-        NotBol = PcreConstants.NOTBOL,
-
-        /// <summary>
-        /// <c>PCRE2_NOTEOL</c> - Don't treat the last character of the subject string as an end of line.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// This option specifies that the end of the subject string is not the end of a line, so the dollar metacharacter should not match it nor (except in multiline mode) a newline immediately before it.
-        /// </para>
-        /// <para>
-        /// Setting this without having set <c>PCRE2_MULTILINE</c> at compile time causes dollar never to match.
-        /// This option affects only the behaviour of the dollar metacharacter. It does not affect <c>\Z</c> or <c>\z</c>.
-        /// </para>
-        /// </remarks>
-        NotEol = PcreConstants.NOTEOL,
-
-        /// <summary>
-        /// <c>PCRE2_NOTEMPTY</c> - Don't consider the empty string as a valid match.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// An empty string is not considered to be a valid match if this option is set. If there are alternatives in the pattern, they are tried.
-        /// If all the alternatives match the empty string, the entire match fails.
-        /// </para>
-        /// <para>
-        /// For example, if the pattern <c>a?b?</c> is applied to a string not beginning with "a" or "b", it matches an empty string at the start of the subject.
-        /// With <c>PCRE2_NOTEMPTY</c> set, this match is not valid, so <c>pcre2_match()</c> searches further into the string for occurrences of "a" or "b".
-        /// </para>
-        /// </remarks>
-        NotEmpty = PcreConstants.NOTEMPTY,
-
-        /// <summary>
-        /// <c>PCRE2_NOTEMPTY_ATSTART</c> - Don't consider the empty string at the starting position as a valid match.
-        /// </summary>
-        /// <remarks>
-        /// This is like <c>PCRE2_NOTEMPTY</c>, except that it locks out an empty string match only at the first matching position, that is, at the start of the subject plus the starting offset.
-        /// An empty string match later in the subject is permitted. If the pattern is anchored, such a match can occur only if the pattern contains <c>\K</c>.
-        /// </remarks>
-        NotEmptyAtStart = PcreConstants.NOTEMPTY_ATSTART,
 
         /// <summary>
         /// <c>PCRE2_FIRSTLINE</c> - Match only until the first newline after the starting position.

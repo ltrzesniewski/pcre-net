@@ -6,6 +6,9 @@ namespace PCRE
     [Flags]
     public enum PcreMatchOptions : long
     {
+        /// <summary>
+        /// No additional options.
+        /// </summary>
         None = 0,
 
         /// <summary>
@@ -23,20 +26,71 @@ namespace PCRE
         /// <seealso cref="PcreOptions.Anchored"/>
         Anchored = PcreConstants.ANCHORED,
 
-        /// <inheritdoc cref="PcreOptions.NotBol"/>
+        /// <summary>
+        /// <c>PCRE2_ENDANCHORED</c> - Make the end of the pattern anchored, so it needs to match until the end of the subject string.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// If the <c>PCRE2_ENDANCHORED</c> option is set, any string that <c>pcre2_match()</c> matches must be right at the end of the subject string.
+        /// </para>
+        /// <para>
+        /// Note that setting the option at match time disables JIT matching.
+        /// </para>
+        /// </remarks>
+        /// <seealso cref="PcreOptions.EndAnchored"/>
+        EndAnchored = PcreConstants.ENDANCHORED,
+
+        /// <summary>
+        /// <c>PCRE2_NOTBOL</c> - Don't treat the first character of the subject string as a beginning of line.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// This option specifies that first character of the subject string is not the beginning of a line, so the circumflex metacharacter should not match before it.
+        /// </para>
+        /// <para>
+        /// Setting this without having set <c>PCRE2_MULTILINE</c> at compile time causes circumflex never to match.
+        /// This option affects only the behaviour of the circumflex metacharacter. It does not affect <c>\A</c>.
+        /// </para>
+        /// </remarks>
         NotBol = PcreConstants.NOTBOL,
 
-        /// <inheritdoc cref="PcreOptions.NotEol"/>
+        /// <summary>
+        /// <c>PCRE2_NOTEOL</c> - Don't treat the last character of the subject string as an end of line.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// This option specifies that the end of the subject string is not the end of a line, so the dollar metacharacter should not match it nor (except in multiline mode) a newline immediately before it.
+        /// </para>
+        /// <para>
+        /// Setting this without having set <c>PCRE2_MULTILINE</c> at compile time causes dollar never to match.
+        /// This option affects only the behaviour of the dollar metacharacter. It does not affect <c>\Z</c> or <c>\z</c>.
+        /// </para>
+        /// </remarks>
         NotEol = PcreConstants.NOTEOL,
 
-        /// <inheritdoc cref="PcreOptions.NotEmpty"/>
+        /// <summary>
+        /// <c>PCRE2_NOTEMPTY</c> - Don't consider the empty string as a valid match.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// An empty string is not considered to be a valid match if this option is set. If there are alternatives in the pattern, they are tried.
+        /// If all the alternatives match the empty string, the entire match fails.
+        /// </para>
+        /// <para>
+        /// For example, if the pattern <c>a?b?</c> is applied to a string not beginning with "a" or "b", it matches an empty string at the start of the subject.
+        /// With <c>PCRE2_NOTEMPTY</c> set, this match is not valid, so <c>pcre2_match()</c> searches further into the string for occurrences of "a" or "b".
+        /// </para>
+        /// </remarks>
         NotEmpty = PcreConstants.NOTEMPTY,
 
-        /// <inheritdoc cref="PcreOptions.NotEmptyAtStart"/>
+        /// <summary>
+        /// <c>PCRE2_NOTEMPTY_ATSTART</c> - Don't consider the empty string at the starting position as a valid match.
+        /// </summary>
+        /// <remarks>
+        /// This is like <c>PCRE2_NOTEMPTY</c>, except that it locks out an empty string match only at the first matching position, that is, at the start of the subject plus the starting offset.
+        /// An empty string match later in the subject is permitted. If the pattern is anchored, such a match can occur only if the pattern contains <c>\K</c>.
+        /// </remarks>
         NotEmptyAtStart = PcreConstants.NOTEMPTY_ATSTART,
-
-        /// <inheritdoc cref="PcreOptions.NoStartOptimize"/>
-        NoStartOptimize = PcreConstants.NO_START_OPTIMIZE,
 
         /// <summary>
         /// <c>PCRE2_PARTIAL_SOFT</c> - Enable partial matching mode. Still try to find a complete match if a partial match is found first.

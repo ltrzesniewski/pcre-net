@@ -8,6 +8,9 @@ namespace PCRE
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum PcreExtraCompileOptions : uint
     {
+        /// <summary>
+        /// No additional options.
+        /// </summary>
         None = 0,
 
         /// <summary>
