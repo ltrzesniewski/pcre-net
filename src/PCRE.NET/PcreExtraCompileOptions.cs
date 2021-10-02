@@ -4,6 +4,9 @@ using PCRE.Internal;
 
 namespace PCRE
 {
+    /// <summary>
+    /// Extra pattern compile options.
+    /// </summary>
     [Flags]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum PcreExtraCompileOptions : uint

@@ -4,6 +4,9 @@ using PCRE.Internal;
 
 namespace PCRE
 {
+    /// <summary>
+    /// Pattern compile options.
+    /// </summary>
     [Flags]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     [SuppressMessage("Microsoft.Design", "CA1069")]

@@ -3,6 +3,9 @@ using PCRE.Internal;
 
 namespace PCRE
 {
+    /// <summary>
+    /// Options for NFA matching.
+    /// </summary>
     [Flags]
     public enum PcreMatchOptions : long
     {
@@ -116,7 +119,7 @@ namespace PCRE
         PartialSoft = PcreConstants.PARTIAL_SOFT,
 
         /// <summary>
-        /// <c>PCRE2_PARTIAL_SOFT</c> - Enable partial matching mode. Stop looking for a complete match if a partial match is found first.
+        /// <c>PCRE2_PARTIAL_HARD</c> - Enable partial matching mode. Stop looking for a complete match if a partial match is found first.
         /// </summary>
         /// <remarks>
         /// <para>
