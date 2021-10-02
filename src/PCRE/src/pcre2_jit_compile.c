@@ -5808,7 +5808,7 @@ static BOOL check_fast_forward_char_pair_simd(compiler_common *common, fast_forw
       while (j < i)
         {
         b_pri = chars[j].last_count;
-        if (b_pri > 2 && (sljit_u32)a_pri + b_pri >= max_pri)
+        if (b_pri > 2 && a_pri + b_pri >= max_pri)
           {
           b1 = chars[j].chars[0];
           b2 = chars[j].chars[1];
@@ -11228,7 +11228,7 @@ early_fail_type = (early_fail_ptr & 0x7);
 early_fail_ptr >>= 3;
 
 /* During recursion, these optimizations are disabled. */
-if (common->early_fail_start_ptr == 0)
+if (common->early_fail_start_ptr == 0 && common->fast_forward_bc_ptr == NULL)
   {
   early_fail_ptr = 0;
   early_fail_type = type_skip;
