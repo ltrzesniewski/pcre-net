@@ -8,6 +8,7 @@ namespace PCRE
     /// Pattern compile options.
     /// </summary>
     [Flags]
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     [SuppressMessage("Microsoft.Design", "CA1069")]
     public enum PcreOptions : long
@@ -67,9 +68,9 @@ namespace PCRE
         /// It is equivalent to Perl's <c>/i</c> option, and it can be changed within a pattern by a <c>(?i)</c> option setting.
         /// </para>
         /// <para>
-        /// If either <c>PCRE2_UTF</c> or <c>PCRE2_UCP</c> is set, Unicode properties are used for all characters with more than one other case,and for all characters whose code points are greater than U+007F.
+        /// If either <see cref="Utf"/> or <see cref="Ucp"/> is set, Unicode properties are used for all characters with more than one other case,and for all characters whose code points are greater than U+007F.
         /// Note that there are two ASCII characters, K and S, that, in addition to their lower case ASCII equivalents, are case-equivalent with U+212A (Kelvin sign) and U+017F (long S) respectively.
-        /// For lower valued characters with only one other case, a lookup table is used for speed. When neither <c>PCRE2_UTF</c> nor <c>PCRE2_UCP</c> is set,
+        /// For lower valued characters with only one other case, a lookup table is used for speed. When neither <see cref="Utf"/> nor <see cref="Ucp"/> is set,
         /// a lookup table is used for all code points less than 256, and higher code points (available only in 16-bit or 32-bit mode) are treated as not having another case.
         /// </para>
         /// </remarks>
@@ -82,12 +83,12 @@ namespace PCRE
         /// <para>
         /// By default, for the purposes of matching "start of line" and "end of line", PCRE2 treats the subject string as consisting of a single line of characters, even if it actually contains newlines.
         /// The "start of line" metacharacter (<c>^</c>) matches only at the start of the string, and the "end of line" metacharacter (<c>$</c>) matches only at the end of the string,
-        /// or before a terminating newline (except when <c>PCRE2_DOLLAR_ENDONLY</c> is set).
-        /// Note, however, that unless <c>PCRE2_DOTALL</c> is set, the "any character" metacharacter (<c>.</c>) does not match at a newline.
+        /// or before a terminating newline (except when <see cref="DollarEndOnly"/> is set).
+        /// Note, however, that unless <see cref="DotAll"/> is set, the "any character" metacharacter (<c>.</c>) does not match at a newline.
         /// This behaviour (for <c>^</c>, <c>$</c>, and dot) is the same as Perl.
         /// </para>
         /// <para>
-        /// When <c>PCRE2_MULTILINE</c> it is set, the "start of line" and "end of line" constructs match immediately following or immediately before internal newlines in the subject string,
+        /// When <see cref="MultiLine"/> it is set, the "start of line" and "end of line" constructs match immediately following or immediately before internal newlines in the subject string,
         /// respectively, as well as at the very start and end.
         /// </para>
         /// <para>
@@ -95,8 +96,8 @@ namespace PCRE
         /// </para>
         /// <para>
         /// Note that the "start of line" metacharacter does not match after a newline at the end of the subject, for compatibility with Perl.
-        /// However, you can change this by setting the <c>PCRE2_ALT_CIRCUMFLEX</c> option.
-        /// If there are no newlines in a subject string, or no occurrences of <c>^</c> or <c>$</c> in a pattern, setting <c>PCRE2_MULTILINE</c> has no effect.
+        /// However, you can change this by setting the <see cref="AltCircumflex"/> option.
+        /// If there are no newlines in a subject string, or no occurrences of <c>^</c> or <c>$</c> in a pattern, setting <see cref="MultiLine"/> has no effect.
         /// </para>
         /// </remarks>
         MultiLine = PcreConstants.MULTILINE,
@@ -113,7 +114,7 @@ namespace PCRE
         /// This option is equivalent to Perl's <c>/s</c> option, and it can be changed within a pattern by a <c>(?s)</c> option setting.
         /// </para>
         /// <para>
-        /// A negative class such as <c>[^a]</c> always matches newline characters, and the <c>\N</c> escape sequence always matches a non-newline character, independent of the setting of <c>PCRE2_DOTALL</c>.
+        /// A negative class such as <c>[^a]</c> always matches newline characters, and the <c>\N</c> escape sequence always matches a non-newline character, independent of the setting of <see cref="DotAll"/>.
         /// </para>
         /// </remarks>
         DotAll = PcreConstants.DOTALL,
@@ -145,21 +146,21 @@ namespace PCRE
         /// Ignorable white space is permitted between an item and a following quantifier and between a quantifier and a following <c>+</c> that indicates possessiveness.
         /// </para>
         /// <para>
-        /// <c>PCRE2_EXTENDED</c> is equivalent to Perl's <c>/x</c> option, and it can be changed within a pattern by a <c>(?x)</c> option setting.
+        /// <see cref="Extended"/> is equivalent to Perl's <c>/x</c> option, and it can be changed within a pattern by a <c>(?x)</c> option setting.
         /// </para>
         /// <para>
-        /// When PCRE2 is compiled without Unicode support, <c>PCRE2_EXTENDED</c> recognizes as white space only those characters with code points less than 256 that are flagged as white space
+        /// When PCRE2 is compiled without Unicode support, <see cref="Extended"/> recognizes as white space only those characters with code points less than 256 that are flagged as white space
         /// in its low-character table. The table is normally created by <c>pcre2_maketables()</c>, which uses the <c>isspace()</c> function to identify space characters.
         /// In most ASCII environments, the relevant characters are those with code points 0x0009 (tab), 0x000A (linefeed), 0x000B (vertical tab), 0x000C (formfeed), 0x000D (carriage return), and 0x0020 (space).
         /// </para>
         /// <para>
-        /// When PCRE2 is compiled with Unicode support, in addition to these characters, five more Unicode "Pattern White Space" characters are recognized by <c>PCRE2_EXTENDED</c>.
+        /// When PCRE2 is compiled with Unicode support, in addition to these characters, five more Unicode "Pattern White Space" characters are recognized by <see cref="Extended"/>.
         /// These are U+0085 (next line), U+200E (left-to-right mark), U+200F (right-to-left mark), U+2028 (line separator), and U+2029 (paragraph separator).
         /// This set of characters is the same as recognized by Perl's <c>/x</c> option.
         /// Note that the horizontal and vertical space characters that are matched by the <c>\h</c> and <c>\v</c> escapes in patterns are a much bigger set.
         /// </para>
         /// <para>
-        /// As well as ignoring most white space, <c>PCRE2_EXTENDED</c> also causes characters between an unescaped <c>#</c> outside a character class and the next newline,
+        /// As well as ignoring most white space, <see cref="Extended"/> also causes characters between an unescaped <c>#</c> outside a character class and the next newline,
         /// inclusive, to be ignored, which makes it possible to include comments inside complicated patterns.
         /// Note that the end of this type of comment is a literal newline sequence in the pattern; escape sequences that happen to represent a newline do not count.
         /// Which characters are interpreted as newlines can be specified by a setting in the compile context that is passed to <c>pcre2_compile()</c> or by a special sequence
@@ -173,11 +174,11 @@ namespace PCRE
         /// </summary>
         /// <remarks>
         /// <para>
-        /// This option has the effect of <c>PCRE2_EXTENDED</c>, but, in addition, unescaped space and horizontal tab characters are ignored inside a character class.
+        /// This option has the effect of <see cref="Extended"/>, but, in addition, unescaped space and horizontal tab characters are ignored inside a character class.
         /// Note: only these two characters are ignored, not the full set of pattern white space characters that are ignored outside a character class.
         /// </para>
         /// <para>
-        /// <c>PCRE2_EXTENDED_MORE</c> is equivalent to Perl's <c>/xx</c> option, and it can be changed within a pattern by a <c>(?xx)</c> option setting.
+        /// <see cref="ExtendedMore"/> is equivalent to Perl's <c>/xx</c> option, and it can be changed within a pattern by a <c>(?xx)</c> option setting.
         /// </para>
         /// </remarks>
         ExtendedMore = PcreConstants.EXTENDED_MORE,
@@ -204,7 +205,7 @@ namespace PCRE
         /// </item>
         /// </list>
         /// <para>
-        /// ECMAscript 6 added additional functionality to <c>\u</c>. This can be accessed using the <c>PCRE2_EXTRA_ALT_BSUX</c> extra option (see "Extra compile options" below).
+        /// ECMAscript 6 added additional functionality to <c>\u</c>. This can be accessed using the <see cref="PcreExtraCompileOptions.AltBsUX"/> extra option (see <see cref="PcreExtraCompileOptions"/>).
         /// Note that this alternative escape handling applies only to patterns. Neither of these options affects the processing of replacement strings passed to <c>pcre2_substitute()</c>.
         /// </para>
         /// </remarks>
@@ -230,9 +231,9 @@ namespace PCRE
         /// If you are doing a lot of literal matching and are worried about efficiency, you should consider using other approaches.
         /// </para>
         /// <para>
-        /// The only other main options that are allowed with <c>PCRE2_LITERAL</c> are: <c>PCRE2_ANCHORED</c>, <c>PCRE2_ENDANCHORED</c>, <c>PCRE2_AUTO_CALLOUT</c>, <c>PCRE2_CASELESS</c>,
-        /// <c>PCRE2_FIRSTLINE</c>, <c>PCRE2_MATCH_INVALID_UTF</c>, <c>PCRE2_NO_START_OPTIMIZE</c>, <c>PCRE2_NO_UTF_CHECK</c>, <c>PCRE2_UTF</c>, and <c>PCRE2_USE_OFFSET_LIMIT</c>.
-        /// The extra options <c>PCRE2_EXTRA_MATCH_LINE</c> and <c>PCRE2_EXTRA_MATCH_WORD</c> are also supported. Any other options cause an error.
+        /// The only other main options that are allowed with <see cref="Literal"/> are: <see cref="Anchored"/>, <see cref="EndAnchored"/>, <see cref="AutoCallout"/>, <see cref="Caseless"/>,
+        /// <see cref="FirstLine"/>, <see cref="MatchInvalidUtf"/>, <see cref="NoStartOptimize"/>, <see cref="NoUtfCheck"/>, <see cref="Utf"/>, and <see cref="UseOffsetLimit"/>.
+        /// The extra options <see cref="PcreExtraCompileOptions.MatchLine"/> and <see cref="PcreExtraCompileOptions.MatchWord"/> are also supported. Any other options cause an error.
         /// </para>
         /// </remarks>
         Literal = PcreConstants.LITERAL,
@@ -243,12 +244,12 @@ namespace PCRE
         /// <remarks>
         /// <para>
         /// This option has two effects. Firstly, it changes the way PCRE2 processes <c>\B</c>, <c>\b</c>, <c>\D</c>, <c>\d</c>, <c>\S</c>, <c>\s</c>, <c>\W</c>, <c>\w</c>,
-        /// and some of the POSIX character classes. By default, only ASCII characters are recognized, but if <c>PCRE2_UCP</c> is set, Unicode properties are used instead to classify characters.
-        /// More details are given in the section on generic character types in the pcre2pattern page. If you set <c>PCRE2_UCP</c>, matching one of the items it affects takes much longer.
+        /// and some of the POSIX character classes. By default, only ASCII characters are recognized, but if <see cref="Ucp"/> is set, Unicode properties are used instead to classify characters.
+        /// More details are given in the section on generic character types in the pcre2pattern page. If you set <see cref="Ucp"/>, matching one of the items it affects takes much longer.
         /// </para>
         /// <para>
-        /// The second effect of <c>PCRE2_UCP</c> is to force the use of Unicode properties for upper/lower casing operations on characters with code points greater than 127,
-        /// even when <c>PCRE2_UTF</c> is not set.
+        /// The second effect of <see cref="Ucp"/> is to force the use of Unicode properties for upper/lower casing operations on characters with code points greater than 127,
+        /// even when <see cref="Utf"/> is not set.
         /// This makes it possible, for example, to process strings in the 16-bit UCS-2 code. This option is available only if PCRE2 has been compiled with Unicode support (which is the default).
         /// </para>
         /// </remarks>
@@ -258,7 +259,7 @@ namespace PCRE
         /// <c>PCRE2_MATCH_INVALID_UTF</c> - Support matching invalid UTF sequences.
         /// </summary>
         /// <remarks>
-        /// This option forces <c>PCRE2_UTF</c> (see below) and also enables support for matching by <c>pcre2_match()</c> in subject strings that contain invalid UTF sequences.
+        /// This option forces <see cref="Utf"/> and also enables support for matching by <c>pcre2_match()</c> in subject strings that contain invalid UTF sequences.
         /// This facility is not supported for DFA matching. For details, see the pcre2unicode documentation.
         /// </remarks>
         MatchInvalidUtf = PcreConstants.MATCH_INVALID_UTF,
@@ -291,11 +292,11 @@ namespace PCRE
         /// <item><c>.(*ACCEPT)|..</c></item>
         /// <item><c>.|..</c></item>
         /// </list>
-        /// If matched against "abc" with <c>PCRE2_ENDANCHORED</c> set, the first matches "c" whereas the second matches "bc".
-        /// The effect of <c>PCRE2_ENDANCHORED</c> can also be achieved by appropriate constructs in the pattern itself, which is the only way to do it in Perl.
+        /// If matched against "abc" with <see cref="EndAnchored"/> set, the first matches "c" whereas the second matches "bc".
+        /// The effect of <see cref="EndAnchored"/> can also be achieved by appropriate constructs in the pattern itself, which is the only way to do it in Perl.
         /// </para>
         /// <para>
-        /// For DFA matching with <c>pcre2_dfa_match()</c>, <c>PCRE2_ENDANCHORED</c> applies only to the first (that is, the longest) matched string.
+        /// For DFA matching with <c>pcre2_dfa_match()</c>, <see cref="EndAnchored"/> applies only to the first (that is, the longest) matched string.
         /// Other parallel matches, which are necessarily substrings of the first one, must obviously end before the end of the subject.
         /// </para>
         /// </remarks>
@@ -320,12 +321,12 @@ namespace PCRE
         /// though the matched text may continue over the newline. If startoffset is non-zero, the limiting newline is not necessarily the first newline in the subject.
         /// </para>
         /// <para>
-        /// For example, if the subject string is "abc\nxyz" (where <c>\n</c> represents a single-character newline) a pattern match for "yz" succeeds with <c>PCRE2_FIRSTLINE</c>
+        /// For example, if the subject string is "abc\nxyz" (where <c>\n</c> represents a single-character newline) a pattern match for "yz" succeeds with <see cref="FirstLine"/>
         /// if startoffset is greater than 3.
-        /// See also <c>PCRE2_USE_OFFSET_LIMIT</c>, which provides a more general limiting facility.
+        /// See also <see cref="UseOffsetLimit"/>, which provides a more general limiting facility.
         /// </para>
         /// <para>
-        /// If <c>PCRE2_FIRSTLINE</c> is set with an offset limit, a match must occur in the first line and also within the offset limit. In other words, whichever limit comes first is used.
+        /// If <see cref="FirstLine"/> is set with an offset limit, a match must occur in the first line and also within the offset limit. In other words, whichever limit comes first is used.
         /// </para>
         /// </remarks>
         FirstLine = PcreConstants.FIRSTLINE,
@@ -336,7 +337,7 @@ namespace PCRE
         /// <remarks>
         /// If this bit is set, names used to identify capture groups need not be unique.
         /// This can be helpful for certain types of pattern when it is known that only one instance of the named group can ever be matched.
-        /// There are more details of named capture groups below; see also the pcre2pattern documentation.
+        /// See also the pcre2pattern documentation.
         /// </remarks>
         DupNames = PcreConstants.DUPNAMES,
 
@@ -367,16 +368,16 @@ namespace PCRE
         /// </para>
         /// <para>
         /// The start-up optimizations are in effect a pre-scan of the subject that takes place before the pattern is run.
-        /// The <c>PCRE2_NO_START_OPTIMIZE</c> option disables the start-up optimizations, possibly causing performance to suffer,
+        /// The <see cref="NoStartOptimize"/> option disables the start-up optimizations, possibly causing performance to suffer,
         /// but ensuring that in cases where the result is "no match", the callouts do occur, and that items such as <c>(*COMMIT)</c> and <c>(*MARK)</c> are considered
         /// at every possible starting position in the subject string.
         /// </para>
         /// <para>
-        /// Setting <c>PCRE2_NO_START_OPTIMIZE</c> may change the outcome of a matching operation. Consider the pattern <c>(*COMMIT)ABC</c>.
+        /// Setting <see cref="NoStartOptimize"/> may change the outcome of a matching operation. Consider the pattern <c>(*COMMIT)ABC</c>.
         /// When this is compiled, PCRE2 records the fact that a match must start with the character "A".
         /// Suppose the subject string is "DEFABC". The start-up optimization scans along the subject, finds "A" and runs the first match attempt from there.
         /// The <c>(*COMMIT)</c> item means that the pattern must match the current starting position, which in this case, it does.
-        /// However, if the same match is run with <c>PCRE2_NO_START_OPTIMIZE</c> set, the initial scan along the subject string does not happen.
+        /// However, if the same match is run with <see cref="NoStartOptimize"/> set, the initial scan along the subject string does not happen.
         /// The first match attempt is run starting from "D" and when this fails, <c>(*COMMIT)</c> prevents any further matches being tried, so the overall result is "no match".
         /// </para>
         /// <para>
@@ -384,7 +385,7 @@ namespace PCRE
         /// The minimum length for a match is two characters. If the subject is "XXBB", the "starting character" optimization skips "XX", then tries to match "BB", which is long enough.
         /// In the process, <c>(*MARK:2)</c> is encountered and remembered. When the match attempt fails, the next "B" is found, but there is only one character left, so there are no more attempts,
         /// and "no match" is returned with the "last mark seen" set to "2".
-        /// If <c>PCRE2_NO_START_OPTIMIZE</c> is set, however, matches are tried at every possible starting position, including at the end of the subject,
+        /// If <see cref="NoStartOptimize"/> is set, however, matches are tried at every possible starting position, including at the end of the subject,
         /// where <c>(*MARK:1)</c> is encountered, but there is no "B", so the "last mark seen" that is returned is "1".
         /// In this case, the optimizations do not affect the overall match result, which is still "no match", but they do affect the auxiliary information that is returned.
         /// </para>
@@ -415,7 +416,7 @@ namespace PCRE
         /// Without this option, a dollar also matches immediately before a newline at the end of the string (but not before any other newlines).
         /// </para>
         /// <para>
-        /// The <c>PCRE2_DOLLAR_ENDONLY</c> option is ignored if <c>PCRE2_MULTILINE</c> is set.
+        /// The <see cref="DollarEndOnly"/> option is ignored if <see cref="MultiLine"/> is set.
         /// There is no equivalent to this option in Perl, and no way to set it within a pattern.
         /// </para>
         /// </remarks>
@@ -425,9 +426,9 @@ namespace PCRE
         /// <c>PCRE2_ALT_CIRCUMFLEX</c> - Make <c>^</c> match after a newline at the end of the subject string.
         /// </summary>
         /// <remarks>
-        /// In multiline mode (when <c>PCRE2_MULTILINE</c> is set), the circumflex metacharacter matches at the start of the subject (unless <c>PCRE2_NOTBOL</c> is set),
+        /// In multiline mode (when <see cref="MultiLine"/> is set), the circumflex metacharacter matches at the start of the subject (unless <see cref="PcreMatchOptions.NotBol"/> is set),
         /// and also after any internal newline. However, it does not match after a newline at the end of the subject, for compatibility with Perl.
-        /// If you want a multiline circumflex also to match after a terminating newline, you must set <c>PCRE2_ALT_CIRCUMFLEX</c>.
+        /// If you want a multiline circumflex also to match after a terminating newline, you must set <see cref="AltCircumflex"/>.
         /// </remarks>
         AltCircumflex = PcreConstants.ALT_CIRCUMFLEX,
 
@@ -440,11 +441,11 @@ namespace PCRE
         /// The name is not processed in any way, and it is not possible to include a closing parenthesis in the name.
         /// </para>
         /// <para>
-        /// However, if the <c>PCRE2_ALT_VERBNAMES</c> option is set, normal backslash processing is applied to verb names and only an unescaped closing parenthesis terminates the name.
+        /// However, if the <see cref="AltVerbNames"/> option is set, normal backslash processing is applied to verb names and only an unescaped closing parenthesis terminates the name.
         /// A closing parenthesis can be included in a name either as <c>\)</c> or between <c>\Q</c> and <c>\E</c>.
         /// </para>
         /// <para>
-        /// If the <c>PCRE2_EXTENDED</c> or <c>PCRE2_EXTENDED_MORE</c> option is set with <c>PCRE2_ALT_VERBNAMES</c>, unescaped whitespace in verb names is skipped
+        /// If the <see cref="Extended"/> or <see cref="ExtendedMore"/> option is set with <see cref="AltVerbNames"/>, unescaped whitespace in verb names is skipped
         /// and <c>#</c>-comments are recognized, exactly as in the rest of the pattern.
         /// </para>
         /// </remarks>
@@ -455,7 +456,7 @@ namespace PCRE
         /// </summary>
         /// <remarks>
         /// By default, for compatibility with Perl, a closing square bracket that immediately follows an opening one is treated as a data character for the class.
-        /// When <c>PCRE2_ALLOW_EMPTY_CLASS</c> is set, it terminates the class, which therefore contains no characters and so can never match.
+        /// When <see cref="AllowEmptyClass"/> is set, it terminates the class, which therefore contains no characters and so can never match.
         /// </remarks>
         AllowEmptyClass = PcreConstants.ALLOW_EMPTY_CLASS,
 
@@ -472,7 +473,7 @@ namespace PCRE
         /// or if the pattern contains <c>(*PRUNE)</c> or <c>(*SKIP)</c>.
         /// </para>
         /// <para>
-        /// When the optimization is not disabled, such a pattern is automatically anchored if <c>PCRE2_DOTALL</c> is set for all the <c>.*</c> items and <c>PCRE2_MULTILINE</c>
+        /// When the optimization is not disabled, such a pattern is automatically anchored if <see cref="DotAll"/> is set for all the <c>.*</c> items and <see cref="MultiLine"/>
         /// is not set for any <c>^</c> items.
         /// Otherwise, the fact that any match must start either at the start of the subject or following a newline is remembered.
         /// </para>
@@ -487,20 +488,20 @@ namespace PCRE
         /// </summary>
         /// <remarks>
         /// <para>
-        /// When <c>PCRE2_UTF</c> is set, the validity of the pattern as a UTF string is automatically checked.
+        /// When <see cref="Utf"/> is set, the validity of the pattern as a UTF string is automatically checked.
         /// There are discussions about the validity of UTF-8 strings, UTF-16 strings, and UTF-32 strings in the pcre2unicode document.
         /// If an invalid UTF sequence is found, <c>pcre2_compile()</c> returns a negative error code.
         /// </para>
         /// <para>
-        /// If you know that your pattern is a valid UTF string, and you want to skip this check for performance reasons, you can set the <c>PCRE2_NO_UTF_CHECK</c> option.
+        /// If you know that your pattern is a valid UTF string, and you want to skip this check for performance reasons, you can set the <see cref="NoUtfCheck"/> option.
         /// When it is set, the effect of passing an invalid UTF string as a pattern is undefined. It may cause your program to crash or loop.
         /// </para>
         /// <para>
         /// Note that this option can also be passed to <c>pcre2_match()</c> and <c>pcre_dfa_match()</c>, to suppress UTF validity checking of the subject string.
-        /// Note also that setting <c>PCRE2_NO_UTF_CHECK</c> at compile time does not disable the error that is given if an escape sequence for an invalid Unicode code point
+        /// Note also that setting <see cref="NoUtfCheck"/> at compile time does not disable the error that is given if an escape sequence for an invalid Unicode code point
         /// is encountered in the pattern. In particular, the so-called "surrogate" code points (0xd800 to 0xdfff) are invalid.
-        /// If you want to allow escape sequences such as <c>\x{d800}</c> you can set the <c>PCRE2_EXTRA_ALLOW_SURROGATE_ESCAPES</c> extra option, as described in the section
-        /// entitled "Extra compile options" below. However, this is possible only in UTF-8 and UTF-32 modes, because these values are not representable in UTF-16.
+        /// If you want to allow escape sequences such as <c>\x{d800}</c> you can set the <see cref="PcreExtraCompileOptions.AllowSurrogateEscapes"/> extra option, as described in
+        /// <see cref="PcreExtraCompileOptions"/>. However, this is possible only in UTF-8 and UTF-32 modes, because these values are not representable in UTF-16.
         /// </para>
         /// </remarks>
         NoUtfCheck = PcreConstants.NO_UTF_CHECK,
@@ -511,11 +512,11 @@ namespace PCRE
         /// <remarks>
         /// <para>
         /// This option locks out the use of Unicode properties for handling <c>\B</c>, <c>\b</c>, <c>\D</c>, <c>\d</c>, <c>\S</c>, <c>\s</c>, <c>\W</c>, <c>\w</c>,
-        /// and some of the POSIX character classes, as described for the <c>PCRE2_UCP</c> option below.
+        /// and some of the POSIX character classes, as described for the <see cref="Ucp"/> option.
         /// </para>
         /// <para>
         /// In particular, it prevents the creator of the pattern from enabling this facility by starting the pattern with <c>(*UCP)</c>.
-        /// This option may be useful in applications that process patterns from external sources. The option combination <c>PCRE2_PCRE_UCP</c> and <c>PCRE2_PCRE_NEVER_UCP</c> causes an error.
+        /// This option may be useful in applications that process patterns from external sources. The option combination <see cref="Ucp"/> and <see cref="NeverUcp"/> causes an error.
         /// </para>
         /// </remarks>
         NeverUcp = PcreConstants.NEVER_UCP,
@@ -540,8 +541,20 @@ namespace PCRE
         /// <remarks>
         /// This option must be set for <c>pcre2_compile()</c> if <c>pcre2_set_offset_limit()</c> is going to be used to set a non-default offset limit in a match context
         /// for matches that use this pattern. An error is generated if an offset limit is set without this option.
-        /// For more details, see the description of <c>pcre2_set_offset_limit()</c> in the section that describes match contexts. See also the <c>PCRE2_FIRSTLINE</c> option above.
+        /// For more details, see the description of <c>pcre2_set_offset_limit()</c> in the section that describes match contexts. See also the <see cref="FirstLine"/> option.
         /// </remarks>
         UseOffsetLimit = PcreConstants.USE_OFFSET_LIMIT,
+
+        /// <summary>
+        /// <c>PCRE2_UTF</c> - Enable UTF mode.
+        /// </summary>
+        /// <remarks>
+        /// This option causes PCRE2 to regard both the pattern and the subject strings that are subsequently processed as strings of UTF characters instead of single-code-unit strings.
+        /// It is available when PCRE2 is built to include Unicode support (which is the default). If Unicode support is not available, the use of this option provokes an error.
+        /// Details of how <see cref="Utf"/> changes the behaviour of PCRE2 are given in the pcre2unicode page.
+        /// In particular, note that it changes the way <see cref="Caseless"/> handles characters with code points greater than 127.
+        /// </remarks>
+        [Obsolete("PCRE.NET always enables UTF mode.")]
+        Utf = PcreConstants.UTF,
     }
 }

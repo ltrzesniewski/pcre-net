@@ -43,12 +43,12 @@ namespace PCRE.Dfa
         /// These have the same general effect as they do for <c>pcre2_match()</c>, but the details are slightly different.
         /// </para>
         /// <para>
-        /// When <c>PCRE2_PARTIAL_HARD</c> is set for <c>pcre2_dfa_match()</c>, it returns <c>PCRE2_ERROR_PARTIAL</c> if the end of the subject is reached and there
+        /// When <see cref="PartialHard"/> is set for <c>pcre2_dfa_match()</c>, it returns <c>PCRE2_ERROR_PARTIAL</c> if the end of the subject is reached and there
         /// is still at least one matching possibility that requires additional characters.
         /// This happens even if some complete matches have already been found.
         /// </para>
         /// <para>
-        /// When <c>PCRE2_PARTIAL_SOFT</c> is set, the return code <c>PCRE2_ERROR_NOMATCH</c> is converted into <c>PCRE2_ERROR_PARTIAL</c> if the end of the subject is reached,
+        /// When <see cref="PartialSoft"/> is set, the return code<c>PCRE2_ERROR_NOMATCH</c> is converted into <c>PCRE2_ERROR_PARTIAL</c> if the end of the subject is reached,
         /// there have been no complete matches, but there is still at least one matching possibility.
         /// </para>
         /// <para>
@@ -67,12 +67,12 @@ namespace PCRE.Dfa
         /// These have the same general effect as they do for <c>pcre2_match()</c>, but the details are slightly different.
         /// </para>
         /// <para>
-        /// When <c>PCRE2_PARTIAL_HARD</c> is set for <c>pcre2_dfa_match()</c>, it returns <c>PCRE2_ERROR_PARTIAL</c> if the end of the subject is reached and there
+        /// When <see cref="PartialHard"/> is set for <c>pcre2_dfa_match()</c>, it returns <c>PCRE2_ERROR_PARTIAL</c> if the end of the subject is reached and there
         /// is still at least one matching possibility that requires additional characters.
         /// This happens even if some complete matches have already been found.
         /// </para>
         /// <para>
-        /// When <c>PCRE2_PARTIAL_SOFT</c> is set, the return code <c>PCRE2_ERROR_NOMATCH</c> is converted into <c>PCRE2_ERROR_PARTIAL</c> if the end of the subject is reached,
+        /// When <see cref="PartialSoft"/> is set, the return code<c>PCRE2_ERROR_NOMATCH</c> is converted into <c>PCRE2_ERROR_PARTIAL</c> if the end of the subject is reached,
         /// there have been no complete matches, but there is still at least one matching possibility.
         /// </para>
         /// <para>
@@ -87,7 +87,7 @@ namespace PCRE.Dfa
         /// <c>PCRE2_DFA_SHORTEST</c> - Stop at the first (and therefore shortest) match.
         /// </summary>
         /// <remarks>
-        /// Setting the <c>PCRE2_DFA_SHORTEST</c> option causes the matching algorithm to stop as soon as it has found one match.
+        /// Setting the <see cref="DfaShortest"/> option causes the matching algorithm to stop as soon as it has found one match.
         /// Because of the way the alternative algorithm works, this is necessarily the shortest possible match at the first possible matching point in the subject string.
         /// </remarks>
         DfaShortest = PcreConstants.DFA_SHORTEST
