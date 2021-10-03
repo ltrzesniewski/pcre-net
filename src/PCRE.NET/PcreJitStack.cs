@@ -5,8 +5,11 @@ using PCRE.Internal;
 namespace PCRE
 {
     /// <summary>
-    /// JIT stack for advanced usage scenarios. Only use from a single thread at a time.
+    /// JIT stack for advanced usage scenarios.
     /// </summary>
+    /// <remarks>
+    /// Not thread-safe and not reentrant.
+    /// </remarks>
     [SuppressMessage("Naming", "CA1711")]
     public sealed class PcreJitStack : IDisposable
     {

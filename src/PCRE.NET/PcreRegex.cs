@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using PCRE.Dfa;
 using PCRE.Internal;
 
@@ -48,9 +49,20 @@ namespace PCRE
             InternalRegex = Caches.RegexCache.GetOrAdd(new RegexKey(pattern, settings));
         }
 
+        /// <summary>
+        /// Creates a buffer for zero-allocation matching.
+        /// </summary>
+        /// <remarks>
+        /// The resulting <see cref="PcreMatchBuffer"/> can be used to perform match operations without allocating any managed memory,
+        /// therefore not inducing any GC pressure. Note that the buffer is not thread-safe and not reentrant.
+        /// </remarks>
+        [Pure]
         public PcreMatchBuffer CreateMatchBuffer()
             => new(InternalRegex, PcreMatchSettings.Default);
 
+        /// <inheritdoc cref="CreateMatchBuffer()"/>
+        /// <param name="settings">Additional settings.</param>
+        [Pure]
         public PcreMatchBuffer CreateMatchBuffer(PcreMatchSettings settings)
             => new(InternalRegex, settings ?? throw new ArgumentNullException(nameof(settings)));
 

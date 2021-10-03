@@ -5,6 +5,12 @@ using PCRE.Internal;
 
 namespace PCRE
 {
+    /// <summary>
+    /// A buffer that allows execution of regular expression matches without managed allocations.
+    /// </summary>
+    /// <remarks>
+    /// Not thread-safe and not reentrant.
+    /// </remarks>
     public class PcreMatchBuffer
     {
         private readonly InternalRegex _regex;
