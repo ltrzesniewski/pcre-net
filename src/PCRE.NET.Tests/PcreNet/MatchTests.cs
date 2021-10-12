@@ -1887,6 +1887,13 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
+        public void should_fix_pcre_issue_21()
+        {
+            var regex = new PcreRegex(@"(?P<size>\\d+)m|M", PcreOptions.Compiled);
+            Assert.That(regex.Match("4M").Value, Is.EqualTo("M"));
+        }
+
+        [Test]
         public void should_throw_on_null_subject()
         {
             var re = new PcreRegex("a");
