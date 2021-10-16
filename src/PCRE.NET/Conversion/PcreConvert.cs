@@ -48,7 +48,7 @@ namespace PCRE.Conversion
                 try
                 {
                     if (errorCode != 0)
-                        throw new ArgumentException($"Could not convert pattern '{pattern}': {Native.GetErrorMessage(errorCode)} at offset {result.output_length}.");
+                        throw new PcreException((PcreErrorCode)errorCode, $"Could not convert pattern '{pattern}': {Native.GetErrorMessage(errorCode)} at offset {result.output_length}.");
 
                     return new string(result.output, 0, (int)result.output_length);
                 }

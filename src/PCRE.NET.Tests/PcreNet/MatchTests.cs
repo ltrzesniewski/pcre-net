@@ -962,6 +962,7 @@ namespace PCRE.Tests.PcreNet
 
             var ex = Assert.Throws<PcreCalloutException>(() => re.Match("ab", _ => throw new DivideByZeroException("test")))!;
 
+            Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Callout));
             Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
         }
 
@@ -972,6 +973,7 @@ namespace PCRE.Tests.PcreNet
 
             var ex = Assert.Throws<PcreCalloutException>(() => re.Match("ab".AsSpan(), _ => throw new DivideByZeroException("test")))!;
 
+            Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Callout));
             Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
         }
 
@@ -983,6 +985,7 @@ namespace PCRE.Tests.PcreNet
             var buffer = re.CreateMatchBuffer();
             var ex = Assert.Throws<PcreCalloutException>(() => buffer.Match("ab".AsSpan(), _ => throw new DivideByZeroException("test")))!;
 
+            Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Callout));
             Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
         }
 
@@ -1597,37 +1600,37 @@ namespace PCRE.Tests.PcreNet
         [Test]
         public void should_check_pattern_utf_validity()
         {
-            // ReSharper disable once ObjectCreationAsStatement
-            var ex = Assert.Throws<ArgumentException>(() => new PcreRegex("A\uD800B"))!;
+            var ex = Assert.Throws<PcrePatternException>(() => _ = new PcreRegex("A\uD800B"))!;
+            Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Utf16Err2));
             Assert.That(ex.Message, Contains.Substring("invalid low surrogate"));
         }
 
         [Test]
-        [SuppressMessage("ReSharper", "ReturnValueOfPureMethodIsNotUsed")]
         public void should_check_subject_utf_validity()
         {
             var re = new PcreRegex(@"A");
-            var ex = Assert.Throws<PcreMatchException>(() => re.Match("A\uD800B"))!;
+            var ex = Assert.Throws<PcreMatchException>(() => _ = re.Match("A\uD800B"))!;
+            Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Utf16Err2));
             Assert.That(ex.Message, Contains.Substring("invalid low surrogate"));
         }
 
         [Test]
-        [SuppressMessage("ReSharper", "ReturnValueOfPureMethodIsNotUsed")]
         public void should_check_subject_utf_validity_ref()
         {
             var re = new PcreRegex(@"A");
-            var ex = Assert.Throws<PcreMatchException>(() => re.Match("A\uD800B".AsSpan()))!;
+            var ex = Assert.Throws<PcreMatchException>(() => _ = re.Match("A\uD800B".AsSpan()))!;
+            Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Utf16Err2));
             Assert.That(ex.Message, Contains.Substring("invalid low surrogate"));
         }
 
         [Test]
-        [SuppressMessage("ReSharper", "ReturnValueOfPureMethodIsNotUsed")]
         public void should_check_subject_utf_validity_buf()
         {
             var re = new PcreRegex(@"A");
             var buffer = re.CreateMatchBuffer();
 
-            var ex = Assert.Throws<PcreMatchException>(() => buffer.Match("A\uD800B".AsSpan()))!;
+            var ex = Assert.Throws<PcreMatchException>(() => _ = buffer.Match("A\uD800B".AsSpan()))!;
+            Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Utf16Err2));
             Assert.That(ex.Message, Contains.Substring("invalid low surrogate"));
         }
 
@@ -1695,20 +1698,26 @@ namespace PCRE.Tests.PcreNet
         public void should_detect_invalid_offset_limit_usage()
         {
             var re = new PcreRegex(@"bar");
-            Assert.Throws<PcreMatchException>(() => re.Match("foobar", 0, PcreMatchOptions.None, null, new PcreMatchSettings
+
+            var ex = Assert.Throws<PcreMatchException>(() => re.Match("foobar", 0, PcreMatchOptions.None, null, new PcreMatchSettings
             {
                 OffsetLimit = 3
-            }));
+            }))!;
+
+            Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Badoffsetlimit));
         }
 
         [Test]
         public void should_detect_invalid_offset_limit_usage_ref()
         {
             var re = new PcreRegex(@"bar");
-            Assert.Throws<PcreMatchException>(() => re.Match("foobar".AsSpan(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
+
+            var ex = Assert.Throws<PcreMatchException>(() => re.Match("foobar".AsSpan(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
             {
                 OffsetLimit = 3
-            }));
+            }))!;
+
+            Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Badoffsetlimit));
         }
 
         [Test]
@@ -1720,7 +1729,8 @@ namespace PCRE.Tests.PcreNet
                 OffsetLimit = 3
             });
 
-            Assert.Throws<PcreMatchException>(() => buffer.Match("foobar".AsSpan()));
+            var ex = Assert.Throws<PcreMatchException>(() => buffer.Match("foobar".AsSpan()))!;
+            Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Badoffsetlimit));
         }
 
         [Test]

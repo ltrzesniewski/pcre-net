@@ -46,7 +46,7 @@ namespace PCRE.Tests.PcreNet.Conversion
         [Test]
         public void should_throw_on_syntax_error()
         {
-            Assert.Throws<ArgumentException>(() => PcreConvert.FromPosixBasic(@"[err"));
+            Assert.Throws<PcreException>(() => PcreConvert.FromPosixBasic(@"[err"));
         }
     }
 }

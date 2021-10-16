@@ -45,7 +45,7 @@ namespace PCRE.Internal
                 if (_code == IntPtr.Zero || result.error_code != 0)
                 {
                     Dispose();
-                    throw new ArgumentException($"Invalid pattern '{pattern}': {Native.GetErrorMessage(result.error_code)} at offset {result.error_offset}.");
+                    throw new PcrePatternException((PcreErrorCode)result.error_code, $"Invalid pattern '{pattern}': {Native.GetErrorMessage(result.error_code)} at offset {result.error_offset}.");
                 }
             }
 
@@ -101,7 +101,7 @@ namespace PCRE.Internal
             var errorCode = Native.pattern_info(_code, key, &result);
 
             if (errorCode != 0)
-                throw new InvalidOperationException($"Error in pcre2_pattern_info: {Native.GetErrorMessage(errorCode)}");
+                throw new PcreException((PcreErrorCode)errorCode, $"Error in pcre2_pattern_info: {Native.GetErrorMessage(errorCode)}");
 
             return result;
         }
@@ -112,7 +112,7 @@ namespace PCRE.Internal
             var errorCode = Native.pattern_info(_code, key, &result);
 
             if (errorCode != 0)
-                throw new InvalidOperationException($"Error in pcre2_pattern_info: {Native.GetErrorMessage(errorCode)}");
+                throw new PcreException((PcreErrorCode)errorCode, $"Error in pcre2_pattern_info: {Native.GetErrorMessage(errorCode)}");
 
             return result;
         }
@@ -268,7 +268,7 @@ namespace PCRE.Internal
 
                 default:
                     if (result.result_code < 0)
-                        throw new PcreMatchException(Native.GetErrorMessage(result.result_code));
+                        throw new PcreMatchException((PcreErrorCode)result.result_code);
 
                     break;
             }

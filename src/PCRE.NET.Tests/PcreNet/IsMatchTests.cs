@@ -13,8 +13,7 @@ namespace PCRE.Tests.PcreNet
         [TestCase(@"Foo$")]
         public void should_compile_correct_pattern(string pattern)
         {
-            // ReSharper disable once ObjectCreationAsStatement
-            new PcreRegex(pattern);
+            _ = new PcreRegex(pattern);
             Assert.Pass();
         }
 
@@ -27,10 +26,9 @@ namespace PCRE.Tests.PcreNet
         {
             try
             {
-                // ReSharper disable once ObjectCreationAsStatement
-                new PcreRegex(pattern);
+                _ = new PcreRegex(pattern);
             }
-            catch (ArgumentException ex)
+            catch (PcrePatternException ex)
             {
                 Console.WriteLine(ex.Message);
                 Assert.Pass();
@@ -130,8 +128,8 @@ namespace PCRE.Tests.PcreNet
             Assert.That(re.IsMatch("U".AsSpan()), Is.True);
             Assert.That(re.CreateMatchBuffer().IsMatch("U".AsSpan()), Is.True);
 
-            // ReSharper disable once ObjectCreationAsStatement
-            Assert.Throws<ArgumentException>(() => new PcreRegex(@"^\U$"));
+            var ex = Assert.Throws<PcrePatternException>(() => _ = new PcreRegex(@"^\U$"));
+            Assert.That(ex!.ErrorCode, Is.EqualTo(PcreErrorCode.UnsupportedEscapeSequence));
         }
 
         [Test]
