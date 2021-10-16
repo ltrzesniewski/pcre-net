@@ -1704,7 +1704,7 @@ namespace PCRE.Tests.PcreNet
                 OffsetLimit = 3
             }))!;
 
-            Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Badoffsetlimit));
+            Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.BadOffsetLimit));
         }
 
         [Test]
@@ -1717,7 +1717,7 @@ namespace PCRE.Tests.PcreNet
                 OffsetLimit = 3
             }))!;
 
-            Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Badoffsetlimit));
+            Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.BadOffsetLimit));
         }
 
         [Test]
@@ -1730,7 +1730,7 @@ namespace PCRE.Tests.PcreNet
             });
 
             var ex = Assert.Throws<PcreMatchException>(() => buffer.Match("foobar".AsSpan()))!;
-            Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Badoffsetlimit));
+            Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.BadOffsetLimit));
         }
 
         [Test]
