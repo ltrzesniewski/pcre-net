@@ -43,12 +43,12 @@ namespace PCRE.Dfa
         /// These have the same general effect as they do for <c>pcre2_match()</c>, but the details are slightly different.
         /// </para>
         /// <para>
-        /// When <see cref="PartialHard"/> is set for <c>pcre2_dfa_match()</c>, it returns <c>PCRE2_ERROR_PARTIAL</c> if the end of the subject is reached and there
+        /// When <see cref="PartialHard"/> is set for <c>pcre2_dfa_match()</c>, it returns <see cref="PcreErrorCode.Partial"/> if the end of the subject is reached and there
         /// is still at least one matching possibility that requires additional characters.
         /// This happens even if some complete matches have already been found.
         /// </para>
         /// <para>
-        /// When <see cref="PartialSoft"/> is set, the return code<c>PCRE2_ERROR_NOMATCH</c> is converted into <c>PCRE2_ERROR_PARTIAL</c> if the end of the subject is reached,
+        /// When <see cref="PartialSoft"/> is set, the return code <see cref="PcreErrorCode.NoMatch"/> is converted into <see cref="PcreErrorCode.Partial"/> if the end of the subject is reached,
         /// there have been no complete matches, but there is still at least one matching possibility.
         /// </para>
         /// <para>
@@ -67,12 +67,12 @@ namespace PCRE.Dfa
         /// These have the same general effect as they do for <c>pcre2_match()</c>, but the details are slightly different.
         /// </para>
         /// <para>
-        /// When <see cref="PartialHard"/> is set for <c>pcre2_dfa_match()</c>, it returns <c>PCRE2_ERROR_PARTIAL</c> if the end of the subject is reached and there
+        /// When <see cref="PartialHard"/> is set for <c>pcre2_dfa_match()</c>, it returns <see cref="PcreErrorCode.Partial"/> if the end of the subject is reached and there
         /// is still at least one matching possibility that requires additional characters.
         /// This happens even if some complete matches have already been found.
         /// </para>
         /// <para>
-        /// When <see cref="PartialSoft"/> is set, the return code<c>PCRE2_ERROR_NOMATCH</c> is converted into <c>PCRE2_ERROR_PARTIAL</c> if the end of the subject is reached,
+        /// When <see cref="PartialSoft"/> is set, the return code <see cref="PcreErrorCode.NoMatch"/> is converted into <see cref="PcreErrorCode.Partial"/> if the end of the subject is reached,
         /// there have been no complete matches, but there is still at least one matching possibility.
         /// </para>
         /// <para>

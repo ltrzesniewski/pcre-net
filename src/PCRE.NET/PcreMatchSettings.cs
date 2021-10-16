@@ -24,7 +24,7 @@ namespace PCRE
         /// </para>
         /// <para>
         /// There is an internal counter in <c>pcre2_match()</c> that is incremented each time round its main matching loop.
-        /// If this value reaches the match limit, <c>pcre2_match()</c> returns the negative value <c>PCRE2_ERROR_MATCHLIMIT</c>.
+        /// If this value reaches the match limit, <c>pcre2_match()</c> returns the negative value <see cref="PcreErrorCode.MatchLimit"/>.
         /// This has the effect of limiting the amount of backtracking that can take place.
         /// For patterns that are not anchored, the count restarts from zero for each position in the subject string.
         /// This limit also applies to <c>pcre2_dfa_match()</c>, though the counting is done in a different way.
@@ -70,7 +70,7 @@ namespace PCRE
         /// </para>
         /// <para>
         /// The default value for the depth limit can be set when PCRE2 is built; if it is not, the default is set to the same value as the default for the match limit.
-        /// If the limit is exceeded, <c>pcre2_match()</c> or <c>pcre2_dfa_match()</c> returns <c>PCRE2_ERROR_DEPTHLIMIT</c>.
+        /// If the limit is exceeded, <c>pcre2_match()</c> or <c>pcre2_dfa_match()</c> returns <see cref="PcreErrorCode.DepthLimit"/>.
         /// A value for the depth limit may also be supplied by an item at the start of a pattern of the form <c>(*LIMIT_DEPTH=ddd)</c>
         /// where <c>ddd</c> is a decimal number. However, such a setting is ignored unless <c>ddd</c> is less than the limit set by the caller of <c>pcre2_match()</c> or <c>pcre2_dfa_match()</c> or,
         /// if no such limit is set, less than the default.
@@ -90,7 +90,7 @@ namespace PCRE
         /// The <see cref="HeapLimit"/> parameter specifies, in units of kibibytes (1024 bytes), the maximum amount of heap memory that <c>pcre2_match()</c> may use to hold backtracking information
         /// when running an interpretive match. This limit also applies to <c>pcre2_dfa_match()</c>, which may use the heap when processing patterns with a lot of nested pattern recursion
         /// or lookarounds or atomic groups. This limit does not apply to matching with the JIT optimization, which has its own memory control arrangements (see the pcre2jit documentation for more details).
-        /// If the limit is reached, the negative error code <c>PCRE2_ERROR_HEAPLIMIT</c> is returned. The default limit can be set when PCRE2 is built;
+        /// If the limit is reached, the negative error code <see cref="PcreErrorCode.HeapLimit"/> is returned. The default limit can be set when PCRE2 is built;
         /// if it is not, the default is set very large and is essentially "unlimited".
         /// </para>
         /// <para>
@@ -121,11 +121,11 @@ namespace PCRE
         /// <remarks>
         /// <para>
         /// The <see cref="OffsetLimit"/> parameter limits how far an unanchored search can advance in the subject string.
-        /// The default value is PCRE2_UNSET. The <c>pcre2_match()</c> and <c>pcre2_dfa_match()</c> functions return <c>PCRE2_ERROR_NOMATCH</c> if a match with a starting point before
+        /// The default value is <c>PCRE2_UNSET</c>. The <c>pcre2_match()</c> and <c>pcre2_dfa_match()</c> functions return <see cref="PcreErrorCode.NoMatch"/> if a match with a starting point before
         /// or at the given offset is not found. The <c>pcre2_substitute()</c> function makes no more substitutions.
         /// </para>
         /// <para>
-        /// For example, if the pattern <c>/abc/</c> is matched against "123abc" with an offset limit less than 3, the result is <c>PCRE2_ERROR_NOMATCH</c>.
+        /// For example, if the pattern <c>/abc/</c> is matched against "123abc" with an offset limit less than 3, the result is <see cref="PcreErrorCode.NoMatch"/>.
         /// A match can never be found if the startoffset argument of <c>pcre2_match(),</c> <c>pcre2_dfa_match()</c>, or <c>pcre2_substitute()</c> is greater than the offset limit set in the match context.
         /// </para>
         /// <para>

@@ -105,11 +105,11 @@ namespace PCRE
         /// </para>
         /// <para>
         /// If this situation arises when <see cref="PartialSoft"/> (but not <see cref="PartialHard"/>) is set, matching continues by testing any remaining alternatives.
-        /// Only if no complete match can be found is <c>PCRE2_ERROR_PARTIAL</c> returned instead of <c>PCRE2_ERROR_NOMATCH</c>.
+        /// Only if no complete match can be found is <see cref="PcreErrorCode.Partial"/> returned instead of <see cref="PcreErrorCode.NoMatch"/>.
         /// In other words, <see cref="PartialSoft"/> specifies that the caller is prepared to handle a partial match, but only if no complete match can be found.
         /// </para>
         /// <para>
-        /// If <see cref="PartialHard"/> is set, it overrides <see cref="PartialSoft"/>. In this case, if a partial match is found, <c>pcre2_match()</c> immediately returns<c>PCRE2_ERROR_PARTIAL</c>,
+        /// If <see cref="PartialHard"/> is set, it overrides <see cref="PartialSoft"/>. In this case, if a partial match is found, <c>pcre2_match()</c> immediately returns <see cref="PcreErrorCode.Partial"/>,
         /// without considering any other alternatives. In other words, when <see cref="PartialHard"/> is set, a partial match is considered to be more important that an alternative complete match.
         /// </para>
         /// <para>
@@ -128,11 +128,11 @@ namespace PCRE
         /// </para>
         /// <para>
         /// If this situation arises when <see cref="PartialSoft"/> (but not <see cref="PartialHard"/>) is set, matching continues by testing any remaining alternatives.
-        /// Only if no complete match can be found is <c>PCRE2_ERROR_PARTIAL</c> returned instead of <c>PCRE2_ERROR_NOMATCH</c>.
+        /// Only if no complete match can be found is <see cref="PcreErrorCode.Partial"/> returned instead of <see cref="PcreErrorCode.NoMatch"/>.
         /// In other words, <see cref="PartialSoft"/> specifies that the caller is prepared to handle a partial match, but only if no complete match can be found.
         /// </para>
         /// <para>
-        /// If <see cref="PartialHard"/> is set, it overrides <see cref="PartialSoft"/>. In this case, if a partial match is found, <c>pcre2_match()</c> immediately returns<c>PCRE2_ERROR_PARTIAL</c>,
+        /// If <see cref="PartialHard"/> is set, it overrides <see cref="PartialSoft"/>. In this case, if a partial match is found, <c>pcre2_match()</c> immediately returns <see cref="PcreErrorCode.Partial"/>,
         /// without considering any other alternatives. In other words, when <see cref="PartialHard"/> is set, a partial match is considered to be more important that an alternative complete match.
         /// </para>
         /// <para>
