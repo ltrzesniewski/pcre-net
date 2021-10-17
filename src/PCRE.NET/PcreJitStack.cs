@@ -36,10 +36,11 @@ namespace PCRE
             _stack = Native.jit_stack_create(startSize, maxSize);
         }
 
+        /// <summary>
+        /// Releases the JIT stack.
+        /// </summary>
         ~PcreJitStack()
-        {
-            FreeStack();
-        }
+            => FreeStack();
 
         /// <summary>
         /// Disposes the JIT stack.

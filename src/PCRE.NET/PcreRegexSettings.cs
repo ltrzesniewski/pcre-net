@@ -3,6 +3,9 @@ using PCRE.Internal;
 
 namespace PCRE
 {
+    /// <summary>
+    /// Advanced regex settings.
+    /// </summary>
     public sealed class PcreRegexSettings
     {
         private PcreOptions _options;
@@ -13,6 +16,9 @@ namespace PCRE
         private PcreExtraCompileOptions _extraCompileOptions;
         private PcreJitCompileOptions _jitCompileOptions;
 
+        /// <summary>
+        /// The options to apply to the regex.
+        /// </summary>
         public PcreOptions Options
         {
             get => _options;
@@ -23,6 +29,9 @@ namespace PCRE
             }
         }
 
+        /// <summary>
+        /// The character sequence that is recognized as meaning "newline".
+        /// </summary>
         public PcreNewLine NewLine
         {
             get => _newLine ?? PcreBuildInfo.NewLine;
@@ -33,6 +42,9 @@ namespace PCRE
             }
         }
 
+        /// <summary>
+        /// The character sequences the <c>\R</c> escape sequence matches.
+        /// </summary>
         public PcreBackslashR BackslashR
         {
             get => _backslashR ?? PcreBuildInfo.BackslashR;
@@ -43,6 +55,9 @@ namespace PCRE
             }
         }
 
+        /// <summary>
+        /// The maximum depth of nesting of parentheses (of any kind).
+        /// </summary>
         public uint ParensLimit
         {
             get => _parensLimit ?? PcreBuildInfo.ParensLimit;
@@ -53,6 +68,13 @@ namespace PCRE
             }
         }
 
+        /// <summary>
+        /// The maximum length, in code units, for the pattern.
+        /// </summary>
+        /// <remarks>
+        /// This facility is provided so that applications that accept patterns from external sources can limit their size.
+        /// The default is the largest number that a <see cref="IntPtr"/> variable can hold, which is effectively unlimited.
+        /// </remarks>
         public uint? MaxPatternLength
         {
             get => _maxPatternLength;
@@ -63,6 +85,9 @@ namespace PCRE
             }
         }
 
+        /// <summary>
+        /// Additional compile options.
+        /// </summary>
         public PcreExtraCompileOptions ExtraCompileOptions
         {
             get => _extraCompileOptions;
@@ -73,6 +98,9 @@ namespace PCRE
             }
         }
 
+        /// <summary>
+        /// Additional options for the JIT compiler.
+        /// </summary>
         public PcreJitCompileOptions JitCompileOptions
         {
             get => _jitCompileOptions | Options.ToJitCompileOptions();
@@ -85,6 +113,9 @@ namespace PCRE
 
         internal bool ReadOnlySettings { get; }
 
+        /// <summary>
+        /// Creates a new <see cref="PcreRegexSettings"/> object.
+        /// </summary>
         public PcreRegexSettings()
         {
         }

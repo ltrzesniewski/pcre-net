@@ -3,6 +3,9 @@ using PCRE.Internal;
 
 namespace PCRE
 {
+    /// <summary>
+    /// An error code returned by PCRE.
+    /// </summary>
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     [SuppressMessage("ReSharper", "IdentifierTypo")]
     [SuppressMessage("ReSharper", "CommentTypo")]
