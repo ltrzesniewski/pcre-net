@@ -93,7 +93,7 @@ namespace PCRE
         public string Value => this[0].Value;
 
         /// <summary>
-        /// Indicates of the match was successful.
+        /// Indicates if the match was successful.
         /// </summary>
         public bool Success => _resultCode > 0;
 

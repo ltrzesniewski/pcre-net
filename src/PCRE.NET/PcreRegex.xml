@@ -30,6 +30,29 @@
     </summary>
   </method>
 
+  <method name="DfaMatch">
+    <summary>
+      Matches the regex against the given subject using the DFA algorithm.
+    </summary>
+    <remarks>
+      <para>
+        The returned result represents all matches starting at the same index.
+      </para>
+    </remarks>
+  </method>
+
+  <method name="DfaMatches">
+    <summary>
+      Returns an enumerable of all matches found in the given subject, using the DFA algorithm.
+    </summary>
+    <remarks>
+      <para>
+        The returned result is a sequence of match results starting at different points in the subject string.
+        Each item represents several matches starting at the same index in the subject string.
+      </para>
+    </remarks>
+  </method>
+
   <!-- Keep the parameters ordered as they appear in the method signatures -->
 
   <param>

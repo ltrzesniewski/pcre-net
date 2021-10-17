@@ -5,6 +5,10 @@ using PCRE.Internal;
 
 namespace PCRE.Dfa
 {
+    /// <summary>
+    /// Represents the result of one execution of the DFA algorithm. This contains several matches
+    /// that start at the same index in the subject string. The longest match is returned first.
+    /// </summary>
     public sealed class PcreDfaMatchResult : IReadOnlyList<PcreDfaMatch>
     {
         private readonly uint[] _oVector;
@@ -63,21 +67,49 @@ namespace PCRE.Dfa
                 yield return GetMatch(i);
         }
 
-        public IEnumerator<PcreDfaMatch> GetEnumerator() => GetMatches().GetEnumerator();
+        /// <summary>
+        /// Enumerates the matches, from longest to shortest.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator<PcreDfaMatch> GetEnumerator()
+            => GetMatches().GetEnumerator();
+
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        /// <summary>
+        /// Returns the match at a given index.
+        /// </summary>
+        /// <param name="index">The index of the match.</param>
         public PcreDfaMatch this[int index] => GetMatch(index);
 
+        /// <summary>
+        /// The available match count.
+        /// </summary>
         public int Count => _matches.Length;
 
+        /// <summary>
+        /// Indicates if the match was successful.
+        /// </summary>
         public bool Success => _resultCode >= 0;
 
+        /// <summary>
+        /// The starting index of the matches.
+        /// </summary>
         public int Index => LongestMatch.Index;
 
+        /// <summary>
+        /// Returns the longest match.
+        /// </summary>
         public PcreDfaMatch LongestMatch => GetMatch(0);
 
+        /// <summary>
+        /// Returns the shortest match.
+        /// </summary>
         public PcreDfaMatch ShortestMatch => GetMatch(Count - 1);
 
+        /// <summary>
+        /// Returns the substring of the longest match in the subject string.
+        /// </summary>
         public override string ToString()
             => LongestMatch.Value;
     }

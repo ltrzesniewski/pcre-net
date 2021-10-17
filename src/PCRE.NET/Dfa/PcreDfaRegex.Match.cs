@@ -5,6 +5,13 @@ using PCRE.Internal;
 
 namespace PCRE.Dfa
 {
+    /// <summary>
+    /// DFA (deterministic finite automaton) matching API.
+    /// </summary>
+    /// <remarks>
+    /// This is a matching algorithm that scans the subject string just once (not counting lookaround assertions), and does not backtrack.
+    /// This has different characteristics to the normal algorithm, and is not compatible with Perl. Some of the features of PCRE2 patterns are not supported.
+    /// </remarks>
     public sealed class PcreDfaRegex
     {
         private readonly InternalRegex _regex;
@@ -14,22 +21,32 @@ namespace PCRE.Dfa
             _regex = regex;
         }
 
+        /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatch"]/*'/>
+        /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject"]]/*'/>
         [Pure]
         public PcreDfaMatchResult Match(string subject)
             => Match(subject, 0, PcreDfaMatchOptions.None);
 
+        /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatch"]/*'/>
+        /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="options"]]/*'/>
         [Pure]
         public PcreDfaMatchResult Match(string subject, PcreDfaMatchOptions options)
             => Match(subject, 0, options);
 
+        /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatch"]/*'/>
+        /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex"]]/*'/>
         [Pure]
         public PcreDfaMatchResult Match(string subject, int startIndex)
             => Match(subject, startIndex, PcreDfaMatchOptions.None);
 
+        /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatch"]/*'/>
+        /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex" or @name="options"]]/*'/>
         [Pure]
         public PcreDfaMatchResult Match(string subject, int startIndex, PcreDfaMatchOptions options)
             => Match(subject, PcreDfaMatchSettings.GetSettings(startIndex, options));
 
+        /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatch"]/*'/>
+        /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="settings"]]/*'/>
         public PcreDfaMatchResult Match(string subject, PcreDfaMatchSettings settings)
         {
             if (subject == null)
@@ -44,14 +61,20 @@ namespace PCRE.Dfa
             return _regex.DfaMatch(subject, settings, settings.StartIndex, ((PcreMatchOptions)settings.AdditionalOptions).ToPatternOptions());
         }
 
+        /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatches"]/*'/>
+        /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject"]]/*'/>
         [Pure]
         public IEnumerable<PcreDfaMatchResult> Matches(string subject)
             => Matches(subject, 0);
 
+        /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatches"]/*'/>
+        /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex"]]/*'/>
         [Pure]
         public IEnumerable<PcreDfaMatchResult> Matches(string subject, int startIndex)
             => Matches(subject, PcreDfaMatchSettings.GetSettings(startIndex, PcreDfaMatchOptions.None));
 
+        /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatches"]/*'/>
+        /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="settings"]]/*'/>
         [Pure]
         public IEnumerable<PcreDfaMatchResult> Matches(string subject, PcreDfaMatchSettings settings)
         {

@@ -2,6 +2,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace PCRE.Dfa
 {
+    /// <summary>
+    /// An output item of a DFA match.
+    /// </summary>
     public sealed class PcreDfaMatch : IPcreGroup
     {
         private readonly string? _subject;
@@ -20,18 +23,30 @@ namespace PCRE.Dfa
                 _subject = subject;
         }
 
+        /// <inheritdoc cref="PcreMatch.Index"/>
         public int Index { get; }
+
+        /// <inheritdoc cref="PcreMatch.EndIndex"/>
         public int EndIndex { get; }
 
+        /// <inheritdoc cref="PcreMatch.Length"/>
         public int Length => EndIndex > Index ? EndIndex - Index : 0;
 
+        /// <inheritdoc cref="PcreMatch.Value"/>
         public string Value => _value ??= _subject!.Substring(Index, Length);
 
+        /// <inheritdoc cref="PcreMatch.Success"/>
         public bool Success => Index >= 0;
 
+        /// <summary>
+        /// Converts a match to its matched substring.
+        /// </summary>
         [return: NotNullIfNotNull("group")]
-        public static implicit operator string?(PcreDfaMatch? group) => group?.Value;
+        public static implicit operator string?(PcreDfaMatch? group)
+            => group?.Value;
 
-        public override string ToString() => Value;
+        /// <inheritdoc cref="PcreMatch.ToString"/>
+        public override string ToString()
+            => Value;
     }
 }
