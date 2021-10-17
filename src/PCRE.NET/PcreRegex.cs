@@ -98,6 +98,9 @@ namespace PCRE
         public PcreMatchBuffer CreateMatchBuffer(PcreMatchSettings settings)
             => new(InternalRegex, settings ?? throw new ArgumentNullException(nameof(settings)));
 
+        /// <summary>
+        /// Returns the regex pattern.
+        /// </summary>
         public override string ToString()
             => InternalRegex.Pattern;
     }
