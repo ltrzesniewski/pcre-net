@@ -6,6 +6,9 @@ using PCRE.Internal;
 
 namespace PCRE
 {
+    /// <summary>
+    /// The result of a match.
+    /// </summary>
     public sealed unsafe class PcreMatch : IPcreGroup, IPcreGroupList
     {
         private readonly InternalRegex _regex;
@@ -50,20 +53,56 @@ namespace PCRE
             _resultCode = oVector.Length / 2;
         }
 
+        /// <summary>
+        /// The number of captured groups.
+        /// </summary>
         public int CaptureCount => _regex.CaptureCount;
 
+        /// <summary>
+        /// Returns the capturing group at a given index.
+        /// </summary>
+        /// <param name="index">The index of the capturing group.</param>
         public PcreGroup this[int index] => GetGroup(index) ?? PcreGroup.Undefined;
+
+        /// <summary>
+        /// Returns the capturing group of a given name.
+        /// </summary>
+        /// <param name="name">The name of the capturing group.</param>
         public PcreGroup this[string name] => GetGroup(name) ?? PcreGroup.Undefined;
 
         internal string Subject { get; }
 
+        /// <summary>
+        /// The start index of the match.
+        /// </summary>
         public int Index => this[0].Index;
+
+        /// <summary>
+        /// The end index of the match.
+        /// </summary>
         public int EndIndex => this[0].EndIndex;
+
+        /// <summary>
+        /// The length of the match.
+        /// </summary>
         public int Length => this[0].Length;
 
+        /// <summary>
+        /// The matched substring.
+        /// </summary>
         public string Value => this[0].Value;
+
+        /// <summary>
+        /// Indicates of the match was successful.
+        /// </summary>
         public bool Success => _resultCode > 0;
 
+        /// <summary>
+        /// Returns the last mark name encountered on the matching path through the pattern.
+        /// </summary>
+        /// <remarks>
+        /// Marks are defined with <c>(*MARK)</c>.
+        /// </remarks>
         public string? Mark
         {
             get
@@ -75,11 +114,21 @@ namespace PCRE
             }
         }
 
+        /// <summary>
+        /// Returns the list of capturing groups.
+        /// </summary>
         public IPcreGroupList Groups => this;
 
+        /// <summary>
+        /// Indicates if the match is partial. See <see cref="PcreMatchOptions.PartialSoft"/>/<see cref="PcreMatchOptions.PartialHard"/>.
+        /// </summary>
         public bool IsPartialMatch => _resultCode == PcreConstants.ERROR_PARTIAL;
 
-        public IEnumerator<PcreGroup> GetEnumerator() => GetAllGroups().GetEnumerator();
+        /// <summary>
+        /// Returns an enumerator through the capturing groups.
+        /// </summary>
+        public IEnumerator<PcreGroup> GetEnumerator()
+            => GetAllGroups().GetEnumerator();
 
         private IEnumerable<PcreGroup> GetAllGroups()
         {
@@ -87,12 +136,24 @@ namespace PCRE
                 yield return this[i];
         }
 
+        /// <summary>
+        /// Tries to get a group by index.
+        /// </summary>
+        /// <param name="index">The index of the group to retrieve.</param>
+        /// <param name="result">The resulting group.</param>
+        /// <returns>True if the group exists.</returns>
         public bool TryGetGroup(int index, [MaybeNullWhen(false)] out PcreGroup result)
         {
             result = GetGroup(index);
             return result != null;
         }
 
+        /// <summary>
+        /// Tries to get a group by name.
+        /// </summary>
+        /// <param name="name">The name of the group to retrieve.</param>
+        /// <param name="result">The resulting group.</param>
+        /// <returns>True if the group exists.</returns>
         public bool TryGetGroup(string name, [MaybeNullWhen(false)] out PcreGroup result)
         {
             result = GetGroup(name);
@@ -159,6 +220,10 @@ namespace PCRE
             return PcreGroup.Empty;
         }
 
+        /// <summary>
+        /// Gets the groups with duplicated names.
+        /// </summary>
+        /// <param name="name">The group name to retrieve.</param>
         public IEnumerable<PcreGroup> GetDuplicateNamedGroups(string name)
         {
             if (!_regex.CaptureNames.TryGetValue(name, out var indexes))
@@ -179,9 +244,14 @@ namespace PCRE
             return Math.Max(Index, EndIndex);
         }
 
-        public override string ToString() => Value;
+        /// <summary>
+        /// Returns the matched substring.
+        /// </summary>
+        public override string ToString()
+            => Value;
 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator()
+            => GetEnumerator();
 
         int IReadOnlyCollection<PcreGroup>.Count => CaptureCount + 1;
     }

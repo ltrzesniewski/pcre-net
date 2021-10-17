@@ -136,6 +136,9 @@ namespace PCRE
             return new RefMatchEnumerable(this, subject, startIndex, options, onCallout);
         }
 
+        /// <summary>
+        /// Returns the regex pattern.
+        /// </summary>
         public override string ToString()
             => _regex.Pattern;
 

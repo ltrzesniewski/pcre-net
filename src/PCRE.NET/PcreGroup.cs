@@ -2,6 +2,9 @@
 
 namespace PCRE
 {
+    /// <summary>
+    /// The result of a capturing group.
+    /// </summary>
     public sealed class PcreGroup : IPcreGroup
     {
         private readonly string? _subject;
@@ -22,19 +25,37 @@ namespace PCRE
                 _subject = subject;
         }
 
+        /// <inheritdoc/>
         public int Index { get; }
+
+        /// <inheritdoc/>
         public int EndIndex { get; }
 
+        /// <inheritdoc/>
         public int Length => EndIndex > Index ? EndIndex - Index : 0;
 
+        /// <inheritdoc/>
         public string Value => _value ??= _subject!.Substring(Index, Length);
 
+        /// <inheritdoc/>
         public bool Success => Index >= 0;
+
+        /// <summary>
+        /// Indicates if the group exists in the pattern.
+        /// </summary>
         public bool IsDefined => !ReferenceEquals(this, Undefined);
 
+        /// <summary>
+        /// Converts a group to its matched substring.
+        /// </summary>
         [return: NotNullIfNotNull("group")]
-        public static implicit operator string?(PcreGroup? group) => group?.Value;
+        public static implicit operator string?(PcreGroup? group)
+            => group?.Value;
 
-        public override string ToString() => Value;
+        /// <summary>
+        /// Returns the matched substring.
+        /// </summary>
+        public override string ToString()
+            => Value;
     }
 }

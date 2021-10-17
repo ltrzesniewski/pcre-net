@@ -134,9 +134,3 @@ const string subject = @"{
 var isValidJson = regex.IsMatch(subject);
 // result: true
 ```
-
-## To do ##
-
-- Include more tests from the PCRE test suite
-- Documentation
-- XML doc comments

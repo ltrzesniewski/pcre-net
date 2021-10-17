@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -6,6 +7,9 @@ using PCRE.Internal;
 
 namespace PCRE
 {
+    /// <summary>
+    /// The result of a match.
+    /// </summary>
     [DebuggerTypeProxy(typeof(DebugProxy))]
     public unsafe ref struct PcreRefMatch
     {
@@ -14,6 +18,10 @@ namespace PCRE
         private int _resultCode;
         private char* _markPtr;
 
+        /// <summary>
+        /// A function which returns an output value out of a match.
+        /// </summary>
+        /// <typeparam name="T">The output value type.</typeparam>
         public delegate T Func<out T>(PcreRefMatch match);
 
         internal PcreRefMatch(InternalRegex regex, Span<uint> oVector)
@@ -40,21 +48,34 @@ namespace PCRE
             _resultCode = oVector.Length / 2;
         }
 
+        /// <inheritdoc cref="PcreMatch.CaptureCount"/>
         public readonly int CaptureCount => _regex?.CaptureCount ?? 0;
 
+        /// <inheritdoc cref="PcreMatch.Item(int)"/>
         public readonly PcreRefGroup this[int index] => GetGroup(index);
+
+        /// <inheritdoc cref="PcreMatch.Item(string)"/>
         public readonly PcreRefGroup this[string name] => GetGroup(name);
 
         internal ReadOnlySpan<char> Subject;
         internal readonly bool IsInitialized => _regex != null;
 
+        /// <inheritdoc cref="PcreMatch.Index"/>
         public readonly int Index => this[0].Index;
+
+        /// <inheritdoc cref="PcreMatch.EndIndex"/>
         public readonly int EndIndex => this[0].EndIndex;
+
+        /// <inheritdoc cref="PcreMatch.Length"/>
         public readonly int Length => this[0].Length;
 
+        /// <inheritdoc cref="PcreMatch.Success"/>
         public readonly bool Success => _resultCode > 0;
+
+        /// <inheritdoc cref="PcreMatch.Value"/>
         public readonly ReadOnlySpan<char> Value => this[0].Value;
 
+        /// <inheritdoc cref="PcreMatch.Mark"/>
         public readonly ReadOnlySpan<char> Mark
         {
             get
@@ -71,18 +92,24 @@ namespace PCRE
             }
         }
 
+        /// <inheritdoc cref="PcreMatch.Groups"/>
         public readonly GroupList Groups => new(this);
 
+        /// <inheritdoc cref="PcreMatch.IsPartialMatch"/>
         public readonly bool IsPartialMatch => _resultCode == PcreConstants.ERROR_PARTIAL;
 
-        public readonly GroupEnumerator GetEnumerator() => new(this);
+        /// <inheritdoc cref="PcreMatch.GetEnumerator"/>
+        public readonly GroupEnumerator GetEnumerator()
+            => new(this);
 
+        /// <inheritdoc cref="PcreMatch.TryGetGroup(int,out PCRE.PcreGroup)"/>
         public readonly bool TryGetGroup(int index, out PcreRefGroup result)
         {
             result = GetGroup(index);
             return result.IsDefined;
         }
 
+        /// <inheritdoc cref="PcreMatch.TryGetGroup(string,out PCRE.PcreGroup)"/>
         public readonly bool TryGetGroup(string name, out PcreRefGroup result)
         {
             result = GetGroup(name);
@@ -135,6 +162,7 @@ namespace PCRE
             return PcreRefGroup.Empty;
         }
 
+        /// <inheritdoc cref="PcreMatch.GetDuplicateNamedGroups"/>
         public readonly DuplicateNamedGroupEnumerable GetDuplicateNamedGroups(string name)
         {
             if (_regex == null)
@@ -204,9 +232,13 @@ namespace PCRE
             return Math.Max(Index, EndIndex);
         }
 
-        public override readonly string ToString()
+        /// <inheritdoc cref="PcreMatch.ToString"/>
+        public readonly override string ToString()
             => Value.ToString();
 
+        /// <summary>
+        /// The list of groups in a match.
+        /// </summary>
         public readonly ref struct GroupList
         {
             private readonly PcreRefMatch _match;
@@ -214,14 +246,26 @@ namespace PCRE
             internal GroupList(PcreRefMatch match)
                 => _match = match;
 
+            /// <summary>
+            /// Returns the capture count.
+            /// </summary>
             public int Count => _match._regex?.CaptureCount + 1 ?? 0;
 
+            /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
             public GroupEnumerator GetEnumerator()
                 => new(_match);
 
+            /// <inheritdoc cref="PcreMatch.Item(int)"/>
             public PcreRefGroup this[int index] => _match[index];
+
+            /// <inheritdoc cref="PcreMatch.Item(string)"/>
             public PcreRefGroup this[string name] => _match[name];
 
+            /// <summary>
+            /// Creates a <see cref="List{T}"/> out of the groups by applying a <paramref name="selector"/> method.
+            /// </summary>
+            /// <param name="selector">The selector that converts a group to a list item.</param>
+            /// <typeparam name="T">The type of list items.</typeparam>
             [SuppressMessage("Microsoft.Design", "CA1002")]
             [SuppressMessage("Microsoft.Design", "CA1062")]
             public List<T> ToList<T>(PcreRefGroup.Func<T> selector)
@@ -235,6 +279,9 @@ namespace PCRE
             }
         }
 
+        /// <summary>
+        /// A capturing group enumerator.
+        /// </summary>
         public ref struct GroupEnumerator
         {
             private readonly PcreRefMatch _match;
@@ -246,12 +293,17 @@ namespace PCRE
                 _index = -1;
             }
 
+            /// <inheritdoc cref="IEnumerator{T}.Current"/>
             public readonly PcreRefGroup Current => _match[_index];
 
+            /// <inheritdoc cref="IEnumerator.MoveNext"/>
             public bool MoveNext()
                 => ++_index <= _match.CaptureCount;
         }
 
+        /// <summary>
+        /// An enumerable of duplicated named groups.
+        /// </summary>
         public readonly ref struct DuplicateNamedGroupEnumerable
         {
             private readonly PcreRefMatch _match;
@@ -263,9 +315,15 @@ namespace PCRE
                 _groupIndexes = groupIndexes;
             }
 
+            /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
             public DuplicateNamedGroupEnumerator GetEnumerator()
                 => new(_match, _groupIndexes);
 
+            /// <summary>
+            /// Creates a <see cref="List{T}"/> out of the groups by applying a <paramref name="selector"/> method.
+            /// </summary>
+            /// <param name="selector">The selector that converts a group to a list item.</param>
+            /// <typeparam name="T">The type of list items.</typeparam>
             [SuppressMessage("Microsoft.Design", "CA1002")]
             [SuppressMessage("Microsoft.Design", "CA1062")]
             public List<T> ToList<T>(PcreRefGroup.Func<T> selector)
@@ -279,6 +337,9 @@ namespace PCRE
             }
         }
 
+        /// <summary>
+        /// An enumerator of duplicated named groups.
+        /// </summary>
         public ref struct DuplicateNamedGroupEnumerator
         {
             private readonly PcreRefMatch _match;
@@ -292,8 +353,10 @@ namespace PCRE
                 _index = -1;
             }
 
+            /// <inheritdoc cref="IEnumerator{T}.Current"/>
             public readonly PcreRefGroup Current => _groupIndexes != null ? _match.GetGroup(_groupIndexes[_index]) : PcreRefGroup.Undefined;
 
+            /// <inheritdoc cref="IEnumerator.MoveNext"/>
             public bool MoveNext()
             {
                 if (_groupIndexes is null)
