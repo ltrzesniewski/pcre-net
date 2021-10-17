@@ -51,10 +51,16 @@ namespace PCRE
         /// <inheritdoc cref="PcreMatch.CaptureCount"/>
         public readonly int CaptureCount => _regex?.CaptureCount ?? 0;
 
-        /// <inheritdoc cref="PcreMatch.Item(int)"/>
+        /// <summary>
+        /// Returns the capturing group at a given index.
+        /// </summary>
+        /// <param name="index">The index of the capturing group.</param>
         public readonly PcreRefGroup this[int index] => GetGroup(index);
 
-        /// <inheritdoc cref="PcreMatch.Item(string)"/>
+        /// <summary>
+        /// Returns the capturing group of a given name.
+        /// </summary>
+        /// <param name="name">The name of the capturing group.</param>
         public readonly PcreRefGroup this[string name] => GetGroup(name);
 
         internal ReadOnlySpan<char> Subject;
@@ -255,10 +261,10 @@ namespace PCRE
             public GroupEnumerator GetEnumerator()
                 => new(_match);
 
-            /// <inheritdoc cref="PcreMatch.Item(int)"/>
+            /// <inheritdoc cref="PcreMatch.get_Item(int)"/>
             public PcreRefGroup this[int index] => _match[index];
 
-            /// <inheritdoc cref="PcreMatch.Item(string)"/>
+            /// <inheritdoc cref="PcreMatch.get_Item(string)"/>
             public PcreRefGroup this[string name] => _match[name];
 
             /// <summary>

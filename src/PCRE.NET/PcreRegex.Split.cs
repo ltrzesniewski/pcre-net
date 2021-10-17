@@ -94,7 +94,7 @@ namespace PCRE
             => Split(subject, pattern, options, PcreSplitOptions.None, -1, 0);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Split"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern" or @name="options" or @name="count"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern" or @name="count"]]/*'/>
         [Pure]
         public static IEnumerable<string> Split(string subject, string pattern, int count)
             => Split(subject, pattern, PcreOptions.None, PcreSplitOptions.None, count, 0);
