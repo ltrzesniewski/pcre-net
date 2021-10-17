@@ -46,7 +46,7 @@ namespace PCRE
             }
 
             var index = 0;
-            var captureCount = CaptureCount;
+            var captureCount = InternalRegex.CaptureCount;
             var includeGroupValues = (options & PcreSplitOptions.IncludeGroupValues) != 0;
 
             foreach (var match in Matches(subject, startIndex))

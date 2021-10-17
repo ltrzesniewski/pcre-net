@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <method name="IsMatch">
+    <summary>
+      Indicates whether the regex matches the given subject.
+    </summary>
+  </method>
+
+  <method name="Match">
+    <summary>
+      Matches the regex against the given subject.
+    </summary>
+  </method>
+
+  <method name="Matches">
+    <summary>
+      Returns an enumerable of all matches found in the given subject.
+    </summary>
+  </method>
+
+  <!-- Keep the parameters ordered as they appear in the method signatures -->
+
+  <param>
+    <param name="subject">The subject string to be matched.</param>
+  </param>
+
+  <param>
+    <param name="pattern">The regular expression pattern.</param>
+    <remarks>
+      <para>
+        Note that using a static matching method is not efficient. For best performance,
+        create a <see cref="PcreRegex"/> object and use its instance methods.
+      </para>
+    </remarks>
+  </param>
+
+  <param>
+    <param name="startIndex">The index at which the match should be attempted.</param>
+    <remarks>
+      <para>
+        Passing a non-zero
+        <paramref name="startIndex"/>
+        differs from passing a shortened string if the pattern
+        starts with an assertion (such as <c>\b</c>) or contains lookbehinds.
+      </para>
+    </remarks>
+  </param>
+
+  <param>
+    <param name="options">Additional options to apply for the match.</param>
+  </param>
+
+  <param>
+    <param name="onCallout">A function to be called when a callout point is reached during the match.</param>
+    <remarks>
+      <para>
+        Within a regular expression, <c>(?C&lt;arg&gt;)</c> indicates a point at which the external function is to be called.
+        Different callout points can be identified by putting a number less than 256 after the letter C. The default value is zero.
+        Alternatively, the argument may be a delimited string. The starting delimiter must be one of
+        <c>` ' " ^ % # $ {</c>
+        and the ending delimiter is the same as the start, except for <c>{</c>, where the ending delimiter is <c>}</c>.
+        If the <see cref="PcreOptions.AutoCallout"/> option bit is set when a pattern is compiled, PCRE2 automatically inserts callouts,
+        all with number 255, before each item in the pattern except for immediately before or after an explicit callout.
+      </para>
+    </remarks>
+  </param>
+
+  <param>
+    <param name="settings">Additional advanced settings.</param>
+  </param>
+
+</doc>

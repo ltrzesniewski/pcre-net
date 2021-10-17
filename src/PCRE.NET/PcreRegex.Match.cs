@@ -11,18 +11,26 @@ namespace PCRE
     [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
     public partial class PcreRegex
     {
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="IsMatch"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject"]]/*'/>
         [Pure]
         public bool IsMatch(string subject)
             => IsMatch(subject.AsSpan(), 0);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="IsMatch"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject"]]/*'/>
         [Pure]
         public bool IsMatch(ReadOnlySpan<char> subject)
             => IsMatch(subject, 0);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="IsMatch"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex"]]/*'/>
         [Pure]
         public bool IsMatch(string subject, int startIndex)
             => IsMatch(subject.AsSpan(), startIndex);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="IsMatch"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex"]]/*'/>
         [Pure]
         public bool IsMatch(ReadOnlySpan<char> subject, int startIndex)
         {
@@ -39,62 +47,96 @@ namespace PCRE
             return match.Success;
         }
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject"]]/*'/>
         [Pure]
         public PcreMatch Match(string subject)
             => Match(subject, 0, PcreMatchOptions.None, null, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject"]]/*'/>
         [Pure]
         public PcreRefMatch Match(ReadOnlySpan<char> subject)
             => Match(subject, 0, PcreMatchOptions.None, null, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="options"]]/*'/>
         [Pure]
         public PcreMatch Match(string subject, PcreMatchOptions options)
             => Match(subject, 0, options, null, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="options"]]/*'/>
         [Pure]
         public PcreRefMatch Match(ReadOnlySpan<char> subject, PcreMatchOptions options)
             => Match(subject, 0, options, null, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex"]]/*'/>
         [Pure]
         public PcreMatch Match(string subject, int startIndex)
             => Match(subject, startIndex, PcreMatchOptions.None, null, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex"]]/*'/>
         [Pure]
         public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex)
             => Match(subject, startIndex, PcreMatchOptions.None, null, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex" or @name="options"]]/*'/>
         [Pure]
         public PcreMatch Match(string subject, int startIndex, PcreMatchOptions options)
             => Match(subject, startIndex, options, null, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex" or @name="options"]]/*'/>
         [Pure]
         public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options)
             => Match(subject, startIndex, options, null, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="onCallout"]]/*'/>
         public PcreMatch Match(string subject, Func<PcreCallout, PcreCalloutResult>? onCallout)
             => Match(subject, 0, PcreMatchOptions.None, onCallout, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="onCallout"]]/*'/>
         public PcreRefMatch Match(ReadOnlySpan<char> subject, PcreRefCalloutFunc? onCallout)
             => Match(subject, 0, PcreMatchOptions.None, onCallout, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="options" or @name="onCallout"]]/*'/>
         public PcreMatch Match(string subject, PcreMatchOptions options, Func<PcreCallout, PcreCalloutResult>? onCallout)
             => Match(subject, 0, options, onCallout, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="options" or @name="onCallout"]]/*'/>
         public PcreRefMatch Match(ReadOnlySpan<char> subject, PcreMatchOptions options, PcreRefCalloutFunc? onCallout)
             => Match(subject, 0, options, onCallout, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex" or @name="onCallout"]]/*'/>
         public PcreMatch Match(string subject, int startIndex, Func<PcreCallout, PcreCalloutResult>? onCallout)
             => Match(subject, startIndex, PcreMatchOptions.None, onCallout, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex" or @name="onCallout"]]/*'/>
         public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex, PcreRefCalloutFunc? onCallout)
             => Match(subject, startIndex, PcreMatchOptions.None, onCallout, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex" or @name="options" or @name="onCallout"]]/*'/>
         public PcreMatch Match(string subject, int startIndex, PcreMatchOptions options, Func<PcreCallout, PcreCalloutResult>? onCallout)
             => Match(subject, startIndex, options, onCallout, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex" or @name="options" or @name="onCallout"]]/*'/>
         public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFunc? onCallout)
             => Match(subject, startIndex, options, onCallout, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex" or @name="options" or @name="onCallout" or @name="settings"]]/*'/>
         public PcreMatch Match(string subject, int startIndex, PcreMatchOptions options, Func<PcreCallout, PcreCalloutResult>? onCallout, PcreMatchSettings settings)
         {
             if (subject == null)
@@ -109,6 +151,8 @@ namespace PCRE
             return InternalRegex.Match(subject, settings, startIndex, options.ToPatternOptions(), onCallout);
         }
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex" or @name="options" or @name="onCallout" or @name="settings"]]/*'/>
         public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFunc? onCallout, PcreMatchSettings settings)
         {
             if (settings == null)
@@ -123,30 +167,44 @@ namespace PCRE
             return match;
         }
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Matches"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject"]]/*'/>
         [Pure]
         public IEnumerable<PcreMatch> Matches(string subject)
             => Matches(subject, 0, PcreMatchOptions.None, null, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Matches"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject"]]/*'/>
         [Pure]
         public RefMatchEnumerable Matches(ReadOnlySpan<char> subject)
             => Matches(subject, 0, PcreMatchOptions.None, null, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Matches"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex"]]/*'/>
         [Pure]
         public IEnumerable<PcreMatch> Matches(string subject, int startIndex)
             => Matches(subject, startIndex, PcreMatchOptions.None, null, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Matches"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex"]]/*'/>
         [Pure]
         public RefMatchEnumerable Matches(ReadOnlySpan<char> subject, int startIndex)
             => Matches(subject, startIndex, PcreMatchOptions.None, null, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Matches"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex" or @name="onCallout"]]/*'/>
         [Pure]
         public IEnumerable<PcreMatch> Matches(string subject, int startIndex, Func<PcreCallout, PcreCalloutResult>? onCallout)
             => Matches(subject, startIndex, PcreMatchOptions.None, onCallout, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Matches"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex" or @name="onCallout"]]/*'/>
         [Pure]
         public RefMatchEnumerable Matches(ReadOnlySpan<char> subject, int startIndex, PcreRefCalloutFunc? onCallout)
             => Matches(subject, startIndex, PcreMatchOptions.None, onCallout, PcreMatchSettings.Default);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Matches"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex" or @name="options" or @name="onCallout" or @name="settings"]]/*'/>
         [Pure]
         public IEnumerable<PcreMatch> Matches(string subject, int startIndex, PcreMatchOptions options, Func<PcreCallout, PcreCalloutResult>? onCallout, PcreMatchSettings settings)
         {
@@ -162,6 +220,8 @@ namespace PCRE
             return MatchesIterator(subject, startIndex, options, onCallout, settings);
         }
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Matches"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex" or @name="options" or @name="onCallout" or @name="settings"]]/*'/>
         [Pure]
         public RefMatchEnumerable Matches(ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFunc? onCallout, PcreMatchSettings settings)
         {
@@ -196,38 +256,56 @@ namespace PCRE
             }
         }
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="IsMatch"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern"]]/*'/>
         [Pure]
         public static bool IsMatch(string subject, string pattern)
             => IsMatch(subject, pattern, PcreOptions.None, 0);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="IsMatch"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern" or @name="options"]]/*'/>
         [Pure]
         public static bool IsMatch(string subject, string pattern, PcreOptions options)
             => IsMatch(subject, pattern, options, 0);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="IsMatch"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern" or @name="options" or @name="startIndex"]]/*'/>
         [Pure]
         public static bool IsMatch(string subject, string pattern, PcreOptions options, int startIndex)
             => new PcreRegex(pattern, options).IsMatch(subject, startIndex);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern"]]/*'/>
         [Pure]
         public static PcreMatch Match(string subject, string pattern)
             => Match(subject, pattern, PcreOptions.None, 0);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern" or @name="options"]]/*'/>
         [Pure]
         public static PcreMatch Match(string subject, string pattern, PcreOptions options)
             => Match(subject, pattern, options, 0);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern" or @name="options" or @name="startIndex"]]/*'/>
         [Pure]
         public static PcreMatch Match(string subject, string pattern, PcreOptions options, int startIndex)
             => new PcreRegex(pattern, options).Match(subject, startIndex);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Matches"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern"]]/*'/>
         [Pure]
         public static IEnumerable<PcreMatch> Matches(string subject, string pattern)
             => Matches(subject, pattern, PcreOptions.None, 0);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Matches"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern" or @name="options"]]/*'/>
         [Pure]
         public static IEnumerable<PcreMatch> Matches(string subject, string pattern, PcreOptions options)
             => Matches(subject, pattern, options, 0);
 
+        /// <include file='PcreRegex.xml' path='/doc/method[@name="Matches"]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern" or @name="options" or @name="startIndex"]]/*'/>
         [Pure]
         public static IEnumerable<PcreMatch> Matches(string subject, string pattern, PcreOptions options, int startIndex)
             => new PcreRegex(pattern, options).Matches(subject, startIndex);
@@ -235,6 +313,9 @@ namespace PCRE
         private static void ThrowInvalidStartIndex()
             => throw new ArgumentOutOfRangeException("Invalid start index.", default(Exception));
 
+        /// <summary>
+        /// An enumerable of matches against a <see cref="ReadOnlySpan{T}"/>.
+        /// </summary>
         public readonly ref struct RefMatchEnumerable
         {
             private readonly ReadOnlySpan<char> _subject;
@@ -259,9 +340,15 @@ namespace PCRE
                 _settings = settings;
             }
 
+            /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
             public RefMatchEnumerator GetEnumerator()
                 => new(_regex, _subject, _startIndex, _options, _callout, _settings);
 
+            /// <summary>
+            /// Creates a <see cref="List{T}"/> out of the matches by applying a <paramref name="selector"/> method.
+            /// </summary>
+            /// <param name="selector">The selector that converts a match to a list item.</param>
+            /// <typeparam name="T">The type of list items.</typeparam>
             [SuppressMessage("Microsoft.Design", "CA1002")]
             [SuppressMessage("Microsoft.Design", "CA1062")]
             public List<T> ToList<T>(PcreRefMatch.Func<T> selector)
@@ -275,6 +362,9 @@ namespace PCRE
             }
         }
 
+        /// <summary>
+        /// An enumerator of matches against a <see cref="ReadOnlySpan{T}"/>.
+        /// </summary>
         public ref struct RefMatchEnumerator
         {
             private readonly ReadOnlySpan<char> _subject;
@@ -301,8 +391,14 @@ namespace PCRE
                 _match = default;
             }
 
+            /// <summary>
+            /// Gets the current match.
+            /// </summary>
             public readonly PcreRefMatch Current => _match;
 
+            /// <summary>
+            /// Moves to the next match.
+            /// </summary>
             public bool MoveNext()
             {
                 if (_regex == null)
