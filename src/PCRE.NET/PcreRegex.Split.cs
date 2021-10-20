@@ -30,12 +30,18 @@ namespace PCRE
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Split"]/*'/>
         /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="count" or @name="startIndex"]]/*'/>
+        /// <remarks>
+        /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex"]/*'/>
+        /// </remarks>
         [Pure]
         public IEnumerable<string> Split(string subject, int count, int startIndex)
             => Split(subject, PcreSplitOptions.None, count, startIndex);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Split"]/*'/>
         /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="options" or @name="count" or @name="startIndex"]]/*'/>
+        /// <remarks>
+        /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex"]/*'/>
+        /// </remarks>
         [Pure]
         public IEnumerable<string> Split(string subject, PcreSplitOptions options, int count, int startIndex)
         {
@@ -83,36 +89,54 @@ namespace PCRE
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Split"]/*'/>
         /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern"]]/*'/>
+        /// <remarks>
+        /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static"]/*'/>
+        /// </remarks>
         [Pure]
         public static IEnumerable<string> Split(string subject, string pattern)
             => Split(subject, pattern, PcreOptions.None, PcreSplitOptions.None, -1, 0);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Split"]/*'/>
         /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern" or @name="options"]]/*'/>
+        /// <remarks>
+        /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static"]/*'/>
+        /// </remarks>
         [Pure]
         public static IEnumerable<string> Split(string subject, string pattern, PcreOptions options)
             => Split(subject, pattern, options, PcreSplitOptions.None, -1, 0);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Split"]/*'/>
         /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern" or @name="count"]]/*'/>
+        /// <remarks>
+        /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static"]/*'/>
+        /// </remarks>
         [Pure]
         public static IEnumerable<string> Split(string subject, string pattern, int count)
             => Split(subject, pattern, PcreOptions.None, PcreSplitOptions.None, count, 0);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Split"]/*'/>
         /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern" or @name="options" or @name="splitOptions"]]/*'/>
+        /// <remarks>
+        /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static"]/*'/>
+        /// </remarks>
         [Pure]
         public static IEnumerable<string> Split(string subject, string pattern, PcreOptions options, PcreSplitOptions splitOptions)
             => Split(subject, pattern, options, splitOptions, -1, 0);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Split"]/*'/>
         /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern" or @name="options" or @name="splitOptions" or @name="count"]]/*'/>
+        /// <remarks>
+        /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static"]/*'/>
+        /// </remarks>
         [Pure]
         public static IEnumerable<string> Split(string subject, string pattern, PcreOptions options, PcreSplitOptions splitOptions, int count)
             => Split(subject, pattern, options, splitOptions, count, 0);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Split"]/*'/>
         /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern" or @name="options" or @name="splitOptions" or @name="count" or @name="startIndex"]]/*'/>
+        /// <remarks>
+        /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static" or @name="startIndex"]/*'/>
+        /// </remarks>
         [Pure]
         public static IEnumerable<string> Split(string subject, string pattern, PcreOptions options, PcreSplitOptions splitOptions, int count, int startIndex)
             => new PcreRegex(pattern, options).Split(subject, splitOptions, count, startIndex);

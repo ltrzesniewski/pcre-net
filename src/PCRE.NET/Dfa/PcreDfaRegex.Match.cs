@@ -23,30 +23,45 @@ namespace PCRE.Dfa
 
         /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatch"]/*'/>
         /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject"]]/*'/>
+        /// <remarks>
+        /// <include file='PcreRegex.xml' path='/doc/remarks[@name="dfaMatch"]/*'/>
+        /// </remarks>
         [Pure]
         public PcreDfaMatchResult Match(string subject)
             => Match(subject, 0, PcreDfaMatchOptions.None);
 
         /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatch"]/*'/>
         /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="options"]]/*'/>
+        /// <remarks>
+        /// <include file='PcreRegex.xml' path='/doc/remarks[@name="dfaMatch"]/*'/>
+        /// </remarks>
         [Pure]
         public PcreDfaMatchResult Match(string subject, PcreDfaMatchOptions options)
             => Match(subject, 0, options);
 
         /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatch"]/*'/>
         /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex"]]/*'/>
+        /// <remarks>
+        /// <include file='PcreRegex.xml' path='/doc/remarks[@name="dfaMatch" or @name="startIndex"]/*'/>
+        /// </remarks>
         [Pure]
         public PcreDfaMatchResult Match(string subject, int startIndex)
             => Match(subject, startIndex, PcreDfaMatchOptions.None);
 
         /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatch"]/*'/>
         /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex" or @name="options"]]/*'/>
+        /// <remarks>
+        /// <include file='PcreRegex.xml' path='/doc/remarks[@name="dfaMatch" or @name="startIndex"]/*'/>
+        /// </remarks>
         [Pure]
         public PcreDfaMatchResult Match(string subject, int startIndex, PcreDfaMatchOptions options)
             => Match(subject, PcreDfaMatchSettings.GetSettings(startIndex, options));
 
         /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatch"]/*'/>
         /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="settings"]]/*'/>
+        /// <remarks>
+        /// <include file='PcreRegex.xml' path='/doc/remarks[@name="dfaMatch"]/*'/>
+        /// </remarks>
         public PcreDfaMatchResult Match(string subject, PcreDfaMatchSettings settings)
         {
             if (subject == null)
@@ -63,18 +78,27 @@ namespace PCRE.Dfa
 
         /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatches"]/*'/>
         /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject"]]/*'/>
+        /// <remarks>
+        /// <include file='PcreRegex.xml' path='/doc/remarks[@name="dfaMatches"]/*'/>
+        /// </remarks>
         [Pure]
         public IEnumerable<PcreDfaMatchResult> Matches(string subject)
             => Matches(subject, 0);
 
         /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatches"]/*'/>
         /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex"]]/*'/>
+        /// <remarks>
+        /// <include file='PcreRegex.xml' path='/doc/remarks[@name="dfaMatches" or @name="startIndex"]/*'/>
+        /// </remarks>
         [Pure]
         public IEnumerable<PcreDfaMatchResult> Matches(string subject, int startIndex)
             => Matches(subject, PcreDfaMatchSettings.GetSettings(startIndex, PcreDfaMatchOptions.None));
 
         /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatches"]/*'/>
         /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="settings"]]/*'/>
+        /// <remarks>
+        /// <include file='PcreRegex.xml' path='/doc/remarks[@name="dfaMatches"]/*'/>
+        /// </remarks>
         [Pure]
         public IEnumerable<PcreDfaMatchResult> Matches(string subject, PcreDfaMatchSettings settings)
         {

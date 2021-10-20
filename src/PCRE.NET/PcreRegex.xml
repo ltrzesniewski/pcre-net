@@ -34,23 +34,12 @@
     <summary>
       Matches the regex against the given subject using the DFA algorithm.
     </summary>
-    <remarks>
-      <para>
-        The returned result represents all matches starting at the same index.
-      </para>
-    </remarks>
   </method>
 
   <method name="DfaMatches">
     <summary>
       Returns an enumerable of all matches found in the given subject, using the DFA algorithm.
     </summary>
-    <remarks>
-      <para>
-        The returned result is a sequence of match results starting at different points in the subject string.
-        Each item represents several matches starting at the same index in the subject string.
-      </para>
-    </remarks>
   </method>
 
   <!-- Keep the parameters ordered as they appear in the method signatures -->
@@ -61,59 +50,10 @@
 
   <param>
     <param name="pattern">The regular expression pattern.</param>
-    <remarks>
-      <para>
-        Note that using a static matching method is not efficient. For best performance,
-        create a
-        <see cref="PcreRegex"/>
-        object and use its instance methods.
-      </para>
-    </remarks>
   </param>
 
   <param>
     <param name="replacement">The replacement string.</param>
-    <remarks>
-      <para>
-        The supported placeholders in the replacement string are similar to those supported by the
-        <see cref="System.Text.RegularExpressions.Regex"/>
-        class:
-        <list type="bullet">
-          <item>
-            <c>$n</c>
-            - The value of the capture group at index <c>n</c>.
-          </item>
-          <item>
-            <c>${name}</c>
-            - The value of the named capture group.
-          </item>
-          <item>
-            <c>$&amp;</c>
-            - The value of the full match. Equivalent to <c>$0</c>.
-          </item>
-          <item>
-            <c>$_</c>
-            - The full subject string.
-          </item>
-          <item>
-            <c>$`</c>
-            - The part of the subject string appearing before the match.
-          </item>
-          <item>
-            <c>$'</c>
-            - The part of the subject string appearing after the match.
-          </item>
-          <item>
-            <c>$+</c>
-            - The value of the last matched capture group.
-          </item>
-          <item>
-            <c>$$</c>
-            - A literal dollar sign.
-          </item>
-        </list>
-      </para>
-    </remarks>
   </param>
 
   <param>
@@ -126,14 +66,6 @@
 
   <param>
     <param name="startIndex">The index at which the match should be attempted.</param>
-    <remarks>
-      <para>
-        Passing a non-zero
-        <paramref name="startIndex"/>
-        differs from passing a shortened string if the pattern
-        starts with an assertion (such as <c>\b</c>) or contains lookbehinds.
-      </para>
-    </remarks>
   </param>
 
   <param>
@@ -146,23 +78,99 @@
 
   <param>
     <param name="onCallout">A function to be called when a callout point is reached during the match.</param>
-    <remarks>
-      <para>
-        Within a regular expression, <c>(?C&lt;arg&gt;)</c> indicates a point at which the external function is to be called.
-        Different callout points can be identified by putting a number less than 256 after the letter C. The default value is zero.
-        Alternatively, the argument may be a delimited string. The starting delimiter must be one of
-        <c>` ' " ^ % # $ {</c>
-        and the ending delimiter is the same as the start, except for <c>{</c>, where the ending delimiter is <c>}</c>.
-        If the
-        <see cref="PcreOptions.AutoCallout"/>
-        option bit is set when a pattern is compiled, PCRE2 automatically inserts callouts,
-        all with number 255, before each item in the pattern except for immediately before or after an explicit callout.
-      </para>
-    </remarks>
   </param>
 
   <param>
     <param name="settings">Additional advanced settings.</param>
   </param>
+
+  <!-- Keep the parameters ordered by importance -->
+
+  <remarks name="dfaMatch">
+    <para>
+      The returned result represents all matches starting at the same index.
+    </para>
+  </remarks>
+
+  <remarks name="dfaMatches">
+    <para>
+      The returned result is a sequence of match results starting at different points in the subject string.
+      Each item represents several matches starting at the same index in the subject string.
+    </para>
+  </remarks>
+
+  <remarks name="static">
+    <para>
+      Note that using a static matching method is not efficient. For best performance,
+      create a
+      <see cref="PcreRegex"/>
+      object and use its instance methods.
+    </para>
+  </remarks>
+
+  <remarks name="replacementString">
+    <para>
+      The supported placeholders in the replacement string are similar to those supported by the
+      <see cref="System.Text.RegularExpressions.Regex"/>
+      class:
+      <list type="bullet">
+        <item>
+          <c>$n</c>
+          - The value of the capture group at index <c>n</c>.
+        </item>
+        <item>
+          <c>${name}</c>
+          - The value of the named capture group.
+        </item>
+        <item>
+          <c>$&amp;</c>
+          - The value of the full match. Equivalent to <c>$0</c>.
+        </item>
+        <item>
+          <c>$_</c>
+          - The full subject string.
+        </item>
+        <item>
+          <c>$`</c>
+          - The part of the subject string appearing before the match.
+        </item>
+        <item>
+          <c>$'</c>
+          - The part of the subject string appearing after the match.
+        </item>
+        <item>
+          <c>$+</c>
+          - The value of the last matched capture group.
+        </item>
+        <item>
+          <c>$$</c>
+          - A literal dollar sign.
+        </item>
+      </list>
+    </para>
+  </remarks>
+
+  <remarks name="callout">
+    <para>
+      Within a regular expression, <c>(?C&lt;arg&gt;)</c> indicates a point at which the external function is to be called.
+      Different callout points can be identified by putting a number less than 256 after the letter C. The default value is zero.
+      Alternatively, the argument may be a delimited string. The starting delimiter must be one of
+      <c>` ' " ^ % # $ {</c>
+      and the ending delimiter is the same as the start, except for <c>{</c>, where the ending delimiter is <c>}</c>.
+      If the
+      <see cref="PcreOptions.AutoCallout"/>
+      option bit is set when a pattern is compiled, PCRE2 automatically inserts callouts,
+      all with number 255, before each item in the pattern except for immediately before or after an explicit callout.
+    </para>
+  </remarks>
+
+  <remarks name="startIndex">
+    <para>
+      Passing a non-zero
+      <paramref name="startIndex"/>
+      differs from passing a shortened string if the pattern
+      starts with an assertion (such as <c>\b</c>) or contains lookbehinds.
+    </para>
+  </remarks>
 
 </doc>
