@@ -34,13 +34,13 @@ namespace PCRE
         }
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="IsMatch"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject"]'/>
         [Pure]
         public bool IsMatch(ReadOnlySpan<char> subject)
             => Match(subject, 0, PcreMatchOptions.None, null).Success;
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="IsMatch"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="startIndex"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex"]/*'/>
         /// </remarks>
@@ -49,19 +49,19 @@ namespace PCRE
             => Match(subject, startIndex, PcreMatchOptions.None, null).Success;
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject"]'/>
         [Pure]
         public PcreRefMatch Match(ReadOnlySpan<char> subject)
             => Match(subject, 0, PcreMatchOptions.None, null);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="options"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="options"]'/>
         [Pure]
         public PcreRefMatch Match(ReadOnlySpan<char> subject, PcreMatchOptions options)
             => Match(subject, 0, options, null);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="startIndex"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex"]/*'/>
         /// </remarks>
@@ -70,7 +70,7 @@ namespace PCRE
             => Match(subject, startIndex, PcreMatchOptions.None, null);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex" or @name="options"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="startIndex" or @name="options"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex"]/*'/>
         /// </remarks>
@@ -79,7 +79,7 @@ namespace PCRE
             => Match(subject, startIndex, options, null);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="onCallout"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="onCallout"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="callout"]/*'/>
         /// </remarks>
@@ -87,7 +87,7 @@ namespace PCRE
             => Match(subject, 0, PcreMatchOptions.None, onCallout);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="options" or @name="onCallout"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="options" or @name="onCallout"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="callout"]/*'/>
         /// </remarks>
@@ -95,7 +95,7 @@ namespace PCRE
             => Match(subject, 0, options, onCallout);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex" or @name="onCallout"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="startIndex" or @name="onCallout"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex" or @name="callout"]/*'/>
         /// </remarks>
@@ -103,7 +103,7 @@ namespace PCRE
             => Match(subject, startIndex, PcreMatchOptions.None, onCallout);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex" or @name="options" or @name="onCallout"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="startIndex" or @name="options" or @name="onCallout"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex" or @name="callout"]/*'/>
         /// </remarks>
@@ -129,13 +129,13 @@ namespace PCRE
         }
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Matches"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject"]'/>
         [Pure]
         public RefMatchEnumerable Matches(ReadOnlySpan<char> subject)
             => Matches(subject, 0, PcreMatchOptions.None, null);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Matches"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="startIndex"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex"]/*'/>
         /// </remarks>
@@ -144,7 +144,7 @@ namespace PCRE
             => Matches(subject, startIndex, PcreMatchOptions.None, null);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Matches"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex" or @name="onCallout"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="startIndex" or @name="onCallout"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex" or @name="callout"]/*'/>
         /// </remarks>
@@ -153,7 +153,7 @@ namespace PCRE
             => Matches(subject, startIndex, PcreMatchOptions.None, onCallout);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Matches"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex" or @name="options" or @name="onCallout"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="startIndex" or @name="options" or @name="onCallout"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex" or @name="callout"]/*'/>
         /// </remarks>

@@ -22,7 +22,7 @@ namespace PCRE.Dfa
         }
 
         /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatch"]/*'/>
-        /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject"]]/*'/>
+        /// <include file='../PcreRegex.xml' path='/doc/param[@name="subject"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="dfaMatch"]/*'/>
         /// </remarks>
@@ -31,7 +31,7 @@ namespace PCRE.Dfa
             => Match(subject, 0, PcreDfaMatchOptions.None);
 
         /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatch"]/*'/>
-        /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="options"]]/*'/>
+        /// <include file='../PcreRegex.xml' path='/doc/param[@name="subject" or @name="options"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="dfaMatch"]/*'/>
         /// </remarks>
@@ -40,7 +40,7 @@ namespace PCRE.Dfa
             => Match(subject, 0, options);
 
         /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatch"]/*'/>
-        /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex"]]/*'/>
+        /// <include file='../PcreRegex.xml' path='/doc/param[@name="subject" or @name="startIndex"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="dfaMatch" or @name="startIndex"]/*'/>
         /// </remarks>
@@ -49,7 +49,7 @@ namespace PCRE.Dfa
             => Match(subject, startIndex, PcreDfaMatchOptions.None);
 
         /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatch"]/*'/>
-        /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex" or @name="options"]]/*'/>
+        /// <include file='../PcreRegex.xml' path='/doc/param[@name="subject" or @name="startIndex" or @name="options"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="dfaMatch" or @name="startIndex"]/*'/>
         /// </remarks>
@@ -58,7 +58,7 @@ namespace PCRE.Dfa
             => Match(subject, PcreDfaMatchSettings.GetSettings(startIndex, options));
 
         /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatch"]/*'/>
-        /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="settings"]]/*'/>
+        /// <include file='../PcreRegex.xml' path='/doc/param[@name="subject" or @name="settings"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="dfaMatch"]/*'/>
         /// </remarks>
@@ -77,7 +77,7 @@ namespace PCRE.Dfa
         }
 
         /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatches"]/*'/>
-        /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject"]]/*'/>
+        /// <include file='../PcreRegex.xml' path='/doc/param[@name="subject"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="dfaMatches"]/*'/>
         /// </remarks>
@@ -86,7 +86,7 @@ namespace PCRE.Dfa
             => Matches(subject, 0);
 
         /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatches"]/*'/>
-        /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="startIndex"]]/*'/>
+        /// <include file='../PcreRegex.xml' path='/doc/param[@name="subject" or @name="startIndex"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="dfaMatches" or @name="startIndex"]/*'/>
         /// </remarks>
@@ -95,7 +95,7 @@ namespace PCRE.Dfa
             => Matches(subject, PcreDfaMatchSettings.GetSettings(startIndex, PcreDfaMatchOptions.None));
 
         /// <include file='../PcreRegex.xml' path='/doc/method[@name="DfaMatches"]/*'/>
-        /// <include file='../PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="settings"]]/*'/>
+        /// <include file='../PcreRegex.xml' path='/doc/param[@name="subject" or @name="settings"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="dfaMatches"]/*'/>
         /// </remarks>

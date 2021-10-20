@@ -12,7 +12,7 @@ namespace PCRE
     public partial class PcreRegex
     {
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Replace"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="replacement"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacement"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="replacementString"]/*'/>
         /// </remarks>
@@ -21,7 +21,7 @@ namespace PCRE
             => Replace(subject, replacement, -1, 0);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Replace"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="replacement" or @name="count"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacement" or @name="count"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="replacementString"]/*'/>
         /// </remarks>
@@ -30,7 +30,7 @@ namespace PCRE
             => Replace(subject, replacement, count, 0);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Replace"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="replacement" or @name="count" or @name="startIndex"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacement" or @name="count" or @name="startIndex"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="replacementString" or @name="startIndex"]/*'/>
         /// </remarks>
@@ -44,17 +44,17 @@ namespace PCRE
         }
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Replace"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="replacementFunc"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacementFunc"]'/>
         public string Replace(string subject, Func<PcreMatch, string> replacementFunc)
             => Replace(subject, replacementFunc, -1, 0);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Replace"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="replacementFunc" or @name="count"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacementFunc" or @name="count"]'/>
         public string Replace(string subject, Func<PcreMatch, string> replacementFunc, int count)
             => Replace(subject, replacementFunc, count, 0);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Replace"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="replacementFunc" or @name="count" or @name="startIndex"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacementFunc" or @name="count" or @name="startIndex"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex"]/*'/>
         /// </remarks>
@@ -90,7 +90,7 @@ namespace PCRE
         }
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Replace"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern" or @name="replacement"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="pattern" or @name="replacement"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static" or @name="replacementString"]/*'/>
         /// </remarks>
@@ -99,7 +99,7 @@ namespace PCRE
             => Replace(subject, pattern, replacement, PcreOptions.None, -1, 0);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Replace"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern" or @name="replacement" or @name="options"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="pattern" or @name="replacement" or @name="options"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static" or @name="replacementString"]/*'/>
         /// </remarks>
@@ -108,7 +108,7 @@ namespace PCRE
             => Replace(subject, pattern, replacement, options, -1, 0);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Replace"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern" or @name="replacement" or @name="options" or @name="count"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="pattern" or @name="replacement" or @name="options" or @name="count"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static" or @name="replacementString"]/*'/>
         /// </remarks>
@@ -117,7 +117,7 @@ namespace PCRE
             => Replace(subject, pattern, replacement, options, count, 0);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Replace"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern" or @name="replacement" or @name="options" or @name="count" or @name="startIndex"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="pattern" or @name="replacement" or @name="options" or @name="count" or @name="startIndex"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static" or @name="replacementString" or @name="startIndex"]/*'/>
         /// </remarks>
@@ -126,7 +126,7 @@ namespace PCRE
             => new PcreRegex(pattern, options).Replace(subject, replacement, count, startIndex);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Replace"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern" or @name="replacementFunc"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="pattern" or @name="replacementFunc"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static"]/*'/>
         /// </remarks>
@@ -134,7 +134,7 @@ namespace PCRE
             => Replace(subject, pattern, replacementFunc, PcreOptions.None, -1, 0);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Replace"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern" or @name="replacementFunc" or @name="options"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="pattern" or @name="replacementFunc" or @name="options"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static"]/*'/>
         /// </remarks>
@@ -142,7 +142,7 @@ namespace PCRE
             => Replace(subject, pattern, replacementFunc, options, -1, 0);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Replace"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern" or @name="replacementFunc" or @name="options" or @name="count"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="pattern" or @name="replacementFunc" or @name="options" or @name="count"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static"]/*'/>
         /// </remarks>
@@ -150,7 +150,7 @@ namespace PCRE
             => Replace(subject, pattern, replacementFunc, options, count, 0);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Replace"]/*'/>
-        /// <include file='PcreRegex.xml' path='/doc/param[param[@name="subject" or @name="pattern" or @name="replacementFunc" or @name="options" or @name="count" or @name="startIndex"]]/*'/>
+        /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="pattern" or @name="replacementFunc" or @name="options" or @name="count" or @name="startIndex"]'/>
         /// <remarks>
         /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static" or @name="startIndex"]/*'/>
         /// </remarks>
