@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
 using NUnit.Framework.Interfaces;
 using PCRE.Dfa;
 
