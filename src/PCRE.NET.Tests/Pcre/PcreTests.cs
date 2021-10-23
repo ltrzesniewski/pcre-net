@@ -189,6 +189,7 @@ namespace PCRE.Tests.Pcre
                         : expectedGroup.Value.UnescapeGroup();
 
                     Assert.That(actualGroup.Value, Is.EqualTo(expectedValue));
+                    Assert.That(actualGroup.ValueSpan.ToString(), Is.EqualTo(expectedValue));
                 }
             }
         }

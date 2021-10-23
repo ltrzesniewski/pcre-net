@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace PCRE.Dfa
@@ -34,6 +35,9 @@ namespace PCRE.Dfa
 
         /// <inheritdoc cref="PcreMatch.Value"/>
         public string Value => _value ??= _subject!.Substring(Index, Length);
+
+        /// <inheritdoc cref="PcreMatch.ValueSpan"/>
+        public ReadOnlySpan<char> ValueSpan => Length <= 0 ? ReadOnlySpan<char>.Empty : _subject!.AsSpan(Index, Length);
 
         /// <inheritdoc cref="PcreMatch.Success"/>
         public bool Success => Index >= 0;

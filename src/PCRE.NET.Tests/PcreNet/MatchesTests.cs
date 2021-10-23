@@ -20,18 +20,22 @@ namespace PCRE.Tests.PcreNet
             Assert.That(matches, Has.Count.EqualTo(2));
 
             Assert.That(matches[0].Value, Is.EqualTo("aba"));
+            Assert.That(matches[0].ValueSpan.ToString(), Is.EqualTo("aba"));
             Assert.That(matches[0].Index, Is.EqualTo(4));
             Assert.That(matches[0].Length, Is.EqualTo(3));
 
             Assert.That(matches[0][1].Value, Is.EqualTo("b"));
+            Assert.That(matches[0][1].ValueSpan.ToString(), Is.EqualTo("b"));
             Assert.That(matches[0][1].Index, Is.EqualTo(5));
             Assert.That(matches[0][1].Length, Is.EqualTo(1));
 
             Assert.That(matches[1].Value, Is.EqualTo("aba"));
+            Assert.That(matches[1].ValueSpan.ToString(), Is.EqualTo("aba"));
             Assert.That(matches[1].Index, Is.EqualTo(12));
             Assert.That(matches[1].Length, Is.EqualTo(3));
 
             Assert.That(matches[1][1].Value, Is.EqualTo("b"));
+            Assert.That(matches[1][1].ValueSpan.ToString(), Is.EqualTo("b"));
             Assert.That(matches[1][1].Index, Is.EqualTo(13));
             Assert.That(matches[1][1].Length, Is.EqualTo(1));
         }
@@ -98,11 +102,13 @@ namespace PCRE.Tests.PcreNet
 
             Assert.That(matches.Select(m => m.Index), Is.EqualTo(new[] { 0, 1, 2, 5, 6 }));
             Assert.That(matches.Select(m => m.Length), Is.All.EqualTo(0));
-            Assert.That(matches.Select(m => m.Value), Is.All.EqualTo(String.Empty));
+            Assert.That(matches.Select(m => m.Value), Is.All.EqualTo(string.Empty));
+            Assert.That(matches.Select(m => m.ValueSpan.Length), Is.All.EqualTo(0));
 
             Assert.That(matches.Select(m => m[1].Index), Is.EqualTo(new[] { 0, 1, 2, 5, 6 }));
             Assert.That(matches.Select(m => m[1].Length), Is.All.EqualTo(1));
             Assert.That(matches.Select(m => m[1].Value), Is.All.EqualTo("a"));
+            Assert.That(matches.Select(m => m[1].ValueSpan.ToString()), Is.All.EqualTo("a"));
         }
 
         [Test]
@@ -208,12 +214,14 @@ namespace PCRE.Tests.PcreNet
             Assert.That(matches[0].EndIndex, Is.EqualTo(0));
             Assert.That(matches[0].Length, Is.EqualTo(0));
             Assert.That(matches[0].Value, Is.EqualTo(string.Empty));
+            Assert.That(matches[0].ValueSpan.Length, Is.EqualTo(0));
 
             Assert.That(matches[1], Is.Not.Null);
             Assert.That(matches[1].Index, Is.EqualTo(6));
             Assert.That(matches[1].EndIndex, Is.EqualTo(4));
             Assert.That(matches[1].Length, Is.EqualTo(0));
             Assert.That(matches[1].Value, Is.EqualTo(string.Empty));
+            Assert.That(matches[1].ValueSpan.Length, Is.EqualTo(0));
         }
 
         [Test]

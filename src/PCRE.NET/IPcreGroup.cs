@@ -1,4 +1,6 @@
-﻿namespace PCRE
+﻿using System;
+
+namespace PCRE
 {
     /// <summary>
     /// The result of a capturing group.
@@ -24,6 +26,11 @@
         /// The value of the group.
         /// </summary>
         string Value { get; }
+
+        /// <summary>
+        /// The value of the group, as a <see cref="ReadOnlySpan{T}"/>.
+        /// </summary>
+        ReadOnlySpan<char> ValueSpan { get; }
 
         /// <summary>
         /// Indicates whether the group matched.

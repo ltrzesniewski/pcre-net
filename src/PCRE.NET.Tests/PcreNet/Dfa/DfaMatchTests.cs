@@ -1,4 +1,7 @@
-﻿using NUnit.Framework;
+﻿using System;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using NUnit.Framework;
 using PCRE.Dfa;
 
 namespace PCRE.Tests.PcreNet.Dfa
@@ -20,18 +23,22 @@ namespace PCRE.Tests.PcreNet.Dfa
 
             Assert.That(result.LongestMatch, Is.Not.Null);
             Assert.That(result.LongestMatch.Value, Is.EqualTo("<something> <something else> <something further>"));
+            Assert.That(result.LongestMatch.ValueSpan.ToString(), Is.EqualTo("<something> <something else> <something further>"));
 
             Assert.That(result.LongestMatch, Is.SameAs(result[0]));
             Assert.That(result.ShortestMatch, Is.SameAs(result[2]));
 
             Assert.That(result.ShortestMatch, Is.Not.Null);
             Assert.That(result.ShortestMatch.Value, Is.EqualTo("<something>"));
+            Assert.That(result.ShortestMatch.ValueSpan.ToString(), Is.EqualTo("<something>"));
 
             Assert.That(result[1], Is.Not.Null);
             Assert.That(result[1].Value, Is.EqualTo("<something> <something else>"));
+            Assert.That(result[1].ValueSpan.ToString(), Is.EqualTo("<something> <something else>"));
 
             Assert.That(result[3], Is.Not.Null);
             Assert.That(result[3].Value, Is.SameAs(string.Empty));
+            Assert.That(result[3].ValueSpan.Length, Is.EqualTo(0));
             Assert.That(result[3].Index, Is.EqualTo(-1));
             Assert.That(result[3].Length, Is.EqualTo(0));
         }
@@ -50,6 +57,7 @@ namespace PCRE.Tests.PcreNet.Dfa
 
             Assert.That(result.ShortestMatch, Is.Not.Null);
             Assert.That(result.ShortestMatch.Value, Is.EqualTo("<something>"));
+            Assert.That(result.ShortestMatch.ValueSpan.ToString(), Is.EqualTo("<something>"));
         }
 
         [Test]
@@ -69,9 +77,11 @@ namespace PCRE.Tests.PcreNet.Dfa
 
             Assert.That(result.LongestMatch, Is.Not.Null);
             Assert.That(result.LongestMatch.Value, Is.EqualTo("<something> <something else> <something further>"));
+            Assert.That(result.LongestMatch.ValueSpan.ToString(), Is.EqualTo("<something> <something else> <something further>"));
 
             Assert.That(result.ShortestMatch, Is.Not.Null);
             Assert.That(result.ShortestMatch.Value, Is.EqualTo("<something> <something else>"));
+            Assert.That(result.ShortestMatch.ValueSpan.ToString(), Is.EqualTo("<something> <something else>"));
         }
 
         [Test]
@@ -88,9 +98,11 @@ namespace PCRE.Tests.PcreNet.Dfa
 
             Assert.That(result.LongestMatch, Is.Not.Null);
             Assert.That(result.LongestMatch.Value, Is.EqualTo("<something else> <something further>"));
+            Assert.That(result.LongestMatch.ValueSpan.ToString(), Is.EqualTo("<something else> <something further>"));
 
             Assert.That(result.ShortestMatch, Is.Not.Null);
             Assert.That(result.ShortestMatch.Value, Is.EqualTo("<something else>"));
+            Assert.That(result.ShortestMatch.ValueSpan.ToString(), Is.EqualTo("<something else>"));
         }
 
         [Test]
@@ -105,6 +117,24 @@ namespace PCRE.Tests.PcreNet.Dfa
             Assert.That(result.Count, Is.EqualTo(2));
             Assert.That(result.LongestMatch.Value, Is.EqualTo("<something> <something else> <something further>"));
             Assert.That(result.ShortestMatch.Value, Is.EqualTo("<something>"));
+        }
+
+        [Test]
+        public void should_return_value_span_from_subject_string()
+        {
+            var subject = string.Concat("foo", "bar");
+            var re = new PcreRegex(@"b(a)(r)");
+
+            var result = re.Dfa.Match(subject);
+
+            ref var subjectRef = ref MemoryMarshal.GetReference(subject.AsSpan(3));
+            ref var valueRef = ref MemoryMarshal.GetReference(result.LongestMatch.ValueSpan);
+            Assert.IsTrue(Unsafe.AreSame(ref valueRef, ref subjectRef));
+
+            _ = result.LongestMatch.Value; // Reading the string value shouldn't change the span target
+
+            valueRef = ref MemoryMarshal.GetReference(result.LongestMatch.ValueSpan);
+            Assert.IsTrue(Unsafe.AreSame(ref valueRef, ref subjectRef));
         }
     }
 }

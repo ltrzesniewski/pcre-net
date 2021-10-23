@@ -93,6 +93,11 @@ namespace PCRE
         public string Value => this[0].Value;
 
         /// <summary>
+        /// The matched substring, as a <see cref="ReadOnlySpan{T}"/>.
+        /// </summary>
+        public ReadOnlySpan<char> ValueSpan => this[0].ValueSpan;
+
+        /// <summary>
         /// Indicates if the match was successful.
         /// </summary>
         public bool Success => _resultCode > 0;

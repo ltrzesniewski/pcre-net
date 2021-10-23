@@ -25,6 +25,7 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match.Success, Is.True);
             Assert.That(match.CaptureCount, Is.EqualTo(1));
             Assert.That(match.Value, Is.EqualTo("aaabbccc"));
+            Assert.That(match.ValueSpan.ToString(), Is.EqualTo("aaabbccc"));
             Assert.That(match.Index, Is.EqualTo(3));
             Assert.That(match.EndIndex, Is.EqualTo(11));
             Assert.That(match.Length, Is.EqualTo(8));
@@ -32,6 +33,7 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match[1], Is.Not.Null);
             Assert.That(match[1].Success, Is.True);
             Assert.That(match[1].Value, Is.EqualTo("bb"));
+            Assert.That(match[1].ValueSpan.ToString(), Is.EqualTo("bb"));
             Assert.That(match[1].Index, Is.EqualTo(6));
             Assert.That(match[1].Length, Is.EqualTo(2));
 
@@ -90,6 +92,7 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match.Success, Is.True);
             Assert.That(match.CaptureCount, Is.EqualTo(3));
             Assert.That(match.Value, Is.EqualTo("aaabbddeee"));
+            Assert.That(match.ValueSpan.ToString(), Is.EqualTo("aaabbddeee"));
             Assert.That(match.Index, Is.EqualTo(3));
             Assert.That(match.Length, Is.EqualTo(10));
 
@@ -97,6 +100,7 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match[1].Success, Is.True);
             Assert.That(match[1].IsDefined, Is.True);
             Assert.That(match[1].Value, Is.EqualTo("bb"));
+            Assert.That(match[1].ValueSpan.ToString(), Is.EqualTo("bb"));
             Assert.That(match[1].Index, Is.EqualTo(6));
             Assert.That(match[1].Length, Is.EqualTo(2));
 
@@ -104,6 +108,7 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match[2].Success, Is.False);
             Assert.That(match[2].IsDefined, Is.True);
             Assert.That(match[2].Value, Is.SameAs(string.Empty));
+            Assert.That(match[2].ValueSpan.Length, Is.EqualTo(0));
             Assert.That(match[2].Index, Is.EqualTo(-1));
             Assert.That(match[2].Length, Is.EqualTo(0));
 
@@ -111,6 +116,7 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match[3].Success, Is.True);
             Assert.That(match[3].IsDefined, Is.True);
             Assert.That(match[3].Value, Is.EqualTo("dd"));
+            Assert.That(match[3].ValueSpan.ToString(), Is.EqualTo("dd"));
             Assert.That(match[3].Index, Is.EqualTo(8));
             Assert.That(match[3].Length, Is.EqualTo(2));
 
@@ -118,6 +124,7 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match[4].Success, Is.False);
             Assert.That(match[4].IsDefined, Is.False);
             Assert.That(match[4].Value, Is.SameAs(string.Empty));
+            Assert.That(match[4].ValueSpan.Length, Is.EqualTo(0));
             Assert.That(match[4].Index, Is.EqualTo(-1));
             Assert.That(match[4].Length, Is.EqualTo(0));
 
@@ -243,16 +250,19 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match[1].Index, Is.EqualTo(0));
             Assert.That(match[1].EndIndex, Is.EqualTo(1));
             Assert.That(match[1].Value, Is.EqualTo("a"));
+            Assert.That(match[1].ValueSpan.ToString(), Is.EqualTo("a"));
 
             Assert.That(match[2].Success, Is.False);
             Assert.That(match[2].Index, Is.EqualTo(-1));
             Assert.That(match[2].EndIndex, Is.EqualTo(-1));
             Assert.That(match[2].Value, Is.SameAs(string.Empty));
+            Assert.That(match[2].ValueSpan.Length, Is.EqualTo(0));
 
             Assert.That(match[3].Success, Is.True);
             Assert.That(match[3].Index, Is.EqualTo(1));
             Assert.That(match[3].Length, Is.EqualTo(2));
             Assert.That(match[3].Value, Is.EqualTo("bc"));
+            Assert.That(match[3].ValueSpan.ToString(), Is.EqualTo("bc"));
         }
 
         [Test]
@@ -344,6 +354,7 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match.Success, Is.True);
             Assert.That(match.CaptureCount, Is.EqualTo(3));
             Assert.That(match.Value, Is.EqualTo("aaabbcccddeee"));
+            Assert.That(match.ValueSpan.ToString(), Is.EqualTo("aaabbcccddeee"));
             Assert.That(match.Index, Is.EqualTo(3));
             Assert.That(match.Length, Is.EqualTo(13));
 
@@ -351,6 +362,7 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match["bees"].Success, Is.True);
             Assert.That(match["bees"].IsDefined, Is.True);
             Assert.That(match["bees"].Value, Is.EqualTo("bb"));
+            Assert.That(match["bees"].ValueSpan.ToString(), Is.EqualTo("bb"));
             Assert.That(match["bees"].Index, Is.EqualTo(6));
             Assert.That(match["bees"].Length, Is.EqualTo(2));
 
@@ -358,6 +370,7 @@ namespace PCRE.Tests.PcreNet
 
             Assert.That(match[2], Is.Not.Null);
             Assert.That(match[2].Value, Is.EqualTo("ccc"));
+            Assert.That(match[2].ValueSpan.ToString(), Is.EqualTo("ccc"));
             Assert.That(match[2].Index, Is.EqualTo(8));
             Assert.That(match[2].Length, Is.EqualTo(3));
 
@@ -365,6 +378,7 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match["dees"].Success, Is.True);
             Assert.That(match["dees"].IsDefined, Is.True);
             Assert.That(match["dees"].Value, Is.EqualTo("dd"));
+            Assert.That(match["dees"].ValueSpan.ToString(), Is.EqualTo("dd"));
             Assert.That(match["dees"].Index, Is.EqualTo(11));
             Assert.That(match["dees"].Length, Is.EqualTo(2));
 
@@ -372,6 +386,7 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match["nope"].Success, Is.False);
             Assert.That(match["nope"].IsDefined, Is.False);
             Assert.That(match["nope"].Value, Is.SameAs(string.Empty));
+            Assert.That(match["nope"].ValueSpan.Length, Is.EqualTo(0));
             Assert.That(match["nope"].Index, Is.EqualTo(-1));
             Assert.That(match["nope"].Length, Is.EqualTo(0));
 
@@ -491,16 +506,19 @@ namespace PCRE.Tests.PcreNet
 
             Assert.That(match["grp"], Is.Not.Null);
             Assert.That(match["grp"].Value, Is.EqualTo("bb"));
+            Assert.That(match["grp"].ValueSpan.ToString(), Is.EqualTo("bb"));
             Assert.That(match["grp"].Index, Is.EqualTo(6));
             Assert.That(match["grp"].Length, Is.EqualTo(2));
 
             Assert.That(match["GRP"], Is.Not.Null);
             Assert.That(match["GRP"].Value, Is.EqualTo("ccc"));
+            Assert.That(match["GRP"].ValueSpan.ToString(), Is.EqualTo("ccc"));
             Assert.That(match["GRP"].Index, Is.EqualTo(8));
             Assert.That(match["GRP"].Length, Is.EqualTo(3));
 
             Assert.That(match["GrP"], Is.Not.Null);
             Assert.That(match["GrP"].Value, Is.EqualTo("dd"));
+            Assert.That(match["GrP"].ValueSpan.ToString(), Is.EqualTo("dd"));
             Assert.That(match["GrP"].Index, Is.EqualTo(11));
             Assert.That(match["GrP"].Length, Is.EqualTo(2));
         }
@@ -554,6 +572,7 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match, Is.Not.Null);
             Assert.That(match.Success, Is.True);
             Assert.That(match["g"].Value, Is.EqualTo("b"));
+            Assert.That(match["g"].ValueSpan.ToString(), Is.EqualTo("b"));
 
             Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo(new[] { false, true, false }));
 
@@ -561,6 +580,7 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match, Is.Not.Null);
             Assert.That(match.Success, Is.True);
             Assert.That(match["g"].Value, Is.EqualTo("b"));
+            Assert.That(match["g"].ValueSpan.ToString(), Is.EqualTo("b"));
 
             Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo(new[] { false, true, true }));
         }
@@ -640,6 +660,24 @@ namespace PCRE.Tests.PcreNet
 
         private static List<bool> GetDuplicateNamedGroupsSuccesses(PcreRefMatch match, string groupName)
             => match.GetDuplicateNamedGroups(groupName).ToList(i => i.Success);
+
+        [Test]
+        public void should_return_value_span_from_subject_string()
+        {
+            var subject = string.Concat("foo", "bar");
+            var re = new PcreRegex(@"b(a)(r)");
+
+            var match = re.Match(subject);
+
+            ref var subjectRef = ref MemoryMarshal.GetReference(subject.AsSpan(3));
+            ref var valueRef = ref MemoryMarshal.GetReference(match.ValueSpan);
+            Assert.IsTrue(Unsafe.AreSame(ref valueRef, ref subjectRef));
+
+            _ = match.Value; // Reading the string value shouldn't change the span target
+
+            valueRef = ref MemoryMarshal.GetReference(match.ValueSpan);
+            Assert.IsTrue(Unsafe.AreSame(ref valueRef, ref subjectRef));
+        }
 
         [Test]
         public void should_return_marks()

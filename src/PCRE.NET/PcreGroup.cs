@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace PCRE
 {
@@ -36,6 +37,9 @@ namespace PCRE
 
         /// <inheritdoc/>
         public string Value => _value ??= _subject!.Substring(Index, Length);
+
+        /// <inheritdoc/>
+        public ReadOnlySpan<char> ValueSpan => Length <= 0 ? ReadOnlySpan<char>.Empty : _subject!.AsSpan(Index, Length);
 
         /// <inheritdoc/>
         public bool Success => Index >= 0;
