@@ -3,7 +3,7 @@
 
 **Perl Compatible Regular Expressions for .NET**
 
-PCRE.NET is a .NET wrapper for the [PCRE library](http://www.pcre.org/).
+PCRE.NET is a .NET wrapper for the [PCRE library](https://github.com/PhilipHazel/pcre2).
 
 The following systems are supported:
 

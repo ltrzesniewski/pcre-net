@@ -7,10 +7,10 @@ PCRE.NET
 [![Build](https://github.com/ltrzesniewski/pcre-net/workflows/Build/badge.svg)](https://github.com/ltrzesniewski/pcre-net/actions?query=workflow%3ABuild)
 [![NuGet Package](https://img.shields.io/nuget/v/PCRE.NET.svg?logo=NuGet)](https://www.nuget.org/packages/PCRE.NET)
 [![GitHub release](https://img.shields.io/github/release/ltrzesniewski/pcre-net.svg?logo=GitHub)](https://github.com/ltrzesniewski/pcre-net/releases)
-[![PCRE](https://img.shields.io/badge/pcre-v10.38-blue.svg)](http://www.pcre.org/)
+[![PCRE](https://img.shields.io/badge/pcre-v10.38-blue.svg)](https://github.com/PhilipHazel/pcre2)
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/ltrzesniewski/pcre-net/blob/master/LICENCE)
 
-PCRE.NET is a .NET wrapper for the [PCRE library](http://www.pcre.org/). The goal of this project is to bring most of PCRE's features for use from .NET applications with as little overhead as possible.
+PCRE.NET is a .NET wrapper for the [PCRE library](https://github.com/PhilipHazel/pcre2). The goal of this project is to bring most of PCRE's features for use from .NET applications with as little overhead as possible.
 
 The current version is **0.17.0**, based on PCRE **10.38** (with a [bugfix](https://github.com/PhilipHazel/pcre2/pull/22)). It supports the following systems:
 
