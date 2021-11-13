@@ -832,6 +832,7 @@ Common,
 Coptic,
 Cuneiform,
 Cypriot,
+Cypro_Minoan,
 Cyrillic,
 Deseret,
 Devanagari,
@@ -915,6 +916,7 @@ Old_Persian,
 Old_Sogdian,
 Old_South_Arabian,
 Old_Turkic,
+Old_Uyghur,
 Oriya,
 Osage,
 Osmanya,
@@ -946,6 +948,7 @@ Tai_Tham,
 Tai_Viet,
 Takri,
 Tamil,
+Tangsa,
 Tangut,
 Telugu,
 Thaana,
@@ -953,9 +956,11 @@ Thai,
 Tibetan,
 Tifinagh,
 Tirhuta,
+Toto,
 Ugaritic,
 Unknown,
 Vai,
+Vithkuqi,
 Wancho,
 Warang_Citi,
 Yezidi,
@@ -2930,7 +2935,7 @@ breaks):
   (?(DEFINE) (?<byte> 2[0-4]\ed | 25[0-5] | 1\ed\ed | [1-9]?\ed) )
   \eb (?&byte) (\e.(?&byte)){3} \eb
 .sp
-The first part of the pattern is a DEFINE group inside which a another group
+The first part of the pattern is a DEFINE group inside which another group
 named "byte" is defined. This matches an individual component of an IPv4
 address (a number less than 256). When matching takes place, this part of the
 pattern is skipped because DEFINE acts like a false condition. The rest of the
