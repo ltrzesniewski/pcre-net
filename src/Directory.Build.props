@@ -26,8 +26,8 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(MSBuildProjectName)' != 'PCRE.NET.Native'">
-    <PackageReference Include="JetBrains.Annotations" Version="2021.2.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
+    <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>
