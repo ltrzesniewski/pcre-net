@@ -3,10 +3,9 @@ name: Build
 on: [push, pull_request]
 
 env:
-  BUILD_DOTNET_VERSION: 5.0.x
   BUILD_CONFIGURATION: Release
   BUILD_WINDOWS_TEST_TARGET: net48
-  BUILD_UNIX_TEST_TARGET: net5.0
+  BUILD_UNIX_TEST_TARGET: net6.0
   DOTNET_NOLOGO: 1
 
 jobs:
@@ -20,7 +19,9 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: ${{ env.BUILD_DOTNET_VERSION }}
+          dotnet-version: |
+            5.0.x
+            6.0.x
 
       - name: CMake x64
         run: |
@@ -63,7 +64,9 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: ${{ env.BUILD_DOTNET_VERSION }}
+          dotnet-version: |
+            5.0.x
+            6.0.x
 
       - name: CMake x64
         run: |
@@ -98,7 +101,7 @@ jobs:
 
   windows:
     name: Windows
-    runs-on: windows-latest
+    runs-on: windows-2022
     needs:
       - linux
       - macos
@@ -115,13 +118,9 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: ${{ env.BUILD_DOTNET_VERSION }}
-
-      - name: Setup .NET 6
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 6.0.x
-          include-prerelease: true
+          dotnet-version: |
+            5.0.x
+            6.0.x
 
       - name: Setup Environment
         run: echo 'BUILD_COMMON_MSBUILD_ARGS=/v:m /m /p:Configuration=${{ env.BUILD_CONFIGURATION }}' >> $GITHUB_ENV
