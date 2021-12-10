@@ -8,7 +8,7 @@ namespace PCRE.NET.Benchmarks
 {
     [MemoryDiagnoser]
     [ReturnValueValidator]
-    [SimpleJob(RuntimeMoniker.Net50)]
+    [SimpleJob(RuntimeMoniker.Net60)]
     public class MemoryBenchmark
     {
         private const string _pattern = @"\b(?<user>[-+\w.]+)@(?<domain>[-\w.]+\.[A-Za-z]{2,})\b";
