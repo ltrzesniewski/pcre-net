@@ -75,6 +75,17 @@ namespace PCRE.Internal
         }
 
         [StructLayout(LayoutKind.Sequential)]
+        internal ref struct match_settings
+        {
+            public uint match_limit;
+            public uint depth_limit;
+            public uint heap_limit;
+            public uint offset_limit;
+
+            public IntPtr jit_stack;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
         internal ref struct match_input
         {
             public IntPtr code;
@@ -82,14 +93,10 @@ namespace PCRE.Internal
             public uint subject_length;
             public uint start_index;
             public uint additional_options;
-            public uint match_limit;
-            public uint depth_limit;
-            public uint heap_limit;
-            public uint offset_limit;
+            public match_settings settings;
             public uint* output_vector;
             public void* callout;
             public void* callout_data;
-            public IntPtr jit_stack;
         }
 
         [StructLayout(LayoutKind.Sequential)]

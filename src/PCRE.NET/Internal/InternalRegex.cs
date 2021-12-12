@@ -126,7 +126,7 @@ namespace PCRE.Internal
             Native.match_input input;
             _ = &input;
 
-            settings.FillMatchInput(ref input);
+            settings.FillMatchSettings(ref input.settings);
 
             Native.match_result result;
             CalloutInterop.CalloutInteropInfo calloutInterop;
@@ -185,7 +185,7 @@ namespace PCRE.Internal
             Native.match_input input;
             _ = &input;
 
-            settings.FillMatchInput(ref input);
+            settings.FillMatchSettings(ref input.settings);
 
             Native.match_result result;
             CalloutInterop.CalloutInteropInfo calloutInterop;

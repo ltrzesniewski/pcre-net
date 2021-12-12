@@ -5,19 +5,24 @@ typedef int (*callout_fn)(pcre2_callout_block*, void*);
 
 typedef struct
 {
+    uint32_t match_limit;
+    uint32_t depth_limit;
+    uint32_t heap_limit;
+    uint32_t offset_limit;
+    pcre2_jit_stack* jit_stack;
+} match_settings;
+
+typedef struct
+{
     pcre2_code* code;
     uint16_t* subject;
     uint32_t subject_length;
     uint32_t start_index;
     uint32_t additional_options;
-    uint32_t match_limit;
-    uint32_t depth_limit;
-    uint32_t heap_limit;
-    uint32_t offset_limit;
+    match_settings settings;
     uint32_t* output_vector;
     callout_fn callout;
     void* callout_data;
-    pcre2_jit_stack* jit_stack;
 } pcrenet_match_input;
 
 typedef struct
@@ -52,23 +57,31 @@ static int callout_handler(pcre2_callout_block* block, void* data)
     return typedData->callout(block, typedData->data);
 }
 
+static void apply_settings(const match_settings* settings, pcre2_match_context* context)
+{
+    if (settings->match_limit)
+        pcre2_set_match_limit(context, settings->match_limit);
+
+    if (settings->depth_limit)
+        pcre2_set_depth_limit(context, settings->depth_limit);
+
+    if (settings->heap_limit)
+        pcre2_set_heap_limit(context, settings->heap_limit);
+
+    if (settings->offset_limit)
+        pcre2_set_offset_limit(context, settings->offset_limit);
+
+    if (settings->jit_stack)
+        pcre2_jit_stack_assign(context, NULL, settings->jit_stack);
+}
+
 PCRENET_EXPORT(void, match)(const pcrenet_match_input* input, pcrenet_match_result* result)
 {
     pcre2_match_data* matchData = pcre2_match_data_create_from_pattern(input->code, NULL);
     pcre2_match_context* context = pcre2_match_context_create(NULL);
     callout_data callout;
 
-    if (input->match_limit)
-        pcre2_set_match_limit(context, input->match_limit);
-
-    if (input->depth_limit)
-        pcre2_set_depth_limit(context, input->depth_limit);
-
-    if (input->heap_limit)
-        pcre2_set_heap_limit(context, input->heap_limit);
-
-    if (input->offset_limit)
-        pcre2_set_offset_limit(context, input->offset_limit);
+    apply_settings(&input->settings, context);
 
     if (input->callout)
     {
@@ -76,9 +89,6 @@ PCRENET_EXPORT(void, match)(const pcrenet_match_input* input, pcrenet_match_resu
         callout.data = input->callout_data;
         pcre2_set_callout(context, &callout_handler, &callout);
     }
-
-    if (input->jit_stack)
-        pcre2_jit_stack_assign(context, NULL, input->jit_stack);
 
     result->result_code = pcre2_match(
         input->code,

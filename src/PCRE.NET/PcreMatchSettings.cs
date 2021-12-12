@@ -145,13 +145,13 @@ namespace PCRE
         /// </summary>
         public PcreJitStack? JitStack { get; set; }
 
-        internal void FillMatchInput(ref Native.match_input input)
+        internal void FillMatchSettings(ref Native.match_settings settings)
         {
-            input.match_limit = _matchLimit.GetValueOrDefault();
-            input.depth_limit = _depthLimit.GetValueOrDefault();
-            input.heap_limit = _heapLimit.GetValueOrDefault();
-            input.offset_limit = OffsetLimit.GetValueOrDefault();
-            input.jit_stack = JitStack?.GetStack() ?? IntPtr.Zero;
+            settings.match_limit = _matchLimit.GetValueOrDefault();
+            settings.depth_limit = _depthLimit.GetValueOrDefault();
+            settings.heap_limit = _heapLimit.GetValueOrDefault();
+            settings.offset_limit = OffsetLimit.GetValueOrDefault();
+            settings.jit_stack = JitStack?.GetStack() ?? IntPtr.Zero;
         }
     }
 }
