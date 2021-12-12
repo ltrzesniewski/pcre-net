@@ -137,7 +137,7 @@ namespace PCRE.Tests.Pcre
                         case ApiKind.MatchBuffer:
                         {
                             var matchCount = 0;
-                            var buffer = regex.CreateMatchBuffer(matchSettings);
+                            using var buffer = regex.CreateMatchBuffer(matchSettings);
 
                             foreach (var actualMatch in buffer.Matches(subject.AsSpan()))
                             {

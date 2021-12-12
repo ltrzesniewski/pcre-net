@@ -14,6 +14,13 @@ typedef struct
 
 typedef struct
 {
+    const pcre2_code* code;
+    pcre2_match_data* match_data;
+    pcre2_match_context* match_context;
+} match_buffer;
+
+typedef struct
+{
     pcre2_code* code;
     uint16_t* subject;
     uint32_t subject_length;
@@ -24,6 +31,18 @@ typedef struct
     callout_fn callout;
     void* callout_data;
 } pcrenet_match_input;
+
+typedef struct
+{
+    match_buffer* buffer;
+    uint16_t* subject;
+    uint32_t subject_length;
+    uint32_t start_index;
+    uint32_t additional_options;
+    uint32_t* output_vector;
+    callout_fn callout;
+    void* callout_data;
+} pcrenet_buffer_match_input;
 
 typedef struct
 {
@@ -115,6 +134,44 @@ PCRENET_EXPORT(void, match)(const pcrenet_match_input* input, pcrenet_match_resu
     pcre2_match_data_free(matchData);
 }
 
+PCRENET_EXPORT(void, buffer_match)(const pcrenet_buffer_match_input* input, pcrenet_match_result* result)
+{
+    callout_data callout;
+
+    if (input->callout)
+    {
+        callout.callout = input->callout;
+        callout.data = input->callout_data;
+        pcre2_set_callout(input->buffer->match_context, &callout_handler, &callout);
+    }
+    else
+    {
+        pcre2_set_callout(input->buffer->match_context, NULL, NULL);
+    }
+
+    result->result_code = pcre2_match(
+        input->buffer->code,
+        input->subject,
+        input->subject_length,
+        input->start_index,
+        input->additional_options,
+        input->buffer->match_data,
+        input->buffer->match_context
+    );
+
+    if (input->output_vector)
+    {
+        PCRE2_SIZE* oVector = pcre2_get_ovector_pointer(input->buffer->match_data);
+        const uint32_t itemCount = pcre2_get_ovector_count(input->buffer->match_data) * 2;
+
+        for (uint32_t i = 0; i < itemCount; ++i)
+            input->output_vector[i] = (uint32_t)oVector[i];
+    }
+
+    result->mark = pcre2_get_mark(input->buffer->match_data);
+}
+
+
 PCRENET_EXPORT(void, dfa_match)(const pcrenet_dfa_match_input* input, pcrenet_match_result* result)
 {
     pcre2_match_data* matchData = pcre2_match_data_create(input->max_results, NULL);
@@ -155,4 +212,34 @@ PCRENET_EXPORT(void, dfa_match)(const pcrenet_dfa_match_input* input, pcrenet_ma
     free(workspace);
     pcre2_match_context_free(context);
     pcre2_match_data_free(matchData);
+}
+
+PCRENET_EXPORT(match_buffer*, create_match_buffer)(const pcre2_code* code, const match_settings* settings)
+{
+    if (!code)
+        return NULL;
+
+    match_buffer* buffer = malloc(sizeof(match_buffer));
+    if (!buffer)
+        return NULL;
+
+    buffer->code = code;
+    buffer->match_data = pcre2_match_data_create_from_pattern(code, NULL);
+    buffer->match_context = pcre2_match_context_create(NULL);
+
+    if (settings)
+        apply_settings(settings, buffer->match_context);
+
+    return buffer;
+}
+
+PCRENET_EXPORT(void, free_match_buffer)(match_buffer* buffer)
+{
+    if (!buffer)
+        return;
+
+    pcre2_match_context_free(buffer->match_context);
+    pcre2_match_data_free(buffer->match_data);
+
+    free(buffer);
 }

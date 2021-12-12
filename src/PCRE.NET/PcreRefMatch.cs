@@ -221,6 +221,43 @@ namespace PCRE
             );
         }
 
+        internal void FirstMatch(ReadOnlySpan<char> subject,
+                                 PcreMatchBuffer buffer,
+                                 int startIndex,
+                                 PcreMatchOptions options,
+                                 PcreRefCalloutFunc? callout,
+                                 uint[] calloutOutputVector)
+        {
+            _regex!.BufferMatch(
+                ref this,
+                subject,
+                buffer,
+                startIndex,
+                options.ToPatternOptions(),
+                callout,
+                calloutOutputVector
+            );
+        }
+
+        internal void NextMatch(PcreMatchBuffer buffer,
+                                PcreMatchOptions options,
+                                PcreRefCalloutFunc? callout,
+                                uint[] calloutOutputVector)
+        {
+            var startOfNextMatchIndex = GetStartOfNextMatchIndex();
+            var nextOptions = options.ToPatternOptions() | PcreConstants.NO_UTF_CHECK | (Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0);
+
+            _regex!.BufferMatch(
+                ref this,
+                Subject,
+                buffer,
+                startOfNextMatchIndex,
+                nextOptions,
+                callout,
+                calloutOutputVector
+            );
+        }
+
         internal void Update(ReadOnlySpan<char> subject, in Native.match_result result, uint[]? outputVector)
         {
             Subject = subject;

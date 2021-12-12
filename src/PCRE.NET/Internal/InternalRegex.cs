@@ -9,10 +9,10 @@ namespace PCRE.Internal
     {
         internal const int MaxStackAllocCaptureCount = 32;
 
-        private IntPtr _code;
         private Dictionary<int, PcreCalloutInfo>? _calloutInfoByPatternPosition;
         private PcreMatch? _noMatch;
 
+        public IntPtr Code { get; private set; }
         public string Pattern { get; }
         public PcreRegexSettings Settings { get; }
 
@@ -40,9 +40,9 @@ namespace PCRE.Internal
                 Settings.FillCompileInput(ref input);
 
                 Native.compile(&input, &result);
-                _code = result.code;
+                Code = result.code;
 
-                if (_code == IntPtr.Zero || result.error_code != 0)
+                if (Code == IntPtr.Zero || result.error_code != 0)
                 {
                     Dispose();
                     throw new PcrePatternException((PcreErrorCode)result.error_code, $"Invalid pattern '{pattern}': {Native.GetErrorMessage(result.error_code)} at offset {result.error_offset}.");
@@ -88,17 +88,17 @@ namespace PCRE.Internal
 
         private void FreeCode()
         {
-            if (_code != IntPtr.Zero)
+            if (Code != IntPtr.Zero)
             {
-                Native.code_free(_code);
-                _code = IntPtr.Zero;
+                Native.code_free(Code);
+                Code = IntPtr.Zero;
             }
         }
 
         public uint GetInfoUInt32(uint key)
         {
             uint result;
-            var errorCode = Native.pattern_info(_code, key, &result);
+            var errorCode = Native.pattern_info(Code, key, &result);
 
             if (errorCode != 0)
                 throw new PcreException((PcreErrorCode)errorCode, $"Error in pcre2_pattern_info: {Native.GetErrorMessage(errorCode)}");
@@ -109,7 +109,7 @@ namespace PCRE.Internal
         public nuint GetInfoNativeInt(uint key)
         {
             nuint result;
-            var errorCode = Native.pattern_info(_code, key, &result);
+            var errorCode = Native.pattern_info(Code, key, &result);
 
             if (errorCode != 0)
                 throw new PcreException((PcreErrorCode)errorCode, $"Error in pcre2_pattern_info: {Native.GetErrorMessage(errorCode)}");
@@ -140,7 +140,7 @@ namespace PCRE.Internal
             fixed (char* pSubject = subject)
             fixed (uint* pOVec = &oVector[0])
             {
-                input.code = _code;
+                input.code = Code;
                 input.subject = pSubject;
                 input.subject_length = (uint)subject.Length;
                 input.output_vector = pOVec;
@@ -201,7 +201,7 @@ namespace PCRE.Internal
             fixed (char* pSubject = subject)
             fixed (uint* pOVec = &oVector[0])
             {
-                input.code = _code;
+                input.code = Code;
                 input.subject = pSubject;
                 input.subject_length = (uint)subject.Length;
                 input.output_vector = pOVec;
@@ -224,6 +224,43 @@ namespace PCRE.Internal
             match.Update(subject, result, oVectorArray);
         }
 
+        public void BufferMatch(ref PcreRefMatch match,
+                                ReadOnlySpan<char> subject,
+                                PcreMatchBuffer buffer,
+                                int startIndex,
+                                uint additionalOptions,
+                                PcreRefCalloutFunc? callout,
+                                uint[] calloutOutputVector)
+        {
+            Native.buffer_match_input input;
+            _ = &input;
+
+            Native.match_result result;
+            CalloutInterop.CalloutInteropInfo calloutInterop;
+
+            fixed (char* pSubject = subject)
+            fixed (uint* pOVec = &match.OutputVector[0])
+            {
+                input.buffer = buffer.NativeBuffer;
+                input.subject = pSubject;
+                input.subject_length = (uint)subject.Length;
+                input.output_vector = pOVec;
+                input.start_index = (uint)startIndex;
+                input.additional_options = additionalOptions;
+
+                if (input.subject == default && input.subject_length == 0)
+                    input.subject = (char*)1; // PCRE doesn't like null subjects, even if the length is zero
+
+                CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout, calloutOutputVector);
+
+                Native.buffer_match(&input, &result);
+            }
+
+            AfterMatch(result, ref calloutInterop);
+
+            match.Update(subject, result, null);
+        }
+
         public PcreDfaMatchResult DfaMatch(string subject, PcreDfaMatchSettings settings, int startIndex, uint additionalOptions)
         {
             Native.dfa_match_input input;
@@ -238,7 +275,7 @@ namespace PCRE.Internal
             fixed (char* pSubject = subject)
             fixed (uint* pOVec = &oVector[0])
             {
-                input.code = _code;
+                input.code = Code;
                 input.subject = pSubject;
                 input.subject_length = (uint)subject.Length;
                 input.output_vector = pOVec;
@@ -276,7 +313,7 @@ namespace PCRE.Internal
 
         public IReadOnlyList<PcreCalloutInfo> GetCallouts()
         {
-            var calloutCount = Native.get_callout_count(_code);
+            var calloutCount = Native.get_callout_count(Code);
             if (calloutCount == 0)
                 return Array.Empty<PcreCalloutInfo>();
 
@@ -286,7 +323,7 @@ namespace PCRE.Internal
 
             fixed (Native.pcre2_callout_enumerate_block* pData = &data[0])
             {
-                Native.get_callouts(_code, pData);
+                Native.get_callouts(Code, pData);
             }
 
             var result = new List<PcreCalloutInfo>((int)calloutCount);

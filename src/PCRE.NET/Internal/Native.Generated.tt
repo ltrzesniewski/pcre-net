@@ -13,7 +13,10 @@ var funcs = ParseFuncs(@"
     int pattern_info(IntPtr code, uint key, void* data) no-gc;
     int config(uint key, void* data) no-gc;
     void match(match_input* input, match_result* result);
+    void buffer_match(buffer_match_input* input, match_result* result);
     void dfa_match(dfa_match_input* input, match_result* result);
+    IntPtr create_match_buffer(IntPtr code, match_settings* settings);
+    void free_match_buffer(IntPtr buffer);
     uint get_callout_count(IntPtr code) no-gc;
     void get_callouts(IntPtr code, pcre2_callout_enumerate_block* data) no-gc;
     IntPtr jit_stack_create(uint startSize, uint maxSize);

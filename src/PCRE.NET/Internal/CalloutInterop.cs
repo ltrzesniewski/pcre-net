@@ -63,6 +63,29 @@ namespace PCRE.Internal
             }
         }
 
+        public static void Prepare(ReadOnlySpan<char> subject,
+                                   InternalRegex regex,
+                                   ref Native.buffer_match_input input,
+                                   out CalloutInteropInfo interopInfo,
+                                   PcreRefCalloutFunc? callout,
+                                   uint[]? calloutOutputVector)
+        {
+            // TODO: Deduplicate this
+
+            if (callout != null)
+            {
+                interopInfo = new CalloutInteropInfo(subject, regex, callout, calloutOutputVector);
+
+                input.callout = _calloutHandlerFnPtr;
+                input.callout_data = interopInfo.ToPointer();
+            }
+            else
+            {
+                SkipInitInteropInfo(out interopInfo);
+                input.callout = null;
+            }
+        }
+
         public static void Prepare(string subject,
                                    InternalRegex regex,
                                    ref Native.dfa_match_input input,

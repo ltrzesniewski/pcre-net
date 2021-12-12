@@ -37,8 +37,17 @@ namespace PCRE.Internal
         [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_match", CallingConvention = CallingConvention.Cdecl)]
         public static extern void match(match_input* input, match_result* result);
 
+        [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_buffer_match", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void buffer_match(buffer_match_input* input, match_result* result);
+
         [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_dfa_match", CallingConvention = CallingConvention.Cdecl)]
         public static extern void dfa_match(dfa_match_input* input, match_result* result);
+
+        [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_create_match_buffer", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr create_match_buffer(IntPtr code, match_settings* settings);
+
+        [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_free_match_buffer", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void free_match_buffer(IntPtr buffer);
 
         [SuppressGCTransition]
         [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_get_callout_count", CallingConvention = CallingConvention.Cdecl)]
@@ -80,8 +89,17 @@ namespace PCRE.Internal
         public static void match(match_input* input, match_result* result)
             => _impl.match(input, result);
 
+        public static void buffer_match(buffer_match_input* input, match_result* result)
+            => _impl.buffer_match(input, result);
+
         public static void dfa_match(dfa_match_input* input, match_result* result)
             => _impl.dfa_match(input, result);
+
+        public static IntPtr create_match_buffer(IntPtr code, match_settings* settings)
+            => _impl.create_match_buffer(code, settings);
+
+        public static void free_match_buffer(IntPtr buffer)
+            => _impl.free_match_buffer(buffer);
 
         public static uint get_callout_count(IntPtr code)
             => _impl.get_callout_count(code);
@@ -109,7 +127,10 @@ namespace PCRE.Internal
             public abstract int pattern_info(IntPtr code, uint key, void* data);
             public abstract int config(uint key, void* data);
             public abstract void match(match_input* input, match_result* result);
+            public abstract void buffer_match(buffer_match_input* input, match_result* result);
             public abstract void dfa_match(dfa_match_input* input, match_result* result);
+            public abstract IntPtr create_match_buffer(IntPtr code, match_settings* settings);
+            public abstract void free_match_buffer(IntPtr buffer);
             public abstract uint get_callout_count(IntPtr code);
             public abstract void get_callouts(IntPtr code, pcre2_callout_enumerate_block* data);
             public abstract IntPtr jit_stack_create(uint startSize, uint maxSize);
@@ -157,11 +178,29 @@ namespace PCRE.Internal
             [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern void pcrenet_match(match_input* input, match_result* result);
 
+            public override void buffer_match(buffer_match_input* input, match_result* result)
+                => pcrenet_buffer_match(input, result);
+
+            [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
+            private static extern void pcrenet_buffer_match(buffer_match_input* input, match_result* result);
+
             public override void dfa_match(dfa_match_input* input, match_result* result)
                 => pcrenet_dfa_match(input, result);
 
             [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern void pcrenet_dfa_match(dfa_match_input* input, match_result* result);
+
+            public override IntPtr create_match_buffer(IntPtr code, match_settings* settings)
+                => pcrenet_create_match_buffer(code, settings);
+
+            [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
+            private static extern IntPtr pcrenet_create_match_buffer(IntPtr code, match_settings* settings);
+
+            public override void free_match_buffer(IntPtr buffer)
+                => pcrenet_free_match_buffer(buffer);
+
+            [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
+            private static extern void pcrenet_free_match_buffer(IntPtr buffer);
 
             public override uint get_callout_count(IntPtr code)
                 => pcrenet_get_callout_count(code);
@@ -240,11 +279,29 @@ namespace PCRE.Internal
             [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern void pcrenet_match(match_input* input, match_result* result);
 
+            public override void buffer_match(buffer_match_input* input, match_result* result)
+                => pcrenet_buffer_match(input, result);
+
+            [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
+            private static extern void pcrenet_buffer_match(buffer_match_input* input, match_result* result);
+
             public override void dfa_match(dfa_match_input* input, match_result* result)
                 => pcrenet_dfa_match(input, result);
 
             [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern void pcrenet_dfa_match(dfa_match_input* input, match_result* result);
+
+            public override IntPtr create_match_buffer(IntPtr code, match_settings* settings)
+                => pcrenet_create_match_buffer(code, settings);
+
+            [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
+            private static extern IntPtr pcrenet_create_match_buffer(IntPtr code, match_settings* settings);
+
+            public override void free_match_buffer(IntPtr buffer)
+                => pcrenet_free_match_buffer(buffer);
+
+            [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
+            private static extern void pcrenet_free_match_buffer(IntPtr buffer);
 
             public override uint get_callout_count(IntPtr code)
                 => pcrenet_get_callout_count(code);
@@ -323,11 +380,29 @@ namespace PCRE.Internal
             [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern void pcrenet_match(match_input* input, match_result* result);
 
+            public override void buffer_match(buffer_match_input* input, match_result* result)
+                => pcrenet_buffer_match(input, result);
+
+            [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
+            private static extern void pcrenet_buffer_match(buffer_match_input* input, match_result* result);
+
             public override void dfa_match(dfa_match_input* input, match_result* result)
                 => pcrenet_dfa_match(input, result);
 
             [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
             private static extern void pcrenet_dfa_match(dfa_match_input* input, match_result* result);
+
+            public override IntPtr create_match_buffer(IntPtr code, match_settings* settings)
+                => pcrenet_create_match_buffer(code, settings);
+
+            [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
+            private static extern IntPtr pcrenet_create_match_buffer(IntPtr code, match_settings* settings);
+
+            public override void free_match_buffer(IntPtr buffer)
+                => pcrenet_free_match_buffer(buffer);
+
+            [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
+            private static extern void pcrenet_free_match_buffer(IntPtr buffer);
 
             public override uint get_callout_count(IntPtr code)
                 => pcrenet_get_callout_count(code);
@@ -406,11 +481,29 @@ namespace PCRE.Internal
             [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
             private static extern void pcrenet_match(match_input* input, match_result* result);
 
+            public override void buffer_match(buffer_match_input* input, match_result* result)
+                => pcrenet_buffer_match(input, result);
+
+            [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
+            private static extern void pcrenet_buffer_match(buffer_match_input* input, match_result* result);
+
             public override void dfa_match(dfa_match_input* input, match_result* result)
                 => pcrenet_dfa_match(input, result);
 
             [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
             private static extern void pcrenet_dfa_match(dfa_match_input* input, match_result* result);
+
+            public override IntPtr create_match_buffer(IntPtr code, match_settings* settings)
+                => pcrenet_create_match_buffer(code, settings);
+
+            [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
+            private static extern IntPtr pcrenet_create_match_buffer(IntPtr code, match_settings* settings);
+
+            public override void free_match_buffer(IntPtr buffer)
+                => pcrenet_free_match_buffer(buffer);
+
+            [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
+            private static extern void pcrenet_free_match_buffer(IntPtr buffer);
 
             public override uint get_callout_count(IntPtr code)
                 => pcrenet_get_callout_count(code);
@@ -489,11 +582,29 @@ namespace PCRE.Internal
             [DllImport("PCRE.NET.Native.dylib", CallingConvention = CallingConvention.Cdecl)]
             private static extern void pcrenet_match(match_input* input, match_result* result);
 
+            public override void buffer_match(buffer_match_input* input, match_result* result)
+                => pcrenet_buffer_match(input, result);
+
+            [DllImport("PCRE.NET.Native.dylib", CallingConvention = CallingConvention.Cdecl)]
+            private static extern void pcrenet_buffer_match(buffer_match_input* input, match_result* result);
+
             public override void dfa_match(dfa_match_input* input, match_result* result)
                 => pcrenet_dfa_match(input, result);
 
             [DllImport("PCRE.NET.Native.dylib", CallingConvention = CallingConvention.Cdecl)]
             private static extern void pcrenet_dfa_match(dfa_match_input* input, match_result* result);
+
+            public override IntPtr create_match_buffer(IntPtr code, match_settings* settings)
+                => pcrenet_create_match_buffer(code, settings);
+
+            [DllImport("PCRE.NET.Native.dylib", CallingConvention = CallingConvention.Cdecl)]
+            private static extern IntPtr pcrenet_create_match_buffer(IntPtr code, match_settings* settings);
+
+            public override void free_match_buffer(IntPtr buffer)
+                => pcrenet_free_match_buffer(buffer);
+
+            [DllImport("PCRE.NET.Native.dylib", CallingConvention = CallingConvention.Cdecl)]
+            private static extern void pcrenet_free_match_buffer(IntPtr buffer);
 
             public override uint get_callout_count(IntPtr code)
                 => pcrenet_get_callout_count(code);
