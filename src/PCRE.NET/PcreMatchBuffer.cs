@@ -20,8 +20,6 @@ namespace PCRE
         internal readonly uint[] OutputVector;
         internal readonly uint[] CalloutOutputVector;
 
-        private int _isUnavailable;
-
         internal PcreMatchBuffer(InternalRegex regex, PcreMatchSettings settings)
         {
             Regex = regex;
@@ -48,12 +46,6 @@ namespace PCRE
         /// <inheritdoc />
         public void Dispose()
         {
-            if (NativeBuffer == IntPtr.Zero)
-                return;
-
-            if (Interlocked.CompareExchange(ref _isUnavailable, 1, 0) != 0)
-                return;
-
             FreeBuffer();
             GC.SuppressFinalize(this);
         }
@@ -144,20 +136,10 @@ namespace PCRE
             if (unchecked((uint)startIndex > (uint)subject.Length))
                 ThrowInvalidStartIndex();
 
-            if (Interlocked.CompareExchange(ref _isUnavailable, 1, 0) != 0)
-                ThrowUnavailable();
+            var match = Regex.CreateRefMatch(OutputVector);
+            match.FirstMatch(subject, this, startIndex, options, onCallout, CalloutOutputVector);
 
-            try
-            {
-                var match = Regex.CreateRefMatch(OutputVector);
-                match.FirstMatch(subject, this, startIndex, options, onCallout, CalloutOutputVector);
-
-                return match;
-            }
-            finally
-            {
-                Volatile.Write(ref _isUnavailable, 0);
-            }
+            return match;
         }
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="Matches"]/*'/>
@@ -206,9 +188,6 @@ namespace PCRE
 
         private static void ThrowInvalidStartIndex()
             => throw new ArgumentOutOfRangeException("Invalid start index.", default(Exception));
-
-        private static void ThrowUnavailable()
-            => throw new InvalidOperationException("A match operation is already in progress on this buffer, or it has been disposed.");
 
         /// <summary>
         /// An enumerable of matches.
@@ -278,24 +257,14 @@ namespace PCRE
                 if (_buffer == null)
                     return false;
 
-                if (Interlocked.CompareExchange(ref _buffer._isUnavailable, 1, 0) != 0)
-                    ThrowUnavailable();
-
-                try
+                if (!_match.IsInitialized)
                 {
-                    if (!_match.IsInitialized)
-                    {
-                        _match = _buffer.Regex.CreateRefMatch(_buffer.OutputVector);
-                        _match.FirstMatch(_subject, _buffer, _startIndex, _options, _callout, _buffer.CalloutOutputVector);
-                    }
-                    else
-                    {
-                        _match.NextMatch(_buffer, _options, _callout, _buffer.CalloutOutputVector);
-                    }
+                    _match = _buffer.Regex.CreateRefMatch(_buffer.OutputVector);
+                    _match.FirstMatch(_subject, _buffer, _startIndex, _options, _callout, _buffer.CalloutOutputVector);
                 }
-                finally
+                else
                 {
-                    Volatile.Write(ref _buffer._isUnavailable, 0);
+                    _match.NextMatch(_buffer, _options, _callout, _buffer.CalloutOutputVector);
                 }
 
                 if (_match.Success)

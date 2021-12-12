@@ -24,3 +24,4 @@ local-*
 *.aps
 *.binlog
 Thumbs.db
+launchSettings.json

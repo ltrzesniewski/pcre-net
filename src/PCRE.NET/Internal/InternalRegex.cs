@@ -251,6 +251,9 @@ namespace PCRE.Internal
                 if (input.subject == default && input.subject_length == 0)
                     input.subject = (char*)1; // PCRE doesn't like null subjects, even if the length is zero
 
+                if (input.buffer == IntPtr.Zero)
+                    ThrowMatchBufferDisposed();
+
                 CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout, calloutOutputVector);
 
                 Native.buffer_match(&input, &result);
@@ -352,5 +355,8 @@ namespace PCRE.Internal
 
         public PcreCalloutInfo GetCalloutInfoByPatternPosition(int patternPosition)
             => TryGetCalloutInfoByPatternPosition(patternPosition) ?? throw new InvalidOperationException($"Could not retrieve callout info at position {patternPosition}.");
+
+        private static void ThrowMatchBufferDisposed()
+            => throw new ObjectDisposedException("The match buffer has been disposed");
     }
 }

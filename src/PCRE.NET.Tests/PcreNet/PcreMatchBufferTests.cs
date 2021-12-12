@@ -51,26 +51,6 @@ namespace PCRE.Tests.PcreNet
             Assert.That(match.Success, Is.True);
         }
 
-        [Test]
-        public void should_not_allow_reentrant_calls()
-        {
-            var re = new PcreRegex(@"foo(?C1)");
-            var buffer = re.CreateMatchBuffer();
-
-            var calloutInvoked = false;
-
-            buffer.Match("foo".AsSpan(), data =>
-            {
-                Assert.Throws<InvalidOperationException>(() => _ = buffer.Match("foo".AsSpan()));
-
-                calloutInvoked = true;
-                return PcreCalloutResult.Pass;
-            });
-
-            Assert.That(calloutInvoked, Is.True);
-            Assert.DoesNotThrow(() => _ = buffer.Match("foo".AsSpan()));
-        }
-
 #if NETCOREAPP
 
         [Test]
