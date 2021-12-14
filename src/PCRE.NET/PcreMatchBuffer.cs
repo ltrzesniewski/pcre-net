@@ -17,15 +17,15 @@ namespace PCRE
         internal readonly InternalRegex Regex;
         internal IntPtr NativeBuffer;
 
-        internal readonly uint[] OutputVector;
-        internal readonly uint[] CalloutOutputVector;
+        internal readonly nuint[] OutputVector;
+        internal readonly nuint[] CalloutOutputVector;
 
         internal PcreMatchBuffer(InternalRegex regex, PcreMatchSettings settings)
         {
             Regex = regex;
 
-            OutputVector = new uint[regex.OutputVectorSize];
-            CalloutOutputVector = new uint[regex.OutputVectorSize];
+            OutputVector = new nuint[regex.OutputVectorSize];
+            CalloutOutputVector = new nuint[regex.OutputVectorSize];
 
             Regex.TryGetCalloutInfoByPatternPosition(0); // Make sure callout info is initialized
 

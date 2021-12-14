@@ -11,7 +11,7 @@ namespace PCRE
         private readonly string _subject;
         private readonly InternalRegex _regex;
         private readonly uint _flags;
-        private readonly uint[] _oVector;
+        private readonly nuint[] _oVector;
         private readonly char* _markPtr;
         private PcreMatch? _match;
         private PcreCalloutInfo? _info;
@@ -31,12 +31,12 @@ namespace PCRE
             NextPatternItemLength = (int)callout->next_item_length;
             _markPtr = callout->mark;
 
-            _oVector = new uint[callout->capture_top * 2];
-            _oVector[0] = (uint)callout->start_match;
-            _oVector[1] = (uint)callout->current_position;
+            _oVector = new nuint[callout->capture_top * 2];
+            _oVector[0] = callout->start_match;
+            _oVector[1] = callout->current_position;
 
             for (var i = 2; i < _oVector.Length; ++i)
-                _oVector[i] = (uint)callout->offset_vector[i];
+                _oVector[i] = callout->offset_vector[i];
         }
 
         /// <inheritdoc cref="PcreCalloutInfo.Number"/>

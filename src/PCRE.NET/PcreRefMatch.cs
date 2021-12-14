@@ -14,7 +14,7 @@ namespace PCRE
     public unsafe ref struct PcreRefMatch
     {
         private readonly InternalRegex? _regex;
-        internal Span<uint> OutputVector; // Can be empty when there is no match
+        internal Span<nuint> OutputVector; // Can be empty when there is no match
         private int _resultCode;
         private char* _markPtr;
 
@@ -24,7 +24,7 @@ namespace PCRE
         /// <typeparam name="T">The output value type.</typeparam>
         public delegate T Func<out T>(PcreRefMatch match);
 
-        internal PcreRefMatch(InternalRegex regex, Span<uint> oVector)
+        internal PcreRefMatch(InternalRegex regex, Span<nuint> oVector)
         {
             // Empty match
 
@@ -36,7 +36,7 @@ namespace PCRE
             _resultCode = 0;
         }
 
-        internal PcreRefMatch(ReadOnlySpan<char> subject, InternalRegex regex, Span<uint> oVector, char* mark)
+        internal PcreRefMatch(ReadOnlySpan<char> subject, InternalRegex regex, Span<nuint> oVector, char* mark)
         {
             // Callout
 
@@ -185,7 +185,7 @@ namespace PCRE
                                  int startIndex,
                                  PcreMatchOptions options,
                                  PcreRefCalloutFunc? callout,
-                                 uint[]? calloutOutputVector)
+                                 nuint[]? calloutOutputVector)
         {
             _regex!.Match(
                 ref this,
@@ -201,14 +201,14 @@ namespace PCRE
         internal void NextMatch(PcreMatchSettings settings,
                                 PcreMatchOptions options,
                                 PcreRefCalloutFunc? callout,
-                                uint[]? calloutOutputVector,
+                                nuint[]? calloutOutputVector,
                                 bool reuseOutputVector)
         {
             var startOfNextMatchIndex = GetStartOfNextMatchIndex();
             var nextOptions = options.ToPatternOptions() | PcreConstants.NO_UTF_CHECK | (Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0);
 
             if (!reuseOutputVector)
-                OutputVector = Span<uint>.Empty;
+                OutputVector = Span<nuint>.Empty;
 
             _regex!.Match(
                 ref this,
@@ -226,7 +226,7 @@ namespace PCRE
                                  int startIndex,
                                  PcreMatchOptions options,
                                  PcreRefCalloutFunc? callout,
-                                 uint[] calloutOutputVector)
+                                 nuint[] calloutOutputVector)
         {
             _regex!.BufferMatch(
                 ref this,
@@ -242,7 +242,7 @@ namespace PCRE
         internal void NextMatch(PcreMatchBuffer buffer,
                                 PcreMatchOptions options,
                                 PcreRefCalloutFunc? callout,
-                                uint[] calloutOutputVector)
+                                nuint[] calloutOutputVector)
         {
             var startOfNextMatchIndex = GetStartOfNextMatchIndex();
             var nextOptions = options.ToPatternOptions() | PcreConstants.NO_UTF_CHECK | (Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0);
@@ -258,7 +258,7 @@ namespace PCRE
             );
         }
 
-        internal void Update(ReadOnlySpan<char> subject, in Native.match_result result, uint[]? outputVector)
+        internal void Update(ReadOnlySpan<char> subject, in Native.match_result result, nuint[]? outputVector)
         {
             Subject = subject;
             _markPtr = result.mark;

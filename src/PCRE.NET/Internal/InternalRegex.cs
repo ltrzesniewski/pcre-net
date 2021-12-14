@@ -131,14 +131,14 @@ namespace PCRE.Internal
             Native.match_result result;
             CalloutInterop.CalloutInteropInfo calloutInterop;
 
-            var oVectorArray = default(uint[]);
+            var oVectorArray = default(nuint[]);
 
             var oVector = CanStackAllocOutputVector
-                ? stackalloc uint[OutputVectorSize]
-                : oVectorArray = new uint[OutputVectorSize];
+                ? stackalloc nuint[OutputVectorSize]
+                : oVectorArray = new nuint[OutputVectorSize];
 
             fixed (char* pSubject = subject)
-            fixed (uint* pOVec = &oVector[0])
+            fixed (nuint* pOVec = &oVector[0])
             {
                 input.code = Code;
                 input.subject = pSubject;
@@ -162,9 +162,9 @@ namespace PCRE.Internal
         }
 
         public PcreRefMatch CreateRefMatch()
-            => new(this, Span<uint>.Empty);
+            => new(this, Span<nuint>.Empty);
 
-        public PcreRefMatch CreateRefMatch(Span<uint> oVector)
+        public PcreRefMatch CreateRefMatch(Span<nuint> oVector)
         {
 #if DEBUG
             if (oVector.Length != OutputVectorSize)
@@ -180,7 +180,7 @@ namespace PCRE.Internal
                           int startIndex,
                           uint additionalOptions,
                           PcreRefCalloutFunc? callout,
-                          uint[]? calloutOutputVector)
+                          nuint[]? calloutOutputVector)
         {
             Native.match_input input;
             _ = &input;
@@ -190,16 +190,16 @@ namespace PCRE.Internal
             Native.match_result result;
             CalloutInterop.CalloutInteropInfo calloutInterop;
 
-            var oVectorArray = default(uint[]);
+            var oVectorArray = default(nuint[]);
 
             var oVector = match.OutputVector.Length == OutputVectorSize
                 ? match.OutputVector
                 : CanStackAllocOutputVector
-                    ? stackalloc uint[OutputVectorSize]
-                    : oVectorArray = new uint[OutputVectorSize];
+                    ? stackalloc nuint[OutputVectorSize]
+                    : oVectorArray = new nuint[OutputVectorSize];
 
             fixed (char* pSubject = subject)
-            fixed (uint* pOVec = &oVector[0])
+            fixed (nuint* pOVec = &oVector[0])
             {
                 input.code = Code;
                 input.subject = pSubject;
@@ -230,7 +230,7 @@ namespace PCRE.Internal
                                 int startIndex,
                                 uint additionalOptions,
                                 PcreRefCalloutFunc? callout,
-                                uint[] calloutOutputVector)
+                                nuint[] calloutOutputVector)
         {
             Native.buffer_match_input input;
             _ = &input;
@@ -239,7 +239,7 @@ namespace PCRE.Internal
             CalloutInterop.CalloutInteropInfo calloutInterop;
 
             fixed (char* pSubject = subject)
-            fixed (uint* pOVec = &match.OutputVector[0])
+            fixed (nuint* pOVec = &match.OutputVector[0])
             {
                 input.buffer = buffer.NativeBuffer;
                 input.subject = pSubject;
@@ -271,12 +271,12 @@ namespace PCRE.Internal
 
             settings.FillMatchInput(ref input);
 
-            var oVector = new uint[2 * Math.Max(1, settings.MaxResults)];
+            var oVector = new nuint[2 * Math.Max(1, settings.MaxResults)];
             Native.match_result result;
             CalloutInterop.CalloutInteropInfo calloutInterop;
 
             fixed (char* pSubject = subject)
-            fixed (uint* pOVec = &oVector[0])
+            fixed (nuint* pOVec = &oVector[0])
             {
                 input.code = Code;
                 input.subject = pSubject;

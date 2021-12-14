@@ -44,8 +44,8 @@ namespace PCRE
                 ThrowInvalidStartIndex();
 
             var outputVector = InternalRegex.CanStackAllocOutputVector
-                ? stackalloc uint[InternalRegex.OutputVectorSize]
-                : new uint[InternalRegex.OutputVectorSize];
+                ? stackalloc nuint[InternalRegex.OutputVectorSize]
+                : new nuint[InternalRegex.OutputVectorSize];
 
             var match = InternalRegex.CreateRefMatch(outputVector);
             match.FirstMatch(subject, PcreMatchSettings.Default, startIndex, 0, null, null);

@@ -13,7 +13,7 @@ namespace PCRE
     {
         private readonly InternalRegex _regex;
         private readonly int _resultCode;
-        private readonly uint[] _oVector;
+        private readonly nuint[] _oVector;
         private readonly char* _markPtr;
 
         private PcreGroup?[]? _groups;
@@ -25,11 +25,11 @@ namespace PCRE
 
             Subject = string.Empty;
             _regex = regex;
-            _oVector = Array.Empty<uint>();
+            _oVector = Array.Empty<nuint>();
             _resultCode = PcreConstants.ERROR_NOMATCH;
         }
 
-        internal PcreMatch(string subject, InternalRegex regex, ref Native.match_result result, uint[] oVector)
+        internal PcreMatch(string subject, InternalRegex regex, ref Native.match_result result, nuint[] oVector)
         {
             // Real match
 
@@ -41,7 +41,7 @@ namespace PCRE
             _resultCode = result.result_code;
         }
 
-        internal PcreMatch(string subject, InternalRegex regex, uint[] oVector, char* mark)
+        internal PcreMatch(string subject, InternalRegex regex, nuint[] oVector, char* mark)
         {
             // Callout
 

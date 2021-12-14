@@ -11,13 +11,13 @@ namespace PCRE.Dfa
     /// </summary>
     public sealed class PcreDfaMatchResult : IReadOnlyList<PcreDfaMatch>
     {
-        private readonly uint[] _oVector;
+        private readonly nuint[] _oVector;
         private readonly int _resultCode;
         private readonly PcreDfaMatch?[] _matches;
 
         internal string Subject { get; }
 
-        internal PcreDfaMatchResult(string subject, ref Native.match_result result, uint[] oVector)
+        internal PcreDfaMatchResult(string subject, ref Native.match_result result, nuint[] oVector)
         {
             // Real match
 

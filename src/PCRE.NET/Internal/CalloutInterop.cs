@@ -47,7 +47,7 @@ namespace PCRE.Internal
                                    ref Native.match_input input,
                                    out CalloutInteropInfo interopInfo,
                                    PcreRefCalloutFunc? callout,
-                                   uint[]? calloutOutputVector)
+                                   nuint[]? calloutOutputVector)
         {
             if (callout != null)
             {
@@ -68,7 +68,7 @@ namespace PCRE.Internal
                                    ref Native.buffer_match_input input,
                                    out CalloutInteropInfo interopInfo,
                                    PcreRefCalloutFunc? callout,
-                                   uint[]? calloutOutputVector)
+                                   nuint[]? calloutOutputVector)
         {
             // TODO: Deduplicate this
 
@@ -151,7 +151,7 @@ namespace PCRE.Internal
             private readonly ReadOnlySpan<char> _subjectSpan;
             private readonly InternalRegex _regex;
             private readonly Delegate _callout;
-            private readonly uint[]? _outputVector;
+            private readonly nuint[]? _outputVector;
             public Exception? Exception { get; private set; }
 
             public CalloutInteropInfo(string subject, InternalRegex regex, Func<PcreCallout, PcreCalloutResult> callout)
@@ -164,7 +164,7 @@ namespace PCRE.Internal
                 Exception = null;
             }
 
-            public CalloutInteropInfo(ReadOnlySpan<char> subject, InternalRegex regex, PcreRefCalloutFunc callout, uint[]? outputVector)
+            public CalloutInteropInfo(ReadOnlySpan<char> subject, InternalRegex regex, PcreRefCalloutFunc callout, nuint[]? outputVector)
             {
                 _subject = null;
                 _subjectSpan = subject;
@@ -188,8 +188,8 @@ namespace PCRE.Internal
                     {
                         var outputVector = _outputVector ?? (
                             callout->capture_top <= InternalRegex.MaxStackAllocCaptureCount
-                                ? stackalloc uint[(int)callout->capture_top * 2]
-                                : Span<uint>.Empty
+                                ? stackalloc nuint[(int)callout->capture_top * 2]
+                                : Span<nuint>.Empty
                         );
 
                         var func = (PcreRefCalloutFunc)_callout;

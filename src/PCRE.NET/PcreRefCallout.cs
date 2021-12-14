@@ -16,10 +16,10 @@ namespace PCRE
         private readonly InternalRegex _regex;
         private readonly Native.pcre2_callout_block* _callout;
 
-        internal Span<uint> OutputVector;
+        internal Span<nuint> OutputVector;
         private bool _oVectorInitialized;
 
-        internal PcreRefCallout(ReadOnlySpan<char> subject, InternalRegex regex, Native.pcre2_callout_block* callout, Span<uint> outputVector)
+        internal PcreRefCallout(ReadOnlySpan<char> subject, InternalRegex regex, Native.pcre2_callout_block* callout, Span<nuint> outputVector)
         {
             _subject = subject;
             _regex = regex;
@@ -39,14 +39,14 @@ namespace PCRE
                 if (!_oVectorInitialized)
                 {
                     OutputVector = OutputVector.Length == 0
-                        ? new uint[_callout->capture_top * 2]
+                        ? new nuint[_callout->capture_top * 2]
                         : OutputVector.Slice(0, (int)_callout->capture_top * 2);
 
-                    OutputVector[0] = (uint)_callout->start_match;
-                    OutputVector[1] = (uint)_callout->current_position;
+                    OutputVector[0] = _callout->start_match;
+                    OutputVector[1] = _callout->current_position;
 
                     for (var i = 2; i < OutputVector.Length; ++i)
-                        OutputVector[i] = (uint)_callout->offset_vector[i];
+                        OutputVector[i] = _callout->offset_vector[i];
 
                     _oVectorInitialized = true;
                 }

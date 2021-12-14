@@ -93,7 +93,7 @@ namespace PCRE.Internal
             public uint start_index;
             public uint additional_options;
             public match_settings settings;
-            public uint* output_vector;
+            public nuint* output_vector;
             public void* callout;
             public void* callout_data;
         }
@@ -106,7 +106,7 @@ namespace PCRE.Internal
             public uint subject_length;
             public uint start_index;
             public uint additional_options;
-            public uint* output_vector;
+            public nuint* output_vector;
             public void* callout;
             public void* callout_data;
         }
@@ -119,7 +119,7 @@ namespace PCRE.Internal
             public uint subject_length;
             public uint start_index;
             public uint additional_options;
-            public uint* output_vector;
+            public nuint* output_vector;
             public void* callout;
             public void* callout_data;
             public uint max_results;

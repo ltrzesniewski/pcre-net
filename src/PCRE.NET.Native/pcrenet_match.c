@@ -1,4 +1,6 @@
 
+#include <string.h>
+
 #include "pcrenet.h"
 
 typedef int (*callout_fn)(pcre2_callout_block*, void*);
@@ -27,7 +29,7 @@ typedef struct
     uint32_t start_index;
     uint32_t additional_options;
     match_settings settings;
-    uint32_t* output_vector;
+    size_t* output_vector;
     callout_fn callout;
     void* callout_data;
 } pcrenet_match_input;
@@ -39,7 +41,7 @@ typedef struct
     uint32_t subject_length;
     uint32_t start_index;
     uint32_t additional_options;
-    uint32_t* output_vector;
+    size_t* output_vector;
     callout_fn callout;
     void* callout_data;
 } pcrenet_buffer_match_input;
@@ -51,7 +53,7 @@ typedef struct
     uint32_t subject_length;
     uint32_t start_index;
     uint32_t additional_options;
-    uint32_t* output_vector;
+    size_t* output_vector;
     callout_fn callout;
     void* callout_data;
     uint32_t max_results;
@@ -123,9 +125,7 @@ PCRENET_EXPORT(void, match)(const pcrenet_match_input* input, pcrenet_match_resu
     {
         PCRE2_SIZE* oVector = pcre2_get_ovector_pointer(matchData);
         const uint32_t itemCount = pcre2_get_ovector_count(matchData) * 2;
-
-        for (uint32_t i = 0; i < itemCount; ++i)
-            input->output_vector[i] = (uint32_t)oVector[i];
+        memcpy(input->output_vector, oVector, itemCount * sizeof(PCRE2_SIZE));
     }
 
     result->mark = pcre2_get_mark(matchData);
@@ -163,9 +163,7 @@ PCRENET_EXPORT(void, buffer_match)(const pcrenet_buffer_match_input* input, pcre
     {
         PCRE2_SIZE* oVector = pcre2_get_ovector_pointer(input->buffer->match_data);
         const uint32_t itemCount = pcre2_get_ovector_count(input->buffer->match_data) * 2;
-
-        for (uint32_t i = 0; i < itemCount; ++i)
-            input->output_vector[i] = (uint32_t)oVector[i];
+        memcpy(input->output_vector, oVector, itemCount * sizeof(PCRE2_SIZE));
     }
 
     result->mark = pcre2_get_mark(input->buffer->match_data);
@@ -204,9 +202,7 @@ PCRENET_EXPORT(void, dfa_match)(const pcrenet_dfa_match_input* input, pcrenet_ma
     {
         PCRE2_SIZE* oVector = pcre2_get_ovector_pointer(matchData);
         const uint32_t itemCount = pcre2_get_ovector_count(matchData) * 2;
-
-        for (uint32_t i = 0; i < itemCount; ++i)
-            input->output_vector[i] = (uint32_t)oVector[i];
+        memcpy(input->output_vector, oVector, itemCount * sizeof(PCRE2_SIZE));
     }
 
     free(workspace);
