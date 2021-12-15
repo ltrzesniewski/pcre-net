@@ -8,7 +8,7 @@ using PCRE.Internal;
 namespace PCRE.Tests.PcreNet
 {
     [TestFixture]
-    public class PcreMatchBufferTests
+    public unsafe class PcreMatchBufferTests
     {
         [Test]
         public void should_use_match_buffer()

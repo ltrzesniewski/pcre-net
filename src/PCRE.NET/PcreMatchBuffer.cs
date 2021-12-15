@@ -17,24 +17,29 @@ namespace PCRE
         internal readonly InternalRegex Regex;
         internal IntPtr NativeBuffer;
 
-        internal readonly nuint[] OutputVector;
+        internal readonly nuint* OutputVector;
         internal readonly nuint[] CalloutOutputVector;
 
         internal PcreMatchBuffer(InternalRegex regex, PcreMatchSettings settings)
         {
             Regex = regex;
 
-            OutputVector = new nuint[regex.OutputVectorSize];
             CalloutOutputVector = new nuint[regex.OutputVectorSize];
 
             Regex.TryGetCalloutInfoByPatternPosition(0); // Make sure callout info is initialized
 
-            var nativeSettings = default(Native.match_settings);
-            settings.FillMatchSettings(ref nativeSettings);
+            var info = new Native.match_buffer_info
+            {
+                code = regex.Code
+            };
 
-            NativeBuffer = Native.create_match_buffer(regex.Code, &nativeSettings);
+            settings.FillMatchSettings(ref info.settings);
+
+            NativeBuffer = Native.create_match_buffer(&info);
             if (NativeBuffer == IntPtr.Zero)
                 throw new InvalidOperationException("Could not create match buffer");
+
+            OutputVector = info.output_vector;
         }
 
         /// <inheritdoc />
@@ -56,6 +61,9 @@ namespace PCRE
             if (buffer != IntPtr.Zero)
                 Native.free_match_buffer(buffer);
         }
+
+        private Span<nuint> GetOutputVectorSpan()
+            => new(OutputVector, Regex.OutputVectorSize);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="IsMatch"]/*'/>
         /// <include file='PcreRegex.xml' path='/doc/param[@name="subject"]'/>
@@ -136,7 +144,7 @@ namespace PCRE
             if (unchecked((uint)startIndex > (uint)subject.Length))
                 ThrowInvalidStartIndex();
 
-            var match = Regex.CreateRefMatch(OutputVector);
+            var match = Regex.CreateRefMatch(GetOutputVectorSpan());
             match.FirstMatch(subject, this, startIndex, options, onCallout, CalloutOutputVector);
 
             return match;
@@ -259,7 +267,7 @@ namespace PCRE
 
                 if (!_match.IsInitialized)
                 {
-                    _match = _buffer.Regex.CreateRefMatch(_buffer.OutputVector);
+                    _match = _buffer.Regex.CreateRefMatch(_buffer.GetOutputVectorSpan());
                     _match.FirstMatch(_subject, _buffer, _startIndex, _options, _callout, _buffer.CalloutOutputVector);
                 }
                 else

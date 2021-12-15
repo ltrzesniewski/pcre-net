@@ -239,12 +239,10 @@ namespace PCRE.Internal
             CalloutInterop.CalloutInteropInfo calloutInterop;
 
             fixed (char* pSubject = subject)
-            fixed (nuint* pOVec = &match.OutputVector[0])
             {
                 input.buffer = buffer.NativeBuffer;
                 input.subject = pSubject;
                 input.subject_length = (uint)subject.Length;
-                input.output_vector = pOVec;
                 input.start_index = (uint)startIndex;
                 input.additional_options = additionalOptions;
 

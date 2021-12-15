@@ -1917,7 +1917,7 @@ namespace PCRE.Tests.PcreNet
         }
 
         [Test]
-        public void should_use_buffer_output_vector_for_no_match()
+        public unsafe void should_use_buffer_output_vector_for_no_match()
         {
             var re = new PcreRegex("foo");
             var buffer = re.CreateMatchBuffer();

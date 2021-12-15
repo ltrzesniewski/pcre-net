@@ -41,7 +41,6 @@ typedef struct
     uint32_t subject_length;
     uint32_t start_index;
     uint32_t additional_options;
-    size_t* output_vector;
     callout_fn callout;
     void* callout_data;
 } pcrenet_buffer_match_input;
@@ -71,6 +70,16 @@ typedef struct
     callout_fn callout;
     void* data;
 } callout_data;
+
+typedef struct
+{
+    // Input
+    pcre2_code* code;
+    match_settings settings;
+
+    // Output
+    size_t* output_vector;
+} match_buffer_info;
 
 static int callout_handler(pcre2_callout_block* block, void* data)
 {
@@ -159,13 +168,6 @@ PCRENET_EXPORT(void, buffer_match)(const pcrenet_buffer_match_input* input, pcre
         input->buffer->match_context
     );
 
-    if (input->output_vector)
-    {
-        PCRE2_SIZE* oVector = pcre2_get_ovector_pointer(input->buffer->match_data);
-        const uint32_t itemCount = pcre2_get_ovector_count(input->buffer->match_data) * 2;
-        memcpy(input->output_vector, oVector, itemCount * sizeof(PCRE2_SIZE));
-    }
-
     result->mark = pcre2_get_mark(input->buffer->match_data);
 }
 
@@ -210,22 +212,22 @@ PCRENET_EXPORT(void, dfa_match)(const pcrenet_dfa_match_input* input, pcrenet_ma
     pcre2_match_data_free(matchData);
 }
 
-PCRENET_EXPORT(match_buffer*, create_match_buffer)(const pcre2_code* code, const match_settings* settings)
+PCRENET_EXPORT(match_buffer*, create_match_buffer)(match_buffer_info* info)
 {
-    if (!code)
+    if (!info->code)
         return NULL;
 
     match_buffer* buffer = malloc(sizeof(match_buffer));
     if (!buffer)
         return NULL;
 
-    buffer->code = code;
-    buffer->match_data = pcre2_match_data_create_from_pattern(code, NULL);
+    buffer->code = info->code;
+    buffer->match_data = pcre2_match_data_create_from_pattern(info->code, NULL);
     buffer->match_context = pcre2_match_context_create(NULL);
 
-    if (settings)
-        apply_settings(settings, buffer->match_context);
+    apply_settings(&info->settings, buffer->match_context);
 
+    info->output_vector = pcre2_get_ovector_pointer(buffer->match_data);
     return buffer;
 }
 

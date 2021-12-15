@@ -106,7 +106,6 @@ namespace PCRE.Internal
             public uint subject_length;
             public uint start_index;
             public uint additional_options;
-            public nuint* output_vector;
             public void* callout;
             public void* callout_data;
         }
@@ -131,6 +130,17 @@ namespace PCRE.Internal
         {
             public int result_code;
             public char* mark;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal ref struct match_buffer_info
+        {
+            // Input
+            public IntPtr code;
+            public match_settings settings;
+
+            // Output
+            public nuint* output_vector;
         }
 
         [StructLayout(LayoutKind.Sequential)]
