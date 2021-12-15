@@ -221,12 +221,11 @@ namespace PCRE
             );
         }
 
-        internal void FirstMatch(ReadOnlySpan<char> subject,
-                                 PcreMatchBuffer buffer,
+        internal void FirstMatch(PcreMatchBuffer buffer,
+                                 ReadOnlySpan<char> subject,
                                  int startIndex,
                                  PcreMatchOptions options,
-                                 PcreRefCalloutFunc? callout,
-                                 nuint[] calloutOutputVector)
+                                 PcreRefCalloutFunc? callout)
         {
             _regex!.BufferMatch(
                 ref this,
@@ -234,15 +233,13 @@ namespace PCRE
                 buffer,
                 startIndex,
                 options.ToPatternOptions(),
-                callout,
-                calloutOutputVector
+                callout
             );
         }
 
         internal void NextMatch(PcreMatchBuffer buffer,
                                 PcreMatchOptions options,
-                                PcreRefCalloutFunc? callout,
-                                nuint[] calloutOutputVector)
+                                PcreRefCalloutFunc? callout)
         {
             var startOfNextMatchIndex = GetStartOfNextMatchIndex();
             var nextOptions = options.ToPatternOptions() | PcreConstants.NO_UTF_CHECK | (Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0);
@@ -253,8 +250,7 @@ namespace PCRE
                 buffer,
                 startOfNextMatchIndex,
                 nextOptions,
-                callout,
-                calloutOutputVector
+                callout
             );
         }
 

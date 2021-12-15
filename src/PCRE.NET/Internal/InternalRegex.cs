@@ -229,8 +229,7 @@ namespace PCRE.Internal
                                 PcreMatchBuffer buffer,
                                 int startIndex,
                                 uint additionalOptions,
-                                PcreRefCalloutFunc? callout,
-                                nuint[] calloutOutputVector)
+                                PcreRefCalloutFunc? callout)
         {
             Native.buffer_match_input input;
             _ = &input;
@@ -252,7 +251,7 @@ namespace PCRE.Internal
                 if (input.buffer == IntPtr.Zero)
                     ThrowMatchBufferDisposed();
 
-                CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout, calloutOutputVector);
+                CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout, buffer.CalloutOutputVector);
 
                 Native.buffer_match(&input, &result);
             }

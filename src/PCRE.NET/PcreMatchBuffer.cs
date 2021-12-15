@@ -14,7 +14,9 @@ namespace PCRE
     /// </remarks>
     public sealed unsafe class PcreMatchBuffer : IDisposable
     {
-        internal readonly InternalRegex Regex;
+        private readonly InternalRegex _regex;
+        private readonly int _outputVectorSize;
+
         internal IntPtr NativeBuffer;
 
         internal readonly nuint* OutputVector;
@@ -22,11 +24,12 @@ namespace PCRE
 
         internal PcreMatchBuffer(InternalRegex regex, PcreMatchSettings settings)
         {
-            Regex = regex;
+            _regex = regex;
+            _outputVectorSize = regex.OutputVectorSize;
 
-            CalloutOutputVector = new nuint[regex.OutputVectorSize];
+            CalloutOutputVector = new nuint[_outputVectorSize];
 
-            Regex.TryGetCalloutInfoByPatternPosition(0); // Make sure callout info is initialized
+            _regex.TryGetCalloutInfoByPatternPosition(0); // Make sure callout info is initialized
 
             var info = new Native.match_buffer_info
             {
@@ -63,7 +66,7 @@ namespace PCRE
         }
 
         private Span<nuint> GetOutputVectorSpan()
-            => new(OutputVector, Regex.OutputVectorSize);
+            => new(OutputVector, _outputVectorSize);
 
         /// <include file='PcreRegex.xml' path='/doc/method[@name="IsMatch"]/*'/>
         /// <include file='PcreRegex.xml' path='/doc/param[@name="subject"]'/>
@@ -144,8 +147,8 @@ namespace PCRE
             if (unchecked((uint)startIndex > (uint)subject.Length))
                 ThrowInvalidStartIndex();
 
-            var match = Regex.CreateRefMatch(GetOutputVectorSpan());
-            match.FirstMatch(subject, this, startIndex, options, onCallout, CalloutOutputVector);
+            var match = _regex.CreateRefMatch(GetOutputVectorSpan());
+            match.FirstMatch(this, subject, startIndex, options, onCallout);
 
             return match;
         }
@@ -192,7 +195,7 @@ namespace PCRE
         /// Returns the regex pattern.
         /// </summary>
         public override string ToString()
-            => Regex.Pattern;
+            => _regex.Pattern;
 
         private static void ThrowInvalidStartIndex()
             => throw new ArgumentOutOfRangeException("Invalid start index.", default(Exception));
@@ -267,12 +270,12 @@ namespace PCRE
 
                 if (!_match.IsInitialized)
                 {
-                    _match = _buffer.Regex.CreateRefMatch(_buffer.GetOutputVectorSpan());
-                    _match.FirstMatch(_subject, _buffer, _startIndex, _options, _callout, _buffer.CalloutOutputVector);
+                    _match = _buffer._regex.CreateRefMatch(_buffer.GetOutputVectorSpan());
+                    _match.FirstMatch(_buffer, _subject, _startIndex, _options, _callout);
                 }
                 else
                 {
-                    _match.NextMatch(_buffer, _options, _callout, _buffer.CalloutOutputVector);
+                    _match.NextMatch(_buffer, _options, _callout);
                 }
 
                 if (_match.Success)
