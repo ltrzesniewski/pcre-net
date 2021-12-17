@@ -1,6 +1,5 @@
 
-PCRE.NET
-=========
+# PCRE.NET
 
 **Perl Compatible Regular Expressions for .NET**
 
@@ -19,39 +18,67 @@ The following systems are supported:
  - Linux x64
  - macOS x64
 
-## Features ##
+## API Types
 
-The following regex operations are supported:
+### The classic API
+
+This is a friendly API that is very similar to .NET's `System.Text.RegularExpressions`. It works on `string` objects, and supports the following operations:
 
 - NFA matching and substring extraction:
-  - `PcreRegex.Matches`
-  - `PcreRegex.Match`
-  - `PcreRegex.IsMatch`
-- Matched string replacement: `PcreRegex.Replace`
+  - `Matches`
+  - `Match`
+  - `IsMatch`
+- Matched string replacement: `Replace`
   - Callbacks: `Func<PcreMatch, string>`
   - Replacement strings with placeholders: ``$n ${name} $& $_ $` $' $+``
-- String splitting on matches: `PcreRegex.Split`
-  - Captured groups are included in the result
-- DFA matching:
-  - `regexInstance.Dfa.Matches`
-  - `regexInstance.Dfa.Match`
-- Partial matching (when the subject is too short to match the pattern)
+- String splitting on matches: `Split`
 
-The following API types are available:
+### The Span API
 
-- A `string` API similar to .NET's `System.Text.RegularExpressions`
-- A `ReadOnlySpan<char>` API, based on `ref struct` types
-- A zero-allocation API (`regex.CreateMatchBuffer()`) that also works on `ReadOnlySpan<char>`
+`PcreRegex` objects provide overloads which take a `ReadOnlySpan<char>` parameter for the following methods:
 
-Library highlights:
+- `Matches`
+- `Match`
+- `IsMatch`
+
+These methods return a `ref struct` type, but are otherwise similar to the classic API.
+
+### The zero-allocation API
+
+This is the fastest matching API the library provides.
+
+Call the `CreateMatchBuffer` method on a `PcreRegex` instance to create the necessary data structures up-front, then use the returned _match buffer_ for subsequent match operations. Performing a match through this buffer will not allocate further memory, reducing GC pressure and optimizing the process.
+
+The downside of this approach is that the returned match buffer is _not_ thread-safe and _not_ reentrant: you _cannot_ perform a match operation with a buffer which is already being used - match operations need to be sequential.
+
+It is also counter-productive to allocate a match buffer to perform a single match operation. Use this API if you need to match a pattern against many subject strings.
+
+`PcreMatchBuffer` objects are disposable (and finalizable in case they're not disposed). They provide an API for matching against `ReadOnlySpan<char>` subjects.
+
+If you're looking for maximum speed, consider using the following options:
+
+- `PcreOptions.Compiled` at compile time to enable the JIT compiler, which will improve matching speed.
+- `PcreMatchOptions.NoUtfCheck` at match time to skip the Unicode validity check: by default PCRE scans the entire input string to make sure it's valid Unicode.
+- `PcreOptions.MatchInvalidUtf` at compile time if you plan to use `PcreMatchOptions.NoUtfCheck` and your subject strings may contain invalid Unicode sequences.
+
+### The DFA matching API
+
+This API provides regex matching in O(_subject length_) time. It is accessible through the `Dfa` property on a `PcreRegex` instance:
+
+- `Dfa.Matches`
+- `Dfa.Match`
+
+You can read more about its features in [the PCRE documentation](https://philiphazel.github.io/pcre2/doc/html/pcre2matching.html), where it's described as the _alternative matching algorithm_.
+
+## Library highlights
 
 - Support for compiled patterns (x86/x64 JIT)
-- Support for partial matching
+- Support for partial matching (when the subject is too short to match the pattern)
 - Callout support (numbered and string-based)
 - Mark retrieval support
 - Conversion from POSIX BRE, POSIX ERE and glob patterns (`PcreConvert` class)
 
-## Example usage ##
+## Example usage
 
 - Extract all words except those within parentheses:
 
