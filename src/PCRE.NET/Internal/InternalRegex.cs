@@ -152,10 +152,11 @@ namespace PCRE.Internal
                 Native.match(&input, &result);
             }
 
-            AfterMatch(result, ref calloutInterop);
-
             if (result.result_code == PcreConstants.ERROR_NOMATCH)
                 return _noMatch ??= new PcreMatch(this);
+
+            if (result.result_code < PcreConstants.ERROR_PARTIAL)
+                HandleError(result, ref calloutInterop);
 
             oVectorArray ??= oVector.ToArray();
             return new PcreMatch(subject, this, ref result, oVectorArray);
@@ -216,7 +217,8 @@ namespace PCRE.Internal
                 Native.match(&input, &result);
             }
 
-            AfterMatch(result, ref calloutInterop);
+            if (result.result_code < PcreConstants.ERROR_PARTIAL)
+                HandleError(result, ref calloutInterop);
 
             if (result.result_code != PcreConstants.ERROR_NOMATCH && oVector != match.OutputVector)
                 oVectorArray ??= oVector.ToArray();
@@ -256,7 +258,8 @@ namespace PCRE.Internal
                 Native.buffer_match(&input, &result);
             }
 
-            AfterMatch(result, ref calloutInterop);
+            if (result.result_code < PcreConstants.ERROR_PARTIAL)
+                HandleError(result, ref calloutInterop);
 
             match.Update(subject, result, null);
         }
@@ -287,12 +290,13 @@ namespace PCRE.Internal
                 Native.dfa_match(&input, &result);
             }
 
-            AfterMatch(result, ref calloutInterop);
+            if (result.result_code < PcreConstants.ERROR_PARTIAL)
+                HandleError(result, ref calloutInterop);
 
             return new PcreDfaMatchResult(subject, ref result, oVector);
         }
 
-        private static void AfterMatch(in Native.match_result result, ref CalloutInterop.CalloutInteropInfo calloutInterop)
+        private static void HandleError(in Native.match_result result, ref CalloutInterop.CalloutInteropInfo calloutInterop)
         {
             switch (result.result_code)
             {
