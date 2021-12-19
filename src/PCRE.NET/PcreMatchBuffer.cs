@@ -148,7 +148,15 @@ namespace PCRE
                 ThrowInvalidStartIndex();
 
             var match = new PcreRefMatch(_regex, GetOutputVectorSpan());
-            match.FirstMatch(this, subject, startIndex, options, onCallout);
+
+            _regex.BufferMatch(
+                ref match,
+                subject,
+                this,
+                startIndex,
+                options.ToPatternOptions(),
+                onCallout
+            );
 
             return match;
         }
@@ -271,7 +279,15 @@ namespace PCRE
                 if (!_match.IsInitialized)
                 {
                     _match = new PcreRefMatch(_buffer._regex, _buffer.GetOutputVectorSpan());
-                    _match.FirstMatch(_buffer, _subject, _startIndex, _options, _callout);
+
+                    _buffer._regex.BufferMatch(
+                        ref _match,
+                        _subject,
+                        _buffer,
+                        _startIndex,
+                        _options.ToPatternOptions(),
+                        _callout
+                    );
                 }
                 else
                 {

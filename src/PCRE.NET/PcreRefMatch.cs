@@ -234,22 +234,6 @@ namespace PCRE
             );
         }
 
-        internal void FirstMatch(PcreMatchBuffer buffer,
-                                 ReadOnlySpan<char> subject,
-                                 int startIndex,
-                                 PcreMatchOptions options,
-                                 PcreRefCalloutFunc? callout)
-        {
-            _regex!.BufferMatch(
-                ref this,
-                subject,
-                buffer,
-                startIndex,
-                options.ToPatternOptions(),
-                callout
-            );
-        }
-
         internal void NextMatch(PcreMatchBuffer buffer,
                                 PcreMatchOptions options,
                                 PcreRefCalloutFunc? callout)
