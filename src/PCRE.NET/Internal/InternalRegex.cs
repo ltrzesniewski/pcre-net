@@ -224,7 +224,7 @@ namespace PCRE.Internal
             _ = &input;
 
             Native.match_result result;
-            CalloutInterop.CalloutInteropInfo calloutInterop;
+            CalloutInterop.SkipInitInteropInfo(out var calloutInterop);
 
             fixed (char* pSubject = subject)
             {
@@ -233,6 +233,7 @@ namespace PCRE.Internal
                 input.subject_length = (uint)subject.Length;
                 input.start_index = (uint)startIndex;
                 input.additional_options = additionalOptions;
+                input.callout = null;
 
                 if (input.subject == default && input.subject_length == 0)
                     input.subject = (char*)1; // PCRE doesn't like null subjects, even if the length is zero
@@ -240,7 +241,8 @@ namespace PCRE.Internal
                 if (input.buffer == IntPtr.Zero)
                     ThrowMatchBufferDisposed();
 
-                CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout, buffer.CalloutOutputVector);
+                if (callout != null)
+                    CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout, buffer.CalloutOutputVector);
 
                 Native.buffer_match(&input, &result);
             }

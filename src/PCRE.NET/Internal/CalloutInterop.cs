@@ -67,23 +67,13 @@ namespace PCRE.Internal
                                    InternalRegex regex,
                                    ref Native.buffer_match_input input,
                                    out CalloutInteropInfo interopInfo,
-                                   PcreRefCalloutFunc? callout,
-                                   nuint[]? calloutOutputVector)
+                                   PcreRefCalloutFunc callout,
+                                   nuint[] calloutOutputVector)
         {
-            // TODO: Deduplicate this
+            interopInfo = new CalloutInteropInfo(subject, regex, callout, calloutOutputVector);
 
-            if (callout != null)
-            {
-                interopInfo = new CalloutInteropInfo(subject, regex, callout, calloutOutputVector);
-
-                input.callout = _calloutHandlerFnPtr;
-                input.callout_data = interopInfo.ToPointer();
-            }
-            else
-            {
-                SkipInitInteropInfo(out interopInfo);
-                input.callout = null;
-            }
+            input.callout = _calloutHandlerFnPtr;
+            input.callout_data = interopInfo.ToPointer();
         }
 
         public static void Prepare(string subject,
@@ -139,7 +129,7 @@ namespace PCRE.Internal
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [SuppressMessage("Usage", "CA1801")]
-        private static void SkipInitInteropInfo(out CalloutInteropInfo value)
+        internal static void SkipInitInteropInfo(out CalloutInteropInfo value)
         {
             Ret();
             throw IL.Unreachable();
