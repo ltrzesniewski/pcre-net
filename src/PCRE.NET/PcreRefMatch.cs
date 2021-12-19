@@ -72,19 +72,27 @@ namespace PCRE
         internal readonly bool IsInitialized => _regex != null;
 
         /// <inheritdoc cref="PcreMatch.Index"/>
-        public readonly int Index => this[0].Index;
+        public readonly int Index => _regex is not null && _resultCode is > 0 or PcreConstants.ERROR_PARTIAL
+            ? (int)OutputVector[0]
+            : -1;
 
         /// <inheritdoc cref="PcreMatch.EndIndex"/>
-        public readonly int EndIndex => this[0].EndIndex;
+        public readonly int EndIndex => _regex is not null && _resultCode is > 0 or PcreConstants.ERROR_PARTIAL
+            ? (int)OutputVector[1]
+            : -1;
 
         /// <inheritdoc cref="PcreMatch.Length"/>
-        public readonly int Length => this[0].Length;
+        public readonly int Length => _regex is not null && _resultCode is > 0 or PcreConstants.ERROR_PARTIAL && OutputVector[1] > OutputVector[0]
+            ? (int)(OutputVector[1] - OutputVector[0])
+            : 0;
 
         /// <inheritdoc cref="PcreMatch.Success"/>
         public readonly bool Success => _resultCode > 0;
 
         /// <inheritdoc cref="PcreMatch.Value"/>
-        public readonly ReadOnlySpan<char> Value => this[0].Value;
+        public readonly ReadOnlySpan<char> Value => _regex is not null && _resultCode is > 0 or PcreConstants.ERROR_PARTIAL && OutputVector[1] > OutputVector[0]
+            ? Subject.Slice((int)OutputVector[0], (int)(OutputVector[1] - OutputVector[0]))
+            : ReadOnlySpan<char>.Empty;
 
         /// <inheritdoc cref="PcreMatch.Mark"/>
         public readonly ReadOnlySpan<char> Mark
