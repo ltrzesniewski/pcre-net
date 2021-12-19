@@ -145,32 +145,35 @@ PCRENET_EXPORT(void, match)(const pcrenet_match_input* input, pcrenet_match_resu
 
 PCRENET_EXPORT(void, buffer_match)(const pcrenet_buffer_match_input* input, pcrenet_match_result* result)
 {
+    const match_buffer* buffer = input->buffer;
+    pcre2_match_context* match_context = buffer->match_context;
+    pcre2_match_data* match_data = buffer->match_data;
+
     callout_data callout;
 
     if (input->callout)
     {
         callout.callout = input->callout;
         callout.data = input->callout_data;
-        pcre2_set_callout(input->buffer->match_context, &callout_handler, &callout);
+        pcre2_set_callout(match_context, &callout_handler, &callout);
     }
     else
     {
-        pcre2_set_callout(input->buffer->match_context, NULL, NULL);
+        pcre2_set_callout(match_context, NULL, NULL);
     }
 
     result->result_code = pcre2_match(
-        input->buffer->code,
+        buffer->code,
         input->subject,
         input->subject_length,
         input->start_index,
         input->additional_options,
-        input->buffer->match_data,
-        input->buffer->match_context
+        match_data,
+        match_context
     );
 
-    result->mark = pcre2_get_mark(input->buffer->match_data);
+    result->mark = pcre2_get_mark(match_data);
 }
-
 
 PCRENET_EXPORT(void, dfa_match)(const pcrenet_dfa_match_input* input, pcrenet_match_result* result)
 {
