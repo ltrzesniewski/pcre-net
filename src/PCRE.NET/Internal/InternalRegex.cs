@@ -242,7 +242,7 @@ namespace PCRE.Internal
                     ThrowMatchBufferDisposed();
 
                 if (callout != null)
-                    CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout, buffer.CalloutOutputVector);
+                    CalloutInterop.Prepare(subject, buffer, ref input, out calloutInterop, callout);
 
                 Native.buffer_match(&input, &result);
             }

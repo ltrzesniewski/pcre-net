@@ -14,7 +14,7 @@ namespace PCRE
     /// </remarks>
     public sealed unsafe class PcreMatchBuffer : IDisposable
     {
-        private readonly InternalRegex _regex;
+        internal readonly InternalRegex Regex;
         private readonly int _outputVectorSize;
 
         internal IntPtr NativeBuffer;
@@ -24,12 +24,12 @@ namespace PCRE
 
         internal PcreMatchBuffer(InternalRegex regex, PcreMatchSettings settings)
         {
-            _regex = regex;
+            Regex = regex;
             _outputVectorSize = regex.OutputVectorSize;
 
             CalloutOutputVector = new nuint[_outputVectorSize];
 
-            _regex.TryGetCalloutInfoByPatternPosition(0); // Make sure callout info is initialized
+            Regex.TryGetCalloutInfoByPatternPosition(0); // Make sure callout info is initialized
 
             var info = new Native.match_buffer_info
             {
@@ -147,9 +147,9 @@ namespace PCRE
             if (unchecked((uint)startIndex > (uint)subject.Length))
                 ThrowInvalidStartIndex();
 
-            var match = new PcreRefMatch(_regex, GetOutputVectorSpan());
+            var match = new PcreRefMatch(Regex, GetOutputVectorSpan());
 
-            _regex.BufferMatch(
+            Regex.BufferMatch(
                 ref match,
                 subject,
                 this,
@@ -203,7 +203,7 @@ namespace PCRE
         /// Returns the regex pattern.
         /// </summary>
         public override string ToString()
-            => _regex.Pattern;
+            => Regex.Pattern;
 
         private static void ThrowInvalidStartIndex()
             => throw new ArgumentOutOfRangeException("Invalid start index.", default(Exception));
@@ -278,9 +278,9 @@ namespace PCRE
 
                 if (!_match.IsInitialized)
                 {
-                    _match = new PcreRefMatch(_buffer._regex, _buffer.GetOutputVectorSpan());
+                    _match = new PcreRefMatch(_buffer.Regex, _buffer.GetOutputVectorSpan());
 
-                    _buffer._regex.BufferMatch(
+                    _buffer.Regex.BufferMatch(
                         ref _match,
                         _subject,
                         _buffer,

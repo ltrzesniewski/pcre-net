@@ -504,7 +504,7 @@ namespace PCRE
                 }
                 else
                 {
-                    _match.NextMatch(_settings, _options, _callout, null, false);
+                    _match.NextMatch(_settings, _options, _callout, null);
                 }
 
                 if (_match.Success)

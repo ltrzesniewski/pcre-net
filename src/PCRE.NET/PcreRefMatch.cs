@@ -18,6 +18,8 @@ namespace PCRE
         private int _resultCode;
         private char* _markPtr;
 
+        internal ReadOnlySpan<char> Subject;
+
         /// <summary>
         /// A function which returns an output value out of a match.
         /// </summary>
@@ -53,6 +55,8 @@ namespace PCRE
             _resultCode = oVector.Length / 2;
         }
 
+        internal readonly bool IsInitialized => _regex != null;
+
         /// <inheritdoc cref="PcreMatch.CaptureCount"/>
         public readonly int CaptureCount => _regex?.CaptureCount ?? 0;
 
@@ -67,9 +71,6 @@ namespace PCRE
         /// </summary>
         /// <param name="name">The name of the capturing group.</param>
         public readonly PcreRefGroup this[string name] => GetGroup(name);
-
-        internal ReadOnlySpan<char> Subject;
-        internal readonly bool IsInitialized => _regex != null;
 
         /// <inheritdoc cref="PcreMatch.Index"/>
         public readonly int Index => _regex is not null && _resultCode is > 0 or PcreConstants.ERROR_PARTIAL
@@ -214,14 +215,12 @@ namespace PCRE
         internal void NextMatch(PcreMatchSettings settings,
                                 PcreMatchOptions options,
                                 PcreRefCalloutFunc? callout,
-                                nuint[]? calloutOutputVector,
-                                bool reuseOutputVector)
+                                nuint[]? calloutOutputVector)
         {
             var startOfNextMatchIndex = GetStartOfNextMatchIndex();
             var nextOptions = options.ToPatternOptions() | PcreConstants.NO_UTF_CHECK | (Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0);
 
-            if (!reuseOutputVector)
-                OutputVector = Span<nuint>.Empty;
+            OutputVector = Span<nuint>.Empty;
 
             _regex!.Match(
                 ref this,

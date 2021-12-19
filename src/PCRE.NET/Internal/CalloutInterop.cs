@@ -64,13 +64,12 @@ namespace PCRE.Internal
         }
 
         public static void Prepare(ReadOnlySpan<char> subject,
-                                   InternalRegex regex,
+                                   PcreMatchBuffer buffer,
                                    ref Native.buffer_match_input input,
                                    out CalloutInteropInfo interopInfo,
-                                   PcreRefCalloutFunc callout,
-                                   nuint[] calloutOutputVector)
+                                   PcreRefCalloutFunc callout)
         {
-            interopInfo = new CalloutInteropInfo(subject, regex, callout, calloutOutputVector);
+            interopInfo = new CalloutInteropInfo(subject, buffer.Regex, callout, buffer.CalloutOutputVector);
 
             input.callout = _calloutHandlerFnPtr;
             input.callout_data = interopInfo.ToPointer();
