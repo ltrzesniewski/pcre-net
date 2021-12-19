@@ -47,7 +47,7 @@ namespace PCRE
                 ? stackalloc nuint[InternalRegex.OutputVectorSize]
                 : new nuint[InternalRegex.OutputVectorSize];
 
-            var match = InternalRegex.CreateRefMatch(outputVector);
+            var match = new PcreRefMatch(InternalRegex, outputVector);
             match.FirstMatch(subject, PcreMatchSettings.Default, startIndex, 0, null, null);
 
             return match.Success;
@@ -209,7 +209,7 @@ namespace PCRE
             if (unchecked((uint)startIndex > (uint)subject.Length))
                 ThrowInvalidStartIndex();
 
-            var match = InternalRegex.CreateRefMatch();
+            var match = new PcreRefMatch(InternalRegex, Span<nuint>.Empty);
             match.FirstMatch(subject, settings, startIndex, options, onCallout, null);
 
             return match;
@@ -499,7 +499,7 @@ namespace PCRE
 
                 if (!_match.IsInitialized)
                 {
-                    _match = _regex.CreateRefMatch();
+                    _match = new PcreRefMatch(_regex, Span<nuint>.Empty);
                     _match.FirstMatch(_subject, _settings, _startIndex, _options, _callout, null);
                 }
                 else

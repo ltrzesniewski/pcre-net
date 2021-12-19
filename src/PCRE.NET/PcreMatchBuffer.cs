@@ -147,7 +147,7 @@ namespace PCRE
             if (unchecked((uint)startIndex > (uint)subject.Length))
                 ThrowInvalidStartIndex();
 
-            var match = _regex.CreateRefMatch(GetOutputVectorSpan());
+            var match = new PcreRefMatch(_regex, GetOutputVectorSpan());
             match.FirstMatch(this, subject, startIndex, options, onCallout);
 
             return match;
@@ -270,7 +270,7 @@ namespace PCRE
 
                 if (!_match.IsInitialized)
                 {
-                    _match = _buffer._regex.CreateRefMatch(_buffer.GetOutputVectorSpan());
+                    _match = new PcreRefMatch(_buffer._regex, _buffer.GetOutputVectorSpan());
                     _match.FirstMatch(_buffer, _subject, _startIndex, _options, _callout);
                 }
                 else

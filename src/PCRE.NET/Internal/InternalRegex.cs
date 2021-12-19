@@ -162,19 +162,6 @@ namespace PCRE.Internal
             return new PcreMatch(subject, this, ref result, oVectorArray);
         }
 
-        public PcreRefMatch CreateRefMatch()
-            => new(this, Span<nuint>.Empty);
-
-        public PcreRefMatch CreateRefMatch(Span<nuint> oVector)
-        {
-#if DEBUG
-            if (oVector.Length != OutputVectorSize)
-                throw new InvalidOperationException("Unexpected output vector size.");
-#endif
-
-            return new PcreRefMatch(this, oVector);
-        }
-
         public void Match(ref PcreRefMatch match,
                           ReadOnlySpan<char> subject,
                           PcreMatchSettings settings,

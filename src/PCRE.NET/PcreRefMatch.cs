@@ -28,6 +28,11 @@ namespace PCRE
         {
             // Empty match
 
+#if DEBUG
+            if (oVector.Length != 0 && oVector.Length != regex.OutputVectorSize)
+                throw new InvalidOperationException("Unexpected output vector size.");
+#endif
+
             _regex = regex;
             OutputVector = oVector;
 
