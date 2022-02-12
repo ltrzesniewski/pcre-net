@@ -18,22 +18,22 @@ using System.Runtime.CompilerServices;
 // ReSharper disable CheckNamespace
 namespace System.Diagnostics.CodeAnalysis
 {
-    [AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property)]
     internal sealed class AllowNullAttribute : Attribute
     {
     }
 
-    [AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property)]
     internal sealed class DisallowNullAttribute : Attribute
     {
     }
 
-    [AttributeUsageAttribute(AttributeTargets.Method, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     internal sealed class DoesNotReturnAttribute : Attribute
     {
     }
 
-    [AttributeUsageAttribute(AttributeTargets.Parameter)]
+    [AttributeUsage(AttributeTargets.Parameter)]
     internal sealed class DoesNotReturnIfAttribute : Attribute
     {
         public DoesNotReturnIfAttribute(bool parameterValue)
@@ -44,12 +44,12 @@ namespace System.Diagnostics.CodeAnalysis
         public bool ParameterValue { get; }
     }
 
-    [AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue)]
     internal sealed class MaybeNullAttribute : Attribute
     {
     }
 
-    [AttributeUsageAttribute(AttributeTargets.Parameter)]
+    [AttributeUsage(AttributeTargets.Parameter)]
     internal sealed class MaybeNullWhenAttribute : Attribute
     {
         public MaybeNullWhenAttribute(bool returnValue)
@@ -60,12 +60,12 @@ namespace System.Diagnostics.CodeAnalysis
         public bool ReturnValue { get; }
     }
 
-    [AttributeUsageAttribute(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue)]
     internal sealed class NotNullAttribute : Attribute
     {
     }
 
-    [AttributeUsageAttribute(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, AllowMultiple = true)]
     internal sealed class NotNullIfNotNullAttribute : Attribute
     {
         public NotNullIfNotNullAttribute(string parameterName)
@@ -76,7 +76,7 @@ namespace System.Diagnostics.CodeAnalysis
         public string ParameterName { get; }
     }
 
-    [AttributeUsageAttribute(AttributeTargets.Parameter)]
+    [AttributeUsage(AttributeTargets.Parameter)]
     internal sealed class NotNullWhenAttribute : Attribute
     {
         public NotNullWhenAttribute(bool returnValue)

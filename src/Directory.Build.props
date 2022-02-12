@@ -1,8 +1,8 @@
 <Project>
 
   <PropertyGroup>
-    <LangVersion>9.0</LangVersion>
-    <AnalysisLevel>5.0</AnalysisLevel>
+    <LangVersion>10.0</LangVersion>
+    <AnalysisLevel>6.0</AnalysisLevel>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

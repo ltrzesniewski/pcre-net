@@ -46,15 +46,15 @@ PCRENET_EXPORT(void, compile)(const pcrenet_compile_input* input, pcrenet_compil
     if (input->compile_extra_options)
         pcre2_set_compile_extra_options(context, input->compile_extra_options);
 
-    int errorCode;
-    PCRE2_SIZE errorOffset;
+    int error_code;
+    PCRE2_SIZE error_offset;
 
     result->code = pcre2_compile(
         input->pattern,
         input->pattern_length,
         input->flags,
-        &errorCode,
-        &errorOffset,
+        &error_code,
+        &error_offset,
         context
     );
 
@@ -72,8 +72,8 @@ PCRENET_EXPORT(void, compile)(const pcrenet_compile_input* input, pcrenet_compil
     }
     else
     {
-        result->error_code = errorCode;
-        result->error_offset = errorOffset;
+        result->error_code = error_code;
+        result->error_offset = (uint32_t)error_offset;
     }
 
     pcre2_compile_context_free(context);

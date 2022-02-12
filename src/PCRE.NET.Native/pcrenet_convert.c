@@ -16,7 +16,7 @@ typedef struct
     uint32_t output_length;
 } convert_result;
 
-PCRENET_EXPORT(int32_t, convert)(convert_input* input, convert_result* result)
+PCRENET_EXPORT(int32_t, convert)(const convert_input* input, convert_result* result)
 {
     pcre2_convert_context* context = pcre2_convert_context_create(NULL);
 
@@ -24,22 +24,22 @@ PCRENET_EXPORT(int32_t, convert)(convert_input* input, convert_result* result)
     pcre2_set_glob_separator(context, input->glob_separator);
 
     PCRE2_UCHAR* buffer = NULL;
-    PCRE2_SIZE bufferLength = 0;
+    PCRE2_SIZE buffer_length = 0;
 
-    const int errorCode = pcre2_pattern_convert(
+    const int error_code = pcre2_pattern_convert(
         input->pattern,
         input->pattern_length,
         input->options,
         &buffer,
-        &bufferLength,
+        &buffer_length,
         context
     );
 
     result->output = buffer;
-    result->output_length = bufferLength;
+    result->output_length = (uint32_t)buffer_length;
 
     pcre2_convert_context_free(context);
-    return errorCode;
+    return error_code;
 }
 
 PCRENET_EXPORT(void, convert_result_free)(uint16_t* str)

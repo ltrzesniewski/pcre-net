@@ -1,7 +1,7 @@
+#if NETCOREAPP
+
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Attributes;
-
-#if NETCOREAPP
 
 namespace PCRE.NET.Benchmarks
 {

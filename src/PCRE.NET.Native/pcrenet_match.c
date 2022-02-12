@@ -83,8 +83,8 @@ typedef struct
 
 static int callout_handler(pcre2_callout_block* block, void* data)
 {
-    const callout_data* typedData = (callout_data*)data;
-    return typedData->callout(block, typedData->data);
+    const callout_data* typed_data = (callout_data*)data;
+    return typed_data->callout(block, typed_data->data);
 }
 
 static void apply_settings(const match_settings* settings, pcre2_match_context* context)
@@ -107,7 +107,7 @@ static void apply_settings(const match_settings* settings, pcre2_match_context* 
 
 PCRENET_EXPORT(void, match)(const pcrenet_match_input* input, pcrenet_match_result* result)
 {
-    pcre2_match_data* matchData = pcre2_match_data_create_from_pattern(input->code, NULL);
+    pcre2_match_data* match_data = pcre2_match_data_create_from_pattern(input->code, NULL);
     pcre2_match_context* context = pcre2_match_context_create(NULL);
     callout_data callout;
 
@@ -126,21 +126,21 @@ PCRENET_EXPORT(void, match)(const pcrenet_match_input* input, pcrenet_match_resu
         input->subject_length,
         input->start_index,
         input->additional_options,
-        matchData,
+        match_data,
         context
     );
 
     if (input->output_vector)
     {
-        PCRE2_SIZE* oVector = pcre2_get_ovector_pointer(matchData);
-        const uint32_t itemCount = pcre2_get_ovector_count(matchData) * 2;
-        memcpy(input->output_vector, oVector, itemCount * sizeof(PCRE2_SIZE));
+        const PCRE2_SIZE* ovector = pcre2_get_ovector_pointer(match_data);
+        const uint32_t item_count = pcre2_get_ovector_count(match_data) * 2;
+        memcpy(input->output_vector, ovector, item_count * sizeof(PCRE2_SIZE));
     }
 
-    result->mark = pcre2_get_mark(matchData);
+    result->mark = pcre2_get_mark(match_data);
 
     pcre2_match_context_free(context);
-    pcre2_match_data_free(matchData);
+    pcre2_match_data_free(match_data);
 }
 
 PCRENET_EXPORT(void, buffer_match)(const pcrenet_buffer_match_input* input, pcrenet_match_result* result)
@@ -177,7 +177,7 @@ PCRENET_EXPORT(void, buffer_match)(const pcrenet_buffer_match_input* input, pcre
 
 PCRENET_EXPORT(void, dfa_match)(const pcrenet_dfa_match_input* input, pcrenet_match_result* result)
 {
-    pcre2_match_data* matchData = pcre2_match_data_create(input->max_results, NULL);
+    pcre2_match_data* match_data = pcre2_match_data_create(input->max_results, NULL);
     pcre2_match_context* context = pcre2_match_context_create(NULL);
     callout_data callout;
 
@@ -188,8 +188,8 @@ PCRENET_EXPORT(void, dfa_match)(const pcrenet_dfa_match_input* input, pcrenet_ma
         pcre2_set_callout(context, &callout_handler, &callout);
     }
 
-    const int workspaceSize = 20u > input->workspace_size ? 20u : input->workspace_size;
-    int* workspace = malloc(workspaceSize * sizeof(int));;
+    const PCRE2_SIZE workspace_size = 20u > input->workspace_size ? 20u : input->workspace_size;
+    int* workspace = malloc(workspace_size * sizeof(int));
 
     result->result_code = pcre2_dfa_match(
         input->code,
@@ -197,22 +197,22 @@ PCRENET_EXPORT(void, dfa_match)(const pcrenet_dfa_match_input* input, pcrenet_ma
         input->subject_length,
         input->start_index,
         input->additional_options,
-        matchData,
+        match_data,
         context,
         workspace,
-        workspaceSize
+        workspace_size
     );
 
     if (input->output_vector)
     {
-        PCRE2_SIZE* oVector = pcre2_get_ovector_pointer(matchData);
-        const uint32_t itemCount = pcre2_get_ovector_count(matchData) * 2;
-        memcpy(input->output_vector, oVector, itemCount * sizeof(PCRE2_SIZE));
+        const PCRE2_SIZE* ovector = pcre2_get_ovector_pointer(match_data);
+        const uint32_t item_count = pcre2_get_ovector_count(match_data) * 2;
+        memcpy(input->output_vector, ovector, item_count * sizeof(PCRE2_SIZE));
     }
 
     free(workspace);
     pcre2_match_context_free(context);
-    pcre2_match_data_free(matchData);
+    pcre2_match_data_free(match_data);
 }
 
 PCRENET_EXPORT(match_buffer*, create_match_buffer)(match_buffer_info* info)
