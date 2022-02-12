@@ -2,278 +2,277 @@
 using System.IO;
 using System.Text;
 
-namespace PCRE.Tests.Pcre
+namespace PCRE.Tests.Pcre;
+
+public abstract class TestFileReader : IDisposable
 {
-    public abstract class TestFileReader : IDisposable
+    private readonly TextReader _reader;
+    private int _lineNumber;
+    private string? _lastReadLine;
+
+    protected TestFileReader(Stream inputStream)
     {
-        private readonly TextReader _reader;
-        private int _lineNumber;
-        private string? _lastReadLine;
+        _reader = new StreamReader(inputStream, Encoding.GetEncoding("ISO-8859-1"));
+    }
 
-        protected TestFileReader(Stream inputStream)
-        {
-            _reader = new StreamReader(inputStream, Encoding.GetEncoding("ISO-8859-1"));
-        }
+    public void Dispose()
+    {
+        _reader.Dispose();
+    }
 
-        public void Dispose()
-        {
-            _reader.Dispose();
-        }
+    protected string? ReadLine()
+    {
+        ++_lineNumber;
+        _lastReadLine = _reader.ReadLine();
+        return _lastReadLine;
+    }
 
-        protected string? ReadLine()
+    protected TestPattern? ReadNextPattern()
+    {
+        while (true)
         {
-            ++_lineNumber;
-            _lastReadLine = _reader.ReadLine();
-            return _lastReadLine;
-        }
+            var line = ReadLine();
+            var lineNumber = _lineNumber;
 
-        protected TestPattern? ReadNextPattern()
-        {
+            if (line == null)
+                return null;
+
+            if (String.IsNullOrWhiteSpace(line))
+                continue;
+
+            if (line.StartsWith("#"))
+                continue; // TODO : Interpret that
+
+            if (line.StartsWith("\\="))
+                continue;
+
+            line = line.TrimStart();
+
+            if (line[0] <= ' ')
+                throw InvalidInputException("Unexpected input");
+
+            var delimiter = line[0];
+
+            var fullString = new StringBuilder();
+            var pattern = new StringBuilder();
+
+            var firstLine = true;
+
             while (true)
             {
-                var line = ReadLine();
-                var lineNumber = _lineNumber;
+                fullString.AppendLine(line);
 
-                if (line == null)
-                    return null;
-
-                if (String.IsNullOrWhiteSpace(line))
-                    continue;
-
-                if (line.StartsWith("#"))
-                    continue; // TODO : Interpret that
-
-                if (line.StartsWith("\\="))
-                    continue;
-
-                line = line.TrimStart();
-
-                if (line[0] <= ' ')
-                    throw InvalidInputException("Unexpected input");
-
-                var delimiter = line[0];
-
-                var fullString = new StringBuilder();
-                var pattern = new StringBuilder();
-
-                var firstLine = true;
-
-                while (true)
+                for (var i = 0; i < line.Length; ++i)
                 {
-                    fullString.AppendLine(line);
-
-                    for (var i = 0; i < line.Length; ++i)
+                    if (line[i] == delimiter)
                     {
-                        if (line[i] == delimiter)
+                        if (firstLine)
                         {
-                            if (firstLine)
-                            {
-                                firstLine = false;
-                            }
-                            else
-                            {
-                                var result = new TestPattern(
-                                    fullString.ToString(),
-                                    pattern.ToString(),
-                                    line.Substring(i + 1),
-                                    lineNumber
-                                );
-
-                                ParseOptions(result);
-
-                                return result;
-                            }
-                        }
-                        else if (line[i] == '\\')
-                        {
-                            pattern.Append('\\');
-                            if (++i < line.Length)
-                                pattern.Append(line[i]);
+                            firstLine = false;
                         }
                         else
                         {
-                            pattern.Append(line[i]);
+                            var result = new TestPattern(
+                                fullString.ToString(),
+                                pattern.ToString(),
+                                line.Substring(i + 1),
+                                lineNumber
+                            );
+
+                            ParseOptions(result);
+
+                            return result;
                         }
                     }
-
-                    pattern.Append('\n');
-
-                    line = ReadLine();
-
-                    if (line == null)
-                        throw InvalidInputException("Unexpected end of pattern");
+                    else if (line[i] == '\\')
+                    {
+                        pattern.Append('\\');
+                        if (++i < line.Length)
+                            pattern.Append(line[i]);
+                    }
+                    else
+                    {
+                        pattern.Append(line[i]);
+                    }
                 }
+
+                pattern.Append('\n');
+
+                line = ReadLine();
+
+                if (line == null)
+                    throw InvalidInputException("Unexpected end of pattern");
             }
         }
+    }
 
-        private void ParseOptions(TestPattern pattern)
+    private void ParseOptions(TestPattern pattern)
+    {
+        pattern.PatternOptions = PcreOptions.None;
+        pattern.ResetOptionBits = PcreOptions.None;
+
+        foreach (var part in pattern.OptionsString.Split(','))
         {
-            pattern.PatternOptions = PcreOptions.None;
-            pattern.ResetOptionBits = PcreOptions.None;
+            var args = part.Split('=');
 
-            foreach (var part in pattern.OptionsString.Split(','))
+            var name = args[0];
+            var value = args.Length == 2 ? args[1] : null;
+
+            switch (name)
             {
-                var args = part.Split('=');
+                case "aftertext":
+                case "allaftertext":
+                    pattern.GetRemainingString = true;
+                    break;
 
-                var name = args[0];
-                var value = args.Length == 2 ? args[1] : null;
+                case "dupnames":
+                    pattern.PatternOptions |= PcreOptions.DupNames;
+                    break;
 
-                switch (name)
-                {
-                    case "aftertext":
-                    case "allaftertext":
-                        pattern.GetRemainingString = true;
-                        break;
+                case "mark":
+                    pattern.ExtractMarks = true;
+                    break;
 
-                    case "dupnames":
-                        pattern.PatternOptions |= PcreOptions.DupNames;
-                        break;
+                case "no_start_optimize":
+                    pattern.PatternOptions |= PcreOptions.NoStartOptimize;
+                    break;
 
-                    case "mark":
-                        pattern.ExtractMarks = true;
-                        break;
+                case "hex":
+                    pattern.HexEncoding = true;
+                    break;
 
-                    case "no_start_optimize":
-                        pattern.PatternOptions |= PcreOptions.NoStartOptimize;
-                        break;
+                case "dollar_endonly":
+                    pattern.PatternOptions |= PcreOptions.DollarEndOnly;
+                    break;
 
-                    case "hex":
-                        pattern.HexEncoding = true;
-                        break;
+                case "anchored":
+                    pattern.PatternOptions |= PcreOptions.Anchored;
+                    break;
 
-                    case "dollar_endonly":
-                        pattern.PatternOptions |= PcreOptions.DollarEndOnly;
-                        break;
+                case "ungreedy":
+                    pattern.PatternOptions |= PcreOptions.Ungreedy;
+                    break;
 
-                    case "anchored":
-                        pattern.PatternOptions |= PcreOptions.Anchored;
-                        break;
+                case "global":
+                case "altglobal":
+                    pattern.AllMatches = true;
+                    break;
 
-                    case "ungreedy":
-                        pattern.PatternOptions |= PcreOptions.Ungreedy;
-                        break;
+                case "no_auto_possess":
+                    pattern.PatternOptions |= PcreOptions.NoAutoPossess;
+                    break;
 
-                    case "global":
-                    case "altglobal":
-                        pattern.AllMatches = true;
-                        break;
+                case "no_auto_capture":
+                    pattern.PatternOptions |= PcreOptions.ExplicitCapture;
+                    break;
 
-                    case "no_auto_possess":
-                        pattern.PatternOptions |= PcreOptions.NoAutoPossess;
-                        break;
+                case "auto_callout":
+                    pattern.PatternOptions |= PcreOptions.AutoCallout;
+                    break;
 
-                    case "no_auto_capture":
-                        pattern.PatternOptions |= PcreOptions.ExplicitCapture;
-                        break;
+                case "firstline":
+                    pattern.PatternOptions |= PcreOptions.FirstLine;
+                    break;
 
-                    case "auto_callout":
-                        pattern.PatternOptions |= PcreOptions.AutoCallout;
-                        break;
+                case "alt_bsux":
+                    pattern.PatternOptions |= PcreOptions.AltBsUX;
+                    break;
 
-                    case "firstline":
-                        pattern.PatternOptions |= PcreOptions.FirstLine;
-                        break;
+                case "allow_empty_class":
+                    pattern.PatternOptions |= PcreOptions.AllowEmptyClass;
+                    break;
 
-                    case "alt_bsux":
-                        pattern.PatternOptions |= PcreOptions.AltBsUX;
-                        break;
+                case "match_unset_backref":
+                    pattern.PatternOptions |= PcreOptions.MatchUnsetBackref;
+                    break;
 
-                    case "allow_empty_class":
-                        pattern.PatternOptions |= PcreOptions.AllowEmptyClass;
-                        break;
+                case "allcaptures":
+                    break;
 
-                    case "match_unset_backref":
-                        pattern.PatternOptions |= PcreOptions.MatchUnsetBackref;
-                        break;
+                case "replace":
+                    pattern.ReplaceWith = value;
+                    break;
 
-                    case "allcaptures":
-                        break;
+                case "info":
+                    pattern.IncludeInfo = true;
+                    break;
 
-                    case "replace":
-                        pattern.ReplaceWith = value;
-                        break;
+                case "no_dotstar_anchor":
+                    pattern.PatternOptions |= PcreOptions.NoDotStarAnchor;
+                    break;
 
-                    case "info":
-                        pattern.IncludeInfo = true;
-                        break;
+                case "dotall":
+                    pattern.PatternOptions |= PcreOptions.Singleline;
+                    break;
 
-                    case "no_dotstar_anchor":
-                        pattern.PatternOptions |= PcreOptions.NoDotStarAnchor;
-                        break;
+                case "subject_literal":
+                    pattern.SubjectLiteral = true;
+                    break;
 
-                    case "dotall":
-                        pattern.PatternOptions |= PcreOptions.Singleline;
-                        break;
+                case "jitstack":
+                    pattern.JitStack = uint.Parse(value ?? "0") * 1024;
+                    break;
 
-                    case "subject_literal":
-                        pattern.SubjectLiteral = true;
-                        break;
+                case "newline": // TODO
+                case "bsr":
+                case "startchar":
+                case "stackguard":
+                case "parens_nest_limit":
+                    break;
 
-                    case "jitstack":
-                        pattern.JitStack = uint.Parse(value ?? "0") * 1024;
-                        break;
-
-                    case "newline": // TODO
-                    case "bsr":
-                    case "startchar":
-                    case "stackguard":
-                    case "parens_nest_limit":
-                        break;
-
-                    default:
-                        foreach (var c in part)
+                default:
+                    foreach (var c in part)
+                    {
+                        switch (c)
                         {
-                            switch (c)
-                            {
-                                case 'i':
-                                    pattern.PatternOptions |= PcreOptions.IgnoreCase;
-                                    break;
+                            case 'i':
+                                pattern.PatternOptions |= PcreOptions.IgnoreCase;
+                                break;
 
-                                case 'm':
-                                    pattern.PatternOptions |= PcreOptions.MultiLine;
-                                    break;
+                            case 'm':
+                                pattern.PatternOptions |= PcreOptions.MultiLine;
+                                break;
 
-                                case 's':
-                                    pattern.PatternOptions |= PcreOptions.Singleline;
-                                    break;
+                            case 's':
+                                pattern.PatternOptions |= PcreOptions.Singleline;
+                                break;
 
-                                case 'x':
-                                    if ((pattern.PatternOptions & PcreOptions.Extended) != 0)
-                                        pattern.PatternOptions = pattern.PatternOptions & ~PcreOptions.Extended | PcreOptions.ExtendedMore;
-                                    else
-                                        pattern.PatternOptions |= PcreOptions.Extended;
-                                    break;
+                            case 'x':
+                                if ((pattern.PatternOptions & PcreOptions.Extended) != 0)
+                                    pattern.PatternOptions = pattern.PatternOptions & ~PcreOptions.Extended | PcreOptions.ExtendedMore;
+                                else
+                                    pattern.PatternOptions |= PcreOptions.Extended;
+                                break;
 
-                                case 'g':
-                                    pattern.AllMatches = true;
-                                    break;
+                            case 'g':
+                                pattern.AllMatches = true;
+                                break;
 
-                                case 'B':
-                                    break;
+                            case 'B':
+                                break;
 
-                                case 'I':
-                                    pattern.IncludeInfo = true;
-                                    break;
+                            case 'I':
+                                pattern.IncludeInfo = true;
+                                break;
 
-                                case '\\':
-                                    pattern.Pattern += "\\";
-                                    break;
+                            case '\\':
+                                pattern.Pattern += "\\";
+                                break;
 
-                                case ' ':
-                                    break;
+                            case ' ':
+                                break;
 
-                                default:
-                                    throw InvalidInputException("Unknown option: " + part);
-                            }
+                            default:
+                                throw InvalidInputException("Unknown option: " + part);
                         }
-                        break;
-                }
+                    }
+                    break;
             }
         }
+    }
 
-        protected InvalidOperationException InvalidInputException(string message, Exception? innerException = null)
-        {
-            return new InvalidOperationException($"{message} at line {_lineNumber}: {_lastReadLine}", innerException);
-        }
+    protected InvalidOperationException InvalidInputException(string message, Exception? innerException = null)
+    {
+        return new InvalidOperationException($"{message} at line {_lineNumber}: {_lastReadLine}", innerException);
     }
 }

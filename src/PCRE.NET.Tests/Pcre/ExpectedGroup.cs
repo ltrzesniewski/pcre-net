@@ -1,22 +1,21 @@
-namespace PCRE.Tests.Pcre
+namespace PCRE.Tests.Pcre;
+
+public class ExpectedGroup
 {
-    public class ExpectedGroup
+    public static readonly ExpectedGroup Unset = new();
+
+    public bool IsMatch { get; }
+    public string Value { get; }
+
+    private ExpectedGroup()
     {
-        public static readonly ExpectedGroup Unset = new();
+        IsMatch = false;
+        Value = "<unset>";
+    }
 
-        public bool IsMatch { get; }
-        public string Value { get; }
-
-        private ExpectedGroup()
-        {
-            IsMatch = false;
-            Value = "<unset>";
-        }
-
-        public ExpectedGroup(string value)
-        {
-            Value = value;
-            IsMatch = true;
-        }
+    public ExpectedGroup(string value)
+    {
+        Value = value;
+        IsMatch = true;
     }
 }

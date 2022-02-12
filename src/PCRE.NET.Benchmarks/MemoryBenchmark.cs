@@ -4,61 +4,60 @@ using System.Text.RegularExpressions;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 
-namespace PCRE.NET.Benchmarks
+namespace PCRE.NET.Benchmarks;
+
+[MemoryDiagnoser]
+[ReturnValueValidator]
+[SimpleJob(RuntimeMoniker.Net60)]
+public class MemoryBenchmark
 {
-    [MemoryDiagnoser]
-    [ReturnValueValidator]
-    [SimpleJob(RuntimeMoniker.Net60)]
-    public class MemoryBenchmark
+    private const string _pattern = @"\b(?<user>[-+\w.]+)@(?<domain>[-\w.]+\.[A-Za-z]{2,})\b";
+
+    private readonly Regex _netRegex = new(_pattern, RegexOptions.Compiled | RegexOptions.CultureInvariant);
+    private readonly PcreRegex _pcreRegex = new(_pattern, PcreOptions.Compiled);
+
+    private string Subject { get; }
+
+    public MemoryBenchmark()
     {
-        private const string _pattern = @"\b(?<user>[-+\w.]+)@(?<domain>[-\w.]+\.[A-Za-z]{2,})\b";
+        var sb = new StringBuilder();
 
-        private readonly Regex _netRegex = new(_pattern, RegexOptions.Compiled | RegexOptions.CultureInvariant);
-        private readonly PcreRegex _pcreRegex = new(_pattern, PcreOptions.Compiled);
+        for (var i = 0; i < 10; ++i)
+            sb.Append("foobar foo bar baz foobar@foo bar baz foobar@ foo bar baz foobar foo bar baz foobar foo bar baz foobar foo bar baz foo@bar.baz ");
 
-        private string Subject { get; }
+        Subject = sb.ToString();
+    }
 
-        public MemoryBenchmark()
-        {
-            var sb = new StringBuilder();
+    [Benchmark(Baseline = true)]
+    public int NetRegex()
+    {
+        var length = 0;
 
-            for (var i = 0; i < 10; ++i)
-                sb.Append("foobar foo bar baz foobar@foo bar baz foobar@ foo bar baz foobar foo bar baz foobar foo bar baz foobar foo bar baz foo@bar.baz ");
+        foreach (Match match in _netRegex.Matches(Subject))
+            length += match.Value.Length + match.Groups["user"].Value.Length;
 
-            Subject = sb.ToString();
-        }
+        return length;
+    }
 
-        [Benchmark(Baseline = true)]
-        public int NetRegex()
-        {
-            var length = 0;
+    [Benchmark]
+    public int PcreRegex()
+    {
+        var length = 0;
 
-            foreach (Match match in _netRegex.Matches(Subject))
-                length += match.Value.Length + match.Groups["user"].Value.Length;
+        foreach (var match in _pcreRegex.Matches(Subject))
+            length += match.Value.Length + match.Groups["user"].Value.Length;
 
-            return length;
-        }
+        return length;
+    }
 
-        [Benchmark]
-        public int PcreRegex()
-        {
-            var length = 0;
+    [Benchmark]
+    public int PcreRegexRef()
+    {
+        var length = 0;
 
-            foreach (var match in _pcreRegex.Matches(Subject))
-                length += match.Value.Length + match.Groups["user"].Value.Length;
+        foreach (var match in _pcreRegex.Matches(Subject.AsSpan()))
+            length += match.Value.Length + match.Groups["user"].Value.Length;
 
-            return length;
-        }
-
-        [Benchmark]
-        public int PcreRegexRef()
-        {
-            var length = 0;
-
-            foreach (var match in _pcreRegex.Matches(Subject.AsSpan()))
-                length += match.Value.Length + match.Groups["user"].Value.Length;
-
-            return length;
-        }
+        return length;
     }
 }

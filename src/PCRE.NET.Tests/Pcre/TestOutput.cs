@@ -1,20 +1,19 @@
 ﻿using System.Collections.Generic;
 
-namespace PCRE.Tests.Pcre
+namespace PCRE.Tests.Pcre;
+
+public class TestOutput
 {
-    public class TestOutput
+    public TestPattern Pattern { get; }
+    public IList<ExpectedResult> ExpectedResults { get; } = new List<ExpectedResult>();
+
+    public TestOutput(TestPattern pattern)
     {
-        public TestPattern Pattern { get; }
-        public IList<ExpectedResult> ExpectedResults { get; } = new List<ExpectedResult>();
+        Pattern = pattern;
+    }
 
-        public TestOutput(TestPattern pattern)
-        {
-            Pattern = pattern;
-        }
-
-        public override string ToString()
-        {
-            return Pattern.ToString();
-        }
+    public override string ToString()
+    {
+        return Pattern.ToString();
     }
 }

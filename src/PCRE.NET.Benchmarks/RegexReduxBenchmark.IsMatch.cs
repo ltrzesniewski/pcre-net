@@ -2,46 +2,45 @@
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Attributes;
 
-namespace PCRE.NET.Benchmarks
+namespace PCRE.NET.Benchmarks;
+
+[MemoryDiagnoser]
+public class RegexReduxBenchmarkIsMatch
 {
-    [MemoryDiagnoser]
-    public class RegexReduxBenchmarkIsMatch
+    private static readonly Regex[] _regexes;
+    private static readonly PcreRegex[] _pcreRegexes;
+
+    static RegexReduxBenchmarkIsMatch()
     {
-        private static readonly Regex[] _regexes;
-        private static readonly PcreRegex[] _pcreRegexes;
+        _regexes = RegexReduxBenchmarkData.Patterns.Select(pattern => new Regex(pattern, RegexOptions.Compiled | RegexOptions.CultureInvariant)).ToArray();
+        _pcreRegexes = RegexReduxBenchmarkData.Patterns.Select(pattern => new PcreRegex(pattern, PcreOptions.Compiled)).ToArray();
+    }
 
-        static RegexReduxBenchmarkIsMatch()
+    [Benchmark(Baseline = true)]
+    public int Regex()
+    {
+        var matches = 0;
+
+        foreach (var regex in _regexes)
         {
-            _regexes = RegexReduxBenchmarkData.Patterns.Select(pattern => new Regex(pattern, RegexOptions.Compiled | RegexOptions.CultureInvariant)).ToArray();
-            _pcreRegexes = RegexReduxBenchmarkData.Patterns.Select(pattern => new PcreRegex(pattern, PcreOptions.Compiled)).ToArray();
+            if (regex.IsMatch(RegexReduxBenchmarkData.Subject))
+                ++matches;
         }
 
-        [Benchmark(Baseline = true)]
-        public int Regex()
+        return matches;
+    }
+
+    [Benchmark]
+    public int PcreRegex()
+    {
+        var matches = 0;
+
+        foreach (var regex in _pcreRegexes)
         {
-            var matches = 0;
-
-            foreach (var regex in _regexes)
-            {
-                if (regex.IsMatch(RegexReduxBenchmarkData.Subject))
-                    ++matches;
-            }
-
-            return matches;
+            if (regex.IsMatch(RegexReduxBenchmarkData.Subject))
+                ++matches;
         }
 
-        [Benchmark]
-        public int PcreRegex()
-        {
-            var matches = 0;
-
-            foreach (var regex in _pcreRegexes)
-            {
-                if (regex.IsMatch(RegexReduxBenchmarkData.Subject))
-                    ++matches;
-            }
-
-            return matches;
-        }
+        return matches;
     }
 }

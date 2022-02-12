@@ -1,28 +1,28 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace PCRE.NET.Benchmarks
-{
-    /// <summary>
-    /// This data is from the regex-redux benchmark by the Benchmark's Game.
-    /// https://benchmarksgame-team.pages.debian.net/benchmarksgame/description/regexredux.html
-    /// </summary>
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    internal static class RegexReduxBenchmarkData
-    {
-        public static readonly string[] Patterns =
-        {
-            @"agggtaaa|tttaccct",
-            @"[cgt]gggtaaa|tttaccc[acg]",
-            @"a[act]ggtaaa|tttacc[agt]t",
-            @"ag[act]gtaaa|tttac[agt]ct",
-            @"agg[act]taaa|ttta[agt]cct",
-            @"aggg[acg]aaa|ttt[cgt]ccct",
-            @"agggt[cgt]aa|tt[acg]accct",
-            @"agggta[cgt]a|t[acg]taccct",
-            @"agggtaa[cgt]|[acg]ttaccct"
-        };
+namespace PCRE.NET.Benchmarks;
 
-        public static readonly string Subject = @"
+/// <summary>
+/// This data is from the regex-redux benchmark by the Benchmark's Game.
+/// https://benchmarksgame-team.pages.debian.net/benchmarksgame/description/regexredux.html
+/// </summary>
+[SuppressMessage("ReSharper", "StringLiteralTypo")]
+internal static class RegexReduxBenchmarkData
+{
+    public static readonly string[] Patterns =
+    {
+        @"agggtaaa|tttaccct",
+        @"[cgt]gggtaaa|tttaccc[acg]",
+        @"a[act]ggtaaa|tttacc[agt]t",
+        @"ag[act]gtaaa|tttac[agt]ct",
+        @"agg[act]taaa|ttta[agt]cct",
+        @"aggg[acg]aaa|ttt[cgt]ccct",
+        @"agggt[cgt]aa|tt[acg]accct",
+        @"agggta[cgt]a|t[acg]taccct",
+        @"agggtaa[cgt]|[acg]ttaccct"
+    };
+
+    public static readonly string Subject = @"
 >ONE Homo sapiens alu
 GGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGCGGA
 TCACCTGAGGTCAGGAGTTCGAGACCAGCCTGGCCAACATGGTGAAACCCCGTCTCTACT
@@ -195,5 +195,4 @@ atccaagcgcgttatctgattagagtttacaactcagtattttatcagtacgttttgttt
 ccaacattacccggtatgacaaaatgacgccacgtgtcgaataatggtctgaccaatgta
 ggaagtgaaaagataaatat
 ".Replace("\r\n", "\n").Trim();
-    }
 }

@@ -1,28 +1,27 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace PCRE.Internal
+namespace PCRE.Internal;
+
+internal static class PcreEnumExtensions
 {
-    internal static class PcreEnumExtensions
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint ToPatternOptions(this PcreOptions options)
+        => (uint)((long)options & 0xFFFFFFFF) | PcreConstants.UTF;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint ToPatternOptions(this PcreMatchOptions options)
+        => (uint)((long)options & 0xFFFFFFFF);
+
+    public static PcreJitCompileOptions ToJitCompileOptions(this PcreOptions options)
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static uint ToPatternOptions(this PcreOptions options)
-            => (uint)((long)options & 0xFFFFFFFF) | PcreConstants.UTF;
+        var jitOptions = PcreJitCompileOptions.None;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static uint ToPatternOptions(this PcreMatchOptions options)
-            => (uint)((long)options & 0xFFFFFFFF);
+        if ((options & PcreOptions.Compiled) != 0)
+            jitOptions |= PcreJitCompileOptions.Complete;
 
-        public static PcreJitCompileOptions ToJitCompileOptions(this PcreOptions options)
-        {
-            var jitOptions = PcreJitCompileOptions.None;
+        if ((options & PcreOptions.CompiledPartial) != 0)
+            jitOptions |= PcreJitCompileOptions.PartialSoft | PcreJitCompileOptions.PartialHard;
 
-            if ((options & PcreOptions.Compiled) != 0)
-                jitOptions |= PcreJitCompileOptions.Complete;
-
-            if ((options & PcreOptions.CompiledPartial) != 0)
-                jitOptions |= PcreJitCompileOptions.PartialSoft | PcreJitCompileOptions.PartialHard;
-
-            return jitOptions;
-        }
+        return jitOptions;
     }
 }

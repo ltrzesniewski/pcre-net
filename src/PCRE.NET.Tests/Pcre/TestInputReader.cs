@@ -1,42 +1,41 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace PCRE.Tests.Pcre
-{
-    public class TestInputReader : TestFileReader
-    {
-        public TestInputReader(Stream inputStream)
-            : base(inputStream)
-        {
-        }
+namespace PCRE.Tests.Pcre;
 
-        public IEnumerable<TestInput> ReadTestInputs()
+public class TestInputReader : TestFileReader
+{
+    public TestInputReader(Stream inputStream)
+        : base(inputStream)
+    {
+    }
+
+    public IEnumerable<TestInput> ReadTestInputs()
+    {
+        while (true)
         {
+            var pattern = ReadNextPattern();
+
+            if (pattern == null)
+                yield break;
+
+            var testCase = new TestInput(pattern);
+
             while (true)
             {
-                var pattern = ReadNextPattern();
+                var line = ReadLine();
 
-                if (pattern == null)
-                    yield break;
+                if (string.IsNullOrWhiteSpace(line))
+                    break;
 
-                var testCase = new TestInput(pattern);
+                if (line!.StartsWith("\\="))
+                    continue;
 
-                while (true)
-                {
-                    var line = ReadLine();
-
-                    if (string.IsNullOrWhiteSpace(line))
-                        break;
-
-                    if (line!.StartsWith("\\="))
-                        continue;
-
-                    line = line.Trim();
-                    testCase.SubjectLines.Add(line);
-                }
-
-                yield return testCase;
+                line = line.Trim();
+                testCase.SubjectLines.Add(line);
             }
+
+            yield return testCase;
         }
     }
 }

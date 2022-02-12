@@ -3,76 +3,75 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Attributes;
 
-namespace PCRE.NET.Benchmarks
+namespace PCRE.NET.Benchmarks;
+
+[MemoryDiagnoser]
+public class RegexReduxBenchmarkMatches
 {
-    [MemoryDiagnoser]
-    public class RegexReduxBenchmarkMatches
+    private static readonly Regex[] _regexes;
+    private static readonly PcreRegex[] _pcreRegexes;
+    private static readonly PcreMatchBuffer[] _pcreRegexBuffers;
+
+    static RegexReduxBenchmarkMatches()
     {
-        private static readonly Regex[] _regexes;
-        private static readonly PcreRegex[] _pcreRegexes;
-        private static readonly PcreMatchBuffer[] _pcreRegexBuffers;
+        _regexes = RegexReduxBenchmarkData.Patterns.Select(pattern => new Regex(pattern, RegexOptions.Compiled | RegexOptions.CultureInvariant)).ToArray();
+        _pcreRegexes = RegexReduxBenchmarkData.Patterns.Select(pattern => new PcreRegex(pattern, PcreOptions.Compiled)).ToArray();
+        _pcreRegexBuffers = _pcreRegexes.Select(re => re.CreateMatchBuffer()).ToArray();
+    }
 
-        static RegexReduxBenchmarkMatches()
+    [Benchmark(Baseline = true)]
+    public int Regex()
+    {
+        var length = 0;
+
+        foreach (var regex in _regexes)
         {
-            _regexes = RegexReduxBenchmarkData.Patterns.Select(pattern => new Regex(pattern, RegexOptions.Compiled | RegexOptions.CultureInvariant)).ToArray();
-            _pcreRegexes = RegexReduxBenchmarkData.Patterns.Select(pattern => new PcreRegex(pattern, PcreOptions.Compiled)).ToArray();
-            _pcreRegexBuffers = _pcreRegexes.Select(re => re.CreateMatchBuffer()).ToArray();
+            foreach (Match match in regex.Matches(RegexReduxBenchmarkData.Subject))
+                length += match.Length;
         }
 
-        [Benchmark(Baseline = true)]
-        public int Regex()
+        return length;
+    }
+
+    [Benchmark]
+    public int PcreRegex()
+    {
+        var length = 0;
+
+        foreach (var regex in _pcreRegexes)
         {
-            var length = 0;
-
-            foreach (var regex in _regexes)
-            {
-                foreach (Match match in regex.Matches(RegexReduxBenchmarkData.Subject))
-                    length += match.Length;
-            }
-
-            return length;
+            foreach (var match in regex.Matches(RegexReduxBenchmarkData.Subject))
+                length += match.Length;
         }
 
-        [Benchmark]
-        public int PcreRegex()
+        return length;
+    }
+
+    [Benchmark]
+    public int PcreRegexSpan()
+    {
+        var length = 0;
+
+        foreach (var regex in _pcreRegexes)
         {
-            var length = 0;
-
-            foreach (var regex in _pcreRegexes)
-            {
-                foreach (var match in regex.Matches(RegexReduxBenchmarkData.Subject))
-                    length += match.Length;
-            }
-
-            return length;
+            foreach (var match in regex.Matches(RegexReduxBenchmarkData.Subject.AsSpan()))
+                length += match.Length;
         }
 
-        [Benchmark]
-        public int PcreRegexSpan()
+        return length;
+    }
+
+    [Benchmark]
+    public int PcreRegexZeroAlloc()
+    {
+        var length = 0;
+
+        foreach (var regex in _pcreRegexBuffers)
         {
-            var length = 0;
-
-            foreach (var regex in _pcreRegexes)
-            {
-                foreach (var match in regex.Matches(RegexReduxBenchmarkData.Subject.AsSpan()))
-                    length += match.Length;
-            }
-
-            return length;
+            foreach (var match in regex.Matches(RegexReduxBenchmarkData.Subject.AsSpan()))
+                length += match.Length;
         }
 
-        [Benchmark]
-        public int PcreRegexZeroAlloc()
-        {
-            var length = 0;
-
-            foreach (var regex in _pcreRegexBuffers)
-            {
-                foreach (var match in regex.Matches(RegexReduxBenchmarkData.Subject.AsSpan()))
-                    length += match.Length;
-            }
-
-            return length;
-        }
+        return length;
     }
 }
