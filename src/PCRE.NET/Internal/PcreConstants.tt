@@ -62,17 +62,16 @@
 
 #nullable enable
 
-namespace PCRE.Internal
+namespace PCRE.Internal;
+
+internal static class PcreConstants
 {
-    internal static class PcreConstants
-    {
 <#
     foreach (var (type, name, value) in constants)
     {
 #>
-        public const <#= type #> <#= name #> = <#= value #>;
+    public const <#= type #> <#= name #> = <#= value #>;
 <#
     }
 #>
-    }
 }
