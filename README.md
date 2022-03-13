@@ -1,3 +1,4 @@
+<img src="icon.png" align="right" style="float: right; margin-left: 10px; margin-bottom: 10px;" alt="Logo" />
 
 # PCRE.NET
 
