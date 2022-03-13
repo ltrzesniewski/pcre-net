@@ -1,6 +1,4 @@
-<img src="icon.png" align="right" style="float: right; margin-left: 10px; margin-bottom: 10px;" alt="Logo" />
-
-# PCRE.NET
+# PCRE.NET                    <a href="#"><img src="icon.png" align="right" alt="Logo" /></a>
 
 **Perl Compatible Regular Expressions for .NET**
 
@@ -9,6 +7,7 @@
 [![GitHub release](https://img.shields.io/github/release/ltrzesniewski/pcre-net.svg?logo=GitHub)](https://github.com/ltrzesniewski/pcre-net/releases)
 [![PCRE](https://img.shields.io/badge/pcre-v10.39-blue.svg)](https://github.com/PhilipHazel/pcre2)
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/ltrzesniewski/pcre-net/blob/master/LICENCE)
+<br clear="right" />
 
 PCRE.NET is a .NET wrapper for the [PCRE library](https://github.com/PhilipHazel/pcre2). The goal of this project is to bring most of PCRE's features for use from .NET applications with as little overhead as possible.
 
