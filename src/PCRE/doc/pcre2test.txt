@@ -44,7 +44,7 @@ PCRE2's 8-BIT, 16-BIT AND 32-BIT LIBRARIES
        output.
 
        In the rest of this document, the names of library functions and struc-
-       tures  are  given in generic form, for example, pcre_compile(). The ac-
+       tures  are given in generic form, for example, pcre2_compile(). The ac-
        tual names used in the libraries have a suffix _8, _16, or _32, as  ap-
        propriate.
 
@@ -197,7 +197,17 @@ COMMAND LINE OPTIONS
 
        -LM       List modifiers: write a list of available pattern and subject
                  modifiers to the standard output, then exit  with  zero  exit
-                 code.  All other options are ignored.  If both -C and -LM are
+                 code.  All other options are ignored.  If both -C and any -Lx
+                 options are present, whichever is first is recognized.
+
+       -LP       List properties: write a list of recognized  Unicode  proper-
+                 ties  to  the standard output, then exit with zero exit code.
+                 All other options are ignored. If both -C and any -Lx options
+                 are present, whichever is first is recognized.
+
+       -LS       List  scripts: write a list of recogized Unicode script names
+                 to the standard output, then exit with zero  exit  code.  All
+                 other options are ignored. If both -C and any -Lx options are
                  present, whichever is first is recognized.
 
        -pattern modifier-list
@@ -1111,6 +1121,8 @@ SUBJECT MODIFIERS
              match_limit=<n>            set a match limit
              memory                     show heap memory usage
              null_context               match with a NULL context
+             null_replacement           substitute with NULL replacement
+             null_subject               match with NULL subject
              offset=<n>                 set starting offset
              offset_limit=<n>           set offset limit
              ovector=<n>                set size of output vector
@@ -1499,7 +1511,7 @@ SUBJECT MODIFIERS
        When testing pcre2_substitute(), this modifier also has the  effect  of
        passing the replacement string as zero-terminated.
 
-   Passing a NULL context
+   Passing a NULL context, subject, or replacement
 
        Normally,   pcre2test   passes   a   context  block  to  pcre2_match(),
        pcre2_dfa_match(), pcre2_jit_match()  or  pcre2_substitute().   If  the
@@ -1507,6 +1519,10 @@ SUBJECT MODIFIERS
        testing that the matching and substitution functions  behave  correctly
        in  this  case  (they use default values). This modifier cannot be used
        with the find_limits or substitute_callout modifiers.
+
+       Similarly, for testing purposes, if the null_subject  or  null_replace-
+       ment  modifier  is  set, the subject or replacement string pointers are
+       passed as NULL, respectively, to the relevant functions.
 
 
 THE ALTERNATIVE MATCHING FUNCTION
@@ -1933,5 +1949,5 @@ AUTHOR
 
 REVISION
 
-       Last updated: 30 August 2021
-       Copyright (c) 1997-2021 University of Cambridge.
+       Last updated: 12 January 2022
+       Copyright (c) 1997-2022 University of Cambridge.

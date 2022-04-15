@@ -1,6 +1,111 @@
 Change Log for PCRE2
 --------------------
 
+
+Version 10.40 15-April-2022
+---------------------------
+
+1. Merged patch from @carenas (GitHub #35, 7db87842) to fix pcre2grep incorrect
+handling of multiple passes.
+
+2. Merged patch from @carenas (GitHub #36, dae47509) to fix portability issue
+in pcre2grep with buffered fseek(stdin).
+
+3. Merged patch from @carenas (GitHub #37, acc520924) to fix tests when -S is
+not supported.
+
+4. Revert an unintended change in JIT repeat detection.
+
+5. Merged patch from @carenas (GitHub #52, b037bfa1) to fix build on GNU Hurd.
+
+6. Merged documentation and comments patches from @carenas (GitHub #47).
+
+7. Merged patch from @carenas (GitHub #49) to remove obsolete JFriedl test code
+from pcre2grep.
+
+8. Merged patch from @carenas (GitHub #48) to fix CMake install issue #46.
+
+9. Merged patch from @carenas (GitHub #53) fixing NULL checks in matching and
+substituting.
+
+10. Add null_subject and null_replacement modifiers to pcre2test.
+
+11. Add check for NULL subject to POSIX regexec() function.
+
+12. Add check for NULL replacement to pcre2_substitute().
+
+13. For the subject arguments of pcre2_match(), pcre2_dfa_match(), and
+pcre2_substitute(), and the replacement argument of the latter, if the pointer
+is NULL and the length is zero, treat as an empty string. Apparently a number
+of applications treat NULL/0 in this way.
+
+14. Added support for Bidi_Class and a number of binary Unicode properties,
+including Bidi_Control.
+
+15. Fix some minor issues raised by clang sanitize.
+
+16. Very minor code speed up for maximizing character property matches.
+
+17. A number of changes to script matching for \p and \P:
+
+    (a) Script extensions for a character are now coded as a bitmap instead of
+        a list of script numbers, which should be faster and does not need a
+        loop.
+
+    (b) Added the syntax \p{script:xxx} and \p{script_extensions:xxx} (synonyms
+        sc and scx).
+
+    (c) Changed \p{scriptname} from being the same as \p{sc:scriptname} to being
+        the same as \p{scx:scriptname} because this change happened in Perl at
+        release 5.26.
+
+    (d) The standard Unicode 4-letter abbreviations for script names are now
+        recognized.
+
+    (e) In accordance with Unicode and Perl's "loose matching" rules, spaces,
+        hyphens, and underscores are ignored in property names, which are then
+        matched independent of case.
+
+18. The Python scripts in the maint directory have been refactored. There are
+now three scripts that generate pcre2_ucd.c, pcre2_ucp.h, and pcre2_ucptables.c
+(which is #included by pcre2_tables.c). The data lists that used to be
+duplicated are now held in a single common Python module.
+
+19. On CHERI, and thus Arm's Morello prototype, pointers are represented as
+hardware capabilities, which consist of both an integer address and additional
+metadata, meaning they are twice the size of the platform's size_t type, i.e.
+16 bytes on a 64-bit system. The ovector member of heapframe happens to only be
+8 byte aligned, and so computing frame_size ended up with a multiple of 8 but
+not 16. Whilst the first frame was always suitably aligned, this then
+misaligned the frame that follows, resulting in an alignment fault when storing
+a pointer to Fecode at the start of match. Patch to fix this issue by Jessica
+Clarke PR#72.
+
+20. Added -LP and -LS listing options to pcre2test.
+
+21. A user discovered that the library names in CMakeLists.txt for MSVC
+debugger (PDB) files were incorrect - perhaps never tried for PCRE2?
+
+22. An item such as [Aa] is optimized into a caseless single character match.
+When this was quantified (e.g. [Aa]{2}) and was also the last literal item in a
+pattern, the optimizing "must be present for a match" character check was not
+being flagged as caseless, causing some matches that should have succeeded to
+fail.
+
+23. Fixed a unicode properrty matching issue in JIT. The character was not
+fully read in caseless matching.
+
+24. Fixed an issue affecting recursions in JIT caused by duplicated data
+transfers.
+
+25. Merged patch from @carenas (GitHub #96) which fixes some problems with
+pcre2test and readline/readedit:
+
+  * Use the right header for libedit in FreeBSD with autoconf
+  * Really allow libedit with cmake
+  * Avoid using readline headers with libedit
+
+
 Version 10.39 29-October-2021
 -----------------------------
 

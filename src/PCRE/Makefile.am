@@ -382,6 +382,10 @@ COMMON_SOURCES = \
   src/pcre2_valid_utf.c \
   src/pcre2_xclass.c
 
+# The pcre2_ucptables.c file is #included by pcre2_tables.c
+
+EXTRA_DIST += src/pcre2_ucptables.c
+
 if WITH_PCRE2_8
 lib_LTLIBRARIES += libpcre2-8.la
 libpcre2_8_la_SOURCES = \
@@ -663,6 +667,7 @@ EXTRA_DIST += \
   testdata/testinput23 \
   testdata/testinput24 \
   testdata/testinput25 \
+  testdata/testinput26 \
   testdata/testinputEBC \
   testdata/testoutput1 \
   testdata/testoutput2 \
@@ -705,6 +710,7 @@ EXTRA_DIST += \
   testdata/testoutput23 \
   testdata/testoutput24 \
   testdata/testoutput25 \
+  testdata/testoutput26 \
   testdata/testoutputEBC \
   testdata/valgrind-jit.supp \
   testdata/wintestinput3 \

@@ -110,6 +110,11 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.0.0)
 # GET_TARGET_PROPERTY. This should no longer be required.
 # CMAKE_POLICY(SET CMP0026 OLD)
 
+# With a recent cmake, you can provide a rootdir to look for non
+# standard installed library dependencies, but to do so, the policy
+# needs to be set to new (by uncommenting the following)
+# CMAKE_POLICY(SET CMP0074 NEW)
+
 # For FindReadline.cmake. This was changed to allow setting CMAKE_MODULE_PATH
 # on the command line.
 # SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
@@ -142,9 +147,15 @@ CHECK_INCLUDE_FILE(windows.h    HAVE_WINDOWS_H)
 CHECK_SYMBOL_EXISTS(bcopy         "strings.h"  HAVE_BCOPY)
 CHECK_SYMBOL_EXISTS(memfd_create  "sys/mman.h" HAVE_MEMFD_CREATE)
 CHECK_SYMBOL_EXISTS(memmove       "string.h"   HAVE_MEMMOVE)
-CHECK_SYMBOL_EXISTS(realpath      "stdlib.h"   HAVE_REALPATH)
 CHECK_SYMBOL_EXISTS(secure_getenv "stdlib.h"   HAVE_SECURE_GETENV)
 CHECK_SYMBOL_EXISTS(strerror      "string.h"   HAVE_STRERROR)
+
+CHECK_C_SOURCE_COMPILES(
+  "#include <stdlib.h>
+   #include <limits.h>
+   int main(int c, char *v[]) { char buf[PATH_MAX]; realpath(v[1], buf); return 0; }"
+  HAVE_REALPATH
+)
 
 set(ORIG_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
 set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} -Werror")
@@ -300,9 +311,19 @@ ENDIF(PCRE2_SUPPORT_LIBZ)
 IF(EDITLINE_FOUND)
   OPTION (PCRE2_SUPPORT_LIBEDIT  "Enable support for linking pcre2test with libedit." OFF)
 ENDIF(EDITLINE_FOUND)
-IF(PCRE2_SUPPORT_LIBEDIT)
-  INCLUDE_DIRECTORIES(${EDITLINE_INCLUDE_DIR})
-ENDIF(PCRE2_SUPPORT_LIBEDIT)
+IF(EDITLINE_FOUND)
+  IF(PCRE2_SUPPORT_LIBEDIT)
+    INCLUDE_DIRECTORIES(${EDITLINE_INCLUDE_DIR})
+  ENDIF(PCRE2_SUPPORT_LIBEDIT)
+ELSE(EDITLINE_FOUND)
+  IF(PCRE2_SUPPORT_LIBEDIT)
+    MESSAGE(FATAL_ERROR
+      " libedit not found, set EDITLINE_INCLUDE_DIR to a compatible header\n"
+      " or set Editline_ROOT to a full libedit installed tree, as needed\n"
+      " Might need to enable policy CMP0074 in CMakeLists.txt"
+    )
+  ENDIF(PCRE2_SUPPORT_LIBEDIT)
+ENDIF(EDITLINE_FOUND)
 
 # readline lib
 IF(READLINE_FOUND)
@@ -340,7 +361,12 @@ IF(PCRE2_BUILD_PCRE2GREP AND NOT PCRE2_BUILD_PCRE2_8)
 ENDIF(PCRE2_BUILD_PCRE2GREP AND NOT PCRE2_BUILD_PCRE2_8)
 
 IF(PCRE2_SUPPORT_LIBREADLINE AND PCRE2_SUPPORT_LIBEDIT)
-        MESSAGE(FATAL_ERROR "Only one of libreadline or libeditline can be specified")
+        IF(READLINE_FOUND)
+                MESSAGE(FATAL_ERROR
+                  " Only one of the readline compatible libraries can be enabled.\n"
+                  " Disable libreadline with -DPCRE2_SUPPORT_LIBREADLINE=OFF"
+                )
+        ENDIF(READLINE_FOUND)
 ENDIF(PCRE2_SUPPORT_LIBREADLINE AND PCRE2_SUPPORT_LIBEDIT)
 
 IF(PCRE2_SUPPORT_BSR_ANYCRLF)
@@ -1022,25 +1048,23 @@ FILE(GLOB html ${PROJECT_SOURCE_DIR}/doc/html/*.html)
 FILE(GLOB man1 ${PROJECT_SOURCE_DIR}/doc/*.1)
 FILE(GLOB man3 ${PROJECT_SOURCE_DIR}/doc/*.3)
 
-FOREACH(man ${man3})
-        GET_FILENAME_COMPONENT(man_tmp ${man} NAME)
-        SET(man3_new ${man3} ${man})
-ENDFOREACH(man ${man3})
-SET(man3 ${man3_new})
-
 INSTALL(FILES ${man1} DESTINATION man/man1)
 INSTALL(FILES ${man3} DESTINATION man/man3)
 INSTALL(FILES ${html} DESTINATION share/doc/pcre2/html)
 
 IF(MSVC AND INSTALL_MSVC_PDB)
-    INSTALL(FILES ${PROJECT_BINARY_DIR}/pcre2.pdb
-                  ${PROJECT_BINARY_DIR}/pcre2posix.pdb
-            DESTINATION bin
-            CONFIGURATIONS RelWithDebInfo)
-    INSTALL(FILES ${PROJECT_BINARY_DIR}/pcre2d.pdb
-                  ${PROJECT_BINARY_DIR}/pcre2posixd.pdb
-            DESTINATION bin
-            CONFIGURATIONS Debug)
+ INSTALL(FILES ${PROJECT_BINARY_DIR}/pcre2-8.pdb
+               ${PROJECT_BINARY_DIR}/pcre2-16.pdb
+               ${PROJECT_BINARY_DIR}/pcre2-32.pdb
+               ${PROJECT_BINARY_DIR}/pcre2-posix.pdb
+         DESTINATION bin
+         CONFIGURATIONS RelWithDebInfo)
+ INSTALL(FILES ${PROJECT_BINARY_DIR}/pcre2-8d.pdb
+               ${PROJECT_BINARY_DIR}/pcre2-16d.pdb
+               ${PROJECT_BINARY_DIR}/pcre2-32d.pdb
+               ${PROJECT_BINARY_DIR}/pcre2-posixd.pdb
+         DESTINATION bin
+         CONFIGURATIONS Debug)
 ENDIF(MSVC AND INSTALL_MSVC_PDB)
 
 # Help, only for nice output

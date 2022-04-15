@@ -829,6 +829,7 @@ EXTRA_LIBPCRE2_32_LDFLAGS = @EXTRA_LIBPCRE2_32_LDFLAGS@
 EXTRA_LIBPCRE2_8_LDFLAGS = @EXTRA_LIBPCRE2_8_LDFLAGS@
 EXTRA_LIBPCRE2_POSIX_LDFLAGS = @EXTRA_LIBPCRE2_POSIX_LDFLAGS@
 FGREP = @FGREP@
+FILECMD = @FILECMD@
 GCOV_CFLAGS = @GCOV_CFLAGS@
 GCOV_CXXFLAGS = @GCOV_CXXFLAGS@
 GCOV_LIBS = @GCOV_LIBS@
@@ -1192,6 +1193,8 @@ MAINTAINERCLEANFILES = src/pcre2.h.generic src/config.h.generic
 # for the benefit of people who are building PCRE2 manually, without the
 # Autotools support.
 
+# The pcre2_ucptables.c file is #included by pcre2_tables.c
+
 # The pcre2_chartables.c.dist file is the default version of
 # pcre2_chartables.c, used unless --enable-rebuild-chartables is specified.
 
@@ -1205,11 +1208,12 @@ MAINTAINERCLEANFILES = src/pcre2.h.generic src/config.h.generic
 EXTRA_DIST = m4/ax_pthread.m4 m4/pcre2_visibility.m4 \
 	NON-AUTOTOOLS-BUILD HACKING PrepareRelease CheckMan CleanTxt \
 	Detrail 132html doc/index.html.src src/pcre2.h.generic \
-	src/config.h.generic src/pcre2_chartables.c.dist \
-	src/sljit/sljitConfig.h src/sljit/sljitConfigInternal.h \
-	src/sljit/sljitExecAllocator.c src/sljit/sljitLir.c \
-	src/sljit/sljitLir.h src/sljit/sljitNativeARM_32.c \
-	src/sljit/sljitNativeARM_64.c src/sljit/sljitNativeARM_T2_32.c \
+	src/config.h.generic src/pcre2_ucptables.c \
+	src/pcre2_chartables.c.dist src/sljit/sljitConfig.h \
+	src/sljit/sljitConfigInternal.h src/sljit/sljitExecAllocator.c \
+	src/sljit/sljitLir.c src/sljit/sljitLir.h \
+	src/sljit/sljitNativeARM_32.c src/sljit/sljitNativeARM_64.c \
+	src/sljit/sljitNativeARM_T2_32.c \
 	src/sljit/sljitNativeMIPS_32.c src/sljit/sljitNativeMIPS_64.c \
 	src/sljit/sljitNativeMIPS_common.c \
 	src/sljit/sljitNativePPC_32.c src/sljit/sljitNativePPC_64.c \
@@ -1235,8 +1239,9 @@ EXTRA_DIST = m4/ax_pthread.m4 m4/pcre2_visibility.m4 \
 	testdata/testinput16 testdata/testinput17 testdata/testinput18 \
 	testdata/testinput19 testdata/testinput20 testdata/testinput21 \
 	testdata/testinput22 testdata/testinput23 testdata/testinput24 \
-	testdata/testinput25 testdata/testinputEBC \
-	testdata/testoutput1 testdata/testoutput2 testdata/testoutput3 \
+	testdata/testinput25 testdata/testinput26 \
+	testdata/testinputEBC testdata/testoutput1 \
+	testdata/testoutput2 testdata/testoutput3 \
 	testdata/testoutput3A testdata/testoutput3B \
 	testdata/testoutput4 testdata/testoutput5 testdata/testoutput6 \
 	testdata/testoutput7 testdata/testoutput8-16-2 \
@@ -1255,10 +1260,11 @@ EXTRA_DIST = m4/ax_pthread.m4 m4/pcre2_visibility.m4 \
 	testdata/testoutput21 testdata/testoutput22-16 \
 	testdata/testoutput22-32 testdata/testoutput22-8 \
 	testdata/testoutput23 testdata/testoutput24 \
-	testdata/testoutput25 testdata/testoutputEBC \
-	testdata/valgrind-jit.supp testdata/wintestinput3 \
-	testdata/wintestoutput3 perltest.sh src/pcre2demo.c \
-	cmake/COPYING-CMAKE-SCRIPTS cmake/FindEditline.cmake \
+	testdata/testoutput25 testdata/testoutput26 \
+	testdata/testoutputEBC testdata/valgrind-jit.supp \
+	testdata/wintestinput3 testdata/wintestoutput3 perltest.sh \
+	src/pcre2demo.c cmake/COPYING-CMAKE-SCRIPTS \
+	cmake/FindEditline.cmake \
 	cmake/FindPackageHandleStandardArgs.cmake \
 	cmake/FindReadline.cmake cmake/pcre2-config-version.cmake.in \
 	cmake/pcre2-config.cmake.in CMakeLists.txt config-cmake.h.in

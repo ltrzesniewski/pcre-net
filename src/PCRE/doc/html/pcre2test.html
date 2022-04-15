@@ -78,7 +78,7 @@ to 8-bit code units for output.
 </P>
 <P>
 In the rest of this document, the names of library functions and structures
-are given in generic form, for example, <b>pcre_compile()</b>. The actual
+are given in generic form, for example, <b>pcre2_compile()</b>. The actual
 names used in the libraries have a suffix _8, _16, or _32, as appropriate.
 <a name="inputencoding"></a></P>
 <br><a name="SEC3" href="#TOC1">INPUT ENCODING</a><br>
@@ -253,7 +253,19 @@ available, and the use of JIT for matching is verified.
 <b>-LM</b>
 List modifiers: write a list of available pattern and subject modifiers to the
 standard output, then exit with zero exit code. All other options are ignored.
-If both -C and -LM are present, whichever is first is recognized.
+If both -C and any -Lx options are present, whichever is first is recognized.
+</P>
+<P>
+<b>-LP</b>
+List properties: write a list of recognized Unicode properties to the standard
+output, then exit with zero exit code. All other options are ignored. If both
+-C and any -Lx options are present, whichever is first is recognized.
+</P>
+<P>
+<b>-LS</b>
+List scripts: write a list of recogized Unicode script names to the standard
+output, then exit with zero exit code. All other options are ignored. If both
+-C and any -Lx options are present, whichever is first is recognized.
 </P>
 <P>
 <b>-pattern</b> <i>modifier-list</i>
@@ -1239,6 +1251,8 @@ pattern, but can be overridden by modifiers on the subject.
       match_limit=&#60;n&#62;            set a match limit
       memory                     show heap memory usage
       null_context               match with a NULL context
+      null_replacement           substitute with NULL replacement
+      null_subject               match with NULL subject
       offset=&#60;n&#62;                 set starting offset
       offset_limit=&#60;n&#62;           set offset limit
       ovector=&#60;n&#62;                set size of output vector
@@ -1668,7 +1682,7 @@ When testing <b>pcre2_substitute()</b>, this modifier also has the effect of
 passing the replacement string as zero-terminated.
 </P>
 <br><b>
-Passing a NULL context
+Passing a NULL context, subject, or replacement
 </b><br>
 <P>
 Normally, <b>pcre2test</b> passes a context block to <b>pcre2_match()</b>,
@@ -1677,6 +1691,11 @@ If the <b>null_context</b> modifier is set, however, NULL is passed. This is for
 testing that the matching and substitution functions behave correctly in this
 case (they use default values). This modifier cannot be used with the
 <b>find_limits</b> or <b>substitute_callout</b> modifiers.
+</P>
+<P>
+Similarly, for testing purposes, if the <b>null_subject</b> or
+<b>null_replacement</b> modifier is set, the subject or replacement string
+pointers are passed as NULL, respectively, to the relevant functions.
 </P>
 <br><a name="SEC12" href="#TOC1">THE ALTERNATIVE MATCHING FUNCTION</a><br>
 <P>
@@ -2122,9 +2141,9 @@ Cambridge, England.
 </P>
 <br><a name="SEC21" href="#TOC1">REVISION</a><br>
 <P>
-Last updated: 30 August 2021
+Last updated: 12 January 2022
 <br>
-Copyright &copy; 1997-2021 University of Cambridge.
+Copyright &copy; 1997-2022 University of Cambridge.
 <br>
 <p>
 Return to the <a href="index.html">PCRE2 index page</a>.
