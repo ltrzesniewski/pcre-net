@@ -5,11 +5,11 @@
 [![Build](https://github.com/ltrzesniewski/pcre-net/workflows/Build/badge.svg)](https://github.com/ltrzesniewski/pcre-net/actions?query=workflow%3ABuild)
 [![NuGet Package](https://img.shields.io/nuget/v/PCRE.NET.svg?logo=NuGet)](https://www.nuget.org/packages/PCRE.NET)
 [![GitHub release](https://img.shields.io/github/release/ltrzesniewski/pcre-net.svg?logo=GitHub)](https://github.com/ltrzesniewski/pcre-net/releases)
-[![PCRE](https://img.shields.io/badge/pcre-v10.40-blue.svg)](https://github.com/PhilipHazel/pcre2)
+[![PCRE](https://img.shields.io/badge/pcre-v10.40-blue.svg)](https://github.com/PCRE2Project/pcre2)
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/ltrzesniewski/pcre-net/blob/master/LICENCE)
 <br clear="right" />
 
-PCRE.NET is a .NET wrapper for the [PCRE library](https://github.com/PhilipHazel/pcre2). The goal of this project is to bring most of PCRE's features for use from .NET applications with as little overhead as possible.
+PCRE.NET is a .NET wrapper for the [PCRE library](https://github.com/PCRE2Project/pcre2). The goal of this project is to bring most of PCRE's features for use from .NET applications with as little overhead as possible.
 
 The following systems are supported:
 
@@ -68,7 +68,7 @@ This API provides regex matching in O(_subject length_) time. It is accessible t
 - `Dfa.Matches`
 - `Dfa.Match`
 
-You can read more about its features in [the PCRE documentation](https://philiphazel.github.io/pcre2/doc/html/pcre2matching.html), where it's described as the _alternative matching algorithm_.
+You can read more about its features in [the PCRE documentation](https://pcre2project.github.io/pcre2/doc/html/pcre2matching.html), where it's described as the _alternative matching algorithm_.
 
 ## Library highlights
 
