@@ -37,7 +37,7 @@ public class DocumentationTests
     public void should_nave_correct_pcre_version_badge_in_readme()
     {
         var readmeText = File.ReadAllText(Path.Combine(Path.GetDirectoryName(typeof(DocumentationTests).Assembly.Location)!, "README.md"));
-        var match = Regex.Match(readmeText, @"https://img\.shields\.io/badge/pcre-v(?<pcreVersion>[\d.]+)-blue\.svg", RegexOptions.CultureInvariant);
+        var match = Regex.Match(readmeText, @"https://img\.shields\.io/badge/pcre2-v(?<pcreVersion>[\d.]+)-blue\.svg", RegexOptions.CultureInvariant);
 
         Assert.That(match.Success);
         Assert.That(NormalizeVersion(match.Groups["pcreVersion"].Value), Is.EqualTo(NormalizeVersion(PcreBuildInfo.Version.Split(' ')[0])));

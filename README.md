@@ -5,11 +5,11 @@
 [![Build](https://github.com/ltrzesniewski/pcre-net/workflows/Build/badge.svg)](https://github.com/ltrzesniewski/pcre-net/actions?query=workflow%3ABuild)
 [![NuGet Package](https://img.shields.io/nuget/v/PCRE.NET.svg?logo=NuGet)](https://www.nuget.org/packages/PCRE.NET)
 [![GitHub release](https://img.shields.io/github/release/ltrzesniewski/pcre-net.svg?logo=GitHub)](https://github.com/ltrzesniewski/pcre-net/releases)
-[![PCRE](https://img.shields.io/badge/pcre-v10.40-blue.svg)](https://github.com/PCRE2Project/pcre2)
+[![PCRE2](https://img.shields.io/badge/pcre2-v10.40-blue.svg)](https://github.com/PCRE2Project/pcre2)
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/ltrzesniewski/pcre-net/blob/master/LICENCE)
 <br clear="right" />
 
-PCRE.NET is a .NET wrapper for the [PCRE library](https://github.com/PCRE2Project/pcre2). The goal of this project is to bring most of PCRE's features for use from .NET applications with as little overhead as possible.
+PCRE.NET is a .NET wrapper for the [PCRE2 library](https://github.com/PCRE2Project/pcre2).
 
 The following systems are supported:
 
@@ -58,7 +58,7 @@ It is also counter-productive to allocate a match buffer to perform a single mat
 If you're looking for maximum speed, consider using the following options:
 
 - `PcreOptions.Compiled` at compile time to enable the JIT compiler, which will improve matching speed.
-- `PcreMatchOptions.NoUtfCheck` at match time to skip the Unicode validity check: by default PCRE scans the entire input string to make sure it's valid Unicode.
+- `PcreMatchOptions.NoUtfCheck` at match time to skip the Unicode validity check: by default PCRE2 scans the entire input string to make sure it's valid Unicode.
 - `PcreOptions.MatchInvalidUtf` at compile time if you plan to use `PcreMatchOptions.NoUtfCheck` and your subject strings may contain invalid Unicode sequences.
 
 ### The DFA matching API
@@ -68,7 +68,7 @@ This API provides regex matching in O(_subject length_) time. It is accessible t
 - `Dfa.Matches`
 - `Dfa.Match`
 
-You can read more about its features in [the PCRE documentation](https://pcre2project.github.io/pcre2/doc/html/pcre2matching.html), where it's described as the _alternative matching algorithm_.
+You can read more about its features in [the PCRE2 documentation](https://pcre2project.github.io/pcre2/doc/html/pcre2matching.html), where it's described as the _alternative matching algorithm_.
 
 ## Library highlights
 
