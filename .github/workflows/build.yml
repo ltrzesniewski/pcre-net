@@ -161,17 +161,17 @@ jobs:
       - name: NuGet Pack
         run: dotnet pack --configuration ${{ env.BUILD_CONFIGURATION }} --no-build src/PCRE.NET/PCRE.NET.csproj -p:RequirePcreNative=true
 
-      - name: Build Tests x86
-        run: msbuild src/PCRE.NET.Tests/PCRE.NET.Tests.csproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:Platform=x86 /p:ExpectPlatform=x86
-
-      - name: Build Tests x64
-        run: msbuild src/PCRE.NET.Tests/PCRE.NET.Tests.csproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:Platform=x64 /p:ExpectPlatform=x64
-
-      - name: Test .NET Framework x86
-        run: vstest.console src/PCRE.NET.Tests/bin/x86/${{ env.BUILD_CONFIGURATION }}/${{ env.BUILD_WINDOWS_TEST_TARGET }}/PCRE.NET.Tests.dll /Platform:x86
-
-      - name: Test .NET Framework x64
-        run: vstest.console src/PCRE.NET.Tests/bin/x64/${{ env.BUILD_CONFIGURATION }}/${{ env.BUILD_WINDOWS_TEST_TARGET }}/PCRE.NET.Tests.dll /Platform:x64
+#      - name: Build Tests x86
+#        run: msbuild src/PCRE.NET.Tests/PCRE.NET.Tests.csproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:Platform=x86 /p:ExpectPlatform=x86
+#
+#      - name: Build Tests x64
+#        run: msbuild src/PCRE.NET.Tests/PCRE.NET.Tests.csproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:Platform=x64 /p:ExpectPlatform=x64
+#
+#      - name: Test .NET Framework x86
+#        run: vstest.console src/PCRE.NET.Tests/bin/x86/${{ env.BUILD_CONFIGURATION }}/${{ env.BUILD_WINDOWS_TEST_TARGET }}/PCRE.NET.Tests.dll /Platform:x86
+#
+#      - name: Test .NET Framework x64
+#        run: vstest.console src/PCRE.NET.Tests/bin/x64/${{ env.BUILD_CONFIGURATION }}/${{ env.BUILD_WINDOWS_TEST_TARGET }}/PCRE.NET.Tests.dll /Platform:x64
 
       - name: Test .NET x64
         run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }}
