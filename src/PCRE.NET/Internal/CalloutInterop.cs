@@ -26,7 +26,11 @@ internal static unsafe class CalloutInterop
         => ToInteropInfo(data).Call(callout);
 #endif
 
-    public static void Prepare(string subject, InternalRegex regex, ref Native.match_input input, out CalloutInteropInfo interopInfo, Func<PcreCallout, PcreCalloutResult>? callout)
+    public static void Prepare(string subject,
+                               InternalRegex regex,
+                               scoped ref Native.match_input input,
+                               out CalloutInteropInfo interopInfo,
+                               Func<PcreCallout, PcreCalloutResult>? callout)
     {
         if (callout != null)
         {
@@ -44,7 +48,7 @@ internal static unsafe class CalloutInterop
 
     public static void Prepare(ReadOnlySpan<char> subject,
                                InternalRegex regex,
-                               ref Native.match_input input,
+                               scoped ref Native.match_input input,
                                out CalloutInteropInfo interopInfo,
                                PcreRefCalloutFunc? callout,
                                nuint[]? calloutOutputVector)
@@ -65,7 +69,7 @@ internal static unsafe class CalloutInterop
 
     public static void Prepare(ReadOnlySpan<char> subject,
                                PcreMatchBuffer buffer,
-                               ref Native.buffer_match_input input,
+                               scoped ref Native.buffer_match_input input,
                                out CalloutInteropInfo interopInfo,
                                PcreRefCalloutFunc callout)
     {
@@ -77,7 +81,7 @@ internal static unsafe class CalloutInterop
 
     public static void Prepare(string subject,
                                InternalRegex regex,
-                               ref Native.dfa_match_input input,
+                               scoped ref Native.dfa_match_input input,
                                out CalloutInteropInfo interopInfo,
                                Func<PcreCallout, PcreCalloutResult>? callout)
     {

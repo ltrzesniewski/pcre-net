@@ -250,7 +250,7 @@ public unsafe ref struct PcreRefMatch
         );
     }
 
-    internal void Update(ReadOnlySpan<char> subject, in Native.match_result result, nuint[]? outputVector)
+    internal void Update(ReadOnlySpan<char> subject, scoped in Native.match_result result, nuint[]? outputVector)
     {
         Subject = subject;
         _markPtr = result.mark;
