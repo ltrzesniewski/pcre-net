@@ -2020,56 +2020,59 @@ public class MatchTests
     [Test]
     public void readme_json_example()
     {
-        const string jsonPattern = @"
-                (?(DEFINE)
-                    # An object is an unordered set of name/value pairs.
-                    (?<object> \{
-                        (?: (?&keyvalue) (?: , (?&keyvalue) )* )?
-                    (?&ws) \} )
-                    (?<keyvalue>
-                        (?&ws) (?&string) (?&ws) : (?&value)
-                    )
-
-                    # An array is an ordered collection of values.
-                    (?<array> \[
-                        (?: (?&value) (?: , (?&value) )* )?
-                    (?&ws) \] )
-
-                    # A value can be a string in double quotes, or a number,
-                    # or true or false or null, or an object or an array.
-                    (?<value> (?&ws)
-                        (?: (?&string) | (?&number) | (?&object) | (?&array) | true | false | null )
-                    )
-
-                    # A string is a sequence of zero or more Unicode characters,
-                    # wrapped in double quotes, using backslash escapes.
-                    (?<string>
-                        "" (?: [^""\\\p{Cc}]++ | \\u[0-9A-Fa-f]{4} | \\ [""\\/bfnrt] )* ""
-                        # \p{Cc} matches control characters
-                    )
-
-                    # A number is very much like a C or Java number, except that the octal
-                    # and hexadecimal formats are not used.
-                    (?<number>
-                        -? (?: 0 | [1-9][0-9]* ) (?: \. [0-9]+ )? (?: [Ee] [-+]? [0-9]+ )?
-                    )
-
-                    # Whitespace
-                    (?<ws> \s*+ )
+        const string jsonPattern = """
+            (?(DEFINE)
+                # An object is an unordered set of name/value pairs.
+                (?<object> \{
+                    (?: (?&keyvalue) (?: , (?&keyvalue) )* )?
+                (?&ws) \} )
+                (?<keyvalue>
+                    (?&ws) (?&string) (?&ws) : (?&value)
                 )
 
-                \A (?&ws) (?&object) (?&ws) \z
-            ";
+                # An array is an ordered collection of values.
+                (?<array> \[
+                    (?: (?&value) (?: , (?&value) )* )?
+                (?&ws) \] )
+
+                # A value can be a string in double quotes, or a number,
+                # or true or false or null, or an object or an array.
+                (?<value> (?&ws)
+                    (?: (?&string) | (?&number) | (?&object) | (?&array) | true | false | null )
+                )
+
+                # A string is a sequence of zero or more Unicode characters,
+                # wrapped in double quotes, using backslash escapes.
+                (?<string>
+                    " (?: [^"\\\p{Cc}]++ | \\u[0-9A-Fa-f]{4} | \\ ["\\/bfnrt] )* "
+                    # \p{Cc} matches control characters
+                )
+
+                # A number is very much like a C or Java number, except that the octal
+                # and hexadecimal formats are not used.
+                (?<number>
+                    -? (?: 0 | [1-9][0-9]* ) (?: \. [0-9]+ )? (?: [Ee] [-+]? [0-9]+ )?
+                )
+
+                # Whitespace
+                (?<ws> \s*+ )
+            )
+
+            \A (?&ws) (?&object) (?&ws) \z
+            """;
 
         var regex = new PcreRegex(jsonPattern, PcreOptions.IgnorePatternWhitespace | PcreOptions.Compiled);
 
-        const string subject = @"{
-                ""hello"": ""world"",
-                ""numbers"": [4, 8, 15, 16, 23, 42],
-                ""foo"": null,
-                ""bar"": -2.42e+17,
-                ""baz"": true
-            }";
+        //language=json
+        const string subject = """
+            {
+                "hello": "world",
+                "numbers": [4, 8, 15, 16, 23, 42],
+                "foo": null,
+                "bar": -2.42e+17,
+                "baz": true
+            }
+            """;
 
         Assert.That(regex.IsMatch(subject), Is.True);
         Assert.That(regex.IsMatch(subject.AsSpan()), Is.True);

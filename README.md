@@ -107,7 +107,7 @@ var match = regex.Match("xyzabc12", PcreMatchOptions.PartialSoft);
 - Validate a JSON string:
 
 ```C#
-const string jsonPattern = @"
+const string jsonPattern = """
     (?(DEFINE)
         # An object is an unordered set of name/value pairs.
         (?<object> \{
@@ -131,7 +131,7 @@ const string jsonPattern = @"
         # A string is a sequence of zero or more Unicode characters,
         # wrapped in double quotes, using backslash escapes.
         (?<string>
-            "" (?: [^""\\\p{Cc}]++ | \\u[0-9A-Fa-f]{4} | \\ [""\\/bfnrt] )* ""
+            " (?: [^"\\\p{Cc}]++ | \\u[0-9A-Fa-f]{4} | \\ ["\\/bfnrt] )* "
             # \p{Cc} matches control characters
         )
 
@@ -146,17 +146,19 @@ const string jsonPattern = @"
     )
 
     \A (?&ws) (?&object) (?&ws) \z
-";
+    """;
 
 var regex = new PcreRegex(jsonPattern, PcreOptions.IgnorePatternWhitespace);
 
-const string subject = @"{
-    ""hello"": ""world"",
-    ""numbers"": [4, 8, 15, 16, 23, 42],
-    ""foo"": null,
-    ""bar"": -2.42e+17,
-    ""baz"": true
-}";
+const string subject = """
+    {
+        "hello": "world",
+        "numbers": [4, 8, 15, 16, 23, 42],
+        "foo": null,
+        "bar": -2.42e+17,
+        "baz": true
+    }
+    """;
 
 var isValidJson = regex.IsMatch(subject);
 // result: true
