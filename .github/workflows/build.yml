@@ -14,10 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: |
             5.0.x
@@ -49,7 +49,7 @@ jobs:
         run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_UNIX_TEST_TARGET }} -- --allocations
 
       - name: Upload Native Lib
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: lib-linux
           path: lib/PCRE.NET.Native.x64.so
@@ -59,10 +59,10 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: |
             5.0.x
@@ -94,7 +94,7 @@ jobs:
         run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_UNIX_TEST_TARGET }} -- --allocations
 
       - name: Upload Native Lib
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: lib-macos
           path: lib/PCRE.NET.Native.x64.dylib
@@ -107,16 +107,16 @@ jobs:
       - macos
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1
 
       - name: Setup VSTest
-        uses: darenm/Setup-VSTest@v1
+        uses: darenm/Setup-VSTest@v1.2
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: |
             5.0.x
@@ -127,19 +127,19 @@ jobs:
         shell: bash
 
       - name: Download Linux Lib
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: lib-linux
           path: lib
 
       - name: Download macOS Lib
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: lib-macos
           path: lib
 
       - name: Delete Native Lib Artifacts
-        uses: geekyeggo/delete-artifact@v1
+        uses: geekyeggo/delete-artifact@v2
         with:
           name: |
             lib-linux
@@ -186,7 +186,7 @@ jobs:
         run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_UNIX_TEST_TARGET }} -- --allocations
 
       - name: Upload NuGet
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: NuGet
           path: src/PCRE.NET/bin/${{ env.BUILD_CONFIGURATION }}/*.nupkg
