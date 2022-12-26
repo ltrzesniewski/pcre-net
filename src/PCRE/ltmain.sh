@@ -2,11 +2,11 @@
 ## DO NOT EDIT - This file generated from ./build-aux/ltmain.in
 ##               by inline-source v2019-02-19.15
 
-# libtool (GNU libtool) 2.4.6.59-b55b-dirty
+# libtool (GNU libtool) 2.4.7-dirty
 # Provide generalized library-building support services.
 # Written by Gordon Matzigkeit <gord@gnu.ai.mit.edu>, 1996
 
-# Copyright (C) 1996-2019, 2021 Free Software Foundation, Inc.
+# Copyright (C) 1996-2019, 2021-2022 Free Software Foundation, Inc.
 # This is free software; see the source for copying conditions.  There is NO
 # warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
@@ -31,8 +31,8 @@
 
 PROGRAM=libtool
 PACKAGE=libtool
-VERSION=2.4.6.59-b55b-dirty
-package_revision=2.4.6.59
+VERSION=2.4.7-dirty
+package_revision=2.4.7
 
 
 ## ------ ##
@@ -75,7 +75,7 @@ scriptversion=2019-02-19.15; # UTC
 # Copyright (C) 2004-2019, 2021 Bootstrap Authors
 #
 # This file is dual licensed under the terms of the MIT license
-# <https://opensource.org/license/MIT>, and GPL version 3 or later
+# <https://opensource.org/license/MIT>, and GPL version 2 or later
 # <http://www.gnu.org/licenses/gpl-2.0.html>.  You must apply one of
 # these licenses when using or redistributing this software or any of
 # the files within it.  See the URLs above, or the file `LICENSE`
@@ -1539,7 +1539,7 @@ func_lt_ver ()
 # Copyright (C) 2010-2019, 2021 Bootstrap Authors
 #
 # This file is dual licensed under the terms of the MIT license
-# <https://opensource.org/license/MIT>, and GPL version 3 or later
+# <https://opensource.org/license/MIT>, and GPL version 2 or later
 # <http://www.gnu.org/licenses/gpl-2.0.html>.  You must apply one of
 # these licenses when using or redistributing this software or any of
 # the files within it.  See the URLs above, or the file `LICENSE`
@@ -2215,7 +2215,7 @@ func_version ()
 # End:
 
 # Set a version string.
-scriptversion='(GNU libtool) 2.4.6.59-b55b-dirty'
+scriptversion='(GNU libtool) 2.4.7-dirty'
 
 
 # func_echo ARG...
@@ -2306,7 +2306,7 @@ include the following information:
        compiler:       $LTCC
        compiler flags: $LTCFLAGS
        linker:         $LD (gnu? $with_gnu_ld)
-       version:        $progname (GNU libtool) 2.4.6.59-b55b-dirty
+       version:        $progname (GNU libtool) 2.4.7-dirty
        automake:       `($AUTOMAKE --version) 2>/dev/null |$SED 1q`
        autoconf:       `($AUTOCONF --version) 2>/dev/null |$SED 1q`
 

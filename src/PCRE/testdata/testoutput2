@@ -17746,6 +17746,16 @@ Subject length lower bound = 2
     aabcd
  0: aa
 
+--
+    \[X]{-10}
+** Zero or negative repeat not allowed
+    
+# Check imposition of maximum by match_data_create().
+
+/abcd/
+    abcd\=ovector=65536
+ 0: abcd
+
 # End of testinput2
 Error -70: PCRE2_ERROR_BADDATA (unknown error number)
 Error -62: bad serialized data

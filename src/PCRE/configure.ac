@@ -9,15 +9,15 @@ dnl The PCRE2_PRERELEASE feature is for identifying release candidates. It might
 dnl be defined as -RC2, for example. For real releases, it should be empty.
 
 m4_define(pcre2_major, [10])
-m4_define(pcre2_minor, [40])
+m4_define(pcre2_minor, [42])
 m4_define(pcre2_prerelease, [])
-m4_define(pcre2_date, [2022-04-14])
+m4_define(pcre2_date, [2022-12-11])
 
 # Libtool shared library interface versions (current:revision:age)
-m4_define(libpcre2_8_version,     [11:0:11])
-m4_define(libpcre2_16_version,    [11:0:11])
-m4_define(libpcre2_32_version,    [11:0:11])
-m4_define(libpcre2_posix_version, [3:2:0])
+m4_define(libpcre2_8_version,     [11:2:11])
+m4_define(libpcre2_16_version,    [11:2:11])
+m4_define(libpcre2_32_version,    [11:2:11])
+m4_define(libpcre2_posix_version, [3:4:0])
 
 # NOTE: The CMakeLists.txt file searches for the above variables in the first
 # 50 lines of this file. Please update that if the variables above are moved.
@@ -66,6 +66,8 @@ AC_TYPE_INT64_T
 AC_PROG_INSTALL
 LT_INIT([win32-dll])
 AC_PROG_LN_S
+
+AC_SYS_LARGEFILE
 
 # Check for GCC visibility feature
 

@@ -452,9 +452,10 @@ EXTRA_DIST += \
   src/sljit/sljitNativePPC_32.c \
   src/sljit/sljitNativePPC_64.c \
   src/sljit/sljitNativePPC_common.c \
+  src/sljit/sljitNativeRISCV_32.c \
+  src/sljit/sljitNativeRISCV_64.c \
+  src/sljit/sljitNativeRISCV_common.c \
   src/sljit/sljitNativeS390X.c \
-  src/sljit/sljitNativeSPARC_32.c \
-  src/sljit/sljitNativeSPARC_common.c \
   src/sljit/sljitNativeX86_32.c \
   src/sljit/sljitNativeX86_64.c \
   src/sljit/sljitNativeX86_common.c \
@@ -553,6 +554,17 @@ endif # WITH_PCRE2_8
 
 ## -------- Testing ----------
 
+## If the 8-bit library is enabled, build the POSIX wrapper test program and
+## arrange for it to run.
+
+if WITH_PCRE2_8
+TESTS += pcre2posix_test
+noinst_PROGRAMS += pcre2posix_test
+pcre2posix_test_SOURCES = src/pcre2posix_test.c
+pcre2posix_test_CFLAGS = $(AM_CFLAGS)
+pcre2posix_test_LDADD = libpcre2-posix.la libpcre2-8.la
+endif # WITH_PCRE2_8
+
 ## If JIT support is enabled, arrange for the JIT test program to run.
 
 if WITH_JIT
@@ -631,15 +643,23 @@ EXTRA_DIST += \
   testdata/grepinput \
   testdata/grepinput3 \
   testdata/grepinput8 \
+  testdata/grepinputC.bz2 \
+  testdata/grepinputC.gz \
   testdata/grepinputM \
   testdata/grepinputv \
   testdata/grepinputx \
   testdata/greplist \
+  testdata/grepnot.bz2 \
   testdata/grepoutput \
   testdata/grepoutput8 \
   testdata/grepoutputC \
   testdata/grepoutputCN \
+  testdata/grepoutputCNU \
+  testdata/grepoutputCU \
+  testdata/grepoutputCbz2 \
+  testdata/grepoutputCgz \
   testdata/grepoutputN \
+  testdata/grepoutputUN \
   testdata/greppatN4 \
   testdata/testbtables \
   testdata/testinput1 \
@@ -669,6 +689,7 @@ EXTRA_DIST += \
   testdata/testinput25 \
   testdata/testinput26 \
   testdata/testinputEBC \
+  testdata/testinputheap \
   testdata/testoutput1 \
   testdata/testoutput2 \
   testdata/testoutput3 \
@@ -712,6 +733,9 @@ EXTRA_DIST += \
   testdata/testoutput25 \
   testdata/testoutput26 \
   testdata/testoutputEBC \
+  testdata/testoutputheap-16 \
+  testdata/testoutputheap-32 \
+  testdata/testoutputheap-8 \
   testdata/valgrind-jit.supp \
   testdata/wintestinput3 \
   testdata/wintestoutput3 \
@@ -738,7 +762,7 @@ CLEANFILES += \
 ## ------------ End of testing -------------
 
 
-# PCRE2 demonstration program. Not built automatcally. The point is that the
+# PCRE2 demonstration program. Not built automatically. The point is that the
 # users should build it themselves. So just distribute the source.
 
 EXTRA_DIST += src/pcre2demo.c
