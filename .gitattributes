@@ -1,3 +1,5 @@
+* text=auto
+*.sh eol=lf
 
 # GitHub Linguist
 src/PCRE/** linguist-vendored

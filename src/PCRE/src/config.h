@@ -1,3 +1,6 @@
+
+#include "../../PCRE.NET.Native/pcre2config.h"
+
 /* src/config.h.  Generated from config.h.in by configure.  */
 /* src/config.h.in.  Generated from configure.ac by autoheader.  */
 
@@ -75,18 +78,15 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 /* #undef HAVE_INTTYPES_H */
-#define HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the <limits.h> header file. */
 /* #undef HAVE_LIMITS_H */
-#define HAVE_LIMITS_H 1
 
 /* Define to 1 if you have the `memfd_create' function. */
 /* #undef HAVE_MEMFD_CREATE */
 
 /* Define to 1 if you have the `memmove' function. */
 /* #undef HAVE_MEMMOVE */
-#define HAVE_MEMMOVE 1
 
 /* Define to 1 if you have the <minix/config.h> header file. */
 /* #undef HAVE_MINIX_CONFIG_H */
@@ -117,15 +117,12 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to 1 if you have the <stdint.h> header file. */
 /* #undef HAVE_STDINT_H */
-#define HAVE_STDINT_H 1
 
 /* Define to 1 if you have the <stdio.h> header file. */
 /* #undef HAVE_STDIO_H */
-#define HAVE_STDIO_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 /* #undef HAVE_STDLIB_H */
-#define HAVE_STDLIB_H 1
 
 /* Define to 1 if you have the `strerror' function. */
 /* #undef HAVE_STRERROR */
@@ -135,15 +132,12 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to 1 if you have the <string.h> header file. */
 /* #undef HAVE_STRING_H */
-#define HAVE_STRING_H 1
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 /* #undef HAVE_SYS_STAT_H */
-#define HAVE_SYS_STAT_H 1
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 /* #undef HAVE_SYS_TYPES_H */
-#define HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have the <sys/wait.h> header file. */
 /* #undef HAVE_SYS_WAIT_H */
@@ -156,11 +150,9 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to 1 if you have the <wchar.h> header file. */
 /* #undef HAVE_WCHAR_H */
-#define HAVE_WCHAR_H 1
 
 /* Define to 1 if you have the <windows.h> header file. */
 /* #undef HAVE_WINDOWS_H */
-#define HAVE_WINDOWS_H 1
 
 /* Define to 1 if you have the <zlib.h> header file. */
 /* #undef HAVE_ZLIB_H */
@@ -233,7 +225,6 @@ sure both macros are undefined; an emulation function will then be used. */
    sequence. PCRE2 client programs can override this by selecting other values
    at run time. The valid values are 1 (CR), 2 (LF), 3 (CRLF), 4 (ANY), 5
    (ANYCRLF), and 6 (NUL). */
-#define NEWLINE_DEFAULT 5
 #ifndef NEWLINE_DEFAULT
 #define NEWLINE_DEFAULT 2
 #endif
@@ -300,7 +291,6 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to any value if linking statically (TODO: make nice with Libtool) */
 /* #undef PCRE2_STATIC */
-#define PCRE2_STATIC 1
 
 /* Define to necessary symbol if this constant uses a non-standard name on
    your system. */
@@ -315,11 +305,9 @@ sure both macros are undefined; an emulation function will then be used. */
    required in a freestanding environment). This macro is provided for
    backward compatibility; new code need not use it. */
 /* #undef STDC_HEADERS */
-#define STDC_HEADERS 1
 
 /* Define to any value to enable support for Just-In-Time compiling. */
 /* #undef SUPPORT_JIT */
-#define SUPPORT_JIT 1
 
 /* Define to any value to allow pcre2grep to be linked with libbz2, so that it
    is able to handle .bz2 files. */
@@ -361,7 +349,6 @@ sure both macros are undefined; an emulation function will then be used. */
    EBCDIC macro. That is, PCRE2 can support *either* EBCDIC code *or*
    ASCII/Unicode, but not both at once. */
 /* #undef SUPPORT_UNICODE */
-#define SUPPORT_UNICODE 1
 
 /* Define to any value for valgrind support to find invalid memory reads. */
 /* #undef SUPPORT_VALGRIND */
@@ -471,5 +458,3 @@ sure both macros are undefined; an emulation function will then be used. */
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 /* #undef size_t */
-
-#define _CRT_SECURE_NO_WARNINGS

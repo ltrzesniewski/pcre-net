@@ -24,6 +24,9 @@ indent_style = tab
 [*.md]
 trim_trailing_whitespace = false
 
+[*.sh]
+end_of_line = lf
+
 ### dotnet settings
 [*.cs]
 
