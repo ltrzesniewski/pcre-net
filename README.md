@@ -1,4 +1,4 @@
-# PCRE.NET                    <a href="#"><img src="icon.png" align="right" alt="Logo" /></a>
+# PCRE.NET                    <picture><source media="(prefers-color-scheme: dark)" srcset="icon-dark.png"><img src="icon.png" align="right" alt="Logo"></picture>
 
 **Perl Compatible Regular Expressions for .NET**
 
