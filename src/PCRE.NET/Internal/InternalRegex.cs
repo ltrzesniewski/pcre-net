@@ -224,7 +224,7 @@ internal sealed unsafe class InternalRegex : IDisposable
         _ = &input;
 
         Native.match_result result;
-        CalloutInterop.SkipInitInteropInfo(out var calloutInterop);
+        CalloutInterop.CalloutInteropInfo calloutInterop;
 
         fixed (char* pSubject = subject)
         {
@@ -241,8 +241,7 @@ internal sealed unsafe class InternalRegex : IDisposable
             if (input.buffer == IntPtr.Zero)
                 ThrowMatchBufferDisposed();
 
-            if (callout != null)
-                CalloutInterop.Prepare(subject, buffer, ref input, out calloutInterop, callout);
+            CalloutInterop.Prepare(subject, buffer, ref input, out calloutInterop, callout);
 
             Native.buffer_match(&input, &result);
         }

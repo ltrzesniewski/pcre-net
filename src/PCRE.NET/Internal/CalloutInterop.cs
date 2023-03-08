@@ -41,7 +41,7 @@ internal static unsafe class CalloutInterop
         }
         else
         {
-            SkipInitInteropInfo(out interopInfo);
+            interopInfo = default;
             input.callout = null;
         }
     }
@@ -62,7 +62,7 @@ internal static unsafe class CalloutInterop
         }
         else
         {
-            SkipInitInteropInfo(out interopInfo);
+            interopInfo = default;
             input.callout = null;
         }
     }
@@ -71,12 +71,20 @@ internal static unsafe class CalloutInterop
                                PcreMatchBuffer buffer,
                                scoped ref Native.buffer_match_input input,
                                out CalloutInteropInfo interopInfo,
-                               PcreRefCalloutFunc callout)
+                               PcreRefCalloutFunc? callout)
     {
-        interopInfo = new CalloutInteropInfo(subject, buffer.Regex, callout, buffer.CalloutOutputVector);
+        if (callout != null)
+        {
+            interopInfo = new CalloutInteropInfo(subject, buffer.Regex, callout, buffer.CalloutOutputVector);
 
-        input.callout = _calloutHandlerFnPtr;
-        input.callout_data = interopInfo.ToPointer();
+            input.callout = _calloutHandlerFnPtr;
+            input.callout_data = interopInfo.ToPointer();
+        }
+        else
+        {
+            interopInfo = default;
+            input.callout = null;
+        }
     }
 
     public static void Prepare(string subject,
@@ -94,7 +102,7 @@ internal static unsafe class CalloutInterop
         }
         else
         {
-            SkipInitInteropInfo(out interopInfo);
+            interopInfo = default;
             input.callout = null;
         }
     }
@@ -128,14 +136,6 @@ internal static unsafe class CalloutInterop
         Ret();
         throw IL.Unreachable();
 #endif
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [SuppressMessage("Usage", "CA1801")]
-    internal static void SkipInitInteropInfo(out CalloutInteropInfo value)
-    {
-        Ret();
-        throw IL.Unreachable();
     }
 
     public ref struct CalloutInteropInfo
