@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <LangVersion>11.0</LangVersion>
+    <LangVersion>12.0</LangVersion>
     <AnalysisLevel>6.0</AnalysisLevel>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -26,8 +26,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(MSBuildProjectName)' != 'PCRE.NET.Native'">
-    <PackageReference Include="JetBrains.Annotations" Version="2023.2.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" />
+    <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>
