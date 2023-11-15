@@ -56,10 +56,12 @@ public readonly ref struct PcreRefGroup
     public bool IsDefined => _indexWithOffset != 0;
 
     /// <inheritdoc cref="PcreGroup.op_Implicit"/>
-    public static implicit operator string(PcreRefGroup group) => group.Value.ToString();
+    public static implicit operator string(PcreRefGroup group)
+        => group.Value.ToString();
 
     /// <inheritdoc cref="PcreGroup.ToString"/>
-    public override string ToString() => Value.ToString();
+    public override string ToString()
+        => Value.ToString();
 
     internal class DebugProxy
     {
@@ -72,6 +74,7 @@ public readonly ref struct PcreRefGroup
             Value = Success ? group.Value.ToString() : null;
         }
 
-        public override string ToString() => Value ?? "<no match>";
+        public override string ToString()
+            => Value ?? "<no match>";
     }
 }

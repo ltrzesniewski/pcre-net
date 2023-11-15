@@ -17,7 +17,7 @@ public class PlatformTests
     {
         foreach (var type in typeof(PcreRegex).Assembly.GetExportedTypes())
         {
-            Assert.That(type.Namespace, Does.Not.Contain("Internal"));
+            Assert.That(type.Namespace, Does.Not.Contain(nameof(Internal)));
         }
     }
 

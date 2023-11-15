@@ -2,16 +2,10 @@
 
 namespace PCRE.Internal;
 
-internal readonly struct RegexKey : IEquatable<RegexKey>
+internal readonly struct RegexKey(string pattern, PcreRegexSettings settings) : IEquatable<RegexKey>
 {
-    public readonly string Pattern;
-    public readonly PcreRegexSettings Settings;
-
-    public RegexKey(string pattern, PcreRegexSettings settings)
-    {
-        Pattern = pattern;
-        Settings = settings.AsReadOnly();
-    }
+    public readonly string Pattern = pattern;
+    public readonly PcreRegexSettings Settings = settings.AsReadOnly();
 
     public bool Equals(RegexKey other)
         => Pattern == other.Pattern

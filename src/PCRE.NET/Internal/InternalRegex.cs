@@ -76,9 +76,7 @@ internal sealed unsafe class InternalRegex : IDisposable
     }
 
     ~InternalRegex()
-    {
-        FreeCode();
-    }
+        => FreeCode();
 
     public void Dispose()
     {
@@ -307,7 +305,7 @@ internal sealed unsafe class InternalRegex : IDisposable
     {
         var calloutCount = Native.get_callout_count(Code);
         if (calloutCount == 0)
-            return Array.Empty<PcreCalloutInfo>();
+            return [];
 
         var data = calloutCount <= 16
             ? stackalloc Native.pcre2_callout_enumerate_block[(int)calloutCount]

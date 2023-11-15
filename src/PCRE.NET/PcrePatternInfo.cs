@@ -15,9 +15,7 @@ public sealed class PcrePatternInfo
     private IReadOnlyList<string>? _groupNames;
 
     internal PcrePatternInfo(InternalRegex re)
-    {
-        _re = re;
-    }
+        => _re = re;
 
     /// <summary>
     /// Returns the regex pattern string.
@@ -227,5 +225,5 @@ public sealed class PcrePatternInfo
     /// </summary>
     /// <param name="name">The capturing group name.</param>
     public IReadOnlyList<int> GetGroupIndexesByName(string name)
-        => _re.CaptureNames.TryGetValue(name, out var indexes) ? indexes : Array.Empty<int>();
+        => _re.CaptureNames.TryGetValue(name, out var indexes) ? indexes : [];
 }

@@ -91,18 +91,11 @@ internal class PriorityCache<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TVal
         }
     }
 
-    private class CacheItem
+    private class CacheItem(TKey key, int keyHashCode, TValue value)
     {
-        public readonly TKey Key;
-        public readonly int KeyHashCode;
-        public readonly TValue Value;
-
-        public CacheItem(TKey key, int keyHashCode, TValue value)
-        {
-            Key = key;
-            KeyHashCode = keyHashCode;
-            Value = value;
-        }
+        public readonly TKey Key = key;
+        public readonly int KeyHashCode = keyHashCode;
+        public readonly TValue Value = value;
     }
 
     public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
@@ -115,5 +108,6 @@ internal class PriorityCache<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TVal
         }
     }
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator()
+        => GetEnumerator();
 }

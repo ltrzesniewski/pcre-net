@@ -52,7 +52,7 @@ public sealed class PcreGroup : IPcreGroup
     /// <summary>
     /// Converts a group to its matched substring.
     /// </summary>
-    [return: NotNullIfNotNull("group")]
+    [return: NotNullIfNotNull(nameof(group))]
     public static implicit operator string?(PcreGroup? group)
         => group?.Value;
 

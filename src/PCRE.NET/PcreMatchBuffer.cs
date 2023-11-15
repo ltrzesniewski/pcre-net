@@ -47,9 +47,7 @@ public sealed unsafe class PcreMatchBuffer : IDisposable
 
     /// <inheritdoc />
     ~PcreMatchBuffer()
-    {
-        FreeBuffer();
-    }
+        => FreeBuffer();
 
     /// <inheritdoc />
     public void Dispose()

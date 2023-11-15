@@ -64,13 +64,15 @@ public unsafe ref struct PcreRefMatch
     /// Returns the capturing group at a given index.
     /// </summary>
     /// <param name="index">The index of the capturing group.</param>
-    public readonly PcreRefGroup this[int index] => GetGroup(index);
+    public readonly PcreRefGroup this[int index]
+        => GetGroup(index);
 
     /// <summary>
     /// Returns the capturing group of a given name.
     /// </summary>
     /// <param name="name">The name of the capturing group.</param>
-    public readonly PcreRefGroup this[string name] => GetGroup(name);
+    public readonly PcreRefGroup this[string name]
+        => GetGroup(name);
 
     /// <inheritdoc cref="PcreMatch.Index"/>
     public readonly int Index => _regex is not null && _resultCode is > 0 or PcreConstants.ERROR_PARTIAL
@@ -291,10 +293,12 @@ public unsafe ref struct PcreRefMatch
             => new(_match);
 
         /// <inheritdoc cref="PcreMatch.get_Item(int)"/>
-        public PcreRefGroup this[int index] => _match[index];
+        public PcreRefGroup this[int index]
+            => _match[index];
 
         /// <inheritdoc cref="PcreMatch.get_Item(string)"/>
-        public PcreRefGroup this[string name] => _match[name];
+        public PcreRefGroup this[string name]
+            => _match[name];
 
         /// <summary>
         /// Creates a <see cref="List{T}"/> out of the groups by applying a <paramref name="selector"/> method.
@@ -423,6 +427,7 @@ public unsafe ref struct PcreRefMatch
                 Groups[i] = new PcreRefGroup.DebugProxy(match[i]);
         }
 
-        public override string ToString() => Value ?? "<no match>";
+        public override string ToString()
+            => Value ?? "<no match>";
     }
 }

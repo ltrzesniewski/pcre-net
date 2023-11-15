@@ -25,7 +25,7 @@ public sealed unsafe class PcreMatch : IPcreGroup, IPcreGroupList
 
         Subject = string.Empty;
         _regex = regex;
-        _oVector = Array.Empty<nuint>();
+        _oVector = [];
         _resultCode = PcreConstants.ERROR_NOMATCH;
     }
 
@@ -62,13 +62,15 @@ public sealed unsafe class PcreMatch : IPcreGroup, IPcreGroupList
     /// Returns the capturing group at a given index.
     /// </summary>
     /// <param name="index">The index of the capturing group.</param>
-    public PcreGroup this[int index] => GetGroup(index) ?? PcreGroup.Undefined;
+    public PcreGroup this[int index]
+        => GetGroup(index) ?? PcreGroup.Undefined;
 
     /// <summary>
     /// Returns the capturing group of a given name.
     /// </summary>
     /// <param name="name">The name of the capturing group.</param>
-    public PcreGroup this[string name] => GetGroup(name) ?? PcreGroup.Undefined;
+    public PcreGroup this[string name]
+        => GetGroup(name) ?? PcreGroup.Undefined;
 
     internal string Subject { get; }
 
@@ -218,7 +220,7 @@ public sealed unsafe class PcreMatch : IPcreGroup, IPcreGroupList
         foreach (var index in indexes)
         {
             var group = GetGroup(index);
-            if (group != null && group.Success)
+            if (group is { Success: true })
                 return group;
         }
 

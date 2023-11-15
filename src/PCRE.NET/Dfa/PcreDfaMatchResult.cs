@@ -26,12 +26,12 @@ public sealed class PcreDfaMatchResult : IReadOnlyList<PcreDfaMatch>
 
         _resultCode = result.result_code;
 
-        if (_resultCode > 0)
-            _matches = new PcreDfaMatch?[_resultCode];
-        else if (_resultCode == 0)
-            _matches = new PcreDfaMatch?[_oVector.Length / 2];
-        else
-            _matches = Array.Empty<PcreDfaMatch?>();
+        _matches = _resultCode switch
+        {
+            > 0 => new PcreDfaMatch?[_resultCode],
+            0   => new PcreDfaMatch?[_oVector.Length / 2],
+            _   => []
+        };
     }
 
     private PcreDfaMatch GetMatch(int index)
@@ -74,13 +74,15 @@ public sealed class PcreDfaMatchResult : IReadOnlyList<PcreDfaMatch>
     public IEnumerator<PcreDfaMatch> GetEnumerator()
         => GetMatches().GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator()
+        => GetEnumerator();
 
     /// <summary>
     /// Returns the match at a given index.
     /// </summary>
     /// <param name="index">The index of the match.</param>
-    public PcreDfaMatch this[int index] => GetMatch(index);
+    public PcreDfaMatch this[int index]
+        => GetMatch(index);
 
     /// <summary>
     /// The available match count.

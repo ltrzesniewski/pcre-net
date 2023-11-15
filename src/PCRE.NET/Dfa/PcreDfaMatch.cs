@@ -45,7 +45,7 @@ public sealed class PcreDfaMatch : IPcreGroup
     /// <summary>
     /// Converts a match to its matched substring.
     /// </summary>
-    [return: NotNullIfNotNull("group")]
+    [return: NotNullIfNotNull(nameof(group))]
     public static implicit operator string?(PcreDfaMatch? group)
         => group?.Value;
 
