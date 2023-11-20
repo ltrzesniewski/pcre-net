@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using NUnit.Framework;
 
 namespace PCRE.Tests.PcreNet;
@@ -15,10 +16,19 @@ public class PlatformTests
     [Test]
     public void should_not_expose_internal_namespace()
     {
-        foreach (var type in typeof(PcreRegex).Assembly.GetExportedTypes())
+        var namespaces = typeof(PcreRegex).Assembly
+                                          .GetExportedTypes()
+                                          .Select(i => i.Namespace)
+                                          .Distinct(StringComparer.Ordinal)
+                                          .OrderBy(i => i, StringComparer.Ordinal)
+                                          .ToList();
+
+        Assert.That(namespaces, Is.EqualTo(new[]
         {
-            Assert.That(type.Namespace, Does.Not.Contain(nameof(Internal)));
-        }
+            "PCRE",
+            "PCRE.Conversion",
+            "PCRE.Dfa"
+        }));
     }
 
 #if EXPECT_X86
