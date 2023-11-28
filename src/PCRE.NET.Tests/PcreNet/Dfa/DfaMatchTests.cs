@@ -129,11 +129,11 @@ public class DfaMatchTests
 
         ref var subjectRef = ref MemoryMarshal.GetReference(subject.AsSpan(3));
         ref var valueRef = ref MemoryMarshal.GetReference(result.LongestMatch.ValueSpan);
-        Assert.IsTrue(Unsafe.AreSame(ref valueRef, ref subjectRef));
+        Assert.That(Unsafe.AreSame(ref valueRef, ref subjectRef), Is.True);
 
         _ = result.LongestMatch.Value; // Reading the string value shouldn't change the span target
 
         valueRef = ref MemoryMarshal.GetReference(result.LongestMatch.ValueSpan);
-        Assert.IsTrue(Unsafe.AreSame(ref valueRef, ref subjectRef));
+        Assert.That(Unsafe.AreSame(ref valueRef, ref subjectRef), Is.True);
     }
 }

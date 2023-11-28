@@ -671,12 +671,12 @@ public class MatchTests
 
         ref var subjectRef = ref MemoryMarshal.GetReference(subject.AsSpan(3));
         ref var valueRef = ref MemoryMarshal.GetReference(match.ValueSpan);
-        Assert.IsTrue(Unsafe.AreSame(ref valueRef, ref subjectRef));
+        Assert.That(Unsafe.AreSame(ref valueRef, ref subjectRef), Is.True);
 
         _ = match.Value; // Reading the string value shouldn't change the span target
 
         valueRef = ref MemoryMarshal.GetReference(match.ValueSpan);
-        Assert.IsTrue(Unsafe.AreSame(ref valueRef, ref subjectRef));
+        Assert.That(Unsafe.AreSame(ref valueRef, ref subjectRef), Is.True);
     }
 
     [Test]
