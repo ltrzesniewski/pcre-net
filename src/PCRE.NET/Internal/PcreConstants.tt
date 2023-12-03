@@ -11,7 +11,7 @@
     );
 
     var defineRe = new Regex(
-        @"
+        """
         ^ \s* \# \s* define \s+
         PCRE2_(?<name>\w+) \s+
         \(? \s*
@@ -19,7 +19,7 @@
         [uU]?
         \s* \)?
         \s* $
-        ",
+        """,
         RegexOptions.CultureInvariant | RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline
     );
 

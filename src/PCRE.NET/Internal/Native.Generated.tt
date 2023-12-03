@@ -6,7 +6,8 @@
 <#@ output extension=".cs" #>
 <#
 
-var funcs = ParseFuncs(@"
+var functions = ParseFunctions(
+    """
     int get_error_message(int errorCode, char* errorBuffer, uint bufferSize) no-gc;
     void compile(compile_input* input, compile_result* result);
     void code_free(IntPtr code);
@@ -23,7 +24,8 @@ var funcs = ParseFuncs(@"
     void jit_stack_free(IntPtr stack);
     int convert(convert_input* input, convert_result* result);
     void convert_result_free(char* str);
-").ToList();
+    """
+).ToList();
 
 const string libName = "PCRE.NET.Native";
 
@@ -54,7 +56,7 @@ unsafe partial class Native
 {
 #if NETCOREAPP
 
-<# foreach (var func in funcs) { #>
+<# foreach (var func in functions) { #>
 <# if (func.SuppressGCTransition) { #>
     [SuppressGCTransition]
 <# } #>
@@ -64,14 +66,14 @@ unsafe partial class Native
 <# } #>
 #else
 
-<# foreach (var func in funcs) { #>
+<# foreach (var func in functions) { #>
     public static <#= func.Declaration #>
         => _impl.<#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => $"{p.Modifier}{p.Name}")) #>);
 
 <# } #>
     private abstract class LibImpl
     {
-<# foreach (var func in funcs) { #>
+<# foreach (var func in functions) { #>
         public abstract <#= func.Declaration #>;
 <# } #>
     }
@@ -80,7 +82,7 @@ unsafe partial class Native
     [SuppressUnmanagedCodeSecurity]
     private sealed class <#= platform.Name #>Impl : LibImpl
     {
-<# foreach (var func in funcs) { #>
+<# foreach (var func in functions) { #>
         public override <#= func.Declaration #>
             => pcrenet_<#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => $"{p.Modifier}{p.Name}")) #>);
 
@@ -95,25 +97,25 @@ unsafe partial class Native
 }
 <#+
 
-private static IEnumerable<FuncDef> ParseFuncs(string funcs)
+private static IEnumerable<FuncDef> ParseFunctions(string functions)
 {
-    var funcsRe = new Regex(
-        @"
-            \G \s*
-            (?<returnType>\S+) \s+ (?<funcName>\w+) \s* \(
-            (?: \s*
-                (?<paramModifier> (?: (?:in|ref|out) \s+)? )
-                (?<paramType>\S+) \s+ (?<paramName>\w+) \s*
-                (?(?=,),|(?=\)))
-            )*
-            \) \s*
-            (?<nogc>no-gc)?
-            \s* ;
-        ",
+    var functionsRe = new Regex(
+        """
+        \G \s*
+        (?<returnType>\S+) \s+ (?<funcName>\w+) \s* \(
+        (?: \s*
+            (?<paramModifier> (?: (?:in|ref|out) \s+)? )
+            (?<paramType>\S+) \s+ (?<paramName>\w+) \s*
+            (?(?=,),|(?=\)))
+        )*
+        \) \s*
+        (?<nogc>no-gc)?
+        \s* ;
+        """,
         RegexOptions.IgnorePatternWhitespace | RegexOptions.CultureInvariant
     );
 
-    foreach (Match match in funcsRe.Matches(funcs))
+    foreach (Match match in functionsRe.Matches(functions))
     {
         var def = new FuncDef
         {
@@ -172,16 +174,10 @@ private class FuncParamDef
     }
 }
 
-private class PlatformDef
+private class PlatformDef(string name, string libName)
 {
-    public readonly string Name;
-    public readonly string LibName;
-
-    public PlatformDef(string name, string libName)
-    {
-        Name = name;
-        LibName = libName;
-    }
+    public readonly string Name = name;
+    public readonly string LibName = libName;
 }
 
 #>
