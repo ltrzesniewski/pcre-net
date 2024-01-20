@@ -26,7 +26,8 @@ public class RegexKeyTests
             NewLine = PcreBuildInfo.NewLine,
             BackslashR = PcreBuildInfo.BackslashR,
             ParensLimit = PcreBuildInfo.ParensLimit,
-            MaxPatternLength = null
+            MaxPatternLength = null,
+            MaxVarLookbehind = 255
         };
 
         var keyA = new RegexKey("test", implicitDefaults);

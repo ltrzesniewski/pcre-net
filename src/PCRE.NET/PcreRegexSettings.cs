@@ -13,6 +13,7 @@ public sealed class PcreRegexSettings
     private PcreBackslashR? _backslashR;
     private uint? _parensLimit;
     private uint? _maxPatternLength;
+    private uint? _maxVarLookbehind;
     private PcreExtraCompileOptions _extraCompileOptions;
     private PcreJitCompileOptions _jitCompileOptions;
 
@@ -86,6 +87,23 @@ public sealed class PcreRegexSettings
     }
 
     /// <summary>
+    /// The maximum length for the number of characters matched by a variable-length lookbehind assertion.
+    /// </summary>
+    /// <remarks>
+    /// The default is set when PCRE2 is built, with the ultimate default being 255, the same as Perl.
+    /// Lookbehind assertions without a bounding length are not supported.
+    /// </remarks>
+    public uint MaxVarLookbehind
+    {
+        get => _maxVarLookbehind ?? 255;
+        set
+        {
+            EnsureIsMutable();
+            _maxVarLookbehind = value;
+        }
+    }
+
+    /// <summary>
     /// Additional compile options.
     /// </summary>
     public PcreExtraCompileOptions ExtraCompileOptions
@@ -132,8 +150,9 @@ public sealed class PcreRegexSettings
         _backslashR = settings._backslashR;
         _parensLimit = settings._parensLimit;
         _maxPatternLength = settings._maxPatternLength;
+        _maxVarLookbehind = settings._maxVarLookbehind;
         _extraCompileOptions = settings._extraCompileOptions;
-        _jitCompileOptions= settings._jitCompileOptions;
+        _jitCompileOptions = settings._jitCompileOptions;
 
         ReadOnlySettings = readOnly;
     }
@@ -145,6 +164,7 @@ public sealed class PcreRegexSettings
                && BackslashR == other.BackslashR
                && ParensLimit == other.ParensLimit
                && MaxPatternLength == other.MaxPatternLength
+               && MaxVarLookbehind == other.MaxVarLookbehind
                && ExtraCompileOptions == other.ExtraCompileOptions
                && JitCompileOptions == other.JitCompileOptions;
     }
@@ -171,6 +191,7 @@ public sealed class PcreRegexSettings
         input.bsr = (uint)_backslashR.GetValueOrDefault();
         input.parens_nest_limit = _parensLimit.GetValueOrDefault();
         input.max_pattern_length = _maxPatternLength.GetValueOrDefault();
+        input.max_var_lookbehind = MaxVarLookbehind;
         input.compile_extra_options = (uint)_extraCompileOptions;
     }
 }

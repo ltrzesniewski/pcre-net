@@ -1,4 +1,3 @@
-
 #include "pcrenet.h"
 
 c_static_assert(sizeof(uint32_t) <= sizeof(PCRE2_SIZE), "Parameter size must fit into PCRE2_SIZE");
@@ -14,6 +13,7 @@ typedef struct
     uint32_t parens_nest_limit;
     uint32_t max_pattern_length;
     uint32_t compile_extra_options;
+    uint32_t max_var_lookbehind;
 } pcrenet_compile_input;
 
 typedef struct
@@ -42,6 +42,9 @@ PCRENET_EXPORT(void, compile)(const pcrenet_compile_input* input, pcrenet_compil
 
     if (input->max_pattern_length)
         pcre2_set_max_pattern_length(context, input->max_pattern_length);
+
+    if (input->max_var_lookbehind != MAX_VARLOOKBEHIND)
+        pcre2_set_max_varlookbehind(context, input->max_var_lookbehind);
 
     if (input->compile_extra_options)
         pcre2_set_compile_extra_options(context, input->compile_extra_options);
