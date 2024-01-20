@@ -840,4 +840,9 @@ public enum PcreErrorCode
     /// <c>PCRE2_ERROR_DFA_UINVALID_UTF</c> - <see cref="PcreOptions.MatchInvalidUtf"/> is not supported for DFA matching.
     /// </summary>
     DfaUInvalidUtf = PcreConstants.ERROR_DFA_UINVALID_UTF,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_INVALIDOFFSET</c> - Invalid offset value.
+    /// </summary>
+    InvalidOffset = PcreConstants.ERROR_INVALIDOFFSET
 }

@@ -99,6 +99,63 @@ public enum PcreExtraCompileOptions : uint
     AllowLookaroundBsK = PcreConstants.EXTRA_ALLOW_LOOKAROUND_BSK,
 
     /// <summary>
+    /// <c>PCRE2_EXTRA_CASELESS_RESTRICT</c> - Disable mixed ASCII/non-ASCII case folding.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// When either <see cref="PcreOptions.Ucp"/> or <see cref="PcreOptions.Utf"/> is set, caseless matching follows Unicode rules, which allow for more than two cases per character.
+    /// There are two case-equivalent character sets that contain both ASCII and non-ASCII characters.
+    /// The ASCII letter S is case-equivalent to U+017f (long S) and the ASCII letter K is case-equivalent to U+212a (Kelvin sign).
+    /// This option disables recognition of case-equivalences that cross the ASCII/non-ASCII boundary.
+    /// In a caseless match, both characters must either be ASCII or non-ASCII.
+    /// </para>
+    /// <para>
+    /// The option can be changed with a pattern by the <c>(?r)</c> option setting.
+    /// </para>
+    /// </remarks>
+    CaselessRestrict = PcreConstants.EXTRA_CASELESS_RESTRICT,
+
+    /// <summary>
+    /// <c>PCRE2_EXTRA_ASCII_BSD</c> - Forces <c>\d</c> to match only ASCII digits, even when <see cref="PcreOptions.Ucp"/> is set.
+    /// </summary>
+    /// <remarks>
+    /// It can also be changed within a pattern by means of the <c>(?aD)</c> option setting.
+    /// </remarks>
+    AsciiBsD = PcreConstants.EXTRA_ASCII_BSD,
+
+    /// <summary>
+    /// <c>PCRE2_EXTRA_ASCII_BSS</c> - Forces <c>\s</c> to match only ASCII digits, even when <see cref="PcreOptions.Ucp"/> is set.
+    /// </summary>
+    /// <remarks>
+    /// It can also be changed within a pattern by means of the <c>(?aS)</c> option setting.
+    /// </remarks>
+    AsciiBsS = PcreConstants.EXTRA_ASCII_BSS,
+
+    /// <summary>
+    /// <c>PCRE2_EXTRA_ASCII_BSW</c> - Forces <c>\w</c> to match only ASCII digits, even when <see cref="PcreOptions.Ucp"/> is set.
+    /// </summary>
+    /// <remarks>
+    /// It can also be changed within a pattern by means of the <c>(?aW)</c> option setting.
+    /// </remarks>
+    AsciiBsW = PcreConstants.EXTRA_ASCII_BSW,
+
+    /// <summary>
+    /// <c>PCRE2_EXTRA_ASCII_POSIX</c> - Forces all the POSIX character classes, including <c>[:digit:]</c> and <c>[:xdigit:]</c>, to match only ASCII characters, even when <see cref="PcreOptions.Ucp"/> is set.
+    /// </summary>
+    /// <remarks>
+    /// It can be changed within a pattern by means of the <c>(?aP)</c> option setting, but note that this also sets <see cref="AsciiDigit"/> in order to ensure that <c>(?-aP)</c> unsets all ASCII restrictions for POSIX classes.
+    /// </remarks>
+    AsciiPosix = PcreConstants.EXTRA_ASCII_POSIX,
+
+    /// <summary>
+    /// <c>PCRE2_EXTRA_ASCII_DIGIT</c> - Forces the POSIX character classes <c>[:digit:]</c> and <c>[:xdigit:]</c> to match only ASCII digits, even when <see cref="PcreOptions.Ucp"/> is set.
+    /// </summary>
+    /// <remarks>
+    /// It can be changed within a pattern by means of the <c>(?aT)</c> option setting.
+    /// </remarks>
+    AsciiDigit = PcreConstants.EXTRA_ASCII_DIGIT,
+
+    /// <summary>
     /// <c>PCRE2_EXTRA_ALLOW_SURROGATE_ESCAPES</c> - Allow surrogate escapes in UTF-8 and UTF-32.
     /// </summary>
     /// <remarks>

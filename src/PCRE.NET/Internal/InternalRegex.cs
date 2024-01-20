@@ -66,7 +66,7 @@ internal sealed unsafe class InternalRegex : IDisposable
             }
             else
             {
-                indexes = new[] { groupIndex };
+                indexes = [groupIndex];
             }
 
             CaptureNames[groupName] = indexes;
@@ -194,9 +194,6 @@ internal sealed unsafe class InternalRegex : IDisposable
             input.start_index = (uint)startIndex;
             input.additional_options = additionalOptions;
 
-            if (input.subject == default && input.subject_length == 0)
-                input.subject = (char*)1; // PCRE doesn't like null subjects, even if the length is zero
-
             CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout, calloutOutputVector);
 
             Native.match(&input, &result);
@@ -232,9 +229,6 @@ internal sealed unsafe class InternalRegex : IDisposable
             input.start_index = (uint)startIndex;
             input.additional_options = additionalOptions;
             input.callout = null;
-
-            if (input.subject == default && input.subject_length == 0)
-                input.subject = (char*)1; // PCRE doesn't like null subjects, even if the length is zero
 
             if (input.buffer == IntPtr.Zero)
                 ThrowMatchBufferDisposed();
