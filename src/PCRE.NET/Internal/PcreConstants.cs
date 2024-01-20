@@ -47,6 +47,12 @@ internal static class PcreConstants
     public const uint EXTRA_ESCAPED_CR_IS_LF = 0x00000010;
     public const uint EXTRA_ALT_BSUX = 0x00000020;
     public const uint EXTRA_ALLOW_LOOKAROUND_BSK = 0x00000040;
+    public const uint EXTRA_CASELESS_RESTRICT = 0x00000080;
+    public const uint EXTRA_ASCII_BSD = 0x00000100;
+    public const uint EXTRA_ASCII_BSS = 0x00000200;
+    public const uint EXTRA_ASCII_BSW = 0x00000400;
+    public const uint EXTRA_ASCII_POSIX = 0x00000800;
+    public const uint EXTRA_ASCII_DIGIT = 0x00001000;
     public const uint JIT_COMPLETE = 0x00000001;
     public const uint JIT_PARTIAL_SOFT = 0x00000002;
     public const uint JIT_PARTIAL_HARD = 0x00000004;
@@ -249,6 +255,7 @@ internal static class PcreConstants
     public const int ERROR_CONVERT_SYNTAX = -64;
     public const int ERROR_INTERNAL_DUPMATCH = -65;
     public const int ERROR_DFA_UINVALID_UTF = -66;
+    public const int ERROR_INVALIDOFFSET = -67;
     public const uint INFO_ALLOPTIONS = 0;
     public const uint INFO_ARGOPTIONS = 1;
     public const uint INFO_BACKREFMAX = 2;

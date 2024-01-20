@@ -8136,7 +8136,19 @@ while (*cc != XCL_END)
       break;
 
       case PT_PC:
+/*
+ * Patch for PCRE.NET: ignore the following warning on 10.43-RC1:
+ * Warning C4334 : '<<': result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)
+ * The code which causes the warning has been removed, so a patch shouldn't be necessary in the next version.
+ */
+#ifdef _MSC_VER
+#pragma warning( push )
+#pragma warning( disable : 4334 )
+#endif
       OP2U(SLJIT_AND | SLJIT_SET_Z, typereg, 0, SLJIT_IMM, UCPCAT(cc[1]));
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif
       jump = JUMP(SLJIT_NOT_ZERO ^ invertcmp);
       break;
 
