@@ -18,10 +18,10 @@ public class DocumentationTests
     private static Dictionary<string, XElement>? _members;
 
     [Test]
-    public void should_nave_correct_version_number_in_nuget_readme()
+    public void should_have_correct_version_number_in_nuget_readme()
     {
         var readmeText = File.ReadAllText(Path.Combine(Path.GetDirectoryName(typeof(DocumentationTests).Assembly.Location)!, "NuGetReadme.md"));
-        var match = Regex.Match(readmeText, @"\*\*v(?<libVersion>[\d.]+)\*\* is based on PCRE2 \*\*v(?<pcreVersion>[\d.]+)\*\*", RegexOptions.CultureInvariant);
+        var match = Regex.Match(readmeText, @"\*\*v(?<libVersion>[\d.]+(?:-\w+)?)\*\* is based on PCRE2 \*\*v(?<pcreVersion>[\d.]+(?:-RC\d+)?)\*\*", RegexOptions.CultureInvariant);
 
         var assemblyVersion = typeof(PcreRegex).Assembly.GetName().Version!.ToString();
 
@@ -30,14 +30,18 @@ public class DocumentationTests
         Assert.That(NormalizeVersion(match.Groups["pcreVersion"].Value), Is.EqualTo(NormalizeVersion(PcreBuildInfo.Version.Split(' ')[0])));
 
         static string NormalizeVersion(string version)
-            => Regex.Replace(version, @"(?:\.0)+$", string.Empty);
+        {
+            version = Regex.Replace(version, @"-\w+$", string.Empty);
+            version = Regex.Replace(version, @"(?:\.0)+$", string.Empty);
+            return version;
+        }
     }
 
     [Test]
-    public void should_nave_correct_pcre_version_badge_in_readme()
+    public void should_have_correct_pcre_version_badge_in_readme()
     {
         var readmeText = File.ReadAllText(Path.Combine(Path.GetDirectoryName(typeof(DocumentationTests).Assembly.Location)!, "README.md"));
-        var match = Regex.Match(readmeText, @"https://img\.shields\.io/badge/pcre2-v(?<pcreVersion>[\d.]+)-blue\.svg", RegexOptions.CultureInvariant);
+        var match = Regex.Match(readmeText, @"https://img\.shields\.io/badge/pcre2-v(?<pcreVersion>[\d.]+(?:-RC\d+)?)-blue\.svg", RegexOptions.CultureInvariant);
 
         Assert.That(match.Success);
         Assert.That(NormalizeVersion(match.Groups["pcreVersion"].Value), Is.EqualTo(NormalizeVersion(PcreBuildInfo.Version.Split(' ')[0])));

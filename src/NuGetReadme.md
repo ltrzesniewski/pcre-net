@@ -5,7 +5,7 @@
 
 PCRE.NET is a .NET wrapper for the [PCRE2 library](https://github.com/PCRE2Project/pcre2).
 
-**v0.20.0** is based on PCRE2 **v10.42**.
+**v0.21.0-pre1** is based on PCRE2 **v10.43-RC1**.
 
 The following systems are supported:
 
