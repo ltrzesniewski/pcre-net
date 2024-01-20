@@ -46,6 +46,7 @@ dist_html_DATA = \
   doc/html/pcre2_general_context_free.html \
   doc/html/pcre2_get_error_message.html \
   doc/html/pcre2_get_mark.html \
+  doc/html/pcre2_get_match_data_heapframes_size.html \
   doc/html/pcre2_get_match_data_size.html \
   doc/html/pcre2_get_ovector_count.html \
   doc/html/pcre2_get_ovector_pointer.html \
@@ -82,6 +83,7 @@ dist_html_DATA = \
   doc/html/pcre2_set_heap_limit.html \
   doc/html/pcre2_set_match_limit.html \
   doc/html/pcre2_set_max_pattern_length.html \
+  doc/html/pcre2_set_max_varlookbehind.html \
   doc/html/pcre2_set_offset_limit.html \
   doc/html/pcre2_set_newline.html \
   doc/html/pcre2_set_parens_nest_limit.html \
@@ -142,6 +144,7 @@ dist_man_MANS = \
   doc/pcre2_general_context_free.3 \
   doc/pcre2_get_error_message.3 \
   doc/pcre2_get_mark.3 \
+  doc/pcre2_get_match_data_heapframes_size.3 \
   doc/pcre2_get_match_data_size.3 \
   doc/pcre2_get_ovector_count.3 \
   doc/pcre2_get_ovector_pointer.3 \
@@ -178,6 +181,7 @@ dist_man_MANS = \
   doc/pcre2_set_heap_limit.3 \
   doc/pcre2_set_match_limit.3 \
   doc/pcre2_set_max_pattern_length.3 \
+  doc/pcre2_set_max_varlookbehind.3 \
   doc/pcre2_set_offset_limit.3 \
   doc/pcre2_set_newline.3 \
   doc/pcre2_set_parens_nest_limit.3 \
@@ -290,8 +294,7 @@ src/pcre2.h.generic: src/pcre2.h.in configure.ac
 # config.status out of the way while doing the default configuration. The
 # resulting config.h is munged by perl to put #ifdefs round any #defines for
 # macros with values, and to #undef all boolean macros such as HAVE_xxx and
-# SUPPORT_xxx. We also get rid of any gcc-specific visibility settings. Make
-# sure that PCRE2_EXP_DEFN is unset (in case it has visibility settings).
+# SUPPORT_xxx. We also get rid of any gcc-specific visibility settings.
 
 src/config.h.generic: configure.ac
 	rm -rf $@ _generic
@@ -302,9 +305,7 @@ src/config.h.generic: configure.ac
 	test -f _generic/src/config.h
 	perl -n \
 	  -e 'BEGIN{$$blank=0;}' \
-	  -e 'if(/PCRE2_EXP_DEFN/){print"/* #undef PCRE2_EXP_DEFN */\n";$$blank=0;next;}' \
-	  -e 'if(/to make a symbol visible/){next;}' \
-	  -e 'if(/__attribute__ \(\(visibility/){next;}' \
+	  -e 'if(/(.+?)\s*__attribute__ \(\(visibility/){print"$$1\n";$$blank=0;next;}' \
 	  -e 'if(/LT_OBJDIR/){print"/* This is ignored unless you are using libtool. */\n";}' \
 	  -e 'if(/^#define\s((?:HAVE|SUPPORT|STDC)_\w+)/){print"/* #undef $$1 */\n";$$blank=0;next;}' \
 	  -e 'if(/^#define\s(?!PACKAGE|VERSION)(\w+)/){print"#ifndef $$1\n$$_#endif\n";$$blank=0;next;}' \
@@ -351,6 +352,7 @@ NODIST_SOURCES = src/pcre2_chartables.c
 
 COMMON_SOURCES = \
   src/pcre2_auto_possess.c \
+  src/pcre2_chkdint.c \
   src/pcre2_compile.c \
   src/pcre2_config.c \
   src/pcre2_context.c \
@@ -439,13 +441,14 @@ CLEANFILES += src/pcre2_chartables.c
 
 EXTRA_DIST += \
   src/sljit/sljitConfig.h \
+  src/sljit/sljitConfigCPU.h \
   src/sljit/sljitConfigInternal.h \
-  src/sljit/sljitExecAllocator.c \
   src/sljit/sljitLir.c \
   src/sljit/sljitLir.h \
   src/sljit/sljitNativeARM_32.c \
   src/sljit/sljitNativeARM_64.c \
   src/sljit/sljitNativeARM_T2_32.c \
+  src/sljit/sljitNativeLOONGARCH_64.c \
   src/sljit/sljitNativeMIPS_32.c \
   src/sljit/sljitNativeMIPS_64.c \
   src/sljit/sljitNativeMIPS_common.c \
@@ -459,9 +462,16 @@ EXTRA_DIST += \
   src/sljit/sljitNativeX86_32.c \
   src/sljit/sljitNativeX86_64.c \
   src/sljit/sljitNativeX86_common.c \
-  src/sljit/sljitProtExecAllocator.c \
   src/sljit/sljitUtils.c \
-  src/sljit/sljitWXExecAllocator.c
+  src/sljit/allocator_src/sljitExecAllocatorApple.c \
+  src/sljit/allocator_src/sljitExecAllocatorCore.c \
+  src/sljit/allocator_src/sljitExecAllocatorFreeBSD.c \
+  src/sljit/allocator_src/sljitExecAllocatorPosix.c \
+  src/sljit/allocator_src/sljitExecAllocatorWindows.c \
+  src/sljit/allocator_src/sljitProtExecAllocatorNetBSD.c \
+  src/sljit/allocator_src/sljitProtExecAllocatorPosix.c \
+  src/sljit/allocator_src/sljitWXExecAllocatorPosix.c \
+  src/sljit/allocator_src/sljitWXExecAllocatorWindows.c
 
 # Some of the JIT sources are also in separate files that are #included.
 
@@ -509,7 +519,7 @@ if WITH_PCRE2_8
 lib_LTLIBRARIES += libpcre2-posix.la
 libpcre2_posix_la_SOURCES = src/pcre2posix.c
 libpcre2_posix_la_CFLAGS = \
-  -DPCRE2_CODE_UNIT_WIDTH=8 \
+  -DPCRE2_CODE_UNIT_WIDTH=8 @PCRE2POSIX_CFLAG@ \
   $(VISIBILITY_CFLAGS) $(AM_CFLAGS)
 libpcre2_posix_la_LDFLAGS = $(EXTRA_LIBPCRE2_POSIX_LDFLAGS)
 libpcre2_posix_la_LIBADD = libpcre2-8.la
@@ -561,7 +571,7 @@ if WITH_PCRE2_8
 TESTS += pcre2posix_test
 noinst_PROGRAMS += pcre2posix_test
 pcre2posix_test_SOURCES = src/pcre2posix_test.c
-pcre2posix_test_CFLAGS = $(AM_CFLAGS)
+pcre2posix_test_CFLAGS = $(AM_CFLAGS) @PCRE2POSIX_CFLAG@
 pcre2posix_test_LDADD = libpcre2-posix.la libpcre2-8.la
 endif # WITH_PCRE2_8
 
