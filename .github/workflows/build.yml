@@ -53,6 +53,7 @@ jobs:
         with:
           name: lib-linux
           path: lib/PCRE.NET.Native.x64.so
+          if-no-files-found: error
 
   macos:
     name: macOS
@@ -98,6 +99,7 @@ jobs:
         with:
           name: lib-macos
           path: lib/PCRE.NET.Native.x64.dylib
+          if-no-files-found: error
 
   windows:
     name: Windows
@@ -118,9 +120,6 @@ jobs:
 
       - name: Setup VS Dev Tools
         uses: ilammy/msvc-dev-cmd@v1
-
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
 
       - name: Setup Environment
         run: |
@@ -192,3 +191,4 @@ jobs:
         with:
           name: NuGet
           path: src/PCRE.NET/bin/${{ env.BUILD_CONFIGURATION }}/*.nupkg
+          if-no-files-found: error
