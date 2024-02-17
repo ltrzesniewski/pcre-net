@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
             5.0.x
@@ -49,7 +49,7 @@ jobs:
         run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_UNIX_TEST_TARGET }} -- --allocations
 
       - name: Upload Native Lib
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: lib-linux
           path: lib/PCRE.NET.Native.x64.so
@@ -62,7 +62,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
             5.0.x
@@ -94,7 +94,7 @@ jobs:
         run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_UNIX_TEST_TARGET }} -- --allocations
 
       - name: Upload Native Lib
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: lib-macos
           path: lib/PCRE.NET.Native.x64.dylib
@@ -109,37 +109,39 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1
-
-      - name: Setup VSTest
-        uses: darenm/Setup-VSTest@v1.2
-
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
             5.0.x
             8.0.x
 
+      - name: Setup VS Dev Tools
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
       - name: Setup Environment
-        run: echo 'BUILD_COMMON_MSBUILD_ARGS=/v:m /m /p:Configuration=${{ env.BUILD_CONFIGURATION }}' >> $GITHUB_ENV
+        run: |
+          echo 'BUILD_COMMON_MSBUILD_ARGS=/v:m /m /p:Configuration=${{ env.BUILD_CONFIGURATION }}' >> $GITHUB_ENV
+          echo 'Platform=' >> $GITHUB_ENV
         shell: bash
 
       - name: Download Linux Lib
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: lib-linux
           path: lib
 
       - name: Download macOS Lib
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: lib-macos
           path: lib
 
       - name: Delete Native Lib Artifacts
-        uses: geekyeggo/delete-artifact@v2
+        uses: geekyeggo/delete-artifact@v4
         with:
           name: |
             lib-linux
@@ -186,7 +188,7 @@ jobs:
         run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_UNIX_TEST_TARGET }} -- --allocations
 
       - name: Upload NuGet
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: NuGet
           path: src/PCRE.NET/bin/${{ env.BUILD_CONFIGURATION }}/*.nupkg
