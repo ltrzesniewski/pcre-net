@@ -10,8 +10,8 @@ dnl be defined as -RC2, for example. For real releases, it should be empty.
 
 m4_define(pcre2_major, [10])
 m4_define(pcre2_minor, [43])
-m4_define(pcre2_prerelease, [-RC1])
-m4_define(pcre2_date, [2023-12-27])
+m4_define(pcre2_prerelease, [])
+m4_define(pcre2_date, [2024-02-16])
 
 # Libtool shared library interface versions (current:revision:age)
 m4_define(libpcre2_8_version,     [12:0:12])
@@ -395,6 +395,12 @@ AC_ARG_ENABLE(fuzz_support,
                              [enable fuzzer support]),
               , enable_fuzz_support=no)
 
+# Handle --enable-diff-fuzz-support
+AC_ARG_ENABLE(diff_fuzz_support,
+              AS_HELP_STRING([--enable-diff-fuzz-support],
+                             [enable differential fuzzer support]),
+              , enable_diff_fuzz_support=no)
+
 # Handle --disable-stack-for-recursion
 # This option became obsolete at release 10.30.
 AC_ARG_ENABLE(stack-for-recursion,,
@@ -529,10 +535,24 @@ AM_CONDITIONAL(WITH_JIT, test "x$enable_jit" = "xyes")
 AM_CONDITIONAL(WITH_UNICODE, test "x$enable_unicode" = "xyes")
 AM_CONDITIONAL(WITH_VALGRIND, test "x$enable_valgrind" = "xyes")
 AM_CONDITIONAL(WITH_FUZZ_SUPPORT, test "x$enable_fuzz_support" = "xyes")
+AM_CONDITIONAL(WITH_DIFF_FUZZ_SUPPORT, test "x$enable_diff_fuzz_support" = "xyes")
 
 if test "$enable_fuzz_support" = "yes" -a "$enable_pcre2_8" = "no"; then
   echo "** ERROR: Fuzzer support requires the 8-bit library"
   exit 1
+fi
+
+if test "$enable_diff_fuzz_support" = "yes"; then
+  if test "$enable_fuzz_support" = "no"; then
+    echo "** ERROR: Differential fuzzing support requires fuzzing support"
+    exit 1
+  fi
+  if test "$enable_jit" = "no"; then
+    echo "** ERROR: Differential fuzzing support requires Just-in-Time compilation support"
+    exit 1
+  fi
+  AC_DEFINE([SUPPORT_DIFF_FUZZ], [], [
+    Define to any value to enable differential fuzzing support.])
 fi
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -1162,6 +1182,7 @@ $PACKAGE-$VERSION configuration summary:
     Valgrind support ................... : ${enable_valgrind}
     Code coverage ...................... : ${enable_coverage}
     Fuzzer support ..................... : ${enable_fuzz_support}
+    Differential fuzzer support ........ : ${enable_diff_fuzz_support}
     Use %zu and %td .................... : ${enable_percent_zt}
 
 EOF

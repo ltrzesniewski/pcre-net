@@ -5,7 +5,7 @@ Before the move to GitHub, this was the only record of changes to PCRE2. Now
 there is often more detail in the pull requests.
 
 
-Version 10.43 27-December-2023
+Version 10.43 16-February-2024
 ------------------------------
 
 1. The test program added by change 2 of 10.42 didn't work when the default
@@ -196,6 +196,20 @@ that sets a mandatory starting character. For example, /a?(?=bc|)d/ used to set
 all of a, b, and d as possible starting code units; now it sets only a and d.
 
 54. Fix incorrect class character matches in JIT.
+
+55. In pcre2test, ensure pcre2_jit_match() is used when jitfast is used with
+substitution testing.
+
+56. Insert omitted setting of subject length in match data at the end of
+pcre2_jit_match().
+
+57. Implemented PCRE2_DISABLE_RECURSELOOP_CHECK for pcre2_match() to enable
+some apparently looping recursions to run to completion and therefore match the
+JIT behaviour. With this set, real loops will eventually get caught by match or
+heap limits or run out of resource.
+
+58. AC did a lot of work on pcre2_fuzzsupport.c to extend it to 16-bit and
+32-bit libraries and to compare JIT and non-JIT matching.
 
 
 Version 10.42 11-December-2022
@@ -1168,7 +1182,7 @@ gets rid of the warnings. There were also two missing casts in pcre2test.
 Version 10.32 10-September-2018
 -------------------------------
 
-1. When matching using the the REG_STARTEND feature of the POSIX API with a
+1. When matching using the REG_STARTEND feature of the POSIX API with a
 non-zero starting offset, unset capturing groups with lower numbers than a
 group that did capture something were not being correctly returned as "unset"
 (that is, with offset values of -1).
@@ -1343,7 +1357,7 @@ assumed empty second branch cannot be anchored. Demonstrated by test patterns
 such as /(?(1)^())b/ or /(?(?=^))b/.
 
 40. A repeated conditional subpattern that could match an empty string was
-always assumed to be unanchored. Now it it checked just like any other
+always assumed to be unanchored. Now it is checked just like any other
 repeated conditional subpattern, and can be found to be anchored if the minimum
 quantifier is one or more. I can't see much use for a repeated anchored
 pattern, but the behaviour is now consistent.

@@ -1286,7 +1286,7 @@ above).
 Dot never matches a single line-ending character. When the two-character
 sequence CRLF is the only line ending, dot does not match CR if it is
 immediately followed by LF, but otherwise it matches all characters (including
-isolated CRs and LFs). When ANYCRLF is selected for line endings, no occurences
+isolated CRs and LFs). When ANYCRLF is selected for line endings, no occurrences
 of CR of LF match dot. When all Unicode line endings are being recognized, dot
 does not match CR or LF or any of the other line ending characters.
 </P>
@@ -1436,7 +1436,7 @@ b to d, a hyphen character, or z.
 </P>
 <P>
 Perl treats a hyphen as a literal if it appears before or after a POSIX class
-(see below) or before or after a character type escape such as as \d or \H.
+(see below) or before or after a character type escape such as \d or \H.
 However, unless the hyphen is the last character in the class, Perl outputs a
 warning in its warning mode, as this is most likely a user error. As PCRE2 has
 no facility for warning, an error is given in these cases.
@@ -2651,7 +2651,7 @@ The current matching point is then reset to the start of the subject, and the
 rest of the pattern match checks for two occurrences of the captured word,
 using an ungreedy .*? to scan from the left. If this succeeds, we are done, but
 if the last word in the string does not occur twice, this part of the pattern
-fails. If a traditional atomic lookhead (?= or (*pla: had been used, the
+fails. If a traditional atomic lookahead (?= or (*pla: had been used, the
 assertion could not be re-entered, and the whole match would fail. The pattern
 would succeed only if the very last word in the subject was found twice.
 </P>
@@ -3728,7 +3728,7 @@ If A matches but B fails, the backtrack to (*COMMIT) causes the entire match to
 fail. However, if A and B match, but C fails, the backtrack to (*THEN) causes
 the next alternative (ABD) to be tried. This behaviour is consistent, but is
 not always the same as Perl's. It means that if two or more backtracking verbs
-appear in succession, all the the last of them has no effect. Consider this
+appear in succession, all but the last of them has no effect. Consider this
 example:
 <pre>
   ...(*COMMIT)(*PRUNE)...
@@ -3844,9 +3844,9 @@ Cambridge, England.
 </P>
 <br><a name="SEC32" href="#TOC1">REVISION</a><br>
 <P>
-Last updated: 12 October 2023
+Last updated: 19 January 2024
 <br>
-Copyright &copy; 1997-2023 University of Cambridge.
+Copyright &copy; 1997-2024 University of Cambridge.
 <br>
 <p>
 Return to the <a href="index.html">PCRE2 index page</a>.

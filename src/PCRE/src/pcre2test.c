@@ -11,7 +11,7 @@ hacked-up (non-) design had also run out of steam.
 
                        Written by Philip Hazel
      Original code Copyright (c) 1997-2012 University of Cambridge
-    Rewritten code Copyright (c) 2016-2023 University of Cambridge
+    Rewritten code Copyright (c) 2016-2024 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -685,6 +685,7 @@ static modstruct modlist[] = {
   { "dfa",                         MOD_DAT,  MOD_CTL, CTL_DFA,                    DO(control) },
   { "dfa_restart",                 MOD_DAT,  MOD_OPT, PCRE2_DFA_RESTART,          DO(options) },
   { "dfa_shortest",                MOD_DAT,  MOD_OPT, PCRE2_DFA_SHORTEST,         DO(options) },
+  { "disable_recurseloop_check",   MOD_DAT,  MOD_OPT, PCRE2_DISABLE_RECURSELOOP_CHECK, DO(options) },
   { "dollar_endonly",              MOD_PAT,  MOD_OPT, PCRE2_DOLLAR_ENDONLY,       PO(options) },
   { "dotall",                      MOD_PATP, MOD_OPT, PCRE2_DOTALL,               PO(options) },
   { "dupnames",                    MOD_PATP, MOD_OPT, PCRE2_DUPNAMES,             PO(options) },
@@ -4352,11 +4353,12 @@ else fprintf(outfile, "%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
 static void
 show_match_options(uint32_t options)
 {
-fprintf(outfile, "%s%s%s%s%s%s%s%s%s%s%s%s%s",
+fprintf(outfile, "%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
   ((options & PCRE2_ANCHORED) != 0)? " anchored" : "",
   ((options & PCRE2_COPY_MATCHED_SUBJECT) != 0)? " copy_matched_subject" : "",
   ((options & PCRE2_DFA_RESTART) != 0)? " dfa_restart" : "",
   ((options & PCRE2_DFA_SHORTEST) != 0)? " dfa_shortest" : "",
+  ((options & PCRE2_DISABLE_RECURSELOOP_CHECK) != 0)? " disable_recurseloop_check" : "",
   ((options & PCRE2_ENDANCHORED) != 0)? " endanchored" : "",
   ((options & PCRE2_NO_JIT) != 0)? " no_jit" : "",
   ((options & PCRE2_NO_UTF_CHECK) != 0)? " no_utf_check" : "",
@@ -7513,9 +7515,9 @@ if (dat_datctl.replacement[0] != 0 && (dat_datctl.control & CTL_DFA) != 0)
   dat_datctl.replacement[0] = 0;
   }
 
-/* If a replacement string is provided, call pcre2_substitute() instead of one
-of the matching functions. First we have to convert the replacement string to
-the appropriate width. */
+/* If a replacement string is provided, call pcre2_substitute() instead of or
+after one of the matching functions. First we have to convert the replacement
+string to the appropriate width. */
 
 if (dat_datctl.replacement[0] != 0)
   {
@@ -7559,8 +7561,16 @@ if (dat_datctl.replacement[0] != 0)
 
   if (emoption != 0)
     {
-    PCRE2_MATCH(rc, compiled_code, pp, arg_ulen, dat_datctl.offset,
-      dat_datctl.options, match_data, use_dat_context);
+    if ((pat_patctl.control & CTL_JITFAST) != 0)
+      {
+      PCRE2_JIT_MATCH(rc, compiled_code, pp, arg_ulen, dat_datctl.offset,
+        dat_datctl.options, match_data, use_dat_context);
+      }
+    else
+      {
+      PCRE2_MATCH(rc, compiled_code, pp, arg_ulen, dat_datctl.offset,
+        dat_datctl.options, match_data, use_dat_context);
+      }
     }
 
   xoptions = emoption |
