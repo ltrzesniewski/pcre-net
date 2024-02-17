@@ -178,4 +178,21 @@ public enum PcreMatchOptions : long
     /// Setting <see cref="NoJit"/> disables the use of JIT; it forces matching to be done by the interpreter.
     /// </remarks>
     NoJit = PcreConstants.NO_JIT,
+
+    /// <summary>
+    /// <c>PCRE2_DISABLE_RECURSELOOP_CHECK</c> - Disable the check for repeated recursion in the interpreter.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The use of recursion in patterns can lead to infinite loops. In the interpretive matcher these would be eventually caught by the match or heap limits,
+    /// but this could take a long time and/or use a lot of memory if the limits are large. There is therefore a check at the start of each recursion.
+    /// If the same group is still active from a previous call, and the current subject pointer is the same as it was at the start of that group, and the furthest inspected character
+    /// of the subject has not changed, an error is generated.
+    /// </para>
+    /// <para>
+    /// There are rare cases of matches that would complete, but nevertheless trigger this error. This option disables the check.
+    /// It is provided mainly for testing when comparing JIT and interpretive behaviour.
+    /// </para>
+    /// </remarks>
+    DisableRecurseLoopCheck = PcreConstants.DISABLE_RECURSELOOP_CHECK,
 }

@@ -75,6 +75,7 @@ internal static class PcreConstants
     public const uint SUBSTITUTE_LITERAL = 0x00008000;
     public const uint SUBSTITUTE_MATCHED = 0x00010000;
     public const uint SUBSTITUTE_REPLACEMENT_ONLY = 0x00020000;
+    public const uint DISABLE_RECURSELOOP_CHECK = 0x00040000;
     public const uint CONVERT_UTF = 0x00000001;
     public const uint CONVERT_NO_UTF_CHECK = 0x00000002;
     public const uint CONVERT_POSIX_BASIC = 0x00000004;
