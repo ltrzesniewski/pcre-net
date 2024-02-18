@@ -62,6 +62,7 @@
     <PcreNetNative Include="..\..\lib\PCRE.NET.Native.x86.dll" Platform="win-x86" />
     <PcreNetNative Include="..\..\lib\PCRE.NET.Native.x64.dll" Platform="win-x64" />
     <PcreNetNative Include="..\..\lib\PCRE.NET.Native.x64.so" Platform="linux-x64" />
+    <PcreNetNative Include="..\..\lib\PCRE.NET.Native.arm64.dylib" Platform="osx-arm64" />
     <PcreNetNative Include="..\..\lib\PCRE.NET.Native.x64.dylib" Platform="osx-x64" />
 
     <PcreNetNative Update="@(PcreNetNative)" ToInclude="$([System.IO.File]::Exists('%(FullPath)'))" Visible="false" />

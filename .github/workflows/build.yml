@@ -21,8 +21,13 @@ jobs:
             platform: x64
             extension: so
 
+          - name: macOS arm64
+            runner: macos-14
+            platform: arm64
+            extension: dylib
+
           - name: macOS x64
-            runner: macos-latest
+            runner: macos-12
             platform: x64
             extension: dylib
 
@@ -195,8 +200,11 @@ jobs:
           - name: Linux x64
             runner: ubuntu-latest
 
+          - name: macOS arm64
+            runner: macos-14
+
           - name: macOS x64
-            runner: macos-latest
+            runner: macos-12
 
           - name: Windows x64
             runner: windows-2022
