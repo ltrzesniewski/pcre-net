@@ -112,6 +112,9 @@
     <ClCompile Include="..\PCRE\src\pcre2_script_run.c">
       <Filter>PCRE\Sources</Filter>
     </ClCompile>
+    <ClCompile Include="..\PCRE\src\pcre2_chkdint.c">
+      <Filter>PCRE\Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\PCRE\src\config.h">
@@ -130,6 +133,9 @@
       <Filter>PCRE\Headers</Filter>
     </ClInclude>
     <ClInclude Include="pcrenet.h">
+      <Filter>PCRE.NET\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="pcre2config.h">
       <Filter>PCRE.NET\Headers</Filter>
     </ClInclude>
   </ItemGroup>

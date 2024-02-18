@@ -59,52 +59,26 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll"
-          Condition="Exists('..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll') or '$(RequirePcreNative)' == 'true'"
-          Link="PCRE.NET.Native.x86.dll"
+    <PcreNetNative Include="..\..\lib\PCRE.NET.Native.x86.dll" Platform="win-x86" />
+    <PcreNetNative Include="..\..\lib\PCRE.NET.Native.x64.dll" Platform="win-x64" />
+    <PcreNetNative Include="..\..\lib\PCRE.NET.Native.x64.so" Platform="linux-x64" />
+    <PcreNetNative Include="..\..\lib\PCRE.NET.Native.x64.dylib" Platform="osx-x64" />
+
+    <PcreNetNative Update="@(PcreNetNative)" ToInclude="$([System.IO.File]::Exists('%(FullPath)'))" Visible="false" />
+    <PcreNetNative Update="@(PcreNetNative)" ToInclude="true" Condition="'$(PcreNetPackage)' == 'true'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="@(PcreNetNative->WithMetadataValue('ToInclude', 'true'))"
+          Link="PCRE.NET.Native%(Extension)"
           CopyToOutputDirectory="PreserveNewest"
           Visible="false"
           Pack="true"
-          PackagePath="runtimes\win-x86\native\PCRE.NET.Native.dll" />
+          PackagePath="runtimes\%(Platform)\native\PCRE.NET.Native%(Extension)" />
+  </ItemGroup>
 
-    <None Include="..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll"
-          Condition="Exists('..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll') or '$(RequirePcreNative)' == 'true'"
-          Link="PCRE.NET.Native.x64.dll"
-          CopyToOutputDirectory="PreserveNewest"
-          Visible="false"
-          Pack="true"
-          PackagePath="runtimes\win-x64\native\PCRE.NET.Native.dll" />
-
-    <None Include="..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll"
-          Condition="Exists('..\PCRE.NET.Native\bin\Win32\$(Configuration)\PCRE.NET.Native.dll') and '$(TargetFrameworkIdentifier)' == '.NETCoreApp' and '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X86'"
-          Link="PCRE.NET.Native.dll"
-          CopyToOutputDirectory="PreserveNewest"
-          Visible="false" />
-
-    <None Include="..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll"
-          Condition="Exists('..\PCRE.NET.Native\bin\x64\$(Configuration)\PCRE.NET.Native.dll') and '$(TargetFrameworkIdentifier)' == '.NETCoreApp' and '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X64'"
-          Link="PCRE.NET.Native.dll"
-          CopyToOutputDirectory="PreserveNewest"
-          Visible="false" />
-
-    <None Include="..\..\lib\PCRE.NET.Native.x64.so"
-          Condition="Exists('..\..\lib\PCRE.NET.Native.x64.so') or '$(RequirePcreNative)' == 'true'"
-          Link="PCRE.NET.Native.so"
-          CopyToOutputDirectory="PreserveNewest"
-          Visible="false"
-          Pack="true"
-          PackagePath="runtimes\linux-x64\native\PCRE.NET.Native.so" />
-
-    <None Include="..\..\lib\PCRE.NET.Native.x64.dylib"
-          Condition="Exists('..\..\lib\PCRE.NET.Native.x64.dylib') or '$(RequirePcreNative)' == 'true'"
-          Link="PCRE.NET.Native.dylib"
-          CopyToOutputDirectory="PreserveNewest"
-          Visible="false"
-          Pack="true"
-          PackagePath="runtimes\osx-x64\native\PCRE.NET.Native.dylib" />
-
+  <ItemGroup>
     <None Include="PCRE.NET.targets" Pack="true" PackagePath="build" />
-
     <None Include="../../icon.png" Pack="true" PackagePath="/" Visible="false" />
     <None Include="../NuGetReadme.md" Pack="true" PackagePath="/README.md" Visible="false" />
   </ItemGroup>

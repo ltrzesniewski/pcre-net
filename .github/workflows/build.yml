@@ -4,14 +4,28 @@ on: [push, pull_request]
 
 env:
   BUILD_CONFIGURATION: Release
-  BUILD_WINDOWS_TEST_TARGET: net48
-  BUILD_UNIX_TEST_TARGET: net8.0
+  BUILD_NET_TEST_TARGET: net8.0
+  BUILD_NETFWK_TEST_TARGET: net48
   DOTNET_NOLOGO: 1
 
 jobs:
-  linux:
-    name: Linux
-    runs-on: ubuntu-latest
+  unix:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      matrix:
+        include:
+          - name: Linux x64
+            runner: ubuntu-latest
+            platform: x64
+            extension: so
+
+          - name: macOS x64
+            runner: macos-latest
+            platform: x64
+            extension: dylib
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,90 +37,51 @@ jobs:
             5.0.x
             8.0.x
 
-      - name: CMake x64
+      - name: CMake
         run: |
-          mkdir src/cmake-x64
-          cd src/cmake-x64
+          mkdir src/cmake
+          cd src/cmake
           cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_CONFIGURATION }}
 
-      - name: Build Native x64
+      - name: Build Native
         run: |
-          cd src/cmake-x64
+          cd src/cmake
           make
 
       - name: Copy Native Lib
         run: |
           mkdir lib
-          cp src/cmake-x64/PCRE.NET.Native.so lib/PCRE.NET.Native.x64.so
+          cp src/cmake/PCRE.NET.Native.${{ matrix.extension }} lib/PCRE.NET.Native.${{ matrix.platform }}.${{ matrix.extension }}
 
-      - name: Test .NET x64
-        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_UNIX_TEST_TARGET }} -p:PcreNetTestBuild=true -p:ExpectPlatform=x64
+      - name: Test .NET
+        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_NET_TEST_TARGET }} -p:PcreNetTestBuild=true -p:ExpectPlatform=${{ matrix.platform }}
 
-      - name: Test .NET Standard x64
-        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_UNIX_TEST_TARGET }} -p:PcreNetTestBuild=true -p:ExpectPlatform=x64 -p:ForceNetStandard=true
+      - name: Test .NET Standard
+        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_NET_TEST_TARGET }} -p:PcreNetTestBuild=true -p:ExpectPlatform=${{ matrix.platform }} -p:ForceNetStandard=true
 
       - name: Test Allocations
-        run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_UNIX_TEST_TARGET }} -- --allocations
+        run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_NET_TEST_TARGET }} -- --allocations
 
       - name: Upload Native Lib
         uses: actions/upload-artifact@v4
         with:
-          name: lib-linux
-          path: lib/PCRE.NET.Native.x64.so
-          if-no-files-found: error
-
-  macos:
-    name: macOS
-    runs-on: macos-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: |
-            5.0.x
-            8.0.x
-
-      - name: CMake x64
-        run: |
-          mkdir src/cmake-x64
-          cd src/cmake-x64
-          cmake .. -DCMAKE_BUILD_TYPE=${{ env.BUILD_CONFIGURATION }}
-
-      - name: Build Native x64
-        run: |
-          cd src/cmake-x64
-          make
-
-      - name: Copy Native Lib
-        run: |
-          mkdir lib
-          cp src/cmake-x64/PCRE.NET.Native.dylib lib/PCRE.NET.Native.x64.dylib
-
-      - name: Test .NET x64
-        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_UNIX_TEST_TARGET }} -p:PcreNetTestBuild=true -p:ExpectPlatform=x64
-
-      - name: Test .NET Standard x64
-        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_UNIX_TEST_TARGET }} -p:PcreNetTestBuild=true -p:ExpectPlatform=x64 -p:ForceNetStandard=true
-
-      - name: Test Allocations
-        run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_UNIX_TEST_TARGET }} -- --allocations
-
-      - name: Upload Native Lib
-        uses: actions/upload-artifact@v4
-        with:
-          name: lib-macos
-          path: lib/PCRE.NET.Native.x64.dylib
+          name: lib-${{ matrix.platform }}.${{ matrix.extension }}
+          path: lib/PCRE.NET.Native.${{ matrix.platform }}.${{ matrix.extension }}
           if-no-files-found: error
 
   windows:
-    name: Windows
+    name: Windows ${{ matrix.platform }}
     runs-on: windows-2022
-    needs:
-      - linux
-      - macos
+
+    strategy:
+      matrix:
+        include:
+          - platform: x86
+            msbuild-platform: Win32
+
+          - platform: x64
+            msbuild-platform: x64
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -127,64 +102,78 @@ jobs:
           echo 'Platform=' >> $GITHUB_ENV
         shell: bash
 
-      - name: Download Linux Lib
-        uses: actions/download-artifact@v4
-        with:
-          name: lib-linux
-          path: lib
+      - name: NuGet Restore
+        run: dotnet restore src/PCRE.NET.sln
 
-      - name: Download macOS Lib
+      - name: Build Native
+        run: msbuild src/PCRE.NET.Native/PCRE.NET.Native.vcxproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:Platform=${{ matrix.msbuild-platform }}
+
+      - name: Build Tests
+        run: msbuild src/PCRE.NET.Tests/PCRE.NET.Tests.csproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:Platform=${{ matrix.platform }} /p:PcreNetTestBuild=true /p:ExpectPlatform=${{ matrix.platform }}
+
+      - name: Test .NET Framework
+        run: vstest.console src/PCRE.NET.Tests/bin/${{ matrix.platform }}/${{ env.BUILD_CONFIGURATION }}/${{ env.BUILD_NETFWK_TEST_TARGET }}/PCRE.NET.Tests.dll /Platform:${{ matrix.platform }}
+
+      - name: Test .NET
+        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} -p:PcreNetTestBuild=true -p:ExpectPlatform=${{ matrix.platform }}
+        if: ${{ matrix.platform == 'x64' }}
+
+      - name: Test .NET Standard
+        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} -p:PcreNetTestBuild=true -p:ExpectPlatform=${{ matrix.platform }} -p:ForceNetStandard=true
+        if: ${{ matrix.platform == 'x64' }}
+
+      - name: Test Allocations .NET
+        run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_NET_TEST_TARGET }} -- --allocations
+        if: ${{ matrix.platform == 'x64' }}
+
+      - name: Test Allocations .NET Framework
+        run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_NETFWK_TEST_TARGET }} -- --allocations
+        if: ${{ matrix.platform == 'x64' }}
+
+      - name: Upload Native Lib
+        uses: actions/upload-artifact@v4
+        with:
+          name: lib-${{ matrix.platform }}.dll
+          path: lib/PCRE.NET.Native.${{ matrix.platform }}.dll
+          if-no-files-found: error
+
+  pack:
+    name: Pack
+    runs-on: ubuntu-latest
+    needs:
+      - unix
+      - windows
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            5.0.x
+            8.0.x
+
+      - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: lib-macos
           path: lib
+          merge-multiple: true
 
       - name: Delete Native Lib Artifacts
         uses: geekyeggo/delete-artifact@v4
         with:
-          name: |
-            lib-linux
-            lib-macos
+          name: lib-*
           failOnError: false
 
       - name: NuGet Restore
-        run: dotnet restore src/PCRE.NET.sln
-
-      - name: Build Native x86
-        run: msbuild src/PCRE.NET.Native/PCRE.NET.Native.vcxproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:Platform=Win32
-
-      - name: Build Native x64
-        run: msbuild src/PCRE.NET.Native/PCRE.NET.Native.vcxproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:Platform=x64
+        run: dotnet restore src/PCRE.NET/PCRE.NET.csproj
 
       - name: Build PCRE.NET
-        run: dotnet build --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore src/PCRE.NET/PCRE.NET.csproj -p:RequirePcreNative=true
+        run: dotnet build --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore src/PCRE.NET/PCRE.NET.csproj -p:PcreNetPackage=true
 
       - name: NuGet Pack
-        run: dotnet pack --configuration ${{ env.BUILD_CONFIGURATION }} --no-build src/PCRE.NET/PCRE.NET.csproj -p:RequirePcreNative=true
-
-      - name: Build Tests x86
-        run: msbuild src/PCRE.NET.Tests/PCRE.NET.Tests.csproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:Platform=x86 /p:ExpectPlatform=x86
-
-      - name: Build Tests x64
-        run: msbuild src/PCRE.NET.Tests/PCRE.NET.Tests.csproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:Platform=x64 /p:ExpectPlatform=x64
-
-      - name: Test .NET Framework x86
-        run: vstest.console src/PCRE.NET.Tests/bin/x86/${{ env.BUILD_CONFIGURATION }}/${{ env.BUILD_WINDOWS_TEST_TARGET }}/PCRE.NET.Tests.dll /Platform:x86
-
-      - name: Test .NET Framework x64
-        run: vstest.console src/PCRE.NET.Tests/bin/x64/${{ env.BUILD_CONFIGURATION }}/${{ env.BUILD_WINDOWS_TEST_TARGET }}/PCRE.NET.Tests.dll /Platform:x64
-
-      - name: Test .NET x64
-        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }}
-
-      - name: Test .NET Standard x64
-        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} -p:ForceNetStandard=true
-
-      - name: Test Allocations .NET Framework x64
-        run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_WINDOWS_TEST_TARGET }} -- --allocations
-
-      - name: Test Allocations .NET x64
-        run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_UNIX_TEST_TARGET }} -- --allocations
+        run: dotnet pack --configuration ${{ env.BUILD_CONFIGURATION }} --no-build src/PCRE.NET/PCRE.NET.csproj -p:PcreNetPackage=true
 
       - name: Upload NuGet
         uses: actions/upload-artifact@v4
