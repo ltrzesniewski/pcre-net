@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>PCRE.Tests.Integration</RootNamespace>
+    <DefineConstants Condition="'$(PcreNetIntegrationTest)' == 'true'">$(DefineConstants);PCRENET_INTEGRATION_TEST</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PCRE.NET\PCRE.NET.csproj" Condition="'$(PcreNetIntegrationTest)' != 'true'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PCRE.NET" Version="$(PackageVersion)" Condition="'$(PcreNetIntegrationTest)' == 'true'" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="NUnit" Version="4.0.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+  </ItemGroup>
+
+</Project>
