@@ -18,7 +18,7 @@ internal readonly struct RegexKey(string pattern, PcreRegexSettings settings) : 
     {
         unchecked
         {
-#if NETCOREAPP
+#if NET
             return Pattern?.GetHashCode(StringComparison.Ordinal) ?? 0;
 #else
             return Pattern?.GetHashCode() ?? 0;

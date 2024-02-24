@@ -1,4 +1,5 @@
-﻿#if NETCOREAPP
+﻿#if NET
+
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 

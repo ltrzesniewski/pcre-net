@@ -42,7 +42,7 @@ internal static class AllocationTest
         var allocatedBytes = bytesAfter - bytesBefore;
         var gcCount = gcCountAfter - gcCountBefore;
 
-#if NETCOREAPP
+#if NET
         Console.WriteLine($"Allocated bytes: {allocatedBytes}");
 #endif
 
@@ -73,7 +73,7 @@ internal static class AllocationTest
     }
 
     private static long GetAllocatedBytes()
-#if NETCOREAPP
+#if NET
         => GC.GetAllocatedBytesForCurrentThread();
 #else
         => 0;

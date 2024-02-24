@@ -10,7 +10,7 @@ namespace PCRE.Internal;
 [SuppressMessage("Security", "CA5392")]
 internal static unsafe partial class Native
 {
-#if !NETCOREAPP
+#if !NET
     private static readonly LibImpl _impl = GetLibImpl();
 
     private static LibImpl GetLibImpl()

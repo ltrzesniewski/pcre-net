@@ -15,7 +15,7 @@ internal static class ReplacementPattern
         if (replacementPattern.Length == 0)
             return _ => string.Empty;
 
-#if NETCOREAPP
+#if NET
         var placeholderIndex = replacementPattern.IndexOf('$', StringComparison.Ordinal);
 #else
         var placeholderIndex = replacementPattern.IndexOf('$');
@@ -111,12 +111,12 @@ internal static class ReplacementPattern
                     case '9':
                     {
                         var startIdx = idx;
-                        while (idx < replacementPattern.Length && replacementPattern[idx] >= '0' && replacementPattern[idx] <= '9')
+                        while (idx < replacementPattern.Length && replacementPattern[idx] is >= '0' and <= '9')
                             ++idx;
 
                         var fallback = new LiteralPart(replacementPattern, startIdx - 1, idx - startIdx + 1);
 
-#if NETCOREAPP
+#if NET
                         var groupIndexString = replacementPattern.AsSpan(startIdx, idx - startIdx);
 #else
                         var groupIndexString = replacementPattern.Substring(startIdx, idx - startIdx);

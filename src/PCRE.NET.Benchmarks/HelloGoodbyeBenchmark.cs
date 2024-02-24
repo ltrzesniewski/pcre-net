@@ -1,4 +1,4 @@
-#if NETCOREAPP
+#if NET
 
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Attributes;

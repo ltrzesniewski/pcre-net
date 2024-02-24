@@ -1,4 +1,5 @@
-﻿#if NETCOREAPP
+﻿#if NET
+
 using System.Runtime.CompilerServices;
 
 [assembly: TypeForwardedTo(typeof(SkipLocalsInitAttribute))]

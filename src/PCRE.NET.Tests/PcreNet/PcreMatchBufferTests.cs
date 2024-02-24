@@ -51,7 +51,7 @@ public unsafe class PcreMatchBufferTests
         Assert.That(match.Success, Is.True);
     }
 
-#if NETCOREAPP
+#if NET
 
     [Test]
     public void should_not_allocate()

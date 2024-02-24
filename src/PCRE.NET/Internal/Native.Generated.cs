@@ -14,7 +14,7 @@ namespace PCRE.Internal;
 
 unsafe partial class Native
 {
-#if NETCOREAPP
+#if NET
 
     [SuppressGCTransition]
     [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_get_error_message", CallingConvention = CallingConvention.Cdecl)]

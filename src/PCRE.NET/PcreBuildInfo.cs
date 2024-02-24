@@ -91,7 +91,6 @@ public static unsafe class PcreBuildInfo
     /// </summary>
     public static uint TablesLength { get; } = GetConfigUInt32(PcreConstants.CONFIG_TABLES_LENGTH);
 
-
     private static bool GetConfigBool(uint key)
         => GetConfigUInt32(key) != 0;
 

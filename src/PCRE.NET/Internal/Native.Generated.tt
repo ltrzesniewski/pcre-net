@@ -54,7 +54,7 @@ namespace PCRE.Internal;
 
 unsafe partial class Native
 {
-#if NETCOREAPP
+#if NET
 
 <# foreach (var func in functions) { #>
 <# if (func.SuppressGCTransition) { #>
