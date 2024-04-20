@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <LangVersion>12.0</LangVersion>
-    <AnalysisLevel>6.0</AnalysisLevel>
+    <AnalysisLevel>8.0</AnalysisLevel>
+    <AnalysisModeStyle>None</AnalysisModeStyle>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
