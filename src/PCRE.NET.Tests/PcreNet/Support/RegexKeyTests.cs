@@ -27,6 +27,7 @@ public class RegexKeyTests
             BackslashR = PcreBuildInfo.BackslashR,
             ParensLimit = PcreBuildInfo.ParensLimit,
             MaxPatternLength = null,
+            MaxPatternCompiledLength = null,
             MaxVarLookbehind = 255
         };
 

@@ -13,6 +13,7 @@ public sealed class PcreRegexSettings
     private PcreBackslashR? _backslashR;
     private uint? _parensLimit;
     private uint? _maxPatternLength;
+    private uint? _maxPatternCompiledLength;
     private uint? _maxVarLookbehind;
     private PcreExtraCompileOptions _extraCompileOptions;
     private PcreJitCompileOptions _jitCompileOptions;
@@ -87,6 +88,23 @@ public sealed class PcreRegexSettings
     }
 
     /// <summary>
+    /// The maximum size, in bytes, for the memory needed to hold the compiled version of a pattern.
+    /// </summary>
+    /// <remarks>
+    /// This facility is provided so that applications that accept patterns from external sources can limit the amount of memory they use.
+    /// The default is the largest number that a <see cref="IntPtr"/> variable can hold, which is effectively unlimited.
+    /// </remarks>
+    public uint? MaxPatternCompiledLength
+    {
+        get => _maxPatternCompiledLength;
+        set
+        {
+            EnsureIsMutable();
+            _maxPatternCompiledLength = value;
+        }
+    }
+
+    /// <summary>
     /// The maximum length for the number of characters matched by a variable-length lookbehind assertion.
     /// </summary>
     /// <remarks>
@@ -150,6 +168,7 @@ public sealed class PcreRegexSettings
         _backslashR = settings._backslashR;
         _parensLimit = settings._parensLimit;
         _maxPatternLength = settings._maxPatternLength;
+        _maxPatternCompiledLength = settings._maxPatternCompiledLength;
         _maxVarLookbehind = settings._maxVarLookbehind;
         _extraCompileOptions = settings._extraCompileOptions;
         _jitCompileOptions = settings._jitCompileOptions;
@@ -164,6 +183,7 @@ public sealed class PcreRegexSettings
                && BackslashR == other.BackslashR
                && ParensLimit == other.ParensLimit
                && MaxPatternLength == other.MaxPatternLength
+               && MaxPatternCompiledLength == other.MaxPatternCompiledLength
                && MaxVarLookbehind == other.MaxVarLookbehind
                && ExtraCompileOptions == other.ExtraCompileOptions
                && JitCompileOptions == other.JitCompileOptions;
@@ -191,6 +211,7 @@ public sealed class PcreRegexSettings
         input.bsr = (uint)_backslashR.GetValueOrDefault();
         input.parens_nest_limit = _parensLimit.GetValueOrDefault();
         input.max_pattern_length = _maxPatternLength.GetValueOrDefault();
+        input.max_pattern_compiled_length = _maxPatternCompiledLength.GetValueOrDefault();
         input.max_var_lookbehind = MaxVarLookbehind;
         input.compile_extra_options = (uint)_extraCompileOptions;
     }

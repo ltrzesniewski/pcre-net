@@ -14,6 +14,7 @@ typedef struct
     uint32_t max_pattern_length;
     uint32_t compile_extra_options;
     uint32_t max_var_lookbehind;
+    uint32_t max_pattern_compiled_length;
 } pcrenet_compile_input;
 
 typedef struct
@@ -42,6 +43,9 @@ PCRENET_EXPORT(void, compile)(const pcrenet_compile_input* input, pcrenet_compil
 
     if (input->max_pattern_length)
         pcre2_set_max_pattern_length(context, input->max_pattern_length);
+
+    if (input->max_pattern_compiled_length)
+        pcre2_set_max_pattern_compiled_length(context, input->max_pattern_compiled_length);
 
     if (input->max_var_lookbehind != MAX_VARLOOKBEHIND)
         pcre2_set_max_varlookbehind(context, input->max_var_lookbehind);
