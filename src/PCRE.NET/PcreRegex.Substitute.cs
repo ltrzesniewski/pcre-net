@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
+using PCRE.Internal;
 
 namespace PCRE;
 
@@ -14,6 +15,7 @@ public partial class PcreRegex
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="replacementStringPcre2"]/*'/>
     /// </remarks>
+    /// <seealso cref="Replace(string,string)"/>
     [Pure]
     public string Substitute(string subject, string replacement)
         => Substitute(subject, replacement, PcreSubstituteOptions.None, 0);
@@ -23,6 +25,7 @@ public partial class PcreRegex
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="replacementStringPcre2"]/*'/>
     /// </remarks>
+    /// <seealso cref="Replace(string,string)"/>
     [Pure]
     public string Substitute(string subject, string replacement, PcreSubstituteOptions options)
         => Substitute(subject, replacement, options, 0);
@@ -32,6 +35,7 @@ public partial class PcreRegex
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="replacementStringPcre2" or @name="startIndex"]/*'/>
     /// </remarks>
+    /// <seealso cref="Replace(string,string)"/>
     [Pure]
     public string Substitute(string subject, string replacement, PcreSubstituteOptions options, int startIndex)
     {
@@ -43,7 +47,7 @@ public partial class PcreRegex
         if (unchecked((uint)startIndex > (uint)subject.Length))
             ThrowInvalidStartIndex();
 
-        return InternalRegex.Substitute(subject, replacement, (uint)options, startIndex);
+        return InternalRegex.Substitute(subject, replacement, options.ToPatternOptions(), startIndex);
     }
 
     // TODO: Static methods

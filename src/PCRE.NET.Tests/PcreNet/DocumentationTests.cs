@@ -79,14 +79,26 @@ public class DocumentationTests
         AssertContainsIfParam(p => p.Name is "callout" or "onCallout", "(?C<arg>)");
         AssertContainsIfParam(p => p.Name is "replacement" && p.ParameterType == typeof(string), "supported placeholders");
 
+        AssertXmlContainsIf(method.DeclaringType == typeof(PcreRegex) && method.Name == nameof(PcreRegex.Replace), """<seealso cref="M:PCRE.PcreRegex.Substitute(System.String,System.String)" />""");
+        AssertXmlContainsIf(method.DeclaringType == typeof(PcreRegex) && method.Name == nameof(PcreRegex.Substitute), """<seealso cref="M:PCRE.PcreRegex.Replace(System.String,System.String)" />""");
+
         void AssertContainsIf(bool condition, string expectedString)
-            => Assert.That(doc.Value, condition
-                               ? Does.Contain(expectedString)
-                               : Does.Not.Contain(expectedString)
+            => Assert.That(
+                doc.Value, condition
+                    ? Does.Contain(expectedString)
+                    : Does.Not.Contain(expectedString)
             );
 
         void AssertContainsIfParam(Func<ParameterInfo, bool> param, string expectedString)
             => AssertContainsIf(method.GetParameters().Any(param), expectedString);
+
+        void AssertXmlContainsIf(bool condition, string expectedString)
+            => Assert.That(
+                doc.ToString(), condition
+                    ? Does.Contain(expectedString)
+                    : Does.Not.Contain(expectedString)
+            );
+
     }
 
     private static Dictionary<string, XElement> GetMembers()
