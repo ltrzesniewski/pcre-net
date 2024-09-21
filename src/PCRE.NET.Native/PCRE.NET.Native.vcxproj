@@ -50,6 +50,7 @@
     <ClCompile Include="pcrenet_convert.c" />
     <ClCompile Include="pcrenet_match.c" />
     <ClCompile Include="pcrenet_info.c" />
+    <ClCompile Include="pcrenet_substitute.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\PCRE\src\config.h" />

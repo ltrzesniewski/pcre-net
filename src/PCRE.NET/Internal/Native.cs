@@ -128,10 +128,30 @@ internal static unsafe partial class Native
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    internal ref struct substitute_input
+    {
+        public IntPtr code;
+        public char* subject;
+        public uint subject_length;
+        public uint start_index;
+        public uint additional_options;
+        public char* replacement;
+        public uint replacement_length;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
     internal ref struct match_result
     {
         public int result_code;
         public char* mark;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal ref struct substitute_result
+    {
+        public int result_code;
+        public char* output;
+        public uint output_length;
     }
 
     [StructLayout(LayoutKind.Sequential)]

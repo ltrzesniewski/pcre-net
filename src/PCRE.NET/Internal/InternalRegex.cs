@@ -276,6 +276,42 @@ internal sealed unsafe class InternalRegex : IDisposable
         return new PcreDfaMatchResult(subject, ref result, oVector);
     }
 
+    public string Substitute(string subject, string replacement, uint additionalOptions, int startIndex)
+    {
+        Native.substitute_input input;
+        _ = &input;
+
+        Native.substitute_result result;
+
+        fixed (char* pSubject = subject)
+        fixed (char* pReplacement = replacement)
+        {
+            input.code = Code;
+            input.subject = pSubject;
+            input.subject_length = (uint)subject.Length;
+            input.start_index = (uint)startIndex;
+            input.additional_options = additionalOptions;
+            input.replacement = pReplacement;
+            input.replacement_length = (uint)replacement.Length;
+
+            Native.substitute(&input, &result);
+        }
+
+        try
+        {
+            return result.result_code switch
+            {
+                0   => (additionalOptions & PcreConstants.SUBSTITUTE_REPLACEMENT_ONLY) != 0 ? string.Empty : subject,
+                < 0 => throw new PcreMatchException((PcreErrorCode)result.result_code),
+                _   => new string(result.output, 0, (int)result.output_length)
+            };
+        }
+        finally
+        {
+            Native.substitute_result_free(&result);
+        }
+    }
+
     private static void HandleError(in Native.match_result result, ref CalloutInterop.CalloutInteropInfo calloutInterop)
     {
         switch (result.result_code)

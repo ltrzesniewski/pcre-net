@@ -20,7 +20,13 @@
 
   <method name="Replace">
     <summary>
-      Replaces matches found in the given subject string.
+      Replaces matches found in the given subject string, using PCRE.NET replacement syntax.
+    </summary>
+  </method>
+
+  <method name="Substitute">
+    <summary>
+      Replaces matches found in the given subject string, using the PCRE2 replacement syntax.
     </summary>
   </method>
 
@@ -118,6 +124,12 @@
           - A literal dollar sign.
         </item>
       </list>
+    </para>
+  </remarks>
+
+  <remarks name="replacementStringPcre2">
+    <para>
+      The supported placeholders in the replacement string are specific to the PCRE2 library.
     </para>
   </remarks>
 

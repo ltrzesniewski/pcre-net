@@ -81,8 +81,8 @@ public class DocumentationTests
 
         void AssertContainsIf(bool condition, string expectedString)
             => Assert.That(doc.Value, condition
-                ? Does.Contain(expectedString)
-                : Does.Not.Contain(expectedString)
+                               ? Does.Contain(expectedString)
+                               : Does.Not.Contain(expectedString)
             );
 
         void AssertContainsIfParam(Func<ParameterInfo, bool> param, string expectedString)
@@ -109,7 +109,12 @@ public class DocumentationTests
         => typeof(PcreRegex).GetMethods()
                             .Concat(typeof(PcreDfaRegex).GetMethods())
                             .Concat(typeof(PcreMatchBuffer).GetMethods())
-                            .Where(m => m.Name is nameof(PcreRegex.Match) or nameof(PcreRegex.IsMatch) or nameof(PcreRegex.Matches) or nameof(PcreRegex.Split) or nameof(PcreRegex.Replace))
+                            .Where(m => m.Name is nameof(PcreRegex.Match)
+                                       or nameof(PcreRegex.IsMatch)
+                                       or nameof(PcreRegex.Matches)
+                                       or nameof(PcreRegex.Split)
+                                       or nameof(PcreRegex.Replace)
+                                       or nameof(PcreRegex.Substitute))
                             .Select(m => new TestCaseData(m).SetName("Remarks: " + GetMethodDocId(m)));
 
     private static string GetMethodDocId(MethodInfo method)

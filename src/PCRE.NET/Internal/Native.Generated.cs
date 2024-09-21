@@ -43,6 +43,12 @@ unsafe partial class Native
     [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_dfa_match", CallingConvention = CallingConvention.Cdecl)]
     public static extern void dfa_match(dfa_match_input* input, match_result* result);
 
+    [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_substitute", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void substitute(substitute_input* input, substitute_result* result);
+
+    [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_substitute_result_free", CallingConvention = CallingConvention.Cdecl)]
+    public static extern void substitute_result_free(substitute_result* result);
+
     [DllImport("PCRE.NET.Native", EntryPoint = "pcrenet_create_match_buffer", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr create_match_buffer(match_buffer_info* info);
 
@@ -95,6 +101,12 @@ unsafe partial class Native
     public static void dfa_match(dfa_match_input* input, match_result* result)
         => _impl.dfa_match(input, result);
 
+    public static void substitute(substitute_input* input, substitute_result* result)
+        => _impl.substitute(input, result);
+
+    public static void substitute_result_free(substitute_result* result)
+        => _impl.substitute_result_free(result);
+
     public static IntPtr create_match_buffer(match_buffer_info* info)
         => _impl.create_match_buffer(info);
 
@@ -129,6 +141,8 @@ unsafe partial class Native
         public abstract void match(match_input* input, match_result* result);
         public abstract void buffer_match(buffer_match_input* input, match_result* result);
         public abstract void dfa_match(dfa_match_input* input, match_result* result);
+        public abstract void substitute(substitute_input* input, substitute_result* result);
+        public abstract void substitute_result_free(substitute_result* result);
         public abstract IntPtr create_match_buffer(match_buffer_info* info);
         public abstract void free_match_buffer(IntPtr buffer);
         public abstract uint get_callout_count(IntPtr code);
@@ -189,6 +203,18 @@ unsafe partial class Native
 
         [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void pcrenet_dfa_match(dfa_match_input* input, match_result* result);
+
+        public override void substitute(substitute_input* input, substitute_result* result)
+            => pcrenet_substitute(input, result);
+
+        [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void pcrenet_substitute(substitute_input* input, substitute_result* result);
+
+        public override void substitute_result_free(substitute_result* result)
+            => pcrenet_substitute_result_free(result);
+
+        [DllImport("PCRE.NET.Native.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void pcrenet_substitute_result_free(substitute_result* result);
 
         public override IntPtr create_match_buffer(match_buffer_info* info)
             => pcrenet_create_match_buffer(info);
@@ -291,6 +317,18 @@ unsafe partial class Native
         [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void pcrenet_dfa_match(dfa_match_input* input, match_result* result);
 
+        public override void substitute(substitute_input* input, substitute_result* result)
+            => pcrenet_substitute(input, result);
+
+        [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void pcrenet_substitute(substitute_input* input, substitute_result* result);
+
+        public override void substitute_result_free(substitute_result* result)
+            => pcrenet_substitute_result_free(result);
+
+        [DllImport("PCRE.NET.Native.x86.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void pcrenet_substitute_result_free(substitute_result* result);
+
         public override IntPtr create_match_buffer(match_buffer_info* info)
             => pcrenet_create_match_buffer(info);
 
@@ -391,6 +429,18 @@ unsafe partial class Native
 
         [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void pcrenet_dfa_match(dfa_match_input* input, match_result* result);
+
+        public override void substitute(substitute_input* input, substitute_result* result)
+            => pcrenet_substitute(input, result);
+
+        [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void pcrenet_substitute(substitute_input* input, substitute_result* result);
+
+        public override void substitute_result_free(substitute_result* result)
+            => pcrenet_substitute_result_free(result);
+
+        [DllImport("PCRE.NET.Native.x64.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void pcrenet_substitute_result_free(substitute_result* result);
 
         public override IntPtr create_match_buffer(match_buffer_info* info)
             => pcrenet_create_match_buffer(info);
@@ -493,6 +543,18 @@ unsafe partial class Native
         [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
         private static extern void pcrenet_dfa_match(dfa_match_input* input, match_result* result);
 
+        public override void substitute(substitute_input* input, substitute_result* result)
+            => pcrenet_substitute(input, result);
+
+        [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void pcrenet_substitute(substitute_input* input, substitute_result* result);
+
+        public override void substitute_result_free(substitute_result* result)
+            => pcrenet_substitute_result_free(result);
+
+        [DllImport("PCRE.NET.Native.so", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void pcrenet_substitute_result_free(substitute_result* result);
+
         public override IntPtr create_match_buffer(match_buffer_info* info)
             => pcrenet_create_match_buffer(info);
 
@@ -593,6 +655,18 @@ unsafe partial class Native
 
         [DllImport("PCRE.NET.Native.dylib", CallingConvention = CallingConvention.Cdecl)]
         private static extern void pcrenet_dfa_match(dfa_match_input* input, match_result* result);
+
+        public override void substitute(substitute_input* input, substitute_result* result)
+            => pcrenet_substitute(input, result);
+
+        [DllImport("PCRE.NET.Native.dylib", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void pcrenet_substitute(substitute_input* input, substitute_result* result);
+
+        public override void substitute_result_free(substitute_result* result)
+            => pcrenet_substitute_result_free(result);
+
+        [DllImport("PCRE.NET.Native.dylib", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void pcrenet_substitute_result_free(substitute_result* result);
 
         public override IntPtr create_match_buffer(match_buffer_info* info)
             => pcrenet_create_match_buffer(info);

@@ -56,6 +56,7 @@ add_library(PCRE.NET.Native SHARED
         PCRE.NET.Native/pcrenet_convert.c
         PCRE.NET.Native/pcrenet_info.c
         PCRE.NET.Native/pcrenet_match.c
+        PCRE.NET.Native/pcrenet_substitute.c
 )
 
 add_compile_definitions(

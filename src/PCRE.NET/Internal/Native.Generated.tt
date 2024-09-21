@@ -16,6 +16,8 @@ var functions = ParseFunctions(
     void match(match_input* input, match_result* result);
     void buffer_match(buffer_match_input* input, match_result* result);
     void dfa_match(dfa_match_input* input, match_result* result);
+    void substitute(substitute_input* input, substitute_result* result);
+    void substitute_result_free(substitute_result* result);
     IntPtr create_match_buffer(match_buffer_info* info);
     void free_match_buffer(IntPtr buffer);
     uint get_callout_count(IntPtr code) no-gc;
