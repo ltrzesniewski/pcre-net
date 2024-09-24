@@ -77,7 +77,7 @@ public class DocumentationTests
 
         AssertContainsIfParam(p => p.Name is "startIndex", "Passing a non-zero");
         AssertContainsIfParam(p => p.Name is "callout" or "onCallout", "(?C<arg>)");
-        AssertContainsIfParam(p => p.Name is "replacement" && p.ParameterType == typeof(string), "supported placeholders");
+        AssertContainsIfParam(p => p.Name is "replacement" && (p.ParameterType == typeof(string) || p.ParameterType == typeof(ReadOnlySpan<char>)), "supported placeholders");
 
         AssertXmlContainsIf(method.DeclaringType == typeof(PcreRegex) && method.Name == nameof(PcreRegex.Replace), """<seealso cref="M:PCRE.PcreRegex.Substitute(System.String,System.String)" />""");
         AssertXmlContainsIf(method.DeclaringType == typeof(PcreRegex) && method.Name == nameof(PcreRegex.Substitute), """<seealso cref="M:PCRE.PcreRegex.Replace(System.String,System.String)" />""");
@@ -98,7 +98,6 @@ public class DocumentationTests
                     ? Does.Contain(expectedString)
                     : Does.Not.Contain(expectedString)
             );
-
     }
 
     private static Dictionary<string, XElement> GetMembers()

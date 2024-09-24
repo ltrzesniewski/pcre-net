@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using PCRE.Dfa;
 
@@ -277,8 +278,14 @@ internal sealed unsafe class InternalRegex : IDisposable
         return new PcreDfaMatchResult(subject, ref result, oVector);
     }
 
-    public string Substitute(string subject, string replacement, uint additionalOptions, int startIndex)
+    public string Substitute(ReadOnlySpan<char> subject,
+                             string? subjectAsString,
+                             ReadOnlySpan<char> replacement,
+                             uint additionalOptions,
+                             int startIndex)
     {
+        Debug.Assert(subjectAsString is null || subjectAsString.AsSpan() == subject);
+
         Native.substitute_input input;
         _ = &input;
 
@@ -306,7 +313,7 @@ internal sealed unsafe class InternalRegex : IDisposable
         {
             return result.result_code switch
             {
-                0   => (additionalOptions & PcreConstants.SUBSTITUTE_REPLACEMENT_ONLY) != 0 ? string.Empty : subject,
+                0   => (additionalOptions & PcreConstants.SUBSTITUTE_REPLACEMENT_ONLY) != 0 ? string.Empty : subjectAsString ?? subject.ToString(),
                 < 0 => throw new PcreMatchException((PcreErrorCode)result.result_code),
                 _   => new string(result.output, 0, (int)result.output_length)
             };
