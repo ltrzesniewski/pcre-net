@@ -8,6 +8,7 @@ namespace PCRE.Internal;
 internal sealed unsafe class InternalRegex : IDisposable
 {
     internal const int MaxStackAllocCaptureCount = 32;
+    internal const int SubstituteBufferSizeInChars = 4096;
 
     private Dictionary<int, PcreCalloutInfo>? _calloutInfoByPatternPosition;
     private PcreMatch? _noMatch;
@@ -282,6 +283,10 @@ internal sealed unsafe class InternalRegex : IDisposable
         _ = &input;
 
         Native.substitute_result result;
+
+        var buffer = stackalloc char[SubstituteBufferSizeInChars];
+        input.buffer = buffer;
+        input.buffer_length = SubstituteBufferSizeInChars;
 
         fixed (char* pSubject = subject)
         fixed (char* pReplacement = replacement)

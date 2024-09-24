@@ -137,6 +137,8 @@ internal static unsafe partial class Native
         public uint additional_options;
         public char* replacement;
         public uint replacement_length;
+        public char* buffer;
+        public uint buffer_length;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -152,6 +154,7 @@ internal static unsafe partial class Native
         public int result_code;
         public char* output;
         public uint output_length;
+        public byte output_on_heap;
     }
 
     [StructLayout(LayoutKind.Sequential)]

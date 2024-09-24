@@ -1,10 +1,13 @@
 using NUnit.Framework;
+using PCRE.Internal;
 
 namespace PCRE.Tests.PcreNet;
 
 [TestFixture]
 public class SubstituteTests
 {
+    private static readonly string _filler = new(':', InternalRegex.SubstituteBufferSizeInChars * 2);
+
     [Test]
     [TestCase("foo", "bar", "foo")]
     [TestCase("abbc", "bar", "bar")]
@@ -15,6 +18,7 @@ public class SubstituteTests
         var re = new PcreRegex("a(b+)c");
 
         Assert.That(re.Substitute(subject, replacement), Is.EqualTo(result));
+        Assert.That(re.Substitute(_filler + subject, replacement), Is.EqualTo(_filler + result));
     }
 
     [Test]
@@ -28,6 +32,7 @@ public class SubstituteTests
         var re = new PcreRegex("a(b+)c");
 
         Assert.That(re.Substitute(subject, replacement, PcreSubstituteOptions.SubstituteGlobal), Is.EqualTo(result));
+        Assert.That(re.Substitute(_filler + subject, replacement, PcreSubstituteOptions.SubstituteGlobal), Is.EqualTo(_filler + result));
     }
 
     [Test]
@@ -39,6 +44,7 @@ public class SubstituteTests
         var re = new PcreRegex("a(b+)c");
 
         Assert.That(re.Substitute(subject, replacement, PcreSubstituteOptions.SubstituteLiteral), Is.EqualTo(result));
+        Assert.That(re.Substitute(_filler + subject, replacement, PcreSubstituteOptions.SubstituteLiteral), Is.EqualTo(_filler + result));
     }
 
     [Test]
@@ -50,6 +56,7 @@ public class SubstituteTests
         var re = new PcreRegex("a(b+)c");
 
         Assert.That(re.Substitute(subject, replacement, PcreSubstituteOptions.SubstituteReplacementOnly), Is.EqualTo(result));
+        Assert.That(re.Substitute(_filler + subject, replacement, PcreSubstituteOptions.SubstituteReplacementOnly), Is.EqualTo(result));
     }
 
     [Test]

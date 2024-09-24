@@ -115,6 +115,9 @@
     <ClCompile Include="..\PCRE\src\pcre2_chkdint.c">
       <Filter>PCRE\Sources</Filter>
     </ClCompile>
+    <ClCompile Include="pcrenet_substitute.c">
+      <Filter>PCRE.NET\Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\PCRE\src\config.h">
