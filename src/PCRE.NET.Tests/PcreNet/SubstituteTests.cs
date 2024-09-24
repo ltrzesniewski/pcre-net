@@ -121,4 +121,12 @@ public class SubstituteTests
 
         Assert.That(re.Substitute(subject, "bar"), Is.SameAs(subject));
     }
+
+    [Test]
+    public void should_throw_on_invalid_replacement_syntax()
+    {
+        var re = new PcreRegex("a(b+)c");
+
+        Assert.Throws<PcreSubstituteException>(() => _ = re.Substitute("abc", "${4}"));
+    }
 }

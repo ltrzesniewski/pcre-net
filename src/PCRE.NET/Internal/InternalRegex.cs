@@ -314,7 +314,7 @@ internal sealed unsafe class InternalRegex : IDisposable
             return result.result_code switch
             {
                 0   => (additionalOptions & PcreConstants.SUBSTITUTE_REPLACEMENT_ONLY) != 0 ? string.Empty : subjectAsString ?? subject.ToString(),
-                < 0 => throw new PcreMatchException((PcreErrorCode)result.result_code),
+                < 0 => throw new PcreSubstituteException((PcreErrorCode)result.result_code),
                 _   => new string(result.output, 0, (int)result.output_length)
             };
         }
