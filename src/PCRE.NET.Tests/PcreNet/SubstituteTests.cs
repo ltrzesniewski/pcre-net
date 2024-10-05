@@ -103,12 +103,12 @@ public class SubstituteTests
         var re = new PcreRegex("a(b+)c");
 
         Assert.That(
-            re.Substitute("abc abc abc", "match", PcreSubstituteOptions.SubstituteGlobal, 4),
+            re.Substitute("abc abc abc", "match", 4, PcreSubstituteOptions.SubstituteGlobal),
             Is.EqualTo("abc match match")
         );
 
         Assert.That(
-            re.Substitute("abc abc abc".AsSpan(), "match".AsSpan(), PcreSubstituteOptions.SubstituteGlobal, 4),
+            re.Substitute("abc abc abc".AsSpan(), "match".AsSpan(), 4, PcreSubstituteOptions.SubstituteGlobal),
             Is.EqualTo("abc match match")
         );
     }
@@ -128,5 +128,14 @@ public class SubstituteTests
         var re = new PcreRegex("a(b+)c");
 
         Assert.Throws<PcreSubstituteException>(() => _ = re.Substitute("abc", "${4}"));
+    }
+
+    [Test]
+    public void should_handle_offset_limit()
+    {
+        var re = new PcreRegex(@"bar", PcreOptions.UseOffsetLimit);
+
+        Assert.That(re.Substitute("foobar", "abc", 0, PcreSubstituteOptions.None, new PcreMatchSettings { OffsetLimit = 3 }), Is.EqualTo("fooabc"));
+        Assert.That(re.Substitute("foobar", "abc", 0, PcreSubstituteOptions.None, new PcreMatchSettings { OffsetLimit = 2 }), Is.EqualTo("foobar"));
     }
 }

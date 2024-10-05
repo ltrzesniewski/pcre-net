@@ -1,18 +1,7 @@
-
 #include <string.h>
-
 #include "pcrenet.h"
 
 typedef int (*callout_fn)(pcre2_callout_block*, void*);
-
-typedef struct
-{
-    uint32_t match_limit;
-    uint32_t depth_limit;
-    uint32_t heap_limit;
-    uint32_t offset_limit;
-    pcre2_jit_stack* jit_stack;
-} match_settings;
 
 typedef struct
 {
@@ -87,7 +76,7 @@ static int callout_handler(pcre2_callout_block* block, void* data)
     return typed_data->callout(block, typed_data->data);
 }
 
-static void apply_settings(const match_settings* settings, pcre2_match_context* context)
+void apply_settings(const match_settings* settings, pcre2_match_context* context)
 {
     if (settings->match_limit)
         pcre2_set_match_limit(context, settings->match_limit);

@@ -135,6 +135,7 @@ internal static unsafe partial class Native
         public uint subject_length;
         public uint start_index;
         public uint additional_options;
+        public match_settings settings;
         public char* replacement;
         public uint replacement_length;
         public char* buffer;

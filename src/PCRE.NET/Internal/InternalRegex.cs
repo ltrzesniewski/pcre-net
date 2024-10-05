@@ -281,13 +281,17 @@ internal sealed unsafe class InternalRegex : IDisposable
     public string Substitute(ReadOnlySpan<char> subject,
                              string? subjectAsString,
                              ReadOnlySpan<char> replacement,
-                             uint additionalOptions,
-                             int startIndex)
+                             PcreMatchSettings settings,
+                             int startIndex,
+                             uint additionalOptions
+    )
     {
         Debug.Assert(subjectAsString is null || subjectAsString.AsSpan() == subject);
 
         Native.substitute_input input;
         _ = &input;
+
+        settings.FillMatchSettings(ref input.settings);
 
         Native.substitute_result result;
 

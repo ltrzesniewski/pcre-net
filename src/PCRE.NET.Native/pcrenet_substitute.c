@@ -7,6 +7,7 @@ typedef struct
     uint32_t subject_length;
     uint32_t start_index;
     uint32_t additional_options;
+    match_settings settings;
     uint16_t* replacement;
     uint32_t replacement_length;
     uint16_t* buffer;
@@ -25,6 +26,8 @@ PCRENET_EXPORT(void, substitute)(const pcrenet_substitute_input* input, pcrenet_
 {
     pcre2_match_data* match_data = pcre2_match_data_create_from_pattern(input->code, NULL);
     pcre2_match_context* context = pcre2_match_context_create(NULL);
+
+    apply_settings(&input->settings, context);
 
     result->output = NULL;
     result->output_length = 0;
