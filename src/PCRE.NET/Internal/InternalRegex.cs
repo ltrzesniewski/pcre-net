@@ -315,12 +315,23 @@ internal sealed unsafe class InternalRegex : IDisposable
 
         try
         {
-            return result.result_code switch
+            switch (result.result_code)
             {
-                0   => (additionalOptions & PcreConstants.SUBSTITUTE_REPLACEMENT_ONLY) != 0 ? string.Empty : subjectAsString ?? subject.ToString(),
-                < 0 => throw new PcreSubstituteException((PcreErrorCode)result.result_code),
-                _   => new string(result.output, 0, (int)result.output_length)
-            };
+                case < 0: // An error occured
+                    throw new PcreSubstituteException((PcreErrorCode)result.result_code);
+
+                case 0: // No substitution was made, avoid allocating a new string if possible
+                    if ((additionalOptions & PcreConstants.SUBSTITUTE_REPLACEMENT_ONLY) != 0)
+                        return string.Empty;
+
+                    return subjectAsString ?? subject.ToString();
+
+                default: // At least one substitution was made, return the result as a new string
+                    if (result.output_length > int.MaxValue)
+                        throw new PcreSubstituteException(PcreErrorCode.Internal, "Invalid output string length", null);
+
+                    return new string(result.output, 0, (int)result.output_length);
+            }
         }
         finally
         {

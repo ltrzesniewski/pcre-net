@@ -18,7 +18,7 @@ typedef struct
 {
     int32_t result_code;
     uint16_t* output;
-    uint32_t output_length;
+    size_t output_length;
     uint8_t output_on_heap;
 } pcrenet_substitute_result;
 

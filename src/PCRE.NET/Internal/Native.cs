@@ -154,7 +154,7 @@ internal static unsafe partial class Native
     {
         public int result_code;
         public char* output;
-        public uint output_length;
+        public nuint output_length;
         public byte output_on_heap;
     }
 

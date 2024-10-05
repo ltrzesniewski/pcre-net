@@ -84,7 +84,7 @@ public class PcreMatchException : PcreException
     /// <param name="errorCode">The associated error code.</param>
     /// <param name="message">The exception message.</param>
     /// <param name="innerException">The inner exception.</param>
-    protected PcreMatchException(PcreErrorCode errorCode, string message, Exception? innerException)
+    public PcreMatchException(PcreErrorCode errorCode, string message, Exception? innerException)
         : base(errorCode, message, innerException)
     {
     }
@@ -126,7 +126,7 @@ public class PcreSubstituteException : PcreException
     /// <param name="errorCode">The associated error code.</param>
     /// <param name="message">The exception message.</param>
     /// <param name="innerException">The inner exception.</param>
-    protected PcreSubstituteException(PcreErrorCode errorCode, string message, Exception? innerException)
+    public PcreSubstituteException(PcreErrorCode errorCode, string message, Exception? innerException)
         : base(errorCode, message, innerException)
     {
     }
