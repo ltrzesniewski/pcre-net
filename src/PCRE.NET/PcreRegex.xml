@@ -61,6 +61,8 @@
   <param name="count">The maximum number of matches to attempt.</param>
   <param name="startIndex">The index at which the match should be attempted.</param>
   <param name="options">Additional options.</param>
+  <param name="patternOptions">Additional options for the pattern.</param>
+  <param name="substituteOptions">Additional options for the substitution.</param>
   <param name="splitOptions">Additional options for the split.</param>
   <param name="onCallout">A function to be called when a callout point is reached during the match.</param>
   <param name="settings">Additional advanced settings.</param>

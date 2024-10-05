@@ -111,4 +111,24 @@ public partial class PcreRegex
 
         return InternalRegex.Substitute(subject, null, replacement, settings, startIndex, options.ToSubstituteOptions());
     }
+
+    /// <include file='PcreRegex.xml' path='/doc/method[@name="Substitute"]/*'/>
+    /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="pattern" or @name="replacement"]'/>
+    /// <remarks>
+    /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static" or @name="replacementStringPcre2"]/*'/>
+    /// </remarks>
+    /// <seealso cref="Replace(string,string)"/>
+    [Pure]
+    public static string Substitute(string subject, string pattern, string replacement)
+        => Substitute(subject, pattern, replacement, PcreOptions.None, PcreSubstituteOptions.None);
+
+    /// <include file='PcreRegex.xml' path='/doc/method[@name="Substitute"]/*'/>
+    /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="pattern" or @name="replacement" or @name="patternOptions" or @name="substituteOptions"]'/>
+    /// <remarks>
+    /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static" or @name="replacementStringPcre2"]/*'/>
+    /// </remarks>
+    /// <seealso cref="Replace(string,string)"/>
+    [Pure]
+    public static string Substitute(string subject, string pattern, string replacement, PcreOptions patternOptions, PcreSubstituteOptions substituteOptions)
+        => new PcreRegex(pattern, patternOptions).Substitute(subject, replacement, substituteOptions);
 }

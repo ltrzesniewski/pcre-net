@@ -138,4 +138,11 @@ public class SubstituteTests
         Assert.That(re.Substitute("foobar", "abc", 0, PcreSubstituteOptions.None, new PcreMatchSettings { OffsetLimit = 3 }), Is.EqualTo("fooabc"));
         Assert.That(re.Substitute("foobar", "abc", 0, PcreSubstituteOptions.None, new PcreMatchSettings { OffsetLimit = 2 }), Is.EqualTo("foobar"));
     }
+
+    [Test]
+    public void readme_replace_example()
+    {
+        var result = PcreRegex.Substitute("hello, world!!!", @"\p{P}+", "<$0>", PcreOptions.None, PcreSubstituteOptions.SubstituteGlobal);
+        Assert.That(result, Is.EqualTo("hello<,> world<!!!>"));
+    }
 }
