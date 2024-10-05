@@ -283,8 +283,8 @@ internal sealed unsafe class InternalRegex : IDisposable
                              ReadOnlySpan<char> replacement,
                              PcreMatchSettings settings,
                              int startIndex,
-                             uint additionalOptions
-    )
+                             uint additionalOptions,
+                             PcreSubstituteCalloutFunc? callout)
     {
         Debug.Assert(subjectAsString is null || subjectAsString.AsSpan() == subject);
 
@@ -294,6 +294,7 @@ internal sealed unsafe class InternalRegex : IDisposable
         settings.FillMatchSettings(ref input.settings);
 
         Native.substitute_result result;
+        CalloutInterop.SubstituteCalloutInteropInfo calloutInterop;
 
         var buffer = stackalloc char[SubstituteBufferSizeInChars];
         input.buffer = buffer;
@@ -310,11 +311,16 @@ internal sealed unsafe class InternalRegex : IDisposable
             input.replacement = pReplacement;
             input.replacement_length = (uint)replacement.Length;
 
+            CalloutInterop.PrepareSubstitute(this, subject, ref input, out calloutInterop, callout);
+
             Native.substitute(&input, &result);
         }
 
         try
         {
+            if (calloutInterop.Exception is { } ex)
+                throw new PcreCalloutException("An exception was thrown by the callout: " + ex.Message, ex);
+
             switch (result.result_code)
             {
                 case < 0: // An error occured
@@ -335,7 +341,8 @@ internal sealed unsafe class InternalRegex : IDisposable
         }
         finally
         {
-            Native.substitute_result_free(&result);
+            if (result.output != null && result.output_on_heap != 0)
+                Native.substitute_result_free(&result);
         }
     }
 
