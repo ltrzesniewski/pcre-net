@@ -41,6 +41,11 @@ typedef struct
     replay_queue callout_queue;
 } substitute_callout_data;
 
+static size_t max_size(const size_t a, const size_t b)
+{
+    return a > b ? a : b;
+}
+
 static void replay_queue_init(replay_queue* queue)
 {
     queue->buffer = NULL;
@@ -83,7 +88,7 @@ static void replay_queue_try_enqueue(replay_queue* queue, uint8_t result)
 
     if (queue->count == queue->buffer_size)
     {
-        const size_t new_size = max(64, 2 * queue->buffer_size);
+        const size_t new_size = max_size(64, 2 * queue->buffer_size);
         uint8_t* new_buf = realloc(queue->buffer, new_size * sizeof(uint8_t));
         if (!new_buf)
             return;
@@ -279,7 +284,7 @@ static void substitute_with_callout(const pcrenet_substitute_input* input,
         // Output buffer is too small
         if (result->result_code == PCRE2_ERROR_NOMEMORY)
         {
-            buffer_length *= 2;
+            buffer_length = max_size(2 * buffer_length, 2 * (size_t)input->subject_length);
 
             if (!result->output_on_heap)
             {
