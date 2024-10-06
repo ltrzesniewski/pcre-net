@@ -281,7 +281,7 @@ internal sealed unsafe class InternalRegex : IDisposable
     public string Substitute(ReadOnlySpan<char> subject,
                              string? subjectAsString,
                              ReadOnlySpan<char> replacement,
-                             PcreMatchSettings settings,
+                             PcreMatchSettings? settings,
                              int startIndex,
                              uint additionalOptions,
                              PcreSubstituteCalloutFunc? callout,
@@ -292,7 +292,7 @@ internal sealed unsafe class InternalRegex : IDisposable
         Native.substitute_input input;
         _ = &input;
 
-        settings.FillMatchSettings(ref input.settings);
+        (settings ?? PcreMatchSettings.Default).FillMatchSettings(ref input.settings);
 
         Native.substitute_result result;
         CalloutInterop.SubstituteCalloutInteropInfo calloutInterop;

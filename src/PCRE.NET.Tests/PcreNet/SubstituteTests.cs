@@ -265,7 +265,7 @@ public class SubstituteTests
 
         var execCount = 0;
 
-        var result = re.InternalRegex.Substitute(str.AsSpan(), null, "#:#:#:#".AsSpan(), PcreMatchSettings.Default, 0, (uint)PcreSubstituteOptions.SubstituteGlobal, data =>
+        var result = re.InternalRegex.Substitute(str.AsSpan(), null, "#:#:#:#".AsSpan(), null, 0, (uint)PcreSubstituteOptions.SubstituteGlobal, data =>
         {
             ++execCount;
             Assert.That(data.SubstitutionCount, Is.EqualTo(execCount));
@@ -286,10 +286,10 @@ public class SubstituteTests
         var shortStr = new string('a', InternalRegex.SubstituteBufferSizeInChars / 2);
         var longStr = new string('a', InternalRegex.SubstituteBufferSizeInChars * 2);
 
-        re.InternalRegex.Substitute(shortStr.AsSpan(), null, "b".AsSpan(), PcreMatchSettings.Default, 0, (uint)PcreSubstituteOptions.SubstituteGlobal, null, out var substituteCallCount);
+        re.InternalRegex.Substitute(shortStr.AsSpan(), null, "b".AsSpan(), null, 0, (uint)PcreSubstituteOptions.SubstituteGlobal, null, out var substituteCallCount);
         Assert.That(substituteCallCount, Is.EqualTo(1));
 
-        re.InternalRegex.Substitute(longStr.AsSpan(), null, "b".AsSpan(), PcreMatchSettings.Default, 0, (uint)PcreSubstituteOptions.SubstituteGlobal, null, out substituteCallCount);
+        re.InternalRegex.Substitute(longStr.AsSpan(), null, "b".AsSpan(), null, 0, (uint)PcreSubstituteOptions.SubstituteGlobal, null, out substituteCallCount);
         Assert.That(substituteCallCount, Is.EqualTo(2));
     }
 
