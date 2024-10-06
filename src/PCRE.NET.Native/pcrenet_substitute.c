@@ -1,5 +1,6 @@
 #include "pcrenet.h"
 
+typedef int (*match_callout_fn)(pcre2_callout_block*, void*);
 typedef int (*substitute_callout_fn)(pcre2_substitute_callout_block*, void*);
 
 typedef struct
@@ -14,8 +15,10 @@ typedef struct
     uint32_t replacement_length;
     uint16_t* buffer;
     uint32_t buffer_length;
-    substitute_callout_fn callout;
-    void* callout_data;
+    match_callout_fn match_callout;
+    void* match_callout_data;
+    substitute_callout_fn substitute_callout;
+    void* substitute_callout_data;
 } pcrenet_substitute_input;
 
 typedef struct
@@ -38,7 +41,8 @@ typedef struct
 typedef struct
 {
     const pcrenet_substitute_input* input;
-    replay_queue callout_queue;
+    replay_queue match_callout_queue;
+    replay_queue substitute_callout_queue;
 } substitute_callout_data;
 
 static size_t max_size(const size_t a, const size_t b)
@@ -114,7 +118,7 @@ static void free_result_memory(pcrenet_substitute_result* result)
     result->output_on_heap = 0;
 }
 
-static uint8_t map_substitute_result_int_to_byte(int result)
+static uint8_t map_callout_result_int_to_byte(int result)
 {
     if (result == 0)
         return 0;
@@ -125,7 +129,7 @@ static uint8_t map_substitute_result_int_to_byte(int result)
     return 2;
 }
 
-static int map_substitute_result_byte_to_int(uint8_t result)
+static int map_callout_result_byte_to_int(uint8_t result)
 {
     switch (result)
     {
@@ -140,17 +144,33 @@ static int map_substitute_result_byte_to_int(uint8_t result)
     }
 }
 
+static int match_callout_handler(pcre2_callout_block* block, void* data_ptr)
+{
+    substitute_callout_data* data = data_ptr;
+
+    uint8_t result;
+    if (replay_queue_try_dequeue(&data->match_callout_queue, &result))
+        return map_callout_result_byte_to_int(result);
+
+    result = map_callout_result_int_to_byte(
+        data->input->match_callout(block, data->input->match_callout_data));
+
+    replay_queue_try_enqueue(&data->match_callout_queue, result);
+    return result;
+}
+
 static int substitute_callout_handler(pcre2_substitute_callout_block* block, void* data_ptr)
 {
     substitute_callout_data* data = data_ptr;
 
     uint8_t result;
-    if (replay_queue_try_dequeue(&data->callout_queue, &result))
-        return map_substitute_result_byte_to_int(result);
+    if (replay_queue_try_dequeue(&data->substitute_callout_queue, &result))
+        return map_callout_result_byte_to_int(result);
 
-    result = map_substitute_result_int_to_byte(data->input->callout(block, data->input->callout_data));
+    result = map_callout_result_int_to_byte(
+        data->input->substitute_callout(block, data->input->substitute_callout_data));
 
-    replay_queue_try_enqueue(&data->callout_queue, result);
+    replay_queue_try_enqueue(&data->substitute_callout_queue, result);
     return result;
 }
 
@@ -257,13 +277,19 @@ static void substitute_with_callout(const pcrenet_substitute_input* input,
         .input = input
     };
 
-    replay_queue_init(&callout_data.callout_queue);
+    replay_queue_init(&callout_data.match_callout_queue);
+    replay_queue_init(&callout_data.substitute_callout_queue);
 
-    pcre2_set_substitute_callout(match_context, &substitute_callout_handler, &callout_data);
+    if (input->match_callout)
+        pcre2_set_callout(match_context, &match_callout_handler, &callout_data);
+
+    if (input->substitute_callout)
+        pcre2_set_substitute_callout(match_context, &substitute_callout_handler, &callout_data);
 
     while (1)
     {
-        replay_queue_start_replay(&callout_data.callout_queue);
+        replay_queue_start_replay(&callout_data.match_callout_queue);
+        replay_queue_start_replay(&callout_data.substitute_callout_queue);
 
         call_substitute(
             input,
@@ -317,7 +343,8 @@ static void substitute_with_callout(const pcrenet_substitute_input* input,
         break;
     }
 
-    replay_queue_free(&callout_data.callout_queue);
+    replay_queue_free(&callout_data.match_callout_queue);
+    replay_queue_free(&callout_data.substitute_callout_queue);
 }
 
 PCRENET_EXPORT(void, substitute)(const pcrenet_substitute_input* input, pcrenet_substitute_result* result)
@@ -329,7 +356,7 @@ PCRENET_EXPORT(void, substitute)(const pcrenet_substitute_input* input, pcrenet_
 
     result->substitute_call_count = 0;
 
-    if (!input->callout)
+    if (!input->match_callout && !input->substitute_callout)
         substitute_simple(input, result, match_data, match_context);
     else
         substitute_with_callout(input, result, match_data, match_context);

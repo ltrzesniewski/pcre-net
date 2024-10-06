@@ -18,7 +18,7 @@ public partial class PcreRegex
     /// <seealso cref="Replace(string,string)"/>
     [Pure]
     public string Substitute(string subject, string replacement)
-        => Substitute(subject, replacement, 0, PcreSubstituteOptions.None, null, null);
+        => Substitute(subject, replacement, 0, PcreSubstituteOptions.None, null, null, null);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Substitute"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacement"]'/>
@@ -28,7 +28,7 @@ public partial class PcreRegex
     /// <seealso cref="Replace(string,string)"/>
     [Pure]
     public string Substitute(ReadOnlySpan<char> subject, ReadOnlySpan<char> replacement)
-        => Substitute(subject, replacement, 0, PcreSubstituteOptions.None, null, null);
+        => Substitute(subject, replacement, 0, PcreSubstituteOptions.None, null, null, null);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Substitute"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacement" or @name="options"]'/>
@@ -38,7 +38,7 @@ public partial class PcreRegex
     /// <seealso cref="Replace(string,string)"/>
     [Pure]
     public string Substitute(string subject, string replacement, PcreSubstituteOptions options)
-        => Substitute(subject, replacement, 0, options, null, null);
+        => Substitute(subject, replacement, 0, options, null, null, null);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Substitute"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacement" or @name="options"]'/>
@@ -48,7 +48,7 @@ public partial class PcreRegex
     /// <seealso cref="Replace(string,string)"/>
     [Pure]
     public string Substitute(ReadOnlySpan<char> subject, ReadOnlySpan<char> replacement, PcreSubstituteOptions options)
-        => Substitute(subject, replacement, 0, options, null, null);
+        => Substitute(subject, replacement, 0, options, null, null, null);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Substitute"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacement" or @name="startIndex" or @name="options"]'/>
@@ -58,7 +58,7 @@ public partial class PcreRegex
     /// <seealso cref="Replace(string,string)"/>
     [Pure]
     public string Substitute(string subject, string replacement, int startIndex, PcreSubstituteOptions options)
-        => Substitute(subject, replacement, startIndex, options, null, null);
+        => Substitute(subject, replacement, startIndex, options, null, null, null);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Substitute"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacement" or @name="startIndex" or @name="options"]'/>
@@ -68,7 +68,7 @@ public partial class PcreRegex
     /// <seealso cref="Replace(string,string)"/>
     [Pure]
     public string Substitute(ReadOnlySpan<char> subject, ReadOnlySpan<char> replacement, int startIndex, PcreSubstituteOptions options)
-        => Substitute(subject, replacement, startIndex, options, null, null);
+        => Substitute(subject, replacement, startIndex, options, null, null, null);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Substitute"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacement" or @name="options" or @name="onSubstituteCallout"]'/>
@@ -78,7 +78,7 @@ public partial class PcreRegex
     /// <seealso cref="Replace(string,string)"/>
     [Pure]
     public string Substitute(string subject, string replacement, PcreSubstituteOptions options, PcreSubstituteCalloutFunc? onSubstituteCallout)
-        => Substitute(subject, replacement, 0, options, onSubstituteCallout, null);
+        => Substitute(subject, replacement, 0, options, null, onSubstituteCallout, null);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Substitute"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacement" or @name="options" or @name="onSubstituteCallout"]'/>
@@ -88,7 +88,7 @@ public partial class PcreRegex
     /// <seealso cref="Replace(string,string)"/>
     [Pure]
     public string Substitute(ReadOnlySpan<char> subject, ReadOnlySpan<char> replacement, PcreSubstituteOptions options, PcreSubstituteCalloutFunc? onSubstituteCallout)
-        => Substitute(subject, replacement, 0, options, onSubstituteCallout, null);
+        => Substitute(subject, replacement, 0, options, null, onSubstituteCallout, null);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Substitute"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacement" or @name="startIndex" or @name="options" or @name="onSubstituteCallout"]'/>
@@ -98,7 +98,7 @@ public partial class PcreRegex
     /// <seealso cref="Replace(string,string)"/>
     [Pure]
     public string Substitute(string subject, string replacement, int startIndex, PcreSubstituteOptions options, PcreSubstituteCalloutFunc? onSubstituteCallout)
-        => Substitute(subject, replacement, startIndex, options, onSubstituteCallout, null);
+        => Substitute(subject, replacement, startIndex, options, null, onSubstituteCallout, null);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Substitute"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacement" or @name="startIndex" or @name="options" or @name="onSubstituteCallout"]'/>
@@ -108,7 +108,7 @@ public partial class PcreRegex
     /// <seealso cref="Replace(string,string)"/>
     [Pure]
     public string Substitute(ReadOnlySpan<char> subject, ReadOnlySpan<char> replacement, int startIndex, PcreSubstituteOptions options, PcreSubstituteCalloutFunc? onSubstituteCallout)
-        => Substitute(subject, replacement, startIndex, options, onSubstituteCallout, null);
+        => Substitute(subject, replacement, startIndex, options, null, onSubstituteCallout, null);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Substitute"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacement" or @name="options" or @name="startIndex" or @name="onSubstituteCallout" or @name="settings"]'/>
@@ -118,6 +118,26 @@ public partial class PcreRegex
     /// <seealso cref="Replace(string,string)"/>
     [Pure]
     public string Substitute(string subject, string replacement, int startIndex, PcreSubstituteOptions options, PcreSubstituteCalloutFunc? onSubstituteCallout, PcreMatchSettings? settings)
+        => Substitute(subject, replacement, startIndex, options, null, onSubstituteCallout, settings);
+
+    /// <include file='PcreRegex.xml' path='/doc/method[@name="Substitute"]/*'/>
+    /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacement" or @name="startIndex" or @name="options" or @name="onSubstituteCallout" or @name="settings"]'/>
+    /// <remarks>
+    /// <include file='PcreRegex.xml' path='/doc/remarks[@name="replacementStringPcre2" or @name="startIndex"]/*'/>
+    /// </remarks>
+    /// <seealso cref="Replace(string,string)"/>
+    [Pure]
+    public string Substitute(ReadOnlySpan<char> subject, ReadOnlySpan<char> replacement, int startIndex, PcreSubstituteOptions options, PcreSubstituteCalloutFunc? onSubstituteCallout, PcreMatchSettings? settings)
+        => Substitute(subject, replacement, startIndex, options, null, onSubstituteCallout, settings);
+
+    /// <include file='PcreRegex.xml' path='/doc/method[@name="Substitute"]/*'/>
+    /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacement" or @name="options" or @name="startIndex" or @name="onMatchCallout" or @name="onSubstituteCallout" or @name="settings"]'/>
+    /// <remarks>
+    /// <include file='PcreRegex.xml' path='/doc/remarks[@name="replacementStringPcre2" or @name="startIndex"]/*'/>
+    /// </remarks>
+    /// <seealso cref="Replace(string,string)"/>
+    [Pure]
+    public string Substitute(string subject, string replacement, int startIndex, PcreSubstituteOptions options, PcreRefCalloutFunc? onMatchCallout, PcreSubstituteCalloutFunc? onSubstituteCallout, PcreMatchSettings? settings)
     {
         if (subject == null)
             throw new ArgumentNullException(nameof(subject));
@@ -128,22 +148,22 @@ public partial class PcreRegex
         if (unchecked((uint)startIndex > (uint)subject.Length))
             ThrowInvalidStartIndex();
 
-        return InternalRegex.Substitute(subject.AsSpan(), subject, replacement.AsSpan(), settings, startIndex, options.ToSubstituteOptions(), onSubstituteCallout, out _);
+        return InternalRegex.Substitute(subject.AsSpan(), subject, replacement.AsSpan(), settings, startIndex, options.ToSubstituteOptions(), onMatchCallout, onSubstituteCallout, out _);
     }
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Substitute"]/*'/>
-    /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacement" or @name="startIndex" or @name="options" or @name="onSubstituteCallout" or @name="settings"]'/>
+    /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacement" or @name="startIndex" or @name="options" or @name="onMatchCallout" or @name="onSubstituteCallout" or @name="settings"]'/>
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="replacementStringPcre2" or @name="startIndex"]/*'/>
     /// </remarks>
     /// <seealso cref="Replace(string,string)"/>
     [Pure]
-    public string Substitute(ReadOnlySpan<char> subject, ReadOnlySpan<char> replacement, int startIndex, PcreSubstituteOptions options, PcreSubstituteCalloutFunc? onSubstituteCallout, PcreMatchSettings? settings)
+    public string Substitute(ReadOnlySpan<char> subject, ReadOnlySpan<char> replacement, int startIndex, PcreSubstituteOptions options, PcreRefCalloutFunc? onMatchCallout, PcreSubstituteCalloutFunc? onSubstituteCallout, PcreMatchSettings? settings)
     {
         if (unchecked((uint)startIndex > (uint)subject.Length))
             ThrowInvalidStartIndex();
 
-        return InternalRegex.Substitute(subject, null, replacement, settings, startIndex, options.ToSubstituteOptions(), onSubstituteCallout, out _);
+        return InternalRegex.Substitute(subject, null, replacement, settings, startIndex, options.ToSubstituteOptions(), onMatchCallout, onSubstituteCallout, out _);
     }
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Substitute"]/*'/>

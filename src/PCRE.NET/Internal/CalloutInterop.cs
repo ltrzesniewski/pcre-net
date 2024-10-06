@@ -11,6 +11,7 @@ internal static unsafe class CalloutInterop
 {
 #if NET
     private static readonly delegate* unmanaged[Cdecl]<Native.pcre2_callout_block*, void*, int> _calloutHandlerFnPtr = &CalloutHandler;
+    private static readonly delegate* unmanaged[Cdecl]<Native.pcre2_callout_block*, void*, int> _substituteMatchCalloutHandlerFnPtr = &SubstituteMatchCalloutHandler;
     private static readonly delegate* unmanaged[Cdecl]<Native.pcre2_substitute_callout_block*, void*, int> _substituteCalloutHandlerFnPtr = &SubstituteCalloutHandler;
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
@@ -18,11 +19,18 @@ internal static unsafe class CalloutInterop
         => ToInteropInfo(data).Call(callout);
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static int SubstituteMatchCalloutHandler(Native.pcre2_callout_block* callout, void* data)
+        => ToSubstituteInteropInfo(data).CallMatchCallout(callout);
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
     private static int SubstituteCalloutHandler(Native.pcre2_substitute_callout_block* callout, void* data)
-        => ToSubstituteInteropInfo(data).Call(callout);
+        => ToSubstituteInteropInfo(data).CallSubstituteCallout(callout);
 #else
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate int CalloutHandlerFunc(Native.pcre2_callout_block* callout, void* data);
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int SubstituteMatchCalloutHandlerFunc(Native.pcre2_callout_block* callout, void* data);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate int SubstituteCalloutHandlerFunc(Native.pcre2_substitute_callout_block* callout, void* data);
@@ -30,14 +38,20 @@ internal static unsafe class CalloutInterop
     private static readonly CalloutHandlerFunc _calloutHandlerDelegate = CalloutHandler; // GC root
     private static readonly void* _calloutHandlerFnPtr = Marshal.GetFunctionPointerForDelegate(_calloutHandlerDelegate).ToPointer();
 
+    private static readonly SubstituteMatchCalloutHandlerFunc _substituteMatchCalloutHandlerDelegate = SubstituteMatchCalloutHandler; // GC root
+    private static readonly void* _substituteMatchCalloutHandlerFnPtr = Marshal.GetFunctionPointerForDelegate(_substituteMatchCalloutHandlerDelegate).ToPointer();
+
     private static readonly SubstituteCalloutHandlerFunc _substituteCalloutHandlerDelegate = SubstituteCalloutHandler; // GC root
     private static readonly void* _substituteCalloutHandlerFnPtr = Marshal.GetFunctionPointerForDelegate(_substituteCalloutHandlerDelegate).ToPointer();
 
     private static int CalloutHandler(Native.pcre2_callout_block* callout, void* data)
         => ToInteropInfo(data).Call(callout);
 
+    private static int SubstituteMatchCalloutHandler(Native.pcre2_callout_block* callout, void* data)
+        => ToSubstituteInteropInfo(data).CallMatchCallout(callout);
+
     private static int SubstituteCalloutHandler(Native.pcre2_substitute_callout_block* callout, void* data)
-        => ToSubstituteInteropInfo(data).Call(callout);
+        => ToSubstituteInteropInfo(data).CallSubstituteCallout(callout);
 #endif
 
     public static void Prepare(string subject,
@@ -125,19 +139,34 @@ internal static unsafe class CalloutInterop
                                          ReadOnlySpan<char> subject,
                                          scoped ref Native.substitute_input input,
                                          out SubstituteCalloutInteropInfo interopInfo,
-                                         PcreSubstituteCalloutFunc? callout)
+                                         PcreRefCalloutFunc? matchCallout,
+                                         PcreSubstituteCalloutFunc? substituteCallout)
     {
-        if (callout != null)
-        {
-            interopInfo = new SubstituteCalloutInteropInfo(regex, subject, callout);
+        interopInfo = new SubstituteCalloutInteropInfo(regex, subject, matchCallout, substituteCallout);
 
-            input.callout = _substituteCalloutHandlerFnPtr;
-            input.callout_data = interopInfo.ToPointer();
+        if (matchCallout is not null)
+        {
+            input.match_callout = _substituteMatchCalloutHandlerFnPtr;
+            input.match_callout_data = interopInfo.ToPointer();
         }
         else
         {
+            input.match_callout = null;
+        }
+
+        if (substituteCallout is not null)
+        {
+            input.substitute_callout = _substituteCalloutHandlerFnPtr;
+            input.substitute_callout_data = interopInfo.ToPointer();
+        }
+        else
+        {
+            input.substitute_callout = null;
+        }
+
+        if (matchCallout is null && substituteCallout is null)
+        {
             interopInfo = default;
-            input.callout = null;
         }
     }
 
@@ -269,25 +298,45 @@ internal static unsafe class CalloutInterop
     {
         private readonly InternalRegex _regex;
         private readonly ReadOnlySpan<char> _subject;
-        private readonly PcreSubstituteCalloutFunc _callout;
+        private readonly PcreRefCalloutFunc? _matchCallout;
+        private readonly PcreSubstituteCalloutFunc? _substituteCallout;
 
         public Exception? Exception { get; private set; }
 
-        public SubstituteCalloutInteropInfo(InternalRegex regex, ReadOnlySpan<char> subject, PcreSubstituteCalloutFunc callout)
+        public SubstituteCalloutInteropInfo(InternalRegex regex, ReadOnlySpan<char> subject, PcreRefCalloutFunc? matchCallout, PcreSubstituteCalloutFunc? substituteCallout)
         {
             _regex = regex;
             _subject = subject;
-            _callout = callout;
+            _matchCallout = matchCallout;
+            _substituteCallout = substituteCallout;
 
             Exception = null;
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031")]
-        public int Call(Native.pcre2_substitute_callout_block* callout)
+        public int CallMatchCallout(Native.pcre2_callout_block* callout)
         {
             try
             {
-                return (int)_callout(new PcreSubstituteCallout(_regex, _subject, callout));
+                var outputVector = callout->capture_top <= InternalRegex.MaxStackAllocCaptureCount
+                    ? stackalloc nuint[(int)callout->capture_top * 2]
+                    : Span<nuint>.Empty;
+
+                return (int)(_matchCallout?.Invoke(new PcreRefCallout(_subject, _regex, callout, outputVector)) ?? PcreCalloutResult.Pass);
+            }
+            catch (Exception ex)
+            {
+                Exception = ex;
+                return (int)PcreCalloutResult.Abort;
+            }
+        }
+
+        [SuppressMessage("Microsoft.Design", "CA1031")]
+        public int CallSubstituteCallout(Native.pcre2_substitute_callout_block* callout)
+        {
+            try
+            {
+                return (int)(_substituteCallout?.Invoke(new PcreSubstituteCallout(_regex, _subject, callout)) ?? PcreSubstituteCalloutResult.Pass);
             }
             catch (Exception ex)
             {
