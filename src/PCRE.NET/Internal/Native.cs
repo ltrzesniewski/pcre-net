@@ -141,9 +141,8 @@ internal static unsafe partial class Native
         public char* buffer;
         public uint buffer_length;
         public void* match_callout;
-        public void* match_callout_data;
         public void* substitute_callout;
-        public void* substitute_callout_data;
+        public void* callout_data;
     }
 
     [StructLayout(LayoutKind.Sequential)]

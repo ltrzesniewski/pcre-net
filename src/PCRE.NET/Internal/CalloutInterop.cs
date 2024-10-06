@@ -142,29 +142,15 @@ internal static unsafe class CalloutInterop
                                          PcreRefCalloutFunc? matchCallout,
                                          PcreSubstituteCalloutFunc? substituteCallout)
     {
-        interopInfo = new SubstituteCalloutInteropInfo(regex, subject, matchCallout, substituteCallout);
+        input.match_callout = matchCallout is not null ? _substituteMatchCalloutHandlerFnPtr : null;
+        input.substitute_callout = substituteCallout is not null ? _substituteCalloutHandlerFnPtr : null;
 
-        if (matchCallout is not null)
+        if (matchCallout is not null || substituteCallout is not null)
         {
-            input.match_callout = _substituteMatchCalloutHandlerFnPtr;
-            input.match_callout_data = interopInfo.ToPointer();
+            interopInfo = new SubstituteCalloutInteropInfo(regex, subject, matchCallout, substituteCallout);
+            input.callout_data = interopInfo.ToPointer();
         }
         else
-        {
-            input.match_callout = null;
-        }
-
-        if (substituteCallout is not null)
-        {
-            input.substitute_callout = _substituteCalloutHandlerFnPtr;
-            input.substitute_callout_data = interopInfo.ToPointer();
-        }
-        else
-        {
-            input.substitute_callout = null;
-        }
-
-        if (matchCallout is null && substituteCallout is null)
         {
             interopInfo = default;
         }

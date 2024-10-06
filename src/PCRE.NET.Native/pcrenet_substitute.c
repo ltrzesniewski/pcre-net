@@ -16,9 +16,8 @@ typedef struct
     uint16_t* buffer;
     uint32_t buffer_length;
     match_callout_fn match_callout;
-    void* match_callout_data;
     substitute_callout_fn substitute_callout;
-    void* substitute_callout_data;
+    void* callout_data;
 } pcrenet_substitute_input;
 
 typedef struct
@@ -153,7 +152,7 @@ static int match_callout_handler(pcre2_callout_block* block, void* data_ptr)
         return map_callout_result_byte_to_int(result);
 
     result = map_callout_result_int_to_byte(
-        data->input->match_callout(block, data->input->match_callout_data));
+        data->input->match_callout(block, data->input->callout_data));
 
     replay_queue_try_enqueue(&data->match_callout_queue, result);
     return result;
@@ -168,7 +167,7 @@ static int substitute_callout_handler(pcre2_substitute_callout_block* block, voi
         return map_callout_result_byte_to_int(result);
 
     result = map_callout_result_int_to_byte(
-        data->input->substitute_callout(block, data->input->substitute_callout_data));
+        data->input->substitute_callout(block, data->input->callout_data));
 
     replay_queue_try_enqueue(&data->substitute_callout_queue, result);
     return result;
