@@ -28,7 +28,7 @@ typedef struct
 
 typedef struct
 {
-    int* buffer;
+    uint8_t* buffer;
     size_t buffer_size;
     size_t count;
     size_t replayed;
@@ -61,7 +61,7 @@ static void replay_queue_start_replay(replay_queue* queue)
     queue->replayed = 0;
 }
 
-static int replay_queue_try_dequeue(replay_queue* queue, int* result)
+static int replay_queue_try_dequeue(replay_queue* queue, uint8_t* result)
 {
     if (!queue->buffer && queue->buffer_size)
         return 0; // Invalid queue
@@ -75,15 +75,15 @@ static int replay_queue_try_dequeue(replay_queue* queue, int* result)
     return 0;
 }
 
-static void replay_queue_try_enqueue(replay_queue* queue, int result)
+static void replay_queue_try_enqueue(replay_queue* queue, uint8_t result)
 {
     if (!queue->buffer && queue->buffer_size)
         return; // Invalid queue
 
     if (queue->count == queue->buffer_size)
     {
-        const size_t new_size = max(8, 2 * queue->buffer_size);
-        int* new_buf = realloc(queue->buffer, new_size * sizeof(int));
+        const size_t new_size = max(64, 2 * queue->buffer_size);
+        uint8_t* new_buf = realloc(queue->buffer, new_size * sizeof(uint8_t));
         if (!new_buf)
             return;
 
@@ -108,15 +108,41 @@ static void free_result_memory(pcrenet_substitute_result* result)
     result->output_on_heap = 0;
 }
 
+static uint8_t map_substitute_result_int_to_byte(int result)
+{
+    if (result == 0)
+        return 0;
+
+    if (result > 0)
+        return 1;
+
+    return 2;
+}
+
+static int map_substitute_result_byte_to_int(uint8_t result)
+{
+    switch (result)
+    {
+    case 0:
+        return 0;
+
+    case 1:
+        return 1;
+
+    default:
+        return -1;
+    }
+}
+
 static int substitute_callout_handler(pcre2_substitute_callout_block* block, void* data_ptr)
 {
     substitute_callout_data* data = data_ptr;
 
-    int result;
+    uint8_t result;
     if (replay_queue_try_dequeue(&data->callout_queue, &result))
-        return result;
+        return map_substitute_result_byte_to_int(result);
 
-    result = data->input->callout(block, data->input->callout_data);
+    result = map_substitute_result_int_to_byte(data->input->callout(block, data->input->callout_data));
 
     replay_queue_try_enqueue(&data->callout_queue, result);
     return result;
