@@ -128,10 +128,38 @@ internal static unsafe partial class Native
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    internal ref struct substitute_input
+    {
+        public IntPtr code;
+        public char* subject;
+        public uint subject_length;
+        public uint start_index;
+        public uint additional_options;
+        public match_settings settings;
+        public char* replacement;
+        public uint replacement_length;
+        public char* buffer;
+        public uint buffer_length;
+        public void* match_callout;
+        public void* substitute_callout;
+        public void* callout_data;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
     internal ref struct match_result
     {
         public int result_code;
         public char* mark;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal ref struct substitute_result
+    {
+        public int result_code;
+        public char* output;
+        public nuint output_length;
+        public byte output_on_heap;
+        public uint substitute_call_count;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -184,9 +212,22 @@ internal static unsafe partial class Native
         public uint callout_number; /* Number compiled into pattern */
         public nuint callout_string_offset; /* Offset to string within pattern */
         public nuint callout_string_length; /* Length of string compiled into pattern */
-
         public IntPtr callout_string; /* String compiled into pattern */
-        /* ------------------------------------------------------------------ */
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct pcre2_substitute_callout_block
+    {
+        public uint version; /* Identifies version of block */
+
+        /* ------------------------ Version 0 ------------------------------- */
+        public char* input; /* Pointer to input subject string */
+        public char* output; /* Pointer to output buffer */
+        public nuint output_offset_start; /* Changed portion of the output */
+        public nuint output_offset_end; /* Changed portion of the output */
+        public nuint* ovector; /* Pointer to current ovector */
+        public uint oveccount; /* Count of pairs set in ovector */
+        public uint subscount; /* Substitution number */
     }
 
     [StructLayout(LayoutKind.Sequential)]

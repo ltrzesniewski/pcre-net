@@ -20,7 +20,17 @@
 
   <method name="Replace">
     <summary>
-      Replaces matches found in the given subject string.
+      Replaces matches found in the given subject string, using the
+      <b>PCRE.NET replacement syntax</b>
+      (similar to the one used by the
+      <see cref="System.Text.RegularExpressions.Regex"/>
+      class).
+    </summary>
+  </method>
+
+  <method name="Substitute">
+    <summary>
+      Replaces matches found in the given subject string, using the <b>PCRE2 replacement syntax</b>.
     </summary>
   </method>
 
@@ -51,8 +61,12 @@
   <param name="count">The maximum number of matches to attempt.</param>
   <param name="startIndex">The index at which the match should be attempted.</param>
   <param name="options">Additional options.</param>
+  <param name="patternOptions">Additional options for the pattern.</param>
+  <param name="substituteOptions">Additional options for the substitution.</param>
   <param name="splitOptions">Additional options for the split.</param>
   <param name="onCallout">A function to be called when a callout point is reached during the match.</param>
+  <param name="onMatchCallout">A function to be called when a callout point is reached during the match.</param>
+  <param name="onSubstituteCallout">A function to be called when a substitution is made.</param>
   <param name="settings">Additional advanced settings.</param>
 
   <!-- Keep the remarks ordered by importance -->
@@ -121,10 +135,68 @@
     </para>
   </remarks>
 
+  <remarks name="replacementStringPcre2">
+    <para>
+      The supported placeholders in the replacement string are specific to the PCRE2 library.
+      <list type="bullet">
+        <item>
+          <c>$n</c>
+          - The value of the capture group <c>n</c> (by index or name).
+        </item>
+        <item>
+          <c>${n}</c>
+          - The value of the capture group <c>n</c> (by index or name).
+        </item>
+        <item>
+          <c>$$</c>
+          - A literal dollar sign.
+        </item>
+        <item>
+          <c>$*MARK</c>
+          or
+          <c>${*MARK}</c>
+          - The last encountered backtracking control verb name.
+        </item>
+      </list>
+      When the option
+      <see cref="PcreSubstituteOptions.SubstituteExtended"/>
+      is enabled, additional syntax is available:
+      <list type="bullet">
+        <item>
+          Backslash in a replacement string is interpreted as an escape character.
+          The usual forms such as <c>\x{ddd}</c> can be used to specify particular character codes, and backslash
+          followed by any non-alphanumeric character quotes that character.
+          Extended quoting can be coded using <c>\Q...\E</c>, exactly as in pattern strings.
+        </item>
+        <item>
+          Case forcing: <c>\U</c> and <c>\L</c> change to upper or lower case forcing, respectively,
+          and <c>\E</c> (when not terminating a <c>\Q</c> quoted sequence) reverts to no case forcing.
+          The sequences <c>\u</c> and <c>\l</c> force the next character (if it is a letter) to upper
+          or lower case, respectively, and then the state automatically reverts to no case forcing.
+          However, if <c>\u</c> is immediately followed by <c>\L</c> or <c>\l</c> is immediately followed by <c>\U</c>,
+          the next character's case is forced by the first escape sequence, and subsequent characters by the second.
+          This provides a "title casing" facility that can be applied to group captures.
+        </item>
+        <item>
+          <c>${n:-string}</c>
+          - If group <c>n</c> is set, its value is inserted;
+          if not, the string is expanded and the result inserted.
+          This is a shorthand for <c>${n:+${n}:string}</c>.
+        </item>
+        <item>
+          <c>${n:+string1:string2}</c>
+          - Strings that are expanded and inserted when group <c>n</c> is set or unset, respectively.
+        </item>
+      </list>
+    </para>
+  </remarks>
+
   <remarks name="callout">
     <para>
-      Within a regular expression, <c>(?C&lt;arg&gt;)</c> indicates a point at which the external function is to be called.
-      Different callout points can be identified by putting a number less than 256 after the letter C. The default value is zero.
+      Within a regular expression, <c>(?C&lt;arg&gt;)</c> indicates a point at which the external function is to be
+      called.
+      Different callout points can be identified by putting a number less than 256 after the letter C. The default value
+      is zero.
       Alternatively, the argument may be a delimited string. The starting delimiter must be one of
       <c>` ' " ^ % # $ {</c>
       and the ending delimiter is the same as the start, except for <c>{</c>, where the ending delimiter is <c>}</c>.

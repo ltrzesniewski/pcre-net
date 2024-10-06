@@ -12,6 +12,10 @@ internal static class PcreEnumExtensions
     public static uint ToPatternOptions(this PcreMatchOptions options)
         => (uint)((long)options & 0xFFFFFFFF);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static uint ToSubstituteOptions(this PcreSubstituteOptions options)
+        => (uint)((long)options & 0xFFFFFFFF);
+
     public static PcreJitCompileOptions ToJitCompileOptions(this PcreOptions options)
     {
         var jitOptions = PcreJitCompileOptions.None;

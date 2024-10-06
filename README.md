@@ -29,9 +29,13 @@ This is a friendly API that is very similar to .NET's `System.Text.RegularExpres
   - `Matches`
   - `Match`
   - `IsMatch`
-- Matched string replacement: `Replace`
-  - Callbacks: `Func<PcreMatch, string>`
-  - Replacement strings with placeholders: ``$n ${name} $& $_ $` $' $+``
+- Matched string replacement:
+  - Using `Replace`, the PCRE.NET API:
+    - Callbacks: `Func<PcreMatch, string>`
+    - Replacement strings with placeholders: ``$n ${name} $& $_ $` $' $+``
+  - Using `Substitute`, the PCRE2 API:
+      - Replacement strings with placeholders: ``$n ${n} $$ $*MARK ${*MARK}``
+      - Callouts for matches and substitutions
 - String splitting on matches: `Split`
 
 ### The Span API
@@ -41,8 +45,9 @@ This is a friendly API that is very similar to .NET's `System.Text.RegularExpres
 - `Matches`
 - `Match`
 - `IsMatch`
+- `Substitute`
 
-These methods return a `ref struct` type, but are otherwise similar to the classic API.
+These methods return a `ref struct` type when possible, but are otherwise similar to the classic API.
 
 ### The zero-allocation API
 
@@ -90,11 +95,18 @@ var matches = PcreRegex.Matches("(foo) bar (baz) 42", @"\(\w+\)(*SKIP)(*FAIL)|\w
 // result: "bar", "42"
 ```
 
-- Enclose a series of punctuation characters within angle brackets:
+- Enclose a series of punctuation characters within angle brackets using `Replace` (the PCRE.NET API):
 
 ```C#
 var result = PcreRegex.Replace("hello, world!!!", @"\p{P}+", "<$&>");
 // result: "hello<,> world<!!!>"
+```
+
+- Enclose a series of punctuation characters within angle brackets using `Substitute` (the PCRE2 API):
+
+```C#
+var result = PcreRegex.Substitute("hello, world!!!", @"\p{P}+", "<$0>", PcreOptions.None, PcreSubstituteOptions.SubstituteGlobal);
+Assert.That(result, Is.EqualTo("hello<,> world<!!!>"));
 ```
 
 - Partial matching:

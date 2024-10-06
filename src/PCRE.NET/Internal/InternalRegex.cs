@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using PCRE.Dfa;
 
@@ -8,6 +9,7 @@ namespace PCRE.Internal;
 internal sealed unsafe class InternalRegex : IDisposable
 {
     internal const int MaxStackAllocCaptureCount = 32;
+    internal const int SubstituteBufferSizeInChars = 4096;
 
     private Dictionary<int, PcreCalloutInfo>? _calloutInfoByPatternPosition;
     private PcreMatch? _noMatch;
@@ -274,6 +276,78 @@ internal sealed unsafe class InternalRegex : IDisposable
             HandleError(result, ref calloutInterop);
 
         return new PcreDfaMatchResult(subject, ref result, oVector);
+    }
+
+    public string Substitute(ReadOnlySpan<char> subject,
+                             string? subjectAsString,
+                             ReadOnlySpan<char> replacement,
+                             PcreMatchSettings? settings,
+                             int startIndex,
+                             uint additionalOptions,
+                             PcreRefCalloutFunc? matchCallout,
+                             PcreSubstituteCalloutFunc? substituteCallout,
+                             out uint substituteCallCount)
+    {
+        Debug.Assert(subjectAsString is null || subjectAsString.AsSpan() == subject);
+
+        Native.substitute_input input;
+        _ = &input;
+
+        (settings ?? PcreMatchSettings.Default).FillMatchSettings(ref input.settings);
+
+        Native.substitute_result result;
+        CalloutInterop.SubstituteCalloutInteropInfo calloutInterop;
+
+        var buffer = stackalloc char[SubstituteBufferSizeInChars];
+        input.buffer = buffer;
+        input.buffer_length = SubstituteBufferSizeInChars;
+
+        fixed (char* pSubject = subject)
+        fixed (char* pReplacement = replacement)
+        {
+            input.code = Code;
+            input.subject = pSubject;
+            input.subject_length = (uint)subject.Length;
+            input.start_index = (uint)startIndex;
+            input.additional_options = additionalOptions;
+            input.replacement = pReplacement;
+            input.replacement_length = (uint)replacement.Length;
+
+            CalloutInterop.PrepareSubstitute(this, subject, ref input, out calloutInterop, matchCallout, substituteCallout);
+
+            Native.substitute(&input, &result);
+
+            substituteCallCount = result.substitute_call_count;
+        }
+
+        try
+        {
+            if (calloutInterop.Exception is { } ex)
+                throw new PcreCalloutException("An exception was thrown by the callout: " + ex.Message, ex);
+
+            switch (result.result_code)
+            {
+                case < 0: // An error occured
+                    throw new PcreSubstituteException((PcreErrorCode)result.result_code);
+
+                case 0: // No substitution was made, avoid allocating a new string if possible
+                    if ((additionalOptions & PcreConstants.SUBSTITUTE_REPLACEMENT_ONLY) != 0)
+                        return string.Empty;
+
+                    return subjectAsString ?? subject.ToString();
+
+                default: // At least one substitution was made, return the result as a new string
+                    if (result.output_length > int.MaxValue)
+                        throw new PcreSubstituteException(PcreErrorCode.Internal, "Invalid output string length", null);
+
+                    return new string(result.output, 0, (int)result.output_length);
+            }
+        }
+        finally
+        {
+            if (result.output != null && result.output_on_heap != 0)
+                Native.substitute_result_free(&result);
+        }
     }
 
     private static void HandleError(in Native.match_result result, ref CalloutInterop.CalloutInteropInfo calloutInterop)

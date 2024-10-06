@@ -77,16 +77,27 @@ public class DocumentationTests
 
         AssertContainsIfParam(p => p.Name is "startIndex", "Passing a non-zero");
         AssertContainsIfParam(p => p.Name is "callout" or "onCallout", "(?C<arg>)");
-        AssertContainsIfParam(p => p.Name is "replacement" && p.ParameterType == typeof(string), "supported placeholders");
+        AssertContainsIfParam(p => p.Name is "replacement" && (p.ParameterType == typeof(string) || p.ParameterType == typeof(ReadOnlySpan<char>)), "supported placeholders");
+
+        AssertXmlContainsIf(method.DeclaringType == typeof(PcreRegex) && method.Name == nameof(PcreRegex.Replace), """<seealso cref="M:PCRE.PcreRegex.Substitute(System.String,System.String)" />""");
+        AssertXmlContainsIf(method.DeclaringType == typeof(PcreRegex) && method.Name == nameof(PcreRegex.Substitute), """<seealso cref="M:PCRE.PcreRegex.Replace(System.String,System.String)" />""");
 
         void AssertContainsIf(bool condition, string expectedString)
-            => Assert.That(doc.Value, condition
-                ? Does.Contain(expectedString)
-                : Does.Not.Contain(expectedString)
+            => Assert.That(
+                doc.Value, condition
+                    ? Does.Contain(expectedString)
+                    : Does.Not.Contain(expectedString)
             );
 
         void AssertContainsIfParam(Func<ParameterInfo, bool> param, string expectedString)
             => AssertContainsIf(method.GetParameters().Any(param), expectedString);
+
+        void AssertXmlContainsIf(bool condition, string expectedString)
+            => Assert.That(
+                doc.ToString(), condition
+                    ? Does.Contain(expectedString)
+                    : Does.Not.Contain(expectedString)
+            );
     }
 
     private static Dictionary<string, XElement> GetMembers()
@@ -109,7 +120,12 @@ public class DocumentationTests
         => typeof(PcreRegex).GetMethods()
                             .Concat(typeof(PcreDfaRegex).GetMethods())
                             .Concat(typeof(PcreMatchBuffer).GetMethods())
-                            .Where(m => m.Name is nameof(PcreRegex.Match) or nameof(PcreRegex.IsMatch) or nameof(PcreRegex.Matches) or nameof(PcreRegex.Split) or nameof(PcreRegex.Replace))
+                            .Where(m => m.Name is nameof(PcreRegex.Match)
+                                       or nameof(PcreRegex.IsMatch)
+                                       or nameof(PcreRegex.Matches)
+                                       or nameof(PcreRegex.Split)
+                                       or nameof(PcreRegex.Replace)
+                                       or nameof(PcreRegex.Substitute))
                             .Select(m => new TestCaseData(m).SetName("Remarks: " + GetMethodDocId(m)));
 
     private static string GetMethodDocId(MethodInfo method)

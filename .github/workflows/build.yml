@@ -27,7 +27,7 @@ jobs:
             extension: dylib
 
           - name: macOS x64
-            runner: macos-12
+            runner: macos-13
             platform: x64
             extension: dylib
 
@@ -204,7 +204,7 @@ jobs:
             runner: macos-14
 
           - name: macOS x64
-            runner: macos-12
+            runner: macos-13
 
           - name: Windows x64
             runner: windows-2022

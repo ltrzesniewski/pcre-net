@@ -16,7 +16,7 @@ public class PcreException : Exception
     public PcreErrorCode ErrorCode { get; }
 
     /// <summary>
-    /// Creates a <see cref="PcreException"/>
+    /// Creates a <see cref="PcreException"/>.
     /// </summary>
     /// <param name="errorCode">The associated error code.</param>
     public PcreException(PcreErrorCode errorCode)
@@ -25,7 +25,7 @@ public class PcreException : Exception
     }
 
     /// <summary>
-    /// Creates a <see cref="PcreException"/>
+    /// Creates a <see cref="PcreException"/>.
     /// </summary>
     /// <param name="errorCode">The associated error code.</param>
     /// <param name="message">The exception message.</param>
@@ -36,7 +36,7 @@ public class PcreException : Exception
     }
 
     /// <summary>
-    /// Creates a <see cref="PcreException"/>
+    /// Creates a <see cref="PcreException"/>.
     /// </summary>
     /// <param name="errorCode">The associated error code.</param>
     /// <param name="message">The exception message.</param>
@@ -54,7 +54,7 @@ public class PcreException : Exception
 public class PcrePatternException : PcreException
 {
     /// <summary>
-    /// Creates a <see cref="PcrePatternException"/>
+    /// Creates a <see cref="PcrePatternException"/>.
     /// </summary>
     /// <param name="errorCode">The associated error code.</param>
     /// <param name="message">The exception message.</param>
@@ -70,7 +70,7 @@ public class PcrePatternException : PcreException
 public class PcreMatchException : PcreException
 {
     /// <summary>
-    /// Creates a <see cref="PcreMatchException"/>
+    /// Creates a <see cref="PcreMatchException"/>.
     /// </summary>
     /// <param name="errorCode">The associated error code.</param>
     public PcreMatchException(PcreErrorCode errorCode)
@@ -79,12 +79,12 @@ public class PcreMatchException : PcreException
     }
 
     /// <summary>
-    /// Creates a <see cref="PcreMatchException"/>
+    /// Creates a <see cref="PcreMatchException"/>.
     /// </summary>
     /// <param name="errorCode">The associated error code.</param>
     /// <param name="message">The exception message.</param>
     /// <param name="innerException">The inner exception.</param>
-    protected PcreMatchException(PcreErrorCode errorCode, string message, Exception? innerException)
+    public PcreMatchException(PcreErrorCode errorCode, string message, Exception? innerException)
         : base(errorCode, message, innerException)
     {
     }
@@ -96,12 +96,38 @@ public class PcreMatchException : PcreException
 public class PcreCalloutException : PcreMatchException
 {
     /// <summary>
-    /// Creates a <see cref="PcreCalloutException"/>
+    /// Creates a <see cref="PcreCalloutException"/>.
     /// </summary>
     /// <param name="message">The exception message.</param>
     /// <param name="innerException">The inner exception.</param>
     public PcreCalloutException(string message, Exception? innerException)
         : base(PcreErrorCode.Callout, message, innerException)
+    {
+    }
+}
+
+/// <summary>
+/// Represents an error that occured during pattern substitution.
+/// </summary>
+public class PcreSubstituteException : PcreException
+{
+    /// <summary>
+    /// Creates a <see cref="PcreSubstituteException"/>.
+    /// </summary>
+    /// <param name="errorCode">The associated error code.</param>
+    public PcreSubstituteException(PcreErrorCode errorCode)
+        : base(errorCode)
+    {
+    }
+
+    /// <summary>
+    /// Creates a <see cref="PcreSubstituteException"/>.
+    /// </summary>
+    /// <param name="errorCode">The associated error code.</param>
+    /// <param name="message">The exception message.</param>
+    /// <param name="innerException">The inner exception.</param>
+    public PcreSubstituteException(PcreErrorCode errorCode, string message, Exception? innerException)
+        : base(errorCode, message, innerException)
     {
     }
 }

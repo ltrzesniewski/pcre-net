@@ -23,3 +23,16 @@
 #else
 #define c_static_assert(e, msg) typedef char __c_static_assert__[(e)?1:-1]
 #endif
+
+// Common types and functions
+
+typedef struct
+{
+    uint32_t match_limit;
+    uint32_t depth_limit;
+    uint32_t heap_limit;
+    uint32_t offset_limit;
+    pcre2_jit_stack* jit_stack;
+} match_settings;
+
+void apply_settings(const match_settings* settings, pcre2_match_context* context);

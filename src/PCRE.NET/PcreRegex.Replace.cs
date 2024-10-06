@@ -16,6 +16,7 @@ public partial class PcreRegex
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="replacementString"]/*'/>
     /// </remarks>
+    /// <seealso cref="Substitute(string,string)"/>
     [Pure]
     public string Replace(string subject, string replacement)
         => Replace(subject, replacement, -1, 0);
@@ -25,6 +26,7 @@ public partial class PcreRegex
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="replacementString"]/*'/>
     /// </remarks>
+    /// <seealso cref="Substitute(string,string)"/>
     [Pure]
     public string Replace(string subject, string replacement, int count)
         => Replace(subject, replacement, count, 0);
@@ -34,6 +36,7 @@ public partial class PcreRegex
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="replacementString" or @name="startIndex"]/*'/>
     /// </remarks>
+    /// <seealso cref="Substitute(string,string)"/>
     [Pure]
     public string Replace(string subject, string replacement, int count, int startIndex)
     {
@@ -45,11 +48,13 @@ public partial class PcreRegex
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Replace"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacementFunc"]'/>
+    /// <seealso cref="Substitute(string,string)"/>
     public string Replace(string subject, Func<PcreMatch, string> replacementFunc)
         => Replace(subject, replacementFunc, -1, 0);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Replace"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="replacementFunc" or @name="count"]'/>
+    /// <seealso cref="Substitute(string,string)"/>
     public string Replace(string subject, Func<PcreMatch, string> replacementFunc, int count)
         => Replace(subject, replacementFunc, count, 0);
 
@@ -58,6 +63,7 @@ public partial class PcreRegex
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex"]/*'/>
     /// </remarks>
+    /// <seealso cref="Substitute(string,string)"/>
     public string Replace(string subject, Func<PcreMatch, string> replacementFunc, int count, int startIndex)
     {
         if (subject == null)
@@ -94,6 +100,7 @@ public partial class PcreRegex
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static" or @name="replacementString"]/*'/>
     /// </remarks>
+    /// <seealso cref="Substitute(string,string)"/>
     [Pure]
     public static string Replace(string subject, string pattern, string replacement)
         => Replace(subject, pattern, replacement, PcreOptions.None, -1, 0);
@@ -103,6 +110,7 @@ public partial class PcreRegex
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static" or @name="replacementString"]/*'/>
     /// </remarks>
+    /// <seealso cref="Substitute(string,string)"/>
     [Pure]
     public static string Replace(string subject, string pattern, string replacement, PcreOptions options)
         => Replace(subject, pattern, replacement, options, -1, 0);
@@ -112,6 +120,7 @@ public partial class PcreRegex
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static" or @name="replacementString"]/*'/>
     /// </remarks>
+    /// <seealso cref="Substitute(string,string)"/>
     [Pure]
     public static string Replace(string subject, string pattern, string replacement, PcreOptions options, int count)
         => Replace(subject, pattern, replacement, options, count, 0);
@@ -121,6 +130,7 @@ public partial class PcreRegex
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static" or @name="replacementString" or @name="startIndex"]/*'/>
     /// </remarks>
+    /// <seealso cref="Substitute(string,string)"/>
     [Pure]
     public static string Replace(string subject, string pattern, string replacement, PcreOptions options, int count, int startIndex)
         => new PcreRegex(pattern, options).Replace(subject, replacement, count, startIndex);
@@ -130,6 +140,7 @@ public partial class PcreRegex
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static"]/*'/>
     /// </remarks>
+    /// <seealso cref="Substitute(string,string)"/>
     public static string Replace(string subject, string pattern, Func<PcreMatch, string> replacementFunc)
         => Replace(subject, pattern, replacementFunc, PcreOptions.None, -1, 0);
 
@@ -138,6 +149,7 @@ public partial class PcreRegex
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static"]/*'/>
     /// </remarks>
+    /// <seealso cref="Substitute(string,string)"/>
     public static string Replace(string subject, string pattern, Func<PcreMatch, string> replacementFunc, PcreOptions options)
         => Replace(subject, pattern, replacementFunc, options, -1, 0);
 
@@ -146,6 +158,7 @@ public partial class PcreRegex
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static"]/*'/>
     /// </remarks>
+    /// <seealso cref="Substitute(string,string)"/>
     public static string Replace(string subject, string pattern, Func<PcreMatch, string> replacementFunc, PcreOptions options, int count)
         => Replace(subject, pattern, replacementFunc, options, count, 0);
 
@@ -154,6 +167,7 @@ public partial class PcreRegex
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="static" or @name="startIndex"]/*'/>
     /// </remarks>
+    /// <seealso cref="Substitute(string,string)"/>
     public static string Replace(string subject, string pattern, Func<PcreMatch, string> replacementFunc, PcreOptions options, int count, int startIndex)
         => new PcreRegex(pattern, options).Replace(subject, replacementFunc, count, startIndex);
 }
