@@ -258,6 +258,26 @@ public class SubstituteTests
     }
 
     [Test]
+    public void should_execute_each_callout_once()
+    {
+        var str = new string('a', InternalRegex.SubstituteBufferSizeInChars * (1 + 2 + 4 + 8 + 16) + 42);
+        var re = new PcreRegex("a");
+
+        var execCount = 0;
+
+        var result = re.Substitute(str, "#", PcreSubstituteOptions.SubstituteGlobal, data =>
+        {
+            ++execCount;
+            Assert.That(data.SubstitutionCount, Is.EqualTo(execCount));
+            Assert.That(data.Match.Index, Is.EqualTo(execCount - 1));
+            return execCount % 3 == 0 ? PcreSubstituteCalloutResult.Pass : PcreSubstituteCalloutResult.Fail;
+        });
+
+        Assert.That(execCount, Is.EqualTo(str.Length));
+        Assert.That(result, Is.EqualTo(str.Replace("aaa", "aa#")));
+    }
+
+    [Test]
     public void readme_replace_example()
     {
         var result = PcreRegex.Substitute("hello, world!!!", @"\p{P}+", "<$0>", PcreOptions.None, PcreSubstituteOptions.SubstituteGlobal);

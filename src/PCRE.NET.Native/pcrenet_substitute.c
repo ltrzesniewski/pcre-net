@@ -28,8 +28,72 @@ typedef struct
 
 typedef struct
 {
+    int* buffer;
+    size_t buffer_size;
+    size_t count;
+    size_t replayed;
+} replay_queue;
+
+typedef struct
+{
     const pcrenet_substitute_input* input;
+    replay_queue callout_queue;
 } substitute_callout_data;
+
+static void replay_queue_init(replay_queue* queue)
+{
+    queue->buffer = NULL;
+    queue->buffer_size = 0;
+    queue->count = 0;
+    queue->replayed = 0;
+}
+
+static void replay_queue_free(replay_queue* queue)
+{
+    if (queue->buffer)
+        free(queue->buffer);
+
+    replay_queue_init(queue);
+}
+
+static void replay_queue_start_replay(replay_queue* queue)
+{
+    queue->replayed = 0;
+}
+
+static int replay_queue_try_dequeue(replay_queue* queue, int* result)
+{
+    if (!queue->buffer && queue->buffer_size)
+        return 0; // Invalid queue
+
+    if (queue->replayed < queue->count)
+    {
+        *result = queue->buffer[queue->replayed++];
+        return 1;
+    }
+
+    return 0;
+}
+
+static void replay_queue_try_enqueue(replay_queue* queue, int result)
+{
+    if (!queue->buffer && queue->buffer_size)
+        return; // Invalid queue
+
+    if (queue->count == queue->buffer_size)
+    {
+        const size_t new_size = max(8, 2 * queue->buffer_size);
+        int* new_buf = realloc(queue->buffer, new_size * sizeof(int));
+        if (!new_buf)
+            return;
+
+        queue->buffer = new_buf;
+        queue->buffer_size = new_size;
+    }
+
+    queue->buffer[queue->count++] = result;
+    queue->replayed = queue->count;
+}
 
 static void free_result_memory(pcrenet_substitute_result* result)
 {
@@ -46,8 +110,16 @@ static void free_result_memory(pcrenet_substitute_result* result)
 
 static int substitute_callout_handler(pcre2_substitute_callout_block* block, void* data_ptr)
 {
-    const substitute_callout_data* data = (substitute_callout_data*)data_ptr;
-    return data->input->callout(block, data->input->callout_data);
+    substitute_callout_data* data = data_ptr;
+
+    int result;
+    if (replay_queue_try_dequeue(&data->callout_queue, &result))
+        return result;
+
+    result = data->input->callout(block, data->input->callout_data);
+
+    replay_queue_try_enqueue(&data->callout_queue, result);
+    return result;
 }
 
 static int call_substitute(const pcrenet_substitute_input* input,
@@ -151,10 +223,14 @@ static void substitute_with_callout(const pcrenet_substitute_input* input,
         .input = input
     };
 
+    replay_queue_init(&callout_data.callout_queue);
+
     pcre2_set_substitute_callout(match_context, &substitute_callout_handler, &callout_data);
 
     while (1)
     {
+        replay_queue_start_replay(&callout_data.callout_queue);
+
         result->result_code = call_substitute(
             input,
             0,
@@ -168,7 +244,7 @@ static void substitute_with_callout(const pcrenet_substitute_input* input,
         if (result->result_code >= 0)
         {
             result->output_length = output_length;
-            return;
+            break;
         }
 
         // Output buffer is too small
@@ -181,7 +257,7 @@ static void substitute_with_callout(const pcrenet_substitute_input* input,
                 result->output = malloc(buffer_length * sizeof(PCRE2_UCHAR));
 
                 if (!result->output)
-                    return;
+                    break;
 
                 result->output_on_heap = 1;
             }
@@ -192,7 +268,7 @@ static void substitute_with_callout(const pcrenet_substitute_input* input,
                 if (!new_buffer)
                 {
                     free_result_memory(result);
-                    return;
+                    break;
                 }
 
                 result->output = new_buffer;
@@ -204,8 +280,10 @@ static void substitute_with_callout(const pcrenet_substitute_input* input,
 
         // Error
         free_result_memory(result);
-        return;
+        break;
     }
+
+    replay_queue_free(&callout_data.callout_queue);
 }
 
 PCRENET_EXPORT(void, substitute)(const pcrenet_substitute_input* input, pcrenet_substitute_result* result)
