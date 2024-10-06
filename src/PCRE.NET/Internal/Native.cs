@@ -158,6 +158,7 @@ internal static unsafe partial class Native
         public char* output;
         public nuint output_length;
         public byte output_on_heap;
+        public uint substitute_call_count;
     }
 
     [StructLayout(LayoutKind.Sequential)]

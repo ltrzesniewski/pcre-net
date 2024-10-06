@@ -284,7 +284,8 @@ internal sealed unsafe class InternalRegex : IDisposable
                              PcreMatchSettings settings,
                              int startIndex,
                              uint additionalOptions,
-                             PcreSubstituteCalloutFunc? callout)
+                             PcreSubstituteCalloutFunc? callout,
+                             out uint substituteCallCount)
     {
         Debug.Assert(subjectAsString is null || subjectAsString.AsSpan() == subject);
 
@@ -314,6 +315,8 @@ internal sealed unsafe class InternalRegex : IDisposable
             CalloutInterop.PrepareSubstitute(this, subject, ref input, out calloutInterop, callout);
 
             Native.substitute(&input, &result);
+
+            substituteCallCount = result.substitute_call_count;
         }
 
         try

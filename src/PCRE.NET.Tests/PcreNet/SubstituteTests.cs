@@ -265,16 +265,17 @@ public class SubstituteTests
 
         var execCount = 0;
 
-        var result = re.Substitute(str, "#", PcreSubstituteOptions.SubstituteGlobal, data =>
+        var result = re.InternalRegex.Substitute(str.AsSpan(), null, "#".AsSpan(), PcreMatchSettings.Default, 0, (uint)PcreSubstituteOptions.SubstituteGlobal, data =>
         {
             ++execCount;
             Assert.That(data.SubstitutionCount, Is.EqualTo(execCount));
             Assert.That(data.Match.Index, Is.EqualTo(execCount - 1));
             return execCount % 3 == 0 ? PcreSubstituteCalloutResult.Pass : PcreSubstituteCalloutResult.Fail;
-        });
+        }, out var substituteCallCount);
 
         Assert.That(execCount, Is.EqualTo(str.Length));
         Assert.That(result, Is.EqualTo(str.Replace("aaa", "aa#")));
+        Assert.That(substituteCallCount, Is.EqualTo(6));
     }
 
     [Test]

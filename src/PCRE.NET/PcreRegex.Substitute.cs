@@ -131,7 +131,7 @@ public partial class PcreRegex
         if (unchecked((uint)startIndex > (uint)subject.Length))
             ThrowInvalidStartIndex();
 
-        return InternalRegex.Substitute(subject.AsSpan(), subject, replacement.AsSpan(), settings, startIndex, options.ToSubstituteOptions(), onSubstituteCallout);
+        return InternalRegex.Substitute(subject.AsSpan(), subject, replacement.AsSpan(), settings, startIndex, options.ToSubstituteOptions(), onSubstituteCallout, out _);
     }
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Substitute"]/*'/>
@@ -149,7 +149,7 @@ public partial class PcreRegex
         if (unchecked((uint)startIndex > (uint)subject.Length))
             ThrowInvalidStartIndex();
 
-        return InternalRegex.Substitute(subject, null, replacement, settings, startIndex, options.ToSubstituteOptions(), onSubstituteCallout);
+        return InternalRegex.Substitute(subject, null, replacement, settings, startIndex, options.ToSubstituteOptions(), onSubstituteCallout, out _);
     }
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Substitute"]/*'/>

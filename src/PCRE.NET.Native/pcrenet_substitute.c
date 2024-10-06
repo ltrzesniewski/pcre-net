@@ -24,6 +24,7 @@ typedef struct
     uint16_t* output;
     size_t output_length;
     uint8_t output_on_heap;
+    uint32_t substitute_call_count;
 } pcrenet_substitute_result;
 
 typedef struct
@@ -148,14 +149,16 @@ static int substitute_callout_handler(pcre2_substitute_callout_block* block, voi
     return result;
 }
 
-static int call_substitute(const pcrenet_substitute_input* input,
-                           const uint32_t additional_options,
-                           PCRE2_UCHAR* output,
-                           PCRE2_SIZE* output_length,
-                           pcre2_match_data* match_data,
-                           pcre2_match_context* match_context)
+static void call_substitute(const pcrenet_substitute_input* input,
+                            pcrenet_substitute_result* result,
+                            const uint32_t additional_options,
+                            PCRE2_SIZE* output_length,
+                            pcre2_match_data* match_data,
+                            pcre2_match_context* match_context)
 {
-    return pcre2_substitute(
+    result->substitute_call_count++;
+
+    result->result_code = pcre2_substitute(
         input->code,
         input->subject,
         input->subject_length,
@@ -165,7 +168,7 @@ static int call_substitute(const pcrenet_substitute_input* input,
         match_context,
         input->replacement,
         input->replacement_length,
-        output,
+        result->output,
         output_length
     );
 }
@@ -183,10 +186,10 @@ static void substitute_simple(const pcrenet_substitute_input* input,
 
     PCRE2_SIZE output_length = input->buffer_length;
 
-    result->result_code = call_substitute(
+    call_substitute(
         input,
+        result,
         PCRE2_SUBSTITUTE_OVERFLOW_LENGTH,
-        result->output,
         &output_length,
         match_data,
         match_context
@@ -209,10 +212,10 @@ static void substitute_simple(const pcrenet_substitute_input* input,
 
         result->output_on_heap = 1;
 
-        result->result_code = call_substitute(
+        call_substitute(
             input,
+            result,
             PCRE2_NO_UTF_CHECK,
-            result->output,
             &output_length,
             match_data,
             match_context
@@ -257,10 +260,10 @@ static void substitute_with_callout(const pcrenet_substitute_input* input,
     {
         replay_queue_start_replay(&callout_data.callout_queue);
 
-        result->result_code = call_substitute(
+        call_substitute(
             input,
+            result,
             0,
-            result->output,
             &output_length,
             match_data,
             match_context
@@ -318,6 +321,8 @@ PCRENET_EXPORT(void, substitute)(const pcrenet_substitute_input* input, pcrenet_
     pcre2_match_context* match_context = pcre2_match_context_create(NULL);
 
     apply_settings(&input->settings, match_context);
+
+    result->substitute_call_count = 0;
 
     if (!input->callout)
         substitute_simple(input, result, match_data, match_context);
