@@ -20,7 +20,7 @@ public enum PcreMatchOptions : long
     /// <remarks>
     /// <para>
     /// The <see cref="Anchored"/> option limits <c>pcre2_match()</c> to matching at the first matching position.
-    /// If a pattern was compiled with <see cref="PcreOptions.Anchored"/>, or turned out to be anchored by virtue of its contents, it cannot be made unachored at matching time.
+    /// If a pattern was compiled with <see cref="PcreOptions.Anchored"/>, or turned out to be anchored by virtue of its contents, it cannot be made unanchored at matching time.
     /// </para>
     /// <para>
     /// Note that setting the option at match time disables JIT matching.

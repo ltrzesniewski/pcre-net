@@ -35,7 +35,7 @@ public sealed unsafe class PcreCalloutInfo
     /// <remarks>
     /// When the callout is at the end of the pattern, the length is zero. When the callout precedes an opening parenthesis,
     /// the length includes meta characters that follow the parenthesis. For example, in a callout before an assertion such as
-    /// <c>(?=ab)</c> the length is 3. For an an alternation bar or a closing parenthesis, the length is one, unless a closing
+    /// <c>(?=ab)</c> the length is 3. For an alternation bar or a closing parenthesis, the length is one, unless a closing
     /// parenthesis is followed by a quantifier, in which case its length is included.
     /// </remarks>
     public int NextPatternItemLength { get; }

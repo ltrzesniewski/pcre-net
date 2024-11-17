@@ -12,6 +12,13 @@ internal class PriorityCache<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TVal
     private readonly Func<TKey, TValue> _valueFactory;
     private readonly IEqualityComparer<TKey> _keyComparer;
     private readonly LinkedList<CacheItem> _cache = new();
+
+#if NET9_0_OR_GREATER
+    private readonly Lock _lock = new();
+#else
+    private readonly object _lock = new();
+#endif
+
     private int _cacheSize;
     private object? _head;
 
@@ -30,7 +37,7 @@ internal class PriorityCache<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TVal
             if (value < 0)
                 throw new ArgumentException("Invalid cache size.");
 
-            lock (_cache)
+            lock (_lock)
             {
                 while (_cache.Count > value)
                     _cache.RemoveLast();
@@ -47,7 +54,7 @@ internal class PriorityCache<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TVal
     {
         get
         {
-            lock (_cache)
+            lock (_lock)
             {
                 return _cache.Count;
             }
@@ -65,7 +72,7 @@ internal class PriorityCache<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TVal
         if (_cacheSize == 0)
             return _valueFactory(key);
 
-        lock (_cache)
+        lock (_lock)
         {
             for (var node = _cache.First; node != null; node = node.Next)
             {
@@ -82,7 +89,7 @@ internal class PriorityCache<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TVal
         var item = new CacheItem(key, keyHash, _valueFactory(key));
         Volatile.Write(ref _head, item);
 
-        lock (_cache)
+        lock (_lock)
         {
             _cache.AddFirst(item);
             if (_cache.Count > _cacheSize)
@@ -100,7 +107,7 @@ internal class PriorityCache<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TVal
 
     public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
     {
-        lock (_cache)
+        lock (_lock)
         {
             return _cache.Select(i => new KeyValuePair<TKey, TValue>(i.Key, i.Value))
                          .ToList()
