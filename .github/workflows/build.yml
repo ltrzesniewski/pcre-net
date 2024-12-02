@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 env:
   BUILD_CONFIGURATION: Release
+  BUILD_NET_SDK: 9.0.x
   BUILD_NET_TEST_TARGET: net9.0
   BUILD_NETFWK_TEST_TARGET: net48
   DOTNET_NOLOGO: 1
@@ -38,9 +39,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: |
-            5.0.x
-            9.0.x
+          dotnet-version: ${{ env.BUILD_NET_SDK }}
 
       - name: CMake
         run: |
@@ -94,9 +93,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: |
-            5.0.x
-            9.0.x
+          dotnet-version: ${{ env.BUILD_NET_SDK }}
 
       - name: Setup VS Dev Tools
         uses: ilammy/msvc-dev-cmd@v1
@@ -156,9 +153,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: |
-            5.0.x
-            9.0.x
+          dotnet-version: ${{ env.BUILD_NET_SDK }}
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4
@@ -216,7 +211,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 9.0.x
+          dotnet-version: ${{ env.BUILD_NET_SDK }}
 
       - name: Download NuGet
         uses: actions/download-artifact@v4
