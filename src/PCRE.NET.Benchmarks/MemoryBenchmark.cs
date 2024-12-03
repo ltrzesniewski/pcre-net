@@ -11,6 +11,7 @@ namespace PCRE.NET.Benchmarks;
 [SimpleJob(RuntimeMoniker.Net70)]
 public class MemoryBenchmark
 {
+    // language=regex
     private const string _pattern = @"\b(?<user>[-+\w.]+)@(?<domain>[-\w.]+\.[A-Za-z]{2,})\b";
 
     private readonly Regex _netRegex = new(_pattern, RegexOptions.Compiled | RegexOptions.CultureInvariant);

@@ -8,8 +8,11 @@ namespace PCRE.NET.Benchmarks;
 [MemoryDiagnoser]
 public class HelloGoodbyeBenchmark
 {
-    private static readonly Regex _regex = new("^(?:Hello|Goodbye)", RegexOptions.Compiled);
-    private static readonly PcreMatchBuffer _pcreRegex = new PcreRegex("^(?:Hello|Goodbye)", PcreOptions.Compiled).CreateMatchBuffer();
+    // language=regex
+    private const string _pattern = "^(?:Hello|Goodbye)";
+
+    private static readonly Regex _regex = new(_pattern, RegexOptions.Compiled);
+    private static readonly PcreMatchBuffer _pcreRegex = new PcreRegex(_pattern, PcreOptions.Compiled).CreateMatchBuffer();
 
     [Benchmark(Baseline = true)]
     public int Regex()

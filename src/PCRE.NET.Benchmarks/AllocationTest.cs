@@ -17,7 +17,7 @@ internal static class AllocationTest
 
         for (var i = 0; i < 2 * InternalRegex.MaxStackAllocCaptureCount; ++i)
         {
-            regexBuilder.Append(@"(?C{before})(.)(?C{after})");
+            regexBuilder.Append("(?C{before})(.)(?C{after})");
             subjectBuilder.Append("foobar");
         }
 

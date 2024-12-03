@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>net9.0;net48</TargetFrameworks>
     <OutputType>Exe</OutputType>
+    <DefaultItemExcludes>$(DefaultItemExcludes);BenchmarkDotNet.Artifacts/**</DefaultItemExcludes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(PcreNetTestBuild)' != 'true'">
@@ -18,8 +19,7 @@
   </ItemGroup>
   
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
-    <!-- These need binding redirects -->
-    <PackageReference Include="System.Collections.Immutable" Version="9.0.0" />
+    <!-- Needed for binding redirects -->
     <PackageReference Include="System.Reflection.Metadata" Version="9.0.0" />
   </ItemGroup>
 
