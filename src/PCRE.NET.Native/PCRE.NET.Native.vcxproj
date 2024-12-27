@@ -23,6 +23,7 @@
     <ClCompile Include="..\PCRE\src\pcre2_chartables.c" />
     <ClCompile Include="..\PCRE\src\pcre2_chkdint.c" />
     <ClCompile Include="..\PCRE\src\pcre2_compile.c" />
+    <ClCompile Include="..\PCRE\src\pcre2_compile_class.c" />
     <ClCompile Include="..\PCRE\src\pcre2_config.c" />
     <ClCompile Include="..\PCRE\src\pcre2_context.c" />
     <ClCompile Include="..\PCRE\src\pcre2_convert.c" />

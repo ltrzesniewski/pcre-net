@@ -5,6 +5,8 @@
 
 /* ReSharper disable All */
 
+#define HAVE_ASSERT_H 1
+#define HAVE_BUILTIN_ASSUME
 #define HAVE_INTTYPES_H 1
 #define HAVE_LIMITS_H 1
 #define HAVE_MEMMOVE 1

@@ -25,6 +25,7 @@ add_library(PCRE.NET.Native SHARED
         PCRE/src/pcre2_chartables.c
         PCRE/src/pcre2_chkdint.c
         PCRE/src/pcre2_compile.c
+        PCRE/src/pcre2_compile_class.c
         PCRE/src/pcre2_config.c
         PCRE/src/pcre2_context.c
         PCRE/src/pcre2_convert.c
