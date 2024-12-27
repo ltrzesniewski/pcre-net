@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace PCRE.Tests.Pcre;
 
 public static class StringExtensions
 {
+    // Taken from perltest.sh, see https://github.com/PCRE2Project/pcre2/pull/529
+    private static readonly Regex _hexRe = new("""\s*(?:([0-9a-fA-F]{2})|(['"])([^\2]+?)\2)\s*""");
+
     public static string Escape(this string str)
     {
         var sb = new StringBuilder();
@@ -94,12 +98,15 @@ public static class StringExtensions
         return sb.ToString();
     }
 
-    public static string UnescapeBinarySubject(this string str)
+    public static string UnescapeBinaryString(this string str)
     {
-        var sb = new StringBuilder();
-        foreach (var charCode in str.Split(' '))
-            sb.Append((char)Convert.ToInt16(charCode, 16));
-        return sb.ToString();
+        return _hexRe.Replace(str.UnescapeSubject(), m =>
+        {
+            if (m.Groups[1].Success)
+                return ((char)Convert.ToInt16(m.Groups[1].Value, 16)).ToString();
+
+            return m.Groups[3].Value;
+        });
     }
 
     public static string UnescapeGroup(this string str)

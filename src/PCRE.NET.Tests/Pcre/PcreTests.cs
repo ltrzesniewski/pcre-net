@@ -45,7 +45,11 @@ public class PcreTests
         PcreRegex regex;
         try
         {
-            regex = new PcreRegex(pattern.Pattern, options);
+            var patternStr = pattern.HexEncoding
+                ? pattern.Pattern.UnescapeBinaryString()
+                : pattern.Pattern;
+
+            regex = new PcreRegex(patternStr, options);
         }
         catch (Exception ex)
         {
@@ -71,7 +75,7 @@ public class PcreTests
                 if (!pattern.SubjectLiteral)
                 {
                     subject = pattern.HexEncoding
-                        ? subject.UnescapeBinarySubject()
+                        ? subject.UnescapeBinaryString()
                         : subject.UnescapeSubject();
                 }
 
