@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using PCRE.Internal;
 
@@ -502,9 +503,15 @@ public enum PcreErrorCode
     TooManyCaptures = PcreConstants.ERROR_TOO_MANY_CAPTURES,
 
     /// <summary>
+    /// <c>PCRE2_ERROR_MISSING_OCTAL_DIGIT</c> - Octal digit missing after <c>\0</c> (PCRE2_EXTRA_NO_BS0 is set).
+    /// </summary>
+    MissingOctalDigit = PcreConstants.ERROR_MISSING_OCTAL_DIGIT,
+
+    /// <summary>
     /// <c>PCRE2_ERROR_CONDITION_ATOMIC_ASSERTION_EXPECTED</c> - Atomic assertion expected after <c>(?(</c> or <c>(?(?C)</c>
     /// </summary>
-    ConditionAtomicAssertionExpected = PcreConstants.ERROR_CONDITION_ATOMIC_ASSERTION_EXPECTED,
+    [Obsolete($"Not used anymore, shares the code with {nameof(MissingOctalDigit)}")]
+    ConditionAtomicAssertionExpected = MissingOctalDigit,
 
     /// <summary>
     /// <c>PCRE2_ERROR_BACKSLASH_K_IN_LOOKAROUND</c> - <c>\K</c> is not allowed in lookarounds (but see <see cref="PcreExtraCompileOptions.AllowLookaroundBsK"/>).

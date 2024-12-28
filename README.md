@@ -34,7 +34,7 @@ This is a friendly API that is very similar to .NET's `System.Text.RegularExpres
     - Callbacks: `Func<PcreMatch, string>`
     - Replacement strings with placeholders: ``$n ${name} $& $_ $` $' $+``
   - Using `Substitute`, the PCRE2 API:
-      - Replacement strings with placeholders: ``$n ${n} $$ $*MARK ${*MARK}``
+      - Replacement strings with placeholders: ``$n ${n} $& $_ $` $' $$ $*MARK ${*MARK}``
       - Callouts for matches and substitutions
 - String splitting on matches: `Split`
 
