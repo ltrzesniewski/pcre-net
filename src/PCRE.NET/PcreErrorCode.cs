@@ -503,7 +503,7 @@ public enum PcreErrorCode
     TooManyCaptures = PcreConstants.ERROR_TOO_MANY_CAPTURES,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_MISSING_OCTAL_DIGIT</c> - Octal digit missing after <c>\0</c> (PCRE2_EXTRA_NO_BS0 is set).
+    /// <c>PCRE2_ERROR_MISSING_OCTAL_DIGIT</c> - Octal digit missing after <c>\0</c> (<see cref="PcreExtraCompileOptions.NoBs0"/> is set).
     /// </summary>
     MissingOctalDigit = PcreConstants.ERROR_MISSING_OCTAL_DIGIT,
 
@@ -517,6 +517,91 @@ public enum PcreErrorCode
     /// <c>PCRE2_ERROR_BACKSLASH_K_IN_LOOKAROUND</c> - <c>\K</c> is not allowed in lookarounds (but see <see cref="PcreExtraCompileOptions.AllowLookaroundBsK"/>).
     /// </summary>
     BackslashKInLookaround = PcreConstants.ERROR_BACKSLASH_K_IN_LOOKAROUND,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_MAX_VAR_LOOKBEHIND_EXCEEDED</c> - Branch too long in variable-length lookbehind assertion.
+    /// </summary>
+    MaxVarLookbehindExceeded = PcreConstants.ERROR_MAX_VAR_LOOKBEHIND_EXCEEDED,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_PATTERN_COMPILED_SIZE_TOO_BIG</c> - Compiled pattern would be longer than the limit set by the application.
+    /// </summary>
+    PatternCompiledSizeTooBig = PcreConstants.ERROR_PATTERN_COMPILED_SIZE_TOO_BIG,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_OVERSIZE_PYTHON_OCTAL</c> - Octal value given by <c>\ddd</c> is greater than <c>\377</c> (forbidden by <see cref="PcreExtraCompileOptions.PythonOctal"/>).
+    /// </summary>
+    OversizePythonOctal = PcreConstants.ERROR_OVERSIZE_PYTHON_OCTAL,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_CALLOUT_CALLER_DISABLED</c> - Using callouts is disabled by the application.
+    /// </summary>
+    CalloutCallerDisabled = PcreConstants.ERROR_CALLOUT_CALLER_DISABLED,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_EXTRA_CASING_REQUIRES_UNICODE</c> - <see cref="PcreExtraCompileOptions.TurkishCasing"/> require Unicode (UTF or UCP) mode.
+    /// </summary>
+    ExtraCasingRequiresUnicode = PcreConstants.ERROR_EXTRA_CASING_REQUIRES_UNICODE,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_TURKISH_CASING_REQUIRES_UTF</c> - <see cref="PcreExtraCompileOptions.TurkishCasing"/> requires UTF in 8-bit mode.
+    /// </summary>
+    TurkishCasingRequiresUtf = PcreConstants.ERROR_TURKISH_CASING_REQUIRES_UTF,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_EXTRA_CASING_INCOMPATIBLE</c> - <see cref="PcreExtraCompileOptions.TurkishCasing"/> and <see cref="PcreExtraCompileOptions.CaselessRestrict"/> are not compatible.
+    /// </summary>
+    ExtraCasingIncompatible = PcreConstants.ERROR_EXTRA_CASING_INCOMPATIBLE,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_ECLASS_NEST_TOO_DEEP</c> - Extended character class nesting is too deep.
+    /// </summary>
+    EClassNestTooDeep = PcreConstants.ERROR_ECLASS_NEST_TOO_DEEP,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_ECLASS_INVALID_OPERATOR</c> - Invalid operator in extended character class.
+    /// </summary>
+    EClassInvalidOperator = PcreConstants.ERROR_ECLASS_INVALID_OPERATOR,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_ECLASS_UNEXPECTED_OPERATOR</c> - Unexpected operator in extended character class (no preceding operand).
+    /// </summary>
+    EClassUnexpectedOperator = PcreConstants.ERROR_ECLASS_UNEXPECTED_OPERATOR,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_ECLASS_EXPECTED_OPERAND</c> - Expected operand after operator in extended character class.
+    /// </summary>
+    EClassExpectedOperand = PcreConstants.ERROR_ECLASS_EXPECTED_OPERAND,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_ECLASS_MIXED_OPERATORS</c> - Square brackets needed to clarify operator precedence in extended character class.
+    /// </summary>
+    EClassMixedOperators = PcreConstants.ERROR_ECLASS_MIXED_OPERATORS,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_ECLASS_HINT_SQUARE_BRACKET</c> - Missing terminating <c>]</c> for extended character class (note <c>[</c> must be escaped under <see cref="PcreOptions.AltExtendedClass"/>).
+    /// </summary>
+    EClassHintSquareBracket = PcreConstants.ERROR_ECLASS_HINT_SQUARE_BRACKET,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_PERL_ECLASS_UNEXPECTED_EXPR</c> - Unexpected expression in extended character class (no preceding operator).
+    /// </summary>
+    PerlEClassUnexpectedExpr = PcreConstants.ERROR_PERL_ECLASS_UNEXPECTED_EXPR,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_PERL_ECLASS_EMPTY_EXPR</c> - Empty expression in extended character class.
+    /// </summary>
+    PerlEClassEmptyExpr = PcreConstants.ERROR_PERL_ECLASS_EMPTY_EXPR,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_PERL_ECLASS_MISSING_CLOSE</c> - Terminating <c>]</c> with no following closing parenthesis in <c>(?[...]</c>.
+    /// </summary>
+    PerlEClassMissingClose = PcreConstants.ERROR_PERL_ECLASS_MISSING_CLOSE,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_PERL_ECLASS_UNEXPECTED_CHAR</c> - Unexpected character in <c>(?[...])</c> extended character class.
+    /// </summary>
+    PerlEClassUnexpectedChar = PcreConstants.ERROR_PERL_ECLASS_UNEXPECTED_CHAR,
 
     /// <summary>
     /// <c>PCRE2_ERROR_NOMATCH</c> - No match.
@@ -851,5 +936,20 @@ public enum PcreErrorCode
     /// <summary>
     /// <c>PCRE2_ERROR_INVALIDOFFSET</c> - Invalid offset value.
     /// </summary>
-    InvalidOffset = PcreConstants.ERROR_INVALIDOFFSET
+    InvalidOffset = PcreConstants.ERROR_INVALIDOFFSET,
+
+    ///<summary>
+    ///<c>PCRE2_ERROR_JIT_UNSUPPORTED</c> - Feature is not supported by the JIT compiler.
+    ///</summary>
+    JitUnsupported = PcreConstants.ERROR_JIT_UNSUPPORTED,
+
+    ///<summary>
+    ///<c>PCRE2_ERROR_REPLACECASE</c> - Error performing replacement case transformation.
+    ///</summary>
+    ReplaceCase = PcreConstants.ERROR_REPLACECASE,
+
+    ///<summary>
+    ///<c>PCRE2_ERROR_TOOLARGEREPLACE</c> - Replacement too large (longer than <c>PCRE2_SIZE</c>).
+    ///</summary>
+    TooLargeReplace = PcreConstants.ERROR_TOOLARGEREPLACE,
 }

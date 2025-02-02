@@ -156,6 +156,37 @@ public enum PcreExtraCompileOptions : uint
     AsciiDigit = PcreConstants.EXTRA_ASCII_DIGIT,
 
     /// <summary>
+    /// <c>PCRE2_EXTRA_PYTHON_OCTAL</c> - Follow Python's rules for interpreting octal escape sequences.
+    /// </summary>
+    /// <remarks>
+    /// The rules for handling sequences such as <c>\14</c>, which could be an octal number or a back reference are different. Details are given in the pcre2pattern documentation.
+    /// </remarks>
+    PythonOctal = PcreConstants.EXTRA_PYTHON_OCTAL,
+
+    /// <summary>
+    /// <c>PCRE2_EXTRA_NO_BS0</c> - Lock out the use of the sequence <c>\0</c> unless at least one more octal digit follows.
+    /// </summary>
+    NoBs0 = PcreConstants.EXTRA_NO_BS0,
+
+    /// <summary>
+    /// <c>PCRE2_EXTRA_NEVER_CALLOUT</c> - Treat callouts in the pattern as a syntax error.
+    /// </summary>
+    /// <remarks>
+    /// If this option is set, PCRE2 treats callouts in the pattern as a syntax error, returning <see cref="PcreErrorCode.CalloutCallerDisabled"/>.
+    /// This is useful if the application knows that a callout will not be provided to <c>Match</c>, so that callouts in the pattern are not silently ignored.
+    /// </remarks>
+    NeverCallout = PcreConstants.EXTRA_NEVER_CALLOUT,
+
+    /// <summary>
+    /// <c>PCRE2_EXTRA_TURKISH_CASING</c> - Alters case-equivalence of the 'i' letters to follow the alphabet used by Turkish and Azeri languages.
+    /// </summary>
+    /// <remarks>
+    /// The option can be changed within a pattern by the <c>(*TURKISH_CASING)</c> start-of-pattern setting. Either the UTF or UCP options must be set.
+    /// This option cannot be combined with <see cref="CaselessRestrict"/>.
+    /// </remarks>
+    TurkishCasing = PcreConstants.EXTRA_TURKISH_CASING,
+
+    /// <summary>
     /// <c>PCRE2_EXTRA_ALLOW_SURROGATE_ESCAPES</c> - Allow surrogate escapes in UTF-8 and UTF-32.
     /// </summary>
     /// <remarks>

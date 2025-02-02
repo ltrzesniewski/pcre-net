@@ -265,6 +265,16 @@ public enum PcreOptions : long
     MatchInvalidUtf = PcreConstants.MATCH_INVALID_UTF,
 
     /// <summary>
+    /// <c>PCRE2_ALT_EXTENDED_CLASS</c> - Alters the parsing of character classes to follow the extended syntax described by Unicode UTS#18.
+    /// </summary>
+    /// <remarks>
+    /// The <see cref="AltExtendedClass"/> option has no impact on the behaviour of the Perl-specific <c>(?[...])</c> syntax for extended classes,
+    /// but instead enables the alternative syntax of extended class behaviour inside ordinary <c>[...]</c> character classes.
+    /// See the pcre2pattern documentation for details of the character classes supported.
+    /// </remarks>
+    AltExtendedClass = PcreConstants.ALT_EXTENDED_CLASS,
+
+    /// <summary>
     /// <c>PCRE2_ANCHORED</c> - Make the start of the pattern anchored, so it can only match at the starting position.
     /// </summary>
     /// <remarks>
