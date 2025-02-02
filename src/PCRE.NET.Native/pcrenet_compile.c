@@ -15,6 +15,8 @@ typedef struct
     uint32_t compile_extra_options;
     uint32_t max_var_lookbehind;
     uint32_t max_pattern_compiled_length;
+    uint32_t optimization_directives_count;
+    uint32_t* optimization_directives;
 } pcrenet_compile_input;
 
 typedef struct
@@ -52,6 +54,9 @@ PCRENET_EXPORT(void, compile)(const pcrenet_compile_input* input, pcrenet_compil
 
     if (input->compile_extra_options)
         pcre2_set_compile_extra_options(context, input->compile_extra_options);
+
+    for (uint32_t i = 0; i < input->optimization_directives_count; ++i)
+        pcre2_set_optimize(context, input->optimization_directives[i]);
 
     int error_code;
     PCRE2_SIZE error_offset;

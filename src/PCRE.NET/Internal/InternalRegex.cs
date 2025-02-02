@@ -39,10 +39,11 @@ internal sealed unsafe class InternalRegex : IDisposable
             input.pattern = pPattern;
             input.pattern_length = (uint)pattern.Length;
 
-            Settings.FillCompileInput(ref input);
-
-            Native.compile(&input, &result);
-            Code = result.code;
+            using (Settings.FillCompileInput(ref input))
+            {
+                Native.compile(&input, &result);
+                Code = result.code;
+            }
 
             if (Code == IntPtr.Zero || result.error_code != 0)
             {

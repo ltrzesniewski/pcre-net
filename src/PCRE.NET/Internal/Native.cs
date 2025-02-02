@@ -62,6 +62,8 @@ internal static unsafe partial class Native
         public uint compile_extra_options;
         public uint max_var_lookbehind;
         public uint max_pattern_compiled_length;
+        public uint optimization_directives_count;
+        public uint* optimization_directives;
     }
 
     [StructLayout(LayoutKind.Sequential)]

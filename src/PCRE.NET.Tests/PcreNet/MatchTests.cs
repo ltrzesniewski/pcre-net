@@ -2018,9 +2018,48 @@ public class MatchTests
     }
 
     [Test]
+    [TestCase(new PcreOptimizationDirective[0], true)]
+    [TestCase(new[] { PcreOptimizationDirective.None }, false)]
+    [TestCase(new[] { PcreOptimizationDirective.Full }, true)]
+    [TestCase(new[] { PcreOptimizationDirective.AutoPossessOff }, false)]
+    [TestCase(new[] { PcreOptimizationDirective.AutoPossess }, true)]
+    [TestCase(new[] { PcreOptimizationDirective.None, PcreOptimizationDirective.AutoPossess }, true)]
+    [TestCase(new[] { PcreOptimizationDirective.Full, PcreOptimizationDirective.AutoPossessOff }, false)]
+    [TestCase(new[] { PcreOptimizationDirective.AutoPossess, PcreOptimizationDirective.None }, false)]
+    [TestCase(new[] { PcreOptimizationDirective.AutoPossessOff, PcreOptimizationDirective.Full }, true)]
+    [TestCase(new[] { PcreOptimizationDirective.AutoPossess, PcreOptimizationDirective.AutoPossessOff }, false)]
+    [TestCase(new[] { PcreOptimizationDirective.AutoPossessOff, PcreOptimizationDirective.AutoPossess }, true)]
+    public void should_use_optimization_settings(PcreOptimizationDirective[] directives, bool expectedAutoPossess)
+    {
+        var settings = new PcreRegexSettings(PcreOptions.AutoCallout | PcreOptions.NoStartOptimize);
+
+        foreach (var directive in directives)
+            settings.OptimizationDirectives.Add(directive);
+
+        var re = new PcreRegex("^a+b", settings);
+
+        var calloutCount = 0;
+        re.Match("aac", _ =>
+        {
+            ++calloutCount;
+            return PcreCalloutResult.Pass;
+        });
+
+        var autoPossess = calloutCount switch
+        {
+            3 => true,
+            4 => false,
+            _ => throw new InvalidOperationException($"Unexpected callout count: {calloutCount}.")
+        };
+
+        Assert.That(autoPossess, Is.EqualTo(expectedAutoPossess));
+    }
+
+    [Test]
     public void readme_json_example()
     {
-        const string jsonPattern = """
+        const string jsonPattern =
+            """
             (?(DEFINE)
                 # An object is an unordered set of name/value pairs.
                 (?<object> \{
@@ -2064,7 +2103,8 @@ public class MatchTests
         var regex = new PcreRegex(jsonPattern, PcreOptions.IgnorePatternWhitespace | PcreOptions.Compiled);
 
         //language=json
-        const string subject = """
+        const string subject =
+            """
             {
                 "hello": "world",
                 "numbers": [4, 8, 15, 16, 23, 42],

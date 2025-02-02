@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Runtime.InteropServices;
 using PCRE.Internal;
 
 namespace PCRE;
@@ -17,6 +21,7 @@ public sealed class PcreRegexSettings
     private uint? _maxVarLookbehind;
     private PcreExtraCompileOptions _extraCompileOptions;
     private PcreJitCompileOptions _jitCompileOptions;
+    private readonly IList<PcreOptimizationDirective> _optimizationDirectives;
 
     /// <summary>
     /// The options to apply to the regex.
@@ -147,6 +152,15 @@ public sealed class PcreRegexSettings
         }
     }
 
+    /// <summary>
+    /// Additional optimization directives.
+    /// </summary>
+    /// <remarks>
+    /// By default, all available optimizations are enabled. However, in rare cases, one might wish to disable specific optimizations.
+    /// For example, if it is known that some optimizations cannot benefit a certain regex, it might be desirable to disable them, in order to speed up compilation.
+    /// </remarks>
+    public IList<PcreOptimizationDirective> OptimizationDirectives => _optimizationDirectives;
+
     internal bool ReadOnlySettings { get; }
 
     /// <summary>
@@ -154,9 +168,11 @@ public sealed class PcreRegexSettings
     /// </summary>
     public PcreRegexSettings()
     {
+        _optimizationDirectives = new List<PcreOptimizationDirective>();
     }
 
     internal PcreRegexSettings(PcreOptions options)
+        : this()
     {
         _options = options;
     }
@@ -173,6 +189,10 @@ public sealed class PcreRegexSettings
         _extraCompileOptions = settings._extraCompileOptions;
         _jitCompileOptions = settings._jitCompileOptions;
 
+        _optimizationDirectives = readOnly
+            ? new ReadOnlyCollection<PcreOptimizationDirective>(settings._optimizationDirectives.ToArray())
+            : settings._optimizationDirectives.ToList();
+
         ReadOnlySettings = readOnly;
     }
 
@@ -186,7 +206,8 @@ public sealed class PcreRegexSettings
                && MaxPatternCompiledLength == other.MaxPatternCompiledLength
                && MaxVarLookbehind == other.MaxVarLookbehind
                && ExtraCompileOptions == other.ExtraCompileOptions
-               && JitCompileOptions == other.JitCompileOptions;
+               && JitCompileOptions == other.JitCompileOptions
+               && OptimizationDirectives.SequenceEqual(other.OptimizationDirectives);
     }
 
     internal PcreRegexSettings AsReadOnly()
@@ -203,7 +224,7 @@ public sealed class PcreRegexSettings
             throw new InvalidOperationException("Settings of a compiled pattern cannot be changed.");
     }
 
-    internal void FillCompileInput(ref Native.compile_input input)
+    internal unsafe IDisposable? FillCompileInput(ref Native.compile_input input)
     {
         input.flags = Options.ToPatternOptions();
         input.flags_jit = (uint)JitCompileOptions;
@@ -214,5 +235,30 @@ public sealed class PcreRegexSettings
         input.max_pattern_compiled_length = _maxPatternCompiledLength.GetValueOrDefault();
         input.max_var_lookbehind = MaxVarLookbehind;
         input.compile_extra_options = (uint)_extraCompileOptions;
+        input.optimization_directives_count = (uint)_optimizationDirectives.Count;
+
+        if (_optimizationDirectives.Count == 0)
+        {
+            input.optimization_directives = null;
+            return null;
+        }
+
+        var directives = _optimizationDirectives.Cast<uint>().ToArray();
+        var handle = GCHandle.Alloc(directives, GCHandleType.Pinned);
+        input.optimization_directives = (uint*)handle.AddrOfPinnedObject();
+        return new GCHandleDisposable(handle);
+    }
+
+    private class GCHandleDisposable(GCHandle handle) : IDisposable
+    {
+        private GCHandle _handle = handle;
+
+        public void Dispose()
+        {
+            if (_handle.IsAllocated)
+                _handle.Free();
+
+            _handle = default;
+        }
     }
 }
