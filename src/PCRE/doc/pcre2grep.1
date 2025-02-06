@@ -1,4 +1,4 @@
-.TH PCRE2GREP 1 "09 October 2024" "PCRE2 10.45-RC1"
+.TH PCRE2GREP 1 "04 February 2025" "PCRE2 10.45"
 .SH NAME
 pcre2grep - a grep with Perl-compatible regular expressions.
 .SH SYNOPSIS
@@ -947,7 +947,7 @@ Any substring (including the executable name) may contain escape sequences
 started by a dollar character. These are the same as for the \fB--output\fP
 (\fB-O\fP) option documented above, except that $0 or $& cannot insert the
 matched string because the match is still in progress. Instead, the character
-'0' is inserted. If you need a literal dollar or pipe character in any
+\&'0' is inserted. If you need a literal dollar or pipe character in any
 substring, use $$ or $| respectively. Here is an example:
 .sp
   echo -e "abcde\en12345" | pcre2grep \e
@@ -1022,6 +1022,6 @@ Cambridge, England.
 .rs
 .sp
 .nf
-Last updated: 09 October 2024
+Last updated: 04 February 2025
 Copyright (c) 1997-2023 University of Cambridge.
 .fi

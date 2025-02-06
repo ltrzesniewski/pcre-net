@@ -10,8 +10,8 @@ dnl be defined as -RC2, for example. For real releases, it should be empty.
 
 m4_define(pcre2_major, [10])
 m4_define(pcre2_minor, [45])
-m4_define(pcre2_prerelease, [-RC1])
-m4_define(pcre2_date, [2024-12-27])
+m4_define(pcre2_prerelease, [])
+m4_define(pcre2_date, [2025-02-05])
 
 # Libtool shared library interface versions (current:revision:age)
 m4_define(libpcre2_8_version,     [14:0:14])
@@ -26,6 +26,15 @@ AC_PREREQ([2.60])
 AC_INIT([PCRE2],pcre2_major.pcre2_minor[]pcre2_prerelease,[],[pcre2])
 AC_CONFIG_SRCDIR([src/pcre2.h.in])
 AM_INIT_AUTOMAKE([dist-bzip2 dist-zip foreign])
+ifelse(pcre2_prerelease, [-DEV],
+  [dnl For development builds, ./configure is not checked in to Git, so we are
+   dnl happy to have it regenerated as needed.
+   AM_MAINTAINER_MODE([enable])],
+  [dnl For a release build (or RC), the ./configure script we ship in the
+   dnl tarball (and check in to the Git tag) should not be regenerated
+   dnl implicitly. This is important if users want to check out a release tag
+   dnl using Git.
+   AM_MAINTAINER_MODE])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AC_CONFIG_HEADERS(src/config.h)
 
@@ -559,7 +568,6 @@ AC_CHECK_HEADERS([sys/wait.h], [HAVE_SYS_WAIT_H=1])
 AM_CONDITIONAL(WITH_PCRE2_8, test "x$enable_pcre2_8" = "xyes")
 AM_CONDITIONAL(WITH_PCRE2_16, test "x$enable_pcre2_16" = "xyes")
 AM_CONDITIONAL(WITH_PCRE2_32, test "x$enable_pcre2_32" = "xyes")
-AM_CONDITIONAL(WITH_DEBUG, test "x$enable_debug" = "xyes")
 AM_CONDITIONAL(WITH_REBUILD_CHARTABLES, test "x$enable_rebuild_chartables" = "xyes")
 AM_CONDITIONAL(WITH_JIT, test "x$enable_jit" = "xyes")
 AM_CONDITIONAL(WITH_UNICODE, test "x$enable_unicode" = "xyes")
