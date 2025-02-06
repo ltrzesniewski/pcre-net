@@ -22,6 +22,11 @@ jobs:
             platform: x64
             extension: so
 
+          - name: Linux arm64
+            runner: ubuntu-24.04-arm
+            platform: arm64
+            extension: so
+
           - name: macOS arm64
             runner: macos-14
             platform: arm64
@@ -194,6 +199,9 @@ jobs:
         include:
           - name: Linux x64
             runner: ubuntu-latest
+
+          - name: Linux arm64
+            runner: ubuntu-24.04-arm
 
           - name: macOS arm64
             runner: macos-14
