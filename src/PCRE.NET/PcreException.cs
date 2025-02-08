@@ -104,6 +104,17 @@ public class PcreCalloutException : PcreMatchException
         : base(PcreErrorCode.Callout, message, innerException)
     {
     }
+
+    /// <summary>
+    /// Creates a <see cref="PcreCalloutException"/>.
+    /// </summary>
+    /// <param name="errorCode">The associated error code.</param>
+    /// <param name="message">The exception message.</param>
+    /// <param name="innerException">The inner exception.</param>
+    public PcreCalloutException(PcreErrorCode errorCode, string message, Exception? innerException)
+        : base(errorCode, message, innerException)
+    {
+    }
 }
 
 /// <summary>

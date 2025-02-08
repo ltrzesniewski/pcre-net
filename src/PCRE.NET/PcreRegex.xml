@@ -67,6 +67,7 @@
   <param name="onCallout">A function to be called when a callout point is reached during the match.</param>
   <param name="onMatchCallout">A function to be called when a callout point is reached during the match.</param>
   <param name="onSubstituteCallout">A function to be called when a substitution is made.</param>
+  <param name="onSubstituteCaseCallout">A function to be called when a case substitution is made.</param>
   <param name="settings">Additional advanced settings.</param>
 
   <!-- Keep the remarks ordered by importance -->

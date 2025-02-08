@@ -193,8 +193,7 @@ public class SubstituteTests
                     ? PcreCalloutResult.Abort
                     : data.CurrentOffset % 3 == 0
                         ? PcreCalloutResult.Pass
-                        : PcreCalloutResult.Fail
-                ,
+                        : PcreCalloutResult.Fail,
                 null,
                 null
             ),
@@ -216,8 +215,60 @@ public class SubstituteTests
                     ? PcreSubstituteCalloutResult.Abort
                     : data.SubstitutionCount % 3 == 0
                         ? PcreSubstituteCalloutResult.Pass
-                        : PcreSubstituteCalloutResult.Fail),
+                        : PcreSubstituteCalloutResult.Fail
+            ),
             Is.EqualTo("ab#de#gh#jklmn")
+        );
+    }
+
+    [Test]
+    public void should_handle_case_substitution_callouts()
+    {
+        var re = new PcreRegex(@"f(\w+)");
+
+        Assert.That(
+            re.Substitute(
+                "abc foo def foo ghi",
+                @"F\U$1",
+                0,
+                PcreSubstituteOptions.SubstituteGlobal | PcreSubstituteOptions.SubstituteExtended,
+                null,
+                null,
+                (input, targetCase) =>
+                {
+                    Assert.That(input.ToString(), Is.EqualTo("oo"));
+                    Assert.That(targetCase, Is.EqualTo(PcreSubstituteCase.Upper));
+                    return "00";
+                },
+                null
+            ),
+            Is.EqualTo("abc F00 def F00 ghi")
+        );
+    }
+
+    [Test]
+    public void should_handle_case_substitution_callouts_with_long_result()
+    {
+        var re = new PcreRegex(@"f(\w+)");
+        var substitution = new string('0', 1024 * 1024);
+
+        Assert.That(
+            re.Substitute(
+                "abc foo def foo ghi",
+                @"F\U$1",
+                0,
+                PcreSubstituteOptions.SubstituteGlobal | PcreSubstituteOptions.SubstituteExtended,
+                null,
+                null,
+                (input, targetCase) =>
+                {
+                    Assert.That(input.ToString(), Is.EqualTo("oo"));
+                    Assert.That(targetCase, Is.EqualTo(PcreSubstituteCase.Upper));
+                    return substitution;
+                },
+                null
+            ),
+            Is.EqualTo($"abc F{substitution} def F{substitution} ghi")
         );
     }
 
@@ -343,6 +394,17 @@ public class SubstituteTests
     }
 
     [Test]
+    public void should_throw_when_case_substitute_callout_throws()
+    {
+        var re = new PcreRegex(@".");
+
+        var ex = Assert.Throws<PcreCalloutException>(() => _ = re.Substitute("abc", @"\U$&", 0, PcreSubstituteOptions.SubstituteExtended, null, null, (_, _) => throw new DivideByZeroException("test"), null))!;
+
+        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.ReplaceCase));
+        Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
+    }
+
+    [Test]
     public void should_execute_each_match_callout_once()
     {
         var str = new string('a', InternalRegex.SubstituteBufferSizeInChars * (1 + 2 + 4 + 8 + 16) + 42);
@@ -350,12 +412,23 @@ public class SubstituteTests
 
         var execCount = 0;
 
-        var result = re.InternalRegex.Substitute(str.AsSpan(), null, "#:#:#:#".AsSpan(), null, 0, (uint)PcreSubstituteOptions.SubstituteGlobal, data =>
-        {
-            ++execCount;
-            Assert.That(data.Match.Index, Is.EqualTo(execCount - 1));
-            return execCount % 3 == 0 ? PcreCalloutResult.Pass : PcreCalloutResult.Fail;
-        }, null, out var substituteCallCount);
+        var result = re.InternalRegex.Substitute(
+            str.AsSpan(),
+            null,
+            "#:#:#:#".AsSpan(),
+            null,
+            0,
+            (uint)PcreSubstituteOptions.SubstituteGlobal,
+            data =>
+            {
+                ++execCount;
+                Assert.That(data.Match.Index, Is.EqualTo(execCount - 1));
+                return execCount % 3 == 0 ? PcreCalloutResult.Pass : PcreCalloutResult.Fail;
+            },
+            null,
+            null,
+            out var substituteCallCount
+        );
 
         Assert.That(execCount, Is.EqualTo(str.Length));
         Assert.That(result, Is.EqualTo(str.Replace("aaa", "aa#:#:#:#")));
@@ -370,13 +443,24 @@ public class SubstituteTests
 
         var execCount = 0;
 
-        var result = re.InternalRegex.Substitute(str.AsSpan(), null, "#:#:#:#".AsSpan(), null, 0, (uint)PcreSubstituteOptions.SubstituteGlobal, null, data =>
-        {
-            ++execCount;
-            Assert.That(data.SubstitutionCount, Is.EqualTo(execCount));
-            Assert.That(data.Match.Index, Is.EqualTo(execCount - 1));
-            return execCount % 3 == 0 ? PcreSubstituteCalloutResult.Pass : PcreSubstituteCalloutResult.Fail;
-        }, out var substituteCallCount);
+        var result = re.InternalRegex.Substitute(
+            str.AsSpan(),
+            null,
+            "#:#:#:#".AsSpan(),
+            null,
+            0,
+            (uint)PcreSubstituteOptions.SubstituteGlobal,
+            null,
+            data =>
+            {
+                ++execCount;
+                Assert.That(data.SubstitutionCount, Is.EqualTo(execCount));
+                Assert.That(data.Match.Index, Is.EqualTo(execCount - 1));
+                return execCount % 3 == 0 ? PcreSubstituteCalloutResult.Pass : PcreSubstituteCalloutResult.Fail;
+            },
+            null,
+            out var substituteCallCount
+        );
 
         Assert.That(execCount, Is.EqualTo(str.Length));
         Assert.That(result, Is.EqualTo(str.Replace("aaa", "aa#:#:#:#")));
@@ -391,10 +475,10 @@ public class SubstituteTests
         var shortStr = new string('a', InternalRegex.SubstituteBufferSizeInChars / 2);
         var longStr = new string('a', InternalRegex.SubstituteBufferSizeInChars * 2);
 
-        re.InternalRegex.Substitute(shortStr.AsSpan(), null, "b".AsSpan(), null, 0, (uint)PcreSubstituteOptions.SubstituteGlobal, null, null, out var substituteCallCount);
+        re.InternalRegex.Substitute(shortStr.AsSpan(), null, "b".AsSpan(), null, 0, (uint)PcreSubstituteOptions.SubstituteGlobal, null, null, null, out var substituteCallCount);
         Assert.That(substituteCallCount, Is.EqualTo(1));
 
-        re.InternalRegex.Substitute(longStr.AsSpan(), null, "b".AsSpan(), null, 0, (uint)PcreSubstituteOptions.SubstituteGlobal, null, null, out substituteCallCount);
+        re.InternalRegex.Substitute(longStr.AsSpan(), null, "b".AsSpan(), null, 0, (uint)PcreSubstituteOptions.SubstituteGlobal, null, null, null, out substituteCallCount);
         Assert.That(substituteCallCount, Is.EqualTo(2));
     }
 

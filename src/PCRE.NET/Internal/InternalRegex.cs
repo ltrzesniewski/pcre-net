@@ -287,6 +287,7 @@ internal sealed unsafe class InternalRegex : IDisposable
                              uint additionalOptions,
                              PcreRefCalloutFunc? matchCallout,
                              PcreSubstituteCalloutFunc? substituteCallout,
+                             PcreSubstituteCaseCalloutFunc? substituteCaseCallout,
                              out uint substituteCallCount)
     {
         Debug.Assert(subjectAsString is null || subjectAsString.AsSpan() == subject);
@@ -314,7 +315,7 @@ internal sealed unsafe class InternalRegex : IDisposable
             input.replacement = pReplacement;
             input.replacement_length = (uint)replacement.Length;
 
-            CalloutInterop.PrepareSubstitute(this, subject, ref input, out calloutInterop, matchCallout, substituteCallout);
+            CalloutInterop.PrepareSubstitute(this, subject, ref input, out calloutInterop, matchCallout, substituteCallout, substituteCaseCallout);
 
             Native.substitute(&input, &result);
 
@@ -324,7 +325,12 @@ internal sealed unsafe class InternalRegex : IDisposable
         try
         {
             if (calloutInterop.Exception is { } ex)
+            {
+                if (result.result_code == PcreConstants.ERROR_REPLACECASE)
+                    throw new PcreCalloutException(PcreErrorCode.ReplaceCase, "An exception was thrown by the case-transformation callout: " + ex.Message, ex);
+
                 throw new PcreCalloutException("An exception was thrown by the callout: " + ex.Message, ex);
+            }
 
             switch (result.result_code)
             {

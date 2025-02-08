@@ -144,6 +144,7 @@ internal static unsafe partial class Native
         public uint buffer_length;
         public void* match_callout;
         public void* substitute_callout;
+        public void* substitute_case_callout;
         public void* callout_data;
     }
 
