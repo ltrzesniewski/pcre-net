@@ -154,7 +154,8 @@ static int match_callout_handler(pcre2_callout_block* block, void* data_ptr)
         return map_callout_result_byte_to_int(result);
 
     result = map_callout_result_int_to_byte(
-        data->input->match_callout(block, data->input->callout_data));
+        data->input->match_callout(block, data->input->callout_data)
+    );
 
     replay_queue_try_enqueue(&data->match_callout_queue, result);
     return result;
@@ -169,7 +170,8 @@ static int substitute_callout_handler(pcre2_substitute_callout_block* block, voi
         return map_callout_result_byte_to_int(result);
 
     result = map_callout_result_int_to_byte(
-        data->input->substitute_callout(block, data->input->callout_data));
+        data->input->substitute_callout(block, data->input->callout_data)
+    );
 
     replay_queue_try_enqueue(&data->substitute_callout_queue, result);
     return result;
@@ -177,16 +179,11 @@ static int substitute_callout_handler(pcre2_substitute_callout_block* block, voi
 
 static void call_substitute(const pcrenet_substitute_input* input,
                             pcrenet_substitute_result* result,
+                            const uint32_t additional_options,
                             PCRE2_SIZE* output_length,
                             pcre2_match_data* match_data,
                             pcre2_match_context* match_context)
 {
-    // - Always try to get an estimate of the required buffer size
-    // - Skip UTF checks if they were already performed in a previous pass
-
-    const uint32_t additional_options = PCRE2_SUBSTITUTE_OVERFLOW_LENGTH
-        | (result->substitute_call_count > 0 ? PCRE2_NO_UTF_CHECK : 0);
-
     result->substitute_call_count++;
 
     result->result_code = pcre2_substitute(
@@ -210,7 +207,6 @@ static void substitute_simple(const pcrenet_substitute_input* input,
                               pcre2_match_context* match_context)
 {
     // Try to substitute in one or two passes max using the PCRE2_SUBSTITUTE_OVERFLOW_LENGTH option
-    // which is automatically added by call_substitute
 
     result->output = input->buffer;
     result->output_length = 0;
@@ -221,6 +217,7 @@ static void substitute_simple(const pcrenet_substitute_input* input,
     call_substitute(
         input,
         result,
+        PCRE2_SUBSTITUTE_OVERFLOW_LENGTH,
         &output_length,
         match_data,
         match_context
@@ -246,6 +243,7 @@ static void substitute_simple(const pcrenet_substitute_input* input,
         call_substitute(
             input,
             result,
+            PCRE2_NO_UTF_CHECK,
             &output_length,
             match_data,
             match_context
@@ -299,9 +297,15 @@ static void substitute_with_callout(const pcrenet_substitute_input* input,
         replay_queue_start_replay(&callout_data.match_callout_queue);
         replay_queue_start_replay(&callout_data.substitute_callout_queue);
 
+        // - Always try to get an estimate of the required buffer size
+        // - Skip UTF checks if they were already performed in a previous pass
+        const uint32_t additional_options = PCRE2_SUBSTITUTE_OVERFLOW_LENGTH
+            | (result->substitute_call_count > 0 ? PCRE2_NO_UTF_CHECK : 0);
+
         call_substitute(
             input,
             result,
+            additional_options,
             &output_length,
             match_data,
             match_context
