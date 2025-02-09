@@ -16,6 +16,7 @@ public sealed unsafe class PcreMatchBuffer : IDisposable
 {
     internal readonly InternalRegex Regex;
     private readonly int _outputVectorSize;
+    private PcreJitStack? _jitStack; // GC reference
 
     internal IntPtr NativeBuffer;
 
@@ -36,7 +37,7 @@ public sealed unsafe class PcreMatchBuffer : IDisposable
             code = regex.Code
         };
 
-        settings.FillMatchSettings(ref info.settings);
+        settings.FillMatchSettings(ref info.settings, out _jitStack);
 
         NativeBuffer = Native.create_match_buffer(&info);
         if (NativeBuffer == IntPtr.Zero)
@@ -58,6 +59,9 @@ public sealed unsafe class PcreMatchBuffer : IDisposable
 
     private void FreeBuffer()
     {
+        GC.KeepAlive(_jitStack);
+        _jitStack = null;
+
         var buffer = Interlocked.Exchange(ref NativeBuffer, IntPtr.Zero);
         if (buffer != IntPtr.Zero)
             Native.free_match_buffer(buffer);

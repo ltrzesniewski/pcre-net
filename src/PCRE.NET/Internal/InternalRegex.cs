@@ -101,6 +101,8 @@ internal sealed unsafe class InternalRegex : IDisposable
         uint result;
         var errorCode = Native.pattern_info(Code, key, &result);
 
+        GC.KeepAlive(this);
+
         if (errorCode != 0)
             throw new PcreException((PcreErrorCode)errorCode, $"Error in pcre2_pattern_info: {Native.GetErrorMessage(errorCode)}");
 
@@ -111,6 +113,8 @@ internal sealed unsafe class InternalRegex : IDisposable
     {
         nuint result;
         var errorCode = Native.pattern_info(Code, key, &result);
+
+        GC.KeepAlive(this);
 
         if (errorCode != 0)
             throw new PcreException((PcreErrorCode)errorCode, $"Error in pcre2_pattern_info: {Native.GetErrorMessage(errorCode)}");
@@ -127,7 +131,7 @@ internal sealed unsafe class InternalRegex : IDisposable
         Native.match_input input;
         _ = &input;
 
-        settings.FillMatchSettings(ref input.settings);
+        settings.FillMatchSettings(ref input.settings, out var jitStack);
 
         Native.match_result result;
         CalloutInterop.CalloutInteropInfo calloutInterop;
@@ -151,6 +155,9 @@ internal sealed unsafe class InternalRegex : IDisposable
             CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout);
 
             Native.match(&input, &result);
+
+            GC.KeepAlive(this);
+            GC.KeepAlive(jitStack);
         }
 
         if (result.result_code == PcreConstants.ERROR_NOMATCH)
@@ -174,7 +181,7 @@ internal sealed unsafe class InternalRegex : IDisposable
         Native.match_input input;
         _ = &input;
 
-        settings.FillMatchSettings(ref input.settings);
+        settings.FillMatchSettings(ref input.settings, out var jitStack);
 
         Native.match_result result;
         CalloutInterop.CalloutInteropInfo calloutInterop;
@@ -200,6 +207,9 @@ internal sealed unsafe class InternalRegex : IDisposable
             CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout, calloutOutputVector);
 
             Native.match(&input, &result);
+
+            GC.KeepAlive(this);
+            GC.KeepAlive(jitStack);
         }
 
         if (result.result_code < PcreConstants.ERROR_PARTIAL)
@@ -239,6 +249,8 @@ internal sealed unsafe class InternalRegex : IDisposable
             CalloutInterop.Prepare(subject, buffer, ref input, out calloutInterop, callout);
 
             Native.buffer_match(&input, &result);
+
+            GC.KeepAlive(buffer); // The buffer keeps alive all the other required stuff
         }
 
         if (result.result_code < PcreConstants.ERROR_PARTIAL)
@@ -271,6 +283,8 @@ internal sealed unsafe class InternalRegex : IDisposable
             CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, settings.Callout);
 
             Native.dfa_match(&input, &result);
+
+            GC.KeepAlive(this);
         }
 
         if (result.result_code < PcreConstants.ERROR_PARTIAL)
@@ -295,7 +309,7 @@ internal sealed unsafe class InternalRegex : IDisposable
         Native.substitute_input input;
         _ = &input;
 
-        (settings ?? PcreMatchSettings.Default).FillMatchSettings(ref input.settings);
+        (settings ?? PcreMatchSettings.Default).FillMatchSettings(ref input.settings, out var jitStack);
 
         Native.substitute_result result;
         CalloutInterop.SubstituteCalloutInteropInfo calloutInterop;
@@ -318,6 +332,9 @@ internal sealed unsafe class InternalRegex : IDisposable
             CalloutInterop.PrepareSubstitute(this, subject, ref input, out calloutInterop, matchCallout, substituteCallout, substituteCaseCallout);
 
             Native.substitute(&input, &result);
+
+            GC.KeepAlive(this);
+            GC.KeepAlive(jitStack);
 
             substituteCallCount = result.substitute_call_count;
         }
@@ -389,6 +406,8 @@ internal sealed unsafe class InternalRegex : IDisposable
         fixed (Native.pcre2_callout_enumerate_block* pData = &data[0])
         {
             Native.get_callouts(Code, pData);
+
+            GC.KeepAlive(this);
         }
 
         var result = new List<PcreCalloutInfo>((int)calloutCount);
