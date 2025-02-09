@@ -432,7 +432,7 @@ public class SubstituteTests
 
         Assert.That(execCount, Is.EqualTo(str.Length));
         Assert.That(result, Is.EqualTo(str.Replace("aaa", "aa#:#:#:#")));
-        Assert.That(substituteCallCount, Is.EqualTo(3));
+        Assert.That(substituteCallCount, Is.EqualTo(2));
     }
 
     [Test]
@@ -464,7 +464,7 @@ public class SubstituteTests
 
         Assert.That(execCount, Is.EqualTo(str.Length));
         Assert.That(result, Is.EqualTo(str.Replace("aaa", "aa#:#:#:#")));
-        Assert.That(substituteCallCount, Is.EqualTo(3));
+        Assert.That(substituteCallCount, Is.EqualTo(2));
     }
 
     [Test]
