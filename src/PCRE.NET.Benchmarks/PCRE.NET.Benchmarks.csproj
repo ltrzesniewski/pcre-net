@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net9.0;net48</TargetFrameworks>
+    <TargetFrameworks>net10.0;net48</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <DefaultItemExcludes>$(DefaultItemExcludes);BenchmarkDotNet.Artifacts/**</DefaultItemExcludes>
   </PropertyGroup>
