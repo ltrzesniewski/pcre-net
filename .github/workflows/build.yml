@@ -28,12 +28,12 @@ jobs:
             extension: so
 
           - name: macOS arm64
-            runner: macos-14
+            runner: macos-15
             platform: arm64
             extension: dylib
 
           - name: macOS x64
-            runner: macos-13
+            runner: macos-15-intel
             platform: x64
             extension: dylib
 
@@ -204,10 +204,10 @@ jobs:
             runner: ubuntu-24.04-arm
 
           - name: macOS arm64
-            runner: macos-14
+            runner: macos-15
 
           - name: macOS x64
-            runner: macos-13
+            runner: macos-15-intel
 
           - name: Windows x64
             runner: windows-2022
