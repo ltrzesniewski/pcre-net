@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using NUnit.Framework;
 
 namespace PCRE.Tests.PcreNet;
@@ -11,6 +12,7 @@ public class PlatformTests
     public void print_current_platform()
     {
         Console.WriteLine("TESTS RUNNING IN {0}-bit mode", Environment.Is64BitProcess ? 64 : 32);
+        Console.WriteLine("ARCHITECTURE: {0}", RuntimeInformation.ProcessArchitecture);
     }
 
     [Test]
@@ -23,19 +25,23 @@ public class PlatformTests
                                           .OrderBy(i => i, StringComparer.Ordinal)
                                           .ToList();
 
-        Assert.That(namespaces, Is.EqualTo(new[]
-        {
-            "PCRE",
-            "PCRE.Conversion",
-            "PCRE.Dfa"
-        }));
+        Assert.That(
+            namespaces,
+            Is.EqualTo(
+                [
+                    "PCRE",
+                    "PCRE.Conversion",
+                    "PCRE.Dfa"
+                ]
+            )
+        );
     }
 
 #if EXPECT_X86
     [Test]
     public void validate_platform_x86()
     {
-        Assert.That(System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture, Is.EqualTo(System.Runtime.InteropServices.Architecture.X86));
+        Assert.That(RuntimeInformation.ProcessArchitecture, Is.EqualTo(Architecture.X86));
     }
 #endif
 
@@ -43,7 +49,15 @@ public class PlatformTests
     [Test]
     public void validate_platform_x64()
     {
-        Assert.That(System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture, Is.EqualTo(System.Runtime.InteropServices.Architecture.X64));
+        Assert.That(RuntimeInformation.ProcessArchitecture, Is.EqualTo(Architecture.X64));
+    }
+#endif
+
+#if EXPECT_ARM64
+    [Test]
+    public void validate_platform_arm64()
+    {
+        Assert.That(RuntimeInformation.ProcessArchitecture, Is.EqualTo(Architecture.Arm64));
     }
 #endif
 }

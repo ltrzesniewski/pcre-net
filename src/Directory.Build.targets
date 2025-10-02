@@ -7,6 +7,7 @@
   <PropertyGroup>
     <DefineConstants Condition="'$(ExpectPlatform)' == 'x86'">$(DefineConstants);EXPECT_X86</DefineConstants>
     <DefineConstants Condition="'$(ExpectPlatform)' == 'x64'">$(DefineConstants);EXPECT_X64</DefineConstants>
+    <DefineConstants Condition="'$(ExpectPlatform)' == 'arm64'">$(DefineConstants);EXPECT_ARM64</DefineConstants>
   </PropertyGroup>
 
 </Project>
