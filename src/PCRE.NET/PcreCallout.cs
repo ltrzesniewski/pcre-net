@@ -13,8 +13,6 @@ public sealed unsafe class PcreCallout
     private readonly uint _flags;
     private readonly nuint[] _oVector;
     private readonly char* _markPtr;
-    private PcreMatch? _match;
-    private PcreCalloutInfo? _info;
 
     internal PcreCallout(string subject, InternalRegex regex, Native.pcre2_callout_block* callout)
     {
@@ -45,7 +43,7 @@ public sealed unsafe class PcreCallout
     /// <summary>
     /// Returns the current match status.
     /// </summary>
-    public PcreMatch Match => _match ??= new PcreMatch(_subject, _regex, _oVector, _markPtr);
+    public PcreMatch Match => field ??= new PcreMatch(_subject, _regex, _oVector, _markPtr);
 
     /// <summary>
     /// The offset within the subject at which the current match attempt started.
@@ -93,7 +91,7 @@ public sealed unsafe class PcreCallout
     /// <summary>
     /// Returns information about the callout.
     /// </summary>
-    public PcreCalloutInfo Info => _info ??= _regex.GetCalloutInfoByPatternPosition(PatternPosition);
+    public PcreCalloutInfo Info => field ??= _regex.GetCalloutInfoByPatternPosition(PatternPosition);
 
     /// <summary>
     /// <c>PCRE2_CALLOUT_STARTMATCH</c> - This is set for the first callout after the start of matching for each new starting position in the subject.
