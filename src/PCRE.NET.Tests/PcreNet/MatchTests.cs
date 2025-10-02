@@ -574,7 +574,7 @@ public class MatchTests
         Assert.That(match["g"].Value, Is.EqualTo("b"));
         Assert.That(match["g"].ValueSpan.ToString(), Is.EqualTo("b"));
 
-        Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo(new[] { false, true, false }));
+        Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo([false, true, false]));
 
         match = re.Match("bc");
         Assert.That(match, Is.Not.Null);
@@ -582,7 +582,7 @@ public class MatchTests
         Assert.That(match["g"].Value, Is.EqualTo("b"));
         Assert.That(match["g"].ValueSpan.ToString(), Is.EqualTo("b"));
 
-        Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo(new[] { false, true, true }));
+        Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo([false, true, true]));
     }
 
     [Test]
@@ -594,13 +594,13 @@ public class MatchTests
         Assert.That(match.Success, Is.True);
         Assert.That(match["g"].Value.ToString(), Is.EqualTo("b"));
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo(new[] { false, true, false }));
+        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, false]));
 
         match = re.Match("bc".AsSpan());
         Assert.That(match.Success, Is.True);
         Assert.That(match["g"].Value.ToString(), Is.EqualTo("b"));
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo(new[] { false, true, true }));
+        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
     }
 
     [Test]
@@ -612,13 +612,13 @@ public class MatchTests
         Assert.That(match.Success, Is.True);
         Assert.That(match["g"].Value.ToString(), Is.EqualTo("b"));
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo(new[] { false, true, false }));
+        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, false]));
 
         match = re.Match("bc".AsSpan());
         Assert.That(match.Success, Is.True);
         Assert.That(match["g"].Value.ToString(), Is.EqualTo("b"));
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo(new[] { false, true, true }));
+        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
     }
 
     [Test]
@@ -631,7 +631,7 @@ public class MatchTests
         Assert.That(match.Success, Is.True);
         Assert.That(match["g"].Value, Is.EqualTo("b"));
 
-        Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo(new[] { false, true, true }));
+        Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo([false, true, true]));
     }
 
     [Test]
@@ -643,7 +643,7 @@ public class MatchTests
         Assert.That(match.Success, Is.True);
         Assert.That(match["g"].Value.ToString(), Is.EqualTo("b"));
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo(new[] { false, true, true }));
+        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
     }
 
     [Test]
@@ -655,7 +655,7 @@ public class MatchTests
         Assert.That(match.Success, Is.True);
         Assert.That(match["g"].Value.ToString(), Is.EqualTo("b"));
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo(new[] { false, true, true }));
+        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
     }
 
     private static List<bool> GetDuplicateNamedGroupsSuccesses(PcreRefMatch match, string groupName)
@@ -1115,8 +1115,8 @@ public class MatchTests
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(startMatchList, Is.EqualTo(new[] { true, false, false }));
-        Assert.That(backtrackList, Is.EqualTo(new[] { false, false, true }));
+        Assert.That(startMatchList, Is.EqualTo([true, false, false]));
+        Assert.That(backtrackList, Is.EqualTo([false, false, true]));
     }
 
     [Test]
@@ -1134,8 +1134,8 @@ public class MatchTests
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(startMatchList, Is.EqualTo(new[] { true, false, false }));
-        Assert.That(backtrackList, Is.EqualTo(new[] { false, false, true }));
+        Assert.That(startMatchList, Is.EqualTo([true, false, false]));
+        Assert.That(backtrackList, Is.EqualTo([false, false, true]));
     }
 
     [Test]
@@ -1153,8 +1153,8 @@ public class MatchTests
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(startMatchList, Is.EqualTo(new[] { true, false, false }));
-        Assert.That(backtrackList, Is.EqualTo(new[] { false, false, true }));
+        Assert.That(startMatchList, Is.EqualTo([true, false, false]));
+        Assert.That(backtrackList, Is.EqualTo([false, false, true]));
     }
 
     [Test]

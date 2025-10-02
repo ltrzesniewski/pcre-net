@@ -100,12 +100,12 @@ public class MatchesTests
 
         Assert.That(matches, Has.Count.EqualTo(5));
 
-        Assert.That(matches.Select(m => m.Index), Is.EqualTo(new[] { 0, 1, 2, 5, 6 }));
+        Assert.That(matches.Select(m => m.Index), Is.EqualTo([0, 1, 2, 5, 6]));
         Assert.That(matches.Select(m => m.Length), Is.All.EqualTo(0));
         Assert.That(matches.Select(m => m.Value), Is.All.EqualTo(string.Empty));
         Assert.That(matches.Select(m => m.ValueSpan.Length), Is.All.EqualTo(0));
 
-        Assert.That(matches.Select(m => m[1].Index), Is.EqualTo(new[] { 0, 1, 2, 5, 6 }));
+        Assert.That(matches.Select(m => m[1].Index), Is.EqualTo([0, 1, 2, 5, 6]));
         Assert.That(matches.Select(m => m[1].Length), Is.All.EqualTo(1));
         Assert.That(matches.Select(m => m[1].Value), Is.All.EqualTo("a"));
         Assert.That(matches.Select(m => m[1].ValueSpan.ToString()), Is.All.EqualTo("a"));
@@ -120,11 +120,11 @@ public class MatchesTests
 
         Assert.That(matches, Has.Count.EqualTo(5));
 
-        Assert.That(matches.Select(m => m.Index), Is.EqualTo(new[] { 0, 1, 2, 5, 6 }));
+        Assert.That(matches.Select(m => m.Index), Is.EqualTo([0, 1, 2, 5, 6]));
         Assert.That(matches.Select(m => m.Length), Is.All.EqualTo(0));
-        Assert.That(matches.Select(m => m.Value), Is.All.EqualTo(String.Empty));
+        Assert.That(matches.Select(m => m.Value), Is.All.EqualTo(string.Empty));
 
-        Assert.That(matches.Select(m => m.Groups[1].Index), Is.EqualTo(new[] { 0, 1, 2, 5, 6 }));
+        Assert.That(matches.Select(m => m.Groups[1].Index), Is.EqualTo([0, 1, 2, 5, 6]));
         Assert.That(matches.Select(m => m.Groups[1].Length), Is.All.EqualTo(1));
         Assert.That(matches.Select(m => m.Groups[1].Value), Is.All.EqualTo("a"));
     }
@@ -138,11 +138,11 @@ public class MatchesTests
 
         Assert.That(matches, Has.Count.EqualTo(5));
 
-        Assert.That(matches.Select(m => m.Index), Is.EqualTo(new[] { 0, 1, 2, 5, 6 }));
+        Assert.That(matches.Select(m => m.Index), Is.EqualTo([0, 1, 2, 5, 6]));
         Assert.That(matches.Select(m => m.Length), Is.All.EqualTo(0));
-        Assert.That(matches.Select(m => m.Value), Is.All.EqualTo(String.Empty));
+        Assert.That(matches.Select(m => m.Value), Is.All.EqualTo(string.Empty));
 
-        Assert.That(matches.Select(m => m.Groups[1].Index), Is.EqualTo(new[] { 0, 1, 2, 5, 6 }));
+        Assert.That(matches.Select(m => m.Groups[1].Index), Is.EqualTo([0, 1, 2, 5, 6]));
         Assert.That(matches.Select(m => m.Groups[1].Length), Is.All.EqualTo(1));
         Assert.That(matches.Select(m => m.Groups[1].Value), Is.All.EqualTo("a"));
     }
@@ -401,6 +401,6 @@ public class MatchesTests
                                .Select(m => m.Value)
                                .ToList();
 
-        Assert.That(matches, Is.EqualTo(new[] { "bar", "42" }));
+        Assert.That(matches, Is.EqualTo(["bar", "42"]));
     }
 }

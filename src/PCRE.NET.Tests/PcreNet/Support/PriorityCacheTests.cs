@@ -23,8 +23,8 @@ public class PriorityCacheTests
         Assert.That(_cache.GetOrAdd(42), Is.EqualTo("42"));
         Assert.That(_cache.Count, Is.EqualTo(1));
 
-        Assert.That(_cache.Select(i => i.Key), Is.EqualTo(new[] { 42 }));
-        Assert.That(_cache.Select(i => i.Value), Is.EqualTo(new[] { "42" }));
+        Assert.That(_cache.Select(i => i.Key), Is.EqualTo([42]));
+        Assert.That(_cache.Select(i => i.Value), Is.EqualTo(["42"]));
     }
 
     [Test]
@@ -37,8 +37,8 @@ public class PriorityCacheTests
 
         Assert.That(_cache.Count, Is.EqualTo(3));
 
-        Assert.That(_cache.Select(i => i.Key), Is.EqualTo(new[] { 4, 3, 2 }));
-        Assert.That(_cache.Select(i => i.Value), Is.EqualTo(new[] { "4", "3", "2" }));
+        Assert.That(_cache.Select(i => i.Key), Is.EqualTo([4, 3, 2]));
+        Assert.That(_cache.Select(i => i.Value), Is.EqualTo(["4", "3", "2"]));
     }
 
     [Test]
@@ -52,8 +52,8 @@ public class PriorityCacheTests
 
         Assert.That(_cache.Count, Is.EqualTo(3));
 
-        Assert.That(_cache.Select(i => i.Key), Is.EqualTo(new[] { 3, 4, 2 }));
-        Assert.That(_cache.Select(i => i.Value), Is.EqualTo(new[] { "3", "4", "2" }));
+        Assert.That(_cache.Select(i => i.Key), Is.EqualTo([3, 4, 2]));
+        Assert.That(_cache.Select(i => i.Value), Is.EqualTo(["3", "4", "2"]));
     }
 
     [Test]
@@ -76,8 +76,8 @@ public class PriorityCacheTests
         _cache.CacheSize = 1;
 
         Assert.That(_cache.Count, Is.EqualTo(1));
-        Assert.That(_cache.Select(i => i.Key), Is.EqualTo(new[] { 3 }));
-        Assert.That(_cache.Select(i => i.Value), Is.EqualTo(new[] { "3" }));
+        Assert.That(_cache.Select(i => i.Key), Is.EqualTo([3]));
+        Assert.That(_cache.Select(i => i.Value), Is.EqualTo(["3"]));
 
         _cache.CacheSize = 0;
 
@@ -98,8 +98,8 @@ public class PriorityCacheTests
 
         Assert.That(_cache.Count, Is.EqualTo(4));
 
-        Assert.That(_cache.Select(i => i.Key), Is.EqualTo(new[] { 4, 3, 2, 1 }));
-        Assert.That(_cache.Select(i => i.Value), Is.EqualTo(new[] { "4", "3", "2", "1" }));
+        Assert.That(_cache.Select(i => i.Key), Is.EqualTo([4, 3, 2, 1]));
+        Assert.That(_cache.Select(i => i.Value), Is.EqualTo(["4", "3", "2", "1"]));
     }
 
     [Test]

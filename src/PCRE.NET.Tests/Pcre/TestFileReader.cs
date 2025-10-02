@@ -37,7 +37,7 @@ public abstract class TestFileReader : IDisposable
             if (line == null)
                 return null;
 
-            if (String.IsNullOrWhiteSpace(line))
+            if (string.IsNullOrWhiteSpace(line))
                 continue;
 
             if (line.StartsWith("#"))
