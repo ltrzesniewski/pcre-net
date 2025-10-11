@@ -3,6 +3,9 @@
 #include <stdint.h>
 #include <assert.h>
 
+#define HAVE_CONFIG_H 1
+#define PCRE2_CODE_UNIT_WIDTH 0
+
 #include "../PCRE/src/config.h"
 #include "../PCRE/src/pcre2.h"
 
@@ -32,7 +35,7 @@ typedef struct
     uint32_t depth_limit;
     uint32_t heap_limit;
     uint32_t offset_limit;
-    pcre2_jit_stack* jit_stack;
+    pcre2_jit_stack_16* jit_stack;
 } match_settings;
 
-void apply_settings(const match_settings* settings, pcre2_match_context* context);
+void apply_settings(const match_settings* settings, pcre2_match_context_16* context);

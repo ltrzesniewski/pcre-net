@@ -19,34 +19,34 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\PCRE\src\pcre2_auto_possess.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_chartables.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_chkdint.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_compile.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_compile_class.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_config.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_context.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_convert.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_dfa_match.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_error.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_extuni.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_find_bracket.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_jit_compile.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_maketables.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_match.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_match_data.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_newline.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_ord2utf.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_pattern_info.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_script_run.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_string_utils.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_study.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_substitute.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_substring.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_tables.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_ucd.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_valid_utf.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_xclass.c" />
+    <ClCompile Include="pcre2/pcre2_auto_possess.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_chartables.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_chkdint.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_compile.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_compile_class.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_config.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_context.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_convert.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_dfa_match.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_error.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_extuni.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_find_bracket.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_jit_compile.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_maketables.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_match.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_match_data.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_newline.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_ord2utf.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_pattern_info.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_script_run.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_string_utils.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_study.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_substitute.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_substring.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_tables.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_ucd.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_valid_utf.utf16.c" />
+    <ClCompile Include="pcre2/pcre2_xclass.utf16.c" />
     <ClCompile Include="pcrenet_compile.c" />
     <ClCompile Include="pcrenet_convert.c" />
     <ClCompile Include="pcrenet_match.c" />
@@ -135,7 +135,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>HAVE_CONFIG_H;PCRE2_CODE_UNIT_WIDTH=16;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4244;4267;4146</DisableSpecificWarnings>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -151,7 +151,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>HAVE_CONFIG_H;PCRE2_CODE_UNIT_WIDTH=16;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4244;4267;4146</DisableSpecificWarnings>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <TreatWarningAsError>true</TreatWarningAsError>
@@ -168,7 +168,7 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>HAVE_CONFIG_H;PCRE2_CODE_UNIT_WIDTH=16;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4244;4267;4146</DisableSpecificWarnings>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -191,7 +191,7 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>HAVE_CONFIG_H;PCRE2_CODE_UNIT_WIDTH=16;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4244;4267;4146</DisableSpecificWarnings>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>

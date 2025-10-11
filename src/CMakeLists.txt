@@ -20,39 +20,34 @@ include_directories(PCRE/src)
 include_directories(PCRE.NET.Native)
 
 add_library(PCRE.NET.Native SHARED
-        PCRE/src/config.h
-        PCRE/src/pcre2.h
-        PCRE/src/pcre2_auto_possess.c
-        PCRE/src/pcre2_chartables.c
-        PCRE/src/pcre2_chkdint.c
-        PCRE/src/pcre2_compile.c
-        PCRE/src/pcre2_compile_class.c
-        PCRE/src/pcre2_config.c
-        PCRE/src/pcre2_context.c
-        PCRE/src/pcre2_convert.c
-        PCRE/src/pcre2_dfa_match.c
-        PCRE/src/pcre2_error.c
-        PCRE/src/pcre2_extuni.c
-        PCRE/src/pcre2_find_bracket.c
-        PCRE/src/pcre2_internal.h
-        PCRE/src/pcre2_intmodedep.h
-        PCRE/src/pcre2_jit_compile.c
-        PCRE/src/pcre2_maketables.c
-        PCRE/src/pcre2_match.c
-        PCRE/src/pcre2_match_data.c
-        PCRE/src/pcre2_newline.c
-        PCRE/src/pcre2_ord2utf.c
-        PCRE/src/pcre2_pattern_info.c
-        PCRE/src/pcre2_script_run.c
-        PCRE/src/pcre2_string_utils.c
-        PCRE/src/pcre2_study.c
-        PCRE/src/pcre2_substitute.c
-        PCRE/src/pcre2_substring.c
-        PCRE/src/pcre2_tables.c
-        PCRE/src/pcre2_ucd.c
-        PCRE/src/pcre2_ucp.h
-        PCRE/src/pcre2_valid_utf.c
-        PCRE/src/pcre2_xclass.c
+        PCRE.NET.Native/pcre2/pcre2_auto_possess.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_chartables.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_chkdint.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_compile.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_compile_class.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_config.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_context.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_convert.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_dfa_match.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_error.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_extuni.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_find_bracket.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_jit_compile.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_maketables.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_match.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_match_data.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_newline.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_ord2utf.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_pattern_info.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_script_run.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_string_utils.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_study.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_substitute.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_substring.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_tables.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_ucd.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_valid_utf.utf16.c
+        PCRE.NET.Native/pcre2/pcre2_xclass.utf16.c
         PCRE.NET.Native/pcrenet.h
         PCRE.NET.Native/pcrenet_compile.c
         PCRE.NET.Native/pcrenet_convert.c
@@ -63,5 +58,4 @@ add_library(PCRE.NET.Native SHARED
 
 add_compile_definitions(
         HAVE_CONFIG_H
-        PCRE2_CODE_UNIT_WIDTH=16
 )
