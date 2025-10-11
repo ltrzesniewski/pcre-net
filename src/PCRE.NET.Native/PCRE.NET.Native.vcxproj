@@ -19,62 +19,44 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="pcre2/pcre2_auto_possess.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_auto_possess.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_chartables.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_chartables.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_chkdint.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_chkdint.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_compile.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_compile.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_compile_class.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_compile_class.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_config.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_config.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_context.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_context.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_convert.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_convert.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_dfa_match.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_dfa_match.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_error.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_error.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_extuni.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_extuni.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_find_bracket.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_find_bracket.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_jit_compile.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_jit_compile.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_maketables.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_maketables.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_match.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_match.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_match_data.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_match_data.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_newline.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_newline.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_ord2utf.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_ord2utf.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_pattern_info.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_pattern_info.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_script_run.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_script_run.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_string_utils.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_string_utils.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_study.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_study.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_substitute.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_substitute.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_substring.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_substring.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_tables.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_tables.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_ucd.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_ucd.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_valid_utf.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_valid_utf.utf16.c" />
-    <ClCompile Include="pcre2/pcre2_xclass.utf8.c" />
-    <ClCompile Include="pcre2/pcre2_xclass.utf16.c" />
+    <Pcre2Source Include="pcre2_auto_possess.c" />
+    <Pcre2Source Include="pcre2_chartables.c" />
+    <Pcre2Source Include="pcre2_chkdint.c" />
+    <Pcre2Source Include="pcre2_compile.c" />
+    <Pcre2Source Include="pcre2_compile_class.c" />
+    <Pcre2Source Include="pcre2_config.c" />
+    <Pcre2Source Include="pcre2_context.c" />
+    <Pcre2Source Include="pcre2_convert.c" />
+    <Pcre2Source Include="pcre2_dfa_match.c" />
+    <Pcre2Source Include="pcre2_error.c" />
+    <Pcre2Source Include="pcre2_extuni.c" />
+    <Pcre2Source Include="pcre2_find_bracket.c" />
+    <Pcre2Source Include="pcre2_jit_compile.c" />
+    <Pcre2Source Include="pcre2_maketables.c" />
+    <Pcre2Source Include="pcre2_match.c" />
+    <Pcre2Source Include="pcre2_match_data.c" />
+    <Pcre2Source Include="pcre2_newline.c" />
+    <Pcre2Source Include="pcre2_ord2utf.c" />
+    <Pcre2Source Include="pcre2_pattern_info.c" />
+    <Pcre2Source Include="pcre2_script_run.c" />
+    <Pcre2Source Include="pcre2_string_utils.c" />
+    <Pcre2Source Include="pcre2_study.c" />
+    <Pcre2Source Include="pcre2_substitute.c" />
+    <Pcre2Source Include="pcre2_substring.c" />
+    <Pcre2Source Include="pcre2_tables.c" />
+    <Pcre2Source Include="pcre2_ucd.c" />
+    <Pcre2Source Include="pcre2_valid_utf.c" />
+    <Pcre2Source Include="pcre2_xclass.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="@(Pcre2Source->'wrappers\%(Filename).utf8%(Extension)')" />
+    <ClCompile Include="@(Pcre2Source->'wrappers\%(Filename).utf16%(Extension)')" />
+    <ClInclude Include="@(Pcre2Source->'..\PCRE\src\%(Filename)%(Extension)')" />
+    <ClInclude Include="wrappers\wrapper.utf16.h" />
+    <ClInclude Include="wrappers\wrapper.utf8.h" />
+    <Pcre2Source Update="@(Pcre2Source)" Visible="false" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="pcrenet_compile.c" />
     <ClCompile Include="pcrenet_convert.c" />
     <ClCompile Include="pcrenet_match.c" />
@@ -163,7 +145,6 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4244;4267;4146</DisableSpecificWarnings>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -179,7 +160,6 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4244;4267;4146</DisableSpecificWarnings>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <TreatWarningAsError>true</TreatWarningAsError>
@@ -196,7 +176,6 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4244;4267;4146</DisableSpecificWarnings>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -219,7 +198,6 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>HAVE_CONFIG_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4244;4267;4146</DisableSpecificWarnings>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
