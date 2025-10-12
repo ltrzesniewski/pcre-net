@@ -49,19 +49,20 @@
     <Pcre2Source Include="pcre2_xclass.c" />
   </ItemGroup>
   <ItemGroup>
+    <PcreNetSource Include="pcrenet_compile.c" />
+    <PcreNetSource Include="pcrenet_convert.c" />
+    <PcreNetSource Include="pcrenet_match.c" />
+    <PcreNetSource Include="pcrenet_info.c" />
+    <PcreNetSource Include="pcrenet_substitute.c" />
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="@(Pcre2Source->'wrappers\%(Filename).utf8%(Extension)')" />
     <ClCompile Include="@(Pcre2Source->'wrappers\%(Filename).utf16%(Extension)')" />
-    <ClInclude Include="@(Pcre2Source->'..\PCRE\src\%(Filename)%(Extension)')" />
+    <ClCompile Include="@(PcreNetSource->'wrappers\%(Filename).utf8%(Extension)')" />
+    <ClCompile Include="@(PcreNetSource->'wrappers\%(Filename).utf16%(Extension)')" />
     <ClInclude Include="wrappers\wrapper.utf16.h" />
     <ClInclude Include="wrappers\wrapper.utf8.h" />
     <Pcre2Source Update="@(Pcre2Source)" Visible="false" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="pcrenet_compile.c" />
-    <ClCompile Include="pcrenet_convert.c" />
-    <ClCompile Include="pcrenet_match.c" />
-    <ClCompile Include="pcrenet_info.c" />
-    <ClCompile Include="pcrenet_substitute.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\PCRE\src\config.h" />

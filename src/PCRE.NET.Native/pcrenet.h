@@ -3,16 +3,22 @@
 #include <stdint.h>
 #include <assert.h>
 
-#define HAVE_CONFIG_H 1
-#define PCRE2_CODE_UNIT_WIDTH 0
+#define HAVE_CONFIG_H
+
+// This is to help the IDE
+#ifndef PCRE2_CODE_UNIT_WIDTH
+#define PCRE2_CODE_UNIT_WIDTH 16
+#endif
 
 #include "../PCRE/src/config.h"
 #include "../PCRE/src/pcre2.h"
 
+#define PCRENET_SUFFIX(a) PCRE2_GLUE(a##_,PCRE2_CODE_UNIT_WIDTH)
+
 #if __GNUC__
-#   define PCRENET_EXPORT(type, name) __attribute__((visibility("default"))) type pcrenet_##name
+#   define PCRENET_EXPORT(type, name) __attribute__((visibility("default"))) type PCRENET_SUFFIX(pcrenet_##name)
 #else
-#   define PCRENET_EXPORT(type, name) __declspec(dllexport) type __cdecl pcrenet_##name
+#   define PCRENET_EXPORT(type, name) __declspec(dllexport) type __cdecl PCRENET_SUFFIX(pcrenet_##name)
 #endif
 
 #ifndef __has_extension
@@ -35,7 +41,7 @@ typedef struct
     uint32_t depth_limit;
     uint32_t heap_limit;
     uint32_t offset_limit;
-    pcre2_jit_stack_16* jit_stack;
+    pcre2_jit_stack* jit_stack;
 } match_settings;
 
-void apply_settings(const match_settings* settings, pcre2_match_context_16* context);
+void PCRENET_SUFFIX(apply_settings)(const match_settings* settings, pcre2_match_context* context);

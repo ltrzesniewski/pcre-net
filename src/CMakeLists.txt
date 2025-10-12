@@ -76,10 +76,14 @@ add_library(PCRE.NET.Native SHARED
     PCRE.NET.Native/wrappers/pcre2_valid_utf.utf16.c
     PCRE.NET.Native/wrappers/pcre2_xclass.utf8.c
     PCRE.NET.Native/wrappers/pcre2_xclass.utf16.c
-    PCRE.NET.Native/pcrenet.h
-    PCRE.NET.Native/pcrenet_compile.c
-    PCRE.NET.Native/pcrenet_convert.c
-    PCRE.NET.Native/pcrenet_info.c
-    PCRE.NET.Native/pcrenet_match.c
-    PCRE.NET.Native/pcrenet_substitute.c
+    PCRE.NET.Native/wrappers/pcrenet_compile.utf8.c
+    PCRE.NET.Native/wrappers/pcrenet_compile.utf16.c
+    PCRE.NET.Native/wrappers/pcrenet_convert.utf8.c
+    PCRE.NET.Native/wrappers/pcrenet_convert.utf16.c
+    PCRE.NET.Native/wrappers/pcrenet_info.utf8.c
+    PCRE.NET.Native/wrappers/pcrenet_info.utf16.c
+    PCRE.NET.Native/wrappers/pcrenet_match.utf8.c
+    PCRE.NET.Native/wrappers/pcrenet_match.utf16.c
+    PCRE.NET.Native/wrappers/pcrenet_substitute.utf8.c
+    PCRE.NET.Native/wrappers/pcrenet_substitute.utf16.c
 )
