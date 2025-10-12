@@ -19,6 +19,8 @@ public class PcreBuildInfoTests
     [Test]
     public void should_report_jit_target()
     {
+        Assert.That(PcreBuildInfo.Jit, Is.True);
+
         var value = PcreBuildInfo.JitTarget;
         Console.WriteLine(value);
         Assert.That(value, Is.Not.Null.Or.Empty);

@@ -79,7 +79,7 @@ You can read more about its features in [the PCRE2 documentation](https://pcre2p
 
 ## Library highlights
 
-- Support for compiled patterns (x86/x64 JIT)
+- Support for compiled patterns (x86/x64/arm64 JIT)
 - Support for partial matching (when the subject is too short to match the pattern)
 - Callout support (numbered and string-based)
 - Mark retrieval support
