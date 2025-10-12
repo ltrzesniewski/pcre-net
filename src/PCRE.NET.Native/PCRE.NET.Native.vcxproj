@@ -56,12 +56,12 @@
     <PcreNetSource Include="pcrenet_substitute.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="@(Pcre2Source->'wrappers\%(Filename).utf8%(Extension)')" />
-    <ClCompile Include="@(Pcre2Source->'wrappers\%(Filename).utf16%(Extension)')" />
-    <ClCompile Include="@(PcreNetSource->'wrappers\%(Filename).utf8%(Extension)')" />
-    <ClCompile Include="@(PcreNetSource->'wrappers\%(Filename).utf16%(Extension)')" />
-    <ClInclude Include="wrappers\wrapper.utf16.h" />
-    <ClInclude Include="wrappers\wrapper.utf8.h" />
+    <ClCompile Include="@(Pcre2Source->'compile\%(Filename).8bit%(Extension)')" />
+    <ClCompile Include="@(Pcre2Source->'compile\%(Filename).16bit%(Extension)')" />
+    <ClCompile Include="@(PcreNetSource->'compile\%(Filename).8bit%(Extension)')" />
+    <ClCompile Include="@(PcreNetSource->'compile\%(Filename).16bit%(Extension)')" />
+    <ClInclude Include="compile\config.16bit.h" />
+    <ClInclude Include="compile\config.8bit.h" />
     <Pcre2Source Update="@(Pcre2Source)" Visible="false" />
   </ItemGroup>
   <ItemGroup>
