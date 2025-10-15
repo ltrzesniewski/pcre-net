@@ -224,7 +224,7 @@ public sealed class PcreRegexSettings
             throw new InvalidOperationException("Settings of a compiled pattern cannot be changed.");
     }
 
-    internal unsafe IDisposable? FillCompileInput(ref Native.compile_input input)
+    internal unsafe IDisposable? FillCompileInput(ref Native16Bit.compile_input input)
     {
         input.flags = Options.ToPatternOptions();
         input.flags_jit = (uint)JitCompileOptions;

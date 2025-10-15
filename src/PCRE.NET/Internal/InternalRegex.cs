@@ -14,7 +14,7 @@ internal sealed unsafe class InternalRegex : IDisposable
     private Dictionary<int, PcreCalloutInfo>? _calloutInfoByPatternPosition;
     private PcreMatch? _noMatch;
 
-    public IntPtr Code { get; private set; }
+    public void* Code { get; private set; }
     public string Pattern { get; }
     public PcreRegexSettings Settings { get; }
 
@@ -29,11 +29,11 @@ internal sealed unsafe class InternalRegex : IDisposable
         Pattern = pattern;
         Settings = settings.AsReadOnly();
 
-        Native.compile_result result;
+        Native16Bit.compile_result result;
 
         fixed (char* pPattern = pattern)
         {
-            Native.compile_input input;
+            Native16Bit.compile_input input;
             _ = &input;
 
             input.pattern = pPattern;
@@ -41,20 +41,25 @@ internal sealed unsafe class InternalRegex : IDisposable
 
             using (Settings.FillCompileInput(ref input))
             {
-                Native.compile(&input, &result);
+                Native16Bit.compile(&input, &result);
                 Code = result.code;
             }
 
-            if (Code == IntPtr.Zero || result.error_code != 0)
+            if (Code == null || result.error_code != 0)
             {
                 Dispose();
-                throw new PcrePatternException((PcreErrorCode)result.error_code, $"Invalid pattern '{pattern}': {Native.GetErrorMessage(result.error_code)} at offset {result.error_offset}.");
+                throw new PcrePatternException((PcreErrorCode)result.error_code, $"Invalid pattern '{pattern}': {Native16Bit.GetErrorMessage(result.error_code)} at offset {result.error_offset}.");
             }
         }
 
         CaptureCount = (int)result.capture_count;
         CaptureNames = new Dictionary<string, int[]>((int)result.name_count, StringComparer.Ordinal);
 
+        // PCRE2_INFO_NAMETABLE returns a pointer to the first entry of the table. This is a PCRE2_SPTR pointer to a block of code units.
+        // In the 8-bit library, the first two bytes of each entry are the number of the capturing parenthesis, most significant byte first.
+        // In the 16-bit library, the pointer points to 16-bit code units, the first of which contains the parenthesis number.
+        // In the 32-bit library, the pointer points to 32-bit code units, the first of which contains the parenthesis number.
+        // The rest of the entry is the corresponding name, zero terminated.
         var currentItem = result.name_entry_table;
 
         for (var i = 0; i < result.name_count; ++i)
@@ -89,22 +94,22 @@ internal sealed unsafe class InternalRegex : IDisposable
 
     private void FreeCode()
     {
-        if (Code != IntPtr.Zero)
+        if (Code != null)
         {
-            Native.code_free(Code);
-            Code = IntPtr.Zero;
+            Native16Bit.code_free(Code);
+            Code = null;
         }
     }
 
     public uint GetInfoUInt32(uint key)
     {
         uint result;
-        var errorCode = Native.pattern_info(Code, key, &result);
+        var errorCode = Native16Bit.pattern_info(Code, key, &result);
 
         GC.KeepAlive(this);
 
         if (errorCode != 0)
-            throw new PcreException((PcreErrorCode)errorCode, $"Error in pcre2_pattern_info: {Native.GetErrorMessage(errorCode)}");
+            throw new PcreException((PcreErrorCode)errorCode, $"Error in pcre2_pattern_info: {Native16Bit.GetErrorMessage(errorCode)}");
 
         return result;
     }
@@ -112,12 +117,12 @@ internal sealed unsafe class InternalRegex : IDisposable
     public nuint GetInfoNativeInt(uint key)
     {
         nuint result;
-        var errorCode = Native.pattern_info(Code, key, &result);
+        var errorCode = Native16Bit.pattern_info(Code, key, &result);
 
         GC.KeepAlive(this);
 
         if (errorCode != 0)
-            throw new PcreException((PcreErrorCode)errorCode, $"Error in pcre2_pattern_info: {Native.GetErrorMessage(errorCode)}");
+            throw new PcreException((PcreErrorCode)errorCode, $"Error in pcre2_pattern_info: {Native16Bit.GetErrorMessage(errorCode)}");
 
         return result;
     }
@@ -128,12 +133,12 @@ internal sealed unsafe class InternalRegex : IDisposable
                            uint additionalOptions,
                            Func<PcreCallout, PcreCalloutResult>? callout)
     {
-        Native.match_input input;
+        Native16Bit.match_input input;
         _ = &input;
 
         settings.FillMatchSettings(ref input.settings, out var jitStack);
 
-        Native.match_result result;
+        Native16Bit.match_result result;
         CalloutInterop.CalloutInteropInfo calloutInterop;
 
         var oVectorArray = default(nuint[]);
@@ -154,7 +159,7 @@ internal sealed unsafe class InternalRegex : IDisposable
 
             CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout);
 
-            Native.match(&input, &result);
+            Native16Bit.match(&input, &result);
 
             GC.KeepAlive(this);
             GC.KeepAlive(jitStack);
@@ -178,12 +183,12 @@ internal sealed unsafe class InternalRegex : IDisposable
                       PcreRefCalloutFunc? callout,
                       nuint[]? calloutOutputVector)
     {
-        Native.match_input input;
+        Native16Bit.match_input input;
         _ = &input;
 
         settings.FillMatchSettings(ref input.settings, out var jitStack);
 
-        Native.match_result result;
+        Native16Bit.match_result result;
         CalloutInterop.CalloutInteropInfo calloutInterop;
 
         var oVectorArray = default(nuint[]);
@@ -206,7 +211,7 @@ internal sealed unsafe class InternalRegex : IDisposable
 
             CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout, calloutOutputVector);
 
-            Native.match(&input, &result);
+            Native16Bit.match(&input, &result);
 
             GC.KeepAlive(this);
             GC.KeepAlive(jitStack);
@@ -228,27 +233,27 @@ internal sealed unsafe class InternalRegex : IDisposable
                             uint additionalOptions,
                             PcreRefCalloutFunc? callout)
     {
-        Native.buffer_match_input input;
+        Native16Bit.buffer_match_input input;
         _ = &input;
 
-        Native.match_result result;
+        Native16Bit.match_result result;
         CalloutInterop.CalloutInteropInfo calloutInterop;
 
         fixed (char* pSubject = subject)
         {
-            input.buffer = buffer.NativeBuffer;
+            input.buffer = (void*)buffer.NativeBuffer;
             input.subject = pSubject;
             input.subject_length = (uint)subject.Length;
             input.start_index = (uint)startIndex;
             input.additional_options = additionalOptions;
             input.callout = null;
 
-            if (input.buffer == IntPtr.Zero)
+            if (input.buffer == null)
                 ThrowMatchBufferDisposed();
 
             CalloutInterop.Prepare(subject, buffer, ref input, out calloutInterop, callout);
 
-            Native.buffer_match(&input, &result);
+            Native16Bit.buffer_match(&input, &result);
 
             GC.KeepAlive(buffer); // The buffer keeps alive all the other required stuff
         }
@@ -261,13 +266,13 @@ internal sealed unsafe class InternalRegex : IDisposable
 
     public PcreDfaMatchResult DfaMatch(string subject, PcreDfaMatchSettings settings, int startIndex, uint additionalOptions)
     {
-        Native.dfa_match_input input;
+        Native16Bit.dfa_match_input input;
         _ = &input;
 
         settings.FillMatchInput(ref input);
 
         var oVector = new nuint[2 * Math.Max(1, settings.MaxResults)];
-        Native.match_result result;
+        Native16Bit.match_result result;
         CalloutInterop.CalloutInteropInfo calloutInterop;
 
         fixed (char* pSubject = subject)
@@ -282,7 +287,7 @@ internal sealed unsafe class InternalRegex : IDisposable
 
             CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, settings.Callout);
 
-            Native.dfa_match(&input, &result);
+            Native16Bit.dfa_match(&input, &result);
 
             GC.KeepAlive(this);
         }
@@ -306,12 +311,12 @@ internal sealed unsafe class InternalRegex : IDisposable
     {
         Debug.Assert(subjectAsString is null || subjectAsString.AsSpan() == subject);
 
-        Native.substitute_input input;
+        Native16Bit.substitute_input input;
         _ = &input;
 
         (settings ?? PcreMatchSettings.Default).FillMatchSettings(ref input.settings, out var jitStack);
 
-        Native.substitute_result result;
+        Native16Bit.substitute_result result;
         CalloutInterop.SubstituteCalloutInteropInfo calloutInterop;
 
         var buffer = stackalloc char[SubstituteBufferSizeInChars];
@@ -331,7 +336,7 @@ internal sealed unsafe class InternalRegex : IDisposable
 
             CalloutInterop.PrepareSubstitute(this, subject, ref input, out calloutInterop, matchCallout, substituteCallout, substituteCaseCallout);
 
-            Native.substitute(&input, &result);
+            Native16Bit.substitute(&input, &result);
 
             GC.KeepAlive(this);
             GC.KeepAlive(jitStack);
@@ -370,11 +375,11 @@ internal sealed unsafe class InternalRegex : IDisposable
         finally
         {
             if (result.output != null && result.output_on_heap != 0)
-                Native.substitute_result_free(&result);
+                Native16Bit.substitute_result_free(&result);
         }
     }
 
-    private static void HandleError(in Native.match_result result, ref CalloutInterop.CalloutInteropInfo calloutInterop)
+    private static void HandleError(in Native16Bit.match_result result, ref CalloutInterop.CalloutInteropInfo calloutInterop)
     {
         switch (result.result_code)
         {
@@ -395,17 +400,17 @@ internal sealed unsafe class InternalRegex : IDisposable
 
     public IReadOnlyList<PcreCalloutInfo> GetCallouts()
     {
-        var calloutCount = Native.get_callout_count(Code);
+        var calloutCount = Native16Bit.get_callout_count(Code);
         if (calloutCount == 0)
             return [];
 
         var data = calloutCount <= 16
-            ? stackalloc Native.pcre2_callout_enumerate_block[(int)calloutCount]
-            : new Native.pcre2_callout_enumerate_block[calloutCount];
+            ? stackalloc Native16Bit.pcre2_callout_enumerate_block[(int)calloutCount]
+            : new Native16Bit.pcre2_callout_enumerate_block[calloutCount];
 
-        fixed (Native.pcre2_callout_enumerate_block* pData = &data[0])
+        fixed (Native16Bit.pcre2_callout_enumerate_block* pData = &data[0])
         {
-            Native.get_callouts(Code, pData);
+            Native16Bit.get_callouts(Code, pData);
 
             GC.KeepAlive(this);
         }

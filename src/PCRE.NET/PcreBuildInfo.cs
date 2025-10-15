@@ -97,7 +97,7 @@ public static unsafe class PcreBuildInfo
     private static uint GetConfigUInt32(uint key)
     {
         uint result;
-        var size = Native.config(key, &result);
+        var size = Native16Bit.config(key, &result);
 
         if (size < 0)
             throw new PcreException((PcreErrorCode)size, "Could not retrieve the configuration property: " + key);
@@ -108,7 +108,7 @@ public static unsafe class PcreBuildInfo
     private static string GetConfigString(uint key)
     {
         var buffer = stackalloc char[256];
-        var messageLength = Native.config(key, buffer);
+        var messageLength = Native16Bit.config(key, buffer);
 
         return messageLength >= 0
             ? new string(buffer, 0, messageLength - 1)

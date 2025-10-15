@@ -61,7 +61,7 @@ public sealed class PcreDfaMatchSettings
         };
     }
 
-    internal void FillMatchInput(ref Native.dfa_match_input input)
+    internal void FillMatchInput(ref Native16Bit.dfa_match_input input)
     {
         input.max_results = (AdditionalOptions & PcreDfaMatchOptions.DfaShortest) != 0 ? 1 : Math.Max(1, MaxResults);
         input.workspace_size = WorkspaceSize;

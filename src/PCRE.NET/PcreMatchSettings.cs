@@ -6,7 +6,7 @@ namespace PCRE;
 /// <summary>
 /// Advanced match settings.
 /// </summary>
-public sealed class PcreMatchSettings
+public sealed unsafe class PcreMatchSettings
 {
     internal static PcreMatchSettings Default { get; } = new();
 
@@ -145,13 +145,13 @@ public sealed class PcreMatchSettings
     /// </summary>
     public PcreJitStack? JitStack { get; set; }
 
-    internal void FillMatchSettings(ref Native.match_settings settings, out PcreJitStack? jitStack)
+    internal void FillMatchSettings(ref Native16Bit.match_settings settings, out PcreJitStack? jitStack)
     {
         settings.match_limit = _matchLimit.GetValueOrDefault();
         settings.depth_limit = _depthLimit.GetValueOrDefault();
         settings.heap_limit = _heapLimit.GetValueOrDefault();
         settings.offset_limit = OffsetLimit.GetValueOrDefault();
-        settings.jit_stack = JitStack?.GetStack() ?? IntPtr.Zero;
+        settings.jit_stack = JitStack is { } stack ? stack.GetStack() : null;
 
         jitStack = JitStack;
     }

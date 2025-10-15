@@ -52,7 +52,7 @@ public sealed class PcreGlobConversionOptions
         SeparatorCharacter = '/'
     };
 
-    internal void FillConvertInput(ref Native.convert_input input)
+    internal void FillConvertInput(ref Native16Bit.convert_input input)
     {
         input.options = GetConvertOptions();
         input.glob_escape = EscapeCharacter;

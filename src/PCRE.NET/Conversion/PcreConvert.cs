@@ -36,7 +36,7 @@ public static unsafe class PcreConvert
         if (pattern == null) throw new ArgumentNullException(nameof(pattern));
         if (options == null) throw new ArgumentNullException(nameof(options));
 
-        Native.convert_input input;
+        Native16Bit.convert_input input;
         _ = &input;
 
         options.FillConvertInput(ref input);
@@ -48,13 +48,13 @@ public static unsafe class PcreConvert
     {
         if (pattern == null) throw new ArgumentNullException(nameof(pattern));
 
-        Native.convert_input input;
+        Native16Bit.convert_input input;
         input.options = options;
 
         return Convert(pattern, &input);
     }
 
-    private static string Convert(string pattern, Native.convert_input* input)
+    private static string Convert(string pattern, Native16Bit.convert_input* input)
     {
         fixed (char* pPattern = pattern)
         {
@@ -62,20 +62,20 @@ public static unsafe class PcreConvert
             input->pattern_length = (uint)pattern.Length;
             input->options |= PcreConstants.CONVERT_UTF;
 
-            Native.convert_result result;
-            var errorCode = Native.convert(input, &result);
+            Native16Bit.convert_result result;
+            var errorCode = Native16Bit.convert(input, &result);
 
             try
             {
                 if (errorCode != 0)
-                    throw new PcreException((PcreErrorCode)errorCode, $"Could not convert pattern '{pattern}': {Native.GetErrorMessage(errorCode)} at offset {result.output_length}.");
+                    throw new PcreException((PcreErrorCode)errorCode, $"Could not convert pattern '{pattern}': {Native16Bit.GetErrorMessage(errorCode)} at offset {result.output_length}.");
 
                 return new string(result.output, 0, (int)result.output_length);
             }
             finally
             {
                 if (result.output != null)
-                    Native.convert_result_free(result.output);
+                    Native16Bit.convert_result_free(result.output);
             }
         }
     }

@@ -8,24 +8,24 @@
 
 var functions = ParseFunctions(
     """
-    int get_error_message(int errorCode, char* errorBuffer, uint bufferSize) no-gc;
+    int get_error_message(int errorCode, PCRE2_UCHAR* errorBuffer, uint bufferSize) no-gc;
     void compile(compile_input* input, compile_result* result);
-    void code_free(IntPtr code);
-    int pattern_info(IntPtr code, uint key, void* data) no-gc;
+    void code_free(void* code);
+    int pattern_info(void* code, uint key, void* data) no-gc;
     int config(uint key, void* data) no-gc;
     void match(match_input* input, match_result* result);
     void buffer_match(buffer_match_input* input, match_result* result);
     void dfa_match(dfa_match_input* input, match_result* result);
     void substitute(substitute_input* input, substitute_result* result);
     void substitute_result_free(substitute_result* result);
-    IntPtr create_match_buffer(match_buffer_info* info);
-    void free_match_buffer(IntPtr buffer);
-    uint get_callout_count(IntPtr code) no-gc;
-    void get_callouts(IntPtr code, pcre2_callout_enumerate_block* data) no-gc;
-    IntPtr jit_stack_create(uint startSize, uint maxSize);
-    void jit_stack_free(IntPtr stack);
+    void* create_match_buffer(match_buffer_info* info);
+    void free_match_buffer(void* buffer);
+    uint get_callout_count(void* code) no-gc;
+    void get_callouts(void* code, pcre2_callout_enumerate_block* data) no-gc;
+    void* jit_stack_create(uint startSize, uint maxSize);
+    void jit_stack_free(void* stack);
     int convert(convert_input* input, convert_result* result);
-    void convert_result_free(char* str);
+    void convert_result_free(PCRE2_UCHAR* str);
     """
 ).ToList();
 
@@ -51,10 +51,12 @@ using System.Runtime.InteropServices;
 using System.Security;
 
 #nullable enable
+#pragma warning disable CA5392
 
 namespace PCRE.Internal;
+<# foreach (var bit in new[] { 8, 16 }) { #>
 
-unsafe partial class Native
+unsafe partial class Native<#= bit #>Bit
 {
 #if NET
 
@@ -62,21 +64,21 @@ unsafe partial class Native
 <# if (func.SuppressGCTransition) { #>
     [SuppressGCTransition]
 <# } #>
-    [DllImport("<#= libName #>", EntryPoint = "pcrenet_<#= func.Name #>_16", CallingConvention = CallingConvention.Cdecl)]
-    public static extern <#= func.ReturnType #> <#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => p.GetPInvokeAttributes() + p.Declaration)) #>);
+    [DllImport("<#= libName #>", EntryPoint = "pcrenet_<#= func.Name #>_<#= bit #>", CallingConvention = CallingConvention.Cdecl)]
+    public static extern <#= func.ReturnType #> <#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => p.GetDeclaration(bit))) #>);
 
 <# } #>
 #else
 
 <# foreach (var func in functions) { #>
-    public static <#= func.Declaration #>
+    public static <#= func.GetDeclaration(bit) #>
         => _impl.<#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => $"{p.Modifier}{p.Name}")) #>);
 
 <# } #>
     private abstract class LibImpl
     {
 <# foreach (var func in functions) { #>
-        public abstract <#= func.Declaration #>;
+        public abstract <#= func.GetDeclaration(bit) #>;
 <# } #>
     }
 
@@ -85,11 +87,11 @@ unsafe partial class Native
     private sealed class <#= platform.Name #>Impl : LibImpl
     {
 <# foreach (var func in functions) { #>
-        public override <#= func.Declaration #>
+        public override <#= func.GetDeclaration(bit) #>
             => pcrenet_<#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => $"{p.Modifier}{p.Name}")) #>);
 
-        [DllImport("<#= platform.LibName #>", EntryPoint = "pcrenet_<#= func.Name #>_16", CallingConvention = CallingConvention.Cdecl)]
-        private static extern <#= func.ReturnType #> pcrenet_<#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => p.GetPInvokeAttributes() + p.Declaration)) #>);
+        [DllImport("<#= platform.LibName #>", EntryPoint = "pcrenet_<#= func.Name #>_<#= bit #>", CallingConvention = CallingConvention.Cdecl)]
+        private static extern <#= func.ReturnType #> pcrenet_<#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => p.GetDeclaration(bit))) #>);
 
 <# } #>
     }
@@ -97,6 +99,7 @@ unsafe partial class Native
 <# } #>
 #endif
 }
+<# } #>
 <#+
 
 private static IEnumerable<FuncDef> ParseFunctions(string functions)
@@ -151,8 +154,8 @@ private class FuncDef
     public readonly List<FuncParamDef> Parameters = new();
     public bool SuppressGCTransition;
 
-    public string Declaration => $"{ReturnType} {Name}({ParametersDeclaration})";
-    public string ParametersDeclaration => string.Join(", ", Parameters.Select(p => p.Declaration));
+    public string GetDeclaration(int bits)
+        => $"{ReturnType} {Name}({string.Join(", ", Parameters.Select(p => p.GetDeclaration(bits)))})";
 }
 
 private class FuncParamDef
@@ -161,18 +164,20 @@ private class FuncParamDef
     public string Name;
     public string Modifier;
 
-    public string Declaration => $"{Modifier}{Type} {Name}";
-
-    public string GetPInvokeAttributes()
+    public string GetDeclaration(int bits)
     {
-        switch (Type)
-        {
-            case "string":
-                return "[In, MarshalAs(UnmanagedType.LPStr)] ";
+        var charType = bits switch {
+            8  => "byte",
+            16 => "char",
+            _  => throw new ArgumentOutOfRangeException()
+        };
 
-            default:
-                return string.Empty;
-        }
+        var paramType = Type switch {
+            "PCRE2_UCHAR*" => $"{charType}*",
+            var type       => type
+        };
+
+        return $"{Modifier}{paramType} {Name}";
     }
 }
 

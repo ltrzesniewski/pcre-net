@@ -16,11 +16,11 @@ public readonly unsafe ref struct PcreSubstituteCallout
 {
     private readonly InternalRegex _regex;
     private readonly ReadOnlySpan<char> _subject;
-    private readonly Native.pcre2_substitute_callout_block* _callout;
+    private readonly Native16Bit.pcre2_substitute_callout_block* _callout;
 
     internal PcreSubstituteCallout(InternalRegex regex,
                                    ReadOnlySpan<char> subject,
-                                   Native.pcre2_substitute_callout_block* callout)
+                                   Native16Bit.pcre2_substitute_callout_block* callout)
     {
         _subject = subject;
         _regex = regex;

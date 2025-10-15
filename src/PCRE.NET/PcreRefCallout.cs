@@ -14,12 +14,12 @@ public unsafe ref struct PcreRefCallout
 {
     private readonly ReadOnlySpan<char> _subject;
     private readonly InternalRegex _regex;
-    private readonly Native.pcre2_callout_block* _callout;
+    private readonly Native16Bit.pcre2_callout_block* _callout;
 
     internal Span<nuint> OutputVector;
     private bool _oVectorInitialized;
 
-    internal PcreRefCallout(ReadOnlySpan<char> subject, InternalRegex regex, Native.pcre2_callout_block* callout, Span<nuint> outputVector)
+    internal PcreRefCallout(ReadOnlySpan<char> subject, InternalRegex regex, Native16Bit.pcre2_callout_block* callout, Span<nuint> outputVector)
     {
         _subject = subject;
         _regex = regex;

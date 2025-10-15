@@ -32,14 +32,14 @@ public sealed unsafe class PcreMatchBuffer : IDisposable
 
         Regex.TryGetCalloutInfoByPatternPosition(0); // Make sure callout info is initialized
 
-        var info = new Native.match_buffer_info
+        var info = new Native16Bit.match_buffer_info
         {
             code = regex.Code
         };
 
         settings.FillMatchSettings(ref info.settings, out _jitStack);
 
-        NativeBuffer = Native.create_match_buffer(&info);
+        NativeBuffer = (IntPtr)Native16Bit.create_match_buffer(&info);
         if (NativeBuffer == IntPtr.Zero)
             throw new InvalidOperationException("Could not create match buffer");
 
@@ -64,7 +64,7 @@ public sealed unsafe class PcreMatchBuffer : IDisposable
 
         var buffer = Interlocked.Exchange(ref NativeBuffer, IntPtr.Zero);
         if (buffer != IntPtr.Zero)
-            Native.free_match_buffer(buffer);
+            Native16Bit.free_match_buffer((void*)buffer);
     }
 
     private Span<nuint> GetOutputVectorSpan()

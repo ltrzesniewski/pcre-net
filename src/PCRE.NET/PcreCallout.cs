@@ -16,7 +16,7 @@ public sealed unsafe class PcreCallout
     private PcreMatch? _match;
     private PcreCalloutInfo? _info;
 
-    internal PcreCallout(string subject, InternalRegex regex, Native.pcre2_callout_block* callout)
+    internal PcreCallout(string subject, InternalRegex regex, Native16Bit.pcre2_callout_block* callout)
     {
         _subject = subject;
         _regex = regex;
