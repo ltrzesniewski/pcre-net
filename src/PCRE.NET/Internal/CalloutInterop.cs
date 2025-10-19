@@ -10,21 +10,21 @@ namespace PCRE.Internal;
 internal static unsafe class CalloutInterop
 {
 #if NET
-    private static readonly delegate* unmanaged[Cdecl]<Native16Bit.pcre2_callout_block*, void*, int> _calloutHandlerFnPtr = &CalloutHandler;
-    private static readonly delegate* unmanaged[Cdecl]<Native16Bit.pcre2_callout_block*, void*, int> _substituteMatchCalloutHandlerFnPtr = &SubstituteMatchCalloutHandler;
-    private static readonly delegate* unmanaged[Cdecl]<Native16Bit.pcre2_substitute_callout_block*, void*, int> _substituteCalloutHandlerFnPtr = &SubstituteCalloutHandler;
+    private static readonly delegate* unmanaged[Cdecl]<Native.pcre2_callout_block*, void*, int> _calloutHandlerFnPtr = &CalloutHandler;
+    private static readonly delegate* unmanaged[Cdecl]<Native.pcre2_callout_block*, void*, int> _substituteMatchCalloutHandlerFnPtr = &SubstituteMatchCalloutHandler;
+    private static readonly delegate* unmanaged[Cdecl]<Native.pcre2_substitute_callout_block*, void*, int> _substituteCalloutHandlerFnPtr = &SubstituteCalloutHandler;
     private static readonly delegate* unmanaged[Cdecl]<char*, nuint, char*, nuint, int, void*, nuint> _substituteCaseCalloutHandlerFnPtr = &SubstituteCaseCalloutHandler;
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
-    private static int CalloutHandler(Native16Bit.pcre2_callout_block* callout, void* data)
+    private static int CalloutHandler(Native.pcre2_callout_block* callout, void* data)
         => ToInteropInfo(data).Call(callout);
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
-    private static int SubstituteMatchCalloutHandler(Native16Bit.pcre2_callout_block* callout, void* data)
+    private static int SubstituteMatchCalloutHandler(Native.pcre2_callout_block* callout, void* data)
         => ToSubstituteInteropInfo(data).CallMatchCallout(callout);
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
-    private static int SubstituteCalloutHandler(Native16Bit.pcre2_substitute_callout_block* callout, void* data)
+    private static int SubstituteCalloutHandler(Native.pcre2_substitute_callout_block* callout, void* data)
         => ToSubstituteInteropInfo(data).CallSubstituteCallout(callout);
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
@@ -32,13 +32,13 @@ internal static unsafe class CalloutInterop
         => ToSubstituteInteropInfo(data).CallSubstituteCaseCallout(input, inputLength, output, outputLength, targetCase);
 #else
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int CalloutHandlerFunc(Native16Bit.pcre2_callout_block* callout, void* data);
+    private delegate int CalloutHandlerFunc(Native.pcre2_callout_block* callout, void* data);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int SubstituteMatchCalloutHandlerFunc(Native16Bit.pcre2_callout_block* callout, void* data);
+    private delegate int SubstituteMatchCalloutHandlerFunc(Native.pcre2_callout_block* callout, void* data);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int SubstituteCalloutHandlerFunc(Native16Bit.pcre2_substitute_callout_block* callout, void* data);
+    private delegate int SubstituteCalloutHandlerFunc(Native.pcre2_substitute_callout_block* callout, void* data);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate nuint SubstituteCaseCalloutHandlerFunc(char* input, nuint inputLength, char* output, nuint outputLength, int targetCase, void* data);
@@ -55,13 +55,13 @@ internal static unsafe class CalloutInterop
     private static readonly SubstituteCaseCalloutHandlerFunc _substituteCaseCalloutHandlerDelegate = SubstituteCaseCalloutHandler; // GC root
     private static readonly void* _substituteCaseCalloutHandlerFnPtr = Marshal.GetFunctionPointerForDelegate(_substituteCaseCalloutHandlerDelegate).ToPointer();
 
-    private static int CalloutHandler(Native16Bit.pcre2_callout_block* callout, void* data)
+    private static int CalloutHandler(Native.pcre2_callout_block* callout, void* data)
         => ToInteropInfo(data).Call(callout);
 
-    private static int SubstituteMatchCalloutHandler(Native16Bit.pcre2_callout_block* callout, void* data)
+    private static int SubstituteMatchCalloutHandler(Native.pcre2_callout_block* callout, void* data)
         => ToSubstituteInteropInfo(data).CallMatchCallout(callout);
 
-    private static int SubstituteCalloutHandler(Native16Bit.pcre2_substitute_callout_block* callout, void* data)
+    private static int SubstituteCalloutHandler(Native.pcre2_substitute_callout_block* callout, void* data)
         => ToSubstituteInteropInfo(data).CallSubstituteCallout(callout);
 
     private static nuint SubstituteCaseCalloutHandler(char* input, nuint inputLength, char* output, nuint outputLength, int targetCase, void* data)
@@ -69,8 +69,8 @@ internal static unsafe class CalloutInterop
 #endif
 
     public static void Prepare(string subject,
-                               InternalRegex regex,
-                               scoped ref Native16Bit.match_input input,
+                               InternalRegex16Bit regex,
+                               scoped ref Native.match_input input,
                                out CalloutInteropInfo interopInfo,
                                Func<PcreCallout, PcreCalloutResult>? callout)
     {
@@ -89,8 +89,8 @@ internal static unsafe class CalloutInterop
     }
 
     public static void Prepare(ReadOnlySpan<char> subject,
-                               InternalRegex regex,
-                               scoped ref Native16Bit.match_input input,
+                               InternalRegex16Bit regex,
+                               scoped ref Native.match_input input,
                                out CalloutInteropInfo interopInfo,
                                PcreRefCalloutFunc? callout,
                                nuint[]? calloutOutputVector)
@@ -111,7 +111,7 @@ internal static unsafe class CalloutInterop
 
     public static void Prepare(ReadOnlySpan<char> subject,
                                PcreMatchBuffer buffer,
-                               scoped ref Native16Bit.buffer_match_input input,
+                               scoped ref Native.buffer_match_input input,
                                out CalloutInteropInfo interopInfo,
                                PcreRefCalloutFunc? callout)
     {
@@ -130,8 +130,8 @@ internal static unsafe class CalloutInterop
     }
 
     public static void Prepare(string subject,
-                               InternalRegex regex,
-                               scoped ref Native16Bit.dfa_match_input input,
+                               InternalRegex16Bit regex,
+                               scoped ref Native.dfa_match_input input,
                                out CalloutInteropInfo interopInfo,
                                Func<PcreCallout, PcreCalloutResult>? callout)
     {
@@ -149,9 +149,9 @@ internal static unsafe class CalloutInterop
         }
     }
 
-    public static void PrepareSubstitute(InternalRegex regex,
+    public static void PrepareSubstitute(InternalRegex16Bit regex,
                                          ReadOnlySpan<char> subject,
-                                         scoped ref Native16Bit.substitute_input input,
+                                         scoped ref Native.substitute_input input,
                                          out SubstituteCalloutInteropInfo interopInfo,
                                          PcreRefCalloutFunc? matchCallout,
                                          PcreSubstituteCalloutFunc? substituteCallout,
@@ -238,13 +238,13 @@ internal static unsafe class CalloutInterop
     {
         private readonly string? _subject;
         private readonly ReadOnlySpan<char> _subjectSpan;
-        private readonly InternalRegex _regex;
+        private readonly InternalRegex16Bit _regex;
         private readonly Delegate _callout;
         private readonly nuint[]? _outputVector;
 
         public Exception? Exception { get; private set; }
 
-        public CalloutInteropInfo(string subject, InternalRegex regex, Func<PcreCallout, PcreCalloutResult> callout)
+        public CalloutInteropInfo(string subject, InternalRegex16Bit regex, Func<PcreCallout, PcreCalloutResult> callout)
         {
             _subject = subject;
             _subjectSpan = default;
@@ -255,7 +255,7 @@ internal static unsafe class CalloutInterop
             Exception = null;
         }
 
-        public CalloutInteropInfo(ReadOnlySpan<char> subject, InternalRegex regex, PcreRefCalloutFunc callout, nuint[]? outputVector)
+        public CalloutInteropInfo(ReadOnlySpan<char> subject, InternalRegex16Bit regex, PcreRefCalloutFunc callout, nuint[]? outputVector)
         {
             _subject = null;
             _subjectSpan = subject;
@@ -267,7 +267,7 @@ internal static unsafe class CalloutInterop
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031")]
-        public int Call(Native16Bit.pcre2_callout_block* callout)
+        public int Call(Native.pcre2_callout_block* callout)
         {
             try
             {
@@ -298,7 +298,7 @@ internal static unsafe class CalloutInterop
 
     public ref struct SubstituteCalloutInteropInfo
     {
-        private readonly InternalRegex _regex;
+        private readonly InternalRegex16Bit _regex;
         private readonly ReadOnlySpan<char> _subject;
         private readonly PcreRefCalloutFunc? _matchCallout;
         private readonly PcreSubstituteCalloutFunc? _substituteCallout;
@@ -306,7 +306,7 @@ internal static unsafe class CalloutInterop
 
         public Exception? Exception { get; private set; }
 
-        public SubstituteCalloutInteropInfo(InternalRegex regex,
+        public SubstituteCalloutInteropInfo(InternalRegex16Bit regex,
                                             ReadOnlySpan<char> subject,
                                             PcreRefCalloutFunc? matchCallout,
                                             PcreSubstituteCalloutFunc? substituteCallout,
@@ -322,7 +322,7 @@ internal static unsafe class CalloutInterop
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031")]
-        public int CallMatchCallout(Native16Bit.pcre2_callout_block* callout)
+        public int CallMatchCallout(Native.pcre2_callout_block* callout)
         {
             try
             {
@@ -340,7 +340,7 @@ internal static unsafe class CalloutInterop
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031")]
-        public int CallSubstituteCallout(Native16Bit.pcre2_substitute_callout_block* callout)
+        public int CallSubstituteCallout(Native.pcre2_substitute_callout_block* callout)
         {
             try
             {

@@ -13,7 +13,7 @@ namespace PCRE;
 [DebuggerTypeProxy(typeof(DebugProxy))]
 public unsafe ref struct PcreRefMatch
 {
-    private readonly InternalRegex? _regex;
+    private readonly InternalRegex16Bit? _regex;
     internal Span<nuint> OutputVector; // Can be empty when there is no match
     private int _resultCode;
     private char* _markPtr;
@@ -26,7 +26,7 @@ public unsafe ref struct PcreRefMatch
     /// <typeparam name="T">The output value type.</typeparam>
     public delegate T Func<out T>(PcreRefMatch match);
 
-    internal PcreRefMatch(InternalRegex regex, Span<nuint> oVector)
+    internal PcreRefMatch(InternalRegex16Bit regex, Span<nuint> oVector)
     {
         // Empty match
 
@@ -43,7 +43,7 @@ public unsafe ref struct PcreRefMatch
         _resultCode = 0;
     }
 
-    internal PcreRefMatch(ReadOnlySpan<char> subject, InternalRegex regex, Span<nuint> oVector, char* mark)
+    internal PcreRefMatch(ReadOnlySpan<char> subject, InternalRegex16Bit regex, Span<nuint> oVector, char* mark)
     {
         // Callout
 
@@ -252,10 +252,10 @@ public unsafe ref struct PcreRefMatch
         );
     }
 
-    internal void Update(ReadOnlySpan<char> subject, scoped in Native16Bit.match_result result, nuint[]? outputVector)
+    internal void Update(ReadOnlySpan<char> subject, scoped in Native.match_result result, nuint[]? outputVector)
     {
         Subject = subject;
-        _markPtr = result.mark;
+        _markPtr = (char*)result.mark;
         _resultCode = result.result_code;
 
         if (outputVector != null)

@@ -9,14 +9,14 @@ namespace PCRE;
 public sealed unsafe class PcreCallout
 {
     private readonly string _subject;
-    private readonly InternalRegex _regex;
+    private readonly InternalRegex16Bit _regex;
     private readonly uint _flags;
     private readonly nuint[] _oVector;
     private readonly char* _markPtr;
     private PcreMatch? _match;
     private PcreCalloutInfo? _info;
 
-    internal PcreCallout(string subject, InternalRegex regex, Native16Bit.pcre2_callout_block* callout)
+    internal PcreCallout(string subject, InternalRegex16Bit regex, Native.pcre2_callout_block* callout)
     {
         _subject = subject;
         _regex = regex;
@@ -29,7 +29,7 @@ public sealed unsafe class PcreCallout
         LastCapture = (int)callout->capture_last;
         PatternPosition = (int)callout->pattern_position;
         NextPatternItemLength = (int)callout->next_item_length;
-        _markPtr = callout->mark;
+        _markPtr = (char*)callout->mark;
 
         _oVector = new nuint[callout->capture_top * 2];
         _oVector[0] = callout->start_match;

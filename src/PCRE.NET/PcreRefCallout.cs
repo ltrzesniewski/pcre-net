@@ -13,13 +13,13 @@ public delegate PcreCalloutResult PcreRefCalloutFunc(PcreRefCallout callout);
 public unsafe ref struct PcreRefCallout
 {
     private readonly ReadOnlySpan<char> _subject;
-    private readonly InternalRegex _regex;
-    private readonly Native16Bit.pcre2_callout_block* _callout;
+    private readonly InternalRegex16Bit _regex;
+    private readonly Native.pcre2_callout_block* _callout;
 
     internal Span<nuint> OutputVector;
     private bool _oVectorInitialized;
 
-    internal PcreRefCallout(ReadOnlySpan<char> subject, InternalRegex regex, Native16Bit.pcre2_callout_block* callout, Span<nuint> outputVector)
+    internal PcreRefCallout(ReadOnlySpan<char> subject, InternalRegex16Bit regex, Native.pcre2_callout_block* callout, Span<nuint> outputVector)
     {
         _subject = subject;
         _regex = regex;
@@ -51,7 +51,7 @@ public unsafe ref struct PcreRefCallout
                 _oVectorInitialized = true;
             }
 
-            return new PcreRefMatch(_subject, _regex, OutputVector, _callout->mark);
+            return new PcreRefMatch(_subject, _regex, OutputVector, (char*)_callout->mark);
         }
     }
 

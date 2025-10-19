@@ -16,7 +16,7 @@ public sealed class PcreDfaMatchResult : IReadOnlyList<PcreDfaMatch>
 
     internal string Subject { get; }
 
-    internal PcreDfaMatchResult(string subject, ref Native16Bit.match_result result, nuint[] oVector)
+    internal PcreDfaMatchResult(string subject, ref Native.match_result result, nuint[] oVector)
     {
         // Real match
 

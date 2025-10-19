@@ -14,7 +14,7 @@ namespace PCRE;
 /// </remarks>
 public sealed unsafe class PcreMatchBuffer : IDisposable
 {
-    internal readonly InternalRegex Regex;
+    internal readonly InternalRegex16Bit Regex;
     private readonly int _outputVectorSize;
     private PcreJitStack? _jitStack; // GC reference
 
@@ -23,7 +23,7 @@ public sealed unsafe class PcreMatchBuffer : IDisposable
     internal readonly nuint* OutputVector;
     internal readonly nuint[] CalloutOutputVector;
 
-    internal PcreMatchBuffer(InternalRegex regex, PcreMatchSettings settings)
+    internal PcreMatchBuffer(InternalRegex16Bit regex, PcreMatchSettings settings)
     {
         Regex = regex;
         _outputVectorSize = regex.OutputVectorSize;
@@ -32,7 +32,7 @@ public sealed unsafe class PcreMatchBuffer : IDisposable
 
         Regex.TryGetCalloutInfoByPatternPosition(0); // Make sure callout info is initialized
 
-        var info = new Native16Bit.match_buffer_info
+        var info = new Native.match_buffer_info
         {
             code = regex.Code
         };

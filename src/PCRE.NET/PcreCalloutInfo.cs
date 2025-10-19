@@ -9,7 +9,7 @@ namespace PCRE;
 /// </summary>
 public sealed unsafe class PcreCalloutInfo
 {
-    internal PcreCalloutInfo(ref Native16Bit.pcre2_callout_enumerate_block info)
+    internal PcreCalloutInfo(ref Native.pcre2_callout_enumerate_block info)
     {
         Number = (int)info.callout_number;
         String = info.callout_string != IntPtr.Zero ? new string((char*)info.callout_string) : null;

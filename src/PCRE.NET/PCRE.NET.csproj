@@ -56,15 +56,6 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>PcreConstants.cs</LastGenOutput>
     </None>
-    <None Update="Internal\Native.Structs.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Native.Structs.cs</LastGenOutput>
-    </None>
-    <Compile Update="Internal\Native.Structs.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Native.Structs.tt</DependentUpon>
-    </Compile>
   </ItemGroup>
 
   <ItemGroup>

@@ -416,9 +416,9 @@ public partial class PcreRegex
         private readonly PcreMatchOptions _options;
         private readonly PcreRefCalloutFunc? _callout;
         private readonly PcreMatchSettings _settings;
-        private readonly InternalRegex _regex;
+        private readonly InternalRegex16Bit _regex;
 
-        internal RefMatchEnumerable(InternalRegex regex,
+        internal RefMatchEnumerable(InternalRegex16Bit regex,
                                     ReadOnlySpan<char> subject,
                                     int startIndex,
                                     PcreMatchOptions options,
@@ -465,10 +465,10 @@ public partial class PcreRegex
         private readonly PcreMatchOptions _options;
         private readonly PcreRefCalloutFunc? _callout;
         private readonly PcreMatchSettings _settings;
-        private InternalRegex? _regex;
+        private InternalRegex16Bit? _regex;
         private PcreRefMatch _match;
 
-        internal RefMatchEnumerator(InternalRegex regex,
+        internal RefMatchEnumerator(InternalRegex16Bit regex,
                                     ReadOnlySpan<char> subject,
                                     int startIndex,
                                     PcreMatchOptions options,

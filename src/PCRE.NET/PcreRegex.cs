@@ -17,7 +17,7 @@ public sealed partial class PcreRegex
     private PcrePatternInfo? _info;
     private PcreDfaRegex? _dfa;
 
-    internal InternalRegex InternalRegex { get; }
+    internal InternalRegex16Bit InternalRegex { get; }
 
     /// <summary>
     /// Returns information about the pattern.

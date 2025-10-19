@@ -145,7 +145,7 @@ public sealed unsafe class PcreMatchSettings
     /// </summary>
     public PcreJitStack? JitStack { get; set; }
 
-    internal void FillMatchSettings(ref Native16Bit.match_settings settings, out PcreJitStack? jitStack)
+    internal void FillMatchSettings(ref Native.match_settings settings, out PcreJitStack? jitStack)
     {
         settings.match_limit = _matchLimit.GetValueOrDefault();
         settings.depth_limit = _depthLimit.GetValueOrDefault();

@@ -10,11 +10,11 @@ namespace PCRE;
 /// </summary>
 public sealed class PcrePatternInfo
 {
-    private readonly InternalRegex _re;
+    private readonly InternalRegex16Bit _re;
     private IReadOnlyList<PcreCalloutInfo>? _callouts;
     private IReadOnlyList<string>? _groupNames;
 
-    internal PcrePatternInfo(InternalRegex re)
+    internal PcrePatternInfo(InternalRegex16Bit re)
         => _re = re;
 
     /// <summary>
