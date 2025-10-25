@@ -1926,12 +1926,82 @@
     a\x85b
 \= Expect no match
     a\rb
+    a\r\nb
 
 /^a.b/newline=any
 \= Expect no match
     a\nb
     a\rb
+    a\r\nb
     a\x85b
+
+/^a.b/newline=nul
+    a\nb
+\= Expect no match
+    a\x{00}b
+
+/^a./newline=lf
+    a\r
+\= Expect no match
+    a\n
+
+/^a./newline=cr
+    a\n
+\= Expect no match
+    a\r
+
+/^a./newline=anycrlf
+    a\x85
+\= Expect no match
+    a\r
+    a\n
+    a\r\n
+
+/^a./newline=any
+\= Expect no match
+    a\n
+    a\r
+    a\r\n
+    a\x85
+
+/^a./newline=nul
+    a\n
+\= Expect no match
+    a\x{00}
+
+/^b/m,newline=lf
+    a\nb
+\= Expect no match
+    a\rb
+
+/^b/m,newline=cr
+    a\rb
+\= Expect no match
+    a\nb
+
+/^b/m,newline=anycrlf
+    a\rb
+    a\nb
+    a\r\nb
+    \nb
+    \rb
+    \r\nb
+\= Expect no match
+    a\x85b
+
+/^b/m,newline=any
+    a\nb
+    a\rb
+    a\r\nb
+    a\x85b
+    \nb
+    \rb
+    \r\nb
+
+/^b/m,newline=nul
+    a\x{00}b
+\= Expect no match
+    a\nb
 
 /^abc./gmx,newline=any
     abc1 \x0aabc2 \x0babc3xx \x0cabc4 \x0dabc5xx \x0d\x0aabc6 \x85abc7 JUNK
@@ -2144,7 +2214,11 @@
 
 /\v*B/B
 
+#if !ebcdic
+
 /\V+\x0a/B
+
+#endif
 
 /A+\h/B
 
@@ -3133,7 +3207,13 @@
 \= Expect no match
     abc\=offset=3
 
+#if !ebcdic
+
 /^\cģ/
+
+#endif
+
+/^\c/
 
 /(?P<abn>(?P=abn)xxx)/B
 
@@ -3413,6 +3493,8 @@
 
 /(a\1z)/B
 
+#if !ebcdic
+
 /^a\x41z/alt_bsux,allow_empty_class,match_unset_backref,dupnames
     aAz
 \= Expect no match
@@ -3449,6 +3531,8 @@
 
 /^\u{7a}/extra_alt_bsux
     zoo 
+
+#endif
 
 /\u{}/extra_alt_bsux
     u{}
@@ -3919,10 +4003,14 @@
 
 /[a-[=xxx=]]+/
 
+#if !ebcdic
+
 /[a-[!xxx!]]+/
 
 /[A-[!xxx!]]+/
     A]]]
+
+#endif
 
 /[a-\d]+/
 
@@ -4088,6 +4176,8 @@
 /(?(VERSION>=10.0.0)yes|no)/
 
 /(?(VERSION=10.101)yes|no)/
+
+/(?(VERSION=10z)yes|no)/
 
 # We should see the starting code unit, required code unit, and minimum length set for this regex:
 /abcd/I
@@ -4313,7 +4403,6 @@
 
 /a(b)c/substitute_extended
     ZabcZ\=replace=>${1:+ yes : no }
-    ZabcZ\=replace=>${1:+ \o{100} : \o{100} }
     ZabcZ\=replace=>${1:+ \o{Z} : no }
     ZabcZ\=replace=>${1:+ yes : \o{Z} }
     ZabcZ\=replace=>${1:+ \g<1> : no }
@@ -4324,6 +4413,13 @@
     ZabcZ\=replace=>${1:+ yes : $<1> }
     ZabcZ\=replace=>${1:+ $<1 : no }
     ZabcZ\=replace=>${1:+ yes : $<1 }
+
+#if !ebcdic
+
+/a(b)c/substitute_extended
+    ZabcZ\=replace=>${1:+ \o{100} : \o{100} }
+
+#endif
 
 /a(b)c/substitute_extended
     ZabcZ\=replace=>${
@@ -4522,11 +4618,34 @@
 
 # Perl loops on this (PCRE2 used to!)
 
+# duplicate matches
 /(?<=\Ka)/g,aftertext,allow_lookaround_bsk
     aaaaa
 
 /(?<=\Ka)/altglobal,aftertext,allow_lookaround_bsk
     aaaaa
+
+# overlapping matches
+/(?(?=\Gc)(?<=\Kb)c|(?<=\Kab))/g,aftertext,allow_lookaround_bsk
+    abc
+
+# not-sorted matches
+/(?(?=\Gc)(?<=\Kab)|(?<=\Kb))/g,aftertext,allow_lookaround_bsk
+    abc
+
+# CRLF cases
+
+/(?<=\Kback)|\Gstart/g,aftertext,allow_lookaround_bsk,newline=LF
+    back\rstart back\nstart back\r\nstart back\r
+
+/(?<=\Kback)|\Gstart/g,aftertext,allow_lookaround_bsk,newline=CRLF
+    back\rstart back\nstart back\r\nstart back\r
+
+/(?<=\Kback)|\Gstart/g,aftertext,allow_lookaround_bsk,newline=ANYCRLF
+    back\rstart back\nstart back\r\nstart back\r
+
+/(?<=\Kback)|\Gstart/g,aftertext,allow_lookaround_bsk,newline=ANY
+    back\rstart back\nstart back\r\nstart back\r
 
 /((?2){73}(?2))((?1))/info
 
@@ -4536,6 +4655,12 @@
 
 /(abc)*/
     \[abc]{5}
+
+/(abc)*/
+    \[abc]{1}
+
+/(abc)*/
+    \[abc]{0}
 
 /^/gm
     \n\n\n
@@ -4689,6 +4814,21 @@
 \= Expect no match
     aacb
 
+/(^aa(*MARK:X)a(*SKIP:X)c|(?!^)a+b)/g
+    aaab
+
+/(^aa(*MARK:X)a(*SKIP:Y)c|(?!^)a+b)/g
+    aaab
+
+/(^aa(*MARK:Y)a(*SKIP:X)c|(?!^)a+b)/g
+    aaab
+
+/(^aa(*MARK:X)a(*SKIP:XX)c|(?!^)a+b)/g
+    aaab
+
+/(^aa(*MARK:XX)a(*SKIP:X)c|(?!^)a+b)/g
+    aaab
+
 /(*MARK:a\zb)z/alt_verbnames
 
 /(*:ab\t(d\)c)xxx/
@@ -4755,11 +4895,15 @@ B)x/alt_verbnames,mark
     abcd\=null_context,find_limits
     abcd\=allusedtext,startchar
 
+#if !ebcdic
+
 /abcd/replace=w\rx\x82y\o{333}z(\Q12\$34$$\x34\E5$$),substitute_extended
     abcd
 
 /abcd/replace=w\rx\x82y\o{333}z(\Q12\$34$$\x34\E5$$),substitute_extended,substitute_literal
     >>abcd<<
+
+#endif
     
 /abcd/g,replace=\$1$2\,substitute_literal
     XabcdYabcdZ
@@ -4826,6 +4970,8 @@ B)x/alt_verbnames,mark
 /abcd/g
     >abcd1234abcd5678<\=replace=wxyz,substitute_matched
 
+#if !ebcdic
+
 /abc/substitute_extended,replace=>\045<
     abc
 
@@ -4834,6 +4980,8 @@ B)x/alt_verbnames,mark
 
 /abc/substitute_extended,replace=>\o{45}<
     abc
+
+#endif
 
 /abc/substitute_extended,replace=>\845<
     abc
@@ -4861,6 +5009,34 @@ B)x/alt_verbnames,mark
     LabcR\=replace=>$`<
     LabcR\=replace=>$'<
     LabcR\=replace=>$_<
+
+/A(.)|B(.)/
+    AMZ\=replace=>$+<
+    BMZ\=replace=>$+<
+    AMZ\=replace=>$+
+    AMZ\=replace=>$+{name}
+    BMZ\=ovector=2
+    BMZ\=ovector=3
+    BMZ\=ovector=2,replace=>$+<
+    BMZ\=ovector=3,replace=>$+<
+    BMZ\=ovector=2,substitute_matched,replace=>$+<
+    BMZ\=ovector=3,substitute_matched,replace=>$+<
+
+/A|(B)/
+    B\=replace=>$1<
+    A\=replace=>$1<
+    B\=substitute_unset_empty,replace=>$1<
+    A\=substitute_unset_empty,replace=>$1<
+    B\=replace=>$+<
+    A\=replace=>$+<
+    B\=substitute_unset_empty,replace=>$+<
+    A\=substitute_unset_empty,replace=>$+<
+
+/ABC/
+    ABC\=replace=$+z
+    ABC\=substitute_unknown_unset,replace=$+z
+    ABC\=substitute_unset_empty,replace=$+z
+    ABC\=substitute_unknown_unset,substitute_unset_empty,replace=$+z
 
 /^(o(\1{72}{\"{\\{00000059079}\d*){74}}){19}/I
 
@@ -4972,7 +5148,11 @@ a)"xI
 /()\Q\E*]/B,auto_callout
     a[bc]d
 
+#if !ebcdic
+
 /\x8a+f|;T?(*:;.'?`(\xeap ){![^()!y*''C*(?';]{1;(\x08)/B,alt_verbnames,dupnames,extended
+
+#endif
 
 # Tests for NULL characters in comments and verb "names" and callouts
 
@@ -5956,6 +6136,16 @@ a)"xI
 
 # ---- Non-atomic assertion tests ----
 
+/(*ploo:abc)/
+
+/(*pla:abc/
+
+/(*pla:/
+
+/(*pla/
+
+/(*pla}abc)/
+
 # Expect error: not allowed as a condition
 /(?(*napla:xx)bc)/
 
@@ -6069,6 +6259,8 @@ a)"xI
 
 /(?(VERSION=10.3)b)((?<=b).*)/B
 
+/(?(VERSION>=10.3)b)((?<=b).*)/B
+
 /[aA]b[cC]/IB
 
 /[cc]abcd/I
@@ -6159,6 +6351,8 @@ a)"xI
 
 "(?<=X(?(DEFINE)(.*))(?1))."
 
+#if !ebcdic
+
 /\sxxx\s/tables=1
 \= Expect no match
     AB\x{85}xxx\x{a0}XYZ
@@ -6176,6 +6370,8 @@ a)"xI
 
 /^\w+/tables=3
     École
+
+#endif
 
 /"(*MARK:>" 00 "<).."/hex,mark,no_start_optimize
     AB
@@ -6210,7 +6406,42 @@ a)"xI
 
 /^abc(?<!b\Kq)d/,allow_lookaround_bsk
     abcd
-    
+
+# PCRE2 now also rejects sneaky cases where the \K is inside a lookaround... but
+# it's not always easy to detect this syntactically at compile-time (indeed,
+# a conditional expression could dynamically invoke \K via a subroutine, based
+# on the subject contents).
+
+/(?(DEFINE)(?<sneaky>b\K))a(?=(?&sneaky))/g,allow_lookaround_bsk
+    ab
+
+/(?(DEFINE)(?<sneaky>b\K))a(?=(?&sneaky))/g
+    ab
+    zz
+
+/a|(?(DEFINE)(?<sneaky>\Ka))(?<=(?&sneaky))b/g,allow_lookaround_bsk
+    ab
+
+/a|(?(DEFINE)(?<sneaky>\Ka))(?<=(?&sneaky))b/g
+    ab
+    zz
+
+/a|(?(DEFINE)(?<sneaky>\K\Ga))(?<=(?&sneaky))b/g
+    ab
+    zz
+
+/(?=.{10}(?1))x(\K){0}/
+    x1234567890
+
+/(?=.{10}(.))(*scs:(1)(?2))x(\K){0}/
+    x1234567890
+
+/(?=.{5}(?1))\d*(\K){0}/
+\= Totally fine - pattern does nothing bad even though \K is reachable
+    1234567890
+\= Not fine - the subject now causes the \K to misbehave
+    abcdefgh
+
 # --------- 
 
 # Tests for zero-length NULL to be treated as an empty string.
@@ -6224,6 +6455,9 @@ a)"xI
     abc\=null_replacement
     \=null_subject
     \=null_replacement
+
+/abc/replace=
+    XabcY\=null_replacement
 
 /X*/g,replace=xy
 \= Expect error
@@ -6678,6 +6912,16 @@ a)"xI
 /(a)(b+)(*scs:(1)a(*ACCEPT))(\2)/
     abbb
 
+# Duplicated capture references
+
+/(a)(b)(c)(d)(*scs:(4,3,1,2,2,1,3,3,4,4)x)/B
+
+/(?<n>a)(?<n>b)(?<n>c)(d)(*scs:(2,3,1,1,<n>,<n>)abc)/B,dupnames
+
+/(?<n>a)(?<n>b)(?<n>c)(d)(*scs:(2,1,1,<n>,<n>)abc)/B,dupnames
+
+/(?<n>a)(?<n>b)(?<n>c)(d)(?<m>e)(?<m>f)(*scs:(<n>,5,3,2,1,4,1,4,<m>,6,<n>,<m>)abc)/B,dupnames
+
 # Tests for pcre2_set_optimize()
 
 /abc/I,optimization_none
@@ -6731,6 +6975,8 @@ a)"xI
 
 # python_octal
 
+#if !ebcdic
+
 /\0-\00-\01-\012-\0123-\123-\1234/
     \x00-\x00-\x01-\o{12}-\o{12}3-\o{123}-\o{123}4
 
@@ -6755,6 +7001,8 @@ a)"xI
     abc\=replace=\0-\00-\01-\012-\0123-\123-\1234
     abc\=replace=\1
     abc\=replace=\12
+
+#endif
 
 # --------------
 
@@ -7328,7 +7576,11 @@ a)"xI
 
 /[\\z]/B
 
+#if !ebcdic
+
 /[0-z]/B
+
+#endif
 
 /[0\-z]/B
 
@@ -7336,11 +7588,15 @@ a)"xI
 
 /[ \]]/B
 
+#if !ebcdic
+
 /[ --]/B
 
 /[A-\]]/B
 
 /[A-\\]/B
+
+#endif
 
 /[\A]/
 
@@ -7373,10 +7629,14 @@ a)"xI
 \= Expect no match
     \\
 
+#if !ebcdic
+
 /[a\x{e1}]/iB
     a
     A
     \x{e1}
+
+#endif
 
 # --------------
 
@@ -7447,12 +7707,16 @@ a)"xI
     XacY\=replace=[2]$1
     XacY\=substitute_overflow_length,replace=[2]$1
 
+#if !ebcdic
+
 # a data character via an escape
 /abc/substitute_extended
     XabcY\=replace=\x{48}
     XabcY\=replace=[1]\x{48}
     XabcY\=substitute_overflow_length,replace=[1]\x{48}
     XXabcY\=substitute_overflow_length,replace=[1]\x{48}
+
+#endif
 
 # a replacement literal character
 /abc/
@@ -7516,6 +7780,8 @@ a)"xI
     XacY\=replace=[2]\U$1
     XacY\=substitute_overflow_length,replace=[2]\U$1
 
+#if !ebcdic
+
 # a data character via an escape
 /abc/substitute_extended
     XabcY\=replace=\U\x{48}
@@ -7523,6 +7789,8 @@ a)"xI
     XabcY\=substitute_overflow_length,replace=[1]\U\x{48}
     XXabcY\=substitute_overflow_length,replace=[1]\U\x{48}
     XabcY\=substitute_case_callout,replace=\U\x{48}
+
+#endif
 
 # a replacement literal character
 /abc/substitute_extended
@@ -7773,5 +8041,237 @@ a)"xI
     Xaay\=replace=\Uaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
 # --------------
+
+# Tests for recurse with returned captures
+
+# Parse error tests
+
+/(?1/
+
+/(?1(/
+
+/(?R(1/
+
+/(?R(1,/
+
+/(?R0(1,2!/
+
+/(?1(1,0))()/
+
+/(?1(1,+2))()/
+
+/(?1(<name>))/
+
+# Operation tests
+
+/^(?1(2))\2(?(DEFINE)(a(.)b(.)c))/B
+  axbycx
+\= Expect no match
+  axby
+  axbycy
+
+/^((.)(?<id>.))(?1('id'))(.)/B
+  abcde
+
+/^(?1(3,2,2,3,2))(?1(3))(?(DEFINE)(a(.)b(.)c))/B
+  a1b2cafbgc
+
+/(?1(2))#(?1(3))#(?1(4))#(?(DEFINE)((.)\2(.)\3(.)\4))/
+  aabbcc#ddeeff#gghhii!aabbcc#ddeeff#gghhii#
+\= Expect no match
+  aabbcc#ddeeff#gghhii
+
+/^(?1(1,2)){2,4}(?(DEFINE)((..)#))xx#/B
+  aa#bb#xx#
+  aa#bb#cc#xx#
+  aa#bb#cc#dd#xx#
+\= Expect no match
+  aa#xx#
+  aa#bb#cc#dd#ee#xx#
+
+/^(?1(1,2)){2,}+(?(DEFINE)((..)#))!/B
+  aa#bb#!
+  aa#bb#cc#dd#ee#!
+\= Expect no match
+  aa#!
+  aa#bb#cc#dd#ee#
+
+/^(?1)(?(DEFINE)(<(?2(3,4))><\4\3>)((..)(..)))/
+  <abcd><cdab>
+
+/(?1)#(?(DEFINE)(a(.(*ACCEPT).)b))/
+  #axyb#axax#
+
+/^(?>(?1(<n>)))!(?(DEFINE)((?<n>..)(?<n>..)))|abcde/dupnames
+  abcd!
+  abcde
+
+/<(?:[^<>]*?(?:(AB)[^<>]*|)(?:|(?R(1))))+>/
+  <aa<bb>cc<dd>ee>
+  <aa<bb<cc>dd>ee<ff<gg>hh>ii>
+  <aa<bb<cc>dd>ee
+  <aa<bb>cc<dd>AB>
+  <aa<AB>cc<dd>ee>
+  <aa<bbAB<cc>dd>ee
+  <aa<bb<ABcc>dd>ee<ff<gg>hh>ii>
+  <aa<bb<cc>dd>ee<ff<gg>hABhABh>ii>
+
+/(?:(?1(<prefix>))#){4}(?(DEFINE)((?(<prefix>)\2)(?<prefix>.{3})))$/
+  abc#abcdef#defghi#ghijkl#
+  abc#abcdef#defghi#ghijkl#jklmno#
+  abc#abcdef#defghi#ghijkl#jklmno#mnopqr#
+\= Expect no match
+  abc#abcdef#defghi#ghijkl
+  abc#abcdef#defghi#ghXjkl#
+
+% # Define the routine "weekendday" which matches Saturday or Sunday, and
+  # returns the Sat/Sun prefix as \k<short>.
+  (?(DEFINE)(?<weekendday>(?|(?<short>Sat)urday|(?<short>Sun)day)))
+  # Call the routine. Matches "Saturday,Sat" or "Sunday,Sun".
+  (?&weekendday(<short>)),\k<short> %x
+  Saturday,Sat
+  Sunday,Sun
+\= Expect no match
+  Saturday,Sun
+
+/()()()(?2(2,3,2,3,2))/B
+  abc
+
+# Test each syntax used for recursion
+
+/(?(R)(Sat)urday|(?R(1)),\1)/
+    Saturday,Sat
+
+/(?(DEFINE)((Sat)urday))(?1(2)),\2/
+    Saturday,Sat
+
+/(?(DEFINE)((Sat)urday))(?-2(-1)),\2/
+    Saturday,Sat
+
+/(?+1(+2)),\2(?(DEFINE)((Sat)urday))/
+    Saturday,Sat
+
+/(?(DEFINE)(?<fn>(?<ret>Sat)urday))(?&fn('ret')),\k<ret>/
+    Saturday,Sat
+
+/(?(DEFINE)(?<fn>(?<ret>Sat)urday))(?P>fn(<ret>)),\k<ret>/
+    Saturday,Sat
+
+/(?(DEFINE)(?<fn>(?<ret>Sat)urday))\g<fn('ret')>,\k<ret>/
+
+/(?(DEFINE)((Sat)urday))(?1),\2/
+\= Expect no match
+    Saturday,Sat
+
+/(?(DEFINE)((Sat)urday))(?1()),\2/
+
+/(?(DEFINE)((Sat)(urday)))(?1(2,3)),\2,\3/
+    Saturday,Sat,urday
+
+# --------------
+
+# Test that a memory leak has been fixed
+/x/replace=r,substitute_matched
+    x\=null_subject
+
+# Test that a couple of double frees have been fixed
+/foo/replace=bar,substitute_matched
+    foo\=copy_matched_subject
+    foo\=global,copy_matched_subject
+
+# Tests for reading matches from NULL subjects
+/(.?)/
+    \=null_subject,copy=0,copy=1,get=0,get=1,getall
+
+# --------------
+# A batch of additional tests of pcre2_substitute error cases
+# --------------
+
+# Some baseline tests of the NULL-handling cases
+
+/\w+|^$/replace=<$&>,global
+    :::
+    \=null_subject
+    foo\=zero_terminate
+    \=null_subject,zero_terminate
+    foo|bar\=offset=1
+
+/\w+|^$/replace=<$&>,global,substitute_matched
+    :::
+    \=null_subject
+    foo\=zero_terminate
+    \=null_subject,zero_terminate
+    foo|bar\=offset=1
+
+/\w+|^$/replace=<$&>,global,null_substitute_match_data
+    :::
+    \=null_subject
+    foo\=zero_terminate
+    \=null_subject,zero_terminate
+    foo|bar\=offset=1
+
+/\w+|^$/replace=<$&>,global,substitute_matched,null_substitute_match_data
+    :::
+    \=null_subject
+    foo\=zero_terminate
+    \=null_subject,zero_terminate
+    foo|bar\=offset=1
+
+# Now some NULL context tests
+
+/\w+|^$/replace=<$&>,global
+    :::\=null_context
+    foo\=null_context
+    :::\=null_context,null_substitute_match_data
+    foo\=null_context,null_substitute_match_data
+    :::\=null_context,substitute_matched
+    foo\=null_context,substitute_matched
+    :::\=null_context,null_substitute_match_data,substitute_matched
+    foo\=null_context,null_substitute_match_data,substitute_matched
+
+# Failed matches: no-match; partial; other failure (callout-triggered)
+
+/abc/replace=yy
+    zABCz
+    zABCz\=substitute_matched
+
+/abc/
+    ab\=replace=yy,partial_hard
+    ab\=replace=yy,partial_hard,substitute_matched
+
+/(?C1)abc/replace=yy
+    zabcz\=callout_error=1
+    zabcz\=callout_error=1,substitute_matched
+
+# Exercise PCRE2_ERROR_DIFFSUBSSUBJECT branches
+
+# Changing the length is always an error
+# (using PCRE2_ZERO_TERMINATED but with different length strings also counts)
+# Using PCRE2_ZERO_TERMINATED vs a concrete length doesn't count as changing the length
+/\w+|^$/replace=<$&>,global,substitute_matched
+    foo\=substitute_subject=foo
+    foo\=substitute_subject=foo,copy_matched_subject
+    foo\=substitute_subject=foo,zero_terminate
+    foo\=substitute_subject=f
+    foo\=substitute_subject=f,copy_matched_subject
+    foo\=substitute_subject=f,zero_terminate
+    \
+    \=copy_matched_subject
+    \=zero_terminate
+    \=null_subject
+    \=null_subject,copy_matched_subject
+
+# Keeping the length the same, the offset the same, and the pointer the same
+# Is ok, even if the contents DIFFER
+/\w+|^$/replace=<$&>,global,substitute_matched
+    foo|bar\=offset=1,substitute_subject=F|OOBAR
+    foo|bar\=offset=1,substitute_subject=F|OOBAR,zero_terminate
+
+# With copy_matched_subject however we are able to detect the mismatch
+/\w+|^$/replace=<$&>,global,substitute_matched
+    foo|bar\=offset=1,substitute_subject=foo|bar,copy_matched_subject
+    foo|bar\=offset=1,substitute_subject=F|OOBAR,copy_matched_subject
+    foo|bar\=offset=1,substitute_subject=F|OOBAR,copy_matched_subject,zero_terminate
+
 
 # End of testinput2

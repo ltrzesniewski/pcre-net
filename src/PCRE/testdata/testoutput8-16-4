@@ -247,7 +247,7 @@ Memory allocation - data size : 6
  12     Any
  13     Any
  14     Any
- 15     \1
+ 15     \g{1}
  17     bbb
  23   3 Recurse
  26     d
@@ -334,6 +334,7 @@ Memory allocation - code size : 20
 
 /\x{110000}/utf
 Failed: error 134 at offset 9: character code point value in \x{} or \o{} is too large
+        here: \x{110000 |<--| }
 
 /[\x{ff}]/utf
 Memory allocation - code size : 18
@@ -453,6 +454,7 @@ Memory allocation - code size : 32
 
 /^[\QĀ\E-\QŐ\E/utf
 Failed: error 106 at offset 13: missing terminating ] for character class
+        here: ...QĀ\E-\QŐ\E |<--|
 
 /[\p{L}]/
 Memory allocation - code size : 30
@@ -729,7 +731,7 @@ Memory allocation - code size : 18
   8  15 CBra 2
  12   8 CBra 3
  16     a
- 18     \2
+ 18     \g{2}
  20   8 Ket
  23  15 Alt
  26   6 CBra 4
@@ -749,7 +751,7 @@ Memory allocation - code size : 18
   3  16 CBra 1
   7  10 Recurse
  10   6 CBra 2
- 14     \1
+ 14     \g{1}
  16   6 Ket
  19  16 Ket
  22  22 Ket
@@ -776,7 +778,7 @@ Memory allocation - code size : 18
   8  26 Recurse
  11   0 Recurse
  14   5 Alt
- 17     \1
+ 17     \g{1}
  19   4 Alt
  22     $
  23  19 Ket
@@ -797,7 +799,7 @@ Memory allocation - code size : 18
  18   4 Ket
  21  14 Recurse
  24   5 Alt
- 27     \1
+ 27     \g{1}
  29   4 Alt
  32     $
  33  29 Ket
@@ -820,7 +822,7 @@ Memory allocation - code size : 18
  29  20 CBra 6
  33  13 CBra 7
  37   6 Once
- 40     \1+
+ 40     \g{1}+
  43   6 Ket
  46  13 Ket
  49  20 Ket
@@ -852,7 +854,7 @@ Memory allocation - code size : 18
 /(?'ABC'\[[bar](]{793}*THEN:\[A]{255}\[)]{794}/expand,-fullbincode,parens_nest_limit=1000
 
 /(?'ABC'\[[bar](]{1793}*THEN:\[A]{255}\[)]{1794}/expand,-fullbincode,parens_nest_limit=2000
-Failed: error 186 at offset 12820: regular expression is too complicated
+Failed: error 186 at offset 0: regular expression is too complicated
 
 /(?(1)(?1)){8,}+()/debug
 ------------------------------------------------------------------
@@ -1011,6 +1013,7 @@ Subject length lower bound = 0
 
 /([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00](*ACCEPT)/
 Failed: error 114 at offset 509: missing closing parenthesis
+        here: ...](*ACCEPT) |<--|
 
 /([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00](*ACCEPT)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))/-fullbincode
 

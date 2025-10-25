@@ -1,4 +1,4 @@
-.TH PCRE2TEST 1 "26 December 2024" "PCRE2 10.46"
+.TH PCRE2TEST 1 "12 October 2025" "PCRE2 10.47"
 .SH NAME
 pcre2test - a program for testing Perl-compatible regular expressions.
 .SH SYNOPSIS
@@ -143,10 +143,6 @@ Output information about a specific build-time option, then exit. This
 functionality is intended for use in scripts such as \fBRunTest\fP. The
 following options output the value and set the exit code as indicated:
 .sp
-  ebcdic-nl  the code for LF (= NL) in an EBCDIC environment:
-               either 0x15 or 0x25
-               0 if used in an ASCII/Unicode environment
-               exit code is always 0
   linksize   the configured internal link size (2, 3, or 4)
                exit code is set to the link size
   newline    the default newline setting:
@@ -161,6 +157,10 @@ to the same value:
 .sp
   backslash-C  \eC is supported (not locked out)
   ebcdic       compiled for an EBCDIC environment
+  ebcdic-io    if PCRE2 is compiled for EBCDIC, whether pcre2test's input and
+                 output is EBCDIC or ASCII
+  ebcdic-nl25  if PCRE2 is compiled for EBCDIC, whether NL (= LF) is 0x25
+                 (otherwise it is 0x15, the default)
   jit          just-in-time support is available
   pcre2-16     the 16-bit library was built
   pcre2-32     the 32-bit library was built
@@ -179,6 +179,11 @@ information. It returns one of the following values:
 .sp
 If an unknown option is given, an error message is output; the exit code is 0.
 .TP 10
+\fB--colo[u]r[=<always,auto,never>]\fP
+By default, the output is coloured if the output file is a terminal (\fBauto\fP).
+Force or suppress output of ANSI colour escapes with \fBalways\fP and \fBnever\fP
+respectively.
+.TP 10
 \fB-d\fP
 Behave as if each pattern has the \fBdebug\fP modifier; the internal
 form and information about the compiled pattern is output after compilation;
@@ -188,6 +193,10 @@ form and information about the compiled pattern is output after compilation;
 Behave as if each subject line has the \fBdfa\fP modifier; matching is done
 using the \fBpcre2_dfa_match()\fP function instead of the default
 \fBpcre2_match()\fP.
+.TP 10
+\fB-E\fP
+Run in "preprocess only" mode (similar to "gcc -E"). The "#if ... #endif"
+commands are processed, and all other lines are printed verbatim.
 .TP 10
 \fB-error\fP \fInumber[,number,...]\fP
 Call \fBpcre2_get_error_message()\fP for each of the error numbers in the
@@ -232,6 +241,11 @@ List scripts: write a list of recognized Unicode script names to the standard
 output, then exit with zero exit code. All other options are ignored. If both
 -C and any -Lx options are present, whichever is first is recognized.
 .TP 10
+\fB-malloc\fP
+Exercise malloc() failures, by first counting the number of calls made to malloc
+during pattern compilation and matching, then re-running the compilation and
+matching that many times, exercising a failure of each malloc() call.
+.TP 10
 \fB-pattern\fP \fImodifier-list\fP
 Behave as if each pattern line contains the given modifiers.
 .TP 10
@@ -260,6 +274,10 @@ compile phase.
 \fB-T\fP \fB-TM\fP
 These behave like \fB-t\fP and \fB-tm\fP, but in addition, at the end of a run,
 the total times for all compiles and matches are output.
+.TP 10
+\fB-unittest\fP
+Run a fixed set of additional tests of the PCRE2 API which are not driven by
+the test input files, and then exit.
 .TP 10
 \fB-version\fP
 Output the PCRE2 version number and then exit.
@@ -420,13 +438,24 @@ below.
 .sp
 This command sets a default modifier list that applies to all subsequent
 subject lines. Modifiers on a subject line can change these settings.
+.sp
+  #if CONDITION
+  ...
+  #endif
+.sp
+If CONDITION is true, then the command is printed, and its contents are
+processed as normal, including printing the commandlines to the output. If
+CONDITION is false, then all lines between the "#if" and "#endif" are skipped
+and not printed. The CONDITION can be any of the conditions which are tested by
+the "-C" commandline option and which set pcre2test's exit code to a boolean
+value. The CONDITION may also be preceded by "!".
 .
 .
 .SH "MODIFIER SYNTAX"
 .rs
 .sp
 Modifier lists are used with both pattern and subject lines. Items in a list
-are separated by commas followed by optional white space. Trailing whitespace
+are separated by commas followed by optional white space. Trailing white space
 in a modifier list is ignored. Some modifiers may be given for both patterns
 and subject lines, whereas others are valid only for one or the other. Each
 modifier has a long name, for example "anchored", and some of them must be
@@ -550,7 +579,7 @@ the start of a modifier list. For example:
 .sp
   abc\e=notbol,notempty
 .sp
-If the subject string is empty and \e= is followed by whitespace, the line is
+If the subject string is empty and \e= is followed by white space, the line is
 treated as a comment line, and is not used for matching. For example:
 .sp
   \e= This is a comment.
@@ -1126,7 +1155,8 @@ process.
       heapframes_size             show match data heapframes size
       jitstack=<n>                set size of JIT stack
       mark                        show mark values
-      replace=<string>            specify a replacement string
+      null_substitute_match_data  substitute with NULL match data
+      replace=<str>               specify a replacement string
       startchar                   show starting character when relevant
       substitute_callout          use substitution callouts
       substitute_case_callout     use substitution case callouts
@@ -1308,11 +1338,12 @@ pattern, but can be overridden by modifiers on the subject.
       null_context               match with a NULL context
       null_replacement           substitute with NULL replacement
       null_subject               match with NULL subject
+      null_substitute_match_data substitute with NULL match data
       offset=<n>                 set starting offset
       offset_limit=<n>           set offset limit
       ovector=<n>                set size of output vector
       recursion_limit=<n>        obsolete synonym for depth_limit
-      replace=<string>           specify a replacement string
+      replace=<str>              specify a replacement string
       startchar                  show startchar when relevant
       startoffset=<n>            same as offset=<n>
       substitute_callout         use substitution callouts
@@ -1324,6 +1355,7 @@ pattern, but can be overridden by modifiers on the subject.
       substitute_replacement_only use PCRE2_SUBSTITUTE_REPLACEMENT_ONLY
       substitute_skip=<n>        skip substitution number n
       substitute_stop=<n>        skip substitution number n and greater
+      substitute_subject=<str>   specify a different subject for substitution
       substitute_unknown_unset   use PCRE2_SUBSTITUTE_UNKNOWN_UNSET
       substitute_unset_empty     use PCRE2_SUBSTITUTE_UNSET_EMPTY
       zero_terminate             pass the subject as zero-terminated
@@ -1446,13 +1478,9 @@ difference to the matching process if the pattern begins with a lookbehind
 assertion (including \eb or \eB).
 .P
 If an empty string is matched, the next match is done with the
-PCRE2_NOTEMPTY_ATSTART and PCRE2_ANCHORED flags set, in order to search for
-another, non-empty, match at the same point in the subject. If this match
-fails, the start offset is advanced, and the normal match is retried. This
-imitates the way Perl handles such cases when using the \fB/g\fP modifier or
-the \fBsplit()\fP function. Normally, the start offset is advanced by one
-character, but if the newline convention recognizes CRLF as a newline, and the
-current character is CR followed by LF, an advance of two characters occurs.
+PCRE2_NOTEMPTY_ATSTART flag set, in order to search for another, non-empty,
+match at the same point in the subject. This imitates the way Perl handles such
+cases when using the \fB/g\fP modifier or the \fBsplit()\fP function.
 .
 .
 .SS "Testing substring extraction functions"
@@ -1540,7 +1568,7 @@ character. Here is an example that tests the edge case:
       123abc123\e=replace=[10]XYZ
    1: 123XYZ123
       123abc123\e=replace=[9]XYZ
-  Failed: error -47: no more memory
+  Failed: error -48: no more memory
 .sp
 The default action of \fBpcre2_substitute()\fP is to return
 PCRE2_ERROR_NOMEMORY when the output buffer is too small. However, if the
@@ -1553,11 +1581,17 @@ for the trailing zero) as part of the error message. For example:
 .sp
   /abc/substitute_overflow_length
       123abc123\e=replace=[9]XYZ
-  Failed: error -47: no more memory: 10 code units are needed
+  Failed: error -48: no more memory: 10 code units are needed
 .sp
 A replacement string is ignored with POSIX and DFA matching. Specifying partial
 matching provokes an error return ("bad option value") from
 \fBpcre2_substitute()\fP.
+.sp
+The \fBsubstitute_subject\fP modifier may be used to test the use of the PCRE2
+API, in which a client calls \fBpcre2_match()\fP followed by \fBpcre2_substitute()\fP
+with PCRE2_SUBSTITUTE_MATCHED, but the client performs an unexpected and
+unsupported modification of the subject buffer in-place, in between the match
+and substitution.
 .
 .
 .SS "Testing substitute callouts"
@@ -2241,6 +2275,6 @@ Cambridge, England.
 .rs
 .sp
 .nf
-Last updated: 26 December 2024
+Last updated: 12 October 2025
 Copyright (c) 1997-2024 University of Cambridge.
 .fi

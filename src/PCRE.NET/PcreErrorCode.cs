@@ -604,6 +604,26 @@ public enum PcreErrorCode
     PerlEClassUnexpectedChar = PcreConstants.ERROR_PERL_ECLASS_UNEXPECTED_CHAR,
 
     /// <summary>
+    /// <c>PCRE2_ERROR_EXPECTED_CAPTURE_GROUP</c> - Expected capture group number or name.
+    /// </summary>
+    ExpectedCaptureGroup = PcreConstants.ERROR_EXPECTED_CAPTURE_GROUP,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_MISSING_OPENING_PARENTHESIS</c> - Missing opening parenthesis.
+    /// </summary>
+    MissingOpeningParenthesis = PcreConstants.ERROR_MISSING_OPENING_PARENTHESIS,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_MISSING_NUMBER_TERMINATOR</c> - Syntax error in subpattern number (missing terminator?).
+    /// </summary>
+    MissingNumberTerminator = PcreConstants.ERROR_MISSING_NUMBER_TERMINATOR,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_NULL_ERROROFFSET</c> - <c>NULL</c> - <c>erroroffset</c> passed as NULL.
+    /// </summary>
+    NullErrorOffset = PcreConstants.ERROR_NULL_ERROROFFSET,
+
+    /// <summary>
     /// <c>PCRE2_ERROR_NOMATCH</c> - No match.
     /// </summary>
     NoMatch = PcreConstants.ERROR_NOMATCH,
@@ -952,4 +972,29 @@ public enum PcreErrorCode
     ///<c>PCRE2_ERROR_TOOLARGEREPLACE</c> - Replacement too large (longer than <c>PCRE2_SIZE</c>).
     ///</summary>
     TooLargeReplace = PcreConstants.ERROR_TOOLARGEREPLACE,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_DIFFSUBSPATTERN</c> - Substitute pattern differs from prior match call.
+    /// </summary>
+    DiffSubsPattern = PcreConstants.ERROR_DIFFSUBSPATTERN,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_DIFFSUBSSUBJECT</c> - Substitute subject differs from prior match call.
+    /// </summary>
+    DiffSubsSubject = PcreConstants.ERROR_DIFFSUBSSUBJECT,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_DIFFSUBSOFFSET</c> - Substitute start offset differs from prior match call.
+    /// </summary>
+    DiffSubsOffset = PcreConstants.ERROR_DIFFSUBSOFFSET,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_DIFFSUBSOPTIONS</c> - Substitute options differ from prior match call.
+    /// </summary>
+    DiffSubsOptions = PcreConstants.ERROR_DIFFSUBSOPTIONS,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_BAD_BACKSLASH_K</c> - Disallowed use of <c>\K</c> in lookaround.
+    /// </summary>
+    BadBackslashK = PcreConstants.ERROR_BAD_BACKSLASH_K,
 }

@@ -23,7 +23,7 @@
       Replaces matches found in the given subject string, using the
       <b>PCRE.NET replacement syntax</b>
       (similar to the one used by the
-      <see cref="System.Text.RegularExpressions.Regex"/>
+      <see cref="System.Text.RegularExpressions.Regex" />
       class).
     </summary>
   </method>
@@ -89,7 +89,7 @@
     <para>
       Note that using a static matching method is not efficient. For best performance,
       create a
-      <see cref="PcreRegex"/>
+      <see cref="PcreRegex" />
       object and use its instance methods.
     </para>
   </remarks>
@@ -97,7 +97,7 @@
   <remarks name="replacementString">
     <para>
       The supported placeholders in the replacement string are similar to those supported by the
-      <see cref="System.Text.RegularExpressions.Regex"/>
+      <see cref="System.Text.RegularExpressions.Regex" />
       class:
       <list type="bullet">
         <item>
@@ -142,11 +142,29 @@
       <list type="bullet">
         <item>
           <c>$n</c>
+          or
+          <c>${n}</c>
           - The value of the capture group <c>n</c> (by index or name).
         </item>
         <item>
-          <c>${n}</c>
-          - The value of the capture group <c>n</c> (by index or name).
+          <c>$&amp;</c>
+          - The value of the full match. Equivalent to <c>$0</c>.
+        </item>
+        <item>
+          <c>$_</c>
+          - The full subject string.
+        </item>
+        <item>
+          <c>$`</c>
+          - The part of the subject string appearing before the match.
+        </item>
+        <item>
+          <c>$'</c>
+          - The part of the subject string appearing after the match.
+        </item>
+        <item>
+          <c>$+</c>
+          - The value of the last matched capture group.
         </item>
         <item>
           <c>$$</c>
@@ -160,7 +178,7 @@
         </item>
       </list>
       When the option
-      <see cref="PcreSubstituteOptions.SubstituteExtended"/>
+      <see cref="PcreSubstituteOptions.SubstituteExtended" />
       is enabled, additional syntax is available:
       <list type="bullet">
         <item>
@@ -202,7 +220,7 @@
       <c>` ' " ^ % # $ {</c>
       and the ending delimiter is the same as the start, except for <c>{</c>, where the ending delimiter is <c>}</c>.
       If the
-      <see cref="PcreOptions.AutoCallout"/>
+      <see cref="PcreOptions.AutoCallout" />
       option bit is set when a pattern is compiled, PCRE2 automatically inserts callouts,
       all with number 255, before each item in the pattern except for immediately before or after an explicit callout.
     </para>
@@ -211,7 +229,7 @@
   <remarks name="startIndex">
     <para>
       Passing a non-zero
-      <paramref name="startIndex"/>
+      <paramref name="startIndex" />
       differs from passing a shortened string if the pattern
       starts with an assertion (such as <c>\b</c>) or contains lookbehinds.
     </para>

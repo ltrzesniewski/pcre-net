@@ -728,7 +728,7 @@ echo "---------------------------- Test 131 -----------------------------" >>tes
 echo "RC=$?" >>testtrygrep
 
 echo "---------------------------- Test 132 -----------------------------" >>testtrygrep
-(cd $srcdir; exec 3<testdata/grepinput; $valgrind $vjs $pcre2grep -m1 -A3 '^match' <&3; echo '---'; head -1 <&3; exec 3<&-) >>testtrygrep 2>&1
+(cd $srcdir; exec 3<testdata/grepinput; $valgrind $vjs $pcre2grep -m1 -A3 '^match' <&3; echo '---'; $valgrind $vjs $pcre2grep -m1 '.*' <&3; exec 3<&-) >>testtrygrep 2>&1
 echo "RC=$?" >>testtrygrep
 
 echo "---------------------------- Test 133 -----------------------------" >>testtrygrep
@@ -859,8 +859,13 @@ if [ $? -ne 0 ]; then
   echo "RC=2" >>testtrygrep
 else
 
-  (cd $srcdir; unset LC_ALL; LC_CTYPE=locale.bad $valgrind $vjs $pcre2grep abc /dev/null) >>testtrygrep 2>&1
+  (cd $srcdir; unset LC_ALL; LC_CTYPE=locale.bad; export LC_CTYPE; $valgrind $vjs $pcre2grep abc /dev/null >>$builddir/testtrygrep 2>&1) >testtemp1grep 2>&1
   echo "RC=$?" >>testtrygrep
+  shell_errors=`cat testtemp1grep`
+  if [ x"$shell_errors" != x ] ; then
+    printf "shell errors during locale test: "
+    echo "$shell_errors"
+  fi
 fi
 
 echo "---------------------------- Test 151 -----------------------------" >>testtrygrep
@@ -1148,6 +1153,9 @@ checkspecial '--line-buffered --colour=auto abc /dev/null' 1
 checkspecial '--line-buffered --color abc /dev/null' 1
 checkspecial '-dskip abc .' 1
 checkspecial '-Dread -Dskip abc /dev/null' 1
+checkspecial "-f $srcdir/testdata/greplistBad /dev/null" 2
+checkspecial "(unpaired /dev/null" 2
+checkspecial "-e (unpaired1 -e (unpaired2 /dev/null" 2
 
 # Clean up local working files
 rm -f testNinputgrep teststderrgrep testtrygrep testtemp1grep testtemp2grep
