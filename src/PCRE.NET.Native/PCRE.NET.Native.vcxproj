@@ -24,6 +24,7 @@
     <Pcre2Source Include="pcre2_chkdint.c" />
     <Pcre2Source Include="pcre2_compile.c" />
     <Pcre2Source Include="pcre2_compile_class.c" />
+    <Pcre2Source Include="pcre2_compile_cgroup.c" />
     <Pcre2Source Include="pcre2_config.c" />
     <Pcre2Source Include="pcre2_context.c" />
     <Pcre2Source Include="pcre2_convert.c" />
@@ -35,6 +36,7 @@
     <Pcre2Source Include="pcre2_maketables.c" />
     <Pcre2Source Include="pcre2_match.c" />
     <Pcre2Source Include="pcre2_match_data.c" />
+    <Pcre2Source Include="pcre2_match_next.c" />
     <Pcre2Source Include="pcre2_newline.c" />
     <Pcre2Source Include="pcre2_ord2utf.c" />
     <Pcre2Source Include="pcre2_pattern_info.c" />

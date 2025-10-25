@@ -28,6 +28,8 @@ add_library(PCRE.NET.Native SHARED
     PCRE.NET.Native/compile/pcre2_chkdint.16bit.c
     PCRE.NET.Native/compile/pcre2_compile.8bit.c
     PCRE.NET.Native/compile/pcre2_compile.16bit.c
+    PCRE.NET.Native/compile/pcre2_compile_cgroup.8bit.c
+    PCRE.NET.Native/compile/pcre2_compile_cgroup.16bit.c
     PCRE.NET.Native/compile/pcre2_compile_class.8bit.c
     PCRE.NET.Native/compile/pcre2_compile_class.16bit.c
     PCRE.NET.Native/compile/pcre2_config.8bit.c
@@ -52,6 +54,8 @@ add_library(PCRE.NET.Native SHARED
     PCRE.NET.Native/compile/pcre2_match.16bit.c
     PCRE.NET.Native/compile/pcre2_match_data.8bit.c
     PCRE.NET.Native/compile/pcre2_match_data.16bit.c
+    PCRE.NET.Native/compile/pcre2_match_next.8bit.c
+    PCRE.NET.Native/compile/pcre2_match_next.16bit.c
     PCRE.NET.Native/compile/pcre2_newline.8bit.c
     PCRE.NET.Native/compile/pcre2_newline.16bit.c
     PCRE.NET.Native/compile/pcre2_ord2utf.8bit.c
