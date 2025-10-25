@@ -38,9 +38,13 @@ POSSIBILITY OF SUCH DAMAGE.
 -----------------------------------------------------------------------------
 */
 
-#ifdef HAVE_CONFIG_H
+
+#if defined HAVE_CONFIG_H && !defined PCRE2_CONFIG_H_IDEMPOTENT_GUARD
+#define PCRE2_CONFIG_H_IDEMPOTENT_GUARD
 #include "config.h"
 #endif
+
+
 
 #include <stdio.h>
 #include <string.h>
@@ -651,6 +655,7 @@ static struct regression_test_case regression_test_cases[] = {
 	{ MU, A, 0, 0, "a(?=)b", "ab" },
 	{ MU, A, 0, 0 | F_NOMATCH, "a(?!)b", "ab" },
 	{ MU, A, 0, 0, "(?(?<!|(|a)))", "a" },
+	{ MU, A, 0, 0, "(?=((?|(a)(.)|(b)(..)|(c)(...)))(?1(2,3))).x", "b12c123bx2c123" },
 
 	/* Not empty, ACCEPT, FAIL */
 	{ MU, A, PCRE2_NOTEMPTY, 0 | F_NOMATCH, "a*", "bcx" },

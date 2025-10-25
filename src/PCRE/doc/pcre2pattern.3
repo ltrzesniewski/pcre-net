@@ -1,4 +1,4 @@
-.TH PCRE2PATTERN 3 "27 November 2024" "PCRE2 10.46"
+.TH PCRE2PATTERN 3 "03 September 2025" "PCRE2 10.47"
 .SH NAME
 PCRE2 - Perl-compatible regular expressions (revised API)
 .SH "PCRE2 REGULAR EXPRESSION DETAILS"
@@ -150,10 +150,11 @@ documentation.
 .rs
 .sp
 If a pattern starts with (*NO_DOTSTAR_ANCHOR), it has the same effect as
-setting the PCRE2_NO_DOTSTAR_ANCHOR option, or calling \fBpcre2_set_optimize()\fP
-with a PCRE2_DOTSTAR_ANCHOR_OFF directive. This disables optimizations that
-apply to patterns whose top-level branches all start with .* (match any number
-of arbitrary characters). For more details, see the
+setting the PCRE2_NO_DOTSTAR_ANCHOR option, or
+calling \fBpcre2_set_optimize()\fP with a PCRE2_DOTSTAR_ANCHOR_OFF directive.
+This disables optimizations that apply to patterns whose top-level branches
+all start with .* (match any number of arbitrary characters). For more details,
+see the
 .\" HREF
 \fBpcre2api\fP
 .\"
@@ -1360,7 +1361,7 @@ it matches any character except one that signifies the end of a line.
 .P
 When \eN is followed by an opening brace it has a different meaning. See the
 section entitled
-.\" HTML <a href="digitsafterbackslash">
+.\" HTML <a href="#digitsafterbackslash">
 .\" </a>
 "Non-printing characters"
 .\"
@@ -2015,8 +2016,9 @@ the naming of capture groups. This feature was not added to Perl until release
 using the Python syntax. PCRE2 supports both the Perl and the Python syntax.
 .P
 In PCRE2, a capture group can be named in one of three ways: (?<name>...) or
-(?'name'...) as in Perl, or (?P<name>...) as in Python. Names may be up to 128
-code units long. When PCRE2_UTF is not set, they may contain only ASCII
+(?'name'...) as in Perl, or (?P<name>...) as in Python. Names may be up to
+.\" DEFINE MAX_NAME_SIZE
+128 code units long. When PCRE2_UTF is not set, they may contain only ASCII
 alphanumeric characters and underscores, but must start with a non-digit. When
 PCRE2_UTF is set, the syntax of group names is extended to allow any Unicode
 letter or Unicode decimal digit. In other words, group names must match one of
@@ -3184,8 +3186,7 @@ For example:
   (?(VERSION>=10.4)yes|no)
 .sp
 This pattern matches "yes" if the PCRE2 version is greater or equal to 10.4, or
-"no" otherwise. The fractional part of the version number may not contain more
-than two digits.
+"no" otherwise. The fractional part of the version number could be ommited.
 .
 .
 .SS "Assertion conditions"
@@ -3442,7 +3443,7 @@ later versions (I tried 5.024) it now works.
 .
 .
 .\" HTML <a name="groupsassubroutines"></a>
-.SH "GROUPS AS SUBROUTINES"
+.SS "Groups as subroutines"
 .rs
 .sp
 If the syntax for a recursive group call (either by number or by name) is used
@@ -3495,8 +3496,51 @@ in groups when called as subroutines is described in the section entitled
 below.
 .
 .
+.SS "Recursion and subroutines with returned capture groups"
+.rs
+.sp
+Since PCRE2 10.46, recursion and subroutine calls may also specify a list of
+capture groups to return. This is a PCRE2 syntax extension not supported by
+Perl. The pattern matching recurses into the referenced expression as described
+above, however, when the recursion returns to the calling expression the
+subgroups captured during the recursion can be retained when the calling
+expression's context is restored.
+.P
+When used as a subroutine, this allows the subroutine's capture groups to
+be used as return values.
+.P
+Only the specific capture groups listed by the caller will be retained, using
+the following syntax:
+.sp
+  (?R(grouplist))       recurse whole pattern, returning capture groups
+  (?n(grouplist))       )
+  (?+n(grouplist))      )
+  (?-n(grouplist))      ) call subroutine, returning capture groups
+  (?&name(grouplist))   )
+  (?P>name(grouplist))  )
+.P
+The list of capture groups "grouplist" is a comma-separated list of (absolute
+or relative) group numbers, and group names enclosed in single quotes or angle
+brackets.
+.P
+Here is an example which first uses the DEFINE condition to create a re-usable
+routine for matching a weekday, then calls that subroutine and retains the
+groups it captures for use later:
+.sp
+  (?x: # ignore whitespace for clarity
+    # Define the routine "weekendday" which matches Saturday or
+    # Sunday, and returns the Sat/Sun prefix as \ek<short>.
+    (?(DEFINE) (?<weekendday>
+        (?|(?<short>Sat)urday|(?<short>Sun)day) ) )
+    # Call the routine. Matches "Saturday,Sat" or "Sunday,Sun".
+    (?&weekendday(<short>)),\ek<short> )
+.P
+This feature is not available using the Oniguruma syntax \eg<...> or \eg'...'
+below.
+.
+.
 .\" HTML <a name="onigurumasubroutines"></a>
-.SH "ONIGURUMA SUBROUTINE SYNTAX"
+.SS "Oniguruma subroutine syntax"
 .rs
 .sp
 For compatibility with Oniguruma, the non-Perl syntax \eg followed by a name or
@@ -3618,7 +3662,7 @@ are faulted.
 .P
 A closing parenthesis can be included in a name either as \e) or between \eQ
 and \eE. In addition to backslash processing, if the PCRE2_EXTENDED or
-PCRE2_EXTENDED_MORE option is also set, unescaped whitespace in verb names is
+PCRE2_EXTENDED_MORE option is also set, unescaped white space in verb names is
 skipped, and #-comments are recognized, exactly as in the rest of the pattern.
 PCRE2_EXTENDED and PCRE2_EXTENDED_MORE do not affect verb names unless
 PCRE2_ALT_VERBNAMES is also set.
@@ -4186,6 +4230,6 @@ Cambridge, England.
 .rs
 .sp
 .nf
-Last updated: 27 November 2024
+Last updated: 03 September 2025
 Copyright (c) 1997-2024 University of Cambridge.
 .fi

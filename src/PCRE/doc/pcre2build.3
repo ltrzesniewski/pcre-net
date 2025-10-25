@@ -1,4 +1,4 @@
-.TH PCRE2BUILD 3 "16 April 2024" "PCRE2 10.46"
+.TH PCRE2BUILD 3 "17 October 2025" "PCRE2 10.47"
 .SH NAME
 PCRE2 - Perl-compatible regular expressions (revised API)
 .
@@ -7,9 +7,9 @@ PCRE2 - Perl-compatible regular expressions (revised API)
 .rs
 .sp
 PCRE2 is distributed with a \fBconfigure\fP script that can be used to build
-the library in Unix-like environments using the applications known as
-Autotools. Also in the distribution are files to support building using
-\fBCMake\fP instead of \fBconfigure\fP. The text file
+the library in Unix-like environments using the Autotools applications. Also in
+the distribution are files to support building using \fBCMake\fP instead of
+\fBconfigure\fP. The text file
 .\" HTML <a href="README.txt">
 .\" </a>
 \fBREADME\fP
@@ -134,8 +134,8 @@ UTF support allows the libraries to process character code points up to
 0x10ffff in the strings that they handle. Unicode support also gives access to
 the Unicode properties of characters, using pattern escapes such as \eP, \ep,
 and \eX. Only the general category properties such as \fILu\fP and \fINd\fP,
-script names, and some bi-directional properties are supported. Details are
-given in the
+script names, and some bi-directional and binary properties are supported.
+Details are given in the
 .\" HREF
 \fBpcre2pattern\fP
 .\"
@@ -152,8 +152,8 @@ request this by starting with (*UCP).
 .sp
 The \eC escape sequence, which matches a single code unit, even in a UTF mode,
 can cause unpredictable behaviour because it may leave the current matching
-point in the middle of a multi-code-unit character. The application can lock it
-out by setting the PCRE2_NEVER_BACKSLASH_C option when calling
+point in the middle of a multi-code-unit character. The application can lock
+it out by setting the PCRE2_NEVER_BACKSLASH_C option when calling
 \fBpcre2_compile()\fP. There is also a build-time option
 .sp
   --enable-never-backslash-C
@@ -395,13 +395,19 @@ most computer operating systems. PCRE2 can, however, be compiled to run in an
 .sp
   --enable-ebcdic --disable-unicode
 .sp
-to the \fBconfigure\fP command. This setting implies
---enable-rebuild-chartables. You should only use it if you know that you are in
-an EBCDIC environment (for example, an IBM mainframe operating system).
+to the \fBconfigure\fP command. You should only use it if you know that you are
+in an EBCDIC environment (for example, an IBM mainframe operating system).
 .P
-It is not possible to support both EBCDIC and UTF-8 codes in the same version
-of the library. Consequently, --enable-unicode and --enable-ebcdic are mutually
-exclusive.
+This setting implies --enable-rebuild-chartables, in order to ensure that you
+have the correct default character tables for your system's codepage. There is
+an exception when you set --enable-ebcdic-ignoring-compiler (see below), which
+allows using a default set of EBCDIC 1047 character tables rather than forcing
+use of --enable-rebuild-chartables.
+.P
+It is not supported to enable both EBCDIC input and either ASCII or UTF-8/16/32
+in the same build of the library. When PCRE2 is built with EBCDIC support, it
+always operates in EBCDIC, and consequently --enable-unicode and --enable-ebcdic
+are mutually exclusive.
 .P
 The EBCDIC character that corresponds to an ASCII LF is assumed to have the
 value 0x15 by default. However, in some EBCDIC environments, 0x25 is used. In
@@ -409,14 +415,25 @@ such an environment you should use
 .sp
   --enable-ebcdic-nl25
 .sp
-as well as, or instead of, --enable-ebcdic. The EBCDIC character for CR has the
-same value as in ASCII, namely, 0x0d. Whichever of 0x15 and 0x25 is \fInot\fP
-chosen as LF is made to correspond to the Unicode NEL character (which, in
-Unicode, is 0x85).
+(which implies --enable-ebcdic). The EBCDIC character for CR has the same value
+as in ASCII, namely, 0x0d. Whichever of 0x15 and 0x25 is \fInot\fP chosen as LF
+is made to correspond to the Unicode NEL character (which, in Unicode, is 0x85).
 .P
 The options that select newline behaviour, such as --enable-newline-is-cr,
 and equivalent run-time options, refer to these character values in an EBCDIC
 environment.
+.P
+On systems requiring an EBCDIC build of PCRE2, the compiler should be set to use
+the correct codepage, so that C character literals such as 'z' use the correct
+numeric value for whichever EBCDIC codpage is in use. (PCRE2 cannot support
+multiple EBCDIC codepages dynamically.) However, if this not possible, then you
+can use
+.sp
+  --enable-ebcdic-ignoring-compiler
+.sp
+in order to disregard the compiler's codepage, and instead force PCRE2 to use
+numeric constants corresponding to the EBCDIC 1047 codepage instead. This can be
+used to build (or test) EBCDIC support on an ASCII/UTF-8 system such as Linux.
 .
 .
 .SH "PCRE2GREP SUPPORT FOR EXTERNAL SCRIPTS"
@@ -500,7 +517,7 @@ use), some extra configuration may be necessary. The INSTALL file for
 If your environment has not been set up so that an appropriate library is
 automatically included, you may need to add something like
 .sp
-  LIBS="-ncurses"
+  LIBS="-lncurses"
 .sp
 immediately before the \fBconfigure\fP command.
 .
@@ -660,6 +677,6 @@ Cambridge, England.
 .rs
 .sp
 .nf
-Last updated: 16 April 2024
+Last updated: 17 October 2025
 Copyright (c) 1997-2024 University of Cambridge.
 .fi

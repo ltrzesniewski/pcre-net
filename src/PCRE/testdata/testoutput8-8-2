@@ -247,7 +247,7 @@ Memory allocation - data size : 4
  13     Any
  14     Any
  15     Any
- 16     \1
+ 16     \g{1}
  19     bbb
  25   3 Recurse
  28     d
@@ -334,6 +334,7 @@ Memory allocation - code size : 12
 
 /\x{110000}/utf
 Failed: error 134 at offset 9: character code point value in \x{} or \o{} is too large
+        here: \x{110000 |<--| }
 
 /[\x{ff}]/utf
 Memory allocation - code size : 10
@@ -453,6 +454,7 @@ Memory allocation - code size : 18
 
 /^[\QĀ\E-\QŐ\E/utf
 Failed: error 106 at offset 15: missing terminating ] for character class
+        here: ...QĀ\E-\QŐ\E |<--|
 
 /[\p{L}]/
 Memory allocation - code size : 15
@@ -729,7 +731,7 @@ Memory allocation - code size : 10
   9  18 CBra 2
  14  10 CBra 3
  19     a
- 21     \2
+ 21     \g{2}
  24  10 Ket
  27  16 Alt
  30   7 CBra 4
@@ -749,7 +751,7 @@ Memory allocation - code size : 10
   3  19 CBra 1
   8  11 Recurse
  11   8 CBra 2
- 16     \1
+ 16     \g{1}
  19   8 Ket
  22  19 Ket
  25  25 Ket
@@ -776,7 +778,7 @@ Memory allocation - code size : 10
   9  28 Recurse
  12   0 Recurse
  15   6 Alt
- 18     \1
+ 18     \g{1}
  21   4 Alt
  24     $
  25  21 Ket
@@ -797,7 +799,7 @@ Memory allocation - code size : 10
  20   5 Ket
  23  15 Recurse
  26   6 Alt
- 29     \1
+ 29     \g{1}
  32   4 Alt
  35     $
  36  32 Ket
@@ -820,7 +822,7 @@ Memory allocation - code size : 10
  34  23 CBra 6
  39  15 CBra 7
  44   7 Once
- 47     \1+
+ 47     \g{1}+
  51   7 Ket
  54  15 Ket
  57  23 Ket
@@ -842,6 +844,7 @@ Memory allocation - code size : 10
 )))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
 /parens_nest_limit=1000,-fullbincode
 Failed: error 184 at offset 1129: (?| and/or (?J: or (?x: parentheses are too deeply nested
+        here: ...?|(?|(?|(? |-->| |(?|(?|(?|...
 
 # Use "expand" to create some very long patterns with nested parentheses, in
 # order to test workspace overflow. Again, this varies with code unit width,
@@ -853,7 +856,7 @@ Failed: error 184 at offset 1129: (?| and/or (?J: or (?x: parentheses are too de
 /(?'ABC'\[[bar](]{793}*THEN:\[A]{255}\[)]{794}/expand,-fullbincode,parens_nest_limit=1000
 
 /(?'ABC'\[[bar](]{1793}*THEN:\[A]{255}\[)]{1794}/expand,-fullbincode,parens_nest_limit=2000
-Failed: error 186 at offset 12820: regular expression is too complicated
+Failed: error 186 at offset 0: regular expression is too complicated
 
 /(?(1)(?1)){8,}+()/debug
 ------------------------------------------------------------------
@@ -1012,12 +1015,13 @@ Subject length lower bound = 0
 
 /([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00](*ACCEPT)/
 Failed: error 114 at offset 509: missing closing parenthesis
+        here: ...](*ACCEPT) |<--|
 
 /([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00]([00](*ACCEPT)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))/-fullbincode
 
 #pattern -fullbincode
 
 /\[()]{65535}/expand
-Failed: error 120 at offset 131070: regular expression is too large
+Failed: error 120 at offset 0: regular expression is too large
 
 # End of testinput8

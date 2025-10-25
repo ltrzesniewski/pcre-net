@@ -503,6 +503,8 @@ Failed: error -46: JIT stack limit reached
     bbb 
 Failed: error -46: JIT stack limit reached
 
+#if !ebcdic
+
 /[^\xff]((?1))/BI
 ------------------------------------------------------------------
         Bra
@@ -518,6 +520,8 @@ Subject length lower bound = 1
 JIT compilation was successful
     abcd
 Failed: error -46: JIT stack limit reached
+
+#endif
 
 /(x(?1)){4}/
 
@@ -566,5 +570,35 @@ Failed: error -47: match limit exceeded
  1: abc
  2: xyz
  2G xyz (3)
+
+# Check the JIT sets all the correct match state for pcre2_substitute
+
+/abc/jitfast,replace=yy
+    zabcz
+ 1: zyyz
+    zabcz\=substitute_matched
+ 1: zyyz
+
+/abc/jitfast,replace=yy
+    zABCz
+ 0: zABCz
+    zABCz\=substitute_matched
+ 0: zABCz
+
+/abc/jitfast
+    ab\=replace=yy,partial_hard
+Failed: error -34: bad option value
+    ab\=replace=yy,partial_hard,substitute_matched
+Failed: error -34: bad option value
+
+/(?C1)abc/jitfast,replace=yy
+    zabcz\=callout_error=1
+--->zabcz
+  1  ^        a
+Failed: error -37: callout error code
+    zabcz\=callout_error=1,substitute_matched
+--->zabcz
+  1  ^        a
+Failed: error -37: callout error code
 
 # End of testinput17

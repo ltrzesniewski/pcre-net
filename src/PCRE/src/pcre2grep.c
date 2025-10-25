@@ -48,8 +48,12 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "config.h"
 #endif
 
+#include "pcre2_util.h"
+
 #include <ctype.h>
+#include <limits.h>
 #include <locale.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -260,7 +264,7 @@ static const uint8_t *character_tables = NULL;
 
 static uint32_t pcre2_options = 0;
 static uint32_t extra_options = 0;
-static PCRE2_SIZE heap_limit = PCRE2_UNSET;
+static uint32_t heap_limit = ~(uint32_t)0;
 static uint32_t match_limit = 0;
 static uint32_t depth_limit = 0;
 
@@ -469,7 +473,7 @@ static option_item optionlist[] = {
   { OP_NODATA,     N_LBUFFER, NULL,             "line-buffered", "use line buffering" },
   { OP_NODATA,     N_LOFFSETS, NULL,            "line-offsets",  "output line numbers and offsets, not text" },
   { OP_STRING,     N_LOCALE, &locale,           "locale=locale", "use the named locale" },
-  { OP_SIZE,       N_H_LIMIT, &heap_limit,      "heap-limit=number",  "set PCRE2 heap limit option (kibibytes)" },
+  { OP_U32NUMBER,  N_H_LIMIT, &heap_limit,      "heap-limit=number",  "set PCRE2 heap limit option (kibibytes)" },
   { OP_U32NUMBER,  N_M_LIMIT, &match_limit,     "match-limit=number", "set PCRE2 match limit option" },
   { OP_U32NUMBER,  N_M_LIMIT_DEP, &depth_limit, "depth-limit=number", "set PCRE2 depth limit option" },
   { OP_U32NUMBER,  N_M_LIMIT_DEP, &depth_limit, "recursion-limit=number", "obsolete synonym for depth-limit" },
@@ -529,44 +533,6 @@ const char utf8_table4[] = {
   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
   2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
   3,3,3,3,3,3,3,3,4,4,4,4,5,5,5,5 };
-
-
-#if !defined(VPCOMPAT) && !defined(HAVE_MEMMOVE)
-/*************************************************
-*    Emulated memmove() for systems without it   *
-*************************************************/
-
-/* This function can make use of bcopy() if it is available. Otherwise do it by
-steam, as there are some non-Unix environments that lack both memmove() and
-bcopy(). */
-
-static void *
-emulated_memmove(void *d, const void *s, size_t n)
-{
-#ifdef HAVE_BCOPY
-bcopy(s, d, n);
-return d;
-#else
-size_t i;
-unsigned char *dest = (unsigned char *)d;
-const unsigned char *src = (const unsigned char *)s;
-if (dest > src)
-  {
-  dest += n;
-  src += n;
-  for (i = 0; i < n; ++i) *(--dest) = *(--src);
-  return (void *)dest;
-  }
-else
-  {
-  for (i = 0; i < n; ++i) *dest++ = *src++;
-  return (void *)(dest - n);
-  }
-#endif   /* not HAVE_BCOPY */
-}
-#undef memmove
-#define memmove(d,s,n) emulated_memmove(d,s,n)
-#endif   /* not VPCOMPAT && not HAVE_MEMMOVE */
 
 
 
@@ -831,7 +797,7 @@ return result;
 
 
 static void
-init_colour_output()
+init_colour_output(void)
 {
 if (do_colour)
   {
@@ -860,7 +826,9 @@ native z/OS, and "no support". */
 
 /************* Directory scanning Unix-style and z/OS ***********/
 
-#if (defined HAVE_SYS_STAT_H && defined HAVE_DIRENT_H && defined HAVE_SYS_TYPES_H) || defined NATIVE_ZOS
+#if !defined WIN32 && \
+  (defined HAVE_SYS_STAT_H && defined HAVE_DIRENT_H && defined HAVE_SYS_TYPES_H) || \
+  defined NATIVE_ZOS
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
@@ -964,7 +932,7 @@ return isatty(fileno(f));
 /************* Print optionally coloured match Unix-style and z/OS **********/
 
 static void
-print_match(const void *buf, int length)
+print_match(const void *buf, size_t length)
 {
 if (length == 0) return;
 if (do_colour) fprintf(stdout, "%c[%sm", 0x1b, colour_string);
@@ -1100,7 +1068,7 @@ return _isatty(_fileno(f));
 /************* Print optionally coloured match in Windows **********/
 
 static void
-print_match(const void *buf, int length)
+print_match(const void *buf, size_t length)
 {
 if (length == 0) return;
 if (do_colour)
@@ -1159,35 +1127,13 @@ return FALSE;
 /************* Print optionally coloured match when we can't do it **********/
 
 static void
-print_match(const void *buf, int length)
+print_match(const void *buf, size_t length)
 {
 if (length == 0) return;
 FWRITE_IGNORE(buf, 1, length, stdout);
 }
 
 #endif  /* End of system-specific functions */
-
-
-
-#ifndef HAVE_STRERROR
-/*************************************************
-*     Provide strerror() for non-ANSI libraries  *
-*************************************************/
-
-/* Some old-fashioned systems still around (e.g. SunOS4) don't have strerror()
-in their libraries, but can provide the same facility by this simple
-alternative function. */
-
-extern int   sys_nerr;
-extern char *sys_errlist[];
-
-char *
-strerror(int n)
-{
-if (n < 0 || n >= sys_nerr) return "unknown error number";
-return sys_errlist[n];
-}
-#endif /* HAVE_STRERROR */
 
 
 
@@ -1263,8 +1209,8 @@ for (op = optionlist; op->one_char != 0; op++)
     n = 31 - printf("  -%c", op->one_char);
   else
     {
-    if (op->one_char > 0) sprintf(s, "-%c,", op->one_char);
-      else strcpy(s, "   ");
+    if (op->one_char > 0) snprintf(s, sizeof(s), "-%c,", op->one_char);
+      else snprintf(s, sizeof(s), "   ");
     n = 31 - printf("  %s --%s", s, op->long_name);
     }
 
@@ -1303,7 +1249,7 @@ Returns:    TRUE if the path is not excluded
 static BOOL
 test_incexc(char *path, patstr *ip, patstr *ep)
 {
-int plen = strlen((const char *)path);
+size_t plen = strlen((const char *)path);
 
 for (; ep != NULL; ep = ep->next)
   {
@@ -2049,7 +1995,7 @@ switch (*(++string))
     break;
     }
 
-  /* Fall through */
+  PCRE2_FALLTHROUGH /* Fall through */
 
   /* The maximum capture number is 65535, so any number greater than that will
   always be an unknown capture number. We just stop incrementing, in order to
@@ -2530,7 +2476,7 @@ necessary, otherwise assume fork(). */
 
 #ifdef WIN32
 (void)fflush(stdout);
-result = _spawnvp(_P_WAIT, argsvector[0], (const char * const *)argsvector);
+result = _spawnvp(_P_WAIT, argsvector[0], (const char * const *)argsvector) != 0;
 
 #elif defined __VMS
   {
@@ -2584,7 +2530,7 @@ return result != 0;
 *     Read a portion of the file into buffer     *
 *************************************************/
 
-static PCRE2_SIZE
+static ptrdiff_t
 fill_buffer(void *handle, int frtype, char *buffer, PCRE2_SIZE length,
   BOOL input_line_buffered)
 {
@@ -2593,13 +2539,15 @@ PCRE2_SIZE nread;
 
 #ifdef SUPPORT_LIBZ
 if (frtype == FR_LIBZ)
-  return gzread((gzFile)handle, buffer, length);
+  return gzread((gzFile)handle, buffer,
+                (length > UINT_MAX)? UINT_MAX : (unsigned)length);
 else
 #endif
 
 #ifdef SUPPORT_LIBBZ2
 if (frtype == FR_LIBBZ2)
-  return (PCRE2_SIZE)BZ2_bzread((BZFILE *)handle, buffer, length);
+  return BZ2_bzread((BZFILE *)handle, buffer,
+                    (length > UINT_MAX)? UINT_MAX : (unsigned)length);
 else
 #endif
 
@@ -2612,7 +2560,7 @@ if (nread > 0) VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(buffer, nread);
 if (nread < length) VALGRIND_MAKE_MEM_UNDEFINED(buffer + nread, length - nread);
 #endif
 
-return nread;
+return (ptrdiff_t)nread;
 }
 
 
@@ -2657,6 +2605,7 @@ char *lastmatchrestart = main_buffer;
 char *ptr = main_buffer;
 char *endptr;
 PCRE2_SIZE bufflength;
+ptrdiff_t buffrc;
 BOOL binary = FALSE;
 BOOL endhyphenpending = FALSE;
 BOOL lines_printed = FALSE;
@@ -2682,13 +2631,17 @@ if (frtype != FR_LIBZ && frtype != FR_LIBBZ2)
   }
 else input_line_buffered = FALSE;
 
-bufflength = fill_buffer(handle, frtype, main_buffer, bufsize,
+buffrc = fill_buffer(handle, frtype, main_buffer, bufsize,
   input_line_buffered);
 
+#if defined SUPPORT_LIBZ
+if (frtype == FR_LIBZ && buffrc < 0) return 3;
+#endif
 #ifdef SUPPORT_LIBBZ2
-if (frtype == FR_LIBBZ2 && (int)bufflength < 0) return 3;   /* Gotcha: bufflength is PCRE2_SIZE */
+if (frtype == FR_LIBBZ2 && buffrc < 0) return 3;
 #endif
 
+bufflength = (PCRE2_SIZE)buffrc;
 endptr = main_buffer + bufflength;
 
 /* Unless binary-files=text, see if we have a binary file. This uses the same
@@ -2786,8 +2739,17 @@ while (ptr < endptr)
       /* Read more data into the buffer and then try to find the line ending
       again. */
 
-      bufflength += fill_buffer(handle, frtype, main_buffer + bufflength,
+      buffrc = fill_buffer(handle, frtype, main_buffer + bufflength,
         bufsize - bufflength, input_line_buffered);
+
+#if defined SUPPORT_LIBZ
+      if (frtype == FR_LIBZ && buffrc < 0) return 3;
+#endif
+#ifdef SUPPORT_LIBBZ2
+      if (frtype == FR_LIBBZ2 && buffrc < 0) return 3;
+#endif
+
+      bufflength += (PCRE2_SIZE)buffrc;
       endptr = main_buffer + bufflength;
       continue;
       }
@@ -2919,7 +2881,7 @@ while (ptr < endptr)
             int n = om->groupnum;
             if (n == 0 || n < mrc)
               {
-              int plen = offsets[2*n + 1] - offsets[2*n];
+              size_t plen = offsets[2*n + 1] - offsets[2*n];
               if (plen > 0)
                 {
                 if (printed && om_separator != NULL)
@@ -3258,8 +3220,17 @@ while (ptr < endptr)
     (void)memmove(main_buffer, main_buffer + bufthird, 2*bufthird);
     ptr -= bufthird;
 
-    bufflength = 2*bufthird + fill_buffer(handle, frtype,
-      main_buffer + 2*bufthird, bufthird, input_line_buffered);
+    buffrc = fill_buffer(handle, frtype, main_buffer + 2*bufthird, bufthird,
+      input_line_buffered);
+
+#if defined SUPPORT_LIBZ
+    if (frtype == FR_LIBZ && buffrc < 0) return 3;
+#endif
+#ifdef SUPPORT_LIBBZ2
+    if (frtype == FR_LIBBZ2 && buffrc < 0) return 3;
+#endif
+
+    bufflength = 2*bufthird + (PCRE2_SIZE)buffrc;
     endptr = main_buffer + bufflength;
 
     /* Adjust any last match point */
@@ -3438,8 +3409,11 @@ if (isdirectory(pathname))
     while ((nextfile = readdirectory(dir)) != NULL)
       {
       int frc;
-      int fnlength = strlen(pathname) + strlen(nextfile) + 2;
-      if (fnlength > FNBUFSIZ)
+      int prc;
+      if (strlen(pathname) + strlen(nextfile) + 2 > sizeof(childpath) ||
+        (prc = snprintf(childpath, sizeof(childpath), "%s%c%s", pathname,
+                        FILESEP, nextfile)) < 0 ||
+        prc >= (int)sizeof(childpath))
         {
         /* LCOV_EXCL_START - this is a "never" event */
         fprintf(stderr, "pcre2grep: recursive filename is too long\n");
@@ -3447,7 +3421,6 @@ if (isdirectory(pathname))
         break;
         /* LCOV_EXCL_STOP */
         }
-      sprintf(childpath, "%s%c%s", pathname, FILESEP, nextfile);
 
       /* If the realpath() function is available, we can try to prevent endless
       recursion caused by a symlink pointing to a parent directory (GitHub
@@ -3507,7 +3480,19 @@ if (iswild(pathname))
   while ((nextfile = readdirectory(dir)) != NULL)
     {
     int frc;
-    sprintf(buffer, "%.512s%.128s", pathname, nextfile);
+    int prc;
+    if (strlen(pathname) + strlen(nextfile) + 1 > sizeof(buffer) ||
+      (prc = snprintf(buffer, sizeof(buffer), "%s%s", pathname,
+                      nextfile)) < 0 ||
+      prc >= (int)sizeof(buffer))
+      {
+      /* LCOV_EXCL_START - this is a "never" event */
+      fprintf(stderr, "pcre2grep: wildcard filename is too long\n");
+      rc = 2;
+      break;
+      /* LCOV_EXCL_STOP */
+      }
+
     frc = grep_or_recurse(buffer, dir_recurse, FALSE);
     if (frc > 1) rc = frc;
      else if (frc == 0 && rc == 1) rc = 0;
@@ -3609,7 +3594,18 @@ rc = pcre2grep(handle, frtype, pathname, (filenames > FN_DEFAULT ||
 
 #ifdef SUPPORT_LIBZ
 if (frtype == FR_LIBZ)
+  {
+  if (rc == 3)
+    {
+    int errnum;
+    const char *err = gzerror(ingz, &errnum);
+    if (!silent)
+      fprintf(stderr, "pcre2grep: Failed to read %s using zlib: %s\n",
+        pathname, err);
+    rc = 2;    /* The normal "something went wrong" code */
+    }
   gzclose(ingz);
+  }
 else
 #endif
 
@@ -3736,16 +3732,16 @@ ordin(int n)
 {
 static char buffer[14];
 char *p = buffer;
-sprintf(p, "%d", n);
+snprintf(p, sizeof(buffer), "%d", n);
 while (*p != 0) p++;
 n %= 100;
 if (n >= 11 && n <= 13) n = 0;
 switch (n%10)
   {
-  case 1: strcpy(p, "st"); break;
-  case 2: strcpy(p, "nd"); break;
-  case 3: strcpy(p, "rd"); break;
-  default: strcpy(p, "th"); break;
+  case 1: snprintf(p, (buffer + sizeof(buffer)) - p, "st"); break;
+  case 2: snprintf(p, (buffer + sizeof(buffer)) - p, "nd"); break;
+  case 3: snprintf(p, (buffer + sizeof(buffer)) - p, "rd"); break;
+  default: snprintf(p, (buffer + sizeof(buffer)) - p, "th"); break;
   }
 return buffer;
 }
@@ -4054,10 +4050,10 @@ for (i = 1; i < argc; i++)
           (int)strlen(arg) : (int)(argequals - arg);
 
         if ((ret = snprintf(buff1, sizeof(buff1), "%.*s", baselen, op->long_name),
-             ret < 0 || ret > (int)sizeof(buff1)) ||
+             ret < 0 || ret >= (int)sizeof(buff1)) ||
             (ret = snprintf(buff2, sizeof(buff2), "%s%.*s", buff1,
                      fulllen - baselen - 2, opbra + 1),
-             ret < 0 || ret > (int)sizeof(buff2)))
+             ret < 0 || ret >= (int)sizeof(buff2)))
           {
           /* LCOV_EXCL_START - this is a "never" event */
           fprintf(stderr, "pcre2grep: Buffer overflow when parsing %s option\n",
@@ -4259,9 +4255,9 @@ for (i = 1; i < argc; i++)
   else
     {
     unsigned long int n = decode_number(option_data, op, longop);
-    if (op->type == OP_U32NUMBER) *((uint32_t *)op->dataptr) = n;
+    if (op->type == OP_U32NUMBER) *((uint32_t *)op->dataptr) = (uint32_t)n;
       else if (op->type == OP_SIZE) *((PCRE2_SIZE *)op->dataptr) = n;
-      else *((int *)op->dataptr) = n;
+      else *((int *)op->dataptr) = (int)n;
     }
   }
 
@@ -4331,7 +4327,7 @@ extra_options |= PCRE2_EXTRA_NEVER_CALLOUT;
 
 /* Put limits into the match context. */
 
-if (heap_limit != PCRE2_UNSET) pcre2_set_heap_limit(match_context, heap_limit);
+if (heap_limit != ~(uint32_t)0) pcre2_set_heap_limit(match_context, heap_limit);
 if (match_limit > 0) pcre2_set_match_limit(match_context, match_limit);
 if (depth_limit > 0) pcre2_set_depth_limit(match_context, depth_limit);
 
