@@ -92,7 +92,7 @@ public static unsafe class PcreBuildInfo
     public static uint TablesLength { get; } = GetConfigUInt32(PcreConstants.CONFIG_TABLES_LENGTH);
 
     /// <summary>
-    /// <c>CONFIG_EFFECTIVE_LINKSIZE</c> - Indicates the number of bytes the library uses for internal linkage in compiled regular expressions.
+    /// <c>PCRE2_CONFIG_EFFECTIVE_LINKSIZE</c> - Indicates the number of bytes the library uses for internal linkage in compiled regular expressions.
     /// </summary>
     public static uint EffectiveLinkSize { get; } = GetConfigUInt32(PcreConstants.CONFIG_EFFECTIVE_LINKSIZE);
 
