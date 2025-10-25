@@ -27,7 +27,7 @@ public enum PcreMatchOptions : long
     /// </para>
     /// </remarks>
     /// <seealso cref="PcreOptions.Anchored"/>
-    Anchored = PcreConstants.ANCHORED,
+    Anchored = PcreConstants.PCRE2_ANCHORED,
 
     /// <summary>
     /// <c>PCRE2_ENDANCHORED</c> - Make the end of the pattern anchored, so it needs to match until the end of the subject string.
@@ -41,7 +41,7 @@ public enum PcreMatchOptions : long
     /// </para>
     /// </remarks>
     /// <seealso cref="PcreOptions.EndAnchored"/>
-    EndAnchored = PcreConstants.ENDANCHORED,
+    EndAnchored = PcreConstants.PCRE2_ENDANCHORED,
 
     /// <summary>
     /// <c>PCRE2_NOTBOL</c> - Don't treat the first character of the subject string as a beginning of line.
@@ -55,7 +55,7 @@ public enum PcreMatchOptions : long
     /// This option affects only the behaviour of the circumflex metacharacter. It does not affect <c>\A</c>.
     /// </para>
     /// </remarks>
-    NotBol = PcreConstants.NOTBOL,
+    NotBol = PcreConstants.PCRE2_NOTBOL,
 
     /// <summary>
     /// <c>PCRE2_NOTEOL</c> - Don't treat the last character of the subject string as an end of line.
@@ -69,7 +69,7 @@ public enum PcreMatchOptions : long
     /// This option affects only the behaviour of the dollar metacharacter. It does not affect <c>\Z</c> or <c>\z</c>.
     /// </para>
     /// </remarks>
-    NotEol = PcreConstants.NOTEOL,
+    NotEol = PcreConstants.PCRE2_NOTEOL,
 
     /// <summary>
     /// <c>PCRE2_NOTEMPTY</c> - Don't consider the empty string as a valid match.
@@ -84,7 +84,7 @@ public enum PcreMatchOptions : long
     /// With <see cref="NotEmpty"/> set, this match is not valid, so <c>pcre2_match()</c> searches further into the string for occurrences of "a" or "b".
     /// </para>
     /// </remarks>
-    NotEmpty = PcreConstants.NOTEMPTY,
+    NotEmpty = PcreConstants.PCRE2_NOTEMPTY,
 
     /// <summary>
     /// <c>PCRE2_NOTEMPTY_ATSTART</c> - Don't consider the empty string at the starting position as a valid match.
@@ -93,7 +93,7 @@ public enum PcreMatchOptions : long
     /// This is like <see cref="NotEmpty"/>, except that it locks out an empty string match only at the first matching position, that is, at the start of the subject plus the starting offset.
     /// An empty string match later in the subject is permitted. If the pattern is anchored, such a match can occur only if the pattern contains <c>\K</c>.
     /// </remarks>
-    NotEmptyAtStart = PcreConstants.NOTEMPTY_ATSTART,
+    NotEmptyAtStart = PcreConstants.PCRE2_NOTEMPTY_ATSTART,
 
     /// <summary>
     /// <c>PCRE2_PARTIAL_SOFT</c> - Enable partial matching mode. Still try to find a complete match if a partial match is found first.
@@ -116,7 +116,7 @@ public enum PcreMatchOptions : long
     /// There is a more detailed discussion of partial and multi-segment matching, with examples, in the pcre2partial documentation.
     /// </para>
     /// </remarks>
-    PartialSoft = PcreConstants.PARTIAL_SOFT,
+    PartialSoft = PcreConstants.PCRE2_PARTIAL_SOFT,
 
     /// <summary>
     /// <c>PCRE2_PARTIAL_HARD</c> - Enable partial matching mode. Stop looking for a complete match if a partial match is found first.
@@ -139,7 +139,7 @@ public enum PcreMatchOptions : long
     /// There is a more detailed discussion of partial and multi-segment matching, with examples, in the pcre2partial documentation.
     /// </para>
     /// </remarks>
-    PartialHard = PcreConstants.PARTIAL_HARD,
+    PartialHard = PcreConstants.PCRE2_PARTIAL_HARD,
 
     /// <summary>
     /// <c>PCRE2_NO_UTF_CHECK</c> - Disable validation of UTF sequences in the subject string.
@@ -168,7 +168,7 @@ public enum PcreMatchOptions : long
     /// or an invalid value of startoffset, is undefined. Your program may crash or loop indefinitely or give wrong results.
     /// </para>
     /// </remarks>
-    NoUtfCheck = PcreConstants.NO_UTF_CHECK,
+    NoUtfCheck = PcreConstants.PCRE2_NO_UTF_CHECK,
 
     /// <summary>
     /// <c>PCRE2_NO_JIT</c> - Disable the JIT for this match and use the interpreter instead.
@@ -177,7 +177,7 @@ public enum PcreMatchOptions : long
     /// By default, if a pattern has been successfully processed by <c>pcre2_jit_compile()</c>, JIT is automatically used when <c>pcre2_match()</c> is called with options that JIT supports.
     /// Setting <see cref="NoJit"/> disables the use of JIT; it forces matching to be done by the interpreter.
     /// </remarks>
-    NoJit = PcreConstants.NO_JIT,
+    NoJit = PcreConstants.PCRE2_NO_JIT,
 
     /// <summary>
     /// <c>PCRE2_DISABLE_RECURSELOOP_CHECK</c> - Disable the check for repeated recursion in the interpreter.
@@ -194,5 +194,5 @@ public enum PcreMatchOptions : long
     /// It is provided mainly for testing when comparing JIT and interpretive behaviour.
     /// </para>
     /// </remarks>
-    DisableRecurseLoopCheck = PcreConstants.DISABLE_RECURSELOOP_CHECK,
+    DisableRecurseLoopCheck = PcreConstants.PCRE2_DISABLE_RECURSELOOP_CHECK,
 }

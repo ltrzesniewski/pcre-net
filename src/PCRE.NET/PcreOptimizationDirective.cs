@@ -10,12 +10,12 @@ public enum PcreOptimizationDirective : uint
     /// <summary>
     /// <c>PCRE2_OPTIMIZATION_NONE</c> - Disable all optional performance optimizations.
     /// </summary>
-    None = PcreConstants.OPTIMIZATION_NONE,
+    None = PcreConstants.PCRE2_OPTIMIZATION_NONE,
 
     /// <summary>
     /// <c>PCRE2_OPTIMIZATION_FULL</c> - Enable all optional performance optimizations. This is the default value.
     /// </summary>
-    Full = PcreConstants.OPTIMIZATION_FULL,
+    Full = PcreConstants.PCRE2_OPTIMIZATION_FULL,
 
     /// <summary>
     /// <c>PCRE2_AUTO_POSSESS</c> - Enable "auto-possessification" of variable quantifiers such as <c>*</c> and <c>+</c>.
@@ -26,7 +26,7 @@ public enum PcreOptimizationDirective : uint
     /// You can disable this optimization if you want the matching functions to do a full, unoptimized search and run all the callouts.
     /// </remarks>
     /// <seealso cref="AutoPossessOff"/>
-    AutoPossess = PcreConstants.AUTO_POSSESS,
+    AutoPossess = PcreConstants.PCRE2_AUTO_POSSESS,
 
     /// <summary>
     /// <c>PCRE2_AUTO_POSSESS_OFF</c> - Disable "auto-possessification" of variable quantifiers such as * and +.
@@ -37,7 +37,7 @@ public enum PcreOptimizationDirective : uint
     /// You can disable this optimization if you want the matching functions to do a full, unoptimized search and run all the callouts.
     /// </remarks>
     /// <seealso cref="AutoPossess"/>
-    AutoPossessOff = PcreConstants.AUTO_POSSESS_OFF,
+    AutoPossessOff = PcreConstants.PCRE2_AUTO_POSSESS_OFF,
 
     /// <summary>
     /// <c>PCRE2_DOTSTAR_ANCHOR</c> - Enable an optimization that is applied when <c>.*</c> is the first significant item in a top-level branch of a pattern,
@@ -50,7 +50,7 @@ public enum PcreOptimizationDirective : uint
     /// or if the pattern contains <c>(*PRUNE)</c> or <c>(*SKIP)</c>.
     /// </remarks>
     /// <seealso cref="DotStarAnchorOff"/>
-    DotStarAnchor = PcreConstants.DOTSTAR_ANCHOR,
+    DotStarAnchor = PcreConstants.PCRE2_DOTSTAR_ANCHOR,
 
     /// <summary>
     /// <c>PCRE2_DOTSTAR_ANCHOR_OFF</c> - Disable an optimization that is applied when <c>.*</c> is the first significant item in a top-level branch of a pattern,
@@ -63,7 +63,7 @@ public enum PcreOptimizationDirective : uint
     /// or if the pattern contains <c>(*PRUNE)</c> or <c>(*SKIP)</c>.
     /// </remarks>
     /// <seealso cref="DotStarAnchor"/>
-    DotStarAnchorOff = PcreConstants.DOTSTAR_ANCHOR_OFF,
+    DotStarAnchorOff = PcreConstants.PCRE2_DOTSTAR_ANCHOR_OFF,
 
     /// <summary>
     /// <c>PCRE2_START_OPTIMIZE</c> - Enable optimizations which cause matching functions to scan the subject string for specific code unit values before attempting a match.
@@ -75,7 +75,7 @@ public enum PcreOptimizationDirective : uint
     /// The start-up optimizations are in effect a pre-scan of the subject that takes place before the pattern is run.
     /// </remarks>
     /// <seealso cref="StartOptimizeOff"/>
-    StartOptimize = PcreConstants.START_OPTIMIZE,
+    StartOptimize = PcreConstants.PCRE2_START_OPTIMIZE,
 
     /// <summary>
     /// <c>PCRE2_START_OPTIMIZE_OFF</c> - Disable optimizations which cause matching functions to scan the subject string for specific code unit values before attempting a match.
@@ -87,5 +87,5 @@ public enum PcreOptimizationDirective : uint
     /// The start-up optimizations are in effect a pre-scan of the subject that takes place before the pattern is run.
     /// </remarks>
     /// <seealso cref="StartOptimize"/>
-    StartOptimizeOff = PcreConstants.START_OPTIMIZE_OFF,
+    StartOptimizeOff = PcreConstants.PCRE2_START_OPTIMIZE_OFF,
 }

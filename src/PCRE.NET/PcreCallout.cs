@@ -101,7 +101,7 @@ public sealed unsafe class PcreCallout
     /// <remarks>
     /// Always false for DFA matching, or if the JIT is used.
     /// </remarks>
-    public bool StartMatch => (_flags & PcreConstants.CALLOUT_STARTMATCH) != 0;
+    public bool StartMatch => (_flags & PcreConstants.PCRE2_CALLOUT_STARTMATCH) != 0;
 
     /// <summary>
     /// <c>PCRE2_CALLOUT_BACKTRACK</c> - This is set if there has been a matching backtrack since the previous callout, or since the start of matching if this is the first callout from a match run.
@@ -109,5 +109,5 @@ public sealed unsafe class PcreCallout
     /// <remarks>
     /// Always false for DFA matching, or if the JIT is used.
     /// </remarks>
-    public bool Backtrack => (_flags & PcreConstants.CALLOUT_BACKTRACK) != 0;
+    public bool Backtrack => (_flags & PcreConstants.PCRE2_CALLOUT_BACKTRACK) != 0;
 }

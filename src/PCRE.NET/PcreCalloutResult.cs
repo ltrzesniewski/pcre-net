@@ -20,5 +20,5 @@ public enum PcreCalloutResult
     /// <summary>
     /// Fail the whole match.
     /// </summary>
-    Abort = PcreConstants.ERROR_NOMATCH
+    Abort = PcreConstants.PCRE2_ERROR_NOMATCH
 }

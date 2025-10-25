@@ -160,10 +160,10 @@ internal sealed unsafe class InternalRegex : IDisposable
             GC.KeepAlive(jitStack);
         }
 
-        if (result.result_code == PcreConstants.ERROR_NOMATCH)
+        if (result.result_code == PcreConstants.PCRE2_ERROR_NOMATCH)
             return _noMatch ??= new PcreMatch(this);
 
-        if (result.result_code < PcreConstants.ERROR_PARTIAL)
+        if (result.result_code < PcreConstants.PCRE2_ERROR_PARTIAL)
             HandleError(result, ref calloutInterop);
 
         oVectorArray ??= oVector.ToArray();
@@ -212,10 +212,10 @@ internal sealed unsafe class InternalRegex : IDisposable
             GC.KeepAlive(jitStack);
         }
 
-        if (result.result_code < PcreConstants.ERROR_PARTIAL)
+        if (result.result_code < PcreConstants.PCRE2_ERROR_PARTIAL)
             HandleError(result, ref calloutInterop);
 
-        if (result.result_code != PcreConstants.ERROR_NOMATCH && oVector != match.OutputVector)
+        if (result.result_code != PcreConstants.PCRE2_ERROR_NOMATCH && oVector != match.OutputVector)
             oVectorArray ??= oVector.ToArray();
 
         match.Update(subject, result, oVectorArray);
@@ -253,7 +253,7 @@ internal sealed unsafe class InternalRegex : IDisposable
             GC.KeepAlive(buffer); // The buffer keeps alive all the other required stuff
         }
 
-        if (result.result_code < PcreConstants.ERROR_PARTIAL)
+        if (result.result_code < PcreConstants.PCRE2_ERROR_PARTIAL)
             HandleError(result, ref calloutInterop);
 
         match.Update(subject, result, null);
@@ -287,7 +287,7 @@ internal sealed unsafe class InternalRegex : IDisposable
             GC.KeepAlive(this);
         }
 
-        if (result.result_code < PcreConstants.ERROR_PARTIAL)
+        if (result.result_code < PcreConstants.PCRE2_ERROR_PARTIAL)
             HandleError(result, ref calloutInterop);
 
         return new PcreDfaMatchResult(subject, ref result, oVector);
@@ -343,7 +343,7 @@ internal sealed unsafe class InternalRegex : IDisposable
         {
             if (calloutInterop.Exception is { } ex)
             {
-                if (result.result_code == PcreConstants.ERROR_REPLACECASE)
+                if (result.result_code == PcreConstants.PCRE2_ERROR_REPLACECASE)
                     throw new PcreCalloutException(PcreErrorCode.ReplaceCase, "An exception was thrown by the case-transformation callout: " + ex.Message, ex);
 
                 throw new PcreCalloutException("An exception was thrown by the callout: " + ex.Message, ex);
@@ -355,7 +355,7 @@ internal sealed unsafe class InternalRegex : IDisposable
                     throw new PcreSubstituteException((PcreErrorCode)result.result_code);
 
                 case 0: // No substitution was made, avoid allocating a new string if possible
-                    if ((additionalOptions & PcreConstants.SUBSTITUTE_REPLACEMENT_ONLY) != 0)
+                    if ((additionalOptions & PcreConstants.PCRE2_SUBSTITUTE_REPLACEMENT_ONLY) != 0)
                         return string.Empty;
 
                     return subjectAsString ?? subject.ToString();
@@ -378,11 +378,11 @@ internal sealed unsafe class InternalRegex : IDisposable
     {
         switch (result.result_code)
         {
-            case PcreConstants.ERROR_NOMATCH:
-            case PcreConstants.ERROR_PARTIAL:
+            case PcreConstants.PCRE2_ERROR_NOMATCH:
+            case PcreConstants.PCRE2_ERROR_PARTIAL:
                 break;
 
-            case PcreConstants.ERROR_CALLOUT:
+            case PcreConstants.PCRE2_ERROR_CALLOUT:
                 throw new PcreCalloutException("An exception was thrown by the callout: " + calloutInterop.Exception?.Message, calloutInterop.Exception);
 
             default:

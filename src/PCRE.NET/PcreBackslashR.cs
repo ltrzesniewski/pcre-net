@@ -15,10 +15,10 @@ public enum PcreBackslashR
     /// <summary>
     /// <c>PCRE2_BSR_UNICODE</c> - <c>\R</c> matches any Unicode line ending sequence.
     /// </summary>
-    Unicode = (int)PcreConstants.BSR_UNICODE,
+    Unicode = (int)PcreConstants.PCRE2_BSR_UNICODE,
 
     /// <summary>
     /// <c>PCRE2_BSR_ANYCRLF</c> - <c>\R</c> matches only CR, LF, or CRLF.
     /// </summary>
-    AnyCrLf = (int)PcreConstants.BSR_ANYCRLF
+    AnyCrLf = (int)PcreConstants.PCRE2_BSR_ANYCRLF
 }

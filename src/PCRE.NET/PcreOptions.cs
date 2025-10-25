@@ -21,19 +21,19 @@ public enum PcreOptions : long
     // --- Synonyms for compatibility with the .NET Regex class ---
 
     /// <inheritdoc cref="Caseless"/>
-    IgnoreCase = PcreConstants.CASELESS,
+    IgnoreCase = PcreConstants.PCRE2_CASELESS,
 
     /// <inheritdoc cref="DotAll"/>
-    Singleline = PcreConstants.DOTALL,
+    Singleline = PcreConstants.PCRE2_DOTALL,
 
     /// <inheritdoc cref="NoAutoCapture"/>
-    ExplicitCapture = PcreConstants.NO_AUTO_CAPTURE,
+    ExplicitCapture = PcreConstants.PCRE2_NO_AUTO_CAPTURE,
 
     /// <inheritdoc cref="Extended"/>
-    IgnorePatternWhitespace = PcreConstants.EXTENDED,
+    IgnorePatternWhitespace = PcreConstants.PCRE2_EXTENDED,
 
     /// <inheritdoc cref="Ucp"/>
-    Unicode = PcreConstants.UCP,
+    Unicode = PcreConstants.PCRE2_UCP,
 
     /// <summary>
     /// Enable JavaScript-compatible mode.
@@ -41,7 +41,7 @@ public enum PcreOptions : long
     /// <remarks>
     /// This enables <see cref="AltBsUX"/> and <see cref="MatchUnsetBackref"/>.
     /// </remarks>
-    JavaScript = PcreConstants.ALT_BSUX | PcreConstants.MATCH_UNSET_BACKREF,
+    JavaScript = PcreConstants.PCRE2_ALT_BSUX | PcreConstants.PCRE2_MATCH_UNSET_BACKREF,
 
     // --- Extra options ---
 
@@ -74,7 +74,7 @@ public enum PcreOptions : long
     /// a lookup table is used for all code points less than 256, and higher code points (available only in 16-bit or 32-bit mode) are treated as not having another case.
     /// </para>
     /// </remarks>
-    Caseless = PcreConstants.CASELESS,
+    Caseless = PcreConstants.PCRE2_CASELESS,
 
     /// <summary>
     /// <c>PCRE2_MULTILINE</c> - Multiline mode. Make <c>^</c> and <c>$</c> match at the beginning and end, respectively, of any line.
@@ -100,7 +100,7 @@ public enum PcreOptions : long
     /// If there are no newlines in a subject string, or no occurrences of <c>^</c> or <c>$</c> in a pattern, setting <see cref="MultiLine"/> has no effect.
     /// </para>
     /// </remarks>
-    MultiLine = PcreConstants.MULTILINE,
+    MultiLine = PcreConstants.PCRE2_MULTILINE,
 
     /// <summary>
     /// <c>PCRE2_DOTALL</c> - Single-line mode. Make the dot (<c>.</c>) match any character (including newlines).
@@ -117,7 +117,7 @@ public enum PcreOptions : long
     /// A negative class such as <c>[^a]</c> always matches newline characters, and the <c>\N</c> escape sequence always matches a non-newline character, independent of the setting of <see cref="DotAll"/>.
     /// </para>
     /// </remarks>
-    DotAll = PcreConstants.DOTALL,
+    DotAll = PcreConstants.PCRE2_DOTALL,
 
     /// <summary>
     /// <c>PCRE2_NO_AUTO_CAPTURE</c> - Disable capturing by unnamed groups. This makes capturing explicit.
@@ -134,7 +134,7 @@ public enum PcreOptions : long
     /// Note that, when this option is set, references to capture groups (backreferences or recursion/subroutine calls) may only refer to named groups, though the reference can be by name or by number.
     /// </para>
     /// </remarks>
-    NoAutoCapture = PcreConstants.NO_AUTO_CAPTURE,
+    NoAutoCapture = PcreConstants.PCRE2_NO_AUTO_CAPTURE,
 
     /// <summary>
     /// <c>PCRE2_EXTENDED</c> - Extended mode. Ignore unescaped whitespace in the pattern. Enable comments marked with <c>#</c>.
@@ -167,7 +167,7 @@ public enum PcreOptions : long
     /// at the start of the pattern, as described in the section entitled "Newline conventions" in the pcre2pattern documentation. A default is defined when PCRE2 is built.
     /// </para>
     /// </remarks>
-    Extended = PcreConstants.EXTENDED,
+    Extended = PcreConstants.PCRE2_EXTENDED,
 
     /// <summary>
     /// <c>PCRE2_EXTENDED_MORE</c> - Extended mode that additionally ignores unescaped whitespace in character classes.
@@ -181,7 +181,7 @@ public enum PcreOptions : long
     /// <see cref="ExtendedMore"/> is equivalent to Perl's <c>/xx</c> option, and it can be changed within a pattern by a <c>(?xx)</c> option setting.
     /// </para>
     /// </remarks>
-    ExtendedMore = PcreConstants.EXTENDED_MORE,
+    ExtendedMore = PcreConstants.PCRE2_EXTENDED_MORE,
 
     /// <summary>
     /// <c>PCRE2_ALT_BSUX</c> - Alternative handling of some escape sequences (ECMAScript-compliant behavior).
@@ -209,7 +209,7 @@ public enum PcreOptions : long
     /// Note that this alternative escape handling applies only to patterns. Neither of these options affects the processing of replacement strings passed to <c>pcre2_substitute()</c>.
     /// </para>
     /// </remarks>
-    AltBsUX = PcreConstants.ALT_BSUX,
+    AltBsUX = PcreConstants.PCRE2_ALT_BSUX,
 
     /// <summary>
     /// <c>PCRE2_MATCH_UNSET_BACKREF</c> - Make backreferences to unset groups match an empty string (ECMAScript-compliant behavior).
@@ -219,7 +219,7 @@ public enum PcreOptions : long
     /// A pattern such as <c>(\1)(a)</c> succeeds when this option is set (assuming it can find an "a" in the subject), whereas it fails by default, for Perl compatibility.
     /// Setting this option makes PCRE2 behave more like ECMAscript (aka JavaScript).
     /// </remarks>
-    MatchUnsetBackref = PcreConstants.MATCH_UNSET_BACKREF,
+    MatchUnsetBackref = PcreConstants.PCRE2_MATCH_UNSET_BACKREF,
 
     /// <summary>
     /// <c>PCRE2_LITERAL</c> - Treat the pattern as a literal string.
@@ -236,7 +236,7 @@ public enum PcreOptions : long
     /// The extra options <see cref="PcreExtraCompileOptions.MatchLine"/> and <see cref="PcreExtraCompileOptions.MatchWord"/> are also supported. Any other options cause an error.
     /// </para>
     /// </remarks>
-    Literal = PcreConstants.LITERAL,
+    Literal = PcreConstants.PCRE2_LITERAL,
 
     /// <summary>
     /// <c>PCRE2_UCP</c> - Use Unicode character properties.
@@ -253,7 +253,7 @@ public enum PcreOptions : long
     /// This makes it possible, for example, to process strings in the 16-bit UCS-2 code. This option is available only if PCRE2 has been compiled with Unicode support (which is the default).
     /// </para>
     /// </remarks>
-    Ucp = PcreConstants.UCP,
+    Ucp = PcreConstants.PCRE2_UCP,
 
     /// <summary>
     /// <c>PCRE2_MATCH_INVALID_UTF</c> - Support matching invalid UTF sequences.
@@ -262,7 +262,7 @@ public enum PcreOptions : long
     /// This option forces <see cref="Utf"/> and also enables support for matching by <c>pcre2_match()</c> in subject strings that contain invalid UTF sequences.
     /// This facility is not supported for DFA matching. For details, see the pcre2unicode documentation.
     /// </remarks>
-    MatchInvalidUtf = PcreConstants.MATCH_INVALID_UTF,
+    MatchInvalidUtf = PcreConstants.PCRE2_MATCH_INVALID_UTF,
 
     /// <summary>
     /// <c>PCRE2_ALT_EXTENDED_CLASS</c> - Alters the parsing of character classes to follow the extended syntax described by Unicode UTS#18.
@@ -272,7 +272,7 @@ public enum PcreOptions : long
     /// but instead enables the alternative syntax of extended class behaviour inside ordinary <c>[...]</c> character classes.
     /// See the pcre2pattern documentation for details of the character classes supported.
     /// </remarks>
-    AltExtendedClass = PcreConstants.ALT_EXTENDED_CLASS,
+    AltExtendedClass = PcreConstants.PCRE2_ALT_EXTENDED_CLASS,
 
     /// <summary>
     /// <c>PCRE2_ANCHORED</c> - Make the start of the pattern anchored, so it can only match at the starting position.
@@ -282,7 +282,7 @@ public enum PcreOptions : long
     /// This effect can also be achieved by appropriate constructs in the pattern itself, which is the only way to do it in Perl.
     /// </remarks>
     /// <seealso cref="PcreMatchOptions.Anchored"/>
-    Anchored = PcreConstants.ANCHORED,
+    Anchored = PcreConstants.PCRE2_ANCHORED,
 
     /// <summary>
     /// <c>PCRE2_ENDANCHORED</c> - Make the end of the pattern anchored, so it needs to match until the end of the subject string.
@@ -311,7 +311,7 @@ public enum PcreOptions : long
     /// </para>
     /// </remarks>
     /// <seealso cref="PcreMatchOptions.EndAnchored"/>
-    EndAnchored = PcreConstants.ENDANCHORED,
+    EndAnchored = PcreConstants.PCRE2_ENDANCHORED,
 
     /// <summary>
     /// <c>PCRE2_UNGREEDY</c> - Makes the quantifiers ungreedy by default.
@@ -320,7 +320,7 @@ public enum PcreOptions : long
     /// This option inverts the "greediness" of the quantifiers so that they are not greedy by default, but become greedy if followed by "<c>?</c>".
     /// It is not compatible with Perl. It can also be set by a <c>(?U)</c> option setting within the pattern.
     /// </remarks>
-    Ungreedy = PcreConstants.UNGREEDY,
+    Ungreedy = PcreConstants.PCRE2_UNGREEDY,
 
     /// <summary>
     /// <c>PCRE2_FIRSTLINE</c> - Match only until the first newline after the starting position.
@@ -339,7 +339,7 @@ public enum PcreOptions : long
     /// If <see cref="FirstLine"/> is set with an offset limit, a match must occur in the first line and also within the offset limit. In other words, whichever limit comes first is used.
     /// </para>
     /// </remarks>
-    FirstLine = PcreConstants.FIRSTLINE,
+    FirstLine = PcreConstants.PCRE2_FIRSTLINE,
 
     /// <summary>
     /// <c>PCRE2_DUPNAMES</c> - Allow duplicate names for capturing groups.
@@ -349,7 +349,7 @@ public enum PcreOptions : long
     /// This can be helpful for certain types of pattern when it is known that only one instance of the named group can ever be matched.
     /// See also the pcre2pattern documentation.
     /// </remarks>
-    DupNames = PcreConstants.DUPNAMES,
+    DupNames = PcreConstants.PCRE2_DUPNAMES,
 
     /// <summary>
     /// <c>PCRE2_AUTO_CALLOUT</c> - Automatically insert callouts before each pattern item except next to other callouts.
@@ -358,7 +358,7 @@ public enum PcreOptions : long
     /// If this bit is set, <c>pcre2_compile()</c> automatically inserts callout items, all with number 255, before each pattern item,
     /// except immediately before or after an explicit callout in the pattern. For discussion of the callout facility, see the pcre2callout documentation.
     /// </remarks>
-    AutoCallout = PcreConstants.AUTO_CALLOUT,
+    AutoCallout = PcreConstants.PCRE2_AUTO_CALLOUT,
 
     /// <summary>
     /// <c>PCRE2_NO_START_OPTIMIZE</c> - Disables optimizations applied at the start of a match.
@@ -400,7 +400,7 @@ public enum PcreOptions : long
     /// In this case, the optimizations do not affect the overall match result, which is still "no match", but they do affect the auxiliary information that is returned.
     /// </para>
     /// </remarks>
-    NoStartOptimize = PcreConstants.NO_START_OPTIMIZE,
+    NoStartOptimize = PcreConstants.PCRE2_NO_START_OPTIMIZE,
 
     /// <summary>
     /// <c>PCRE2_NO_AUTO_POSSESS</c> - Disable the auto-possessification optimization.
@@ -415,7 +415,7 @@ public enum PcreOptions : long
     /// You can set this option if you want the matching functions to do a full unoptimized search and run all the callouts, but it is mainly provided for testing purposes.
     /// </para>
     /// </remarks>
-    NoAutoPossess = PcreConstants.NO_AUTO_POSSESS,
+    NoAutoPossess = PcreConstants.PCRE2_NO_AUTO_POSSESS,
 
     /// <summary>
     /// <c>PCRE2_DOLLAR_ENDONLY</c> - Make <c>$</c> match only at the end of the subject string.
@@ -430,7 +430,7 @@ public enum PcreOptions : long
     /// There is no equivalent to this option in Perl, and no way to set it within a pattern.
     /// </para>
     /// </remarks>
-    DollarEndOnly = PcreConstants.DOLLAR_ENDONLY,
+    DollarEndOnly = PcreConstants.PCRE2_DOLLAR_ENDONLY,
 
     /// <summary>
     /// <c>PCRE2_ALT_CIRCUMFLEX</c> - Make <c>^</c> match after a newline at the end of the subject string.
@@ -440,7 +440,7 @@ public enum PcreOptions : long
     /// and also after any internal newline. However, it does not match after a newline at the end of the subject, for compatibility with Perl.
     /// If you want a multiline circumflex also to match after a terminating newline, you must set <see cref="AltCircumflex"/>.
     /// </remarks>
-    AltCircumflex = PcreConstants.ALT_CIRCUMFLEX,
+    AltCircumflex = PcreConstants.PCRE2_ALT_CIRCUMFLEX,
 
     /// <summary>
     /// <c>PCRE2_ALT_VERBNAMES</c> - Allow escaped closing parentheses in a verb name.
@@ -459,7 +459,7 @@ public enum PcreOptions : long
     /// and <c>#</c>-comments are recognized, exactly as in the rest of the pattern.
     /// </para>
     /// </remarks>
-    AltVerbNames = PcreConstants.ALT_VERBNAMES,
+    AltVerbNames = PcreConstants.PCRE2_ALT_VERBNAMES,
 
     /// <summary>
     /// <c>PCRE2_ALLOW_EMPTY_CLASS</c> - Allow empty character classes.
@@ -468,7 +468,7 @@ public enum PcreOptions : long
     /// By default, for compatibility with Perl, a closing square bracket that immediately follows an opening one is treated as a data character for the class.
     /// When <see cref="AllowEmptyClass"/> is set, it terminates the class, which therefore contains no characters and so can never match.
     /// </remarks>
-    AllowEmptyClass = PcreConstants.ALLOW_EMPTY_CLASS,
+    AllowEmptyClass = PcreConstants.PCRE2_ALLOW_EMPTY_CLASS,
 
     /// <summary>
     /// <c>PCRE2_NO_DOTSTAR_ANCHOR</c> - Disable optimizing branches starting with <c>.*</c>.
@@ -491,7 +491,7 @@ public enum PcreOptions : long
     /// Like other optimizations, this can cause callouts to be skipped.
     /// </para>
     /// </remarks>
-    NoDotStarAnchor = PcreConstants.NO_DOTSTAR_ANCHOR,
+    NoDotStarAnchor = PcreConstants.PCRE2_NO_DOTSTAR_ANCHOR,
 
     /// <summary>
     /// <c>PCRE2_NO_UTF_CHECK</c> - Disable validation of UTF sequences in the pattern string.
@@ -514,7 +514,7 @@ public enum PcreOptions : long
     /// <see cref="PcreExtraCompileOptions"/>. However, this is possible only in UTF-8 and UTF-32 modes, because these values are not representable in UTF-16.
     /// </para>
     /// </remarks>
-    NoUtfCheck = PcreConstants.NO_UTF_CHECK,
+    NoUtfCheck = PcreConstants.PCRE2_NO_UTF_CHECK,
 
     /// <summary>
     /// <c>PCRE2_NEVER_UCP</c> - Disallow using Unicode character properties.
@@ -529,7 +529,7 @@ public enum PcreOptions : long
     /// This option may be useful in applications that process patterns from external sources. The option combination <see cref="Ucp"/> and <see cref="NeverUcp"/> causes an error.
     /// </para>
     /// </remarks>
-    NeverUcp = PcreConstants.NEVER_UCP,
+    NeverUcp = PcreConstants.PCRE2_NEVER_UCP,
 
     /// <summary>
     /// <c>PCRE2_NEVER_BACKSLASH_C</c> - Disallow using <c>\C</c> in the pattern.
@@ -543,7 +543,7 @@ public enum PcreOptions : long
     /// This option may be useful in applications that process patterns from external sources. Note that there is also a build-time option that permanently locks out the use of <c>\C</c>.
     /// </para>
     /// </remarks>
-    NeverBackslashC = PcreConstants.NEVER_BACKSLASH_C,
+    NeverBackslashC = PcreConstants.PCRE2_NEVER_BACKSLASH_C,
 
     /// <summary>
     /// <c>PCRE2_USE_OFFSET_LIMIT</c> - Allow setting a non-default offset limit.
@@ -553,7 +553,7 @@ public enum PcreOptions : long
     /// for matches that use this pattern. An error is generated if an offset limit is set without this option.
     /// For more details, see the description of <c>pcre2_set_offset_limit()</c> in the section that describes match contexts. See also the <see cref="FirstLine"/> option.
     /// </remarks>
-    UseOffsetLimit = PcreConstants.USE_OFFSET_LIMIT,
+    UseOffsetLimit = PcreConstants.PCRE2_USE_OFFSET_LIMIT,
 
     /// <summary>
     /// <c>PCRE2_UTF</c> - Enable UTF mode.
@@ -565,5 +565,5 @@ public enum PcreOptions : long
     /// In particular, note that it changes the way <see cref="Caseless"/> handles characters with code points greater than 127.
     /// </remarks>
     [Obsolete("PCRE.NET always enables UTF mode.")]
-    Utf = PcreConstants.UTF,
+    Utf = PcreConstants.PCRE2_UTF,
 }

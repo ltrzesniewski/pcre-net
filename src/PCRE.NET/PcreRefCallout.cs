@@ -84,8 +84,8 @@ public unsafe ref struct PcreRefCallout
     public readonly PcreCalloutInfo Info => _regex.GetCalloutInfoByPatternPosition(PatternPosition);
 
     /// <inheritdoc cref="PcreCallout.StartMatch"/>
-    public readonly bool StartMatch => (_callout->callout_flags & PcreConstants.CALLOUT_STARTMATCH) != 0;
+    public readonly bool StartMatch => (_callout->callout_flags & PcreConstants.PCRE2_CALLOUT_STARTMATCH) != 0;
 
     /// <inheritdoc cref="PcreCallout.Backtrack"/>
-    public readonly bool Backtrack => (_callout->callout_flags & PcreConstants.CALLOUT_BACKTRACK) != 0;
+    public readonly bool Backtrack => (_callout->callout_flags & PcreConstants.PCRE2_CALLOUT_BACKTRACK) != 0;
 }

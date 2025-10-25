@@ -75,17 +75,17 @@ public unsafe ref struct PcreRefMatch
         => GetGroup(name);
 
     /// <inheritdoc cref="PcreMatch.Index"/>
-    public readonly int Index => _regex is not null && _resultCode is > 0 or PcreConstants.ERROR_PARTIAL
+    public readonly int Index => _regex is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL
         ? (int)OutputVector[0]
         : -1;
 
     /// <inheritdoc cref="PcreMatch.EndIndex"/>
-    public readonly int EndIndex => _regex is not null && _resultCode is > 0 or PcreConstants.ERROR_PARTIAL
+    public readonly int EndIndex => _regex is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL
         ? (int)OutputVector[1]
         : -1;
 
     /// <inheritdoc cref="PcreMatch.Length"/>
-    public readonly int Length => _regex is not null && _resultCode is > 0 or PcreConstants.ERROR_PARTIAL && OutputVector[1] > OutputVector[0]
+    public readonly int Length => _regex is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL && OutputVector[1] > OutputVector[0]
         ? (int)(OutputVector[1] - OutputVector[0])
         : 0;
 
@@ -93,7 +93,7 @@ public unsafe ref struct PcreRefMatch
     public readonly bool Success => _resultCode > 0;
 
     /// <inheritdoc cref="PcreMatch.Value"/>
-    public readonly ReadOnlySpan<char> Value => _regex is not null && _resultCode is > 0 or PcreConstants.ERROR_PARTIAL && OutputVector[1] > OutputVector[0]
+    public readonly ReadOnlySpan<char> Value => _regex is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL && OutputVector[1] > OutputVector[0]
         ? Subject.Slice((int)OutputVector[0], (int)(OutputVector[1] - OutputVector[0]))
         : ReadOnlySpan<char>.Empty;
 
@@ -118,7 +118,7 @@ public unsafe ref struct PcreRefMatch
     public readonly GroupList Groups => new(this);
 
     /// <inheritdoc cref="PcreMatch.IsPartialMatch"/>
-    public readonly bool IsPartialMatch => _resultCode == PcreConstants.ERROR_PARTIAL;
+    public readonly bool IsPartialMatch => _resultCode == PcreConstants.PCRE2_ERROR_PARTIAL;
 
     /// <inheritdoc cref="PcreMatch.GetEnumerator"/>
     public readonly GroupEnumerator GetEnumerator()
@@ -220,7 +220,7 @@ public unsafe ref struct PcreRefMatch
                             nuint[]? calloutOutputVector)
     {
         var startOfNextMatchIndex = GetStartOfNextMatchIndex();
-        var nextOptions = options.ToPatternOptions() | PcreConstants.NO_UTF_CHECK | (Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0);
+        var nextOptions = options.ToPatternOptions() | PcreConstants.PCRE2_NO_UTF_CHECK | (Length == 0 ? PcreConstants.PCRE2_NOTEMPTY_ATSTART : 0);
 
         OutputVector = Span<nuint>.Empty;
 
@@ -240,7 +240,7 @@ public unsafe ref struct PcreRefMatch
                             PcreRefCalloutFunc? callout)
     {
         var startOfNextMatchIndex = GetStartOfNextMatchIndex();
-        var nextOptions = options.ToPatternOptions() | PcreConstants.NO_UTF_CHECK | (Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0);
+        var nextOptions = options.ToPatternOptions() | PcreConstants.PCRE2_NO_UTF_CHECK | (Length == 0 ? PcreConstants.PCRE2_NOTEMPTY_ATSTART : 0);
 
         _regex!.BufferMatch(
             ref this,
