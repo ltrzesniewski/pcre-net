@@ -26,6 +26,7 @@ add_library(PCRE.NET.Native SHARED
         PCRE/src/pcre2_chartables.c
         PCRE/src/pcre2_chkdint.c
         PCRE/src/pcre2_compile.c
+        PCRE/src/pcre2_compile_cgroup.c
         PCRE/src/pcre2_compile_class.c
         PCRE/src/pcre2_config.c
         PCRE/src/pcre2_context.c
@@ -40,6 +41,7 @@ add_library(PCRE.NET.Native SHARED
         PCRE/src/pcre2_maketables.c
         PCRE/src/pcre2_match.c
         PCRE/src/pcre2_match_data.c
+        PCRE/src/pcre2_match_next.c
         PCRE/src/pcre2_newline.c
         PCRE/src/pcre2_ord2utf.c
         PCRE/src/pcre2_pattern_info.c
