@@ -213,6 +213,10 @@ internal static class PcreConstants
     public const int ERROR_PERL_ECLASS_EMPTY_EXPR = 214;
     public const int ERROR_PERL_ECLASS_MISSING_CLOSE = 215;
     public const int ERROR_PERL_ECLASS_UNEXPECTED_CHAR = 216;
+    public const int ERROR_EXPECTED_CAPTURE_GROUP = 217;
+    public const int ERROR_MISSING_OPENING_PARENTHESIS = 218;
+    public const int ERROR_MISSING_NUMBER_TERMINATOR = 219;
+    public const int ERROR_NULL_ERROROFFSET = 220;
     public const int ERROR_NOMATCH = -1;
     public const int ERROR_PARTIAL = -2;
     public const int ERROR_UTF8_ERR1 = -3;
@@ -283,6 +287,11 @@ internal static class PcreConstants
     public const int ERROR_JIT_UNSUPPORTED = -68;
     public const int ERROR_REPLACECASE = -69;
     public const int ERROR_TOOLARGEREPLACE = -70;
+    public const int ERROR_DIFFSUBSPATTERN = -71;
+    public const int ERROR_DIFFSUBSSUBJECT = -72;
+    public const int ERROR_DIFFSUBSOFFSET = -73;
+    public const int ERROR_DIFFSUBSOPTIONS = -74;
+    public const int ERROR_BAD_BACKSLASH_K = -75;
     public const uint INFO_ALLOPTIONS = 0;
     public const uint INFO_ARGOPTIONS = 1;
     public const uint INFO_BACKREFMAX = 2;
@@ -325,6 +334,7 @@ internal static class PcreConstants
     public const uint CONFIG_NEVER_BACKSLASH_C = 13;
     public const uint CONFIG_COMPILED_WIDTHS = 14;
     public const uint CONFIG_TABLES_LENGTH = 15;
+    public const uint CONFIG_EFFECTIVE_LINKSIZE = 16;
     public const uint OPTIMIZATION_NONE = 0;
     public const uint OPTIMIZATION_FULL = 1;
     public const uint AUTO_POSSESS = 64;
