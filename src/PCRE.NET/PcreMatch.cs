@@ -26,7 +26,7 @@ public sealed unsafe class PcreMatch : IPcreGroup, IPcreGroupList
         Subject = string.Empty;
         _regex = regex;
         _oVector = [];
-        _resultCode = PcreConstants.ERROR_NOMATCH;
+        _resultCode = PcreConstants.PCRE2_ERROR_NOMATCH;
     }
 
     internal PcreMatch(string subject, InternalRegex regex, ref Native.match_result result, nuint[] oVector)
@@ -129,7 +129,7 @@ public sealed unsafe class PcreMatch : IPcreGroup, IPcreGroupList
     /// <summary>
     /// Indicates if the match is partial. See <see cref="PcreMatchOptions.PartialSoft"/>/<see cref="PcreMatchOptions.PartialHard"/>.
     /// </summary>
-    public bool IsPartialMatch => _resultCode == PcreConstants.ERROR_PARTIAL;
+    public bool IsPartialMatch => _resultCode == PcreConstants.PCRE2_ERROR_PARTIAL;
 
     /// <summary>
     /// Returns an enumerator through the capturing groups.

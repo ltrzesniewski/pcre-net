@@ -291,7 +291,7 @@ internal static unsafe class CalloutInterop
             catch (Exception ex)
             {
                 Exception = ex;
-                return PcreConstants.ERROR_CALLOUT;
+                return PcreConstants.PCRE2_ERROR_CALLOUT;
             }
         }
     }

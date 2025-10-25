@@ -15,25 +15,25 @@ public enum PcreDfaMatchOptions : long
     None = 0,
 
     /// <inheritdoc cref="PcreMatchOptions.Anchored"/>
-    Anchored = PcreConstants.ANCHORED,
+    Anchored = PcreConstants.PCRE2_ANCHORED,
 
     /// <inheritdoc cref="PcreMatchOptions.EndAnchored"/>
-    EndAnchored = PcreConstants.ENDANCHORED,
+    EndAnchored = PcreConstants.PCRE2_ENDANCHORED,
 
     /// <inheritdoc cref="PcreMatchOptions.NotBol"/>
-    NotBol = PcreConstants.NOTBOL,
+    NotBol = PcreConstants.PCRE2_NOTBOL,
 
     /// <inheritdoc cref="PcreMatchOptions.NotEol"/>
-    NotEol = PcreConstants.NOTEOL,
+    NotEol = PcreConstants.PCRE2_NOTEOL,
 
     /// <inheritdoc cref="PcreMatchOptions.NotEmpty"/>
-    NotEmpty = PcreConstants.NOTEMPTY,
+    NotEmpty = PcreConstants.PCRE2_NOTEMPTY,
 
     /// <inheritdoc cref="PcreMatchOptions.NotEmptyAtStart"/>
-    NotEmptyAtStart = PcreConstants.NOTEMPTY_ATSTART,
+    NotEmptyAtStart = PcreConstants.PCRE2_NOTEMPTY_ATSTART,
 
     /// <inheritdoc cref="PcreMatchOptions.NoUtfCheck"/>
-    NoUtfCheck = PcreConstants.NO_UTF_CHECK,
+    NoUtfCheck = PcreConstants.PCRE2_NO_UTF_CHECK,
 
     /// <summary>
     /// <c>PCRE2_PARTIAL_SOFT</c> - Enable partial matching mode. Still try to find a complete match if a partial match is found first.
@@ -57,7 +57,7 @@ public enum PcreDfaMatchOptions : long
     /// </para>
     /// </remarks>
     /// <see cref="PcreMatchOptions.PartialSoft"/>
-    PartialSoft = PcreConstants.PARTIAL_SOFT,
+    PartialSoft = PcreConstants.PCRE2_PARTIAL_SOFT,
 
     /// <summary>
     /// <c>PCRE2_PARTIAL_HARD</c> - Enable partial matching mode. Stop looking for a complete match if a partial match is found first.
@@ -81,7 +81,7 @@ public enum PcreDfaMatchOptions : long
     /// </para>
     /// </remarks>
     /// <see cref="PcreMatchOptions.PartialHard"/>
-    PartialHard = PcreConstants.PARTIAL_HARD,
+    PartialHard = PcreConstants.PCRE2_PARTIAL_HARD,
 
     /// <summary>
     /// <c>PCRE2_DFA_SHORTEST</c> - Stop at the first (and therefore shortest) match.
@@ -90,5 +90,5 @@ public enum PcreDfaMatchOptions : long
     /// Setting the <see cref="DfaShortest"/> option causes the matching algorithm to stop as soon as it has found one match.
     /// Because of the way the alternative algorithm works, this is necessarily the shortest possible match at the first possible matching point in the subject string.
     /// </remarks>
-    DfaShortest = PcreConstants.DFA_SHORTEST
+    DfaShortest = PcreConstants.PCRE2_DFA_SHORTEST
 }

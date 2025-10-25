@@ -13,14 +13,14 @@ public static unsafe class PcreConvert
     /// </summary>
     /// <param name="pattern">The pattern to convert.</param>
     public static string FromPosixBasic(string pattern)
-        => BasicConvert(pattern, PcreConstants.CONVERT_POSIX_BASIC);
+        => BasicConvert(pattern, PcreConstants.PCRE2_CONVERT_POSIX_BASIC);
 
     /// <summary>
     /// Converts a POSIX extended pattern to a PCRE pattern.
     /// </summary>
     /// <param name="pattern">The pattern to convert.</param>
     public static string FromPosixExtended(string pattern)
-        => BasicConvert(pattern, PcreConstants.CONVERT_POSIX_EXTENDED);
+        => BasicConvert(pattern, PcreConstants.PCRE2_CONVERT_POSIX_EXTENDED);
 
     /// <summary>
     /// Converts a glob pattern to a PCRE pattern.
@@ -60,7 +60,7 @@ public static unsafe class PcreConvert
         {
             input->pattern = pPattern;
             input->pattern_length = (uint)pattern.Length;
-            input->options |= PcreConstants.CONVERT_UTF;
+            input->options |= PcreConstants.PCRE2_CONVERT_UTF;
 
             Native.convert_result result;
             var errorCode = Native16Bit.convert(input, &result);

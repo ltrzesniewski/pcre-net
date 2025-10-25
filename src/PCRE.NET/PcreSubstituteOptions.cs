@@ -28,7 +28,7 @@ public enum PcreSubstituteOptions : long
     /// </para>
     /// </remarks>
     /// <seealso cref="PcreOptions.Anchored"/>
-    Anchored = PcreConstants.ANCHORED,
+    Anchored = PcreConstants.PCRE2_ANCHORED,
 
     /// <summary>
     /// <c>PCRE2_ENDANCHORED</c> - Make the end of the pattern anchored, so it needs to match until the end of the subject string.
@@ -42,7 +42,7 @@ public enum PcreSubstituteOptions : long
     /// </para>
     /// </remarks>
     /// <seealso cref="PcreOptions.EndAnchored"/>
-    EndAnchored = PcreConstants.ENDANCHORED,
+    EndAnchored = PcreConstants.PCRE2_ENDANCHORED,
 
     /// <summary>
     /// <c>PCRE2_NOTBOL</c> - Don't treat the first character of the subject string as a beginning of line.
@@ -56,7 +56,7 @@ public enum PcreSubstituteOptions : long
     /// This option affects only the behaviour of the circumflex metacharacter. It does not affect <c>\A</c>.
     /// </para>
     /// </remarks>
-    NotBol = PcreConstants.NOTBOL,
+    NotBol = PcreConstants.PCRE2_NOTBOL,
 
     /// <summary>
     /// <c>PCRE2_NOTEOL</c> - Don't treat the last character of the subject string as an end of line.
@@ -70,7 +70,7 @@ public enum PcreSubstituteOptions : long
     /// This option affects only the behaviour of the dollar metacharacter. It does not affect <c>\Z</c> or <c>\z</c>.
     /// </para>
     /// </remarks>
-    NotEol = PcreConstants.NOTEOL,
+    NotEol = PcreConstants.PCRE2_NOTEOL,
 
     /// <summary>
     /// <c>PCRE2_NOTEMPTY</c> - Don't consider the empty string as a valid match.
@@ -85,7 +85,7 @@ public enum PcreSubstituteOptions : long
     /// With <see cref="NotEmpty"/> set, this match is not valid, so <c>pcre2_match()</c> searches further into the string for occurrences of "a" or "b".
     /// </para>
     /// </remarks>
-    NotEmpty = PcreConstants.NOTEMPTY,
+    NotEmpty = PcreConstants.PCRE2_NOTEMPTY,
 
     /// <summary>
     /// <c>PCRE2_NOTEMPTY_ATSTART</c> - Don't consider the empty string at the starting position as a valid match.
@@ -94,7 +94,7 @@ public enum PcreSubstituteOptions : long
     /// This is like <see cref="NotEmpty"/>, except that it locks out an empty string match only at the first matching position, that is, at the start of the subject plus the starting offset.
     /// An empty string match later in the subject is permitted. If the pattern is anchored, such a match can occur only if the pattern contains <c>\K</c>.
     /// </remarks>
-    NotEmptyAtStart = PcreConstants.NOTEMPTY_ATSTART,
+    NotEmptyAtStart = PcreConstants.PCRE2_NOTEMPTY_ATSTART,
 
     /// <summary>
     /// <c>PCRE2_NO_UTF_CHECK</c> - Disable validation of UTF sequences in the subject string.
@@ -123,7 +123,7 @@ public enum PcreSubstituteOptions : long
     /// or an invalid value of startoffset, is undefined. Your program may crash or loop indefinitely or give wrong results.
     /// </para>
     /// </remarks>
-    NoUtfCheck = PcreConstants.NO_UTF_CHECK,
+    NoUtfCheck = PcreConstants.PCRE2_NO_UTF_CHECK,
 
     /// <summary>
     /// <c>PCRE2_NO_JIT</c> - Disable the JIT for this match and use the interpreter instead.
@@ -132,7 +132,7 @@ public enum PcreSubstituteOptions : long
     /// By default, if a pattern has been successfully processed by <c>pcre2_jit_compile()</c>, JIT is automatically used when <c>pcre2_match()</c> is called with options that JIT supports.
     /// Setting <see cref="NoJit"/> disables the use of JIT; it forces matching to be done by the interpreter.
     /// </remarks>
-    NoJit = PcreConstants.NO_JIT,
+    NoJit = PcreConstants.PCRE2_NO_JIT,
 
     /// <summary>
     /// <c>PCRE2_DISABLE_RECURSELOOP_CHECK</c> - Disable the check for repeated recursion in the interpreter.
@@ -149,7 +149,7 @@ public enum PcreSubstituteOptions : long
     /// It is provided mainly for testing when comparing JIT and interpretive behaviour.
     /// </para>
     /// </remarks>
-    DisableRecurseLoopCheck = PcreConstants.DISABLE_RECURSELOOP_CHECK,
+    DisableRecurseLoopCheck = PcreConstants.PCRE2_DISABLE_RECURSELOOP_CHECK,
 
     /*
         SUBSTITUTE_OPTIONS =
@@ -166,7 +166,7 @@ public enum PcreSubstituteOptions : long
     /// <summary>
     /// <c>PCRE2_SUBSTITUTE_EXTENDED</c> - Add extra syntax to the replacement string.
     /// </summary>
-    SubstituteExtended = PcreConstants.SUBSTITUTE_EXTENDED,
+    SubstituteExtended = PcreConstants.PCRE2_SUBSTITUTE_EXTENDED,
 
     /// <summary>
     /// <c>PCRE2_SUBSTITUTE_GLOBAL</c> - Replace every matching substring. By default, only the first match is replaced.
@@ -174,7 +174,7 @@ public enum PcreSubstituteOptions : long
     /// <remarks>
     /// If this option is not set, only the first matching substring is replaced. The search for matches takes place in the original subject string (that is, previous replacements do not affect it).
     /// </remarks>
-    SubstituteGlobal = PcreConstants.SUBSTITUTE_GLOBAL,
+    SubstituteGlobal = PcreConstants.PCRE2_SUBSTITUTE_GLOBAL,
 
     /// <summary>
     /// <c>PCRE2_SUBSTITUTE_LITERAL</c> - Disables any interpretation of the replacement string.
@@ -182,7 +182,7 @@ public enum PcreSubstituteOptions : long
     /// <remarks>
     /// This takes precedence over <see cref="SubstituteExtended"/>.
     /// </remarks>
-    SubstituteLiteral = PcreConstants.SUBSTITUTE_LITERAL,
+    SubstituteLiteral = PcreConstants.PCRE2_SUBSTITUTE_LITERAL,
 
     /// <summary>
     /// <c>PCRE2_SUBSTITUTE_REPLACEMENT_ONLY</c> - Return only the replacement string.
@@ -192,7 +192,7 @@ public enum PcreSubstituteOptions : long
     /// is used). This option will only return the first replacement, or all replacements concatenated when
     /// <see cref="SubstituteGlobal"/> is used.
     /// </remarks>
-    SubstituteReplacementOnly = PcreConstants.SUBSTITUTE_REPLACEMENT_ONLY,
+    SubstituteReplacementOnly = PcreConstants.PCRE2_SUBSTITUTE_REPLACEMENT_ONLY,
 
     /// <summary>
     /// <c>PCRE2_SUBSTITUTE_UNKNOWN_UNSET</c> - Causes references to capture groups that do not appear in the pattern to be treated as unset groups.
@@ -200,7 +200,7 @@ public enum PcreSubstituteOptions : long
     /// <remarks>
     /// This option should be used with care, because it means that a typo in a group name or number no longer causes the <see cref="PcreErrorCode.NoSubstring"/> error.
     /// </remarks>
-    SubstituteUnknownUnset = PcreConstants.SUBSTITUTE_UNKNOWN_UNSET,
+    SubstituteUnknownUnset = PcreConstants.PCRE2_SUBSTITUTE_UNKNOWN_UNSET,
 
     /// <summary>
     /// <c>PCRE2_SUBSTITUTE_UNSET_EMPTY</c> - Causes unset capture groups (including unknown groups when <see cref="SubstituteUnknownUnset"/> is set) to be treated as empty strings when inserted.
@@ -208,5 +208,5 @@ public enum PcreSubstituteOptions : long
     /// <remarks>
     /// If this option is not set, an attempt to insert an unset group causes the <see cref="PcreErrorCode.Unset"/> error. This option does not influence the extended substitution syntax.
     /// </remarks>
-    SubstituteUnsetEmpty = PcreConstants.SUBSTITUTE_UNSET_EMPTY,
+    SubstituteUnsetEmpty = PcreConstants.PCRE2_SUBSTITUTE_UNSET_EMPTY,
 }

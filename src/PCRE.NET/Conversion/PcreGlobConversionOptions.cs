@@ -61,13 +61,13 @@ public sealed class PcreGlobConversionOptions
 
     private uint GetConvertOptions()
     {
-        var options = PcreConstants.CONVERT_GLOB;
+        var options = PcreConstants.PCRE2_CONVERT_GLOB;
 
         if (NoWildcardSeparator)
-            options |= PcreConstants.CONVERT_GLOB_NO_WILD_SEPARATOR;
+            options |= PcreConstants.PCRE2_CONVERT_GLOB_NO_WILD_SEPARATOR;
 
         if (NoStarStar)
-            options |= PcreConstants.CONVERT_GLOB_NO_STARSTAR;
+            options |= PcreConstants.PCRE2_CONVERT_GLOB_NO_STARSTAR;
 
         return options;
     }

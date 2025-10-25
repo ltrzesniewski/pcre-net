@@ -124,7 +124,7 @@ public sealed class PcreDfaRegex
 
         yield return match;
 
-        additionalOptions |= PcreConstants.NO_UTF_CHECK;
+        additionalOptions |= PcreConstants.PCRE2_NO_UTF_CHECK;
 
         while (true)
         {

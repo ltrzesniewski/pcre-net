@@ -13,7 +13,7 @@
     var defineRe = new Regex(
         """
         ^ \s* \# \s* define \s+
-        PCRE2_(?<name>\w+) \s+
+        (?<name>PCRE2_\w+) \s+
         \(? \s*
         (?<value> -? (?:0x)? [0-9]+ )
         [uU]?
@@ -25,7 +25,9 @@
 
     var toIgnore = new HashSet<string>
     {
-        "MAJOR", "MINOR", "LOCAL_WIDTH"
+        "PCRE2_MAJOR",
+        "PCRE2_MINOR",
+        "PCRE2_LOCAL_WIDTH"
     };
 
     var constants = new List<(string type, string name, string value)>();
@@ -43,13 +45,10 @@
 
         var (name, value) = (m.Groups["name"].Value, m.Groups["value"].Value);
 
-        if (name.StartsWith("HAVE_"))
-            continue;
-
         if (toIgnore.Contains(name))
             continue;
 
-        var type = name.StartsWith("ERROR_") ? "int" : "uint";
+        var type = name.StartsWith("PCRE2_ERROR_") ? "int" : "uint";
 
         constants.Add((type, name, value));
     }

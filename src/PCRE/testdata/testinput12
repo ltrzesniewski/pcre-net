@@ -250,6 +250,10 @@
 
 /abc/utf,never_utf
 
+/(*UCP)abc/never_ucp
+
+/abc/ucp,never_ucp
+
 /A\x{391}\x{10427}\x{ff3a}\x{1fb0}/IBi,utf
 
 /A\x{391}\x{10427}\x{ff3a}\x{1fb0}/IB,utf
@@ -360,7 +364,11 @@
 /\pP/ucp
     \x{7fffffff}
 
-# A special extra option allows excaped surrogate code points in 32-bit mode,
+/\p{  Aሴ}/utf
+
+/\p{BC: Aሴ}/utf
+
+# A special extra option allows escaped surrogate code points in 32-bit mode,
 # but subjects containing them must not be UTF-checked. These patterns give
 # errors in 16-bit mode.
 
@@ -398,6 +406,10 @@
 /(?(n/utf
 
 /(?(á/utf
+
+/^\cģ/utf
+
+/(?'٠ABC'...)/utf
 
 # Invalid UTF-16/32 tests.
 

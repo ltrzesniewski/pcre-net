@@ -308,11 +308,11 @@ public partial class PcreRegex
 
         yield return match;
 
-        var baseOptions = options.ToPatternOptions() | PcreConstants.NO_UTF_CHECK;
+        var baseOptions = options.ToPatternOptions() | PcreConstants.PCRE2_NO_UTF_CHECK;
 
         while (true)
         {
-            var nextOptions = baseOptions | (match.Length == 0 ? PcreConstants.NOTEMPTY_ATSTART : 0);
+            var nextOptions = baseOptions | (match.Length == 0 ? PcreConstants.PCRE2_NOTEMPTY_ATSTART : 0);
 
             match = InternalRegex.Match(subject, settings, match.GetStartOfNextMatchIndex(), nextOptions, onCallout);
             if (!match.Success)

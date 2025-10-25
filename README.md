@@ -5,7 +5,7 @@
 [![Build](https://github.com/ltrzesniewski/pcre-net/workflows/Build/badge.svg)](https://github.com/ltrzesniewski/pcre-net/actions?query=workflow%3ABuild)
 [![NuGet Package](https://img.shields.io/nuget/v/PCRE.NET.svg?logo=NuGet)](https://www.nuget.org/packages/PCRE.NET)
 [![GitHub release](https://img.shields.io/github/release/ltrzesniewski/pcre-net.svg?logo=GitHub)](https://github.com/ltrzesniewski/pcre-net/releases)
-[![PCRE2](https://img.shields.io/badge/pcre2-v10.46-blue.svg)](https://github.com/PCRE2Project/pcre2)
+[![PCRE2](https://img.shields.io/badge/pcre2-v10.47-blue.svg)](https://github.com/PCRE2Project/pcre2)
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/ltrzesniewski/pcre-net/blob/master/LICENCE)
 <br clear="right" />
 
@@ -35,7 +35,7 @@ This is a friendly API that is very similar to .NET's `System.Text.RegularExpres
     - Callbacks: `Func<PcreMatch, string>`
     - Replacement strings with placeholders: ``$n ${name} $& $_ $` $' $+``
   - Using `Substitute`, the PCRE2 API:
-      - Replacement strings with placeholders: ``$n ${n} $& $_ $` $' $$ $*MARK ${*MARK}``
+      - Replacement strings with placeholders: ``$n ${n} $& $_ $` $' $+ $$ $*MARK ${*MARK}``
       - Callouts for matches and substitutions
 - String splitting on matches: `Split`
 
@@ -79,7 +79,7 @@ You can read more about its features in [the PCRE2 documentation](https://pcre2p
 
 ## Library highlights
 
-- Support for compiled patterns (x86/x64 JIT)
+- Support for compiled patterns (x86/x64/arm64 JIT)
 - Support for partial matching (when the subject is too short to match the pattern)
 - Callout support (numbered and string-based)
 - Mark retrieval support
