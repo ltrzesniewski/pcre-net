@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 using System.Threading;
 using PCRE.Dfa;
 
@@ -31,22 +32,46 @@ internal abstract unsafe class InternalRegex : IDisposable
     protected abstract void FreeCode();
 }
 
-internal abstract unsafe class InternalRegex<TNative> : InternalRegex
+internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex
+    where TChar : unmanaged
     where TNative : struct, INative
 {
-    protected static TNative _native;
+    private readonly TChar[] _pattern;
+    private string? _patternString;
 
-    public string Pattern { get; }
+    public ReadOnlySpan<TChar> Pattern => _pattern;
+
+    protected string PatternString
+    {
+        get => _patternString ??= typeof(TChar) == typeof(char)
+            ? Pattern.ToString()
+            : Encoding.UTF8.GetString((byte[])(object)_pattern);
+        init => _patternString = value;
+    }
+
     public PcreRegexSettings Settings { get; }
 
-    protected InternalRegex(string pattern, PcreRegexSettings settings)
+    protected InternalRegex(ReadOnlySpan<TChar> pattern, PcreRegexSettings settings)
     {
-        Pattern = pattern;
+        Debug.Assert(typeof(TChar) == typeof(char) || typeof(TChar) == typeof(byte));
+
+        _pattern = pattern.ToArray();
         Settings = settings.AsReadOnly();
 
+        Compile(pattern, out var captureCount, out var captureNames);
+        CaptureCount = captureCount;
+        CaptureNames = captureNames;
+
+        GC.KeepAlive(this);
+    }
+
+    private void Compile(ReadOnlySpan<TChar> pattern,
+                         out int captureCount,
+                         out Dictionary<string, int[]> captureNames)
+    {
         Native.compile_result result;
 
-        fixed (char* pPattern = pattern)
+        fixed (TChar* pPattern = pattern)
         {
             Native.compile_input input;
             _ = &input;
@@ -56,28 +81,26 @@ internal abstract unsafe class InternalRegex<TNative> : InternalRegex
 
             using (Settings.FillCompileInput(ref input))
             {
-                _native.compile(&input, &result);
+                default(TNative).compile(&input, &result);
                 Code = result.code;
             }
 
             if (Code == null || result.error_code != 0)
             {
                 Dispose();
-                throw new PcrePatternException((PcreErrorCode)result.error_code, $"Invalid pattern '{pattern}': {_native.GetErrorMessage(result.error_code)} at offset {result.error_offset}.");
+                throw new PcrePatternException((PcreErrorCode)result.error_code, $"Invalid pattern '{PatternString}': {default(TNative).GetErrorMessage(result.error_code)} at offset {result.error_offset}.");
             }
         }
 
-        CaptureCount = (int)result.capture_count;
-        CaptureNames = _native.GetCaptureNames(result.name_entry_table, result.name_count, result.name_entry_size);
-
-        GC.KeepAlive(this);
+        captureCount = (int)result.capture_count;
+        captureNames = default(TNative).GetCaptureNames(result.name_entry_table, result.name_count, result.name_entry_size);
     }
 
     protected override void FreeCode()
     {
         if (Code != null)
         {
-            Native16Bit.code_free(Code);
+            default(TNative).code_free(Code);
             Code = null;
         }
     }
@@ -85,12 +108,12 @@ internal abstract unsafe class InternalRegex<TNative> : InternalRegex
     public uint GetInfoUInt32(uint key)
     {
         uint result;
-        var errorCode = _native.pattern_info(Code, key, &result);
+        var errorCode = default(TNative).pattern_info(Code, key, &result);
 
         GC.KeepAlive(this);
 
         if (errorCode != 0)
-            throw new PcreException((PcreErrorCode)errorCode, $"Error in pcre2_pattern_info: {_native.GetErrorMessage(errorCode)}");
+            throw new PcreException((PcreErrorCode)errorCode, $"Error in pcre2_pattern_info: {default(TNative).GetErrorMessage(errorCode)}");
 
         return result;
     }
@@ -98,28 +121,34 @@ internal abstract unsafe class InternalRegex<TNative> : InternalRegex
     public nuint GetInfoNativeInt(uint key)
     {
         nuint result;
-        var errorCode = _native.pattern_info(Code, key, &result);
+        var errorCode = default(TNative).pattern_info(Code, key, &result);
 
         GC.KeepAlive(this);
 
         if (errorCode != 0)
-            throw new PcreException((PcreErrorCode)errorCode, $"Error in pcre2_pattern_info: {_native.GetErrorMessage(errorCode)}");
+            throw new PcreException((PcreErrorCode)errorCode, $"Error in pcre2_pattern_info: {default(TNative).GetErrorMessage(errorCode)}");
 
         return result;
     }
+
+    public override string ToString()
+        => PatternString;
 
     protected static void ThrowMatchBufferDisposed()
         => throw new ObjectDisposedException("The match buffer has been disposed");
 }
 
-internal sealed unsafe class InternalRegex16Bit : InternalRegex<NativeStruct16Bit>
+internal sealed unsafe class InternalRegex16Bit : InternalRegex<char, NativeStruct16Bit>
 {
     private Dictionary<int, PcreCalloutInfo>? _calloutInfoByPatternPosition;
     private PcreMatch? _noMatch;
 
+    public new string Pattern => PatternString;
+
     public InternalRegex16Bit(string pattern, PcreRegexSettings settings)
-        : base(pattern, settings)
+        : base(pattern.AsSpan(), settings)
     {
+        PatternString = pattern;
     }
 
     public PcreMatch Match(string subject,
@@ -154,7 +183,7 @@ internal sealed unsafe class InternalRegex16Bit : InternalRegex<NativeStruct16Bi
 
             CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout);
 
-            _native.match(&input, &result);
+            default(NativeStruct16Bit).match(&input, &result);
 
             GC.KeepAlive(this);
             GC.KeepAlive(jitStack);
@@ -206,7 +235,7 @@ internal sealed unsafe class InternalRegex16Bit : InternalRegex<NativeStruct16Bi
 
             CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout, calloutOutputVector);
 
-            _native.match(&input, &result);
+            default(NativeStruct16Bit).match(&input, &result);
 
             GC.KeepAlive(this);
             GC.KeepAlive(jitStack);
@@ -248,7 +277,7 @@ internal sealed unsafe class InternalRegex16Bit : InternalRegex<NativeStruct16Bi
 
             CalloutInterop.Prepare(subject, buffer, ref input, out calloutInterop, callout);
 
-            _native.buffer_match(&input, &result);
+            default(NativeStruct16Bit).buffer_match(&input, &result);
 
             GC.KeepAlive(buffer); // The buffer keeps alive all the other required stuff
         }
@@ -282,7 +311,7 @@ internal sealed unsafe class InternalRegex16Bit : InternalRegex<NativeStruct16Bi
 
             CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, settings.Callout);
 
-            _native.dfa_match(&input, &result);
+            default(NativeStruct16Bit).dfa_match(&input, &result);
 
             GC.KeepAlive(this);
         }
@@ -331,7 +360,7 @@ internal sealed unsafe class InternalRegex16Bit : InternalRegex<NativeStruct16Bi
 
             CalloutInterop.PrepareSubstitute(this, subject, ref input, out calloutInterop, matchCallout, substituteCallout, substituteCaseCallout);
 
-            _native.substitute(&input, &result);
+            default(NativeStruct16Bit).substitute(&input, &result);
 
             GC.KeepAlive(this);
             GC.KeepAlive(jitStack);
@@ -370,7 +399,7 @@ internal sealed unsafe class InternalRegex16Bit : InternalRegex<NativeStruct16Bi
         finally
         {
             if (result.output != null && result.output_on_heap != 0)
-                _native.substitute_result_free(&result);
+                default(NativeStruct16Bit).substitute_result_free(&result);
         }
     }
 
@@ -395,7 +424,7 @@ internal sealed unsafe class InternalRegex16Bit : InternalRegex<NativeStruct16Bi
 
     public IReadOnlyList<PcreCalloutInfo> GetCallouts()
     {
-        var calloutCount = _native.get_callout_count(Code);
+        var calloutCount = default(NativeStruct16Bit).get_callout_count(Code);
         if (calloutCount == 0)
             return [];
 
@@ -405,7 +434,7 @@ internal sealed unsafe class InternalRegex16Bit : InternalRegex<NativeStruct16Bi
 
         fixed (Native.pcre2_callout_enumerate_block* pData = &data[0])
         {
-            _native.get_callouts(Code, pData);
+            default(NativeStruct16Bit).get_callouts(Code, pData);
 
             GC.KeepAlive(this);
         }
