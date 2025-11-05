@@ -7,7 +7,7 @@ using PCRE.Internal;
 namespace PCRE;
 
 /// <summary>
-/// A PCRE regular expression.
+/// A PCRE regular expression for UTF-16.
 /// </summary>
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
@@ -47,7 +47,7 @@ public sealed partial class PcreRegex
     public PcreDfaRegex Dfa => _dfa ??= new PcreDfaRegex(InternalRegex);
 
     /// <summary>
-    /// Creates a PCRE regex.
+    /// Creates a PCRE2 regex for UTF-16.
     /// </summary>
     /// <param name="pattern">The regular expression pattern.</param>
     [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
@@ -57,7 +57,7 @@ public sealed partial class PcreRegex
     }
 
     /// <summary>
-    /// Creates a PCRE regex.
+    /// Creates a PCRE2 regex for UTF-16.
     /// </summary>
     /// <param name="pattern">The regular expression pattern.</param>
     /// <param name="options">Pattern options.</param>
@@ -67,7 +67,7 @@ public sealed partial class PcreRegex
     }
 
     /// <summary>
-    /// Creates a PCRE regex.
+    /// Creates a PCRE2 regex for UTF-16.
     /// </summary>
     /// <param name="pattern">The regular expression pattern.</param>
     /// <param name="settings">Additional advanced settings.</param>

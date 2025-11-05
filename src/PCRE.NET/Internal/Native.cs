@@ -62,24 +62,7 @@ internal static unsafe partial class Native8Bit
         for (var i = 0; i < nameCount; ++i)
         {
             var groupIndex = currentItem[0] << 8 | currentItem[1];
-            var nameStart = currentItem + 2;
-
-            // TODO: The pattern may not be UTF-8
-#if NET
-            var groupName = Marshal.PtrToStringUTF8((IntPtr)nameStart) ?? string.Empty;
-#else
-            var groupName = Encoding.UTF8.GetString(nameStart, GetStringLength(nameStart));
-
-            int GetStringLength(byte* value)
-            {
-                var start = value;
-
-                while (*value != 0)
-                    ++value;
-
-                return (int)(value - start);
-            }
-#endif
+            var groupName = GetString(currentItem + 2) ?? string.Empty;
 
             if (captureNames.TryGetValue(groupName, out var indexes))
             {
@@ -96,6 +79,37 @@ internal static unsafe partial class Native8Bit
         }
 
         return captureNames;
+    }
+
+    public static string GetString(ReadOnlySpan<byte> value)
+    {
+        // TODO: The pattern may not be UTF-8
+
+        fixed (byte* ptr = value)
+            return Encoding.UTF8.GetString(ptr, value.Length);
+    }
+
+    public static string? GetString(byte* ptr)
+    {
+        if (ptr is null)
+            return null;
+
+        // TODO: The pattern may not be UTF-8
+#if NET
+        return Marshal.PtrToStringUTF8((IntPtr)ptr) ?? string.Empty;
+#else
+        return Encoding.UTF8.GetString(ptr, GetStringLength(ptr));
+
+        static int GetStringLength(byte* value)
+        {
+            var start = value;
+
+            while (*value != 0)
+                ++value;
+
+            return (int)(value - start);
+        }
+#endif
     }
 }
 
@@ -143,6 +157,9 @@ internal static unsafe partial class Native16Bit
 
         return captureNames;
     }
+
+    public static string? GetString(char* ptr)
+        => ptr is not null ? new string(ptr) : null;
 }
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using PCRE.Dfa;
 
@@ -11,6 +11,8 @@ internal abstract unsafe class InternalRegex : IDisposable
 {
     internal const int MaxStackAllocCaptureCount = 32;
     internal const int SubstituteBufferSizeInChars = 4096;
+
+    private Dictionary<int, PcreCalloutInfo>? _calloutInfoByPatternPosition;
 
     public void* Code { get; protected set; }
 
@@ -30,9 +32,36 @@ internal abstract unsafe class InternalRegex : IDisposable
     }
 
     protected abstract void FreeCode();
+
+    public abstract IReadOnlyList<PcreCalloutInfo> GetCallouts();
+
+    [return: NotNullIfNotNull(nameof(ptr))]
+    public abstract string? GetString(void* ptr);
+
+    public PcreCalloutInfo? TryGetCalloutInfoByPatternPosition(int patternPosition)
+    {
+        if (_calloutInfoByPatternPosition == null)
+        {
+            var dict = new Dictionary<int, PcreCalloutInfo>();
+
+            foreach (var info in GetCallouts())
+                dict.Add(info.PatternPosition, info);
+
+            Thread.MemoryBarrier();
+            _calloutInfoByPatternPosition = dict;
+        }
+
+        return _calloutInfoByPatternPosition.TryGetValue(patternPosition, out var result) ? result : null;
+    }
+
+    public PcreCalloutInfo GetCalloutInfoByPatternPosition(int patternPosition)
+        => TryGetCalloutInfoByPatternPosition(patternPosition) ?? throw new InvalidOperationException($"Could not retrieve callout info at position {patternPosition}.");
 }
 
-internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex
+internal abstract class InternalRegex<TChar> : InternalRegex
+    where TChar : unmanaged;
+
+internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TChar>
     where TChar : unmanaged
     where TNative : struct, INative
 {
@@ -41,12 +70,27 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex
 
     public ReadOnlySpan<TChar> Pattern => _pattern;
 
-    protected string PatternString
+    public string PatternString
     {
-        get => _patternString ??= typeof(TChar) == typeof(char)
-            ? Pattern.ToString()
-            : Encoding.UTF8.GetString((byte[])(object)_pattern);
-        init => _patternString = value;
+        get
+        {
+            if (_patternString == null)
+            {
+                if (typeof(TChar) == typeof(char))
+                {
+                    _patternString = Pattern.ToString();
+                }
+                else
+                {
+                    fixed (byte* ptr = (byte[])(object)_pattern)
+                        _patternString = GetString(ptr);
+                }
+            }
+
+            return _patternString;
+        }
+
+        protected init => _patternString = value;
     }
 
     public PcreRegexSettings Settings { get; }
@@ -105,6 +149,82 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex
         }
     }
 
+    public void Match(ref Span<nuint> matchOVector,
+                      ReadOnlySpan<TChar> subject,
+                      PcreMatchSettings settings,
+                      int startIndex,
+                      uint additionalOptions,
+                      PcreRefCalloutFunc? callout,
+                      nuint[]? calloutOutputVector,
+                      out TChar* markPtr,
+                      out int resultCode)
+    {
+        Native.match_input input;
+        _ = &input;
+
+        settings.FillMatchSettings(ref input.settings, out var jitStack);
+
+        Native.match_result result;
+        CalloutInterop.CalloutInteropInfo<TChar> calloutInterop;
+
+        var oVectorArray = default(nuint[]);
+
+        var oVector = matchOVector.Length == OutputVectorSize
+            ? matchOVector
+            : CanStackAllocOutputVector
+                ? stackalloc nuint[OutputVectorSize]
+                : oVectorArray = new nuint[OutputVectorSize];
+
+        fixed (TChar* pSubject = subject)
+        fixed (nuint* pOVec = &oVector[0])
+        {
+            input.code = Code;
+            input.subject = pSubject;
+            input.subject_length = (uint)subject.Length;
+            input.output_vector = pOVec;
+            input.start_index = (uint)startIndex;
+            input.additional_options = additionalOptions;
+
+            CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout, calloutOutputVector);
+
+            default(NativeStruct16Bit).match(&input, &result);
+
+            GC.KeepAlive(this);
+            GC.KeepAlive(jitStack);
+        }
+
+        if (result.result_code < PcreConstants.PCRE2_ERROR_PARTIAL)
+            HandleError(result, ref calloutInterop);
+
+        if (result.result_code != PcreConstants.PCRE2_ERROR_NOMATCH && oVector != matchOVector)
+            oVectorArray ??= oVector.ToArray();
+
+        if (oVectorArray != null)
+            matchOVector = oVectorArray;
+
+        markPtr = (TChar*)result.mark;
+        resultCode = result.result_code;
+    }
+
+    protected static void HandleError(in Native.match_result result, ref CalloutInterop.CalloutInteropInfo<TChar> calloutInterop)
+    {
+        switch (result.result_code)
+        {
+            case PcreConstants.PCRE2_ERROR_NOMATCH:
+            case PcreConstants.PCRE2_ERROR_PARTIAL:
+                break;
+
+            case PcreConstants.PCRE2_ERROR_CALLOUT:
+                throw new PcreCalloutException("An exception was thrown by the callout: " + calloutInterop.Exception?.Message, calloutInterop.Exception);
+
+            default:
+                if (result.result_code < 0)
+                    throw new PcreMatchException((PcreErrorCode)result.result_code);
+
+                break;
+        }
+    }
+
     public uint GetInfoUInt32(uint key)
     {
         uint result;
@@ -131,6 +251,28 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex
         return result;
     }
 
+    public override IReadOnlyList<PcreCalloutInfo> GetCallouts()
+    {
+        var calloutCount = default(TNative).get_callout_count(Code);
+        if (calloutCount == 0)
+            return [];
+
+        var data = calloutCount <= 16
+            ? stackalloc Native.pcre2_callout_enumerate_block[(int)calloutCount]
+            : new Native.pcre2_callout_enumerate_block[calloutCount];
+
+        fixed (Native.pcre2_callout_enumerate_block* pData = &data[0])
+            default(TNative).get_callouts(Code, pData);
+
+        var result = new List<PcreCalloutInfo>((int)calloutCount);
+
+        for (var i = 0; i < data.Length; ++i)
+            result.Add(new PcreCalloutInfo(this, ref data[i]));
+
+        GC.KeepAlive(this);
+        return result.AsReadOnly();
+    }
+
     public override string ToString()
         => PatternString;
 
@@ -140,7 +282,6 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex
 
 internal sealed unsafe class InternalRegex16Bit : InternalRegex<char, NativeStruct16Bit>
 {
-    private Dictionary<int, PcreCalloutInfo>? _calloutInfoByPatternPosition;
     private PcreMatch? _noMatch;
 
     public new string Pattern => PatternString;
@@ -163,7 +304,7 @@ internal sealed unsafe class InternalRegex16Bit : InternalRegex<char, NativeStru
         settings.FillMatchSettings(ref input.settings, out var jitStack);
 
         Native.match_result result;
-        CalloutInterop.CalloutInteropInfo calloutInterop;
+        CalloutInterop.CalloutInteropInfo<char> calloutInterop;
 
         var oVectorArray = default(nuint[]);
 
@@ -199,57 +340,6 @@ internal sealed unsafe class InternalRegex16Bit : InternalRegex<char, NativeStru
         return new PcreMatch(subject, this, ref result, oVectorArray);
     }
 
-    public void Match(ref PcreRefMatch match,
-                      ReadOnlySpan<char> subject,
-                      PcreMatchSettings settings,
-                      int startIndex,
-                      uint additionalOptions,
-                      PcreRefCalloutFunc? callout,
-                      nuint[]? calloutOutputVector)
-    {
-        Native.match_input input;
-        _ = &input;
-
-        settings.FillMatchSettings(ref input.settings, out var jitStack);
-
-        Native.match_result result;
-        CalloutInterop.CalloutInteropInfo calloutInterop;
-
-        var oVectorArray = default(nuint[]);
-
-        var oVector = match.OutputVector.Length == OutputVectorSize
-            ? match.OutputVector
-            : CanStackAllocOutputVector
-                ? stackalloc nuint[OutputVectorSize]
-                : oVectorArray = new nuint[OutputVectorSize];
-
-        fixed (char* pSubject = subject)
-        fixed (nuint* pOVec = &oVector[0])
-        {
-            input.code = Code;
-            input.subject = pSubject;
-            input.subject_length = (uint)subject.Length;
-            input.output_vector = pOVec;
-            input.start_index = (uint)startIndex;
-            input.additional_options = additionalOptions;
-
-            CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout, calloutOutputVector);
-
-            default(NativeStruct16Bit).match(&input, &result);
-
-            GC.KeepAlive(this);
-            GC.KeepAlive(jitStack);
-        }
-
-        if (result.result_code < PcreConstants.PCRE2_ERROR_PARTIAL)
-            HandleError(result, ref calloutInterop);
-
-        if (result.result_code != PcreConstants.PCRE2_ERROR_NOMATCH && oVector != match.OutputVector)
-            oVectorArray ??= oVector.ToArray();
-
-        match.Update(subject, result, oVectorArray);
-    }
-
     public void BufferMatch(ref PcreRefMatch match,
                             ReadOnlySpan<char> subject,
                             PcreMatchBuffer buffer,
@@ -261,7 +351,7 @@ internal sealed unsafe class InternalRegex16Bit : InternalRegex<char, NativeStru
         _ = &input;
 
         Native.match_result result;
-        CalloutInterop.CalloutInteropInfo calloutInterop;
+        CalloutInterop.CalloutInteropInfo<char> calloutInterop;
 
         fixed (char* pSubject = subject)
         {
@@ -297,7 +387,7 @@ internal sealed unsafe class InternalRegex16Bit : InternalRegex<char, NativeStru
 
         var oVector = new nuint[2 * Math.Max(1, settings.MaxResults)];
         Native.match_result result;
-        CalloutInterop.CalloutInteropInfo calloutInterop;
+        CalloutInterop.CalloutInteropInfo<char> calloutInterop;
 
         fixed (char* pSubject = subject)
         fixed (nuint* pOVec = &oVector[0])
@@ -403,66 +493,17 @@ internal sealed unsafe class InternalRegex16Bit : InternalRegex<char, NativeStru
         }
     }
 
-    private static void HandleError(in Native.match_result result, ref CalloutInterop.CalloutInteropInfo calloutInterop)
+    public override string? GetString(void* ptr)
+        => Native16Bit.GetString((char*)ptr);
+}
+
+internal sealed unsafe class InternalRegex8Bit : InternalRegex<byte, NativeStruct8Bit>
+{
+    public InternalRegex8Bit(ReadOnlySpan<byte> pattern, PcreRegexSettings settings)
+        : base(pattern, settings)
     {
-        switch (result.result_code)
-        {
-            case PcreConstants.PCRE2_ERROR_NOMATCH:
-            case PcreConstants.PCRE2_ERROR_PARTIAL:
-                break;
-
-            case PcreConstants.PCRE2_ERROR_CALLOUT:
-                throw new PcreCalloutException("An exception was thrown by the callout: " + calloutInterop.Exception?.Message, calloutInterop.Exception);
-
-            default:
-                if (result.result_code < 0)
-                    throw new PcreMatchException((PcreErrorCode)result.result_code);
-
-                break;
-        }
     }
 
-    public IReadOnlyList<PcreCalloutInfo> GetCallouts()
-    {
-        var calloutCount = default(NativeStruct16Bit).get_callout_count(Code);
-        if (calloutCount == 0)
-            return [];
-
-        var data = calloutCount <= 16
-            ? stackalloc Native.pcre2_callout_enumerate_block[(int)calloutCount]
-            : new Native.pcre2_callout_enumerate_block[calloutCount];
-
-        fixed (Native.pcre2_callout_enumerate_block* pData = &data[0])
-        {
-            default(NativeStruct16Bit).get_callouts(Code, pData);
-
-            GC.KeepAlive(this);
-        }
-
-        var result = new List<PcreCalloutInfo>((int)calloutCount);
-
-        for (var i = 0; i < data.Length; ++i)
-            result.Add(new PcreCalloutInfo(ref data[i]));
-
-        return result.AsReadOnly();
-    }
-
-    public PcreCalloutInfo? TryGetCalloutInfoByPatternPosition(int patternPosition)
-    {
-        if (_calloutInfoByPatternPosition == null)
-        {
-            var dict = new Dictionary<int, PcreCalloutInfo>();
-
-            foreach (var info in GetCallouts())
-                dict.Add(info.PatternPosition, info);
-
-            Thread.MemoryBarrier();
-            _calloutInfoByPatternPosition = dict;
-        }
-
-        return _calloutInfoByPatternPosition.TryGetValue(patternPosition, out var result) ? result : null;
-    }
-
-    public PcreCalloutInfo GetCalloutInfoByPatternPosition(int patternPosition)
-        => TryGetCalloutInfoByPatternPosition(patternPosition) ?? throw new InvalidOperationException($"Could not retrieve callout info at position {patternPosition}.");
+    public override string? GetString(void* ptr)
+        => Native8Bit.GetString((byte*)ptr);
 }
