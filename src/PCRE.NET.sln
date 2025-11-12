@@ -22,7 +22,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2183A203
 		NuGetReadme.md = NuGetReadme.md
 		..\.editorconfig = ..\.editorconfig
 		update-pcre2.sh = update-pcre2.sh
-		global.json = global.json
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCRE.NET.Benchmarks", "PCRE.NET.Benchmarks\PCRE.NET.Benchmarks.csproj", "{865E5DBA-AE97-4CDC-AD8F-8BCBCA542565}"
