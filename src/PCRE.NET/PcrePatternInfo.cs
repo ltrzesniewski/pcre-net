@@ -11,8 +11,6 @@ namespace PCRE;
 public sealed class PcrePatternInfo
 {
     private readonly InternalRegex _re;
-    private IReadOnlyList<PcreCalloutInfo>? _callouts;
-    private IReadOnlyList<string>? _groupNames;
 
     internal PcrePatternInfo(InternalRegex re)
         => _re = re;
@@ -213,12 +211,12 @@ public sealed class PcrePatternInfo
     /// <summary>
     /// Returns the list of callouts in the pattern.
     /// </summary>
-    public IReadOnlyList<PcreCalloutInfo> Callouts => _callouts ??= _re.GetCallouts();
+    public IReadOnlyList<PcreCalloutInfo> Callouts => field ??= _re.GetCallouts();
 
     /// <summary>
     /// Returns the list of group names in the pattern.
     /// </summary>
-    public IReadOnlyList<string> GroupNames => _groupNames ??= _re.CaptureNames.OrderBy(i => i.Value.Min()).Select(i => i.Key).ToList().AsReadOnly();
+    public IReadOnlyList<string> GroupNames => field ??= _re.CaptureNames.OrderBy(i => i.Value.Min()).Select(i => i.Key).ToList().AsReadOnly();
 
     /// <summary>
     /// Returns the list of indexes in the pattern for a given capturing group name.

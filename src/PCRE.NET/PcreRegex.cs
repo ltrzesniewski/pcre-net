@@ -14,15 +14,12 @@ namespace PCRE;
 [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
 public sealed partial class PcreRegex
 {
-    private PcrePatternInfo? _info;
-    private PcreDfaRegex? _dfa;
-
     internal InternalRegex InternalRegex { get; }
 
     /// <summary>
     /// Returns information about the pattern.
     /// </summary>
-    public PcrePatternInfo PatternInfo => _info ??= new PcrePatternInfo(InternalRegex);
+    public PcrePatternInfo PatternInfo => field ??= new PcrePatternInfo(InternalRegex);
 
     /// <summary>
     /// The size of the internal caches.
@@ -44,7 +41,7 @@ public sealed partial class PcreRegex
     /// <summary>
     /// Gives access to the DFA (deterministic finite automaton) matching API.
     /// </summary>
-    public PcreDfaRegex Dfa => _dfa ??= new PcreDfaRegex(InternalRegex);
+    public PcreDfaRegex Dfa => field ??= new PcreDfaRegex(InternalRegex);
 
     /// <summary>
     /// Creates a PCRE regex.

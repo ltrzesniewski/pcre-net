@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>PCRE.Tests.Integration</RootNamespace>
     <DefineConstants Condition="'$(PcreNetIntegrationTest)' == 'true'">$(DefineConstants);PCRENET_INTEGRATION_TEST</DefineConstants>
   </PropertyGroup>

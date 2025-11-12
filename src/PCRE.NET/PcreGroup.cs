@@ -9,7 +9,6 @@ namespace PCRE;
 public sealed class PcreGroup : IPcreGroup
 {
     private readonly string? _subject;
-    private string? _value;
 
     // The offsets match the truncated value of PCRE2_UNSET
     internal static readonly PcreGroup Empty = new(string.Empty, -1, -1);
@@ -21,7 +20,7 @@ public sealed class PcreGroup : IPcreGroup
         EndIndex = endOffset;
 
         if (Length <= 0)
-            _value = string.Empty;
+            Value = string.Empty;
         else
             _subject = subject;
     }
@@ -36,7 +35,7 @@ public sealed class PcreGroup : IPcreGroup
     public int Length => EndIndex > Index ? EndIndex - Index : 0;
 
     /// <inheritdoc/>
-    public string Value => _value ??= _subject!.Substring(Index, Length);
+    public string Value => field ??= _subject!.Substring(Index, Length);
 
     /// <inheritdoc/>
     public ReadOnlySpan<char> ValueSpan => Length <= 0 ? ReadOnlySpan<char>.Empty : _subject!.AsSpan(Index, Length);

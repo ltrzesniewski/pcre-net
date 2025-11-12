@@ -81,7 +81,7 @@ public class PcreRefMatchTests
         var re = new PcreRegex("(.)(?<name>.)");
         var values = re.Match("ab".AsSpan()).Groups.ToList(i => i.Value.ToString());
 
-        Assert.That(values, Is.EqualTo(new[] { "ab", "a", "b" }));
+        Assert.That(values, Is.EqualTo(["ab", "a", "b"]));
     }
 
     [Test]

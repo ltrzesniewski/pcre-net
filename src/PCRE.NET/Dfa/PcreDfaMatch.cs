@@ -8,10 +8,9 @@ namespace PCRE.Dfa;
 /// </summary>
 public sealed class PcreDfaMatch : IPcreGroup
 {
-    private readonly string? _subject;
-    private string? _value;
-
     internal static readonly PcreDfaMatch Empty = new(string.Empty, -1, -1);
+
+    private readonly string? _subject;
 
     internal PcreDfaMatch(string subject, int startOffset, int endOffset)
     {
@@ -19,7 +18,7 @@ public sealed class PcreDfaMatch : IPcreGroup
         EndIndex = endOffset;
 
         if (Length <= 0)
-            _value = string.Empty;
+            Value = string.Empty;
         else
             _subject = subject;
     }
@@ -34,7 +33,7 @@ public sealed class PcreDfaMatch : IPcreGroup
     public int Length => EndIndex > Index ? EndIndex - Index : 0;
 
     /// <inheritdoc cref="PcreMatch.Value"/>
-    public string Value => _value ??= _subject!.Substring(Index, Length);
+    public string Value => field ??= _subject!.Substring(Index, Length);
 
     /// <inheritdoc cref="PcreMatch.ValueSpan"/>
     public ReadOnlySpan<char> ValueSpan => Length <= 0 ? ReadOnlySpan<char>.Empty : _subject!.AsSpan(Index, Length);

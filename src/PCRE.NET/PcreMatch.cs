@@ -17,7 +17,6 @@ public sealed unsafe class PcreMatch : IPcreGroup, IPcreGroupList
     private readonly char* _markPtr;
 
     private PcreGroup?[]? _groups;
-    private string? _mark;
 
     internal PcreMatch(InternalRegex regex)
     {
@@ -110,16 +109,7 @@ public sealed unsafe class PcreMatch : IPcreGroup, IPcreGroupList
     /// <remarks>
     /// Marks are defined with <c>(*MARK)</c>.
     /// </remarks>
-    public string? Mark
-    {
-        get
-        {
-            if (_mark == null && _markPtr != null)
-                _mark = new string(_markPtr);
-
-            return _mark;
-        }
-    }
+    public string? Mark => field ??= _markPtr != null ? new string(_markPtr) : null;
 
     /// <summary>
     /// Returns the list of capturing groups.
