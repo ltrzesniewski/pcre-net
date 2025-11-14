@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using PCRE.Internal;
 
 namespace PCRE;
@@ -10,6 +11,7 @@ namespace PCRE;
 [DebuggerTypeProxy(typeof(DebugProxy))]
 public readonly ref struct PcreRefGroupUtf8
 {
+    [SuppressMessage("ReSharper", "ReplaceWithFieldKeyword")]
     private readonly ReadOnlySpan<byte> _subject;
 
     // Indices are offset by 1. 0 means undefined group. -1 means empty group.

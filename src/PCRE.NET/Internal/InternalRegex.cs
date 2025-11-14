@@ -66,7 +66,6 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
     where TNative : struct, INative
 {
     private readonly TChar[] _pattern;
-    private string? _patternString;
 
     public ReadOnlySpan<TChar> Pattern => _pattern;
 
@@ -74,23 +73,23 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
     {
         get
         {
-            if (_patternString == null)
+            if (field == null)
             {
                 if (typeof(TChar) == typeof(char))
                 {
-                    _patternString = Pattern.ToString();
+                    field = Pattern.ToString();
                 }
                 else
                 {
                     fixed (byte* ptr = (byte[])(object)_pattern)
-                        _patternString = GetString(ptr);
+                        field = GetString(ptr);
                 }
             }
 
-            return _patternString;
+            return field;
         }
 
-        protected init => _patternString = value;
+        protected init;
     }
 
     public PcreRegexSettings Settings { get; }
@@ -187,7 +186,7 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
 
             CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout, calloutOutputVector);
 
-            default(NativeStruct16Bit).match(&input, &result);
+            default(TNative).match(&input, &result);
 
             GC.KeepAlive(this);
             GC.KeepAlive(jitStack);
@@ -316,7 +315,7 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
     public override string ToString()
         => PatternString;
 
-    protected static void ThrowMatchBufferDisposed()
+    private static void ThrowMatchBufferDisposed()
         => throw new ObjectDisposedException("The match buffer has been disposed");
 }
 
