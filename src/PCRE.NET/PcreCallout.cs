@@ -27,7 +27,7 @@ public sealed unsafe class PcreCallout
         LastCapture = (int)callout->capture_last;
         PatternPosition = (int)callout->pattern_position;
         NextPatternItemLength = (int)callout->next_item_length;
-        _markPtr = callout->mark;
+        _markPtr = (char*)callout->mark;
 
         _oVector = new nuint[callout->capture_top * 2];
         _oVector[0] = callout->start_match;

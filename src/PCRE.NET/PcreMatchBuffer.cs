@@ -6,15 +6,22 @@ using PCRE.Internal;
 
 namespace PCRE;
 
+internal interface IPcreMatchBuffer
+{
+    InternalRegex Regex { get; }
+    IntPtr NativeBuffer { get; }
+    nuint[] CalloutOutputVector { get; }
+}
+
 /// <summary>
 /// A buffer that allows execution of regular expression matches without managed allocations.
 /// </summary>
 /// <remarks>
 /// Not thread-safe and not reentrant.
 /// </remarks>
-public sealed unsafe class PcreMatchBuffer : IDisposable
+public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IDisposable
 {
-    internal readonly InternalRegex Regex;
+    internal readonly InternalRegex16Bit Regex;
     private readonly int _outputVectorSize;
     private PcreJitStack? _jitStack; // GC reference
 
@@ -23,7 +30,11 @@ public sealed unsafe class PcreMatchBuffer : IDisposable
     internal readonly nuint* OutputVector;
     internal readonly nuint[] CalloutOutputVector;
 
-    internal PcreMatchBuffer(InternalRegex regex, PcreMatchSettings settings)
+    InternalRegex IPcreMatchBuffer.Regex => Regex;
+    IntPtr IPcreMatchBuffer.NativeBuffer => NativeBuffer;
+    nuint[] IPcreMatchBuffer.CalloutOutputVector => CalloutOutputVector;
+
+    internal PcreMatchBuffer(InternalRegex16Bit regex, PcreMatchSettings settings)
     {
         Regex = regex;
         _outputVectorSize = regex.OutputVectorSize;
@@ -39,7 +50,7 @@ public sealed unsafe class PcreMatchBuffer : IDisposable
 
         settings.FillMatchSettings(ref info.settings, out _jitStack);
 
-        NativeBuffer = Native.create_match_buffer(&info);
+        NativeBuffer = (IntPtr)Native16Bit.create_match_buffer(&info);
         if (NativeBuffer == IntPtr.Zero)
             throw new InvalidOperationException("Could not create match buffer");
 
@@ -64,7 +75,7 @@ public sealed unsafe class PcreMatchBuffer : IDisposable
 
         var buffer = Interlocked.Exchange(ref NativeBuffer, IntPtr.Zero);
         if (buffer != IntPtr.Zero)
-            Native.free_match_buffer(buffer);
+            Native16Bit.free_match_buffer((void*)buffer);
     }
 
     private Span<nuint> GetOutputVectorSpan()
@@ -150,16 +161,7 @@ public sealed unsafe class PcreMatchBuffer : IDisposable
             ThrowInvalidStartIndex();
 
         var match = new PcreRefMatch(Regex, GetOutputVectorSpan());
-
-        Regex.BufferMatch(
-            ref match,
-            subject,
-            this,
-            startIndex,
-            options.ToPatternOptions(),
-            onCallout
-        );
-
+        match.FirstMatch(this, subject, startIndex, options, onCallout);
         return match;
     }
 
@@ -205,7 +207,7 @@ public sealed unsafe class PcreMatchBuffer : IDisposable
     /// Returns the regex pattern.
     /// </summary>
     public override string ToString()
-        => Regex.Pattern;
+        => Regex.PatternString;
 
     private static void ThrowInvalidStartIndex()
         => throw new ArgumentOutOfRangeException("Invalid start index.", default(Exception));
@@ -281,15 +283,7 @@ public sealed unsafe class PcreMatchBuffer : IDisposable
             if (!_match.IsInitialized)
             {
                 _match = new PcreRefMatch(_buffer.Regex, _buffer.GetOutputVectorSpan());
-
-                _buffer.Regex.BufferMatch(
-                    ref _match,
-                    _subject,
-                    _buffer,
-                    _startIndex,
-                    _options.ToPatternOptions(),
-                    _callout
-                );
+                _match.FirstMatch(_buffer, _subject, _startIndex, _options, _callout);
             }
             else
             {

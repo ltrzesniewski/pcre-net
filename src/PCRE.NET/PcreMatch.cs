@@ -35,7 +35,7 @@ public sealed unsafe class PcreMatch : IPcreGroup, IPcreGroupList
         Subject = subject;
         _regex = regex;
         _oVector = oVector;
-        _markPtr = result.mark;
+        _markPtr = (char*)result.mark;
 
         _resultCode = result.result_code;
     }

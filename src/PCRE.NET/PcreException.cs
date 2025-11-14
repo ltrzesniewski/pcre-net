@@ -20,7 +20,7 @@ public class PcreException : Exception
     /// </summary>
     /// <param name="errorCode">The associated error code.</param>
     public PcreException(PcreErrorCode errorCode)
-        : this(errorCode, Native.GetErrorMessage((int)errorCode), null)
+        : this(errorCode, Native16Bit.GetErrorMessage((int)errorCode), null)
     {
     }
 

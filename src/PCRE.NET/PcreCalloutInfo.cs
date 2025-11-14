@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using PCRE.Internal;
 
 namespace PCRE;
@@ -9,10 +8,10 @@ namespace PCRE;
 /// </summary>
 public sealed unsafe class PcreCalloutInfo
 {
-    internal PcreCalloutInfo(ref Native.pcre2_callout_enumerate_block info)
+    internal PcreCalloutInfo(InternalRegex regex, ref Native.pcre2_callout_enumerate_block info)
     {
         Number = (int)info.callout_number;
-        String = info.callout_string != IntPtr.Zero ? new string((char*)info.callout_string) : null;
+        String = regex.GetString((void*)info.callout_string);
         NextPatternItemLength = (int)info.next_item_length;
         PatternPosition = (int)info.pattern_position;
         StringOffset = (int)info.callout_string_offset;

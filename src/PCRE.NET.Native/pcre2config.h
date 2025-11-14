@@ -22,6 +22,8 @@
 #define PCRE2_STATIC 1
 #define STDC_HEADERS 1
 #define SUPPORT_JIT 1
+#define SUPPORT_PCRE2_8 1
+#define SUPPORT_PCRE2_16 1
 #define SUPPORT_UNICODE 1
 
 #if _MSC_VER

@@ -25,7 +25,7 @@ public class ManualTests
             var memberName = Regex.Replace(name.Substring(errorPrefix.Length).ToLowerInvariant(), @"(?:^|_)(?<char>\w)", m => m.Groups["char"].Value.ToUpperInvariant());
 
             Console.WriteLine("/// <summary>");
-            Console.WriteLine($"/// <c>PCRE2_{name}</c> - {WebUtility.HtmlEncode(Native.GetErrorMessage(value))}");
+            Console.WriteLine($"/// <c>PCRE2_{name}</c> - {WebUtility.HtmlEncode(Native16Bit.GetErrorMessage(value))}");
             Console.WriteLine("/// </summary>");
             Console.WriteLine($"{memberName} = PcreConstants.{name},");
             Console.WriteLine();
