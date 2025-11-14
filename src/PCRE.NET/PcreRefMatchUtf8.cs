@@ -200,9 +200,11 @@ public unsafe ref struct PcreRefMatchUtf8
                              PcreMatchSettings settings,
                              int startIndex,
                              PcreMatchOptions options,
-                             PcreRefCalloutFunc? callout,
+                             PcreRefCalloutFuncUtf8? callout,
                              nuint[]? calloutOutputVector)
     {
+        Subject = subject;
+
         _regex!.Match(
             ref OutputVector,
             subject,
@@ -218,7 +220,7 @@ public unsafe ref struct PcreRefMatchUtf8
 
     internal void NextMatch(PcreMatchSettings settings,
                             PcreMatchOptions options,
-                            PcreRefCalloutFunc? callout,
+                            PcreRefCalloutFuncUtf8? callout,
                             nuint[]? calloutOutputVector)
     {
         var startOfNextMatchIndex = GetStartOfNextMatchIndex();
@@ -239,31 +241,41 @@ public unsafe ref struct PcreRefMatchUtf8
         );
     }
 
-    // internal void NextMatch(PcreMatchBuffer buffer,
-    //                         PcreMatchOptions options,
-    //                         PcreRefCalloutFunc? callout)
-    // {
-    //     var startOfNextMatchIndex = GetStartOfNextMatchIndex();
-    //     var nextOptions = options.ToPatternOptions() | PcreConstants.PCRE2_NO_UTF_CHECK | (Length == 0 ? PcreConstants.PCRE2_NOTEMPTY_ATSTART : 0);
-    //
-    //     _regex!.BufferMatch(
-    //         ref this,
-    //         Subject,
-    //         buffer,
-    //         startOfNextMatchIndex,
-    //         nextOptions,
-    //         callout
-    //     );
-    // }
-
-    internal void Update(ReadOnlySpan<byte> subject, scoped in Native.match_result result, nuint[]? outputVector)
+    internal void FirstMatch(PcreMatchBufferUtf8 buffer,
+                             ReadOnlySpan<byte> subject,
+                             int startIndex,
+                             PcreMatchOptions options,
+                             PcreRefCalloutFuncUtf8? callout)
     {
         Subject = subject;
-        _markPtr = (byte*)result.mark;
-        _resultCode = result.result_code;
 
-        if (outputVector != null)
-            OutputVector = outputVector;
+        _regex!.BufferMatch(
+            Subject,
+            buffer,
+            startIndex,
+            options.ToPatternOptions(),
+            callout,
+            out _markPtr,
+            out _resultCode
+        );
+    }
+
+    internal void NextMatch(PcreMatchBufferUtf8 buffer,
+                            PcreMatchOptions options,
+                            PcreRefCalloutFuncUtf8? callout)
+    {
+        var startOfNextMatchIndex = GetStartOfNextMatchIndex();
+        var nextOptions = options.ToPatternOptions() | PcreConstants.PCRE2_NO_UTF_CHECK | (Length == 0 ? PcreConstants.PCRE2_NOTEMPTY_ATSTART : 0);
+
+        _regex!.BufferMatch(
+            Subject,
+            buffer,
+            startOfNextMatchIndex,
+            nextOptions,
+            callout,
+            out _markPtr,
+            out _resultCode
+        );
     }
 
     private readonly int GetStartOfNextMatchIndex()

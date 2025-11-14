@@ -1,21 +1,84 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
+using System.Threading;
 using PCRE.Internal;
 
 namespace PCRE;
 
-[SuppressMessage("ReSharper", "UnusedMember.Global")]
-[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-[SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
-public partial class PcreRegexUtf8
+/// <summary>
+/// A buffer that allows execution of regular expression matches without managed allocations.
+/// </summary>
+/// <remarks>
+/// Not thread-safe and not reentrant.
+/// </remarks>
+public sealed unsafe class PcreMatchBufferUtf8 : IPcreMatchBuffer, IDisposable
 {
+    internal readonly InternalRegex8Bit Regex;
+    private readonly int _outputVectorSize;
+    private PcreJitStack? _jitStack; // GC reference
+
+    internal IntPtr NativeBuffer;
+
+    internal readonly nuint* OutputVector;
+    internal readonly nuint[] CalloutOutputVector;
+
+    InternalRegex IPcreMatchBuffer.Regex => Regex;
+    IntPtr IPcreMatchBuffer.NativeBuffer => NativeBuffer;
+    nuint[] IPcreMatchBuffer.CalloutOutputVector => CalloutOutputVector;
+
+    internal PcreMatchBufferUtf8(InternalRegex8Bit regex, PcreMatchSettings settings)
+    {
+        Regex = regex;
+        _outputVectorSize = regex.OutputVectorSize;
+
+        CalloutOutputVector = new nuint[_outputVectorSize];
+
+        Regex.TryGetCalloutInfoByPatternPosition(0); // Make sure callout info is initialized
+
+        var info = new Native.match_buffer_info
+        {
+            code = regex.Code
+        };
+
+        settings.FillMatchSettings(ref info.settings, out _jitStack);
+
+        NativeBuffer = (IntPtr)Native8Bit.create_match_buffer(&info);
+        if (NativeBuffer == IntPtr.Zero)
+            throw new InvalidOperationException("Could not create match buffer");
+
+        OutputVector = info.output_vector;
+    }
+
+    /// <inheritdoc />
+    ~PcreMatchBufferUtf8()
+        => FreeBuffer();
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        FreeBuffer();
+        GC.SuppressFinalize(this);
+    }
+
+    private void FreeBuffer()
+    {
+        GC.KeepAlive(_jitStack);
+        _jitStack = null;
+
+        var buffer = Interlocked.Exchange(ref NativeBuffer, IntPtr.Zero);
+        if (buffer != IntPtr.Zero)
+            Native8Bit.free_match_buffer((void*)buffer);
+    }
+
+    private Span<nuint> GetOutputVectorSpan()
+        => new(OutputVector, _outputVectorSize);
+
     /// <include file='PcreRegex.xml' path='/doc/method[@name="IsMatch"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject"]'/>
     [Pure]
     public bool IsMatch(ReadOnlySpan<byte> subject)
-        => IsMatch(subject, 0);
+        => Match(subject, 0, PcreMatchOptions.None, null).Success;
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="IsMatch"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="startIndex"]'/>
@@ -24,31 +87,19 @@ public partial class PcreRegexUtf8
     /// </remarks>
     [Pure]
     public bool IsMatch(ReadOnlySpan<byte> subject, int startIndex)
-    {
-        if (unchecked((uint)startIndex > (uint)subject.Length))
-            ThrowInvalidStartIndex();
-
-        var outputVector = InternalRegex.CanStackAllocOutputVector
-            ? stackalloc nuint[InternalRegex.OutputVectorSize]
-            : new nuint[InternalRegex.OutputVectorSize];
-
-        var match = new PcreRefMatchUtf8(InternalRegex, outputVector);
-        match.FirstMatch(subject, PcreMatchSettings.Default, startIndex, 0, null, null);
-
-        return match.Success;
-    }
+        => Match(subject, startIndex, PcreMatchOptions.None, null).Success;
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject"]'/>
     [Pure]
     public PcreRefMatchUtf8 Match(ReadOnlySpan<byte> subject)
-        => Match(subject, 0, PcreMatchOptions.None, null, PcreMatchSettings.Default);
+        => Match(subject, 0, PcreMatchOptions.None, null);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="options"]'/>
     [Pure]
     public PcreRefMatchUtf8 Match(ReadOnlySpan<byte> subject, PcreMatchOptions options)
-        => Match(subject, 0, options, null, PcreMatchSettings.Default);
+        => Match(subject, 0, options, null);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="startIndex"]'/>
@@ -57,7 +108,7 @@ public partial class PcreRegexUtf8
     /// </remarks>
     [Pure]
     public PcreRefMatchUtf8 Match(ReadOnlySpan<byte> subject, int startIndex)
-        => Match(subject, startIndex, PcreMatchOptions.None, null, PcreMatchSettings.Default);
+        => Match(subject, startIndex, PcreMatchOptions.None, null);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="startIndex" or @name="options"]'/>
@@ -66,7 +117,7 @@ public partial class PcreRegexUtf8
     /// </remarks>
     [Pure]
     public PcreRefMatchUtf8 Match(ReadOnlySpan<byte> subject, int startIndex, PcreMatchOptions options)
-        => Match(subject, startIndex, options, null, PcreMatchSettings.Default);
+        => Match(subject, startIndex, options, null);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="onCallout"]'/>
@@ -74,7 +125,7 @@ public partial class PcreRegexUtf8
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="callout"]/*'/>
     /// </remarks>
     public PcreRefMatchUtf8 Match(ReadOnlySpan<byte> subject, PcreRefCalloutFuncUtf8? onCallout)
-        => Match(subject, 0, PcreMatchOptions.None, onCallout, PcreMatchSettings.Default);
+        => Match(subject, 0, PcreMatchOptions.None, onCallout);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="options" or @name="onCallout"]'/>
@@ -82,7 +133,7 @@ public partial class PcreRegexUtf8
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="callout"]/*'/>
     /// </remarks>
     public PcreRefMatchUtf8 Match(ReadOnlySpan<byte> subject, PcreMatchOptions options, PcreRefCalloutFuncUtf8? onCallout)
-        => Match(subject, 0, options, onCallout, PcreMatchSettings.Default);
+        => Match(subject, 0, options, onCallout);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="startIndex" or @name="onCallout"]'/>
@@ -90,7 +141,7 @@ public partial class PcreRegexUtf8
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex" or @name="callout"]/*'/>
     /// </remarks>
     public PcreRefMatchUtf8 Match(ReadOnlySpan<byte> subject, int startIndex, PcreRefCalloutFuncUtf8? onCallout)
-        => Match(subject, startIndex, PcreMatchOptions.None, onCallout, PcreMatchSettings.Default);
+        => Match(subject, startIndex, PcreMatchOptions.None, onCallout);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="startIndex" or @name="options" or @name="onCallout"]'/>
@@ -98,24 +149,12 @@ public partial class PcreRegexUtf8
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex" or @name="callout"]/*'/>
     /// </remarks>
     public PcreRefMatchUtf8 Match(ReadOnlySpan<byte> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFuncUtf8? onCallout)
-        => Match(subject, startIndex, options, onCallout, PcreMatchSettings.Default);
-
-    /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
-    /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="startIndex" or @name="options" or @name="onCallout" or @name="settings"]'/>
-    /// <remarks>
-    /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex" or @name="callout"]/*'/>
-    /// </remarks>
-    public PcreRefMatchUtf8 Match(ReadOnlySpan<byte> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFuncUtf8? onCallout, PcreMatchSettings settings)
     {
-        if (settings == null)
-            throw new ArgumentNullException(nameof(settings));
-
         if (unchecked((uint)startIndex > (uint)subject.Length))
             ThrowInvalidStartIndex();
 
-        var match = new PcreRefMatchUtf8(InternalRegex, Span<nuint>.Empty);
-        match.FirstMatch(subject, settings, startIndex, options, onCallout, null);
-
+        var match = new PcreRefMatchUtf8(Regex, GetOutputVectorSpan());
+        match.FirstMatch(this, subject, startIndex, options, onCallout);
         return match;
     }
 
@@ -123,7 +162,7 @@ public partial class PcreRegexUtf8
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject"]'/>
     [Pure]
     public RefMatchEnumerable Matches(ReadOnlySpan<byte> subject)
-        => Matches(subject, 0, PcreMatchOptions.None, null, PcreMatchSettings.Default);
+        => Matches(subject, 0, PcreMatchOptions.None, null);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Matches"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="startIndex"]'/>
@@ -132,7 +171,7 @@ public partial class PcreRegexUtf8
     /// </remarks>
     [Pure]
     public RefMatchEnumerable Matches(ReadOnlySpan<byte> subject, int startIndex)
-        => Matches(subject, startIndex, PcreMatchOptions.None, null, PcreMatchSettings.Default);
+        => Matches(subject, startIndex, PcreMatchOptions.None, null);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Matches"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="startIndex" or @name="onCallout"]'/>
@@ -141,30 +180,33 @@ public partial class PcreRegexUtf8
     /// </remarks>
     [Pure]
     public RefMatchEnumerable Matches(ReadOnlySpan<byte> subject, int startIndex, PcreRefCalloutFuncUtf8? onCallout)
-        => Matches(subject, startIndex, PcreMatchOptions.None, onCallout, PcreMatchSettings.Default);
+        => Matches(subject, startIndex, PcreMatchOptions.None, onCallout);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Matches"]/*'/>
-    /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="startIndex" or @name="options" or @name="onCallout" or @name="settings"]'/>
+    /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="startIndex" or @name="options" or @name="onCallout"]'/>
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex" or @name="callout"]/*'/>
     /// </remarks>
     [Pure]
-    public RefMatchEnumerable Matches(ReadOnlySpan<byte> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFuncUtf8? onCallout, PcreMatchSettings settings)
+    public RefMatchEnumerable Matches(ReadOnlySpan<byte> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFuncUtf8? onCallout)
     {
-        if (settings == null)
-            throw new ArgumentNullException(nameof(settings));
-
         if (unchecked((uint)startIndex > (uint)subject.Length))
             ThrowInvalidStartIndex();
 
-        return new RefMatchEnumerable(InternalRegex, subject, startIndex, options, onCallout, settings);
+        return new RefMatchEnumerable(this, subject, startIndex, options, onCallout);
     }
+
+    /// <summary>
+    /// Returns the regex pattern.
+    /// </summary>
+    public override string ToString()
+        => Regex.PatternString;
 
     private static void ThrowInvalidStartIndex()
         => throw new ArgumentOutOfRangeException("Invalid start index.", default(Exception));
 
     /// <summary>
-    /// An enumerable of matches against a <see cref="ReadOnlySpan{T}"/>.
+    /// An enumerable of matches.
     /// </summary>
     public readonly ref struct RefMatchEnumerable
     {
@@ -172,48 +214,28 @@ public partial class PcreRegexUtf8
         private readonly int _startIndex;
         private readonly PcreMatchOptions _options;
         private readonly PcreRefCalloutFuncUtf8? _callout;
-        private readonly PcreMatchSettings _settings;
-        private readonly InternalRegex8Bit _regex;
+        private readonly PcreMatchBufferUtf8 _buffer;
 
-        internal RefMatchEnumerable(InternalRegex8Bit regex,
+        internal RefMatchEnumerable(PcreMatchBufferUtf8 buffer,
                                     ReadOnlySpan<byte> subject,
                                     int startIndex,
                                     PcreMatchOptions options,
-                                    PcreRefCalloutFuncUtf8? callout,
-                                    PcreMatchSettings settings)
+                                    PcreRefCalloutFuncUtf8? callout)
         {
-            _regex = regex;
+            _buffer = buffer;
             _subject = subject;
             _startIndex = startIndex;
             _options = options;
             _callout = callout;
-            _settings = settings;
         }
 
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
         public RefMatchEnumerator GetEnumerator()
-            => new(_regex, _subject, _startIndex, _options, _callout, _settings);
-
-        /// <summary>
-        /// Creates a <see cref="List{T}"/> out of the matches by applying a <paramref name="selector"/> method.
-        /// </summary>
-        /// <param name="selector">The selector that converts a match to a list item.</param>
-        /// <typeparam name="T">The type of list items.</typeparam>
-        [SuppressMessage("Microsoft.Design", "CA1002")]
-        [SuppressMessage("Microsoft.Design", "CA1062")]
-        public List<T> ToList<T>(PcreRefMatchUtf8.Func<T> selector)
-        {
-            var result = new List<T>();
-
-            foreach (var item in this)
-                result.Add(selector(item));
-
-            return result;
-        }
+            => new(_buffer, _subject, _startIndex, _options, _callout);
     }
 
     /// <summary>
-    /// An enumerator of matches against a <see cref="ReadOnlySpan{T}"/>.
+    /// An enumerator of matches.
     /// </summary>
     public ref struct RefMatchEnumerator
     {
@@ -221,23 +243,20 @@ public partial class PcreRegexUtf8
         private readonly int _startIndex;
         private readonly PcreMatchOptions _options;
         private readonly PcreRefCalloutFuncUtf8? _callout;
-        private readonly PcreMatchSettings _settings;
-        private InternalRegex8Bit? _regex;
+        private PcreMatchBufferUtf8? _buffer;
         private PcreRefMatchUtf8 _match;
 
-        internal RefMatchEnumerator(InternalRegex8Bit regex,
+        internal RefMatchEnumerator(PcreMatchBufferUtf8 buffer,
                                     ReadOnlySpan<byte> subject,
                                     int startIndex,
                                     PcreMatchOptions options,
-                                    PcreRefCalloutFuncUtf8? callout,
-                                    PcreMatchSettings settings)
+                                    PcreRefCalloutFuncUtf8? callout)
         {
-            _regex = regex;
+            _buffer = buffer;
             _subject = subject;
             _startIndex = startIndex;
             _options = options;
             _callout = callout;
-            _settings = settings;
             _match = default;
         }
 
@@ -251,23 +270,23 @@ public partial class PcreRegexUtf8
         /// </summary>
         public bool MoveNext()
         {
-            if (_regex == null)
+            if (_buffer == null)
                 return false;
 
             if (!_match.IsInitialized)
             {
-                _match = new PcreRefMatchUtf8(_regex, Span<nuint>.Empty);
-                _match.FirstMatch(_subject, _settings, _startIndex, _options, _callout, null);
+                _match = new PcreRefMatchUtf8(_buffer.Regex, _buffer.GetOutputVectorSpan());
+                _match.FirstMatch(_buffer, _subject, _startIndex, _options, _callout);
             }
             else
             {
-                _match.NextMatch(_settings, _options, _callout, null);
+                _match.NextMatch(_buffer, _options, _callout);
             }
 
             if (_match.Success)
                 return true;
 
-            _regex = null;
+            _buffer = null;
             return false;
         }
     }

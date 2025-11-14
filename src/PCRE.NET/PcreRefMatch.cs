@@ -241,6 +241,25 @@ public unsafe ref struct PcreRefMatch
         );
     }
 
+    internal void FirstMatch(PcreMatchBuffer buffer,
+                             ReadOnlySpan<char> subject,
+                             int startIndex,
+                             PcreMatchOptions options,
+                             PcreRefCalloutFunc? callout)
+    {
+        Subject = subject;
+
+        _regex!.BufferMatch(
+            Subject,
+            buffer,
+            startIndex,
+            options.ToPatternOptions(),
+            callout,
+            out _markPtr,
+            out _resultCode
+        );
+    }
+
     internal void NextMatch(PcreMatchBuffer buffer,
                             PcreMatchOptions options,
                             PcreRefCalloutFunc? callout)
@@ -249,23 +268,14 @@ public unsafe ref struct PcreRefMatch
         var nextOptions = options.ToPatternOptions() | PcreConstants.PCRE2_NO_UTF_CHECK | (Length == 0 ? PcreConstants.PCRE2_NOTEMPTY_ATSTART : 0);
 
         _regex!.BufferMatch(
-            ref this,
             Subject,
             buffer,
             startOfNextMatchIndex,
             nextOptions,
-            callout
+            callout,
+            out _markPtr,
+            out _resultCode
         );
-    }
-
-    internal void Update(ReadOnlySpan<char> subject, scoped in Native.match_result result, nuint[]? outputVector)
-    {
-        Subject = subject;
-        _markPtr = (char*)result.mark;
-        _resultCode = result.result_code;
-
-        if (outputVector != null)
-            OutputVector = outputVector;
     }
 
     private readonly int GetStartOfNextMatchIndex()

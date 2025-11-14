@@ -6,13 +6,20 @@ using PCRE.Internal;
 
 namespace PCRE;
 
+internal interface IPcreMatchBuffer
+{
+    InternalRegex Regex { get; }
+    IntPtr NativeBuffer { get; }
+    nuint[] CalloutOutputVector { get; }
+}
+
 /// <summary>
 /// A buffer that allows execution of regular expression matches without managed allocations.
 /// </summary>
 /// <remarks>
 /// Not thread-safe and not reentrant.
 /// </remarks>
-public sealed unsafe class PcreMatchBuffer : IDisposable
+public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IDisposable
 {
     internal readonly InternalRegex16Bit Regex;
     private readonly int _outputVectorSize;
@@ -22,6 +29,10 @@ public sealed unsafe class PcreMatchBuffer : IDisposable
 
     internal readonly nuint* OutputVector;
     internal readonly nuint[] CalloutOutputVector;
+
+    InternalRegex IPcreMatchBuffer.Regex => Regex;
+    IntPtr IPcreMatchBuffer.NativeBuffer => NativeBuffer;
+    nuint[] IPcreMatchBuffer.CalloutOutputVector => CalloutOutputVector;
 
     internal PcreMatchBuffer(InternalRegex16Bit regex, PcreMatchSettings settings)
     {
@@ -150,16 +161,7 @@ public sealed unsafe class PcreMatchBuffer : IDisposable
             ThrowInvalidStartIndex();
 
         var match = new PcreRefMatch(Regex, GetOutputVectorSpan());
-
-        Regex.BufferMatch(
-            ref match,
-            subject,
-            this,
-            startIndex,
-            options.ToPatternOptions(),
-            onCallout
-        );
-
+        match.FirstMatch(this, subject, startIndex, options, onCallout);
         return match;
     }
 
@@ -281,15 +283,7 @@ public sealed unsafe class PcreMatchBuffer : IDisposable
             if (!_match.IsInitialized)
             {
                 _match = new PcreRefMatch(_buffer.Regex, _buffer.GetOutputVectorSpan());
-
-                _buffer.Regex.BufferMatch(
-                    ref _match,
-                    _subject,
-                    _buffer,
-                    _startIndex,
-                    _options.ToPatternOptions(),
-                    _callout
-                );
+                _match.FirstMatch(_buffer, _subject, _startIndex, _options, _callout);
             }
             else
             {

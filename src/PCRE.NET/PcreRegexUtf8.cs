@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using PCRE.Internal;
 
 namespace PCRE;
@@ -44,6 +45,23 @@ public sealed partial class PcreRegexUtf8
         // TODO: InternalRegex = Caches.RegexCache.GetOrAdd(new RegexKey(pattern, settings));
         InternalRegex = new InternalRegex8Bit(pattern, settings);
     }
+
+    /// <summary>
+    /// Creates a buffer for zero-allocation matching.
+    /// </summary>
+    /// <remarks>
+    /// The resulting <see cref="PcreMatchBuffer"/> can be used to perform match operations without allocating any managed memory,
+    /// therefore not inducing any GC pressure. Note that the buffer is not thread-safe and not reentrant.
+    /// </remarks>
+    [Pure]
+    public PcreMatchBufferUtf8 CreateMatchBuffer()
+        => new(InternalRegex, PcreMatchSettings.Default);
+
+    /// <inheritdoc cref="CreateMatchBuffer()"/>
+    /// <param name="settings">Additional settings.</param>
+    [Pure]
+    public PcreMatchBufferUtf8 CreateMatchBuffer(PcreMatchSettings settings)
+        => new(InternalRegex, settings ?? throw new ArgumentNullException(nameof(settings)));
 
     /// <summary>
     /// Returns the regex pattern.

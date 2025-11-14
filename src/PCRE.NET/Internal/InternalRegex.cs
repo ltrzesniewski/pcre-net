@@ -154,7 +154,7 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
                       PcreMatchSettings settings,
                       int startIndex,
                       uint additionalOptions,
-                      PcreRefCalloutFunc? callout,
+                      Delegate? callout,
                       nuint[]? calloutOutputVector,
                       out TChar* markPtr,
                       out int resultCode)
@@ -201,6 +201,46 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
 
         if (oVectorArray != null)
             matchOVector = oVectorArray;
+
+        markPtr = (TChar*)result.mark;
+        resultCode = result.result_code;
+    }
+
+    public void BufferMatch(ReadOnlySpan<TChar> subject,
+                            IPcreMatchBuffer buffer,
+                            int startIndex,
+                            uint additionalOptions,
+                            Delegate? callout,
+                            out TChar* markPtr,
+                            out int resultCode)
+    {
+        Native.buffer_match_input input;
+        _ = &input;
+
+        Native.match_result result;
+        CalloutInterop.CalloutInteropInfo<TChar> calloutInterop;
+
+        fixed (TChar* pSubject = subject)
+        {
+            input.buffer = (void*)buffer.NativeBuffer;
+            input.subject = pSubject;
+            input.subject_length = (uint)subject.Length;
+            input.start_index = (uint)startIndex;
+            input.additional_options = additionalOptions;
+            input.callout = null;
+
+            if (input.buffer == null)
+                ThrowMatchBufferDisposed();
+
+            CalloutInterop.Prepare(subject, buffer, ref input, out calloutInterop, callout);
+
+            default(TNative).buffer_match(&input, &result);
+
+            GC.KeepAlive(buffer); // The buffer keeps alive all the other required stuff
+        }
+
+        if (result.result_code < PcreConstants.PCRE2_ERROR_PARTIAL)
+            HandleError(result, ref calloutInterop);
 
         markPtr = (TChar*)result.mark;
         resultCode = result.result_code;
@@ -338,44 +378,6 @@ internal sealed unsafe class InternalRegex16Bit : InternalRegex<char, NativeStru
 
         oVectorArray ??= oVector.ToArray();
         return new PcreMatch(subject, this, ref result, oVectorArray);
-    }
-
-    public void BufferMatch(ref PcreRefMatch match,
-                            ReadOnlySpan<char> subject,
-                            PcreMatchBuffer buffer,
-                            int startIndex,
-                            uint additionalOptions,
-                            PcreRefCalloutFunc? callout)
-    {
-        Native.buffer_match_input input;
-        _ = &input;
-
-        Native.match_result result;
-        CalloutInterop.CalloutInteropInfo<char> calloutInterop;
-
-        fixed (char* pSubject = subject)
-        {
-            input.buffer = (void*)buffer.NativeBuffer;
-            input.subject = pSubject;
-            input.subject_length = (uint)subject.Length;
-            input.start_index = (uint)startIndex;
-            input.additional_options = additionalOptions;
-            input.callout = null;
-
-            if (input.buffer == null)
-                ThrowMatchBufferDisposed();
-
-            CalloutInterop.Prepare(subject, buffer, ref input, out calloutInterop, callout);
-
-            default(NativeStruct16Bit).buffer_match(&input, &result);
-
-            GC.KeepAlive(buffer); // The buffer keeps alive all the other required stuff
-        }
-
-        if (result.result_code < PcreConstants.PCRE2_ERROR_PARTIAL)
-            HandleError(result, ref calloutInterop);
-
-        match.Update(subject, result, null);
     }
 
     public PcreDfaMatchResult DfaMatch(string subject, PcreDfaMatchSettings settings, int startIndex, uint additionalOptions)
