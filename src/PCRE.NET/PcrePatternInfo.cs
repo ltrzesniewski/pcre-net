@@ -10,15 +10,15 @@ namespace PCRE;
 /// </summary>
 public sealed class PcrePatternInfo
 {
-    private readonly InternalRegex16Bit _re;
+    private readonly InternalRegex _re;
 
-    internal PcrePatternInfo(InternalRegex16Bit re)
+    internal PcrePatternInfo(InternalRegex re)
         => _re = re;
 
     /// <summary>
     /// Returns the regex pattern string.
     /// </summary>
-    public string PatternString => _re.Pattern;
+    public string PatternString => _re.PatternString;
 
     /// <summary>
     /// Returns the advanced settings that were used.

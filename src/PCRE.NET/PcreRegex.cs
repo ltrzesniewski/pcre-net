@@ -99,5 +99,5 @@ public sealed partial class PcreRegex
     /// Returns the regex pattern.
     /// </summary>
     public override string ToString()
-        => InternalRegex.Pattern;
+        => InternalRegex.PatternString;
 }

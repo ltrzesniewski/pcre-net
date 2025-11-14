@@ -22,6 +22,14 @@ internal abstract unsafe class InternalRegex : IDisposable
     public int OutputVectorSize => 2 * (CaptureCount + 1);
     public bool CanStackAllocOutputVector => CaptureCount <= MaxStackAllocCaptureCount;
 
+    public abstract string PatternString { get; protected init; }
+    public PcreRegexSettings Settings { get; }
+
+    protected InternalRegex(PcreRegexSettings settings)
+    {
+        Settings = settings.AsReadOnly();
+    }
+
     ~InternalRegex()
         => FreeCode();
 
@@ -37,6 +45,9 @@ internal abstract unsafe class InternalRegex : IDisposable
 
     [return: NotNullIfNotNull(nameof(ptr))]
     public abstract string? GetString(void* ptr);
+
+    public abstract uint GetInfoUInt32(uint key);
+    public abstract nuint GetInfoNativeInt(uint key);
 
     public PcreCalloutInfo? TryGetCalloutInfoByPatternPosition(int patternPosition)
     {
@@ -58,7 +69,7 @@ internal abstract unsafe class InternalRegex : IDisposable
         => TryGetCalloutInfoByPatternPosition(patternPosition) ?? throw new InvalidOperationException($"Could not retrieve callout info at position {patternPosition}.");
 }
 
-internal abstract class InternalRegex<TChar> : InternalRegex
+internal abstract class InternalRegex<TChar>(PcreRegexSettings settings) : InternalRegex(settings)
     where TChar : unmanaged;
 
 internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TChar>
@@ -67,9 +78,7 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
 {
     private readonly TChar[] _pattern;
 
-    public ReadOnlySpan<TChar> Pattern => _pattern;
-
-    public string PatternString
+    public override string PatternString
     {
         get
         {
@@ -77,7 +86,7 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
             {
                 if (typeof(TChar) == typeof(char))
                 {
-                    field = Pattern.ToString();
+                    field = _pattern.AsSpan().ToString();
                 }
                 else
                 {
@@ -92,14 +101,12 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
         protected init;
     }
 
-    public PcreRegexSettings Settings { get; }
-
     protected InternalRegex(ReadOnlySpan<TChar> pattern, PcreRegexSettings settings)
+        : base(settings)
     {
         Debug.Assert(typeof(TChar) == typeof(char) || typeof(TChar) == typeof(byte));
 
         _pattern = pattern.ToArray();
-        Settings = settings.AsReadOnly();
 
         Compile(pattern, out var captureCount, out var captureNames);
         CaptureCount = captureCount;
@@ -264,7 +271,7 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
         }
     }
 
-    public uint GetInfoUInt32(uint key)
+    public override uint GetInfoUInt32(uint key)
     {
         uint result;
         var errorCode = default(TNative).pattern_info(Code, key, &result);
@@ -277,7 +284,7 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
         return result;
     }
 
-    public nuint GetInfoNativeInt(uint key)
+    public override nuint GetInfoNativeInt(uint key)
     {
         nuint result;
         var errorCode = default(TNative).pattern_info(Code, key, &result);
@@ -322,8 +329,6 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
 internal sealed unsafe class InternalRegex16Bit : InternalRegex<char, NativeStruct16Bit>
 {
     private PcreMatch? _noMatch;
-
-    public new string Pattern => PatternString;
 
     public InternalRegex16Bit(string pattern, PcreRegexSettings settings)
         : base(pattern.AsSpan(), settings)

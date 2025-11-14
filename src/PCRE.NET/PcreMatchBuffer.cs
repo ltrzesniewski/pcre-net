@@ -207,7 +207,7 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IDisposable
     /// Returns the regex pattern.
     /// </summary>
     public override string ToString()
-        => Regex.Pattern;
+        => Regex.PatternString;
 
     private static void ThrowInvalidStartIndex()
         => throw new ArgumentOutOfRangeException("Invalid start index.", default(Exception));

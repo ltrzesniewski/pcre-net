@@ -13,6 +13,11 @@ public sealed partial class PcreRegexUtf8
     internal InternalRegex8Bit InternalRegex { get; }
 
     /// <summary>
+    /// Returns information about the pattern.
+    /// </summary>
+    public PcrePatternInfo PatternInfo => field ??= new PcrePatternInfo(InternalRegex);
+
+    /// <summary>
     /// Creates a PCRE2 regex for UTF-8.
     /// </summary>
     /// <param name="pattern">The regular expression pattern.</param>
