@@ -10,7 +10,7 @@ internal class NetCoreStandardConfig : ManualConfig
     {
         AddJob(
             Job.Default.WithId(".NET Core"),
-            Job.Default.WithId(".NET Standard").WithArguments(new[] { new MsBuildArgument("/p:ForceNetStandard=true") })
+            Job.Default.WithId(".NET Standard").WithArguments([new MsBuildArgument("/p:ForceNetStandard=true")])
         );
     }
 }
@@ -21,7 +21,7 @@ internal class NetCoreStandardFrameworkConfig : ManualConfig
     {
         AddJob(
             Job.Default.WithId(".NET Core"),
-            Job.Default.WithId(".NET Standard").WithArguments(new[] { new MsBuildArgument("/p:ForceNetStandard=true") }),
+            Job.Default.WithId(".NET Standard").WithArguments([new MsBuildArgument("/p:ForceNetStandard=true")]),
             Job.Default.WithId(".NET Framework").WithRuntime(ClrRuntime.Net48)
         );
     }
