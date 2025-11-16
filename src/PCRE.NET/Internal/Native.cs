@@ -1,39 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text;
 
 namespace PCRE.Internal;
 
-internal unsafe partial interface INative
+internal partial interface INative
 {
     string GetErrorMessage(int errorCode);
-
-    // PCRE2_INFO_NAMETABLE returns a pointer to the first entry of the table. This is a PCRE2_SPTR pointer to a block of code units.
-    // In the 8-bit library, the first two bytes of each entry are the number of the capturing parenthesis, most significant byte first.
-    // In the 16-bit library, the pointer points to 16-bit code units, the first of which contains the parenthesis number.
-    // In the 32-bit library, the pointer points to 32-bit code units, the first of which contains the parenthesis number.
-    // The rest of the entry is the corresponding name, zero terminated.
-    Dictionary<string, int[]> GetCaptureNames(void* nameEntryTable, uint nameCount, uint nameEntrySize);
 }
 
-internal readonly unsafe partial struct NativeStruct8Bit : INative
+internal readonly partial struct NativeStruct8Bit : INative
 {
     public string GetErrorMessage(int errorCode)
         => Native8Bit.GetErrorMessage(errorCode);
-
-    public Dictionary<string, int[]> GetCaptureNames(void* nameEntryTable, uint nameCount, uint nameEntrySize)
-        => Native8Bit.GetCaptureNames(nameEntryTable, nameCount, nameEntrySize);
 }
 
-internal readonly unsafe partial struct NativeStruct16Bit : INative
+internal readonly partial struct NativeStruct16Bit : INative
 {
     public string GetErrorMessage(int errorCode)
         => Native16Bit.GetErrorMessage(errorCode);
-
-    public Dictionary<string, int[]> GetCaptureNames(void* nameEntryTable, uint nameCount, uint nameEntrySize)
-        => Native16Bit.GetCaptureNames(nameEntryTable, nameCount, nameEntrySize);
 }
 
 [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global")]
@@ -48,68 +34,6 @@ internal static unsafe partial class Native8Bit
         return messageLength >= 0
             ? Encoding.ASCII.GetString(buffer, messageLength)
             : $"Unknown error, code: {errorCode}";
-    }
-
-    public static Dictionary<string, int[]> GetCaptureNames(void* nameEntryTable, uint nameCount, uint nameEntrySize)
-    {
-        // PCRE2_INFO_NAMETABLE returns a pointer to the first entry of the table. This is a PCRE2_SPTR pointer to a block of code units.
-        // In the 8-bit library, the first two bytes of each entry are the number of the capturing parenthesis, most significant byte first.
-        // The rest of the entry is the corresponding name, zero terminated.
-
-        var captureNames = new Dictionary<string, int[]>((int)nameCount, StringComparer.Ordinal);
-        var currentItem = (byte*)nameEntryTable;
-
-        for (var i = 0; i < nameCount; ++i)
-        {
-            var groupIndex = currentItem[0] << 8 | currentItem[1];
-            var groupName = GetString(currentItem + 2) ?? string.Empty;
-
-            if (captureNames.TryGetValue(groupName, out var indexes))
-            {
-                Array.Resize(ref indexes, indexes.Length + 1);
-                indexes[indexes.Length - 1] = groupIndex;
-            }
-            else
-            {
-                indexes = [groupIndex];
-            }
-
-            captureNames[groupName] = indexes;
-            currentItem += nameEntrySize;
-        }
-
-        return captureNames;
-    }
-
-    public static string GetString(ReadOnlySpan<byte> value)
-    {
-        // TODO: The pattern may not be UTF-8
-
-        fixed (byte* ptr = value)
-            return Encoding.UTF8.GetString(ptr, value.Length);
-    }
-
-    public static string? GetString(byte* ptr)
-    {
-        if (ptr is null)
-            return null;
-
-        // TODO: The pattern may not be UTF-8
-#if NET
-        return Marshal.PtrToStringUTF8((IntPtr)ptr) ?? string.Empty;
-#else
-        return Encoding.UTF8.GetString(ptr, GetStringLength(ptr));
-
-        static int GetStringLength(byte* value)
-        {
-            var start = value;
-
-            while (*value != 0)
-                ++value;
-
-            return (int)(value - start);
-        }
-#endif
     }
 }
 
@@ -126,40 +50,6 @@ internal static unsafe partial class Native16Bit
             ? new string(buffer, 0, messageLength)
             : $"Unknown error, code: {errorCode}";
     }
-
-    public static Dictionary<string, int[]> GetCaptureNames(void* nameEntryTable, uint nameCount, uint nameEntrySize)
-    {
-        // PCRE2_INFO_NAMETABLE returns a pointer to the first entry of the table. This is a PCRE2_SPTR pointer to a block of code units.
-        // In the 16-bit library, the pointer points to 16-bit code units, the first of which contains the parenthesis number.
-        // The rest of the entry is the corresponding name, zero terminated.
-
-        var captureNames = new Dictionary<string, int[]>((int)nameCount, StringComparer.Ordinal);
-        var currentItem = (char*)nameEntryTable;
-
-        for (var i = 0; i < nameCount; ++i)
-        {
-            var groupIndex = (int)*currentItem;
-            var groupName = new string(currentItem + 1);
-
-            if (captureNames.TryGetValue(groupName, out var indexes))
-            {
-                Array.Resize(ref indexes, indexes.Length + 1);
-                indexes[indexes.Length - 1] = groupIndex;
-            }
-            else
-            {
-                indexes = [groupIndex];
-            }
-
-            captureNames[groupName] = indexes;
-            currentItem += nameEntrySize;
-        }
-
-        return captureNames;
-    }
-
-    public static string? GetString(char* ptr)
-        => ptr is not null ? new string(ptr) : null;
 }
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]

@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
+using System.Text;
 using PCRE.Internal;
 
 namespace PCRE;
@@ -23,7 +24,17 @@ public sealed partial class PcreRegexUtf8
     /// <param name="pattern">The regular expression pattern.</param>
     [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
     public PcreRegexUtf8(ReadOnlySpan<byte> pattern)
-        : this(pattern, PcreOptions.None)
+        : this(pattern, GetString(pattern), new PcreRegexSettings(PcreOptions.None))
+    {
+    }
+
+    /// <summary>
+    /// Creates a PCRE2 regex for UTF-8.
+    /// </summary>
+    /// <param name="pattern">The regular expression pattern.</param>
+    [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
+    public PcreRegexUtf8(string pattern)
+        : this(GetBytes(pattern), pattern, new PcreRegexSettings(PcreOptions.None))
     {
     }
 
@@ -33,7 +44,17 @@ public sealed partial class PcreRegexUtf8
     /// <param name="pattern">The regular expression pattern.</param>
     /// <param name="options">Pattern options.</param>
     public PcreRegexUtf8(ReadOnlySpan<byte> pattern, PcreOptions options)
-        : this(pattern, new PcreRegexSettings(options))
+        : this(pattern, GetString(pattern), new PcreRegexSettings(options))
+    {
+    }
+
+    /// <summary>
+    /// Creates a PCRE2 regex for UTF-8.
+    /// </summary>
+    /// <param name="pattern">The regular expression pattern.</param>
+    /// <param name="options">Pattern options.</param>
+    public PcreRegexUtf8(string pattern, PcreOptions options)
+        : this(GetBytes(pattern), pattern, new PcreRegexSettings(options))
     {
     }
 
@@ -43,12 +64,29 @@ public sealed partial class PcreRegexUtf8
     /// <param name="pattern">The regular expression pattern.</param>
     /// <param name="settings">Additional advanced settings.</param>
     public PcreRegexUtf8(ReadOnlySpan<byte> pattern, PcreRegexSettings settings)
+        : this(pattern, GetString(pattern), settings)
+    {
+    }
+
+    private PcreRegexUtf8(ReadOnlySpan<byte> pattern, string patternString, PcreRegexSettings settings)
     {
         if (settings == null)
             throw new ArgumentNullException(nameof(settings));
 
-        // TODO: InternalRegex = Caches.RegexCache.GetOrAdd(new RegexKey(pattern, settings));
-        InternalRegex = new InternalRegex8Bit(pattern, settings);
+        InternalRegex = new InternalRegex8Bit(pattern, patternString, settings, Encoding.UTF8);
+    }
+
+    private static ReadOnlySpan<byte> GetBytes(string value)
+        => Encoding.UTF8.GetBytes(value);
+
+    internal static unsafe string GetString(ReadOnlySpan<byte> value)
+    {
+# if NET
+        return Encoding.UTF8.GetString(value);
+#else
+        fixed (byte* ptr = value)
+            return Encoding.UTF8.GetString(ptr, value.Length);
+#endif
     }
 
     /// <summary>

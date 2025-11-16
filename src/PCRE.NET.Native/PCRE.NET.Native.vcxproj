@@ -62,8 +62,8 @@
     <ClCompile Include="@(Pcre2Source->'compile\%(Filename).16bit%(Extension)')" />
     <ClCompile Include="@(PcreNetSource->'compile\%(Filename).8bit%(Extension)')" />
     <ClCompile Include="@(PcreNetSource->'compile\%(Filename).16bit%(Extension)')" />
-    <ClInclude Include="compile\config.16bit.h" />
     <ClInclude Include="compile\config.8bit.h" />
+    <ClInclude Include="compile\config.16bit.h" />
     <Pcre2Source Update="@(Pcre2Source)" Visible="false" />
   </ItemGroup>
   <ItemGroup>

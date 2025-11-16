@@ -60,7 +60,7 @@ public readonly ref struct PcreRefGroupUtf8
 
     /// <inheritdoc cref="PcreGroup.op_Implicit"/>
     public static explicit operator string(PcreRefGroupUtf8 group)
-        => Native8Bit.GetString(group.Value);
+        => PcreRegexUtf8.GetString(group.Value);
 
     /// <inheritdoc cref="PcreGroup.ToString"/>
     public override string ToString()
@@ -74,7 +74,7 @@ public readonly ref struct PcreRefGroupUtf8
         public DebugProxy(PcreRefGroupUtf8 group)
         {
             Success = group.Success;
-            Value = Success ? Native8Bit.GetString(group.Value) : null;
+            Value = Success ? PcreRegexUtf8.GetString(group.Value) : null;
         }
 
         public override string ToString()

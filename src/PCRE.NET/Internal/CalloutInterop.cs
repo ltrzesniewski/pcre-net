@@ -311,22 +311,6 @@ internal static unsafe class CalloutInterop
                         : Span<nuint>.Empty
                 );
 
-                if (typeof(TChar) == typeof(char))
-                {
-                    var func = (PcreRefCalloutFunc)_callout;
-                    fixed (TChar* ptr = _subjectSpan)
-                    {
-                        return (int)func(
-                            new PcreRefCallout(
-                                new ReadOnlySpan<char>(ptr, _subjectSpan.Length),
-                                (InternalRegex16Bit)(object)_regex,
-                                callout,
-                                outputVector
-                            )
-                        );
-                    }
-                }
-
                 if (typeof(TChar) == typeof(byte))
                 {
                     var func = (PcreRefCalloutFuncUtf8)_callout;
@@ -336,6 +320,22 @@ internal static unsafe class CalloutInterop
                             new PcreRefCalloutUtf8(
                                 new ReadOnlySpan<byte>(ptr, _subjectSpan.Length),
                                 (InternalRegex8Bit)(object)_regex,
+                                callout,
+                                outputVector
+                            )
+                        );
+                    }
+                }
+
+                if (typeof(TChar) == typeof(char))
+                {
+                    var func = (PcreRefCalloutFunc)_callout;
+                    fixed (TChar* ptr = _subjectSpan)
+                    {
+                        return (int)func(
+                            new PcreRefCallout(
+                                new ReadOnlySpan<char>(ptr, _subjectSpan.Length),
+                                (InternalRegex16Bit)(object)_regex,
                                 callout,
                                 outputVector
                             )

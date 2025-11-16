@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using PCRE.Dfa;
 
@@ -22,11 +24,12 @@ internal abstract unsafe class InternalRegex : IDisposable
     public int OutputVectorSize => 2 * (CaptureCount + 1);
     public bool CanStackAllocOutputVector => CaptureCount <= MaxStackAllocCaptureCount;
 
-    public abstract string PatternString { get; protected init; }
+    public string PatternString { get; }
     public PcreRegexSettings Settings { get; }
 
-    protected InternalRegex(PcreRegexSettings settings)
+    protected InternalRegex(string patternString, PcreRegexSettings settings)
     {
+        PatternString = patternString;
         Settings = settings.AsReadOnly();
     }
 
@@ -69,44 +72,18 @@ internal abstract unsafe class InternalRegex : IDisposable
         => TryGetCalloutInfoByPatternPosition(patternPosition) ?? throw new InvalidOperationException($"Could not retrieve callout info at position {patternPosition}.");
 }
 
-internal abstract class InternalRegex<TChar>(PcreRegexSettings settings) : InternalRegex(settings)
+internal abstract class InternalRegex<TChar>(string patternString, PcreRegexSettings settings)
+    : InternalRegex(patternString, settings)
     where TChar : unmanaged;
 
 internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TChar>
     where TChar : unmanaged
     where TNative : struct, INative
 {
-    private readonly TChar[] _pattern;
-
-    public override string PatternString
-    {
-        get
-        {
-            if (field == null)
-            {
-                if (typeof(TChar) == typeof(char))
-                {
-                    field = _pattern.AsSpan().ToString();
-                }
-                else
-                {
-                    fixed (byte* ptr = (byte[])(object)_pattern)
-                        field = GetString(ptr);
-                }
-            }
-
-            return field;
-        }
-
-        protected init;
-    }
-
-    protected InternalRegex(ReadOnlySpan<TChar> pattern, PcreRegexSettings settings)
-        : base(settings)
+    protected InternalRegex(ReadOnlySpan<TChar> pattern, string patternString, PcreRegexSettings settings)
+        : base(patternString, settings)
     {
         Debug.Assert(typeof(TChar) == typeof(char) || typeof(TChar) == typeof(byte));
-
-        _pattern = pattern.ToArray();
 
         Compile(pattern, out var captureCount, out var captureNames);
         CaptureCount = captureCount;
@@ -143,7 +120,7 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
         }
 
         captureCount = (int)result.capture_count;
-        captureNames = default(TNative).GetCaptureNames(result.name_entry_table, result.name_count, result.name_entry_size);
+        captureNames = GetCaptureNames(result.name_entry_table, result.name_count, result.name_entry_size);
     }
 
     protected override void FreeCode()
@@ -250,6 +227,10 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
 
         markPtr = (TChar*)result.mark;
         resultCode = result.result_code;
+        return;
+
+        static void ThrowMatchBufferDisposed()
+            => throw new ObjectDisposedException("The match buffer has been disposed");
     }
 
     protected static void HandleError(in Native.match_result result, ref CalloutInterop.CalloutInteropInfo<TChar> calloutInterop)
@@ -319,22 +300,85 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
         return result.AsReadOnly();
     }
 
+    /// <summary>
+    /// Retrieves the capture names from the name entry table.
+    /// </summary>
+    /// <remarks>
+    /// PCRE2_INFO_NAMETABLE returns a pointer to the first entry of the table. This is a PCRE2_SPTR pointer to a block of code units.
+    /// In the 8-bit library, the first two bytes of each entry are the number of the capturing parenthesis, most significant byte first.
+    /// In the 16-bit library, the pointer points to 16-bit code units, the first of which contains the parenthesis number.
+    /// In the 32-bit library, the pointer points to 32-bit code units, the first of which contains the parenthesis number.
+    /// The rest of the entry is the corresponding name, zero terminated.
+    /// </remarks>
+    protected abstract Dictionary<string, int[]> GetCaptureNames(void* nameEntryTable, uint nameCount, uint nameEntrySize);
+
     public override string ToString()
         => PatternString;
-
-    private static void ThrowMatchBufferDisposed()
-        => throw new ObjectDisposedException("The match buffer has been disposed");
 }
 
-internal sealed unsafe class InternalRegex16Bit : InternalRegex<char, NativeStruct16Bit>
+internal sealed unsafe class InternalRegex8Bit(ReadOnlySpan<byte> pattern, string patternString, PcreRegexSettings settings, Encoding encoding)
+    : InternalRegex<byte, NativeStruct8Bit>(pattern, patternString, settings)
+{
+    public override string? GetString(void* ptr)
+        => GetString((byte*)ptr, encoding);
+
+    private static string? GetString(byte* ptr, Encoding encoding)
+    {
+        if (ptr is null)
+            return null;
+#if NET
+        if (ReferenceEquals(encoding, Encoding.UTF8))
+            return Marshal.PtrToStringUTF8((IntPtr)ptr) ?? string.Empty;
+#endif
+        return encoding.GetString(ptr, GetStringLength(ptr));
+
+        static int GetStringLength(byte* ptr)
+        {
+            var start = ptr;
+
+            while (*ptr != 0)
+                ++ptr;
+
+            return (int)(ptr - start);
+        }
+    }
+
+    protected override Dictionary<string, int[]> GetCaptureNames(void* nameEntryTable, uint nameCount, uint nameEntrySize)
+    {
+        // PCRE2_INFO_NAMETABLE returns a pointer to the first entry of the table. This is a PCRE2_SPTR pointer to a block of code units.
+        // In the 8-bit library, the first two bytes of each entry are the number of the capturing parenthesis, most significant byte first.
+        // The rest of the entry is the corresponding name, zero terminated.
+
+        var captureNames = new Dictionary<string, int[]>((int)nameCount, StringComparer.Ordinal);
+        var currentItem = (byte*)nameEntryTable;
+
+        for (var i = 0; i < nameCount; ++i)
+        {
+            var groupIndex = currentItem[0] << 8 | currentItem[1];
+            var groupName = GetString(currentItem + 2) ?? string.Empty;
+
+            if (captureNames.TryGetValue(groupName, out var indexes))
+            {
+                Array.Resize(ref indexes, indexes.Length + 1);
+                indexes[indexes.Length - 1] = groupIndex;
+            }
+            else
+            {
+                indexes = [groupIndex];
+            }
+
+            captureNames[groupName] = indexes;
+            currentItem += nameEntrySize;
+        }
+
+        return captureNames;
+    }
+}
+
+internal sealed unsafe class InternalRegex16Bit(string pattern, PcreRegexSettings settings)
+    : InternalRegex<char, NativeStruct16Bit>(pattern, pattern, settings)
 {
     private PcreMatch? _noMatch;
-
-    public InternalRegex16Bit(string pattern, PcreRegexSettings settings)
-        : base(pattern.AsSpan(), settings)
-    {
-        PatternString = pattern;
-    }
 
     public PcreMatch Match(string subject,
                            PcreMatchSettings settings,
@@ -500,16 +544,36 @@ internal sealed unsafe class InternalRegex16Bit : InternalRegex<char, NativeStru
     }
 
     public override string? GetString(void* ptr)
-        => Native16Bit.GetString((char*)ptr);
-}
+        => ptr is not null ? new string((char*)ptr) : null;
 
-internal sealed unsafe class InternalRegex8Bit : InternalRegex<byte, NativeStruct8Bit>
-{
-    public InternalRegex8Bit(ReadOnlySpan<byte> pattern, PcreRegexSettings settings)
-        : base(pattern, settings)
+    protected override Dictionary<string, int[]> GetCaptureNames(void* nameEntryTable, uint nameCount, uint nameEntrySize)
     {
-    }
+        // PCRE2_INFO_NAMETABLE returns a pointer to the first entry of the table. This is a PCRE2_SPTR pointer to a block of code units.
+        // In the 16-bit library, the pointer points to 16-bit code units, the first of which contains the parenthesis number.
+        // The rest of the entry is the corresponding name, zero terminated.
 
-    public override string? GetString(void* ptr)
-        => Native8Bit.GetString((byte*)ptr);
+        var captureNames = new Dictionary<string, int[]>((int)nameCount, StringComparer.Ordinal);
+        var currentItem = (char*)nameEntryTable;
+
+        for (var i = 0; i < nameCount; ++i)
+        {
+            var groupIndex = (int)*currentItem;
+            var groupName = new string(currentItem + 1);
+
+            if (captureNames.TryGetValue(groupName, out var indexes))
+            {
+                Array.Resize(ref indexes, indexes.Length + 1);
+                indexes[indexes.Length - 1] = groupIndex;
+            }
+            else
+            {
+                indexes = [groupIndex];
+            }
+
+            captureNames[groupName] = indexes;
+            currentItem += nameEntrySize;
+        }
+
+        return captureNames;
+    }
 }

@@ -287,7 +287,7 @@ public unsafe ref struct PcreRefMatchUtf8
 
     /// <inheritdoc cref="PcreMatch.ToString"/>
     public readonly override string ToString()
-        => Native8Bit.GetString(Value);
+        => PcreRegexUtf8.GetString(Value);
 
     /// <summary>
     /// The list of groups in a match.
@@ -436,7 +436,7 @@ public unsafe ref struct PcreRefMatchUtf8
         public DebugProxy(PcreRefMatchUtf8 match)
         {
             Success = match.Success;
-            Value = Success ? Native8Bit.GetString(match.Value) : null;
+            Value = Success ? PcreRegexUtf8.GetString(match.Value) : null;
 
             Groups = new PcreRefGroupUtf8.DebugProxy[match.CaptureCount + 1];
             for (var i = 0; i <= match.CaptureCount; ++i)
