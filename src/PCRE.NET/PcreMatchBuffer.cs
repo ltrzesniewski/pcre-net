@@ -50,7 +50,7 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IDisposable
 
         settings.FillMatchSettings(ref info.settings, out _jitStack);
 
-        NativeBuffer = (IntPtr)Native16Bit.create_match_buffer(&info);
+        NativeBuffer = (IntPtr)default(Native16Bit).create_match_buffer(&info);
         if (NativeBuffer == IntPtr.Zero)
             throw new InvalidOperationException("Could not create match buffer");
 
@@ -75,7 +75,7 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IDisposable
 
         var buffer = Interlocked.Exchange(ref NativeBuffer, IntPtr.Zero);
         if (buffer != IntPtr.Zero)
-            Native16Bit.free_match_buffer((void*)buffer);
+            default(Native16Bit).free_match_buffer((void*)buffer);
     }
 
     private Span<nuint> GetOutputVectorSpan()

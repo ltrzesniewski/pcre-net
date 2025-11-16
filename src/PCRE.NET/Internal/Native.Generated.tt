@@ -58,90 +58,81 @@ namespace PCRE.Internal;
 internal unsafe partial interface INative
 {
 <# foreach (var func in functions) { #>
-    <#= func.ReturnType #> <#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => p.GetDeclaration())) #>);
+    <#= func.GetDeclaration() #>;
 <# } #>
-
 }
 <# foreach (var bit in new[] { 8, 16 }) { #>
 
-internal readonly unsafe partial struct NativeStruct<#= bit #>Bit
+internal readonly unsafe partial struct Native<#= bit #>Bit : INative
 {
+#if NET
+
 <# foreach (var func in functions) { #>
-    public readonly <#= func.ReturnType #> <#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => p.GetDeclaration())) #>)
-        => Native<#= bit #>Bit.<#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => $"{p.Modifier}{p.Name}")) #>);
+    public readonly <#= func.GetDeclaration() #>
+        => pcrenet_<#= func.GetCall() #>;
+
+<# if (func.SuppressGCTransition) { #>
+    [SuppressGCTransition]
+<# } #>
+    [DllImport("<#= libName #>", EntryPoint = "pcrenet_<#= func.Name #>_<#= bit #>", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    private static extern <#= func.ReturnType #> pcrenet_<#= func.Name #>(<#= func.GetParametersDeclaration() #>);
 
 <# } #>
-}
+#else
 
-internal unsafe partial class Native<#= bit #>Bit
-{
-#if !NET
-    private static readonly LibImpl _impl = GetLibImpl();
+    private static readonly Lib _lib = GetLib();
 
-    private static LibImpl GetLibImpl()
+<# foreach (var func in functions) { #>
+    public readonly <#= func.GetDeclaration() #>
+        => _lib.<#= func.GetCall() #>;
+
+<# } #>
+    private static Lib GetLib()
     {
         try
         {
-            var impl = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? new WinImpl()
+            var lib = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? new WinLib()
                 : RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
-                    ? new LinuxImpl()
+                    ? new LinuxLib()
                     : RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
-                        ? (LibImpl)new OSXImpl()
+                        ? (Lib)new OSXLib()
                         : throw new PlatformNotSupportedException();
 
-            impl.get_error_message(0, null, 0);
-            return impl;
+            lib.get_error_message(0, null, 0);
+            return lib;
         }
         catch (DllNotFoundException) when (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             // Used in the .NET Framework
             return Environment.Is64BitProcess
-                ? new Win64Impl()
-                : new Win32Impl();
+                ? new Win64Lib()
+                : new Win32Lib();
         }
     }
-#endif
 
-#if NET
-
-<# foreach (var func in functions) { #>
-<# if (func.SuppressGCTransition) { #>
-    [SuppressGCTransition]
-<# } #>
-    [DllImport("<#= libName #>", EntryPoint = "pcrenet_<#= func.Name #>_<#= bit #>", CallingConvention = CallingConvention.Cdecl)]
-    public static extern <#= func.ReturnType #> <#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => p.GetDeclaration())) #>);
-
-<# } #>
-#else
-
-<# foreach (var func in functions) { #>
-    public static <#= func.GetDeclaration() #>
-        => _impl.<#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => $"{p.Modifier}{p.Name}")) #>);
-
-<# } #>
-    private abstract class LibImpl
+    private abstract class Lib
     {
 <# foreach (var func in functions) { #>
         public abstract <#= func.GetDeclaration() #>;
 <# } #>
     }
-
 <# foreach (var platform in platforms) { #>
+
     [SuppressUnmanagedCodeSecurity]
-    private sealed class <#= platform.Name #>Impl : LibImpl
+    private sealed class <#= platform.Name #>Lib : Lib
     {
 <# foreach (var func in functions) { #>
         public override <#= func.GetDeclaration() #>
-            => pcrenet_<#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => $"{p.Modifier}{p.Name}")) #>);
+            => pcrenet_<#= func.GetCall() #>;
 
-        [DllImport("<#= platform.LibName #>", EntryPoint = "pcrenet_<#= func.Name #>_<#= bit #>", CallingConvention = CallingConvention.Cdecl)]
-        private static extern <#= func.ReturnType #> pcrenet_<#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => p.GetDeclaration())) #>);
+        [DllImport("<#= platform.LibName #>", EntryPoint = "pcrenet_<#= func.Name #>_<#= bit #>", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+        private static extern <#= func.ReturnType #> pcrenet_<#= func.Name #>(<#= func.GetParametersDeclaration() #>);
 
 <# } #>
     }
-
 <# } #>
+
 #endif
 }
 <# } #>
@@ -200,7 +191,13 @@ private class FuncDef
     public bool SuppressGCTransition;
 
     public string GetDeclaration()
-        => $"{ReturnType} {Name}({string.Join(", ", Parameters.Select(p => p.GetDeclaration()))})";
+        => $"{ReturnType} {Name}({GetParametersDeclaration()})";
+
+    public string GetParametersDeclaration()
+        => string.Join(", ", Parameters.Select(p => p.GetDeclaration()));
+
+    public string GetCall()
+        => $"{Name}({string.Join(", ", Parameters.Select(p => p.GetCall()))})";
 }
 
 private class FuncParamDef
@@ -211,6 +208,9 @@ private class FuncParamDef
 
     public string GetDeclaration()
         => $"{Modifier}{Type} {Name}";
+
+    public string GetCall()
+        => $"{Modifier}{Name}";
 }
 
 private class PlatformDef(string name, string libName)

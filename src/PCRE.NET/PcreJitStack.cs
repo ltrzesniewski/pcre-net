@@ -33,7 +33,8 @@ public sealed unsafe class PcreJitStack : IDisposable
     /// <param name="maxSize">The maximum stack size.</param>
     public PcreJitStack(uint startSize, uint maxSize)
     {
-        _stack = Native16Bit.jit_stack_create(startSize, maxSize);
+        // The JIT stack is independent of the character width.
+        _stack = default(Native16Bit).jit_stack_create(startSize, maxSize);
     }
 
     /// <summary>
@@ -56,7 +57,7 @@ public sealed unsafe class PcreJitStack : IDisposable
         if (_stack == null)
             return;
 
-        Native16Bit.jit_stack_free(_stack);
+        default(Native16Bit).jit_stack_free(_stack);
         _stack = null;
     }
 

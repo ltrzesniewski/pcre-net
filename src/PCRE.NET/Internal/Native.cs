@@ -10,23 +10,9 @@ internal partial interface INative
     string GetErrorMessage(int errorCode);
 }
 
-internal readonly partial struct NativeStruct8Bit : INative
+internal readonly unsafe partial struct Native8Bit : INative
 {
     public string GetErrorMessage(int errorCode)
-        => Native8Bit.GetErrorMessage(errorCode);
-}
-
-internal readonly partial struct NativeStruct16Bit : INative
-{
-    public string GetErrorMessage(int errorCode)
-        => Native16Bit.GetErrorMessage(errorCode);
-}
-
-[SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global")]
-[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-internal static unsafe partial class Native8Bit
-{
-    public static string GetErrorMessage(int errorCode)
     {
         const int bufferSize = 512;
         var buffer = stackalloc byte[bufferSize];
@@ -37,11 +23,9 @@ internal static unsafe partial class Native8Bit
     }
 }
 
-[SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global")]
-[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-internal static unsafe partial class Native16Bit
+internal readonly unsafe partial struct Native16Bit : INative
 {
-    public static string GetErrorMessage(int errorCode)
+    public string GetErrorMessage(int errorCode)
     {
         const int bufferSize = 256;
         var buffer = stackalloc char[bufferSize];

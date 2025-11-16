@@ -317,7 +317,7 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
 }
 
 internal sealed unsafe class InternalRegex8Bit(ReadOnlySpan<byte> pattern, string patternString, PcreRegexSettings settings, Encoding encoding)
-    : InternalRegex<byte, NativeStruct8Bit>(pattern, patternString, settings)
+    : InternalRegex<byte, Native8Bit>(pattern, patternString, settings)
 {
     public override string? GetString(void* ptr)
         => GetString((byte*)ptr, encoding);
@@ -376,7 +376,7 @@ internal sealed unsafe class InternalRegex8Bit(ReadOnlySpan<byte> pattern, strin
 }
 
 internal sealed unsafe class InternalRegex16Bit(string pattern, PcreRegexSettings settings)
-    : InternalRegex<char, NativeStruct16Bit>(pattern, pattern, settings)
+    : InternalRegex<char, Native16Bit>(pattern, pattern, settings)
 {
     private PcreMatch? _noMatch;
 
@@ -412,7 +412,7 @@ internal sealed unsafe class InternalRegex16Bit(string pattern, PcreRegexSetting
 
             CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout);
 
-            default(NativeStruct16Bit).match(&input, &result);
+            default(Native16Bit).match(&input, &result);
 
             GC.KeepAlive(this);
             GC.KeepAlive(jitStack);
@@ -451,7 +451,7 @@ internal sealed unsafe class InternalRegex16Bit(string pattern, PcreRegexSetting
 
             CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, settings.Callout);
 
-            default(NativeStruct16Bit).dfa_match(&input, &result);
+            default(Native16Bit).dfa_match(&input, &result);
 
             GC.KeepAlive(this);
         }
@@ -500,7 +500,7 @@ internal sealed unsafe class InternalRegex16Bit(string pattern, PcreRegexSetting
 
             CalloutInterop.PrepareSubstitute(this, subject, ref input, out calloutInterop, matchCallout, substituteCallout, substituteCaseCallout);
 
-            default(NativeStruct16Bit).substitute(&input, &result);
+            default(Native16Bit).substitute(&input, &result);
 
             GC.KeepAlive(this);
             GC.KeepAlive(jitStack);
@@ -539,7 +539,7 @@ internal sealed unsafe class InternalRegex16Bit(string pattern, PcreRegexSetting
         finally
         {
             if (result.output != null && result.output_on_heap != 0)
-                default(NativeStruct16Bit).substitute_result_free(&result);
+                default(Native16Bit).substitute_result_free(&result);
         }
     }
 

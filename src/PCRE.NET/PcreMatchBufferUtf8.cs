@@ -43,7 +43,7 @@ public sealed unsafe class PcreMatchBufferUtf8 : IPcreMatchBuffer, IDisposable
 
         settings.FillMatchSettings(ref info.settings, out _jitStack);
 
-        NativeBuffer = (IntPtr)Native8Bit.create_match_buffer(&info);
+        NativeBuffer = (IntPtr)default(Native8Bit).create_match_buffer(&info);
         if (NativeBuffer == IntPtr.Zero)
             throw new InvalidOperationException("Could not create match buffer");
 
@@ -68,7 +68,7 @@ public sealed unsafe class PcreMatchBufferUtf8 : IPcreMatchBuffer, IDisposable
 
         var buffer = Interlocked.Exchange(ref NativeBuffer, IntPtr.Zero);
         if (buffer != IntPtr.Zero)
-            Native8Bit.free_match_buffer((void*)buffer);
+            default(Native8Bit).free_match_buffer((void*)buffer);
     }
 
     private Span<nuint> GetOutputVectorSpan()
