@@ -4,3 +4,6 @@
 # GitHub Linguist
 src/PCRE/** linguist-vendored
 src/PCRE/doc/** linguist-documentation
+
+# Verify
+*.verified.txt text eol=lf working-tree-encoding=UTF-8
