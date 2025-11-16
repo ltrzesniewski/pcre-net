@@ -68,6 +68,16 @@ public sealed partial class PcreRegexUtf8
     {
     }
 
+    /// <summary>
+    /// Creates a PCRE2 regex for UTF-8.
+    /// </summary>
+    /// <param name="pattern">The regular expression pattern.</param>
+    /// <param name="settings">Additional advanced settings.</param>
+    public PcreRegexUtf8(string pattern, PcreRegexSettings settings)
+        : this(GetBytes(pattern), pattern, settings)
+    {
+    }
+
     private PcreRegexUtf8(ReadOnlySpan<byte> pattern, string patternString, PcreRegexSettings settings)
     {
         if (settings == null)
@@ -81,6 +91,9 @@ public sealed partial class PcreRegexUtf8
 
     internal static unsafe string GetString(ReadOnlySpan<byte> value)
     {
+        if (value.IsEmpty)
+            return string.Empty;
+
 # if NET
         return Encoding.UTF8.GetString(value);
 #else

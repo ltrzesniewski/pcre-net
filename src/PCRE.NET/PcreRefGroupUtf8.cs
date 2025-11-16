@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using PCRE.Internal;
 
 namespace PCRE;
 
@@ -64,7 +63,7 @@ public readonly ref struct PcreRefGroupUtf8
 
     /// <inheritdoc cref="PcreGroup.ToString"/>
     public override string ToString()
-        => Value.ToString();
+        => PcreRegexUtf8.GetString(Value);
 
     internal class DebugProxy
     {
