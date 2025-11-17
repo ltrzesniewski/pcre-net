@@ -1,0 +1,839 @@
+﻿namespace PCRE.Conversion
+{
+    public static class PcreConvert
+    {
+        public static string FromGlob(string pattern, PCRE.Conversion.PcreGlobConversionOptions options) { }
+        public static string FromPosixBasic(string pattern) { }
+        public static string FromPosixExtended(string pattern) { }
+    }
+    public sealed class PcreGlobConversionOptions
+    {
+        public PcreGlobConversionOptions() { }
+        public char EscapeCharacter { get; set; }
+        public bool NoStarStar { get; set; }
+        public bool NoWildcardSeparator { get; set; }
+        public char SeparatorCharacter { get; set; }
+        public static PCRE.Conversion.PcreGlobConversionOptions DefaultUnix() { }
+        public static PCRE.Conversion.PcreGlobConversionOptions DefaultWindows() { }
+    }
+}
+namespace PCRE.Dfa
+{
+    public sealed class PcreDfaMatch : PCRE.IPcreGroup
+    {
+        public int EndIndex { get; }
+        public int Index { get; }
+        public int Length { get; }
+        public bool Success { get; }
+        public string Value { get; }
+        public System.ReadOnlySpan<char> ValueSpan { get; }
+        public override string ToString() { }
+        [return: System.Diagnostics.CodeAnalysis.NotNullIfNotNull("group")]
+        public static string? op_Implicit(PCRE.Dfa.PcreDfaMatch? group) { }
+    }
+    [System.Flags]
+    public enum PcreDfaMatchOptions : long
+    {
+        None = 0,
+        Anchored = 2147483648,
+        EndAnchored = 536870912,
+        NotBol = 1,
+        NotEol = 2,
+        NotEmpty = 4,
+        NotEmptyAtStart = 8,
+        NoUtfCheck = 1073741824,
+        PartialSoft = 16,
+        PartialHard = 32,
+        DfaShortest = 128,
+    }
+    public sealed class PcreDfaMatchResult : System.Collections.Generic.IEnumerable<PCRE.Dfa.PcreDfaMatch>, System.Collections.Generic.IReadOnlyCollection<PCRE.Dfa.PcreDfaMatch>, System.Collections.Generic.IReadOnlyList<PCRE.Dfa.PcreDfaMatch>, System.Collections.IEnumerable
+    {
+        public int Count { get; }
+        public int Index { get; }
+        public PCRE.Dfa.PcreDfaMatch this[int index] { get; }
+        public PCRE.Dfa.PcreDfaMatch LongestMatch { get; }
+        public PCRE.Dfa.PcreDfaMatch ShortestMatch { get; }
+        public bool Success { get; }
+        public System.Collections.Generic.IEnumerator<PCRE.Dfa.PcreDfaMatch> GetEnumerator() { }
+        public override string ToString() { }
+    }
+    public sealed class PcreDfaMatchSettings
+    {
+        public PcreDfaMatchSettings() { }
+        public PCRE.Dfa.PcreDfaMatchOptions AdditionalOptions { get; set; }
+        public uint MaxResults { get; set; }
+        public int StartIndex { get; set; }
+        public uint WorkspaceSize { get; set; }
+        public event System.Func<PCRE.PcreCallout, PCRE.PcreCalloutResult>? OnCallout;
+    }
+    public sealed class PcreDfaRegex
+    {
+        public PCRE.Dfa.PcreDfaMatchResult Match(string subject) { }
+        public PCRE.Dfa.PcreDfaMatchResult Match(string subject, PCRE.Dfa.PcreDfaMatchOptions options) { }
+        public PCRE.Dfa.PcreDfaMatchResult Match(string subject, PCRE.Dfa.PcreDfaMatchSettings settings) { }
+        public PCRE.Dfa.PcreDfaMatchResult Match(string subject, int startIndex) { }
+        public PCRE.Dfa.PcreDfaMatchResult Match(string subject, int startIndex, PCRE.Dfa.PcreDfaMatchOptions options) { }
+        public System.Collections.Generic.IEnumerable<PCRE.Dfa.PcreDfaMatchResult> Matches(string subject) { }
+        public System.Collections.Generic.IEnumerable<PCRE.Dfa.PcreDfaMatchResult> Matches(string subject, PCRE.Dfa.PcreDfaMatchSettings settings) { }
+        public System.Collections.Generic.IEnumerable<PCRE.Dfa.PcreDfaMatchResult> Matches(string subject, int startIndex) { }
+    }
+}
+namespace PCRE
+{
+    public interface IPcreGroup
+    {
+        int EndIndex { get; }
+        int Index { get; }
+        int Length { get; }
+        bool Success { get; }
+        string Value { get; }
+        System.ReadOnlySpan<char> ValueSpan { get; }
+    }
+    public interface IPcreGroupList : System.Collections.Generic.IEnumerable<PCRE.PcreGroup>, System.Collections.Generic.IReadOnlyCollection<PCRE.PcreGroup>, System.Collections.Generic.IReadOnlyList<PCRE.PcreGroup>, System.Collections.IEnumerable
+    {
+        PCRE.PcreGroup this[string name] { get; }
+    }
+    public enum PcreBackslashR
+    {
+        Default = 0,
+        Unicode = 1,
+        AnyCrLf = 2,
+    }
+    public static class PcreBuildInfo
+    {
+        public static PCRE.PcreBackslashR BackslashR { get; }
+        public static uint CompiledWidths { get; }
+        public static uint DepthLimit { get; }
+        public static uint EffectiveLinkSize { get; }
+        public static uint HeapLimit { get; }
+        public static bool Jit { get; }
+        public static string JitTarget { get; }
+        public static uint LinkSize { get; }
+        public static uint MatchLimit { get; }
+        public static bool NeverBackslashC { get; }
+        public static PCRE.PcreNewLine NewLine { get; }
+        public static uint ParensLimit { get; }
+        public static uint TablesLength { get; }
+        public static bool Unicode { get; }
+        public static string UnicodeVersion { get; }
+        public static string Version { get; }
+    }
+    public sealed class PcreCallout
+    {
+        public bool Backtrack { get; }
+        public int CurrentOffset { get; }
+        public PCRE.PcreCalloutInfo Info { get; }
+        public int LastCapture { get; }
+        public PCRE.PcreMatch Match { get; }
+        public int MaxCapture { get; }
+        public int NextPatternItemLength { get; }
+        public int Number { get; }
+        public int PatternPosition { get; }
+        public bool StartMatch { get; }
+        public int StartOffset { get; }
+        public string? String { get; }
+        public int StringOffset { get; }
+    }
+    public class PcreCalloutException : PCRE.PcreMatchException
+    {
+        public PcreCalloutException(string message, System.Exception? innerException) { }
+        public PcreCalloutException(PCRE.PcreErrorCode errorCode, string message, System.Exception? innerException) { }
+    }
+    public sealed class PcreCalloutInfo
+    {
+        public int NextPatternItemLength { get; }
+        public int Number { get; }
+        public int PatternPosition { get; }
+        public string? String { get; }
+        public int StringOffset { get; }
+    }
+    public enum PcreCalloutResult
+    {
+        Pass = 0,
+        Fail = 1,
+        Abort = -1,
+    }
+    public enum PcreErrorCode
+    {
+        None = 0,
+        EndBackslash = 101,
+        EndBackslashC = 102,
+        UnknownEscape = 103,
+        QuantifierOutOfOrder = 104,
+        QuantifierTooBig = 105,
+        MissingSquareBracket = 106,
+        EscapeInvalidInClass = 107,
+        ClassRangeOrder = 108,
+        QuantifierInvalid = 109,
+        InternalUnexpectedRepeat = 110,
+        InvalidAfterParensQuery = 111,
+        PosixClassNotInClass = 112,
+        PosixNoSupportCollating = 113,
+        MissingClosingParenthesis = 114,
+        BadSubpatternReference = 115,
+        NullPattern = 116,
+        BadOptions = 117,
+        MissingCommentClosing = 118,
+        ParenthesesNestTooDeep = 119,
+        PatternTooLarge = 120,
+        HeapFailed = 121,
+        UnmatchedClosingParenthesis = 122,
+        InternalCodeOverflow = 123,
+        MissingConditionClosing = 124,
+        LookbehindNotFixedLength = 125,
+        ZeroRelativeReference = 126,
+        TooManyConditionBranches = 127,
+        ConditionAssertionExpected = 128,
+        BadRelativeReference = 129,
+        UnknownPosixClass = 130,
+        InternalStudyError = 131,
+        UnicodeNotSupported = 132,
+        ParenthesesStackCheck = 133,
+        CodePointTooBig = 134,
+        LookbehindTooComplicated = 135,
+        LookbehindInvalidBackslashC = 136,
+        UnsupportedEscapeSequence = 137,
+        CalloutNumberTooBig = 138,
+        MissingCalloutClosing = 139,
+        EscapeInvalidInVerb = 140,
+        UnrecognizedAfterQueryP = 141,
+        MissingNameTerminator = 142,
+        DuplicateSubpatternName = 143,
+        InvalidSubpatternName = 144,
+        UnicodePropertiesUnavailable = 145,
+        MalformedUnicodeProperty = 146,
+        UnknownUnicodeProperty = 147,
+        SubpatternNameTooLong = 148,
+        TooManyNamedSubpatterns = 149,
+        ClassInvalidRange = 150,
+        OctalByteTooBig = 151,
+        InternalOverranWorkspace = 152,
+        InternalMissingSubpattern = 153,
+        DefineTooManyBranches = 154,
+        BackslashOMissingBrace = 155,
+        InternalUnknownNewline = 156,
+        BackslashGSyntax = 157,
+        ParensQueryRMissingClosing = 158,
+        VerbArgumentNotAllowed = 159,
+        VerbUnknown = 160,
+        SubpatternNumberTooBig = 161,
+        SubpatternNameExpected = 162,
+        InternalParsedOverflow = 163,
+        InvalidOctal = 164,
+        SubpatternNamesMismatch = 165,
+        MarkMissingArgument = 166,
+        InvalidHexadecimal = 167,
+        BackslashCSyntax = 168,
+        BackslashKSyntax = 169,
+        InternalBadCodeLookbehinds = 170,
+        BackslashNInClass = 171,
+        CalloutStringTooLong = 172,
+        UnicodeDisallowedCodePoint = 173,
+        UtfIsDisabled = 174,
+        UcpIsDisabled = 175,
+        VerbNameTooLong = 176,
+        BackslashUCodePointTooBig = 177,
+        MissingOctalOrHexDigits = 178,
+        VersionConditionSyntax = 179,
+        InternalBadCodeAutoPossess = 180,
+        CalloutNoStringDelimiter = 181,
+        CalloutBadStringDelimiter = 182,
+        BackslashCCallerDisabled = 183,
+        QueryBarJxNestTooDeep = 184,
+        BackslashCLibraryDisabled = 185,
+        PatternTooComplicated = 186,
+        LookbehindTooLong = 187,
+        PatternStringTooLong = 188,
+        InternalBadCode = 189,
+        InternalBadCodeInSkip = 190,
+        NoSurrogatesInUtf16 = 191,
+        BadLiteralOptions = 192,
+        SupportedOnlyInUnicode = 193,
+        InvalidHyphenInOptions = 194,
+        AlphaAssertionUnknown = 195,
+        ScriptRunNotAvailable = 196,
+        TooManyCaptures = 197,
+        MissingOctalDigit = 198,
+        ConditionAtomicAssertionExpected = 198,
+        BackslashKInLookaround = 199,
+        MaxVarLookbehindExceeded = 200,
+        PatternCompiledSizeTooBig = 201,
+        OversizePythonOctal = 202,
+        CalloutCallerDisabled = 203,
+        ExtraCasingRequiresUnicode = 204,
+        TurkishCasingRequiresUtf = 205,
+        ExtraCasingIncompatible = 206,
+        EClassNestTooDeep = 207,
+        EClassInvalidOperator = 208,
+        EClassUnexpectedOperator = 209,
+        EClassExpectedOperand = 210,
+        EClassMixedOperators = 211,
+        EClassHintSquareBracket = 212,
+        PerlEClassUnexpectedExpr = 213,
+        PerlEClassEmptyExpr = 214,
+        PerlEClassMissingClose = 215,
+        PerlEClassUnexpectedChar = 216,
+        ExpectedCaptureGroup = 217,
+        MissingOpeningParenthesis = 218,
+        MissingNumberTerminator = 219,
+        NullErrorOffset = 220,
+        NoMatch = -1,
+        Partial = -2,
+        Utf8Err1 = -3,
+        Utf8Err2 = -4,
+        Utf8Err3 = -5,
+        Utf8Err4 = -6,
+        Utf8Err5 = -7,
+        Utf8Err6 = -8,
+        Utf8Err7 = -9,
+        Utf8Err8 = -10,
+        Utf8Err9 = -11,
+        Utf8Err10 = -12,
+        Utf8Err11 = -13,
+        Utf8Err12 = -14,
+        Utf8Err13 = -15,
+        Utf8Err14 = -16,
+        Utf8Err15 = -17,
+        Utf8Err16 = -18,
+        Utf8Err17 = -19,
+        Utf8Err18 = -20,
+        Utf8Err19 = -21,
+        Utf8Err20 = -22,
+        Utf8Err21 = -23,
+        Utf16Err1 = -24,
+        Utf16Err2 = -25,
+        Utf16Err3 = -26,
+        Utf32Err1 = -27,
+        Utf32Err2 = -28,
+        BadData = -29,
+        MixedTables = -30,
+        BadMagic = -31,
+        BadMode = -32,
+        BadOffset = -33,
+        BadOption = -34,
+        BadReplacement = -35,
+        BadUtfOffset = -36,
+        Callout = -37,
+        DfaBadRestart = -38,
+        DfaRecurse = -39,
+        DfaUCond = -40,
+        DfaUFunc = -41,
+        DfaUItem = -42,
+        DfaWsSize = -43,
+        Internal = -44,
+        JitBadOption = -45,
+        JitStackLimit = -46,
+        MatchLimit = -47,
+        NoMemory = -48,
+        NoSubstring = -49,
+        NoUniqueSubstring = -50,
+        Null = -51,
+        RecurseLoop = -52,
+        DepthLimit = -53,
+        Unavailable = -54,
+        Unset = -55,
+        BadOffsetLimit = -56,
+        BadRepEscape = -57,
+        RepMissingBrace = -58,
+        BadSubstitution = -59,
+        BadSubsPattern = -60,
+        TooManyReplace = -61,
+        BadSerializedData = -62,
+        HeapLimit = -63,
+        ConvertSyntax = -64,
+        InternalDupMatch = -65,
+        DfaUInvalidUtf = -66,
+        InvalidOffset = -67,
+        JitUnsupported = -68,
+        ReplaceCase = -69,
+        TooLargeReplace = -70,
+        DiffSubsPattern = -71,
+        DiffSubsSubject = -72,
+        DiffSubsOffset = -73,
+        DiffSubsOptions = -74,
+        BadBackslashK = -75,
+    }
+    public class PcreException : System.Exception
+    {
+        public PcreException(PCRE.PcreErrorCode errorCode) { }
+        public PcreException(PCRE.PcreErrorCode errorCode, string message) { }
+        public PcreException(PCRE.PcreErrorCode errorCode, string message, System.Exception? innerException) { }
+        public PCRE.PcreErrorCode ErrorCode { get; }
+    }
+    [System.Flags]
+    public enum PcreExtraCompileOptions : uint
+    {
+        None = 0u,
+        BadEscapeIsLiteral = 2u,
+        MatchWord = 4u,
+        MatchLine = 8u,
+        EscapedCrIsLf = 16u,
+        AltBsUX = 32u,
+        AllowLookaroundBsK = 64u,
+        CaselessRestrict = 128u,
+        AsciiBsD = 256u,
+        AsciiBsS = 512u,
+        AsciiBsW = 1024u,
+        AsciiPosix = 2048u,
+        AsciiDigit = 4096u,
+        PythonOctal = 8192u,
+        NoBs0 = 16384u,
+        NeverCallout = 32768u,
+        TurkishCasing = 65536u,
+        AllowSurrogateEscapes = 1u,
+    }
+    public sealed class PcreGroup : PCRE.IPcreGroup
+    {
+        public int EndIndex { get; }
+        public int Index { get; }
+        public bool IsDefined { get; }
+        public int Length { get; }
+        public bool Success { get; }
+        public string Value { get; }
+        public System.ReadOnlySpan<char> ValueSpan { get; }
+        public override string ToString() { }
+        [return: System.Diagnostics.CodeAnalysis.NotNullIfNotNull("group")]
+        public static string? op_Implicit(PCRE.PcreGroup? group) { }
+    }
+    [System.Flags]
+    public enum PcreJitCompileOptions : uint
+    {
+        None = 0u,
+        Complete = 1u,
+        PartialSoft = 2u,
+        PartialHard = 4u,
+    }
+    public sealed class PcreJitStack : System.IDisposable
+    {
+        public PcreJitStack(uint startSize, uint maxSize) { }
+        public void Dispose() { }
+        protected override void Finalize() { }
+    }
+    public sealed class PcreMatch : PCRE.IPcreGroup, PCRE.IPcreGroupList, System.Collections.Generic.IEnumerable<PCRE.PcreGroup>, System.Collections.Generic.IReadOnlyCollection<PCRE.PcreGroup>, System.Collections.Generic.IReadOnlyList<PCRE.PcreGroup>, System.Collections.IEnumerable
+    {
+        public int CaptureCount { get; }
+        public int EndIndex { get; }
+        public PCRE.IPcreGroupList Groups { get; }
+        public int Index { get; }
+        public bool IsPartialMatch { get; }
+        public PCRE.PcreGroup this[int index] { get; }
+        public PCRE.PcreGroup this[string name] { get; }
+        public int Length { get; }
+        public string? Mark { get; }
+        public bool Success { get; }
+        public string Value { get; }
+        public System.ReadOnlySpan<char> ValueSpan { get; }
+        public System.Collections.Generic.IEnumerable<PCRE.PcreGroup> GetDuplicateNamedGroups(string name) { }
+        public System.Collections.Generic.IEnumerator<PCRE.PcreGroup> GetEnumerator() { }
+        public override string ToString() { }
+        public bool TryGetGroup(int index, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out PCRE.PcreGroup result) { }
+        public bool TryGetGroup(string name, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out PCRE.PcreGroup result) { }
+    }
+    public sealed class PcreMatchBuffer : System.IDisposable
+    {
+        public void Dispose() { }
+        protected override void Finalize() { }
+        public bool IsMatch(System.ReadOnlySpan<char> subject) { }
+        public bool IsMatch(System.ReadOnlySpan<char> subject, int startIndex) { }
+        public PCRE.PcreRefMatch Match(System.ReadOnlySpan<char> subject) { }
+        public PCRE.PcreRefMatch Match(System.ReadOnlySpan<char> subject, PCRE.PcreMatchOptions options) { }
+        public PCRE.PcreRefMatch Match(System.ReadOnlySpan<char> subject, PCRE.PcreRefCalloutFunc? onCallout) { }
+        public PCRE.PcreRefMatch Match(System.ReadOnlySpan<char> subject, int startIndex) { }
+        public PCRE.PcreRefMatch Match(System.ReadOnlySpan<char> subject, PCRE.PcreMatchOptions options, PCRE.PcreRefCalloutFunc? onCallout) { }
+        public PCRE.PcreRefMatch Match(System.ReadOnlySpan<char> subject, int startIndex, PCRE.PcreMatchOptions options) { }
+        public PCRE.PcreRefMatch Match(System.ReadOnlySpan<char> subject, int startIndex, PCRE.PcreRefCalloutFunc? onCallout) { }
+        public PCRE.PcreRefMatch Match(System.ReadOnlySpan<char> subject, int startIndex, PCRE.PcreMatchOptions options, PCRE.PcreRefCalloutFunc? onCallout) { }
+        public PCRE.PcreMatchBuffer.RefMatchEnumerable Matches(System.ReadOnlySpan<char> subject) { }
+        public PCRE.PcreMatchBuffer.RefMatchEnumerable Matches(System.ReadOnlySpan<char> subject, int startIndex) { }
+        public PCRE.PcreMatchBuffer.RefMatchEnumerable Matches(System.ReadOnlySpan<char> subject, int startIndex, PCRE.PcreRefCalloutFunc? onCallout) { }
+        public PCRE.PcreMatchBuffer.RefMatchEnumerable Matches(System.ReadOnlySpan<char> subject, int startIndex, PCRE.PcreMatchOptions options, PCRE.PcreRefCalloutFunc? onCallout) { }
+        public override string ToString() { }
+        public readonly ref struct RefMatchEnumerable
+        {
+            public PCRE.PcreMatchBuffer.RefMatchEnumerator GetEnumerator() { }
+        }
+        public ref struct RefMatchEnumerator
+        {
+            public PCRE.PcreRefMatch Current { get; }
+            public bool MoveNext() { }
+        }
+    }
+    public class PcreMatchException : PCRE.PcreException
+    {
+        public PcreMatchException(PCRE.PcreErrorCode errorCode) { }
+        public PcreMatchException(PCRE.PcreErrorCode errorCode, string message, System.Exception? innerException) { }
+    }
+    [System.Flags]
+    public enum PcreMatchOptions : long
+    {
+        None = 0,
+        Anchored = 2147483648,
+        EndAnchored = 536870912,
+        NotBol = 1,
+        NotEol = 2,
+        NotEmpty = 4,
+        NotEmptyAtStart = 8,
+        PartialSoft = 16,
+        PartialHard = 32,
+        NoUtfCheck = 1073741824,
+        NoJit = 8192,
+        DisableRecurseLoopCheck = 262144,
+    }
+    public sealed class PcreMatchSettings
+    {
+        public PcreMatchSettings() { }
+        public uint DepthLimit { get; set; }
+        public uint HeapLimit { get; set; }
+        public PCRE.PcreJitStack? JitStack { get; set; }
+        public uint MatchLimit { get; set; }
+        public uint? OffsetLimit { get; set; }
+    }
+    public enum PcreNewLine
+    {
+        Default = 0,
+        Cr = 1,
+        Lf = 2,
+        CrLf = 3,
+        Any = 4,
+        AnyCrLf = 5,
+        Nul = 6,
+    }
+    public enum PcreOptimizationDirective : uint
+    {
+        None = 0u,
+        Full = 1u,
+        AutoPossess = 64u,
+        AutoPossessOff = 65u,
+        DotStarAnchor = 66u,
+        DotStarAnchorOff = 67u,
+        StartOptimize = 68u,
+        StartOptimizeOff = 69u,
+    }
+    [System.Flags]
+    public enum PcreOptions : long
+    {
+        None = 0,
+        IgnoreCase = 8,
+        Singleline = 32,
+        ExplicitCapture = 8192,
+        IgnorePatternWhitespace = 128,
+        Unicode = 131072,
+        JavaScript = 514,
+        Compiled = 4294967296,
+        CompiledPartial = 8589934592,
+        Caseless = 8,
+        MultiLine = 1024,
+        DotAll = 32,
+        NoAutoCapture = 8192,
+        Extended = 128,
+        ExtendedMore = 16777216,
+        AltBsUX = 2,
+        MatchUnsetBackref = 512,
+        Literal = 33554432,
+        Ucp = 131072,
+        MatchInvalidUtf = 67108864,
+        AltExtendedClass = 134217728,
+        Anchored = 2147483648,
+        EndAnchored = 536870912,
+        Ungreedy = 262144,
+        FirstLine = 256,
+        DupNames = 64,
+        AutoCallout = 4,
+        NoStartOptimize = 65536,
+        NoAutoPossess = 16384,
+        DollarEndOnly = 16,
+        AltCircumflex = 2097152,
+        AltVerbNames = 4194304,
+        AllowEmptyClass = 1,
+        NoDotStarAnchor = 32768,
+        NoUtfCheck = 1073741824,
+        NeverUcp = 2048,
+        NeverBackslashC = 1048576,
+        UseOffsetLimit = 8388608,
+        Utf = 524288,
+    }
+    public class PcrePatternException : PCRE.PcreException
+    {
+        public PcrePatternException(PCRE.PcreErrorCode errorCode, string message) { }
+    }
+    public sealed class PcrePatternInfo
+    {
+        public PCRE.PcreOptions AllOptions { get; }
+        public PCRE.PcreOptions ArgOptions { get; }
+        public PCRE.PcreBackslashR BackslashR { get; }
+        public System.Collections.Generic.IReadOnlyList<PCRE.PcreCalloutInfo> Callouts { get; }
+        public bool CanMatchEmptyString { get; }
+        public int CaptureCount { get; }
+        public uint DepthLimit { get; }
+        public PCRE.PcreExtraCompileOptions ExtraOptions { get; }
+        public uint FirstCodeType { get; }
+        public uint FirstCodeUnit { get; }
+        public ulong FrameSize { get; }
+        public System.Collections.Generic.IReadOnlyList<string> GroupNames { get; }
+        public bool HasBackslashC { get; }
+        public bool HasCrOrLf { get; }
+        public uint HeapLimit { get; }
+        public bool IsCompiled { get; }
+        public bool JChanged { get; }
+        public PCRE.PcreJitCompileOptions JitOptions { get; }
+        public ulong JitSize { get; }
+        public uint LastCodeType { get; }
+        public uint LastCodeUnit { get; }
+        public uint MatchLimit { get; }
+        public uint MaxBackReference { get; }
+        public uint MaxLookBehind { get; }
+        public uint MinSubjectLength { get; }
+        public uint NamedGroupsCount { get; }
+        public PCRE.PcreOptions Options { get; }
+        public ulong PatternSize { get; }
+        public string PatternString { get; }
+        public PCRE.PcreRegexSettings Settings { get; }
+        public System.Collections.Generic.IReadOnlyList<int> GetGroupIndexesByName(string name) { }
+    }
+    public ref struct PcreRefCallout
+    {
+        public bool Backtrack { get; }
+        public int CurrentOffset { get; }
+        public PCRE.PcreCalloutInfo Info { get; }
+        public int LastCapture { get; }
+        public PCRE.PcreRefMatch Match { get; }
+        public int MaxCapture { get; }
+        public int NextPatternItemLength { get; }
+        public int Number { get; }
+        public int PatternPosition { get; }
+        public bool StartMatch { get; }
+        public int StartOffset { get; }
+        public string? String { get; }
+        public int StringOffset { get; }
+    }
+    public delegate PCRE.PcreCalloutResult PcreRefCalloutFunc(PCRE.PcreRefCallout callout);
+    [System.Diagnostics.DebuggerTypeProxy(typeof(PCRE.PcreRefGroup.DebugProxy))]
+    public readonly ref struct PcreRefGroup
+    {
+        public int EndIndex { get; }
+        public int Index { get; }
+        public bool IsDefined { get; }
+        public int Length { get; }
+        public bool Success { get; }
+        public System.ReadOnlySpan<char> Value { get; }
+        public override string ToString() { }
+        public static string op_Implicit(PCRE.PcreRefGroup group) { }
+        public delegate T Func<out T>(PCRE.PcreRefGroup group);
+    }
+    [System.Diagnostics.DebuggerTypeProxy(typeof(PCRE.PcreRefMatch.DebugProxy))]
+    public ref struct PcreRefMatch
+    {
+        public int CaptureCount { get; }
+        public int EndIndex { get; }
+        public PCRE.PcreRefMatch.GroupList Groups { get; }
+        public int Index { get; }
+        public bool IsPartialMatch { get; }
+        public PCRE.PcreRefGroup this[int index] { get; }
+        public PCRE.PcreRefGroup this[string name] { get; }
+        public int Length { get; }
+        public System.ReadOnlySpan<char> Mark { get; }
+        public bool Success { get; }
+        public System.ReadOnlySpan<char> Value { get; }
+        public PCRE.PcreRefMatch.DuplicateNamedGroupEnumerable GetDuplicateNamedGroups(string name) { }
+        public PCRE.PcreRefMatch.GroupEnumerator GetEnumerator() { }
+        public override string ToString() { }
+        public bool TryGetGroup(int index, out PCRE.PcreRefGroup result) { }
+        public bool TryGetGroup(string name, out PCRE.PcreRefGroup result) { }
+        public readonly ref struct DuplicateNamedGroupEnumerable
+        {
+            public PCRE.PcreRefMatch.DuplicateNamedGroupEnumerator GetEnumerator() { }
+            public System.Collections.Generic.List<T> ToList<T>(PCRE.PcreRefGroup.Func<T> selector) { }
+        }
+        public ref struct DuplicateNamedGroupEnumerator
+        {
+            public PCRE.PcreRefGroup Current { get; }
+            public bool MoveNext() { }
+        }
+        public ref struct GroupEnumerator
+        {
+            public PCRE.PcreRefGroup Current { get; }
+            public bool MoveNext() { }
+        }
+        public readonly ref struct GroupList
+        {
+            public int Count { get; }
+            public PCRE.PcreRefGroup this[int index] { get; }
+            public PCRE.PcreRefGroup this[string name] { get; }
+            public PCRE.PcreRefMatch.GroupEnumerator GetEnumerator() { }
+            public System.Collections.Generic.List<T> ToList<T>(PCRE.PcreRefGroup.Func<T> selector) { }
+        }
+        public delegate T Func<out T>(PCRE.PcreRefMatch match);
+    }
+    public sealed class PcreRegex
+    {
+        public PcreRegex(string pattern) { }
+        public PcreRegex(string pattern, PCRE.PcreOptions options) { }
+        public PcreRegex(string pattern, PCRE.PcreRegexSettings settings) { }
+        public PCRE.Dfa.PcreDfaRegex Dfa { get; }
+        public PCRE.PcrePatternInfo PatternInfo { get; }
+        public static int CacheSize { get; set; }
+        public PCRE.PcreMatchBuffer CreateMatchBuffer() { }
+        public PCRE.PcreMatchBuffer CreateMatchBuffer(PCRE.PcreMatchSettings settings) { }
+        public bool IsMatch(System.ReadOnlySpan<char> subject) { }
+        public bool IsMatch(string subject) { }
+        public bool IsMatch(System.ReadOnlySpan<char> subject, int startIndex) { }
+        public bool IsMatch(string subject, int startIndex) { }
+        public PCRE.PcreRefMatch Match(System.ReadOnlySpan<char> subject) { }
+        public PCRE.PcreMatch Match(string subject) { }
+        public PCRE.PcreRefMatch Match(System.ReadOnlySpan<char> subject, PCRE.PcreMatchOptions options) { }
+        public PCRE.PcreRefMatch Match(System.ReadOnlySpan<char> subject, PCRE.PcreRefCalloutFunc? onCallout) { }
+        public PCRE.PcreRefMatch Match(System.ReadOnlySpan<char> subject, int startIndex) { }
+        public PCRE.PcreMatch Match(string subject, PCRE.PcreMatchOptions options) { }
+        public PCRE.PcreMatch Match(string subject, System.Func<PCRE.PcreCallout, PCRE.PcreCalloutResult>? onCallout) { }
+        public PCRE.PcreMatch Match(string subject, int startIndex) { }
+        public PCRE.PcreRefMatch Match(System.ReadOnlySpan<char> subject, PCRE.PcreMatchOptions options, PCRE.PcreRefCalloutFunc? onCallout) { }
+        public PCRE.PcreRefMatch Match(System.ReadOnlySpan<char> subject, int startIndex, PCRE.PcreMatchOptions options) { }
+        public PCRE.PcreRefMatch Match(System.ReadOnlySpan<char> subject, int startIndex, PCRE.PcreRefCalloutFunc? onCallout) { }
+        public PCRE.PcreMatch Match(string subject, PCRE.PcreMatchOptions options, System.Func<PCRE.PcreCallout, PCRE.PcreCalloutResult>? onCallout) { }
+        public PCRE.PcreMatch Match(string subject, int startIndex, PCRE.PcreMatchOptions options) { }
+        public PCRE.PcreMatch Match(string subject, int startIndex, System.Func<PCRE.PcreCallout, PCRE.PcreCalloutResult>? onCallout) { }
+        public PCRE.PcreRefMatch Match(System.ReadOnlySpan<char> subject, int startIndex, PCRE.PcreMatchOptions options, PCRE.PcreRefCalloutFunc? onCallout) { }
+        public PCRE.PcreMatch Match(string subject, int startIndex, PCRE.PcreMatchOptions options, System.Func<PCRE.PcreCallout, PCRE.PcreCalloutResult>? onCallout) { }
+        public PCRE.PcreRefMatch Match(System.ReadOnlySpan<char> subject, int startIndex, PCRE.PcreMatchOptions options, PCRE.PcreRefCalloutFunc? onCallout, PCRE.PcreMatchSettings settings) { }
+        public PCRE.PcreMatch Match(string subject, int startIndex, PCRE.PcreMatchOptions options, System.Func<PCRE.PcreCallout, PCRE.PcreCalloutResult>? onCallout, PCRE.PcreMatchSettings settings) { }
+        public PCRE.PcreRegex.RefMatchEnumerable Matches(System.ReadOnlySpan<char> subject) { }
+        public System.Collections.Generic.IEnumerable<PCRE.PcreMatch> Matches(string subject) { }
+        public PCRE.PcreRegex.RefMatchEnumerable Matches(System.ReadOnlySpan<char> subject, int startIndex) { }
+        public System.Collections.Generic.IEnumerable<PCRE.PcreMatch> Matches(string subject, int startIndex) { }
+        public PCRE.PcreRegex.RefMatchEnumerable Matches(System.ReadOnlySpan<char> subject, int startIndex, PCRE.PcreRefCalloutFunc? onCallout) { }
+        public System.Collections.Generic.IEnumerable<PCRE.PcreMatch> Matches(string subject, int startIndex, System.Func<PCRE.PcreCallout, PCRE.PcreCalloutResult>? onCallout) { }
+        public PCRE.PcreRegex.RefMatchEnumerable Matches(System.ReadOnlySpan<char> subject, int startIndex, PCRE.PcreMatchOptions options, PCRE.PcreRefCalloutFunc? onCallout, PCRE.PcreMatchSettings settings) { }
+        public System.Collections.Generic.IEnumerable<PCRE.PcreMatch> Matches(string subject, int startIndex, PCRE.PcreMatchOptions options, System.Func<PCRE.PcreCallout, PCRE.PcreCalloutResult>? onCallout, PCRE.PcreMatchSettings settings) { }
+        public string Replace(string subject, System.Func<PCRE.PcreMatch, string> replacementFunc) { }
+        public string Replace(string subject, string replacement) { }
+        public string Replace(string subject, System.Func<PCRE.PcreMatch, string> replacementFunc, int count) { }
+        public string Replace(string subject, string replacement, int count) { }
+        public string Replace(string subject, System.Func<PCRE.PcreMatch, string> replacementFunc, int count, int startIndex) { }
+        public string Replace(string subject, string replacement, int count, int startIndex) { }
+        public System.Collections.Generic.IEnumerable<string> Split(string subject) { }
+        public System.Collections.Generic.IEnumerable<string> Split(string subject, PCRE.PcreSplitOptions options) { }
+        public System.Collections.Generic.IEnumerable<string> Split(string subject, int count) { }
+        public System.Collections.Generic.IEnumerable<string> Split(string subject, int count, int startIndex) { }
+        public System.Collections.Generic.IEnumerable<string> Split(string subject, PCRE.PcreSplitOptions options, int count, int startIndex) { }
+        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement) { }
+        public string Substitute(string subject, string replacement) { }
+        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement, PCRE.PcreSubstituteOptions options) { }
+        public string Substitute(string subject, string replacement, PCRE.PcreSubstituteOptions options) { }
+        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement, PCRE.PcreSubstituteOptions options, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout) { }
+        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement, int startIndex, PCRE.PcreSubstituteOptions options) { }
+        public string Substitute(string subject, string replacement, PCRE.PcreSubstituteOptions options, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout) { }
+        public string Substitute(string subject, string replacement, int startIndex, PCRE.PcreSubstituteOptions options) { }
+        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement, int startIndex, PCRE.PcreSubstituteOptions options, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout) { }
+        public string Substitute(string subject, string replacement, int startIndex, PCRE.PcreSubstituteOptions options, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout) { }
+        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement, int startIndex, PCRE.PcreSubstituteOptions options, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout, PCRE.PcreMatchSettings? settings) { }
+        public string Substitute(string subject, string replacement, int startIndex, PCRE.PcreSubstituteOptions options, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout, PCRE.PcreMatchSettings? settings) { }
+        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement, int startIndex, PCRE.PcreSubstituteOptions options, PCRE.PcreRefCalloutFunc? onMatchCallout, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout, PCRE.PcreMatchSettings? settings) { }
+        public string Substitute(string subject, string replacement, int startIndex, PCRE.PcreSubstituteOptions options, PCRE.PcreRefCalloutFunc? onMatchCallout, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout, PCRE.PcreMatchSettings? settings) { }
+        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement, int startIndex, PCRE.PcreSubstituteOptions options, PCRE.PcreRefCalloutFunc? onMatchCallout, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout, PCRE.PcreSubstituteCaseCalloutFunc? onSubstituteCaseCallout, PCRE.PcreMatchSettings? settings) { }
+        public string Substitute(string subject, string replacement, int startIndex, PCRE.PcreSubstituteOptions options, PCRE.PcreRefCalloutFunc? onMatchCallout, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout, PCRE.PcreSubstituteCaseCalloutFunc? onSubstituteCaseCallout, PCRE.PcreMatchSettings? settings) { }
+        public override string ToString() { }
+        public static bool IsMatch(string subject, string pattern) { }
+        public static bool IsMatch(string subject, string pattern, PCRE.PcreOptions options) { }
+        public static bool IsMatch(string subject, string pattern, PCRE.PcreOptions options, int startIndex) { }
+        public static PCRE.PcreMatch Match(string subject, string pattern) { }
+        public static PCRE.PcreMatch Match(string subject, string pattern, PCRE.PcreOptions options) { }
+        public static PCRE.PcreMatch Match(string subject, string pattern, PCRE.PcreOptions options, int startIndex) { }
+        public static System.Collections.Generic.IEnumerable<PCRE.PcreMatch> Matches(string subject, string pattern) { }
+        public static System.Collections.Generic.IEnumerable<PCRE.PcreMatch> Matches(string subject, string pattern, PCRE.PcreOptions options) { }
+        public static System.Collections.Generic.IEnumerable<PCRE.PcreMatch> Matches(string subject, string pattern, PCRE.PcreOptions options, int startIndex) { }
+        public static string Replace(string subject, string pattern, System.Func<PCRE.PcreMatch, string> replacementFunc) { }
+        public static string Replace(string subject, string pattern, string replacement) { }
+        public static string Replace(string subject, string pattern, System.Func<PCRE.PcreMatch, string> replacementFunc, PCRE.PcreOptions options) { }
+        public static string Replace(string subject, string pattern, string replacement, PCRE.PcreOptions options) { }
+        public static string Replace(string subject, string pattern, System.Func<PCRE.PcreMatch, string> replacementFunc, PCRE.PcreOptions options, int count) { }
+        public static string Replace(string subject, string pattern, string replacement, PCRE.PcreOptions options, int count) { }
+        public static string Replace(string subject, string pattern, System.Func<PCRE.PcreMatch, string> replacementFunc, PCRE.PcreOptions options, int count, int startIndex) { }
+        public static string Replace(string subject, string pattern, string replacement, PCRE.PcreOptions options, int count, int startIndex) { }
+        public static System.Collections.Generic.IEnumerable<string> Split(string subject, string pattern) { }
+        public static System.Collections.Generic.IEnumerable<string> Split(string subject, string pattern, PCRE.PcreOptions options) { }
+        public static System.Collections.Generic.IEnumerable<string> Split(string subject, string pattern, int count) { }
+        public static System.Collections.Generic.IEnumerable<string> Split(string subject, string pattern, PCRE.PcreOptions options, PCRE.PcreSplitOptions splitOptions) { }
+        public static System.Collections.Generic.IEnumerable<string> Split(string subject, string pattern, PCRE.PcreOptions options, PCRE.PcreSplitOptions splitOptions, int count) { }
+        public static System.Collections.Generic.IEnumerable<string> Split(string subject, string pattern, PCRE.PcreOptions options, PCRE.PcreSplitOptions splitOptions, int count, int startIndex) { }
+        public static string Substitute(string subject, string pattern, string replacement) { }
+        public static string Substitute(string subject, string pattern, string replacement, PCRE.PcreOptions patternOptions, PCRE.PcreSubstituteOptions substituteOptions) { }
+        public readonly ref struct RefMatchEnumerable
+        {
+            public PCRE.PcreRegex.RefMatchEnumerator GetEnumerator() { }
+            public System.Collections.Generic.List<T> ToList<T>(PCRE.PcreRefMatch.Func<T> selector) { }
+        }
+        public ref struct RefMatchEnumerator
+        {
+            public PCRE.PcreRefMatch Current { get; }
+            public bool MoveNext() { }
+        }
+    }
+    public sealed class PcreRegexSettings
+    {
+        public PcreRegexSettings() { }
+        public PCRE.PcreBackslashR BackslashR { get; set; }
+        public PCRE.PcreExtraCompileOptions ExtraCompileOptions { get; set; }
+        public PCRE.PcreJitCompileOptions JitCompileOptions { get; set; }
+        public uint? MaxPatternCompiledLength { get; set; }
+        public uint? MaxPatternLength { get; set; }
+        public uint MaxVarLookbehind { get; set; }
+        public PCRE.PcreNewLine NewLine { get; set; }
+        public System.Collections.Generic.IList<PCRE.PcreOptimizationDirective> OptimizationDirectives { get; }
+        public PCRE.PcreOptions Options { get; set; }
+        public uint ParensLimit { get; set; }
+    }
+    [System.Flags]
+    public enum PcreSplitOptions : long
+    {
+        None = 0,
+        IncludeGroupValues = 1,
+    }
+    public readonly ref struct PcreSubstituteCallout
+    {
+        public PCRE.PcreRefMatch Match { get; }
+        public System.ReadOnlySpan<char> Output { get; }
+        public System.ReadOnlySpan<char> Subject { get; }
+        public System.ReadOnlySpan<char> Substitution { get; }
+        public int SubstitutionCount { get; }
+    }
+    public delegate PCRE.PcreSubstituteCalloutResult PcreSubstituteCalloutFunc(PCRE.PcreSubstituteCallout callout);
+    public enum PcreSubstituteCalloutResult
+    {
+        Pass = 0,
+        Fail = 1,
+        Abort = -1,
+    }
+    public enum PcreSubstituteCase
+    {
+        None = 0,
+        Lower = 1,
+        Upper = 2,
+        TitleFirst = 3,
+    }
+    public delegate string PcreSubstituteCaseCalloutFunc(System.ReadOnlySpan<char> input, PCRE.PcreSubstituteCase targetCase);
+    public class PcreSubstituteException : PCRE.PcreException
+    {
+        public PcreSubstituteException(PCRE.PcreErrorCode errorCode) { }
+        public PcreSubstituteException(PCRE.PcreErrorCode errorCode, string message, System.Exception? innerException) { }
+    }
+    [System.Flags]
+    public enum PcreSubstituteOptions : long
+    {
+        None = 0,
+        Anchored = 2147483648,
+        EndAnchored = 536870912,
+        NotBol = 1,
+        NotEol = 2,
+        NotEmpty = 4,
+        NotEmptyAtStart = 8,
+        NoUtfCheck = 1073741824,
+        NoJit = 8192,
+        DisableRecurseLoopCheck = 262144,
+        SubstituteExtended = 512,
+        SubstituteGlobal = 256,
+        SubstituteLiteral = 32768,
+        SubstituteReplacementOnly = 131072,
+        SubstituteUnknownUnset = 2048,
+        SubstituteUnsetEmpty = 1024,
+    }
+}

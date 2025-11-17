@@ -25,3 +25,7 @@ local-*
 *.binlog
 Thumbs.db
 launchSettings.json
+
+# Verify
+*.received.*
+*.received/
