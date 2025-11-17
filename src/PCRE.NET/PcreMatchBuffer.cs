@@ -19,7 +19,7 @@ internal interface IPcreMatchBuffer
 /// <remarks>
 /// Not thread-safe and not reentrant.
 /// </remarks>
-public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IDisposable
+public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit, IDisposable
 {
     internal readonly InternalRegex16Bit Regex;
     private readonly int _outputVectorSize;
@@ -33,6 +33,7 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IDisposable
     InternalRegex IPcreMatchBuffer.Regex => Regex;
     IntPtr IPcreMatchBuffer.NativeBuffer => NativeBuffer;
     nuint[] IPcreMatchBuffer.CalloutOutputVector => CalloutOutputVector;
+    InternalRegex16Bit IRegexHolder16Bit.Regex => Regex;
 
     internal PcreMatchBuffer(InternalRegex16Bit regex, PcreMatchSettings settings)
     {

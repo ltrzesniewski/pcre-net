@@ -13,7 +13,7 @@ namespace PCRE;
 [DebuggerTypeProxy(typeof(DebugProxy))]
 public unsafe ref struct PcreRefMatchUtf8
 {
-    private readonly object? _owner;
+    private readonly IRegexHolder8Bit? _owner; // Needs to be kept alive as long as this match is used
     internal Span<nuint> OutputVector; // Can be empty when there is no match
     private int _resultCode;
     private byte* _markPtr;
@@ -26,26 +26,13 @@ public unsafe ref struct PcreRefMatchUtf8
     /// <typeparam name="T">The output value type.</typeparam>
     public delegate T Func<out T>(PcreRefMatchUtf8 match);
 
-    internal PcreRefMatchUtf8(InternalRegex8Bit regex, Span<nuint> oVector)
-        : this(oVector)
-    {
-        Debug.Assert(oVector.Length == 0 || oVector.Length == regex.OutputVectorSize);
-
-        _owner = regex;
-    }
-
-    internal PcreRefMatchUtf8(PcreMatchBufferUtf8 buffer, Span<nuint> oVector)
-        : this(oVector)
-    {
-        Debug.Assert(oVector.Length == 0 || oVector.Length == buffer.Regex.OutputVectorSize);
-
-        _owner = buffer; // Needs to be kept alive, as the output vector is in native memory.
-    }
-
-    private PcreRefMatchUtf8(Span<nuint> oVector)
+    internal PcreRefMatchUtf8(IRegexHolder8Bit owner, Span<nuint> oVector)
     {
         // Empty match
 
+        Debug.Assert(oVector.Length == 0 || oVector.Length == owner.Regex.OutputVectorSize);
+
+        _owner = owner;
         OutputVector = oVector;
 
         Subject = default;
@@ -65,8 +52,7 @@ public unsafe ref struct PcreRefMatchUtf8
         _resultCode = oVector.Length / 2;
     }
 
-    private readonly InternalRegex8Bit? Regex => _owner as InternalRegex8Bit
-                                                 ?? (_owner as PcreMatchBufferUtf8)?.Regex;
+    private readonly InternalRegex8Bit? Regex => _owner?.Regex;
 
     internal readonly bool IsInitialized => _owner != null;
 

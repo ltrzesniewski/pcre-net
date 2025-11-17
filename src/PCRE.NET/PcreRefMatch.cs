@@ -13,7 +13,7 @@ namespace PCRE;
 [DebuggerTypeProxy(typeof(DebugProxy))]
 public unsafe ref struct PcreRefMatch
 {
-    private readonly object? _owner;
+    private readonly IRegexHolder16Bit? _owner; // Needs to be kept alive as long as this match is used
     internal Span<nuint> OutputVector; // Can be empty when there is no match
     private int _resultCode;
     private char* _markPtr;
@@ -26,26 +26,13 @@ public unsafe ref struct PcreRefMatch
     /// <typeparam name="T">The output value type.</typeparam>
     public delegate T Func<out T>(PcreRefMatch match);
 
-    internal PcreRefMatch(InternalRegex16Bit regex, Span<nuint> oVector)
-        : this(oVector)
-    {
-        Debug.Assert(oVector.Length == 0 || oVector.Length == regex.OutputVectorSize);
-
-        _owner = regex;
-    }
-
-    internal PcreRefMatch(PcreMatchBuffer buffer, Span<nuint> oVector)
-        : this(oVector)
-    {
-        Debug.Assert(oVector.Length == 0 || oVector.Length == buffer.Regex.OutputVectorSize);
-
-        _owner = buffer; // Needs to be kept alive, as the output vector is in native memory.
-    }
-
-    private PcreRefMatch(Span<nuint> oVector)
+    internal PcreRefMatch(IRegexHolder16Bit owner, Span<nuint> oVector)
     {
         // Empty match
 
+        Debug.Assert(oVector.Length == 0 || oVector.Length == owner.Regex.OutputVectorSize);
+
+        _owner = owner;
         OutputVector = oVector;
 
         Subject = default;
@@ -65,8 +52,7 @@ public unsafe ref struct PcreRefMatch
         _resultCode = oVector.Length / 2;
     }
 
-    private readonly InternalRegex16Bit? Regex => _owner as InternalRegex16Bit
-                                                  ?? (_owner as PcreMatchBuffer)?.Regex;
+    private readonly InternalRegex16Bit? Regex => _owner?.Regex;
 
     internal readonly bool IsInitialized => _owner != null;
 

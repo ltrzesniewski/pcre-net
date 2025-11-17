@@ -206,6 +206,5 @@ public enum PcreExtraCompileOptions : uint
     /// However, they can only match subject characters if the matching function is called with <see cref="PcreOptions.NoUtfCheck"/> set.
     /// </para>
     /// </remarks>
-    [Obsolete("PCRE.NET only supports UTF-16 mode.")]
     AllowSurrogateEscapes = PcreConstants.PCRE2_EXTRA_ALLOW_SURROGATE_ESCAPES,
 }

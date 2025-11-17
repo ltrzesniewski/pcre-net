@@ -12,7 +12,7 @@ namespace PCRE;
 /// <remarks>
 /// Not thread-safe and not reentrant.
 /// </remarks>
-public sealed unsafe class PcreMatchBufferUtf8 : IPcreMatchBuffer, IDisposable
+public sealed unsafe class PcreMatchBufferUtf8 : IPcreMatchBuffer, IRegexHolder8Bit, IDisposable
 {
     internal readonly InternalRegex8Bit Regex;
     private readonly int _outputVectorSize;
@@ -26,6 +26,7 @@ public sealed unsafe class PcreMatchBufferUtf8 : IPcreMatchBuffer, IDisposable
     InternalRegex IPcreMatchBuffer.Regex => Regex;
     IntPtr IPcreMatchBuffer.NativeBuffer => NativeBuffer;
     nuint[] IPcreMatchBuffer.CalloutOutputVector => CalloutOutputVector;
+    InternalRegex8Bit IRegexHolder8Bit.Regex => Regex;
 
     internal PcreMatchBufferUtf8(InternalRegex8Bit regex, PcreMatchSettings settings)
     {

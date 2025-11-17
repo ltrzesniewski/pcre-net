@@ -316,9 +316,17 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
         => PatternString;
 }
 
-internal sealed unsafe class InternalRegex8Bit(ReadOnlySpan<byte> pattern, string patternString, PcreRegexSettings settings, Encoding encoding)
-    : InternalRegex<byte, Native8Bit>(pattern, patternString, settings)
+internal interface IRegexHolder8Bit
 {
+    InternalRegex8Bit Regex { get; }
+}
+
+internal sealed unsafe class InternalRegex8Bit(ReadOnlySpan<byte> pattern, string patternString, PcreRegexSettings settings, Encoding encoding)
+    : InternalRegex<byte, Native8Bit>(pattern, patternString, settings),
+      IRegexHolder8Bit
+{
+    InternalRegex8Bit IRegexHolder8Bit.Regex => this;
+
     public override string? GetString(void* ptr)
         => GetString((byte*)ptr, encoding);
 
@@ -375,10 +383,18 @@ internal sealed unsafe class InternalRegex8Bit(ReadOnlySpan<byte> pattern, strin
     }
 }
 
+internal interface IRegexHolder16Bit
+{
+    InternalRegex16Bit Regex { get; }
+}
+
 internal sealed unsafe class InternalRegex16Bit(string pattern, PcreRegexSettings settings)
-    : InternalRegex<char, Native16Bit>(pattern, pattern, settings)
+    : InternalRegex<char, Native16Bit>(pattern, pattern, settings),
+      IRegexHolder16Bit
 {
     private PcreMatch? _noMatch;
+
+    InternalRegex16Bit IRegexHolder16Bit.Regex => this;
 
     public PcreMatch Match(string subject,
                            PcreMatchSettings settings,
