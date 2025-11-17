@@ -13,7 +13,7 @@ namespace PCRE;
 [DebuggerTypeProxy(typeof(DebugProxy))]
 public unsafe ref struct PcreRefMatch
 {
-    private readonly InternalRegex16Bit? _regex;
+    private readonly object? _owner;
     internal Span<nuint> OutputVector; // Can be empty when there is no match
     private int _resultCode;
     private char* _markPtr;
@@ -27,15 +27,25 @@ public unsafe ref struct PcreRefMatch
     public delegate T Func<out T>(PcreRefMatch match);
 
     internal PcreRefMatch(InternalRegex16Bit regex, Span<nuint> oVector)
+        : this(oVector)
+    {
+        Debug.Assert(oVector.Length == 0 || oVector.Length == regex.OutputVectorSize);
+
+        _owner = regex;
+    }
+
+    internal PcreRefMatch(PcreMatchBuffer buffer, Span<nuint> oVector)
+        : this(oVector)
+    {
+        Debug.Assert(oVector.Length == 0 || oVector.Length == buffer.Regex.OutputVectorSize);
+
+        _owner = buffer; // Needs to be kept alive, as the output vector is in native memory.
+    }
+
+    private PcreRefMatch(Span<nuint> oVector)
     {
         // Empty match
 
-#if DEBUG
-        if (oVector.Length != 0 && oVector.Length != regex.OutputVectorSize)
-            throw new InvalidOperationException("Unexpected output vector size.");
-#endif
-
-        _regex = regex;
         OutputVector = oVector;
 
         Subject = default;
@@ -48,17 +58,20 @@ public unsafe ref struct PcreRefMatch
         // Callout
 
         Subject = subject;
-        _regex = regex;
+        _owner = regex;
         OutputVector = oVector;
         _markPtr = mark;
 
         _resultCode = oVector.Length / 2;
     }
 
-    internal readonly bool IsInitialized => _regex != null;
+    private readonly InternalRegex16Bit? Regex => _owner as InternalRegex16Bit
+                                                  ?? (_owner as PcreMatchBuffer)?.Regex;
+
+    internal readonly bool IsInitialized => _owner != null;
 
     /// <inheritdoc cref="PcreMatch.CaptureCount"/>
-    public readonly int CaptureCount => _regex?.CaptureCount ?? 0;
+    public readonly int CaptureCount => Regex?.CaptureCount ?? 0;
 
     /// <summary>
     /// Returns the capturing group at a given index.
@@ -75,17 +88,17 @@ public unsafe ref struct PcreRefMatch
         => GetGroup(name);
 
     /// <inheritdoc cref="PcreMatch.Index"/>
-    public readonly int Index => _regex is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL
+    public readonly int Index => _owner is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL
         ? (int)OutputVector[0]
         : -1;
 
     /// <inheritdoc cref="PcreMatch.EndIndex"/>
-    public readonly int EndIndex => _regex is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL
+    public readonly int EndIndex => _owner is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL
         ? (int)OutputVector[1]
         : -1;
 
     /// <inheritdoc cref="PcreMatch.Length"/>
-    public readonly int Length => _regex is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL && OutputVector[1] > OutputVector[0]
+    public readonly int Length => _owner is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL && OutputVector[1] > OutputVector[0]
         ? (int)(OutputVector[1] - OutputVector[0])
         : 0;
 
@@ -93,7 +106,7 @@ public unsafe ref struct PcreRefMatch
     public readonly bool Success => _resultCode > 0;
 
     /// <inheritdoc cref="PcreMatch.Value"/>
-    public readonly ReadOnlySpan<char> Value => _regex is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL && OutputVector[1] > OutputVector[0]
+    public readonly ReadOnlySpan<char> Value => _owner is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL && OutputVector[1] > OutputVector[0]
         ? Subject.Slice((int)OutputVector[0], (int)(OutputVector[1] - OutputVector[0]))
         : ReadOnlySpan<char>.Empty;
 
@@ -140,10 +153,10 @@ public unsafe ref struct PcreRefMatch
 
     private readonly PcreRefGroup GetGroup(int index)
     {
-        if (_regex == null)
+        if (Regex is not { } regex)
             return PcreRefGroup.Undefined;
 
-        if (index < 0 || index > _regex.CaptureCount)
+        if (index < 0 || index > regex.CaptureCount)
             return PcreRefGroup.Undefined;
 
         var isAvailable = index < _resultCode || IsPartialMatch && index == 0;
@@ -165,10 +178,10 @@ public unsafe ref struct PcreRefMatch
 
     private readonly PcreRefGroup GetGroup(string name)
     {
-        if (_regex == null)
+        if (Regex is not { } regex)
             return PcreRefGroup.Undefined;
 
-        if (!_regex.CaptureNames.TryGetValue(name, out var indexes))
+        if (!regex.CaptureNames.TryGetValue(name, out var indexes))
             return PcreRefGroup.Undefined;
 
         if (indexes.Length == 1)
@@ -187,10 +200,10 @@ public unsafe ref struct PcreRefMatch
     /// <inheritdoc cref="PcreMatch.GetDuplicateNamedGroups"/>
     public readonly DuplicateNamedGroupEnumerable GetDuplicateNamedGroups(string name)
     {
-        if (_regex == null)
+        if (Regex is not { } regex)
             return default;
 
-        if (!_regex.CaptureNames.TryGetValue(name, out var indexes))
+        if (!regex.CaptureNames.TryGetValue(name, out var indexes))
             return default;
 
         return new DuplicateNamedGroupEnumerable(this, indexes);
@@ -205,7 +218,7 @@ public unsafe ref struct PcreRefMatch
     {
         Subject = subject;
 
-        _regex!.Match(
+        Regex!.Match(
             ref OutputVector,
             subject,
             settings,
@@ -228,7 +241,7 @@ public unsafe ref struct PcreRefMatch
 
         OutputVector = Span<nuint>.Empty;
 
-        _regex!.Match(
+        Regex!.Match(
             ref OutputVector,
             Subject,
             settings,
@@ -249,7 +262,7 @@ public unsafe ref struct PcreRefMatch
     {
         Subject = subject;
 
-        _regex!.BufferMatch(
+        Regex!.BufferMatch(
             Subject,
             buffer,
             startIndex,
@@ -267,7 +280,7 @@ public unsafe ref struct PcreRefMatch
         var startOfNextMatchIndex = GetStartOfNextMatchIndex();
         var nextOptions = options.ToPatternOptions() | PcreConstants.PCRE2_NO_UTF_CHECK | (Length == 0 ? PcreConstants.PCRE2_NOTEMPTY_ATSTART : 0);
 
-        _regex!.BufferMatch(
+        Regex!.BufferMatch(
             Subject,
             buffer,
             startOfNextMatchIndex,
@@ -287,7 +300,10 @@ public unsafe ref struct PcreRefMatch
 
     /// <inheritdoc cref="PcreMatch.ToString"/>
     public readonly override string ToString()
-        => Value.ToString();
+    {
+        GC.KeepAlive(_owner); // Good enough place to keep the object alive, I suppose.
+        return Value.ToString();
+    }
 
     /// <summary>
     /// The list of groups in a match.
@@ -302,7 +318,7 @@ public unsafe ref struct PcreRefMatch
         /// <summary>
         /// Returns the capture count.
         /// </summary>
-        public int Count => _match._regex?.CaptureCount + 1 ?? 0;
+        public int Count => _match.Regex?.CaptureCount + 1 ?? 0;
 
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
         public GroupEnumerator GetEnumerator()

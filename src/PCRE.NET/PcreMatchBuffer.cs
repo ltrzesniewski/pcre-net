@@ -55,6 +55,8 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IDisposable
             throw new InvalidOperationException("Could not create match buffer");
 
         OutputVector = info.output_vector;
+
+        GC.KeepAlive(this);
     }
 
     /// <inheritdoc />
@@ -160,7 +162,7 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IDisposable
         if (unchecked((uint)startIndex > (uint)subject.Length))
             ThrowInvalidStartIndex();
 
-        var match = new PcreRefMatch(Regex, GetOutputVectorSpan());
+        var match = new PcreRefMatch(this, GetOutputVectorSpan());
         match.FirstMatch(this, subject, startIndex, options, onCallout);
         return match;
     }
@@ -282,7 +284,7 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IDisposable
 
             if (!_match.IsInitialized)
             {
-                _match = new PcreRefMatch(_buffer.Regex, _buffer.GetOutputVectorSpan());
+                _match = new PcreRefMatch(_buffer, _buffer.GetOutputVectorSpan());
                 _match.FirstMatch(_buffer, _subject, _startIndex, _options, _callout);
             }
             else
