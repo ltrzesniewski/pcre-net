@@ -15,7 +15,7 @@ public class ForwardTo8BitGenerator : IIncrementalGenerator
         var toForward = context.SyntaxProvider
                                .ForAttributeWithMetadataName(
                                    "PCRE.Internal.ForwardTo8BitAttribute",
-                                   static (node, _) => (SyntaxKind)node.RawKind is SyntaxKind.ClassDeclaration or SyntaxKind.StructDeclaration,
+                                   static (node, _) => (SyntaxKind)node.RawKind is SyntaxKind.ClassDeclaration or SyntaxKind.StructDeclaration && node.Parent is not TypeDeclarationSyntax,
                                    static (context, _) => TypeModel.From(context)
                                );
 
@@ -26,11 +26,11 @@ public class ForwardTo8BitGenerator : IIncrementalGenerator
     {
         context.AddSource(
             $"{model.Node.Identifier}.g.cs",
-            GenerateType(model, "Utf8", context.CancellationToken)
+            GenerateTopLevelType(model, "Utf8", context.CancellationToken)
         );
     }
 
-    private static string GenerateType(TypeModel model, string suffix, CancellationToken cancellationToken)
+    private static string GenerateTopLevelType(TypeModel model, string suffix, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -43,16 +43,29 @@ public class ForwardTo8BitGenerator : IIncrementalGenerator
               .AppendLine()
               .AppendLine($"namespace {model.Namespace};")
               .AppendLine()
-              .AppendLine("#nullable enable")
-              .AppendLine();
+              .AppendLine("#nullable enable");
 
-        writer.Append(node.Modifiers)
+        GenerateType(writer, node, false, suffix, cancellationToken);
+
+        return writer.ToString();
+    }
+
+    private static void GenerateType(CodeWriter writer,
+                                     TypeDeclarationSyntax node,
+                                     bool isInnerType,
+                                     string suffix,
+                                     CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        writer.AppendLine()
+              .Append(node.Modifiers)
               .Append(node.Modifiers.Any(SyntaxKind.PartialKeyword) ? "" : " partial")
               .Append(' ')
               .Append(node.Keyword)
               .Append(' ')
               .Append(node.Identifier)
-              .Append(suffix)
+              .Append(isInnerType ? "" : suffix)
               .AppendLine();
 
         using (writer.WriteBlock())
@@ -62,14 +75,27 @@ public class ForwardTo8BitGenerator : IIncrementalGenerator
                 if (!HasAttribute(member, "ForwardTo8Bit"))
                     continue;
 
-                GenerateMember(writer, member, suffix, cancellationToken);
+                switch ((SyntaxKind)member.RawKind)
+                {
+                    case SyntaxKind.MethodDeclaration:
+                    case SyntaxKind.PropertyDeclaration:
+                    case SyntaxKind.IndexerDeclaration:
+                        GenerateMethodOrProperty(writer, member, suffix, cancellationToken);
+                        break;
+
+                    case SyntaxKind.ClassDeclaration:
+                    case SyntaxKind.StructDeclaration:
+                        GenerateType(writer, (TypeDeclarationSyntax)member, true, suffix, cancellationToken);
+                        break;
+                }
             }
         }
-
-        return writer.ToString();
     }
 
-    private static void GenerateMember(CodeWriter writer, MemberDeclarationSyntax member, string suffix, CancellationToken cancellationToken)
+    private static void GenerateMethodOrProperty(CodeWriter writer,
+                                                 MemberDeclarationSyntax member,
+                                                 string suffix,
+                                                 CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 

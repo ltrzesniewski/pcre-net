@@ -314,6 +314,7 @@ public unsafe ref struct PcreRefMatch
     /// <summary>
     /// The list of groups in a match.
     /// </summary>
+    [ForwardTo8Bit]
     public readonly ref struct GroupList
     {
         private readonly PcreRefMatch _match;
@@ -324,17 +325,21 @@ public unsafe ref struct PcreRefMatch
         /// <summary>
         /// Returns the capture count.
         /// </summary>
+        [ForwardTo8Bit]
         public int Count => _match.Regex?.CaptureCount + 1 ?? 0;
 
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
+        [ForwardTo8Bit]
         public GroupEnumerator GetEnumerator()
             => new(_match);
 
         /// <inheritdoc cref="PcreMatch.get_Item(int)"/>
+        [ForwardTo8Bit]
         public PcreRefGroup this[int index]
             => _match[index];
 
         /// <inheritdoc cref="PcreMatch.get_Item(string)"/>
+        [ForwardTo8Bit]
         public PcreRefGroup this[string name]
             => _match[name];
 
@@ -343,6 +348,7 @@ public unsafe ref struct PcreRefMatch
         /// </summary>
         /// <param name="selector">The selector that converts a group to a list item.</param>
         /// <typeparam name="T">The type of list items.</typeparam>
+        [ForwardTo8Bit]
         [SuppressMessage("Microsoft.Design", "CA1002")]
         [SuppressMessage("Microsoft.Design", "CA1062")]
         public List<T> ToList<T>(PcreRefGroup.Func<T> selector)
@@ -359,6 +365,7 @@ public unsafe ref struct PcreRefMatch
     /// <summary>
     /// A capturing group enumerator.
     /// </summary>
+    [ForwardTo8Bit]
     public ref struct GroupEnumerator
     {
         private readonly PcreRefMatch _match;
@@ -371,9 +378,11 @@ public unsafe ref struct PcreRefMatch
         }
 
         /// <inheritdoc cref="IEnumerator{T}.Current"/>
+        [ForwardTo8Bit]
         public readonly PcreRefGroup Current => _match[_index];
 
         /// <inheritdoc cref="IEnumerator.MoveNext"/>
+        [ForwardTo8Bit]
         public bool MoveNext()
             => ++_index <= _match.CaptureCount;
     }
@@ -381,6 +390,7 @@ public unsafe ref struct PcreRefMatch
     /// <summary>
     /// An enumerable of duplicated named groups.
     /// </summary>
+    [ForwardTo8Bit]
     public readonly ref struct DuplicateNamedGroupEnumerable
     {
         private readonly PcreRefMatch _match;
@@ -393,6 +403,7 @@ public unsafe ref struct PcreRefMatch
         }
 
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
+        [ForwardTo8Bit]
         public DuplicateNamedGroupEnumerator GetEnumerator()
             => new(_match, _groupIndexes);
 
@@ -401,6 +412,7 @@ public unsafe ref struct PcreRefMatch
         /// </summary>
         /// <param name="selector">The selector that converts a group to a list item.</param>
         /// <typeparam name="T">The type of list items.</typeparam>
+        [ForwardTo8Bit]
         [SuppressMessage("Microsoft.Design", "CA1002")]
         [SuppressMessage("Microsoft.Design", "CA1062")]
         public List<T> ToList<T>(PcreRefGroup.Func<T> selector)
@@ -417,6 +429,7 @@ public unsafe ref struct PcreRefMatch
     /// <summary>
     /// An enumerator of duplicated named groups.
     /// </summary>
+    [ForwardTo8Bit]
     public ref struct DuplicateNamedGroupEnumerator
     {
         private readonly PcreRefMatch _match;
@@ -431,9 +444,11 @@ public unsafe ref struct PcreRefMatch
         }
 
         /// <inheritdoc cref="IEnumerator{T}.Current"/>
+        [ForwardTo8Bit]
         public readonly PcreRefGroup Current => _groupIndexes != null ? _match.GetGroup(_groupIndexes[_index]) : PcreRefGroup.Undefined;
 
         /// <inheritdoc cref="IEnumerator.MoveNext"/>
+        [ForwardTo8Bit]
         public bool MoveNext()
         {
             if (_groupIndexes is null)

@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using PCRE.Internal;
@@ -83,52 +81,18 @@ public unsafe ref partial struct PcreRefMatchUtf8
     /// <summary>
     /// The list of groups in a match.
     /// </summary>
-    public readonly ref struct GroupList
+    public readonly ref partial struct GroupList
     {
         private readonly PcreRefMatchUtf8 _match;
 
         internal GroupList(PcreRefMatchUtf8 match)
             => _match = match;
-
-        /// <summary>
-        /// Returns the capture count.
-        /// </summary>
-        public int Count => _match.Regex?.CaptureCount + 1 ?? 0;
-
-        /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
-        public GroupEnumerator GetEnumerator()
-            => new(_match);
-
-        /// <inheritdoc cref="PcreMatch.get_Item(int)"/>
-        public PcreRefGroupUtf8 this[int index]
-            => _match[index];
-
-        /// <inheritdoc cref="PcreMatch.get_Item(string)"/>
-        public PcreRefGroupUtf8 this[string name]
-            => _match[name];
-
-        /// <summary>
-        /// Creates a <see cref="List{T}"/> out of the groups by applying a <paramref name="selector"/> method.
-        /// </summary>
-        /// <param name="selector">The selector that converts a group to a list item.</param>
-        /// <typeparam name="T">The type of list items.</typeparam>
-        [SuppressMessage("Microsoft.Design", "CA1002")]
-        [SuppressMessage("Microsoft.Design", "CA1062")]
-        public List<T> ToList<T>(PcreRefGroupUtf8.Func<T> selector)
-        {
-            var result = new List<T>(Count);
-
-            foreach (var item in this)
-                result.Add(selector(item));
-
-            return result;
-        }
     }
 
     /// <summary>
     /// A capturing group enumerator.
     /// </summary>
-    public ref struct GroupEnumerator
+    public ref partial struct GroupEnumerator
     {
         private readonly PcreRefMatchUtf8 _match;
         private int _index;
@@ -138,19 +102,12 @@ public unsafe ref partial struct PcreRefMatchUtf8
             _match = match;
             _index = -1;
         }
-
-        /// <inheritdoc cref="IEnumerator{T}.Current"/>
-        public readonly PcreRefGroupUtf8 Current => _match[_index];
-
-        /// <inheritdoc cref="IEnumerator.MoveNext"/>
-        public bool MoveNext()
-            => ++_index <= _match.CaptureCount;
     }
 
     /// <summary>
     /// An enumerable of duplicated named groups.
     /// </summary>
-    public readonly ref struct DuplicateNamedGroupEnumerable
+    public readonly ref partial struct DuplicateNamedGroupEnumerable
     {
         private readonly PcreRefMatchUtf8 _match;
         private readonly int[]? _groupIndexes;
@@ -160,33 +117,12 @@ public unsafe ref partial struct PcreRefMatchUtf8
             _match = match;
             _groupIndexes = groupIndexes;
         }
-
-        /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
-        public DuplicateNamedGroupEnumerator GetEnumerator()
-            => new(_match, _groupIndexes);
-
-        /// <summary>
-        /// Creates a <see cref="List{T}"/> out of the groups by applying a <paramref name="selector"/> method.
-        /// </summary>
-        /// <param name="selector">The selector that converts a group to a list item.</param>
-        /// <typeparam name="T">The type of list items.</typeparam>
-        [SuppressMessage("Microsoft.Design", "CA1002")]
-        [SuppressMessage("Microsoft.Design", "CA1062")]
-        public List<T> ToList<T>(PcreRefGroupUtf8.Func<T> selector)
-        {
-            var result = new List<T>(_groupIndexes?.Length ?? 0);
-
-            foreach (var item in this)
-                result.Add(selector(item));
-
-            return result;
-        }
     }
 
     /// <summary>
     /// An enumerator of duplicated named groups.
     /// </summary>
-    public ref struct DuplicateNamedGroupEnumerator
+    public ref partial struct DuplicateNamedGroupEnumerator
     {
         private readonly PcreRefMatchUtf8 _match;
         private readonly int[]? _groupIndexes;
@@ -197,22 +133,6 @@ public unsafe ref partial struct PcreRefMatchUtf8
             _match = match;
             _groupIndexes = groupIndexes;
             _index = -1;
-        }
-
-        /// <inheritdoc cref="IEnumerator{T}.Current"/>
-        public readonly PcreRefGroupUtf8 Current => _groupIndexes != null ? _match.GetGroup(_groupIndexes[_index]) : PcreRefGroupUtf8.Undefined;
-
-        /// <inheritdoc cref="IEnumerator.MoveNext"/>
-        public bool MoveNext()
-        {
-            if (_groupIndexes is null)
-                return false;
-
-            if (_index + 1 >= _groupIndexes.Length)
-                return false;
-
-            ++_index;
-            return true;
         }
     }
 

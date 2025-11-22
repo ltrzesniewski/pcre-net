@@ -59,8 +59,8 @@ internal class CodeWriter
 
     private void WriteIndent()
     {
-        // if (_isAtStartOfLine)
-        //     _sb.Append(' ', Indent * _indentWidth);
+        if (_isAtStartOfLine)
+            _sb.Append(' ', Indent * _indentWidth);
 
         _isAtStartOfLine = false;
     }
