@@ -10,6 +10,7 @@ namespace PCRE;
 /// <summary>
 /// The result of a match.
 /// </summary>
+[ForwardTo8Bit]
 [DebuggerTypeProxy(typeof(DebugProxy))]
 public unsafe ref struct PcreRefMatch
 {
@@ -74,29 +75,35 @@ public unsafe ref struct PcreRefMatch
         => GetGroup(name);
 
     /// <inheritdoc cref="PcreMatch.Index"/>
+    [ForwardTo8Bit]
     public readonly int Index => _owner is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL
         ? (int)OutputVector[0]
         : -1;
 
     /// <inheritdoc cref="PcreMatch.EndIndex"/>
+    [ForwardTo8Bit]
     public readonly int EndIndex => _owner is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL
         ? (int)OutputVector[1]
         : -1;
 
     /// <inheritdoc cref="PcreMatch.Length"/>
+    [ForwardTo8Bit]
     public readonly int Length => _owner is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL && OutputVector[1] > OutputVector[0]
         ? (int)(OutputVector[1] - OutputVector[0])
         : 0;
 
     /// <inheritdoc cref="PcreMatch.Success"/>
+    [ForwardTo8Bit]
     public readonly bool Success => _resultCode > 0;
 
     /// <inheritdoc cref="PcreMatch.Value"/>
+    [ForwardTo8Bit]
     public readonly ReadOnlySpan<char> Value => _owner is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL && OutputVector[1] > OutputVector[0]
         ? Subject.Slice((int)OutputVector[0], (int)(OutputVector[1] - OutputVector[0]))
         : ReadOnlySpan<char>.Empty;
 
     /// <inheritdoc cref="PcreMatch.Mark"/>
+    [ForwardTo8Bit]
     public readonly ReadOnlySpan<char> Mark
     {
         get
@@ -114,16 +121,20 @@ public unsafe ref struct PcreRefMatch
     }
 
     /// <inheritdoc cref="PcreMatch.Groups"/>
+    [ForwardTo8Bit]
     public readonly GroupList Groups => new(this);
 
     /// <inheritdoc cref="PcreMatch.IsPartialMatch"/>
+    [ForwardTo8Bit]
     public readonly bool IsPartialMatch => _resultCode == PcreConstants.PCRE2_ERROR_PARTIAL;
 
     /// <inheritdoc cref="PcreMatch.GetEnumerator"/>
+    [ForwardTo8Bit]
     public readonly GroupEnumerator GetEnumerator()
         => new(this);
 
     /// <inheritdoc cref="PcreMatch.TryGetGroup(int,out PCRE.PcreGroup)"/>
+    [ForwardTo8Bit]
     public readonly bool TryGetGroup(int index, out PcreRefGroup result)
     {
         result = GetGroup(index);
@@ -131,12 +142,14 @@ public unsafe ref struct PcreRefMatch
     }
 
     /// <inheritdoc cref="PcreMatch.TryGetGroup(string,out PCRE.PcreGroup)"/>
+    [ForwardTo8Bit]
     public readonly bool TryGetGroup(string name, out PcreRefGroup result)
     {
         result = GetGroup(name);
         return result.IsDefined;
     }
 
+    [ForwardTo8Bit]
     private readonly PcreRefGroup GetGroup(int index)
     {
         if (Regex is not { } regex)
@@ -162,6 +175,7 @@ public unsafe ref struct PcreRefMatch
         return new PcreRefGroup(Subject, startOffset, endOffset);
     }
 
+    [ForwardTo8Bit]
     private readonly PcreRefGroup GetGroup(string name)
     {
         if (Regex is not { } regex)
@@ -184,6 +198,7 @@ public unsafe ref struct PcreRefMatch
     }
 
     /// <inheritdoc cref="PcreMatch.GetDuplicateNamedGroups"/>
+    [ForwardTo8Bit]
     public readonly DuplicateNamedGroupEnumerable GetDuplicateNamedGroups(string name)
     {
         if (Regex is not { } regex)
@@ -195,6 +210,7 @@ public unsafe ref struct PcreRefMatch
         return new DuplicateNamedGroupEnumerable(this, indexes);
     }
 
+    [ForwardTo8Bit]
     internal void FirstMatch(ReadOnlySpan<char> subject,
                              PcreMatchSettings settings,
                              int startIndex,
@@ -217,6 +233,7 @@ public unsafe ref struct PcreRefMatch
         );
     }
 
+    [ForwardTo8Bit]
     internal void NextMatch(PcreMatchSettings settings,
                             PcreMatchOptions options,
                             PcreRefCalloutFunc? callout,
@@ -240,6 +257,7 @@ public unsafe ref struct PcreRefMatch
         );
     }
 
+    [ForwardTo8Bit]
     internal void FirstMatch(PcreMatchBuffer buffer,
                              ReadOnlySpan<char> subject,
                              int startIndex,
@@ -259,6 +277,7 @@ public unsafe ref struct PcreRefMatch
         );
     }
 
+    [ForwardTo8Bit]
     internal void NextMatch(PcreMatchBuffer buffer,
                             PcreMatchOptions options,
                             PcreRefCalloutFunc? callout)
@@ -277,6 +296,7 @@ public unsafe ref struct PcreRefMatch
         );
     }
 
+    [ForwardTo8Bit]
     private readonly int GetStartOfNextMatchIndex()
     {
         // It's possible to have EndIndex < Index
