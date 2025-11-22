@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
 using System.Text;
 using PCRE.Internal;
 
@@ -12,11 +11,6 @@ namespace PCRE;
 public sealed partial class PcreRegexUtf8
 {
     internal InternalRegex8Bit InternalRegex { get; }
-
-    /// <summary>
-    /// Returns information about the pattern.
-    /// </summary>
-    public PcrePatternInfo PatternInfo => field ??= new PcrePatternInfo(InternalRegex);
 
     /// <summary>
     /// Creates a PCRE2 regex for UTF-8.
@@ -101,27 +95,4 @@ public sealed partial class PcreRegexUtf8
             return Encoding.UTF8.GetString(ptr, value.Length);
 #endif
     }
-
-    /// <summary>
-    /// Creates a buffer for zero-allocation matching.
-    /// </summary>
-    /// <remarks>
-    /// The resulting <see cref="PcreMatchBuffer"/> can be used to perform match operations without allocating any managed memory,
-    /// therefore not inducing any GC pressure. Note that the buffer is not thread-safe and not reentrant.
-    /// </remarks>
-    [Pure]
-    public PcreMatchBufferUtf8 CreateMatchBuffer()
-        => new(InternalRegex, PcreMatchSettings.Default);
-
-    /// <inheritdoc cref="CreateMatchBuffer()"/>
-    /// <param name="settings">Additional settings.</param>
-    [Pure]
-    public PcreMatchBufferUtf8 CreateMatchBuffer(PcreMatchSettings settings)
-        => new(InternalRegex, settings ?? throw new ArgumentNullException(nameof(settings)));
-
-    /// <summary>
-    /// Returns the regex pattern.
-    /// </summary>
-    public override string ToString()
-        => InternalRegex.PatternString;
 }

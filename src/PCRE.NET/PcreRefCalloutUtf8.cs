@@ -10,7 +10,7 @@ namespace PCRE;
 public delegate PcreCalloutResult PcreRefCalloutFuncUtf8(PcreRefCalloutUtf8 callout);
 
 /// <inheritdoc cref="PcreCallout"/>
-public unsafe ref struct PcreRefCalloutUtf8
+public unsafe ref partial struct PcreRefCalloutUtf8
 {
     private readonly ReadOnlySpan<byte> _subject;
     private readonly InternalRegex8Bit _regex;
@@ -18,74 +18,4 @@ public unsafe ref struct PcreRefCalloutUtf8
 
     internal Span<nuint> OutputVector;
     private bool _oVectorInitialized;
-
-    internal PcreRefCalloutUtf8(ReadOnlySpan<byte> subject, InternalRegex8Bit regex, Native.pcre2_callout_block* callout, Span<nuint> outputVector)
-    {
-        _subject = subject;
-        _regex = regex;
-        _callout = callout;
-        OutputVector = outputVector;
-        _oVectorInitialized = false;
-    }
-
-    /// <inheritdoc cref="PcreCallout.Number"/>
-    public readonly int Number => (int)_callout->callout_number;
-
-    /// <inheritdoc cref="PcreCallout.Match"/>
-    public PcreRefMatchUtf8 Match
-    {
-        get
-        {
-            if (!_oVectorInitialized)
-            {
-                OutputVector = OutputVector.Length == 0
-                    ? new nuint[_callout->capture_top * 2]
-                    : OutputVector.Slice(0, (int)_callout->capture_top * 2);
-
-                OutputVector[0] = _callout->start_match;
-                OutputVector[1] = _callout->current_position;
-
-                for (var i = 2; i < OutputVector.Length; ++i)
-                    OutputVector[i] = _callout->offset_vector[i];
-
-                _oVectorInitialized = true;
-            }
-
-            return new PcreRefMatchUtf8(_subject, _regex, OutputVector, (byte*)_callout->mark);
-        }
-    }
-
-    /// <inheritdoc cref="PcreCallout.StartOffset"/>
-    public readonly int StartOffset => (int)_callout->start_match;
-
-    /// <inheritdoc cref="PcreCallout.CurrentOffset"/>
-    public readonly int CurrentOffset => (int)_callout->current_position;
-
-    /// <inheritdoc cref="PcreCallout.MaxCapture"/>
-    public readonly int MaxCapture => (int)_callout->capture_top;
-
-    /// <inheritdoc cref="PcreCallout.LastCapture"/>
-    public readonly int LastCapture => (int)_callout->capture_last;
-
-    /// <inheritdoc cref="PcreCallout.PatternPosition"/>
-    public readonly int PatternPosition => (int)_callout->pattern_position;
-
-    /// <inheritdoc cref="PcreCallout.NextPatternItemLength"/>
-    public readonly int NextPatternItemLength => (int)_callout->next_item_length;
-
-    /// <inheritdoc cref="PcreCallout.StringOffset"/>
-    public readonly int StringOffset => Info.StringOffset;
-
-    /// <inheritdoc cref="PcreCallout.String"/>
-    [SuppressMessage("Naming", "CA1720")]
-    public readonly string? String => Info.String;
-
-    /// <inheritdoc cref="PcreCallout.Info"/>
-    public readonly PcreCalloutInfo Info => _regex.GetCalloutInfoByPatternPosition(PatternPosition);
-
-    /// <inheritdoc cref="PcreCallout.StartMatch"/>
-    public readonly bool StartMatch => (_callout->callout_flags & PcreConstants.PCRE2_CALLOUT_STARTMATCH) != 0;
-
-    /// <inheritdoc cref="PcreCallout.Backtrack"/>
-    public readonly bool Backtrack => (_callout->callout_flags & PcreConstants.PCRE2_CALLOUT_BACKTRACK) != 0;
 }

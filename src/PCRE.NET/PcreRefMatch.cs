@@ -27,6 +27,7 @@ public unsafe ref struct PcreRefMatch
     /// <typeparam name="T">The output value type.</typeparam>
     public delegate T Func<out T>(PcreRefMatch match);
 
+    [ForwardTo8Bit]
     internal PcreRefMatch(IRegexHolder16Bit owner, Span<nuint> oVector)
     {
         // Empty match
@@ -41,6 +42,7 @@ public unsafe ref struct PcreRefMatch
         _resultCode = 0;
     }
 
+    [ForwardTo8Bit]
     internal PcreRefMatch(ReadOnlySpan<char> subject, InternalRegex16Bit regex, Span<nuint> oVector, char* mark)
     {
         // Callout
@@ -53,17 +55,21 @@ public unsafe ref struct PcreRefMatch
         _resultCode = oVector.Length / 2;
     }
 
+    [ForwardTo8Bit]
     private readonly InternalRegex16Bit? Regex => _owner?.Regex;
 
+    [ForwardTo8Bit]
     internal readonly bool IsInitialized => _owner != null;
 
     /// <inheritdoc cref="PcreMatch.CaptureCount"/>
+    [ForwardTo8Bit]
     public readonly int CaptureCount => Regex?.CaptureCount ?? 0;
 
     /// <summary>
     /// Returns the capturing group at a given index.
     /// </summary>
     /// <param name="index">The index of the capturing group.</param>
+    [ForwardTo8Bit]
     public readonly PcreRefGroup this[int index]
         => GetGroup(index);
 
@@ -71,6 +77,7 @@ public unsafe ref struct PcreRefMatch
     /// Returns the capturing group of a given name.
     /// </summary>
     /// <param name="name">The name of the capturing group.</param>
+    [ForwardTo8Bit]
     public readonly PcreRefGroup this[string name]
         => GetGroup(name);
 
@@ -319,6 +326,7 @@ public unsafe ref struct PcreRefMatch
     {
         private readonly PcreRefMatch _match;
 
+        [ForwardTo8Bit]
         internal GroupList(PcreRefMatch match)
             => _match = match;
 
@@ -371,6 +379,7 @@ public unsafe ref struct PcreRefMatch
         private readonly PcreRefMatch _match;
         private int _index;
 
+        [ForwardTo8Bit]
         internal GroupEnumerator(PcreRefMatch match)
         {
             _match = match;
@@ -396,6 +405,7 @@ public unsafe ref struct PcreRefMatch
         private readonly PcreRefMatch _match;
         private readonly int[]? _groupIndexes;
 
+        [ForwardTo8Bit]
         internal DuplicateNamedGroupEnumerable(PcreRefMatch match, int[] groupIndexes)
         {
             _match = match;
@@ -436,6 +446,7 @@ public unsafe ref struct PcreRefMatch
         private readonly int[]? _groupIndexes;
         private int _index;
 
+        [ForwardTo8Bit]
         internal DuplicateNamedGroupEnumerator(PcreRefMatch match, int[]? groupIndexes)
         {
             _match = match;

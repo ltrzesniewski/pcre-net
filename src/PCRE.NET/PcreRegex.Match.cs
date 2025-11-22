@@ -6,6 +6,7 @@ using PCRE.Internal;
 
 namespace PCRE;
 
+[ForwardTo8Bit]
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
@@ -20,6 +21,7 @@ public partial class PcreRegex
     /// <include file='PcreRegex.xml' path='/doc/method[@name="IsMatch"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject"]'/>
     [Pure]
+    [ForwardTo8Bit]
     public bool IsMatch(ReadOnlySpan<char> subject)
         => IsMatch(subject, 0);
 
@@ -38,6 +40,7 @@ public partial class PcreRegex
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex"]/*'/>
     /// </remarks>
     [Pure]
+    [ForwardTo8Bit]
     public bool IsMatch(ReadOnlySpan<char> subject, int startIndex)
     {
         if (unchecked((uint)startIndex > (uint)subject.Length))
@@ -62,6 +65,7 @@ public partial class PcreRegex
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject"]'/>
     [Pure]
+    [ForwardTo8Bit]
     public PcreRefMatch Match(ReadOnlySpan<char> subject)
         => Match(subject, 0, PcreMatchOptions.None, null, PcreMatchSettings.Default);
 
@@ -74,6 +78,7 @@ public partial class PcreRegex
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="options"]'/>
     [Pure]
+    [ForwardTo8Bit]
     public PcreRefMatch Match(ReadOnlySpan<char> subject, PcreMatchOptions options)
         => Match(subject, 0, options, null, PcreMatchSettings.Default);
 
@@ -92,6 +97,7 @@ public partial class PcreRegex
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex"]/*'/>
     /// </remarks>
     [Pure]
+    [ForwardTo8Bit]
     public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex)
         => Match(subject, startIndex, PcreMatchOptions.None, null, PcreMatchSettings.Default);
 
@@ -110,6 +116,7 @@ public partial class PcreRegex
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex"]/*'/>
     /// </remarks>
     [Pure]
+    [ForwardTo8Bit]
     public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options)
         => Match(subject, startIndex, options, null, PcreMatchSettings.Default);
 
@@ -126,6 +133,7 @@ public partial class PcreRegex
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="callout"]/*'/>
     /// </remarks>
+    [ForwardTo8Bit]
     public PcreRefMatch Match(ReadOnlySpan<char> subject, PcreRefCalloutFunc? onCallout)
         => Match(subject, 0, PcreMatchOptions.None, onCallout, PcreMatchSettings.Default);
 
@@ -142,6 +150,7 @@ public partial class PcreRegex
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="callout"]/*'/>
     /// </remarks>
+    [ForwardTo8Bit]
     public PcreRefMatch Match(ReadOnlySpan<char> subject, PcreMatchOptions options, PcreRefCalloutFunc? onCallout)
         => Match(subject, 0, options, onCallout, PcreMatchSettings.Default);
 
@@ -158,6 +167,7 @@ public partial class PcreRegex
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex" or @name="callout"]/*'/>
     /// </remarks>
+    [ForwardTo8Bit]
     public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex, PcreRefCalloutFunc? onCallout)
         => Match(subject, startIndex, PcreMatchOptions.None, onCallout, PcreMatchSettings.Default);
 
@@ -174,6 +184,7 @@ public partial class PcreRegex
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex" or @name="callout"]/*'/>
     /// </remarks>
+    [ForwardTo8Bit]
     public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFunc? onCallout)
         => Match(subject, startIndex, options, onCallout, PcreMatchSettings.Default);
 
@@ -201,6 +212,7 @@ public partial class PcreRegex
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex" or @name="callout"]/*'/>
     /// </remarks>
+    [ForwardTo8Bit]
     public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFunc? onCallout, PcreMatchSettings settings)
     {
         if (settings == null)
@@ -224,6 +236,7 @@ public partial class PcreRegex
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Matches"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject"]'/>
     [Pure]
+    [ForwardTo8Bit]
     public RefMatchEnumerable Matches(ReadOnlySpan<char> subject)
         => Matches(subject, 0, PcreMatchOptions.None, null, PcreMatchSettings.Default);
 
@@ -242,6 +255,7 @@ public partial class PcreRegex
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex"]/*'/>
     /// </remarks>
     [Pure]
+    [ForwardTo8Bit]
     public RefMatchEnumerable Matches(ReadOnlySpan<char> subject, int startIndex)
         => Matches(subject, startIndex, PcreMatchOptions.None, null, PcreMatchSettings.Default);
 
@@ -260,6 +274,7 @@ public partial class PcreRegex
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex" or @name="callout"]/*'/>
     /// </remarks>
     [Pure]
+    [ForwardTo8Bit]
     public RefMatchEnumerable Matches(ReadOnlySpan<char> subject, int startIndex, PcreRefCalloutFunc? onCallout)
         => Matches(subject, startIndex, PcreMatchOptions.None, onCallout, PcreMatchSettings.Default);
 
@@ -289,6 +304,7 @@ public partial class PcreRegex
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex" or @name="callout"]/*'/>
     /// </remarks>
     [Pure]
+    [ForwardTo8Bit]
     public RefMatchEnumerable Matches(ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFunc? onCallout, PcreMatchSettings settings)
     {
         if (settings == null)
@@ -403,12 +419,14 @@ public partial class PcreRegex
     public static IEnumerable<PcreMatch> Matches(string subject, string pattern, PcreOptions options, int startIndex)
         => new PcreRegex(pattern, options).Matches(subject, startIndex);
 
+    [ForwardTo8Bit]
     private static void ThrowInvalidStartIndex()
         => throw new ArgumentOutOfRangeException("Invalid start index.", default(Exception));
 
     /// <summary>
     /// An enumerable of matches against a <see cref="ReadOnlySpan{T}"/>.
     /// </summary>
+    [ForwardTo8Bit]
     public readonly ref struct RefMatchEnumerable
     {
         private readonly ReadOnlySpan<char> _subject;
@@ -418,6 +436,7 @@ public partial class PcreRegex
         private readonly PcreMatchSettings _settings;
         private readonly InternalRegex16Bit _regex;
 
+        [ForwardTo8Bit]
         internal RefMatchEnumerable(InternalRegex16Bit regex,
                                     ReadOnlySpan<char> subject,
                                     int startIndex,
@@ -434,6 +453,7 @@ public partial class PcreRegex
         }
 
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
+        [ForwardTo8Bit]
         public RefMatchEnumerator GetEnumerator()
             => new(_regex, _subject, _startIndex, _options, _callout, _settings);
 
@@ -442,6 +462,7 @@ public partial class PcreRegex
         /// </summary>
         /// <param name="selector">The selector that converts a match to a list item.</param>
         /// <typeparam name="T">The type of list items.</typeparam>
+        [ForwardTo8Bit]
         [SuppressMessage("Microsoft.Design", "CA1002")]
         [SuppressMessage("Microsoft.Design", "CA1062")]
         public List<T> ToList<T>(PcreRefMatch.Func<T> selector)
@@ -458,6 +479,7 @@ public partial class PcreRegex
     /// <summary>
     /// An enumerator of matches against a <see cref="ReadOnlySpan{T}"/>.
     /// </summary>
+    [ForwardTo8Bit]
     public ref struct RefMatchEnumerator
     {
         private readonly ReadOnlySpan<char> _subject;
@@ -468,6 +490,7 @@ public partial class PcreRegex
         private InternalRegex16Bit? _regex;
         private PcreRefMatch _match;
 
+        [ForwardTo8Bit]
         internal RefMatchEnumerator(InternalRegex16Bit regex,
                                     ReadOnlySpan<char> subject,
                                     int startIndex,
@@ -487,11 +510,13 @@ public partial class PcreRegex
         /// <summary>
         /// Gets the current match.
         /// </summary>
+        [ForwardTo8Bit]
         public readonly PcreRefMatch Current => _match;
 
         /// <summary>
         /// Moves to the next match.
         /// </summary>
+        [ForwardTo8Bit]
         public bool MoveNext()
         {
             if (_regex == null)
