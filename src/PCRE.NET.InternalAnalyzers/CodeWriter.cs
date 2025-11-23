@@ -14,15 +14,25 @@ internal class CodeWriter
 
     public CodeWriter Append<T>(T? value)
     {
-        WriteIndent();
-        Append(value?.ToString() ?? "");
+        var text = value?.ToString();
+
+        if (!string.IsNullOrEmpty(text))
+        {
+            WriteIndent();
+            Append(text);
+        }
+
         return this;
     }
 
     public CodeWriter Append(string? value)
     {
-        WriteIndent();
-        _sb.Append(value);
+        if (!string.IsNullOrEmpty(value))
+        {
+            WriteIndent();
+            _sb.Append(value);
+        }
+
         return this;
     }
 
@@ -34,9 +44,15 @@ internal class CodeWriter
 
     public CodeWriter AppendLine(string? value = null)
     {
-        WriteIndent();
-        _sb.Append(value).Append('\n');
+        if (!string.IsNullOrEmpty(value))
+        {
+            WriteIndent();
+            _sb.Append(value);
+        }
+
+        _sb.Append('\n');
         _isAtStartOfLine = true;
+
         return this;
     }
 
@@ -46,7 +62,7 @@ internal class CodeWriter
     public BlockScope WriteBlock()
     {
         EnsureIsOnNewLine();
-        Append("{");
+        AppendLine("{");
         Indent++;
         return new BlockScope(this);
     }
