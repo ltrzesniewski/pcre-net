@@ -32,7 +32,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../PCRE.NET.InternalAnalyzers/PCRE.NET.InternalAnalyzers.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    <ProjectReference Include="../PCRE.NET.InternalAnalyzers/PCRE.NET.InternalAnalyzers.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" OutputItemType="Analyzer" SetPlatform="Platform=AnyCPU" />
   </ItemGroup>
 
   <ItemGroup>
