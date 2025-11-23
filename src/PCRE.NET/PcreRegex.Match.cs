@@ -426,7 +426,7 @@ public partial class PcreRegex
     /// <summary>
     /// An enumerable of matches against a <see cref="ReadOnlySpan{T}"/>.
     /// </summary>
-    [ForwardTo8Bit]
+    [ForwardTo8Bit(FullType = true)]
     public readonly ref struct RefMatchEnumerable
     {
         private readonly ReadOnlySpan<char> _subject;
@@ -436,7 +436,6 @@ public partial class PcreRegex
         private readonly PcreMatchSettings _settings;
         private readonly InternalRegex16Bit _regex;
 
-        [ForwardTo8Bit]
         internal RefMatchEnumerable(InternalRegex16Bit regex,
                                     ReadOnlySpan<char> subject,
                                     int startIndex,
@@ -453,7 +452,6 @@ public partial class PcreRegex
         }
 
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
-        [ForwardTo8Bit]
         public RefMatchEnumerator GetEnumerator()
             => new(_regex, _subject, _startIndex, _options, _callout, _settings);
 
@@ -462,7 +460,6 @@ public partial class PcreRegex
         /// </summary>
         /// <param name="selector">The selector that converts a match to a list item.</param>
         /// <typeparam name="T">The type of list items.</typeparam>
-        [ForwardTo8Bit]
         [SuppressMessage("Microsoft.Design", "CA1002")]
         [SuppressMessage("Microsoft.Design", "CA1062")]
         public List<T> ToList<T>(PcreRefMatch.Func<T> selector)
@@ -479,7 +476,7 @@ public partial class PcreRegex
     /// <summary>
     /// An enumerator of matches against a <see cref="ReadOnlySpan{T}"/>.
     /// </summary>
-    [ForwardTo8Bit]
+    [ForwardTo8Bit(FullType = true)]
     public ref struct RefMatchEnumerator
     {
         private readonly ReadOnlySpan<char> _subject;
@@ -490,7 +487,6 @@ public partial class PcreRegex
         private InternalRegex16Bit? _regex;
         private PcreRefMatch _match;
 
-        [ForwardTo8Bit]
         internal RefMatchEnumerator(InternalRegex16Bit regex,
                                     ReadOnlySpan<char> subject,
                                     int startIndex,
@@ -510,13 +506,11 @@ public partial class PcreRegex
         /// <summary>
         /// Gets the current match.
         /// </summary>
-        [ForwardTo8Bit]
         public readonly PcreRefMatch Current => _match;
 
         /// <summary>
         /// Moves to the next match.
         /// </summary>
-        [ForwardTo8Bit]
         public bool MoveNext()
         {
             if (_regex == null)

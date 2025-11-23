@@ -23,10 +23,33 @@ public class ForwardTo8BitGenerator : IIncrementalGenerator
         "PcreRefMatch"
     ];
 
-    private static readonly Regex _regexCharToByte = new("""\bchar\b""", RegexOptions.Compiled | RegexOptions.CultureInvariant);
-    private static readonly Regex _regexBitSuffix = new("""(?<prefix>\w+)16Bit\b""", RegexOptions.Compiled | RegexOptions.CultureInvariant);
-    private static readonly Regex _regexRemoveAttribute = new("""^[ ]*\[\s*ForwardTo8Bit\s*\][ ]*\r?\n""", RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.Multiline);
-    private static readonly Regex _regexTypeNamesToSuffix = new("""\bPcre\w+""", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+    private static readonly Regex _regexCharToByte = new(
+        """\bchar\b""",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant
+    );
+
+    private static readonly Regex _regexBitSuffix = new(
+        """(?<prefix>\w+)16Bit\b""",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant
+    );
+
+    private static readonly Regex _regexRemoveAttribute = new(
+        """
+        ^[ ]* \[ \s*
+        ForwardTo8Bit
+        (?:
+            \s* \( [\w\s=,]* \)
+        )?
+        \s*\]
+        [ ]* \r? \n
+        """,
+        RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace
+    );
+
+    private static readonly Regex _regexTypeNamesToSuffix = new(
+        """\bPcre\w+""",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant
+    );
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -76,6 +99,12 @@ public class ForwardTo8BitGenerator : IIncrementalGenerator
         cancellationToken.ThrowIfCancellationRequested();
         var node = (TypeDeclarationSyntax)type.Node;
 
+        if (type.Attribute.FullType)
+        {
+            TranslateMember(writer, node, suffix, type.Cref, cancellationToken);
+            return;
+        }
+
         writer.AppendLine()
               .Append(node.Modifiers)
               .Append(node.Modifiers.Any(SyntaxKind.PartialKeyword) ? "" : " partial")
@@ -97,7 +126,7 @@ public class ForwardTo8BitGenerator : IIncrementalGenerator
                     case SyntaxKind.IndexerDeclaration:
                     case SyntaxKind.ConstructorDeclaration:
                     case SyntaxKind.DestructorDeclaration:
-                        GenerateMethodOrProperty(writer, member, suffix, cancellationToken);
+                        TranslateMember(writer, member.Node, suffix, member.Cref, cancellationToken);
                         break;
 
                     case SyntaxKind.ClassDeclaration:
@@ -109,14 +138,15 @@ public class ForwardTo8BitGenerator : IIncrementalGenerator
         }
     }
 
-    private static void GenerateMethodOrProperty(CodeWriter writer,
-                                                 MemberModel member,
-                                                 string suffix,
-                                                 CancellationToken cancellationToken)
+    private static void TranslateMember(CodeWriter writer,
+                                        SyntaxNode node,
+                                        string suffix,
+                                        string? cref,
+                                        CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var memberText = member.Node.ToString();
+        var memberText = node.ToString();
 
         memberText = _regexCharToByte.Replace(memberText, "byte");
         memberText = _regexBitSuffix.Replace(memberText, "${prefix}8Bit");
@@ -124,24 +154,13 @@ public class ForwardTo8BitGenerator : IIncrementalGenerator
         memberText = _regexTypeNamesToSuffix.Replace(memberText, m => _typeNamesToSuffix.Contains(m.Value) ? $"{m.Value}{suffix}" : m.Value);
 
         // Work around https://youtrack.jetbrains.com/issue/RIDER-84751
-        var cref = member.Cref ?? string.Empty;
+        cref ??= "";
         if (cref.IndexOf('~') is >= 0 and var index)
             cref = cref.Substring(0, index);
 
         writer.AppendLine()
               .Append($"""/// <inheritdoc cref="{cref}" />""").Append('\n')
               .AppendLine(memberText);
-    }
-
-    private static bool HasAttribute(ISymbol symbol, ISymbol attribute)
-    {
-        foreach (var attributeData in symbol.GetAttributes())
-        {
-            if (SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, attribute))
-                return true;
-        }
-
-        return false;
     }
 
     private record GeneratorModel(TypeModel Type, string FileName, SyntaxList<UsingDirectiveSyntax> Usings, string Namespace)
@@ -156,6 +175,7 @@ public class ForwardTo8BitGenerator : IIncrementalGenerator
                     (INamedTypeSymbol)context.TargetSymbol,
                     context.SemanticModel,
                     context.Attributes[0].AttributeClass!,
+                    AttributeModel.Create(context.Attributes)!,
                     cancellationToken
                 ),
                 Path.GetFileNameWithoutExtension(context.TargetNode.SyntaxTree.FilePath),
@@ -168,11 +188,13 @@ public class ForwardTo8BitGenerator : IIncrementalGenerator
     private record MemberModel
     {
         public MemberDeclarationSyntax Node { get; }
+        public AttributeModel Attribute { get; }
         public string? Cref { get; }
 
-        protected MemberModel(MemberDeclarationSyntax node, ISymbol symbol)
+        protected MemberModel(MemberDeclarationSyntax node, ISymbol symbol, AttributeModel attribute)
         {
             Node = node;
+            Attribute = attribute;
             Cref = DocumentationCommentId.CreateDeclarationId(symbol);
         }
 
@@ -180,43 +202,54 @@ public class ForwardTo8BitGenerator : IIncrementalGenerator
                                             ISymbol symbol,
                                             SemanticModel semanticModel,
                                             INamedTypeSymbol attributeSymbol,
+                                            AttributeModel attributeModel,
                                             CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             if (member is TypeDeclarationSyntax type)
-                return TypeModel.Create(type, (INamedTypeSymbol)symbol, semanticModel, attributeSymbol, cancellationToken);
+            {
+                return TypeModel.Create(
+                    type,
+                    (INamedTypeSymbol)symbol,
+                    semanticModel,
+                    attributeSymbol,
+                    attributeModel,
+                    cancellationToken
+                );
+            }
 
-            return new MemberModel(member, symbol);
+            return new MemberModel(member, symbol, attributeModel);
         }
     }
 
     private sealed record TypeModel : MemberModel
     {
-        public ImmutableArray<MemberModel> Members { get; }
+        public ImmutableArray<MemberModel> Members { get; init; }
 
-        private TypeModel(MemberDeclarationSyntax node, ISymbol symbol, IEnumerable<MemberModel> members)
-            : base(node, symbol)
+        private TypeModel(MemberDeclarationSyntax node, ISymbol symbol, AttributeModel attribute, IEnumerable<MemberModel> members)
+            : base(node, symbol, attribute)
         {
             Members = [..members];
         }
 
-        public static TypeModel Create(TypeDeclarationSyntax type,
+        public static TypeModel Create(TypeDeclarationSyntax typeSyntax,
                                        INamedTypeSymbol symbol,
                                        SemanticModel semanticModel,
                                        INamedTypeSymbol attributeSymbol,
+                                       AttributeModel attributeModel,
                                        CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             var members = new List<MemberModel>();
 
-            foreach (var memberSyntax in type.Members)
+            foreach (var memberSyntax in typeSyntax.Members)
             {
                 if (semanticModel.GetDeclaredSymbol(memberSyntax) is not { } memberSymbol)
                     continue;
 
-                if (!HasAttribute(memberSymbol, attributeSymbol))
+                if (AttributeModel.Create(memberSymbol, attributeSymbol) is not { } memberAttributeModel)
                     continue;
 
                 members.Add(
@@ -225,12 +258,43 @@ public class ForwardTo8BitGenerator : IIncrementalGenerator
                         memberSymbol,
                         semanticModel,
                         attributeSymbol,
+                        memberAttributeModel,
                         cancellationToken
                     )
                 );
             }
 
-            return new TypeModel(type, symbol, members);
+            return new TypeModel(typeSyntax, symbol, attributeModel, members);
+        }
+    }
+
+    private record AttributeModel(bool FullType)
+    {
+        public static AttributeModel? Create(ISymbol symbol, ISymbol attributeSymbol)
+        {
+            foreach (var attributeData in symbol.GetAttributes())
+            {
+                if (SymbolEqualityComparer.Default.Equals(attributeData.AttributeClass, attributeSymbol))
+                    return Create(attributeData);
+            }
+
+            return null;
+        }
+
+        public static AttributeModel? Create(ImmutableArray<AttributeData> attributeData)
+            => attributeData.IsEmpty ? null : Create(attributeData[0]);
+
+        public static AttributeModel Create(AttributeData attributeData)
+        {
+            var fullType = false;
+
+            foreach (var kvp in attributeData.NamedArguments)
+            {
+                if (kvp.Key == "FullType")
+                    fullType = (bool)kvp.Value.Value!;
+            }
+
+            return new AttributeModel(fullType);
         }
     }
 }

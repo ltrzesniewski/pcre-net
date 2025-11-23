@@ -19,7 +19,7 @@ internal interface IPcreMatchBuffer
 /// <remarks>
 /// Not thread-safe and not reentrant.
 /// </remarks>
-[ForwardTo8Bit]
+[ForwardTo8Bit(FullType = true)]
 public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit, IDisposable
 {
     internal readonly InternalRegex16Bit Regex;
@@ -36,7 +36,6 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
     nuint[] IPcreMatchBuffer.CalloutOutputVector => CalloutOutputVector;
     InternalRegex16Bit IRegexHolder16Bit.Regex => Regex;
 
-    [ForwardTo8Bit]
     internal PcreMatchBuffer(InternalRegex16Bit regex, PcreMatchSettings settings)
     {
         Regex = regex;
@@ -63,19 +62,16 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
     }
 
     /// <inheritdoc />
-    [ForwardTo8Bit]
     ~PcreMatchBuffer()
         => FreeBuffer();
 
     /// <inheritdoc />
-    [ForwardTo8Bit]
     public void Dispose()
     {
         FreeBuffer();
         GC.SuppressFinalize(this);
     }
 
-    [ForwardTo8Bit]
     private void FreeBuffer()
     {
         GC.KeepAlive(_jitStack);
@@ -86,14 +82,12 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
             default(Native16Bit).free_match_buffer((void*)buffer);
     }
 
-    [ForwardTo8Bit]
     private Span<nuint> GetOutputVectorSpan()
         => new(OutputVector, _outputVectorSize);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="IsMatch"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject"]'/>
     [Pure]
-    [ForwardTo8Bit]
     public bool IsMatch(ReadOnlySpan<char> subject)
         => Match(subject, 0, PcreMatchOptions.None, null).Success;
 
@@ -103,21 +97,18 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex"]/*'/>
     /// </remarks>
     [Pure]
-    [ForwardTo8Bit]
     public bool IsMatch(ReadOnlySpan<char> subject, int startIndex)
         => Match(subject, startIndex, PcreMatchOptions.None, null).Success;
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject"]'/>
     [Pure]
-    [ForwardTo8Bit]
     public PcreRefMatch Match(ReadOnlySpan<char> subject)
         => Match(subject, 0, PcreMatchOptions.None, null);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Match"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="options"]'/>
     [Pure]
-    [ForwardTo8Bit]
     public PcreRefMatch Match(ReadOnlySpan<char> subject, PcreMatchOptions options)
         => Match(subject, 0, options, null);
 
@@ -127,7 +118,6 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex"]/*'/>
     /// </remarks>
     [Pure]
-    [ForwardTo8Bit]
     public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex)
         => Match(subject, startIndex, PcreMatchOptions.None, null);
 
@@ -137,7 +127,6 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex"]/*'/>
     /// </remarks>
     [Pure]
-    [ForwardTo8Bit]
     public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options)
         => Match(subject, startIndex, options, null);
 
@@ -146,7 +135,6 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="callout"]/*'/>
     /// </remarks>
-    [ForwardTo8Bit]
     public PcreRefMatch Match(ReadOnlySpan<char> subject, PcreRefCalloutFunc? onCallout)
         => Match(subject, 0, PcreMatchOptions.None, onCallout);
 
@@ -155,7 +143,6 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="callout"]/*'/>
     /// </remarks>
-    [ForwardTo8Bit]
     public PcreRefMatch Match(ReadOnlySpan<char> subject, PcreMatchOptions options, PcreRefCalloutFunc? onCallout)
         => Match(subject, 0, options, onCallout);
 
@@ -164,7 +151,6 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex" or @name="callout"]/*'/>
     /// </remarks>
-    [ForwardTo8Bit]
     public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex, PcreRefCalloutFunc? onCallout)
         => Match(subject, startIndex, PcreMatchOptions.None, onCallout);
 
@@ -173,7 +159,6 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex" or @name="callout"]/*'/>
     /// </remarks>
-    [ForwardTo8Bit]
     public PcreRefMatch Match(ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFunc? onCallout)
     {
         if (unchecked((uint)startIndex > (uint)subject.Length))
@@ -187,7 +172,6 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Matches"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject"]'/>
     [Pure]
-    [ForwardTo8Bit]
     public RefMatchEnumerable Matches(ReadOnlySpan<char> subject)
         => Matches(subject, 0, PcreMatchOptions.None, null);
 
@@ -197,7 +181,6 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex"]/*'/>
     /// </remarks>
     [Pure]
-    [ForwardTo8Bit]
     public RefMatchEnumerable Matches(ReadOnlySpan<char> subject, int startIndex)
         => Matches(subject, startIndex, PcreMatchOptions.None, null);
 
@@ -207,7 +190,6 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex" or @name="callout"]/*'/>
     /// </remarks>
     [Pure]
-    [ForwardTo8Bit]
     public RefMatchEnumerable Matches(ReadOnlySpan<char> subject, int startIndex, PcreRefCalloutFunc? onCallout)
         => Matches(subject, startIndex, PcreMatchOptions.None, onCallout);
 
@@ -217,7 +199,6 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex" or @name="callout"]/*'/>
     /// </remarks>
     [Pure]
-    [ForwardTo8Bit]
     public RefMatchEnumerable Matches(ReadOnlySpan<char> subject, int startIndex, PcreMatchOptions options, PcreRefCalloutFunc? onCallout)
     {
         if (unchecked((uint)startIndex > (uint)subject.Length))
@@ -229,18 +210,15 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
     /// <summary>
     /// Returns the regex pattern.
     /// </summary>
-    [ForwardTo8Bit]
     public override string ToString()
         => Regex.PatternString;
 
-    [ForwardTo8Bit]
     private static void ThrowInvalidStartIndex()
         => throw new ArgumentOutOfRangeException("Invalid start index.", default(Exception));
 
     /// <summary>
     /// An enumerable of matches.
     /// </summary>
-    [ForwardTo8Bit]
     public readonly ref struct RefMatchEnumerable
     {
         private readonly ReadOnlySpan<char> _subject;
@@ -263,7 +241,6 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
         }
 
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
-        [ForwardTo8Bit]
         public RefMatchEnumerator GetEnumerator()
             => new(_buffer, _subject, _startIndex, _options, _callout);
     }
@@ -271,7 +248,6 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
     /// <summary>
     /// An enumerator of matches.
     /// </summary>
-    [ForwardTo8Bit]
     public ref struct RefMatchEnumerator
     {
         private readonly ReadOnlySpan<char> _subject;
@@ -281,7 +257,6 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
         private PcreMatchBuffer? _buffer;
         private PcreRefMatch _match;
 
-        [ForwardTo8Bit]
         internal RefMatchEnumerator(PcreMatchBuffer buffer,
                                     ReadOnlySpan<char> subject,
                                     int startIndex,
@@ -299,13 +274,11 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
         /// <summary>
         /// Gets the current match.
         /// </summary>
-        [ForwardTo8Bit]
         public readonly PcreRefMatch Current => _match;
 
         /// <summary>
         /// Moves to the next match.
         /// </summary>
-        [ForwardTo8Bit]
         public bool MoveNext()
         {
             if (_buffer == null)
