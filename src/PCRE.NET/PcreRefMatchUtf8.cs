@@ -31,6 +31,42 @@ public unsafe ref partial struct PcreRefMatchUtf8
         return PcreRegexUtf8.GetString(Value);
     }
 
+    /// <summary>
+    /// The list of groups in a match.
+    /// </summary>
+    public readonly ref partial struct GroupList
+    {
+        private readonly PcreRefMatchUtf8 _match;
+    }
+
+    /// <summary>
+    /// A capturing group enumerator.
+    /// </summary>
+    public ref partial struct GroupEnumerator
+    {
+        private readonly PcreRefMatchUtf8 _match;
+        private int _index;
+    }
+
+    /// <summary>
+    /// An enumerable of duplicated named groups.
+    /// </summary>
+    public readonly ref partial struct DuplicateNamedGroupEnumerable
+    {
+        private readonly PcreRefMatchUtf8 _match;
+        private readonly int[]? _groupIndexes;
+    }
+
+    /// <summary>
+    /// An enumerator of duplicated named groups.
+    /// </summary>
+    public ref partial struct DuplicateNamedGroupEnumerator
+    {
+        private readonly PcreRefMatchUtf8 _match;
+        private readonly int[]? _groupIndexes;
+        private int _index;
+    }
+
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     internal class DebugProxy
     {
