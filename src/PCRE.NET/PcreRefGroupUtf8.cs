@@ -23,6 +23,13 @@ public readonly ref partial struct PcreRefGroupUtf8
     /// <typeparam name="T">The output value type.</typeparam>
     public delegate T Func<out T>(PcreRefGroupUtf8 group);
 
+    internal PcreRefGroupUtf8(ReadOnlySpan<byte> subject, int startOffset, int endOffset)
+    {
+        _subject = subject;
+        _indexWithOffset = startOffset >= 0 ? startOffset + 1 : -1;
+        _endIndexWithOffset = endOffset >= 0 ? endOffset + 1 : -1;
+    }
+
     /// <inheritdoc cref="PcreGroup.op_Implicit"/>
     public static explicit operator string(PcreRefGroupUtf8 group)
         => PcreRegexUtf8.GetString(group.Value);

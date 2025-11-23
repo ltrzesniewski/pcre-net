@@ -329,7 +329,7 @@ internal sealed unsafe class InternalRegex8Bit(ReadOnlySpan<byte> pattern, strin
 {
     InternalRegex8Bit IRegexHolder8Bit.Regex => this;
 
-    public string? GetString(ReadOnlySpan<byte> value)
+    public string GetString(ReadOnlySpan<byte> value)
         => GetString(value, encoding);
 
     public static string GetString(ReadOnlySpan<byte> value, Encoding encoding)

@@ -313,17 +313,37 @@ internal static unsafe class CalloutInterop
 
                 if (typeof(TChar) == typeof(byte))
                 {
-                    var func = (PcreRefCalloutFuncUtf8)_callout;
                     fixed (TChar* ptr = _subjectSpan)
                     {
-                        return (int)func(
-                            new PcreRefCalloutUtf8(
-                                new ReadOnlySpan<byte>(ptr, _subjectSpan.Length),
-                                (InternalRegex8Bit)(object)_regex,
-                                callout,
-                                outputVector
-                            )
-                        );
+                        switch (_callout)
+                        {
+                            case PcreRefCalloutFuncUtf8 func:
+                            {
+                                return (int)func(
+                                    new PcreRefCalloutUtf8(
+                                        new ReadOnlySpan<byte>(ptr, _subjectSpan.Length),
+                                        (InternalRegex8Bit)(object)_regex,
+                                        callout,
+                                        outputVector
+                                    )
+                                );
+                            }
+
+                            case PcreRefCalloutFunc8Bit func:
+                            {
+                                return (int)func(
+                                    new PcreRefCallout8Bit(
+                                        new ReadOnlySpan<byte>(ptr, _subjectSpan.Length),
+                                        (InternalRegex8Bit)(object)_regex,
+                                        callout,
+                                        outputVector
+                                    )
+                                );
+                            }
+
+                            default:
+                                throw new InvalidOperationException("Unexpected callout funtion type");
+                        }
                     }
                 }
 

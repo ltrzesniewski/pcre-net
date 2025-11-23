@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using NUnit.Framework;
 using PCRE.Internal;
+using PCRE.Tests.Support;
 
 namespace PCRE.Tests.PcreNet;
 
@@ -167,6 +168,59 @@ public unsafe class PcreMatchBufferTests
         var re = new PcreRegexUtf8(regexBuilder.ToString(), PcreOptions.Compiled);
         var buffer = re.CreateMatchBuffer();
         var subject = Encoding.UTF8.GetBytes(subjectBuilder.ToString());
+
+        for (var i = 0; i < 10; ++i)
+            Iteration();
+
+        var bytesBefore = GC.GetAllocatedBytesForCurrentThread();
+
+        for (var i = 0; i < 10000; ++i)
+            Iteration();
+
+        var bytesAfter = GC.GetAllocatedBytesForCurrentThread();
+
+        Assert.That(bytesAfter - bytesBefore, Is.Zero);
+
+        void Iteration()
+        {
+            var matches = buffer.Matches(subject, 0, PcreMatchOptions.None, static data =>
+            {
+                _ = data.Match.Groups["char"].Value;
+                _ = data.Match.Groups[^1].Value;
+                _ = data.String;
+
+                return PcreCalloutResult.Pass;
+            });
+
+            foreach (var match in matches)
+            {
+                _ = match.Value;
+                _ = match.Groups["char"].Value;
+                _ = match.Groups[^1].Value;
+            }
+        }
+    }
+
+    [Test]
+    [NonParallelizable]
+    public void should_not_allocate_8bit()
+    {
+        // This is a simplified version of AllocationTest
+
+        var regexBuilder = new StringBuilder();
+        var subjectBuilder = new StringBuilder();
+
+        regexBuilder.Append("(?<char>.)");
+
+        for (var i = 0; i < 2 * InternalRegex.MaxStackAllocCaptureCount; ++i)
+        {
+            regexBuilder.Append(@"(?C{before})(.)(?C{after})");
+            subjectBuilder.Append("foobar");
+        }
+
+        var re = new PcreRegex8Bit(regexBuilder.ToString().ToLatin1Bytes(), TestSupport.Latin1Encoding, PcreOptions.Compiled);
+        var buffer = re.CreateMatchBuffer();
+        var subject = subjectBuilder.ToString().ToLatin1Bytes();
 
         for (var i = 0; i < 10; ++i)
             Iteration();

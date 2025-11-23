@@ -736,6 +736,7 @@ namespace PCRE
         public bool Success { get; }
         public System.ReadOnlySpan<byte> Value { get; }
         public override string ToString() { }
+        public static string op_Explicit(PCRE.PcreRefGroup8Bit group) { }
         public delegate T Func<out T>(PCRE.PcreRefGroup8Bit group);
     }
     [System.Diagnostics.DebuggerTypeProxy(typeof(PCRE.PcreRefGroupUtf8.DebugProxy))]

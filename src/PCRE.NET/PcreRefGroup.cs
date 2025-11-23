@@ -31,7 +31,6 @@ public readonly ref struct PcreRefGroup
     [ForwardTo8Bit]
     internal static PcreRefGroup Undefined => default;
 
-    [ForwardTo8Bit]
     internal PcreRefGroup(ReadOnlySpan<char> subject, int startOffset, int endOffset)
     {
         _subject = subject;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using PCRE.Tests.Support;
 
 namespace PCRE.Tests.Pcre;
 
@@ -12,7 +13,7 @@ public abstract class TestFileReader : IDisposable
 
     protected TestFileReader(Stream inputStream)
     {
-        _reader = new StreamReader(inputStream, Encoding.GetEncoding("ISO-8859-1"));
+        _reader = new StreamReader(inputStream, TestSupport.Latin1Encoding);
     }
 
     public void Dispose()

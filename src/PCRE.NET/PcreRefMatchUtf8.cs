@@ -24,6 +24,9 @@ public unsafe ref partial struct PcreRefMatchUtf8
     /// <typeparam name="T">The output value type.</typeparam>
     public delegate T Func<out T>(PcreRefMatchUtf8 match);
 
+    private readonly PcreRefGroupUtf8 CreatePcreRefGroup(int startOffset, int endOffset)
+        => new(Subject, startOffset, endOffset);
+
     /// <inheritdoc cref="PcreMatch.ToString"/>
     public readonly override string ToString()
     {

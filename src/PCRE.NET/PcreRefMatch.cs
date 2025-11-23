@@ -179,7 +179,7 @@ public unsafe ref struct PcreRefMatch
 
         var endOffset = (int)OutputVector[index + 1];
 
-        return new PcreRefGroup(Subject, startOffset, endOffset);
+        return CreatePcreRefGroup(startOffset, endOffset);
     }
 
     [ForwardTo8Bit]
@@ -203,6 +203,9 @@ public unsafe ref struct PcreRefMatch
 
         return PcreRefGroup.Empty;
     }
+
+    private readonly PcreRefGroup CreatePcreRefGroup(int startOffset, int endOffset)
+        => new(Subject, startOffset, endOffset);
 
     /// <inheritdoc cref="PcreMatch.GetDuplicateNamedGroups"/>
     [ForwardTo8Bit]

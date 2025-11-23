@@ -24,11 +24,14 @@ public unsafe ref partial struct PcreRefMatch8Bit
     /// <typeparam name="T">The output value type.</typeparam>
     public delegate T Func<out T>(PcreRefMatch8Bit match);
 
+    private readonly PcreRefGroup8Bit CreatePcreRefGroup(int startOffset, int endOffset)
+        => new(Subject, _owner?.Regex, startOffset, endOffset);
+
     /// <inheritdoc cref="PcreMatch.ToString"/>
     public readonly override string ToString()
     {
         GC.KeepAlive(_owner); // Good enough place to keep the object alive, I suppose.
-        return _owner?.Regex?.GetString(Value) ?? string.Empty;
+        return _owner?.Regex.GetString(Value) ?? string.Empty;
     }
 
     /// <summary>
