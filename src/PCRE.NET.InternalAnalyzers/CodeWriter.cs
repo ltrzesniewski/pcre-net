@@ -14,14 +14,7 @@ internal class CodeWriter
 
     public CodeWriter Append<T>(T? value)
     {
-        var text = value?.ToString();
-
-        if (!string.IsNullOrEmpty(text))
-        {
-            WriteIndent();
-            Append(text);
-        }
-
+        Append(value?.ToString());
         return this;
     }
 

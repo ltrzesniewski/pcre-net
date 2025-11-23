@@ -8,9 +8,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" PrivateAssets="all" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <Compile Include="../PCRE.NET/Support/CompilerServices.cs" Link="Support/%(FileName)%(Extension)" />
+    <Compile Include="../PCRE.NET/Internal/AnalyzerAttributes.cs" Link="Support/%(FileName)%(Extension)" />
   </ItemGroup>
 
 </Project>
