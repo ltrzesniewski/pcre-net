@@ -43,7 +43,7 @@ internal class CodeWriter
             _sb.Append(value);
         }
 
-        _sb.Append('\n');
+        _sb.AppendLine();
         _isAtStartOfLine = true;
 
         return this;

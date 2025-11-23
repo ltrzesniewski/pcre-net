@@ -564,6 +564,5 @@ public enum PcreOptions : long
     /// Details of how <see cref="Utf"/> changes the behaviour of PCRE2 are given in the pcre2unicode page.
     /// In particular, note that it changes the way <see cref="Caseless"/> handles characters with code points greater than 127.
     /// </remarks>
-    [Obsolete("PCRE.NET always enables UTF mode.")]
     Utf = PcreConstants.PCRE2_UTF,
 }

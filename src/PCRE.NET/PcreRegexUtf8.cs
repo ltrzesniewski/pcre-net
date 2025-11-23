@@ -8,6 +8,7 @@ namespace PCRE;
 /// <summary>
 /// A PCRE regular expression for UTF-8.
 /// </summary>
+/// <seealso cref="PcreRegex8Bit"/>
 public sealed partial class PcreRegexUtf8
 {
     internal InternalRegex8Bit InternalRegex { get; }
@@ -84,15 +85,5 @@ public sealed partial class PcreRegexUtf8
         => Encoding.UTF8.GetBytes(value);
 
     internal static unsafe string GetString(ReadOnlySpan<byte> value)
-    {
-        if (value.IsEmpty)
-            return string.Empty;
-
-# if NET
-        return Encoding.UTF8.GetString(value);
-#else
-        fixed (byte* ptr = value)
-            return Encoding.UTF8.GetString(ptr, value.Length);
-#endif
-    }
+        => InternalRegex8Bit.GetString(value, Encoding.UTF8);
 }
