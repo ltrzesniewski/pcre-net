@@ -22,9 +22,9 @@ namespace PCRE;
 /// </para>
 /// </remarks>
 [SuppressMessage("Naming", "CA1711")]
-public sealed class PcreJitStack : IDisposable
+public sealed unsafe class PcreJitStack : IDisposable
 {
-    private IntPtr _stack;
+    private void* _stack;
 
     /// <summary>
     /// Creates a JIT stack.
@@ -33,7 +33,8 @@ public sealed class PcreJitStack : IDisposable
     /// <param name="maxSize">The maximum stack size.</param>
     public PcreJitStack(uint startSize, uint maxSize)
     {
-        _stack = Native.jit_stack_create(startSize, maxSize);
+        // The JIT stack is independent of the character width.
+        _stack = default(Native16Bit).jit_stack_create(startSize, maxSize);
     }
 
     /// <summary>
@@ -53,16 +54,16 @@ public sealed class PcreJitStack : IDisposable
 
     private void FreeStack()
     {
-        if (_stack == IntPtr.Zero)
+        if (_stack == null)
             return;
 
-        Native.jit_stack_free(_stack);
-        _stack = IntPtr.Zero;
+        default(Native16Bit).jit_stack_free(_stack);
+        _stack = null;
     }
 
-    internal IntPtr GetStack()
+    internal void* GetStack()
     {
-        if (_stack == IntPtr.Zero)
+        if (_stack == null)
             ThrowDisposed();
 
         return _stack;

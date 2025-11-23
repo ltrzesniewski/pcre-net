@@ -13,7 +13,7 @@ typedef struct
 typedef struct
 {
     pcre2_code* code;
-    uint16_t* subject;
+    PCRE2_SPTR subject;
     uint32_t subject_length;
     uint32_t start_index;
     uint32_t additional_options;
@@ -26,7 +26,7 @@ typedef struct
 typedef struct
 {
     match_buffer* buffer;
-    uint16_t* subject;
+    PCRE2_SPTR subject;
     uint32_t subject_length;
     uint32_t start_index;
     uint32_t additional_options;
@@ -37,7 +37,7 @@ typedef struct
 typedef struct
 {
     pcre2_code* code;
-    uint16_t* subject;
+    PCRE2_SPTR subject;
     uint32_t subject_length;
     uint32_t start_index;
     uint32_t additional_options;
@@ -51,7 +51,7 @@ typedef struct
 typedef struct
 {
     int32_t result_code;
-    PCRE2_SPTR16 mark;
+    PCRE2_SPTR mark;
 } pcrenet_match_result;
 
 typedef struct
@@ -76,7 +76,7 @@ static int callout_handler(pcre2_callout_block* block, void* data)
     return typed_data->callout(block, typed_data->data);
 }
 
-void apply_settings(const match_settings* settings, pcre2_match_context* context)
+void PCRENET_SUFFIX(apply_settings)(const match_settings* settings, pcre2_match_context* context)
 {
     if (settings->match_limit)
         pcre2_set_match_limit(context, settings->match_limit);
@@ -100,7 +100,7 @@ PCRENET_EXPORT(void, match)(const pcrenet_match_input* input, pcrenet_match_resu
     pcre2_match_context* context = pcre2_match_context_create(NULL);
     callout_data callout;
 
-    apply_settings(&input->settings, context);
+    PCRENET_SUFFIX(apply_settings)(&input->settings, context);
 
     if (input->callout)
     {
@@ -217,7 +217,7 @@ PCRENET_EXPORT(match_buffer*, create_match_buffer)(match_buffer_info* info)
     buffer->match_data = pcre2_match_data_create_from_pattern(info->code, NULL);
     buffer->match_context = pcre2_match_context_create(NULL);
 
-    apply_settings(&info->settings, buffer->match_context);
+    PCRENET_SUFFIX(apply_settings)(&info->settings, buffer->match_context);
 
     info->output_vector = pcre2_get_ovector_pointer(buffer->match_data);
     return buffer;

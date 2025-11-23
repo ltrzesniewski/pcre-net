@@ -7,14 +7,14 @@ typedef PCRE2_SIZE (*substitute_case_callout_fn)(PCRE2_SPTR, PCRE2_SIZE, PCRE2_U
 typedef struct
 {
     pcre2_code* code;
-    uint16_t* subject;
+    PCRE2_SPTR subject;
     uint32_t subject_length;
     uint32_t start_index;
     uint32_t additional_options;
     match_settings settings;
-    uint16_t* replacement;
+    PCRE2_SPTR replacement;
     uint32_t replacement_length;
-    uint16_t* buffer;
+    PCRE2_UCHAR* buffer;
     uint32_t buffer_length;
     match_callout_fn match_callout;
     substitute_callout_fn substitute_callout;
@@ -25,7 +25,7 @@ typedef struct
 typedef struct
 {
     int32_t result_code;
-    uint16_t* output;
+    PCRE2_UCHAR* output;
     size_t output_length;
     uint8_t output_on_heap;
     uint32_t substitute_call_count;
@@ -334,7 +334,7 @@ static void substitute_with_callout(const pcrenet_substitute_input* input,
             }
             else
             {
-                uint16_t* new_buffer = realloc(result->output, buffer_length * sizeof(PCRE2_UCHAR));
+                PCRE2_UCHAR* new_buffer = realloc(result->output, buffer_length * sizeof(PCRE2_UCHAR));
 
                 if (!new_buffer)
                 {
@@ -363,7 +363,7 @@ PCRENET_EXPORT(void, substitute)(const pcrenet_substitute_input* input, pcrenet_
     pcre2_match_data* match_data = pcre2_match_data_create_from_pattern(input->code, NULL);
     pcre2_match_context* match_context = pcre2_match_context_create(NULL);
 
-    apply_settings(&input->settings, match_context);
+    PCRENET_SUFFIX(apply_settings)(&input->settings, match_context);
 
     result->substitute_call_count = 0;
 

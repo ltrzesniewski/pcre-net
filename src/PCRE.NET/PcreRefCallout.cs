@@ -7,19 +7,25 @@ namespace PCRE;
 /// <summary>
 /// A callout function.
 /// </summary>
+public delegate PcreCalloutResult PcreRefCalloutFuncUtf8(PcreRefCalloutUtf8 callout);
+
+/// <summary>
+/// A callout function.
+/// </summary>
 public delegate PcreCalloutResult PcreRefCalloutFunc(PcreRefCallout callout);
 
 /// <inheritdoc cref="PcreCallout"/>
-public unsafe ref struct PcreRefCallout
+[ForwardTo8Bit(FullType = true)]
+public unsafe ref partial struct PcreRefCallout
 {
     private readonly ReadOnlySpan<char> _subject;
-    private readonly InternalRegex _regex;
+    private readonly InternalRegex16Bit _regex;
     private readonly Native.pcre2_callout_block* _callout;
 
     internal Span<nuint> OutputVector;
     private bool _oVectorInitialized;
 
-    internal PcreRefCallout(ReadOnlySpan<char> subject, InternalRegex regex, Native.pcre2_callout_block* callout, Span<nuint> outputVector)
+    internal PcreRefCallout(ReadOnlySpan<char> subject, InternalRegex16Bit regex, Native.pcre2_callout_block* callout, Span<nuint> outputVector)
     {
         _subject = subject;
         _regex = regex;
@@ -51,7 +57,7 @@ public unsafe ref struct PcreRefCallout
                 _oVectorInitialized = true;
             }
 
-            return new PcreRefMatch(_subject, _regex, OutputVector, _callout->mark);
+            return new PcreRefMatch(_subject, _regex, OutputVector, (char*)_callout->mark);
         }
     }
 

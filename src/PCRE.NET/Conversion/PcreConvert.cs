@@ -63,19 +63,19 @@ public static unsafe class PcreConvert
             input->options |= PcreConstants.PCRE2_CONVERT_UTF;
 
             Native.convert_result result;
-            var errorCode = Native.convert(input, &result);
+            var errorCode = default(Native16Bit).convert(input, &result);
 
             try
             {
                 if (errorCode != 0)
-                    throw new PcreException((PcreErrorCode)errorCode, $"Could not convert pattern '{pattern}': {Native.GetErrorMessage(errorCode)} at offset {result.output_length}.");
+                    throw new PcreException((PcreErrorCode)errorCode, $"Could not convert pattern '{pattern}': {default(Native16Bit).GetErrorMessage(errorCode)} at offset {result.output_length}.");
 
-                return new string(result.output, 0, (int)result.output_length);
+                return new string((char*)result.output, 0, (int)result.output_length);
             }
             finally
             {
                 if (result.output != null)
-                    Native.convert_result_free(result.output);
+                    default(Native16Bit).convert_result_free(result.output);
             }
         }
     }

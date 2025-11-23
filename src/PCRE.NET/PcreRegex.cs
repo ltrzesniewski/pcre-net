@@ -7,18 +7,20 @@ using PCRE.Internal;
 namespace PCRE;
 
 /// <summary>
-/// A PCRE regular expression.
+/// A PCRE regular expression for UTF-16.
 /// </summary>
+[ForwardTo8Bit]
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
 public sealed partial class PcreRegex
 {
-    internal InternalRegex InternalRegex { get; }
+    internal InternalRegex16Bit InternalRegex { get; }
 
     /// <summary>
     /// Returns information about the pattern.
     /// </summary>
+    [ForwardTo8Bit]
     public PcrePatternInfo PatternInfo => field ??= new PcrePatternInfo(InternalRegex);
 
     /// <summary>
@@ -44,7 +46,7 @@ public sealed partial class PcreRegex
     public PcreDfaRegex Dfa => field ??= new PcreDfaRegex(InternalRegex);
 
     /// <summary>
-    /// Creates a PCRE regex.
+    /// Creates a PCRE2 regex for UTF-16.
     /// </summary>
     /// <param name="pattern">The regular expression pattern.</param>
     [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
@@ -54,7 +56,7 @@ public sealed partial class PcreRegex
     }
 
     /// <summary>
-    /// Creates a PCRE regex.
+    /// Creates a PCRE2 regex for UTF-16.
     /// </summary>
     /// <param name="pattern">The regular expression pattern.</param>
     /// <param name="options">Pattern options.</param>
@@ -64,7 +66,7 @@ public sealed partial class PcreRegex
     }
 
     /// <summary>
-    /// Creates a PCRE regex.
+    /// Creates a PCRE2 regex for UTF-16.
     /// </summary>
     /// <param name="pattern">The regular expression pattern.</param>
     /// <param name="settings">Additional advanced settings.</param>
@@ -86,18 +88,21 @@ public sealed partial class PcreRegex
     /// therefore not inducing any GC pressure. Note that the buffer is not thread-safe and not reentrant.
     /// </remarks>
     [Pure]
+    [ForwardTo8Bit]
     public PcreMatchBuffer CreateMatchBuffer()
         => new(InternalRegex, PcreMatchSettings.Default);
 
     /// <inheritdoc cref="CreateMatchBuffer()"/>
     /// <param name="settings">Additional settings.</param>
     [Pure]
+    [ForwardTo8Bit]
     public PcreMatchBuffer CreateMatchBuffer(PcreMatchSettings settings)
         => new(InternalRegex, settings ?? throw new ArgumentNullException(nameof(settings)));
 
     /// <summary>
     /// Returns the regex pattern.
     /// </summary>
+    [ForwardTo8Bit]
     public override string ToString()
-        => InternalRegex.Pattern;
+        => InternalRegex.PatternString;
 }

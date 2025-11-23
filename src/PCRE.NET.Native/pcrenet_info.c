@@ -1,7 +1,7 @@
 
 #include "pcrenet.h"
 
-PCRENET_EXPORT(int32_t, get_error_message)(const int32_t error_code, uint16_t* error_buffer, const uint32_t buffer_size)
+PCRENET_EXPORT(int32_t, get_error_message)(const int32_t error_code, PCRE2_UCHAR* error_buffer, const uint32_t buffer_size)
 {
     return pcre2_get_error_message(error_code, error_buffer, buffer_size);
 }

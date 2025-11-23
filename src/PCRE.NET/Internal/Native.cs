@@ -1,44 +1,31 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace PCRE.Internal;
 
-[SuppressMessage("ReSharper", "InconsistentNaming")]
-[SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global")]
-[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-[SuppressMessage("Security", "CA5392")]
-internal static unsafe partial class Native
+internal partial interface INative
 {
-#if !NET
-    private static readonly LibImpl _impl = GetLibImpl();
+    string GetErrorMessage(int errorCode);
+}
 
-    private static LibImpl GetLibImpl()
+internal readonly unsafe partial struct Native8Bit : INative
+{
+    public string GetErrorMessage(int errorCode)
     {
-        try
-        {
-            var impl = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? new WinImpl()
-                : RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
-                    ? new LinuxImpl()
-                    : RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
-                        ? (LibImpl)new OSXImpl()
-                        : throw new PlatformNotSupportedException();
-
-            impl.get_error_message(0, null, 0);
-            return impl;
-        }
-        catch (DllNotFoundException) when (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            // Used in the .NET Framework
-            return Environment.Is64BitProcess
-                ? new Win64Impl()
-                : new Win32Impl();
-        }
+        const int bufferSize = 512;
+        var buffer = stackalloc byte[bufferSize];
+        var messageLength = get_error_message(errorCode, buffer, bufferSize);
+        return messageLength >= 0
+            ? Encoding.ASCII.GetString(buffer, messageLength)
+            : $"Unknown error, code: {errorCode}";
     }
-#endif
+}
 
-    public static string GetErrorMessage(int errorCode)
+internal readonly unsafe partial struct Native16Bit : INative
+{
+    public string GetErrorMessage(int errorCode)
     {
         const int bufferSize = 256;
         var buffer = stackalloc char[bufferSize];
@@ -47,11 +34,18 @@ internal static unsafe partial class Native
             ? new string(buffer, 0, messageLength)
             : $"Unknown error, code: {errorCode}";
     }
+}
+
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+internal static unsafe class Native
+{
+    // These structs need to be kept identical between the 8-bit and 16-bit versions:
+    // same size, same alignment, no PCRE2_UCHAR field types without indirection.
 
     [StructLayout(LayoutKind.Sequential)]
     internal ref struct compile_input
     {
-        public char* pattern;
+        public void* pattern;
         public uint pattern_length;
         public uint flags;
         public uint flags_jit;
@@ -69,13 +63,13 @@ internal static unsafe partial class Native
     [StructLayout(LayoutKind.Sequential)]
     internal ref struct compile_result
     {
-        public IntPtr code;
+        public void* code;
         public int error_code;
         public uint error_offset;
         public uint capture_count;
         public uint name_count;
         public uint name_entry_size;
-        public char* name_entry_table;
+        public void* name_entry_table;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -85,14 +79,14 @@ internal static unsafe partial class Native
         public uint depth_limit;
         public uint heap_limit;
         public uint offset_limit;
-        public IntPtr jit_stack;
+        public void* jit_stack;
     }
 
     [StructLayout(LayoutKind.Sequential)]
     internal ref struct match_input
     {
-        public IntPtr code;
-        public char* subject;
+        public void* code;
+        public void* subject;
         public uint subject_length;
         public uint start_index;
         public uint additional_options;
@@ -105,8 +99,8 @@ internal static unsafe partial class Native
     [StructLayout(LayoutKind.Sequential)]
     internal ref struct buffer_match_input
     {
-        public IntPtr buffer;
-        public char* subject;
+        public void* buffer;
+        public void* subject;
         public uint subject_length;
         public uint start_index;
         public uint additional_options;
@@ -117,8 +111,8 @@ internal static unsafe partial class Native
     [StructLayout(LayoutKind.Sequential)]
     internal ref struct dfa_match_input
     {
-        public IntPtr code;
-        public char* subject;
+        public void* code;
+        public void* subject;
         public uint subject_length;
         public uint start_index;
         public uint additional_options;
@@ -132,15 +126,15 @@ internal static unsafe partial class Native
     [StructLayout(LayoutKind.Sequential)]
     internal ref struct substitute_input
     {
-        public IntPtr code;
-        public char* subject;
+        public void* code;
+        public void* subject;
         public uint subject_length;
         public uint start_index;
         public uint additional_options;
         public match_settings settings;
-        public char* replacement;
+        public void* replacement;
         public uint replacement_length;
-        public char* buffer;
+        public void* buffer;
         public uint buffer_length;
         public void* match_callout;
         public void* substitute_callout;
@@ -152,14 +146,14 @@ internal static unsafe partial class Native
     internal ref struct match_result
     {
         public int result_code;
-        public char* mark;
+        public void* mark;
     }
 
     [StructLayout(LayoutKind.Sequential)]
     internal ref struct substitute_result
     {
         public int result_code;
-        public char* output;
+        public void* output;
         public nuint output_length;
         public byte output_on_heap;
         public uint substitute_call_count;
@@ -169,7 +163,7 @@ internal static unsafe partial class Native
     internal ref struct match_buffer_info
     {
         // Input
-        public IntPtr code;
+        public void* code;
         public match_settings settings;
 
         // Output
@@ -186,8 +180,8 @@ internal static unsafe partial class Native
         public uint capture_top; /* Max current capture */
         public uint capture_last; /* Most recently closed capture */
         public nuint* offset_vector; /* The offset vector */
-        public char* mark; /* Pointer to current mark or NULL */
-        public char* subject; /* The subject being matched */
+        public void* mark; /* Pointer to current mark or NULL */
+        public void* subject; /* The subject being matched */
         public nuint subject_length; /* The length of the subject */
         public nuint start_match; /* Offset to start of this match attempt */
         public nuint current_position; /* Where we currently are in the subject */
@@ -197,7 +191,7 @@ internal static unsafe partial class Native
         /* ------------------- Added for Version 1 -------------------------- */
         public nuint callout_string_offset; /* Offset to string within pattern */
         public nuint callout_string_length; /* Length of string compiled into pattern */
-        public char* callout_string; /* String compiled into pattern */
+        public void* callout_string; /* String compiled into pattern */
 
         /* ------------------- Added for Version 2 -------------------------- */
         public uint callout_flags; /* See above for list */
@@ -224,8 +218,8 @@ internal static unsafe partial class Native
         public uint version; /* Identifies version of block */
 
         /* ------------------------ Version 0 ------------------------------- */
-        public char* input; /* Pointer to input subject string */
-        public char* output; /* Pointer to output buffer */
+        public void* input; /* Pointer to input subject string */
+        public void* output; /* Pointer to output buffer */
         public nuint output_offset_start; /* Changed portion of the output */
         public nuint output_offset_end; /* Changed portion of the output */
         public nuint* ovector; /* Pointer to current ovector */
@@ -236,7 +230,7 @@ internal static unsafe partial class Native
     [StructLayout(LayoutKind.Sequential)]
     internal ref struct convert_input
     {
-        public char* pattern;
+        public void* pattern;
         public uint pattern_length;
         public uint options;
         public uint glob_escape;
@@ -246,7 +240,7 @@ internal static unsafe partial class Native
     [StructLayout(LayoutKind.Sequential)]
     internal ref struct convert_result
     {
-        public char* output;
+        public void* output;
         public uint output_length;
     }
 }

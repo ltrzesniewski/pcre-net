@@ -13,4 +13,14 @@ internal static class Extensions
 
         return result;
     }
+
+    public static List<T> ToList<T>(this PcreMatchBufferUtf8.RefMatchEnumerable enumerable, PcreRefMatchUtf8.Func<T> selector)
+    {
+        var result = new List<T>();
+
+        foreach (var item in enumerable)
+            result.Add(selector(item));
+
+        return result;
+    }
 }
