@@ -80,12 +80,12 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
     where TChar : unmanaged
     where TNative : struct, INative
 {
-    protected InternalRegex(ReadOnlySpan<TChar> pattern, string patternString, PcreRegexSettings settings)
+    protected InternalRegex(ReadOnlySpan<TChar> pattern, string patternString, PcreRegexSettings settings, uint additionalPatternOptions)
         : base(patternString, settings)
     {
         Debug.Assert(typeof(TChar) == typeof(char) || typeof(TChar) == typeof(byte));
 
-        Compile(pattern, out var captureCount, out var captureNames);
+        Compile(pattern, additionalPatternOptions, out var captureCount, out var captureNames);
         CaptureCount = captureCount;
         CaptureNames = captureNames;
 
@@ -93,6 +93,7 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
     }
 
     private void Compile(ReadOnlySpan<TChar> pattern,
+                         uint additionalPatternOptions,
                          out int captureCount,
                          out Dictionary<string, int[]> captureNames)
     {
@@ -108,6 +109,7 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
 
             using (Settings.FillCompileInput(ref input))
             {
+                input.flags |= additionalPatternOptions;
                 default(TNative).compile(&input, &result);
                 Code = result.code;
             }
@@ -321,8 +323,8 @@ internal interface IRegexHolder8Bit
     InternalRegex8Bit Regex { get; }
 }
 
-internal sealed unsafe class InternalRegex8Bit(ReadOnlySpan<byte> pattern, string patternString, PcreRegexSettings settings, Encoding encoding)
-    : InternalRegex<byte, Native8Bit>(pattern, patternString, settings),
+internal sealed unsafe class InternalRegex8Bit(ReadOnlySpan<byte> pattern, string patternString, PcreRegexSettings settings, uint additionalPatternOptions, Encoding encoding)
+    : InternalRegex<byte, Native8Bit>(pattern, patternString, settings, additionalPatternOptions),
       IRegexHolder8Bit
 {
     InternalRegex8Bit IRegexHolder8Bit.Regex => this;
@@ -405,7 +407,7 @@ internal interface IRegexHolder16Bit
 }
 
 internal sealed unsafe class InternalRegex16Bit(string pattern, PcreRegexSettings settings)
-    : InternalRegex<char, Native16Bit>(pattern, pattern, settings),
+    : InternalRegex<char, Native16Bit>(pattern, pattern, settings, PcreConstants.PCRE2_UTF),
       IRegexHolder16Bit
 {
     private PcreMatch? _noMatch;

@@ -49,6 +49,6 @@ public sealed partial class PcreRegex8Bit
         if (encoding is null)
             throw new ArgumentNullException(nameof(encoding));
 
-        InternalRegex = new InternalRegex8Bit(pattern, InternalRegex8Bit.GetString(pattern, encoding), settings, encoding);
+        InternalRegex = new InternalRegex8Bit(pattern, InternalRegex8Bit.GetString(pattern, encoding), settings, 0, encoding);
     }
 }

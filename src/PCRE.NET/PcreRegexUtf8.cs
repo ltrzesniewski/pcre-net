@@ -78,12 +78,12 @@ public sealed partial class PcreRegexUtf8
         if (settings == null)
             throw new ArgumentNullException(nameof(settings));
 
-        InternalRegex = new InternalRegex8Bit(pattern, patternString, settings, Encoding.UTF8);
+        InternalRegex = new InternalRegex8Bit(pattern, patternString, settings, PcreConstants.PCRE2_UTF, Encoding.UTF8);
     }
 
     private static ReadOnlySpan<byte> GetBytes(string value)
         => Encoding.UTF8.GetBytes(value);
 
-    internal static unsafe string GetString(ReadOnlySpan<byte> value)
+    internal static string GetString(ReadOnlySpan<byte> value)
         => InternalRegex8Bit.GetString(value, Encoding.UTF8);
 }
