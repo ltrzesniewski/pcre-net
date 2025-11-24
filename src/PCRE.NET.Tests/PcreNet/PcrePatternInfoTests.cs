@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿using System.Text;
+using NUnit.Framework;
+using PCRE.Tests.Support;
 
 namespace PCRE.Tests.PcreNet;
 
@@ -21,6 +23,18 @@ public class PcrePatternInfoTests
 
         Assert.That(re.PatternInfo.PatternString, Is.EqualTo(@"foo\s+bar"));
         Assert.That(re.PatternInfo.Options, Is.EqualTo(PcreOptions.IgnoreCase));
+    }
+
+    [Test]
+    public void should_return_strings_with_the_given_encoding()
+    {
+        var re = new PcreRegex8Bit("foo(?<bar>bär)".ToLatin1Bytes(), Encoding.ASCII);
+        Assert.That(re.Encoding, Is.SameAs(Encoding.ASCII));
+        Assert.That(re.PatternInfo.PatternString, Is.EqualTo("foo(?<bar>b?r)"));
+
+        re = new PcreRegex8Bit("foo(?<bar>bär)".ToLatin1Bytes(), TestSupport.Latin1Encoding);
+        Assert.That(re.Encoding, Is.SameAs(TestSupport.Latin1Encoding));
+        Assert.That(re.PatternInfo.PatternString, Is.EqualTo("foo(?<bar>bär)"));
     }
 
     [Test]

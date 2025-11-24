@@ -14,6 +14,11 @@ public sealed partial class PcreRegex8Bit
     internal InternalRegex8Bit InternalRegex { get; }
 
     /// <summary>
+    /// The encoding used to retrieve information about the pattern, such as the capture group names.
+    /// </summary>
+    public Encoding Encoding => InternalRegex.Encoding;
+
+    /// <summary>
     /// Creates a PCRE2 regex for the 8-bit PCRE2 library.
     /// </summary>
     /// <param name="pattern">The regular expression pattern.</param>

@@ -993,6 +993,7 @@ namespace PCRE
         public PcreRegex8Bit(System.ReadOnlySpan<byte> pattern, System.Text.Encoding encoding) { }
         public PcreRegex8Bit(System.ReadOnlySpan<byte> pattern, System.Text.Encoding encoding, PCRE.PcreOptions options) { }
         public PcreRegex8Bit(System.ReadOnlySpan<byte> pattern, System.Text.Encoding encoding, PCRE.PcreRegexSettings settings) { }
+        public System.Text.Encoding Encoding { get; }
         public PCRE.PcrePatternInfo PatternInfo { get; }
         public PCRE.PcreMatchBuffer8Bit CreateMatchBuffer() { }
         public PCRE.PcreMatchBuffer8Bit CreateMatchBuffer(PCRE.PcreMatchSettings settings) { }
