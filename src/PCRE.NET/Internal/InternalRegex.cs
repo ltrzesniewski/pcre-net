@@ -72,6 +72,7 @@ internal abstract unsafe class InternalRegex : IDisposable
         => TryGetCalloutInfoByPatternPosition(patternPosition) ?? throw new InvalidOperationException($"Could not retrieve callout info at position {patternPosition}.");
 }
 
+[SuppressMessage("ReSharper", "UnusedTypeParameter")]
 internal abstract class InternalRegex<TChar>(string patternString, PcreRegexSettings settings)
     : InternalRegex(patternString, settings)
     where TChar : unmanaged;
@@ -170,7 +171,7 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
             input.start_index = (uint)startIndex;
             input.additional_options = additionalOptions;
 
-            CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout, calloutOutputVector);
+            CalloutInterop.PrepareForSpan(subject, this, ref input, out calloutInterop, callout, calloutOutputVector);
 
             default(TNative).match(&input, &result);
 
@@ -217,7 +218,7 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
             if (input.buffer == null)
                 ThrowMatchBufferDisposed();
 
-            CalloutInterop.Prepare(subject, buffer, ref input, out calloutInterop, callout);
+            CalloutInterop.PrepareForBuffer(subject, buffer, ref input, out calloutInterop, callout);
 
             default(TNative).buffer_match(&input, &result);
 
@@ -332,14 +333,14 @@ internal sealed unsafe class InternalRegex8Bit(ReadOnlySpan<byte> pattern, strin
     InternalRegex8Bit IRegexHolder8Bit.Regex => this;
 
     public string GetString(ReadOnlySpan<byte> value)
-        => GetString(value, encoding);
+        => GetString(value, Encoding);
 
     public static string GetString(ReadOnlySpan<byte> value, Encoding encoding)
     {
         if (value.IsEmpty)
             return string.Empty;
 
-# if NET
+#if NET
         return encoding.GetString(value);
 #else
         fixed (byte* ptr = value)
@@ -348,7 +349,7 @@ internal sealed unsafe class InternalRegex8Bit(ReadOnlySpan<byte> pattern, strin
     }
 
     public override string? GetString(void* ptr)
-        => GetString((byte*)ptr, encoding);
+        => GetString((byte*)ptr, Encoding);
 
     private static string? GetString(byte* ptr, Encoding encoding)
     {
@@ -358,6 +359,9 @@ internal sealed unsafe class InternalRegex8Bit(ReadOnlySpan<byte> pattern, strin
         if (ReferenceEquals(encoding, Encoding.UTF8))
             return Marshal.PtrToStringUTF8((IntPtr)ptr) ?? string.Empty;
 #endif
+#if NET9_0_OR_GREATER
+        return encoding.GetString(MemoryMarshal.CreateReadOnlySpanFromNullTerminated(ptr));
+#else
         return encoding.GetString(ptr, GetStringLength(ptr));
 
         static int GetStringLength(byte* ptr)
@@ -369,6 +373,7 @@ internal sealed unsafe class InternalRegex8Bit(ReadOnlySpan<byte> pattern, strin
 
             return (int)(ptr - start);
         }
+#endif
     }
 
     protected override Dictionary<string, int[]> GetCaptureNames(void* nameEntryTable, uint nameCount, uint nameEntrySize)
@@ -422,46 +427,27 @@ internal sealed unsafe class InternalRegex16Bit(string pattern, PcreRegexSetting
                            uint additionalOptions,
                            Func<PcreCallout, PcreCalloutResult>? callout)
     {
-        Native.match_input input;
-        _ = &input;
+        var oVectorArray = new nuint[OutputVectorSize];
+        var matchOVector = oVectorArray.AsSpan();
 
-        settings.FillMatchSettings(ref input.settings, out var jitStack);
+        CalloutInterop.StringToSpanCallout(subject, callout, out var spanCallout, out var calloutOutputVector);
 
-        Native.match_result result;
-        CalloutInterop.CalloutInteropInfo<char> calloutInterop;
+        Match(
+            ref matchOVector,
+            subject,
+            settings,
+            startIndex,
+            additionalOptions,
+            spanCallout,
+            calloutOutputVector,
+            out var markPtr,
+            out var resultCode
+        );
 
-        var oVectorArray = default(nuint[]);
-
-        var oVector = CanStackAllocOutputVector
-            ? stackalloc nuint[OutputVectorSize]
-            : oVectorArray = new nuint[OutputVectorSize];
-
-        fixed (char* pSubject = subject)
-        fixed (nuint* pOVec = &oVector[0])
-        {
-            input.code = Code;
-            input.subject = pSubject;
-            input.subject_length = (uint)subject.Length;
-            input.output_vector = pOVec;
-            input.start_index = (uint)startIndex;
-            input.additional_options = additionalOptions;
-
-            CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, callout);
-
-            default(Native16Bit).match(&input, &result);
-
-            GC.KeepAlive(this);
-            GC.KeepAlive(jitStack);
-        }
-
-        if (result.result_code == PcreConstants.PCRE2_ERROR_NOMATCH)
+        if (resultCode == PcreConstants.PCRE2_ERROR_NOMATCH)
             return _noMatch ??= new PcreMatch(this);
 
-        if (result.result_code < PcreConstants.PCRE2_ERROR_PARTIAL)
-            HandleError(result, ref calloutInterop);
-
-        oVectorArray ??= oVector.ToArray();
-        return new PcreMatch(subject, this, ref result, oVectorArray);
+        return new PcreMatch(subject, this, markPtr, resultCode, oVectorArray);
     }
 
     public PcreDfaMatchResult DfaMatch(string subject, PcreDfaMatchSettings settings, int startIndex, uint additionalOptions)
@@ -485,7 +471,7 @@ internal sealed unsafe class InternalRegex16Bit(string pattern, PcreRegexSetting
             input.start_index = (uint)startIndex;
             input.additional_options = additionalOptions;
 
-            CalloutInterop.Prepare(subject, this, ref input, out calloutInterop, settings.Callout);
+            CalloutInterop.PrepareForDfa(subject, this, ref input, out calloutInterop, settings.Callout);
 
             default(Native16Bit).dfa_match(&input, &result);
 
@@ -534,7 +520,7 @@ internal sealed unsafe class InternalRegex16Bit(string pattern, PcreRegexSetting
             input.replacement = pReplacement;
             input.replacement_length = (uint)replacement.Length;
 
-            CalloutInterop.PrepareSubstitute(this, subject, ref input, out calloutInterop, matchCallout, substituteCallout, substituteCaseCallout);
+            CalloutInterop.PrepareForSubstitute(this, subject, ref input, out calloutInterop, matchCallout, substituteCallout, substituteCaseCallout);
 
             default(Native16Bit).substitute(&input, &result);
 

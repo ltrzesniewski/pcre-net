@@ -28,16 +28,16 @@ public sealed unsafe class PcreMatch : IPcreGroup, IPcreGroupList
         _resultCode = PcreConstants.PCRE2_ERROR_NOMATCH;
     }
 
-    internal PcreMatch(string subject, InternalRegex regex, ref Native.match_result result, nuint[] oVector)
+    internal PcreMatch(string subject, InternalRegex regex, char* markPtr, int resultCode, nuint[] oVector)
     {
         // Real match
 
         Subject = subject;
         _regex = regex;
         _oVector = oVector;
-        _markPtr = (char*)result.mark;
+        _markPtr = markPtr;
 
-        _resultCode = result.result_code;
+        _resultCode = resultCode;
     }
 
     internal PcreMatch(string subject, InternalRegex regex, nuint[] oVector, char* mark)

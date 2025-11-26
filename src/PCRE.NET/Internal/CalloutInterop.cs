@@ -79,32 +79,26 @@ internal static unsafe class CalloutInterop
         => ToSubstituteInteropInfo(data).CallSubstituteCaseCallout(input, inputLength, output, outputLength, targetCase);
 #endif
 
-    public static void Prepare(string subject,
-                               InternalRegex16Bit regex,
-                               scoped ref Native.match_input input,
-                               out CalloutInteropInfo<char> interopInfo,
-                               Func<PcreCallout, PcreCalloutResult>? callout)
-    {
-        if (callout != null)
-        {
-            interopInfo = new CalloutInteropInfo<char>(subject, regex, callout);
+    private delegate (string, Func<PcreCallout, PcreCalloutResult>) StringCalloutWrapper();
 
-            input.callout = _calloutHandlerFnPtr16Bit;
-            input.callout_data = interopInfo.ToPointer();
-        }
-        else
-        {
-            interopInfo = default;
-            input.callout = null;
-        }
+    public static void StringToSpanCallout(string subject,
+                                           Func<PcreCallout, PcreCalloutResult>? callout,
+                                           out Delegate? spanCallout,
+                                           out nuint[]? calloutOutputVector)
+    {
+        spanCallout = callout is not null
+            ? new StringCalloutWrapper(() => (subject, callout))
+            : null;
+
+        calloutOutputVector = []; // Return an empty non-null instance to avoid allocating an unused one later.
     }
 
-    public static void Prepare<TChar>(ReadOnlySpan<TChar> subject,
-                                      InternalRegex<TChar> regex,
-                                      scoped ref Native.match_input input,
-                                      out CalloutInteropInfo<TChar> interopInfo,
-                                      Delegate? callout,
-                                      nuint[]? calloutOutputVector)
+    public static void PrepareForSpan<TChar>(ReadOnlySpan<TChar> subject,
+                                             InternalRegex<TChar> regex,
+                                             scoped ref Native.match_input input,
+                                             out CalloutInteropInfo<TChar> interopInfo,
+                                             Delegate? callout,
+                                             nuint[]? calloutOutputVector)
         where TChar : unmanaged
     {
         if (callout != null)
@@ -127,11 +121,11 @@ internal static unsafe class CalloutInterop
         }
     }
 
-    public static void Prepare<TChar>(ReadOnlySpan<TChar> subject,
-                                      IPcreMatchBuffer buffer,
-                                      scoped ref Native.buffer_match_input input,
-                                      out CalloutInteropInfo<TChar> interopInfo,
-                                      Delegate? callout)
+    public static void PrepareForBuffer<TChar>(ReadOnlySpan<TChar> subject,
+                                               IPcreMatchBuffer buffer,
+                                               scoped ref Native.buffer_match_input input,
+                                               out CalloutInteropInfo<TChar> interopInfo,
+                                               Delegate? callout)
         where TChar : unmanaged
     {
         if (callout != null)
@@ -154,15 +148,16 @@ internal static unsafe class CalloutInterop
         }
     }
 
-    public static void Prepare(string subject,
-                               InternalRegex16Bit regex,
-                               scoped ref Native.dfa_match_input input,
-                               out CalloutInteropInfo<char> interopInfo,
-                               Func<PcreCallout, PcreCalloutResult>? callout)
+    public static void PrepareForDfa(string subject,
+                                     InternalRegex16Bit regex,
+                                     scoped ref Native.dfa_match_input input,
+                                     out CalloutInteropInfo<char> interopInfo,
+                                     Func<PcreCallout, PcreCalloutResult>? callout)
     {
         if (callout != null)
         {
-            interopInfo = new CalloutInteropInfo<char>(subject, regex, callout);
+            var wrapper = new StringCalloutWrapper(() => (subject, callout));
+            interopInfo = new CalloutInteropInfo<char>([], regex, wrapper, []);
 
             input.callout = _calloutHandlerFnPtr16Bit;
             input.callout_data = interopInfo.ToPointer();
@@ -174,13 +169,13 @@ internal static unsafe class CalloutInterop
         }
     }
 
-    public static void PrepareSubstitute(InternalRegex16Bit regex,
-                                         ReadOnlySpan<char> subject,
-                                         scoped ref Native.substitute_input input,
-                                         out SubstituteCalloutInteropInfo interopInfo,
-                                         PcreRefCalloutFunc? matchCallout,
-                                         PcreSubstituteCalloutFunc? substituteCallout,
-                                         PcreSubstituteCaseCalloutFunc? substituteCaseCallout)
+    public static void PrepareForSubstitute(InternalRegex16Bit regex,
+                                            ReadOnlySpan<char> subject,
+                                            scoped ref Native.substitute_input input,
+                                            out SubstituteCalloutInteropInfo interopInfo,
+                                            PcreRefCalloutFunc? matchCallout,
+                                            PcreSubstituteCalloutFunc? substituteCallout,
+                                            PcreSubstituteCaseCalloutFunc? substituteCaseCallout)
     {
         input.match_callout = matchCallout is not null ? _substituteMatchCalloutHandlerFnPtr : null;
         input.substitute_callout = substituteCallout is not null ? _substituteCalloutHandlerFnPtr : null;
@@ -264,29 +259,16 @@ internal static unsafe class CalloutInterop
     public ref struct CalloutInteropInfo<TChar>
         where TChar : unmanaged
     {
-        private readonly string? _subject;
-        private readonly ReadOnlySpan<TChar> _subjectSpan;
+        private readonly ReadOnlySpan<TChar> _subject;
         private readonly InternalRegex<TChar> _regex;
         private readonly Delegate _callout;
         private readonly nuint[]? _outputVector;
 
         public Exception? Exception { get; private set; }
 
-        public CalloutInteropInfo(string subject, InternalRegex<TChar> regex, Func<PcreCallout, PcreCalloutResult> callout)
-        {
-            _subject = subject;
-            _subjectSpan = default;
-            _regex = regex;
-            _callout = callout;
-            _outputVector = null;
-
-            Exception = null;
-        }
-
         public CalloutInteropInfo(ReadOnlySpan<TChar> subject, InternalRegex<TChar> regex, Delegate callout, nuint[]? outputVector)
         {
-            _subject = null;
-            _subjectSpan = subject;
+            _subject = subject;
             _regex = regex;
             _callout = callout;
             _outputVector = outputVector;
@@ -299,12 +281,6 @@ internal static unsafe class CalloutInterop
         {
             try
             {
-                if (_subject != null)
-                {
-                    var func = (Func<PcreCallout, PcreCalloutResult>)_callout;
-                    return (int)func(new PcreCallout(_subject, _regex, callout));
-                }
-
                 var outputVector = _outputVector ?? (
                     callout->capture_top <= InternalRegex.MaxStackAllocCaptureCount
                         ? stackalloc nuint[(int)callout->capture_top * 2]
@@ -313,53 +289,55 @@ internal static unsafe class CalloutInterop
 
                 if (typeof(TChar) == typeof(byte))
                 {
-                    fixed (TChar* ptr = _subjectSpan)
+                    switch (_callout)
                     {
-                        switch (_callout)
+                        case PcreRefCalloutFuncUtf8 func:
                         {
-                            case PcreRefCalloutFuncUtf8 func:
-                            {
-                                return (int)func(
-                                    new PcreRefCalloutUtf8(
-                                        new ReadOnlySpan<byte>(ptr, _subjectSpan.Length),
-                                        (InternalRegex8Bit)(object)_regex,
-                                        callout,
-                                        outputVector
-                                    )
-                                );
-                            }
+                            return (int)func(
+                                new PcreRefCalloutUtf8(
+                                    MemoryMarshal.Cast<TChar, byte>(_subject),
+                                    (InternalRegex8Bit)(object)_regex,
+                                    callout,
+                                    outputVector
+                                )
+                            );
+                        }
 
-                            case PcreRefCalloutFunc8Bit func:
-                            {
-                                return (int)func(
-                                    new PcreRefCallout8Bit(
-                                        new ReadOnlySpan<byte>(ptr, _subjectSpan.Length),
-                                        (InternalRegex8Bit)(object)_regex,
-                                        callout,
-                                        outputVector
-                                    )
-                                );
-                            }
-
-                            default:
-                                throw new InvalidOperationException("Unexpected callout funtion type");
+                        case PcreRefCalloutFunc8Bit func:
+                        {
+                            return (int)func(
+                                new PcreRefCallout8Bit(
+                                    MemoryMarshal.Cast<TChar, byte>(_subject),
+                                    (InternalRegex8Bit)(object)_regex,
+                                    callout,
+                                    outputVector
+                                )
+                            );
                         }
                     }
                 }
 
                 if (typeof(TChar) == typeof(char))
                 {
-                    var func = (PcreRefCalloutFunc)_callout;
-                    fixed (TChar* ptr = _subjectSpan)
+                    switch (_callout)
                     {
-                        return (int)func(
-                            new PcreRefCallout(
-                                new ReadOnlySpan<char>(ptr, _subjectSpan.Length),
-                                (InternalRegex16Bit)(object)_regex,
-                                callout,
-                                outputVector
-                            )
-                        );
+                        case PcreRefCalloutFunc func:
+                        {
+                            return (int)func(
+                                new PcreRefCallout(
+                                    MemoryMarshal.Cast<TChar, char>(_subject),
+                                    (InternalRegex16Bit)(object)_regex,
+                                    callout,
+                                    outputVector
+                                )
+                            );
+                        }
+
+                        case StringCalloutWrapper wrapper:
+                        {
+                            var (subject, func) = wrapper();
+                            return (int)func(new PcreCallout(subject, _regex, callout));
+                        }
                     }
                 }
 
