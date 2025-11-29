@@ -11,6 +11,8 @@ namespace PCRE;
 /// <seealso cref="PcreRegex8Bit"/>
 public partial class PcreRegex8Bit
 {
+    private static PcreRegexSettings DefaultSettings { get; } = new PcreRegexSettings().ToReadOnlySnapshot(PcreOptions.None);
+
     internal InternalRegex8Bit InternalRegex { get; }
 
     /// <summary>
@@ -25,7 +27,7 @@ public partial class PcreRegex8Bit
     /// <param name="encoding">The pattern encoding.</param>
     [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
     public PcreRegex8Bit(ReadOnlySpan<byte> pattern, Encoding encoding)
-        : this(pattern, encoding, new PcreRegexSettings(PcreOptions.None))
+        : this(pattern, encoding, DefaultSettings)
     {
     }
 
@@ -36,7 +38,7 @@ public partial class PcreRegex8Bit
     /// <param name="encoding">The pattern encoding.</param>
     /// <param name="options">Pattern options.</param>
     public PcreRegex8Bit(ReadOnlySpan<byte> pattern, Encoding encoding, PcreOptions options)
-        : this(pattern, encoding, new PcreRegexSettings(options))
+        : this(pattern, encoding, OptionsToSettings(options))
     {
     }
 
@@ -54,11 +56,19 @@ public partial class PcreRegex8Bit
         if (encoding is null)
             throw new ArgumentNullException(nameof(encoding));
 
-        InternalRegex = new InternalRegex8Bit(pattern, InternalRegex8Bit.GetString(pattern, encoding), settings, 0, encoding);
+        InternalRegex = new InternalRegex8Bit(
+            pattern,
+            InternalRegex8Bit.GetString(pattern, encoding),
+            settings.ToReadOnlySnapshot(PcreOptions.None),
+            encoding
+        );
     }
 
     private protected PcreRegex8Bit(InternalRegex8Bit internalRegex)
     {
         InternalRegex = internalRegex;
     }
+
+    private static PcreRegexSettings OptionsToSettings(PcreOptions options)
+        => options is PcreOptions.None ? DefaultSettings : new PcreRegexSettings(options);
 }

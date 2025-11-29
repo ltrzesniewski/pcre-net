@@ -17,6 +17,9 @@ public sealed partial class PcreRegex; // Do not forward the sealed keyword to 8
 [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
 public partial class PcreRegex
 {
+    private const PcreOptions _additionalOptions = PcreOptions.Utf;
+    private static PcreRegexSettings DefaultSettings { get; } = new PcreRegexSettings().ToReadOnlySnapshot(_additionalOptions);
+
     internal InternalRegex16Bit InternalRegex { get; }
 
     /// <summary>
@@ -53,7 +56,7 @@ public partial class PcreRegex
     /// <param name="pattern">The regular expression pattern.</param>
     [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
     public PcreRegex(string pattern)
-        : this(pattern, PcreOptions.None)
+        : this(pattern, DefaultSettings)
     {
     }
 
@@ -63,7 +66,7 @@ public partial class PcreRegex
     /// <param name="pattern">The regular expression pattern.</param>
     /// <param name="options">Pattern options.</param>
     public PcreRegex(string pattern, PcreOptions options)
-        : this(pattern, new PcreRegexSettings(options))
+        : this(pattern, OptionsToSettings(options))
     {
     }
 
@@ -79,8 +82,14 @@ public partial class PcreRegex
         if (settings == null)
             throw new ArgumentNullException(nameof(settings));
 
-        InternalRegex = Caches.RegexCache.GetOrAdd(new RegexKey(pattern, settings));
+        InternalRegex = Caches.RegexCache.GetOrAdd(new RegexKey(pattern, settings.ToReadOnlySnapshot(_additionalOptions)));
     }
+
+    /// <summary>
+    /// Converts options to settings to avoid allocating settings for default options. Settings will be made read-only later.
+    /// </summary>
+    private static PcreRegexSettings OptionsToSettings(PcreOptions options)
+        => options is PcreOptions.None or _additionalOptions ? DefaultSettings : new PcreRegexSettings(options | _additionalOptions);
 
     /// <summary>
     /// Creates a buffer for zero-allocation matching.

@@ -13,6 +13,15 @@ public class PcrePatternInfoTests
         var re = new PcreRegex(@"foo\s+bar", PcreOptions.IgnoreCase);
 
         Assert.That(re.PatternInfo.PatternString, Is.EqualTo(@"foo\s+bar"));
+        Assert.That(re.PatternInfo.Options, Is.EqualTo(PcreOptions.IgnoreCase | PcreOptions.Utf));
+    }
+
+    [Test]
+    public void should_return_pattern_and_options_8bit()
+    {
+        var re = new PcreRegex8Bit(@"foo\s+bar".ToLatin1Bytes(), TestSupport.Latin1Encoding, PcreOptions.IgnoreCase);
+
+        Assert.That(re.PatternInfo.PatternString, Is.EqualTo(@"foo\s+bar"));
         Assert.That(re.PatternInfo.Options, Is.EqualTo(PcreOptions.IgnoreCase));
     }
 
@@ -22,7 +31,7 @@ public class PcrePatternInfoTests
         var re = new PcreRegexUtf8(@"foo\s+bar"u8, PcreOptions.IgnoreCase);
 
         Assert.That(re.PatternInfo.PatternString, Is.EqualTo(@"foo\s+bar"));
-        Assert.That(re.PatternInfo.Options, Is.EqualTo(PcreOptions.IgnoreCase));
+        Assert.That(re.PatternInfo.Options, Is.EqualTo(PcreOptions.IgnoreCase | PcreOptions.Utf));
     }
 
     [Test]
@@ -81,6 +90,36 @@ public class PcrePatternInfoTests
     {
         var re = new PcreRegexUtf8(pattern);
         Assert.That(re.PatternInfo.GroupNames, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void should_add_utf_mode_for_16bit()
+    {
+        var re = new PcreRegex("a");
+        Assert.That(re.PatternInfo.Options.HasFlag(PcreOptions.Utf), Is.True);
+        Assert.That(re.PatternInfo.Settings.Options.HasFlag(PcreOptions.Utf), Is.True);
+        Assert.That(re.PatternInfo.ArgOptions.HasFlag(PcreOptions.Utf), Is.True);
+        Assert.That(re.PatternInfo.AllOptions.HasFlag(PcreOptions.Utf), Is.True);
+    }
+
+    [Test]
+    public void should_not_add_utf_mode_for_8bit()
+    {
+        var re = new PcreRegex8Bit("a".ToLatin1Bytes(), TestSupport.Latin1Encoding);
+        Assert.That(re.PatternInfo.Options.HasFlag(PcreOptions.Utf), Is.False);
+        Assert.That(re.PatternInfo.Settings.Options.HasFlag(PcreOptions.Utf), Is.False);
+        Assert.That(re.PatternInfo.ArgOptions.HasFlag(PcreOptions.Utf), Is.False);
+        Assert.That(re.PatternInfo.AllOptions.HasFlag(PcreOptions.Utf), Is.False);
+    }
+
+    [Test]
+    public void should_add_utf_mode_for_utf8()
+    {
+        var re = new PcreRegexUtf8("a");
+        Assert.That(re.PatternInfo.Options.HasFlag(PcreOptions.Utf), Is.True);
+        Assert.That(re.PatternInfo.Settings.Options.HasFlag(PcreOptions.Utf), Is.True);
+        Assert.That(re.PatternInfo.ArgOptions.HasFlag(PcreOptions.Utf), Is.True);
+        Assert.That(re.PatternInfo.AllOptions.HasFlag(PcreOptions.Utf), Is.True);
     }
 
     [Test]

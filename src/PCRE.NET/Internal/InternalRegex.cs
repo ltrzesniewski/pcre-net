@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using PCRE.Dfa;
@@ -29,8 +28,11 @@ internal abstract unsafe class InternalRegex : IDisposable
 
     protected InternalRegex(string patternString, PcreRegexSettings settings)
     {
+        if (!settings.ReadOnlySettings)
+            throw new ArgumentException("Provided settings must be read-only.", nameof(settings));
+
         PatternString = patternString;
-        Settings = settings.AsReadOnly();
+        Settings = settings;
     }
 
     ~InternalRegex()
@@ -81,12 +83,12 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
     where TChar : unmanaged
     where TNative : struct, INative
 {
-    protected InternalRegex(ReadOnlySpan<TChar> pattern, string patternString, PcreRegexSettings settings, uint additionalPatternOptions)
+    protected InternalRegex(ReadOnlySpan<TChar> pattern, string patternString, PcreRegexSettings settings)
         : base(patternString, settings)
     {
         Debug.Assert(typeof(TChar) == typeof(char) || typeof(TChar) == typeof(byte));
 
-        Compile(pattern, additionalPatternOptions, out var captureCount, out var captureNames);
+        Compile(pattern, out var captureCount, out var captureNames);
         CaptureCount = captureCount;
         CaptureNames = captureNames;
 
@@ -94,7 +96,6 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
     }
 
     private void Compile(ReadOnlySpan<TChar> pattern,
-                         uint additionalPatternOptions,
                          out int captureCount,
                          out Dictionary<string, int[]> captureNames)
     {
@@ -110,7 +111,6 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
 
             using (Settings.FillCompileInput(ref input))
             {
-                input.flags |= additionalPatternOptions;
                 default(TNative).compile(&input, &result);
                 Code = result.code;
             }
@@ -324,8 +324,8 @@ internal interface IRegexHolder8Bit
     InternalRegex8Bit Regex { get; }
 }
 
-internal sealed unsafe class InternalRegex8Bit(ReadOnlySpan<byte> pattern, string patternString, PcreRegexSettings settings, uint additionalPatternOptions, Encoding encoding)
-    : InternalRegex<byte, Native8Bit>(pattern, patternString, settings, additionalPatternOptions),
+internal sealed unsafe class InternalRegex8Bit(ReadOnlySpan<byte> pattern, string patternString, PcreRegexSettings settings, Encoding encoding)
+    : InternalRegex<byte, Native8Bit>(pattern, patternString, settings),
       IRegexHolder8Bit
 {
     public Encoding Encoding => encoding;
@@ -357,10 +357,10 @@ internal sealed unsafe class InternalRegex8Bit(ReadOnlySpan<byte> pattern, strin
             return null;
 #if NET
         if (ReferenceEquals(encoding, Encoding.UTF8))
-            return Marshal.PtrToStringUTF8((IntPtr)ptr) ?? string.Empty;
+            return System.Runtime.InteropServices.Marshal.PtrToStringUTF8((IntPtr)ptr) ?? string.Empty;
 #endif
 #if NET9_0_OR_GREATER
-        return encoding.GetString(MemoryMarshal.CreateReadOnlySpanFromNullTerminated(ptr));
+        return encoding.GetString(System.Runtime.InteropServices.MemoryMarshal.CreateReadOnlySpanFromNullTerminated(ptr));
 #else
         return encoding.GetString(ptr, GetStringLength(ptr));
 
@@ -414,7 +414,7 @@ internal interface IRegexHolder16Bit
 }
 
 internal sealed unsafe class InternalRegex16Bit(string pattern, PcreRegexSettings settings)
-    : InternalRegex<char, Native16Bit>(pattern, pattern, settings, PcreConstants.PCRE2_UTF),
+    : InternalRegex<char, Native16Bit>(pattern, pattern, settings),
       IRegexHolder16Bit
 {
     private PcreMatch? _noMatch;

@@ -372,7 +372,7 @@ public class MatchesTests
     }
 
     [Test]
-    public void should_match_from_index_8bytes()
+    public void should_match_from_index_8bit()
     {
         var re = TestSupport.CreatePcreRegex8Bit(@"a".ToLatin1Bytes());
         var matches = re.Matches("foo bar baz".ToLatin1Bytes(), 6).ToList(_ => true);
@@ -381,7 +381,7 @@ public class MatchesTests
     }
 
     [Test]
-    public void should_match_from_index_buf_8bytes()
+    public void should_match_from_index_buf_8bit()
     {
         var re = TestSupport.CreatePcreRegex8Bit(@"a".ToLatin1Bytes());
         var matches = re.CreateMatchBuffer().Matches("foo bar baz".ToLatin1Bytes(), 6).ToList(_ => true);
