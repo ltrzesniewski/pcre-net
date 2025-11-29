@@ -9,10 +9,8 @@ namespace PCRE;
 /// A PCRE regular expression for UTF-8.
 /// </summary>
 /// <seealso cref="PcreRegex8Bit"/>
-public sealed partial class PcreRegexUtf8
+public sealed class PcreRegexUtf8 : PcreRegex8Bit
 {
-    internal InternalRegex8Bit InternalRegex { get; }
-
     /// <summary>
     /// Creates a PCRE2 regex for UTF-8.
     /// </summary>
@@ -74,16 +72,21 @@ public sealed partial class PcreRegexUtf8
     }
 
     private PcreRegexUtf8(ReadOnlySpan<byte> pattern, string patternString, PcreRegexSettings settings)
+        : base(CreateRegex(pattern, patternString, settings))
+    {
+    }
+
+    private static InternalRegex8Bit CreateRegex(ReadOnlySpan<byte> pattern, string patternString, PcreRegexSettings settings)
     {
         if (settings == null)
             throw new ArgumentNullException(nameof(settings));
 
-        InternalRegex = new InternalRegex8Bit(pattern, patternString, settings, PcreConstants.PCRE2_UTF, Encoding.UTF8);
+        return new InternalRegex8Bit(pattern, patternString, settings, PcreConstants.PCRE2_UTF, Encoding.UTF8);
     }
 
     private static ReadOnlySpan<byte> GetBytes(string value)
         => Encoding.UTF8.GetBytes(value);
 
-    internal static string GetString(ReadOnlySpan<byte> value)
+    private static string GetString(ReadOnlySpan<byte> value)
         => InternalRegex8Bit.GetString(value, Encoding.UTF8);
 }

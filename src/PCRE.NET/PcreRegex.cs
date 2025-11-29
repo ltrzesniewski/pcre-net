@@ -6,6 +6,8 @@ using PCRE.Internal;
 
 namespace PCRE;
 
+public sealed partial class PcreRegex; // Do not forward the sealed keyword to 8-bit.
+
 /// <summary>
 /// A PCRE regular expression for UTF-16.
 /// </summary>
@@ -13,7 +15,7 @@ namespace PCRE;
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
-public sealed partial class PcreRegex
+public partial class PcreRegex
 {
     internal InternalRegex16Bit InternalRegex { get; }
 

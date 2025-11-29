@@ -291,18 +291,6 @@ internal static unsafe class CalloutInterop
                 {
                     switch (_callout)
                     {
-                        case PcreRefCalloutFuncUtf8 func:
-                        {
-                            return (int)func(
-                                new PcreRefCalloutUtf8(
-                                    MemoryMarshal.Cast<TChar, byte>(_subject),
-                                    (InternalRegex8Bit)(object)_regex,
-                                    callout,
-                                    outputVector
-                                )
-                            );
-                        }
-
                         case PcreRefCalloutFunc8Bit func:
                         {
                             return (int)func(

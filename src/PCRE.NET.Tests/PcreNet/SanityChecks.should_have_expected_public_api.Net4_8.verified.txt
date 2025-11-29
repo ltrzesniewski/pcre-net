@@ -494,35 +494,6 @@ namespace PCRE
             public bool MoveNext() { }
         }
     }
-    public sealed class PcreMatchBufferUtf8 : System.IDisposable
-    {
-        public void Dispose() { }
-        protected override void Finalize() { }
-        public bool IsMatch(System.ReadOnlySpan<byte> subject) { }
-        public bool IsMatch(System.ReadOnlySpan<byte> subject, int startIndex) { }
-        public PCRE.PcreRefMatchUtf8 Match(System.ReadOnlySpan<byte> subject) { }
-        public PCRE.PcreRefMatchUtf8 Match(System.ReadOnlySpan<byte> subject, PCRE.PcreMatchOptions options) { }
-        public PCRE.PcreRefMatchUtf8 Match(System.ReadOnlySpan<byte> subject, PCRE.PcreRefCalloutFuncUtf8? onCallout) { }
-        public PCRE.PcreRefMatchUtf8 Match(System.ReadOnlySpan<byte> subject, int startIndex) { }
-        public PCRE.PcreRefMatchUtf8 Match(System.ReadOnlySpan<byte> subject, PCRE.PcreMatchOptions options, PCRE.PcreRefCalloutFuncUtf8? onCallout) { }
-        public PCRE.PcreRefMatchUtf8 Match(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreMatchOptions options) { }
-        public PCRE.PcreRefMatchUtf8 Match(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreRefCalloutFuncUtf8? onCallout) { }
-        public PCRE.PcreRefMatchUtf8 Match(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreMatchOptions options, PCRE.PcreRefCalloutFuncUtf8? onCallout) { }
-        public PCRE.PcreMatchBufferUtf8.RefMatchEnumerable Matches(System.ReadOnlySpan<byte> subject) { }
-        public PCRE.PcreMatchBufferUtf8.RefMatchEnumerable Matches(System.ReadOnlySpan<byte> subject, int startIndex) { }
-        public PCRE.PcreMatchBufferUtf8.RefMatchEnumerable Matches(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreRefCalloutFuncUtf8? onCallout) { }
-        public PCRE.PcreMatchBufferUtf8.RefMatchEnumerable Matches(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreMatchOptions options, PCRE.PcreRefCalloutFuncUtf8? onCallout) { }
-        public override string ToString() { }
-        public readonly ref struct RefMatchEnumerable
-        {
-            public PCRE.PcreMatchBufferUtf8.RefMatchEnumerator GetEnumerator() { }
-        }
-        public ref struct RefMatchEnumerator
-        {
-            public PCRE.PcreRefMatchUtf8 Current { get; }
-            public bool MoveNext() { }
-        }
-    }
     public class PcreMatchException : PCRE.PcreException
     {
         public PcreMatchException() { }
@@ -697,23 +668,6 @@ namespace PCRE
     }
     public delegate PCRE.PcreCalloutResult PcreRefCalloutFunc(PCRE.PcreRefCallout callout);
     public delegate PCRE.PcreCalloutResult PcreRefCalloutFunc8Bit(PCRE.PcreRefCallout8Bit callout);
-    public delegate PCRE.PcreCalloutResult PcreRefCalloutFuncUtf8(PCRE.PcreRefCalloutUtf8 callout);
-    public ref struct PcreRefCalloutUtf8
-    {
-        public bool Backtrack { get; }
-        public int CurrentOffset { get; }
-        public PCRE.PcreCalloutInfo Info { get; }
-        public int LastCapture { get; }
-        public PCRE.PcreRefMatchUtf8 Match { get; }
-        public int MaxCapture { get; }
-        public int NextPatternItemLength { get; }
-        public int Number { get; }
-        public int PatternPosition { get; }
-        public bool StartMatch { get; }
-        public int StartOffset { get; }
-        public string? String { get; }
-        public int StringOffset { get; }
-    }
     [System.Diagnostics.DebuggerTypeProxy(typeof(PCRE.PcreRefGroup.DebugProxy))]
     public readonly ref struct PcreRefGroup
     {
@@ -738,19 +692,6 @@ namespace PCRE
         public override string ToString() { }
         public static string op_Explicit(PCRE.PcreRefGroup8Bit group) { }
         public delegate T Func<out T>(PCRE.PcreRefGroup8Bit group);
-    }
-    [System.Diagnostics.DebuggerTypeProxy(typeof(PCRE.PcreRefGroupUtf8.DebugProxy))]
-    public readonly ref struct PcreRefGroupUtf8
-    {
-        public int EndIndex { get; }
-        public int Index { get; }
-        public bool IsDefined { get; }
-        public int Length { get; }
-        public bool Success { get; }
-        public System.ReadOnlySpan<byte> Value { get; }
-        public override string ToString() { }
-        public static string op_Explicit(PCRE.PcreRefGroupUtf8 group) { }
-        public delegate T Func<out T>(PCRE.PcreRefGroupUtf8 group);
     }
     [System.Diagnostics.DebuggerTypeProxy(typeof(PCRE.PcreRefMatch.DebugProxy))]
     public ref struct PcreRefMatch
@@ -839,50 +780,6 @@ namespace PCRE
             public System.Collections.Generic.List<T> ToList<T>(PCRE.PcreRefGroup8Bit.Func<T> selector) { }
         }
         public delegate T Func<out T>(PCRE.PcreRefMatch8Bit match);
-    }
-    [System.Diagnostics.DebuggerTypeProxy(typeof(PCRE.PcreRefMatchUtf8.DebugProxy))]
-    public ref struct PcreRefMatchUtf8
-    {
-        public int CaptureCount { get; }
-        public int EndIndex { get; }
-        public PCRE.PcreRefMatchUtf8.GroupList Groups { get; }
-        public int Index { get; }
-        public bool IsPartialMatch { get; }
-        public PCRE.PcreRefGroupUtf8 this[int index] { get; }
-        public PCRE.PcreRefGroupUtf8 this[string name] { get; }
-        public int Length { get; }
-        public System.ReadOnlySpan<byte> Mark { get; }
-        public bool Success { get; }
-        public System.ReadOnlySpan<byte> Value { get; }
-        public PCRE.PcreRefMatchUtf8.DuplicateNamedGroupEnumerable GetDuplicateNamedGroups(string name) { }
-        public PCRE.PcreRefMatchUtf8.GroupEnumerator GetEnumerator() { }
-        public override string ToString() { }
-        public bool TryGetGroup(int index, out PCRE.PcreRefGroupUtf8 result) { }
-        public bool TryGetGroup(string name, out PCRE.PcreRefGroupUtf8 result) { }
-        public readonly ref struct DuplicateNamedGroupEnumerable
-        {
-            public PCRE.PcreRefMatchUtf8.DuplicateNamedGroupEnumerator GetEnumerator() { }
-            public System.Collections.Generic.List<T> ToList<T>(PCRE.PcreRefGroupUtf8.Func<T> selector) { }
-        }
-        public ref struct DuplicateNamedGroupEnumerator
-        {
-            public PCRE.PcreRefGroupUtf8 Current { get; }
-            public bool MoveNext() { }
-        }
-        public ref struct GroupEnumerator
-        {
-            public PCRE.PcreRefGroupUtf8 Current { get; }
-            public bool MoveNext() { }
-        }
-        public readonly ref struct GroupList
-        {
-            public int Count { get; }
-            public PCRE.PcreRefGroupUtf8 this[int index] { get; }
-            public PCRE.PcreRefGroupUtf8 this[string name] { get; }
-            public PCRE.PcreRefMatchUtf8.GroupEnumerator GetEnumerator() { }
-            public System.Collections.Generic.List<T> ToList<T>(PCRE.PcreRefGroupUtf8.Func<T> selector) { }
-        }
-        public delegate T Func<out T>(PCRE.PcreRefMatchUtf8 match);
     }
     public sealed class PcreRegex
     {
@@ -988,7 +885,7 @@ namespace PCRE
             public bool MoveNext() { }
         }
     }
-    public sealed class PcreRegex8Bit
+    public class PcreRegex8Bit
     {
         public PcreRegex8Bit(System.ReadOnlySpan<byte> pattern, System.Text.Encoding encoding) { }
         public PcreRegex8Bit(System.ReadOnlySpan<byte> pattern, System.Text.Encoding encoding, PCRE.PcreOptions options) { }
@@ -1038,7 +935,7 @@ namespace PCRE
         public PCRE.PcreOptions Options { get; set; }
         public uint ParensLimit { get; set; }
     }
-    public sealed class PcreRegexUtf8
+    public sealed class PcreRegexUtf8 : PCRE.PcreRegex8Bit
     {
         public PcreRegexUtf8(System.ReadOnlySpan<byte> pattern) { }
         public PcreRegexUtf8(string pattern) { }
@@ -1046,35 +943,6 @@ namespace PCRE
         public PcreRegexUtf8(System.ReadOnlySpan<byte> pattern, PCRE.PcreRegexSettings settings) { }
         public PcreRegexUtf8(string pattern, PCRE.PcreOptions options) { }
         public PcreRegexUtf8(string pattern, PCRE.PcreRegexSettings settings) { }
-        public PCRE.PcrePatternInfo PatternInfo { get; }
-        public PCRE.PcreMatchBufferUtf8 CreateMatchBuffer() { }
-        public PCRE.PcreMatchBufferUtf8 CreateMatchBuffer(PCRE.PcreMatchSettings settings) { }
-        public bool IsMatch(System.ReadOnlySpan<byte> subject) { }
-        public bool IsMatch(System.ReadOnlySpan<byte> subject, int startIndex) { }
-        public PCRE.PcreRefMatchUtf8 Match(System.ReadOnlySpan<byte> subject) { }
-        public PCRE.PcreRefMatchUtf8 Match(System.ReadOnlySpan<byte> subject, PCRE.PcreMatchOptions options) { }
-        public PCRE.PcreRefMatchUtf8 Match(System.ReadOnlySpan<byte> subject, PCRE.PcreRefCalloutFuncUtf8? onCallout) { }
-        public PCRE.PcreRefMatchUtf8 Match(System.ReadOnlySpan<byte> subject, int startIndex) { }
-        public PCRE.PcreRefMatchUtf8 Match(System.ReadOnlySpan<byte> subject, PCRE.PcreMatchOptions options, PCRE.PcreRefCalloutFuncUtf8? onCallout) { }
-        public PCRE.PcreRefMatchUtf8 Match(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreMatchOptions options) { }
-        public PCRE.PcreRefMatchUtf8 Match(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreRefCalloutFuncUtf8? onCallout) { }
-        public PCRE.PcreRefMatchUtf8 Match(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreMatchOptions options, PCRE.PcreRefCalloutFuncUtf8? onCallout) { }
-        public PCRE.PcreRefMatchUtf8 Match(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreMatchOptions options, PCRE.PcreRefCalloutFuncUtf8? onCallout, PCRE.PcreMatchSettings settings) { }
-        public PCRE.PcreRegexUtf8.RefMatchEnumerable Matches(System.ReadOnlySpan<byte> subject) { }
-        public PCRE.PcreRegexUtf8.RefMatchEnumerable Matches(System.ReadOnlySpan<byte> subject, int startIndex) { }
-        public PCRE.PcreRegexUtf8.RefMatchEnumerable Matches(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreRefCalloutFuncUtf8? onCallout) { }
-        public PCRE.PcreRegexUtf8.RefMatchEnumerable Matches(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreMatchOptions options, PCRE.PcreRefCalloutFuncUtf8? onCallout, PCRE.PcreMatchSettings settings) { }
-        public override string ToString() { }
-        public readonly ref struct RefMatchEnumerable
-        {
-            public PCRE.PcreRegexUtf8.RefMatchEnumerator GetEnumerator() { }
-            public System.Collections.Generic.List<T> ToList<T>(PCRE.PcreRefMatchUtf8.Func<T> selector) { }
-        }
-        public ref struct RefMatchEnumerator
-        {
-            public PCRE.PcreRefMatchUtf8 Current { get; }
-            public bool MoveNext() { }
-        }
     }
     [System.Flags]
     public enum PcreSplitOptions : long

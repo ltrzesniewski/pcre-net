@@ -66,7 +66,6 @@ public class ForwardTo8BitGenerator : IIncrementalGenerator
               .AppendLine("#nullable enable");
 
         GenerateType(writer, model, model.RootTypeNode, false, "8Bit", cancellationToken);
-        GenerateType(writer, model, model.RootTypeNode, false, "Utf8", cancellationToken);
 
         return writer.ToString();
     }

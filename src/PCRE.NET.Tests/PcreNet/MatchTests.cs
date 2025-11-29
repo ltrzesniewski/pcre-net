@@ -1461,9 +1461,6 @@ public class MatchTests
     private static List<bool> GetDuplicateNamedGroupsSuccesses(PcreRefMatch match, string groupName)
         => match.GetDuplicateNamedGroups(groupName).ToList(i => i.Success);
 
-    private static List<bool> GetDuplicateNamedGroupsSuccesses(PcreRefMatchUtf8 match, string groupName)
-        => match.GetDuplicateNamedGroups(groupName).ToList(i => i.Success);
-
     private static List<bool> GetDuplicateNamedGroupsSuccesses(PcreRefMatch8Bit match, string groupName)
         => match.GetDuplicateNamedGroups(groupName).ToList(i => i.Success);
 
@@ -4351,22 +4348,9 @@ public class MatchTests
     }
 
     [Test]
-    public void should_have_undefined_value_in_default_ref_group_utf8()
-    {
-        var group = default(PcreRefGroupUtf8);
-
-        Assert.That(group.Success, Is.False);
-        Assert.That(group.IsDefined, Is.False);
-        Assert.That(group.Value.IsEmpty);
-        Assert.That(group.Index, Is.EqualTo(-1));
-        Assert.That(group.EndIndex, Is.EqualTo(-1));
-        Assert.That(group.Length, Is.EqualTo(0));
-    }
-
-    [Test]
     public void should_have_undefined_value_in_default_ref_group_8bit()
     {
-        var group = default(PcreRefGroupUtf8);
+        var group = default(PcreRefGroup8Bit);
 
         Assert.That(group.Success, Is.False);
         Assert.That(group.IsDefined, Is.False);

@@ -202,13 +202,13 @@ public class PcreTests
                             var expectedMatch = expected.Matches[matchCount];
                             ++matchCount;
 
-                            CompareGroups(pattern, actualMatch, expectedMatch);
+                            CompareGroups(pattern, actualMatch, expectedMatch, Encoding.UTF8);
 
                             if (pattern.ExtractMarks)
-                                CompareMark(actualMatch, expectedMatch);
+                                CompareMark(actualMatch, expectedMatch, Encoding.UTF8);
 
                             if (pattern.GetRemainingString)
-                                CompareRemainingString(actualMatch, expectedMatch);
+                                CompareRemainingString(actualMatch, expectedMatch, Encoding.UTF8);
 
                             if (!pattern.AllMatches)
                                 break;
@@ -230,13 +230,13 @@ public class PcreTests
                             var expectedMatch = expected.Matches[matchCount];
                             ++matchCount;
 
-                            CompareGroups(pattern, actualMatch, expectedMatch);
+                            CompareGroups(pattern, actualMatch, expectedMatch, Encoding.UTF8);
 
                             if (pattern.ExtractMarks)
-                                CompareMark(actualMatch, expectedMatch);
+                                CompareMark(actualMatch, expectedMatch, Encoding.UTF8);
 
                             if (pattern.GetRemainingString)
-                                CompareRemainingString(actualMatch, expectedMatch);
+                                CompareRemainingString(actualMatch, expectedMatch, Encoding.UTF8);
 
                             if (!pattern.AllMatches)
                                 break;
@@ -257,13 +257,13 @@ public class PcreTests
                             var expectedMatch = expected.Matches[matchCount];
                             ++matchCount;
 
-                            CompareGroups(pattern, actualMatch, expectedMatch);
+                            CompareGroups(pattern, actualMatch, expectedMatch, TestSupport.Latin1Encoding);
 
                             if (pattern.ExtractMarks)
-                                CompareMark(actualMatch, expectedMatch);
+                                CompareMark(actualMatch, expectedMatch, TestSupport.Latin1Encoding);
 
                             if (pattern.GetRemainingString)
-                                CompareRemainingString(actualMatch, expectedMatch);
+                                CompareRemainingString(actualMatch, expectedMatch, TestSupport.Latin1Encoding);
 
                             if (!pattern.AllMatches)
                                 break;
@@ -285,13 +285,13 @@ public class PcreTests
                             var expectedMatch = expected.Matches[matchCount];
                             ++matchCount;
 
-                            CompareGroups(pattern, actualMatch, expectedMatch);
+                            CompareGroups(pattern, actualMatch, expectedMatch, TestSupport.Latin1Encoding);
 
                             if (pattern.ExtractMarks)
-                                CompareMark(actualMatch, expectedMatch);
+                                CompareMark(actualMatch, expectedMatch, TestSupport.Latin1Encoding);
 
                             if (pattern.GetRemainingString)
-                                CompareRemainingString(actualMatch, expectedMatch);
+                                CompareRemainingString(actualMatch, expectedMatch, TestSupport.Latin1Encoding);
 
                             if (!pattern.AllMatches)
                                 break;
@@ -362,7 +362,7 @@ public class PcreTests
         }
     }
 
-    private static void CompareGroups(TestPattern pattern, PcreRefMatch8Bit actualMatch, ExpectedMatch expectedMatch)
+    private static void CompareGroups(TestPattern pattern, PcreRefMatch8Bit actualMatch, ExpectedMatch expectedMatch, Encoding encoding)
     {
         var expectedGroups = expectedMatch.Groups.ToList();
 
@@ -383,33 +383,7 @@ public class PcreTests
                     ? expectedGroup.Value
                     : expectedGroup.Value.UnescapeGroup();
 
-                CompareGroupsAssert(TestSupport.Latin1Encoding.GetString(actualGroup.Value.ToArray()), expectedValue);
-            }
-        }
-    }
-
-    private static void CompareGroups(TestPattern pattern, PcreRefMatchUtf8 actualMatch, ExpectedMatch expectedMatch)
-    {
-        var expectedGroups = expectedMatch.Groups.ToList();
-
-        Assert.That(actualMatch.Groups.Count, Is.GreaterThanOrEqualTo(expectedGroups.Count));
-
-        for (var groupIndex = 0; groupIndex < actualMatch.Groups.Count; ++groupIndex)
-        {
-            var actualGroup = actualMatch.Groups[groupIndex];
-            var expectedGroup = groupIndex < expectedGroups.Count
-                ? expectedGroups[groupIndex]
-                : ExpectedGroup.Unset;
-
-            Assert.That(actualGroup.Success, Is.EqualTo(expectedGroup.IsMatch));
-
-            if (expectedGroup.IsMatch)
-            {
-                var expectedValue = pattern.SubjectLiteral
-                    ? expectedGroup.Value
-                    : expectedGroup.Value.UnescapeGroup();
-
-                CompareGroupsAssert(Encoding.UTF8.GetString(actualGroup.Value.ToArray()), expectedValue);
+                CompareGroupsAssert(encoding.GetString(actualGroup.Value.ToArray()), expectedValue);
             }
         }
     }
@@ -429,11 +403,8 @@ public class PcreTests
     private static void CompareMark(PcreRefMatch actualMatch, ExpectedMatch expectedMatch)
         => Assert.That(actualMatch.Mark.ToString(), Is.EqualTo(expectedMatch.Mark?.UnescapeGroup() ?? string.Empty));
 
-    private static void CompareMark(PcreRefMatch8Bit actualMatch, ExpectedMatch expectedMatch)
-        => Assert.That(TestSupport.Latin1Encoding.GetString(actualMatch.Mark.ToArray()), Is.EqualTo(expectedMatch.Mark?.UnescapeGroup() ?? string.Empty));
-
-    private static void CompareMark(PcreRefMatchUtf8 actualMatch, ExpectedMatch expectedMatch)
-        => Assert.That(Encoding.UTF8.GetString(actualMatch.Mark.ToArray()), Is.EqualTo(expectedMatch.Mark?.UnescapeGroup() ?? string.Empty));
+    private static void CompareMark(PcreRefMatch8Bit actualMatch, ExpectedMatch expectedMatch, Encoding encoding)
+        => Assert.That(encoding.GetString(actualMatch.Mark.ToArray()), Is.EqualTo(expectedMatch.Mark?.UnescapeGroup() ?? string.Empty));
 
     private static void CompareRemainingString(PcreMatch actualMatch, ExpectedMatch expectedMatch)
         => Assert.That(actualMatch.Subject.Substring(actualMatch.Index + actualMatch.Length), Is.EqualTo(expectedMatch.RemainingString?.UnescapeGroup()));
@@ -441,11 +412,8 @@ public class PcreTests
     private static void CompareRemainingString(PcreRefMatch actualMatch, ExpectedMatch expectedMatch)
         => Assert.That(actualMatch.Subject.Slice(actualMatch.Index + actualMatch.Length).ToString(), Is.EqualTo(expectedMatch.RemainingString?.UnescapeGroup()));
 
-    private static void CompareRemainingString(PcreRefMatch8Bit actualMatch, ExpectedMatch expectedMatch)
-        => Assert.That(TestSupport.Latin1Encoding.GetString(actualMatch.Subject.Slice(actualMatch.Index + actualMatch.Length).ToArray()), Is.EqualTo(expectedMatch.RemainingString?.UnescapeGroup()));
-
-    private static void CompareRemainingString(PcreRefMatchUtf8 actualMatch, ExpectedMatch expectedMatch)
-        => Assert.That(Encoding.UTF8.GetString(actualMatch.Subject.Slice(actualMatch.Index + actualMatch.Length).ToArray()), Is.EqualTo(expectedMatch.RemainingString?.UnescapeGroup()));
+    private static void CompareRemainingString(PcreRefMatch8Bit actualMatch, ExpectedMatch expectedMatch, Encoding encoding)
+        => Assert.That(encoding.GetString(actualMatch.Subject.Slice(actualMatch.Index + actualMatch.Length).ToArray()), Is.EqualTo(expectedMatch.RemainingString?.UnescapeGroup()));
 
     private class PcreTestsSource : IEnumerable<ITestCaseData>
     {

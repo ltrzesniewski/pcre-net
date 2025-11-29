@@ -264,28 +264,6 @@ public class PcreRefMatchTests
     }
 
     [Test]
-    public void should_have_undefined_value_in_default_utf8_match()
-    {
-        var match = default(PcreRefMatchUtf8);
-
-        Assert.That(match.Success, Is.False);
-        Assert.That(match.CaptureCount, Is.EqualTo(0));
-        Assert.That(match.Value.IsEmpty);
-        Assert.That(match.Index, Is.EqualTo(-1));
-        Assert.That(match.EndIndex, Is.EqualTo(-1));
-        Assert.That(match.Length, Is.EqualTo(0));
-        Assert.That(match.IsPartialMatch, Is.False);
-        Assert.That(match.Mark.Length, Is.EqualTo(0));
-
-        Assert.That(match[0].Success, Is.False);
-        Assert.That(match[0].IsDefined, Is.False);
-        Assert.That(match[0].Value.IsEmpty);
-        Assert.That(match[0].Index, Is.EqualTo(-1));
-        Assert.That(match[0].EndIndex, Is.EqualTo(-1));
-        Assert.That(match[0].Length, Is.EqualTo(0));
-    }
-
-    [Test]
     public void should_have_undefined_value_in_default_8bit_match()
     {
         var match = default(PcreRefMatch8Bit);
@@ -412,17 +390,6 @@ public class PcreRefMatchTests
     }
 
     [Test]
-    public void should_support_indexed_groups_on_default_match_utf8()
-    {
-        var match = default(PcreRefMatchUtf8);
-        var groupA = match[0];
-        var groupB = match.Groups[0];
-
-        Assert.That(groupA.IsDefined, Is.False);
-        Assert.That(groupB.IsDefined, Is.False);
-    }
-
-    [Test]
     public void should_support_indexed_groups_on_default_match_8bit()
     {
         var match = default(PcreRefMatch8Bit);
@@ -437,17 +404,6 @@ public class PcreRefMatchTests
     public void should_support_named_groups_on_default_match()
     {
         var match = default(PcreRefMatch);
-        var groupA = match["foo"];
-        var groupB = match.Groups["foo"];
-
-        Assert.That(groupA.IsDefined, Is.False);
-        Assert.That(groupB.IsDefined, Is.False);
-    }
-
-    [Test]
-    public void should_support_named_groups_on_default_match_utf8()
-    {
-        var match = default(PcreRefMatchUtf8);
         var groupA = match["foo"];
         var groupB = match.Groups["foo"];
 
@@ -477,16 +433,6 @@ public class PcreRefMatchTests
     }
 
     [Test]
-    public void should_support_duplicated_named_groups_on_default_match_utf8()
-    {
-        var match = default(PcreRefMatchUtf8);
-        var enumerator = match.GetDuplicateNamedGroups("foo").GetEnumerator();
-
-        Assert.That(enumerator.MoveNext(), Is.False);
-        Assert.That(enumerator.MoveNext(), Is.False);
-    }
-
-    [Test]
     public void should_support_duplicated_named_groups_on_default_match_8bit()
     {
         var match = default(PcreRefMatch8Bit);
@@ -500,19 +446,6 @@ public class PcreRefMatchTests
     public void should_support_group_enumeration_on_default_match()
     {
         var match = default(PcreRefMatch);
-        var enumerator = match.GetEnumerator();
-
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.Current.Success, Is.False);
-
-        Assert.That(enumerator.MoveNext(), Is.False);
-        Assert.That(enumerator.MoveNext(), Is.False);
-    }
-
-    [Test]
-    public void should_support_group_enumeration_on_default_match_utf8()
-    {
-        var match = default(PcreRefMatchUtf8);
         var enumerator = match.GetEnumerator();
 
         Assert.That(enumerator.MoveNext(), Is.True);

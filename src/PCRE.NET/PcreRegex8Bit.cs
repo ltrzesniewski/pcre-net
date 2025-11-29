@@ -9,7 +9,7 @@ namespace PCRE;
 /// A PCRE regular expression for the 8-bit PCRE2 library.
 /// </summary>
 /// <seealso cref="PcreRegex8Bit"/>
-public sealed partial class PcreRegex8Bit
+public partial class PcreRegex8Bit
 {
     internal InternalRegex8Bit InternalRegex { get; }
 
@@ -55,5 +55,10 @@ public sealed partial class PcreRegex8Bit
             throw new ArgumentNullException(nameof(encoding));
 
         InternalRegex = new InternalRegex8Bit(pattern, InternalRegex8Bit.GetString(pattern, encoding), settings, 0, encoding);
+    }
+
+    private protected PcreRegex8Bit(InternalRegex8Bit internalRegex)
+    {
+        InternalRegex = internalRegex;
     }
 }
