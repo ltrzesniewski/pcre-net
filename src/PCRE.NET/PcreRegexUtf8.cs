@@ -9,8 +9,8 @@ namespace PCRE;
 /// A PCRE regular expression for UTF-8.
 /// </summary>
 /// <remarks>
-/// This inherits from <see cref="PcreRegex8Bit"/> just for convenience.
-/// It forces the encoding to UTF-8 and adds the <see cref="PcreOptions.Utf"/> option.
+/// This inherits from <see cref="PcreRegex8Bit"/> and is provided for convenience.
+/// It forces the encoding to <see cref="Encoding.UTF8"/> and adds the <see cref="PcreOptions.Utf"/> option.
 /// </remarks>
 /// <seealso cref="PcreRegex8Bit"/>
 public sealed class PcreRegexUtf8 : PcreRegex8Bit

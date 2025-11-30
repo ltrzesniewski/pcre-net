@@ -11,7 +11,7 @@
 
 PCRE.NET is a .NET wrapper for the [PCRE2 library](https://github.com/PCRE2Project/pcre2).
 
-The library provides variants for UTF-16 (`string` and `ReadOnlySpan<char>`) and UTF-8 (`ReadOnlySpan<byte>`).
+The library provides variants for UTF-16 (.NET `string` and `ReadOnlySpan<char>`) and 8-bit encodings such as UTF-8 (`ReadOnlySpan<byte>`).
 
 The following systems are supported:
 
@@ -56,13 +56,13 @@ These methods return a `ref struct` type when possible, but are otherwise simila
 
 This is the fastest matching API the library provides.
 
-Call the `CreateMatchBuffer` method on a `PcreRegex` or `PcreRegexUtf8` instance to create the necessary data structures up-front, then use the returned _match buffer_ for subsequent match operations. Performing a match through this buffer will not allocate further memory, reducing GC pressure and optimizing the process.
+Call the `CreateMatchBuffer` method on a `PcreRegex` or `PcreRegex8Bit`/`PcreRegexUtf8` instance to create the necessary data structures up-front, then use the returned _match buffer_ for subsequent match operations. Performing a match through this buffer will not allocate further memory, reducing GC pressure and optimizing the process.
 
 The downside of this approach is that the returned match buffer is _not_ thread-safe and _not_ reentrant: you _cannot_ perform a match operation with a buffer which is already being used - match operations need to be sequential.
 
 It is also counter-productive to allocate a match buffer to perform a single match operation. Use this API if you need to match a pattern against many subject strings.
 
-`PcreMatchBuffer` objects are disposable (and finalizable in case they're not disposed). They provide an API for matching against `ReadOnlySpan<char>` subjects. The same applies for `PcreMatchBufferUtf8` objects on `ReadOnlySpan<byte>` subjects 
+`PcreMatchBuffer` objects are disposable (and finalizable in case they're not disposed). They provide an API for matching against `ReadOnlySpan<char>` subjects. The same applies for `PcreMatchBuffer8Bit` objects on `ReadOnlySpan<byte>` subjects.
 
 If you're looking for maximum speed, consider using the following options:
 
@@ -70,11 +70,13 @@ If you're looking for maximum speed, consider using the following options:
 - `PcreMatchOptions.NoUtfCheck` at match time to skip the Unicode validity check: by default PCRE2 scans the entire input string to make sure it's valid Unicode.
 - `PcreOptions.MatchInvalidUtf` at compile time if you plan to use `PcreMatchOptions.NoUtfCheck` and your subject strings may contain invalid Unicode sequences.
 
-### The UTF-8 API
+### The 8-bit and UTF-8 APIs
 
-`PcreRegexUtf8` objects handle UTF-8 text provided as `ReadOnlySpan<byte>`.
+The `PcreRegex8Bit` class handles text provided as `ReadOnlySpan<byte>`. It requires an `Encoding` instance to interpret the byte sequences and turn them into .NET strings for usages such as easy handling of named groups as .NET strings. When in doubt, with one byte per character encodings, you can use ISO-8859-1 (`Encoding.Latin1`).
 
-A Span API similar to the one mentioned above is provided, with the following methods:
+`PcreRegexUtf8` is a specialization of `PcreRegex8Bit` which handles the input as UTF-8 encoded text. It is provided for convenience, as UTF-8 usage is very common. You could achieve the same result by using `PcreRegex8Bit` with `Encoding.UTF8` and the `PcreOptions.Utf` flag.
+
+A Span API similar to the one mentioned above is provided with the following methods:
 
 - `Matches`
 - `Match`
@@ -93,7 +95,7 @@ You can read more about its features in [the PCRE2 documentation](https://pcre2p
 
 ## Library highlights
 
-- Support for UTF-8 and UTF-16
+- Support for UTF-8 and UTF-16. Other 8-bit encodings are also supported.
 - Support for compiled patterns (x86/x64/arm64 JIT)
 - Support for partial matching (when the subject is too short to match the pattern)
 - Callout support (numbered and string-based)
