@@ -19,7 +19,7 @@
     <IsPackable>true</IsPackable>
     <PackageId>PCRE.NET</PackageId>
     <Title>PCRE.NET - Perl Compatible Regular Expressions for .NET</Title>
-    <Authors>Philip Hazel;Zoltan Herczeg;Lucas Trzesniewski</Authors>
+    <Authors>Lucas Trzesniewski</Authors>
     <Copyright>Copyright © Lucas Trzesniewski 2014-$([System.DateTime]::Now.ToString('yyyy'))</Copyright>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
     <RequireLicenseAcceptance>true</RequireLicenseAcceptance>
