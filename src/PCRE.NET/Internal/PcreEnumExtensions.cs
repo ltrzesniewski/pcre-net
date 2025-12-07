@@ -6,7 +6,7 @@ internal static class PcreEnumExtensions
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static uint ToPatternOptions(this PcreOptions options)
-        => (uint)((long)options & 0xFFFFFFFF) | PcreConstants.PCRE2_UTF;
+        => (uint)((long)options & 0xFFFFFFFF);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static uint ToPatternOptions(this PcreMatchOptions options)

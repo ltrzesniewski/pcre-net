@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
+using PCRE.Tests.Support;
 
 namespace PCRE.Tests.PcreNet;
 
@@ -12,6 +13,16 @@ public class PcreRegexTests
     public void should_throw_on_null_pattern()
     {
         Assert.Throws<ArgumentNullException>(() => _ = new PcreRegex(default(string)!));
+        Assert.Throws<ArgumentNullException>(() => _ = new PcreRegex(default(string)!, PcreOptions.None));
+        Assert.Throws<ArgumentNullException>(() => _ = new PcreRegex(default(string)!, new PcreRegexSettings()));
+    }
+
+    [Test]
+    public void should_throw_on_null_pattern_utf8()
+    {
+        Assert.Throws<ArgumentNullException>(() => _ = new PcreRegexUtf8(default(string)!));
+        Assert.Throws<ArgumentNullException>(() => _ = new PcreRegexUtf8(default(string)!, PcreOptions.None));
+        Assert.Throws<ArgumentNullException>(() => _ = new PcreRegexUtf8(default(string)!, new PcreRegexSettings()));
     }
 
     [Test]
@@ -21,9 +32,36 @@ public class PcreRegexTests
     }
 
     [Test]
+    public void should_throw_on_null_settings_utf8()
+    {
+        Assert.Throws<ArgumentNullException>(() => _ = new PcreRegexUtf8("a"u8, default(PcreRegexSettings)!));
+        Assert.Throws<ArgumentNullException>(() => _ = new PcreRegexUtf8("a", default(PcreRegexSettings)!));
+    }
+
+    [Test]
+    public void should_throw_on_null_settings_8bit()
+    {
+        Assert.Throws<ArgumentNullException>(() => _ = TestSupport.CreatePcreRegex8Bit("a".ToLatin1Bytes(), default(PcreRegexSettings)!));
+    }
+
+    [Test]
     public void should_return_pattern_string()
     {
         var re = new PcreRegex("foo|bar");
+        Assert.That(re.ToString(), Is.EqualTo("foo|bar"));
+    }
+
+    [Test]
+    public void should_return_pattern_string_utf8()
+    {
+        var re = new PcreRegexUtf8("foo|bar"u8);
+        Assert.That(re.ToString(), Is.EqualTo("foo|bar"));
+    }
+
+    [Test]
+    public void should_return_pattern_string_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit("foo|bar".ToLatin1Bytes());
         Assert.That(re.ToString(), Is.EqualTo("foo|bar"));
     }
 
@@ -37,6 +75,24 @@ public class PcreRegexTests
     }
 
     [Test]
+    [TestCase(10u, ExpectedResult = true)]
+    [TestCase(3u, ExpectedResult = true)]
+    [TestCase(2u, ExpectedResult = false)]
+    public bool should_limit_max_pattern_length_utf8(uint maxLength)
+    {
+        return TryCompilePatternUtf8("foo"u8, new PcreRegexSettings { MaxPatternLength = maxLength }) is not null;
+    }
+
+    [Test]
+    [TestCase(10u, ExpectedResult = true)]
+    [TestCase(3u, ExpectedResult = true)]
+    [TestCase(2u, ExpectedResult = false)]
+    public bool should_limit_max_pattern_length_8bit(uint maxLength)
+    {
+        return TryCompilePattern8Bit("foo".ToLatin1Bytes(), new PcreRegexSettings { MaxPatternLength = maxLength }) is not null;
+    }
+
+    [Test]
     [TestCase(1000u, ExpectedResult = true)]
     [TestCase(2u, ExpectedResult = false)]
     public bool should_limit_max_compiled_pattern_length(uint maxLength)
@@ -45,7 +101,32 @@ public class PcreRegexTests
         if (re is null)
             return false;
 
-        Console.WriteLine(re.PatternInfo.PatternSize);
+        Assert.That(re.PatternInfo.PatternSize, Is.LessThanOrEqualTo(maxLength));
+        return true;
+    }
+
+    [Test]
+    [TestCase(1000u, ExpectedResult = true)]
+    [TestCase(2u, ExpectedResult = false)]
+    public bool should_limit_max_compiled_pattern_length_utf8(uint maxLength)
+    {
+        var re = TryCompilePatternUtf8("foo"u8, new PcreRegexSettings { MaxPatternCompiledLength = maxLength });
+        if (re is null)
+            return false;
+
+        Assert.That(re.PatternInfo.PatternSize, Is.LessThanOrEqualTo(maxLength));
+        return true;
+    }
+
+    [Test]
+    [TestCase(1000u, ExpectedResult = true)]
+    [TestCase(2u, ExpectedResult = false)]
+    public bool should_limit_max_compiled_pattern_length_8bit(uint maxLength)
+    {
+        var re = TryCompilePattern8Bit("foo".ToLatin1Bytes(), new PcreRegexSettings { MaxPatternCompiledLength = maxLength });
+        if (re is null)
+            return false;
+
         Assert.That(re.PatternInfo.PatternSize, Is.LessThanOrEqualTo(maxLength));
         return true;
     }
@@ -56,9 +137,32 @@ public class PcreRegexTests
         {
             return new PcreRegex(pattern, settings);
         }
-        catch (PcrePatternException ex)
+        catch (PcrePatternException)
         {
-            Console.WriteLine(ex.Message);
+            return null;
+        }
+    }
+
+    private static PcreRegexUtf8? TryCompilePatternUtf8(ReadOnlySpan<byte> pattern, PcreRegexSettings settings)
+    {
+        try
+        {
+            return new PcreRegexUtf8(pattern, settings);
+        }
+        catch (PcrePatternException)
+        {
+            return null;
+        }
+    }
+
+    private static PcreRegex8Bit? TryCompilePattern8Bit(ReadOnlySpan<byte> pattern, PcreRegexSettings settings)
+    {
+        try
+        {
+            return new PcreRegex8Bit(pattern, TestSupport.Latin1Encoding, settings);
+        }
+        catch (PcrePatternException)
+        {
             return null;
         }
     }

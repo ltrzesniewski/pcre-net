@@ -14,9 +14,9 @@ namespace PCRE.Dfa;
 /// </remarks>
 public sealed class PcreDfaRegex
 {
-    private readonly InternalRegex _regex;
+    private readonly InternalRegex16Bit _regex;
 
-    internal PcreDfaRegex(InternalRegex regex)
+    internal PcreDfaRegex(InternalRegex16Bit regex)
     {
         _regex = regex;
     }

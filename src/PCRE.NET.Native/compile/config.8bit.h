@@ -1,0 +1,3 @@
+
+#define HAVE_CONFIG_H
+#define PCRE2_CODE_UNIT_WIDTH 8

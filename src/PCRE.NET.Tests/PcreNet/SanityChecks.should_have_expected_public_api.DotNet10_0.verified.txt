@@ -136,6 +136,10 @@ namespace PCRE
     }
     public class PcreCalloutException : PCRE.PcreMatchException
     {
+        public PcreCalloutException() { }
+        public PcreCalloutException(PCRE.PcreErrorCode errorCode) { }
+        public PcreCalloutException(string message) { }
+        public PcreCalloutException(PCRE.PcreErrorCode errorCode, string message) { }
         public PcreCalloutException(string message, System.Exception? innerException) { }
         public PcreCalloutException(PCRE.PcreErrorCode errorCode, string message, System.Exception? innerException) { }
     }
@@ -355,8 +359,11 @@ namespace PCRE
     }
     public class PcreException : System.Exception
     {
+        public PcreException() { }
         public PcreException(PCRE.PcreErrorCode errorCode) { }
+        public PcreException(string message) { }
         public PcreException(PCRE.PcreErrorCode errorCode, string message) { }
+        public PcreException(string message, System.Exception? innerException) { }
         public PcreException(PCRE.PcreErrorCode errorCode, string message, System.Exception? innerException) { }
         public PCRE.PcreErrorCode ErrorCode { get; }
     }
@@ -458,9 +465,42 @@ namespace PCRE
             public bool MoveNext() { }
         }
     }
+    public sealed class PcreMatchBuffer8Bit : System.IDisposable
+    {
+        public void Dispose() { }
+        protected override void Finalize() { }
+        public bool IsMatch(System.ReadOnlySpan<byte> subject) { }
+        public bool IsMatch(System.ReadOnlySpan<byte> subject, int startIndex) { }
+        public PCRE.PcreRefMatch8Bit Match(System.ReadOnlySpan<byte> subject) { }
+        public PCRE.PcreRefMatch8Bit Match(System.ReadOnlySpan<byte> subject, PCRE.PcreMatchOptions options) { }
+        public PCRE.PcreRefMatch8Bit Match(System.ReadOnlySpan<byte> subject, PCRE.PcreRefCalloutFunc8Bit? onCallout) { }
+        public PCRE.PcreRefMatch8Bit Match(System.ReadOnlySpan<byte> subject, int startIndex) { }
+        public PCRE.PcreRefMatch8Bit Match(System.ReadOnlySpan<byte> subject, PCRE.PcreMatchOptions options, PCRE.PcreRefCalloutFunc8Bit? onCallout) { }
+        public PCRE.PcreRefMatch8Bit Match(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreMatchOptions options) { }
+        public PCRE.PcreRefMatch8Bit Match(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreRefCalloutFunc8Bit? onCallout) { }
+        public PCRE.PcreRefMatch8Bit Match(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreMatchOptions options, PCRE.PcreRefCalloutFunc8Bit? onCallout) { }
+        public PCRE.PcreMatchBuffer8Bit.RefMatchEnumerable Matches(System.ReadOnlySpan<byte> subject) { }
+        public PCRE.PcreMatchBuffer8Bit.RefMatchEnumerable Matches(System.ReadOnlySpan<byte> subject, int startIndex) { }
+        public PCRE.PcreMatchBuffer8Bit.RefMatchEnumerable Matches(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreRefCalloutFunc8Bit? onCallout) { }
+        public PCRE.PcreMatchBuffer8Bit.RefMatchEnumerable Matches(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreMatchOptions options, PCRE.PcreRefCalloutFunc8Bit? onCallout) { }
+        public override string ToString() { }
+        public readonly ref struct RefMatchEnumerable
+        {
+            public PCRE.PcreMatchBuffer8Bit.RefMatchEnumerator GetEnumerator() { }
+        }
+        public ref struct RefMatchEnumerator
+        {
+            public PCRE.PcreRefMatch8Bit Current { get; }
+            public bool MoveNext() { }
+        }
+    }
     public class PcreMatchException : PCRE.PcreException
     {
+        public PcreMatchException() { }
         public PcreMatchException(PCRE.PcreErrorCode errorCode) { }
+        public PcreMatchException(string message) { }
+        public PcreMatchException(PCRE.PcreErrorCode errorCode, string message) { }
+        public PcreMatchException(string message, System.Exception? innerException) { }
         public PcreMatchException(PCRE.PcreErrorCode errorCode, string message, System.Exception? innerException) { }
     }
     [System.Flags]
@@ -554,7 +594,11 @@ namespace PCRE
     }
     public class PcrePatternException : PCRE.PcreException
     {
+        public PcrePatternException() { }
+        public PcrePatternException(string message) { }
         public PcrePatternException(PCRE.PcreErrorCode errorCode, string message) { }
+        public PcrePatternException(string message, System.Exception? innerException) { }
+        public PcrePatternException(PCRE.PcreErrorCode errorCode, string message, System.Exception? innerException) { }
     }
     public sealed class PcrePatternInfo
     {
@@ -606,7 +650,24 @@ namespace PCRE
         public string? String { get; }
         public int StringOffset { get; }
     }
+    public ref struct PcreRefCallout8Bit
+    {
+        public bool Backtrack { get; }
+        public int CurrentOffset { get; }
+        public PCRE.PcreCalloutInfo Info { get; }
+        public int LastCapture { get; }
+        public PCRE.PcreRefMatch8Bit Match { get; }
+        public int MaxCapture { get; }
+        public int NextPatternItemLength { get; }
+        public int Number { get; }
+        public int PatternPosition { get; }
+        public bool StartMatch { get; }
+        public int StartOffset { get; }
+        public string? String { get; }
+        public int StringOffset { get; }
+    }
     public delegate PCRE.PcreCalloutResult PcreRefCalloutFunc(PCRE.PcreRefCallout callout);
+    public delegate PCRE.PcreCalloutResult PcreRefCalloutFunc8Bit(PCRE.PcreRefCallout8Bit callout);
     [System.Diagnostics.DebuggerTypeProxy(typeof(PCRE.PcreRefGroup.DebugProxy))]
     public readonly ref struct PcreRefGroup
     {
@@ -619,6 +680,18 @@ namespace PCRE
         public override string ToString() { }
         public static string op_Implicit(PCRE.PcreRefGroup group) { }
         public delegate T Func<out T>(PCRE.PcreRefGroup group);
+    }
+    public readonly ref struct PcreRefGroup8Bit
+    {
+        public int EndIndex { get; }
+        public int Index { get; }
+        public bool IsDefined { get; }
+        public int Length { get; }
+        public bool Success { get; }
+        public System.ReadOnlySpan<byte> Value { get; }
+        public override string ToString() { }
+        public static string op_Explicit(PCRE.PcreRefGroup8Bit group) { }
+        public delegate T Func<out T>(PCRE.PcreRefGroup8Bit group);
     }
     [System.Diagnostics.DebuggerTypeProxy(typeof(PCRE.PcreRefMatch.DebugProxy))]
     public ref struct PcreRefMatch
@@ -663,6 +736,50 @@ namespace PCRE
             public System.Collections.Generic.List<T> ToList<T>(PCRE.PcreRefGroup.Func<T> selector) { }
         }
         public delegate T Func<out T>(PCRE.PcreRefMatch match);
+    }
+    [System.Diagnostics.DebuggerTypeProxy(typeof(PCRE.PcreRefMatch8Bit.DebugProxy))]
+    public ref struct PcreRefMatch8Bit
+    {
+        public int CaptureCount { get; }
+        public int EndIndex { get; }
+        public PCRE.PcreRefMatch8Bit.GroupList Groups { get; }
+        public int Index { get; }
+        public bool IsPartialMatch { get; }
+        public PCRE.PcreRefGroup8Bit this[int index] { get; }
+        public PCRE.PcreRefGroup8Bit this[string name] { get; }
+        public int Length { get; }
+        public System.ReadOnlySpan<byte> Mark { get; }
+        public bool Success { get; }
+        public System.ReadOnlySpan<byte> Value { get; }
+        public PCRE.PcreRefMatch8Bit.DuplicateNamedGroupEnumerable GetDuplicateNamedGroups(string name) { }
+        public PCRE.PcreRefMatch8Bit.GroupEnumerator GetEnumerator() { }
+        public override string ToString() { }
+        public bool TryGetGroup(int index, out PCRE.PcreRefGroup8Bit result) { }
+        public bool TryGetGroup(string name, out PCRE.PcreRefGroup8Bit result) { }
+        public readonly ref struct DuplicateNamedGroupEnumerable
+        {
+            public PCRE.PcreRefMatch8Bit.DuplicateNamedGroupEnumerator GetEnumerator() { }
+            public System.Collections.Generic.List<T> ToList<T>(PCRE.PcreRefGroup8Bit.Func<T> selector) { }
+        }
+        public ref struct DuplicateNamedGroupEnumerator
+        {
+            public PCRE.PcreRefGroup8Bit Current { get; }
+            public bool MoveNext() { }
+        }
+        public ref struct GroupEnumerator
+        {
+            public PCRE.PcreRefGroup8Bit Current { get; }
+            public bool MoveNext() { }
+        }
+        public readonly ref struct GroupList
+        {
+            public int Count { get; }
+            public PCRE.PcreRefGroup8Bit this[int index] { get; }
+            public PCRE.PcreRefGroup8Bit this[string name] { get; }
+            public PCRE.PcreRefMatch8Bit.GroupEnumerator GetEnumerator() { }
+            public System.Collections.Generic.List<T> ToList<T>(PCRE.PcreRefGroup8Bit.Func<T> selector) { }
+        }
+        public delegate T Func<out T>(PCRE.PcreRefMatch8Bit match);
     }
     public sealed class PcreRegex
     {
@@ -768,6 +885,42 @@ namespace PCRE
             public bool MoveNext() { }
         }
     }
+    public class PcreRegex8Bit
+    {
+        public PcreRegex8Bit(System.ReadOnlySpan<byte> pattern, System.Text.Encoding encoding) { }
+        public PcreRegex8Bit(System.ReadOnlySpan<byte> pattern, System.Text.Encoding encoding, PCRE.PcreOptions options) { }
+        public PcreRegex8Bit(System.ReadOnlySpan<byte> pattern, System.Text.Encoding encoding, PCRE.PcreRegexSettings settings) { }
+        public System.Text.Encoding Encoding { get; }
+        public PCRE.PcrePatternInfo PatternInfo { get; }
+        public PCRE.PcreMatchBuffer8Bit CreateMatchBuffer() { }
+        public PCRE.PcreMatchBuffer8Bit CreateMatchBuffer(PCRE.PcreMatchSettings settings) { }
+        public bool IsMatch(System.ReadOnlySpan<byte> subject) { }
+        public bool IsMatch(System.ReadOnlySpan<byte> subject, int startIndex) { }
+        public PCRE.PcreRefMatch8Bit Match(System.ReadOnlySpan<byte> subject) { }
+        public PCRE.PcreRefMatch8Bit Match(System.ReadOnlySpan<byte> subject, PCRE.PcreMatchOptions options) { }
+        public PCRE.PcreRefMatch8Bit Match(System.ReadOnlySpan<byte> subject, PCRE.PcreRefCalloutFunc8Bit? onCallout) { }
+        public PCRE.PcreRefMatch8Bit Match(System.ReadOnlySpan<byte> subject, int startIndex) { }
+        public PCRE.PcreRefMatch8Bit Match(System.ReadOnlySpan<byte> subject, PCRE.PcreMatchOptions options, PCRE.PcreRefCalloutFunc8Bit? onCallout) { }
+        public PCRE.PcreRefMatch8Bit Match(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreMatchOptions options) { }
+        public PCRE.PcreRefMatch8Bit Match(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreRefCalloutFunc8Bit? onCallout) { }
+        public PCRE.PcreRefMatch8Bit Match(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreMatchOptions options, PCRE.PcreRefCalloutFunc8Bit? onCallout) { }
+        public PCRE.PcreRefMatch8Bit Match(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreMatchOptions options, PCRE.PcreRefCalloutFunc8Bit? onCallout, PCRE.PcreMatchSettings settings) { }
+        public PCRE.PcreRegex8Bit.RefMatchEnumerable Matches(System.ReadOnlySpan<byte> subject) { }
+        public PCRE.PcreRegex8Bit.RefMatchEnumerable Matches(System.ReadOnlySpan<byte> subject, int startIndex) { }
+        public PCRE.PcreRegex8Bit.RefMatchEnumerable Matches(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreRefCalloutFunc8Bit? onCallout) { }
+        public PCRE.PcreRegex8Bit.RefMatchEnumerable Matches(System.ReadOnlySpan<byte> subject, int startIndex, PCRE.PcreMatchOptions options, PCRE.PcreRefCalloutFunc8Bit? onCallout, PCRE.PcreMatchSettings settings) { }
+        public override string ToString() { }
+        public readonly ref struct RefMatchEnumerable
+        {
+            public PCRE.PcreRegex8Bit.RefMatchEnumerator GetEnumerator() { }
+            public System.Collections.Generic.List<T> ToList<T>(PCRE.PcreRefMatch8Bit.Func<T> selector) { }
+        }
+        public ref struct RefMatchEnumerator
+        {
+            public PCRE.PcreRefMatch8Bit Current { get; }
+            public bool MoveNext() { }
+        }
+    }
     public sealed class PcreRegexSettings
     {
         public PcreRegexSettings() { }
@@ -781,6 +934,15 @@ namespace PCRE
         public System.Collections.Generic.IList<PCRE.PcreOptimizationDirective> OptimizationDirectives { get; }
         public PCRE.PcreOptions Options { get; set; }
         public uint ParensLimit { get; set; }
+    }
+    public sealed class PcreRegexUtf8 : PCRE.PcreRegex8Bit
+    {
+        public PcreRegexUtf8(System.ReadOnlySpan<byte> pattern) { }
+        public PcreRegexUtf8(string pattern) { }
+        public PcreRegexUtf8(System.ReadOnlySpan<byte> pattern, PCRE.PcreOptions options) { }
+        public PcreRegexUtf8(System.ReadOnlySpan<byte> pattern, PCRE.PcreRegexSettings settings) { }
+        public PcreRegexUtf8(string pattern, PCRE.PcreOptions options) { }
+        public PcreRegexUtf8(string pattern, PCRE.PcreRegexSettings settings) { }
     }
     [System.Flags]
     public enum PcreSplitOptions : long
@@ -813,7 +975,11 @@ namespace PCRE
     public delegate string PcreSubstituteCaseCalloutFunc(System.ReadOnlySpan<char> input, PCRE.PcreSubstituteCase targetCase);
     public class PcreSubstituteException : PCRE.PcreException
     {
+        public PcreSubstituteException() { }
         public PcreSubstituteException(PCRE.PcreErrorCode errorCode) { }
+        public PcreSubstituteException(string message) { }
+        public PcreSubstituteException(PCRE.PcreErrorCode errorCode, string message) { }
+        public PcreSubstituteException(string message, System.Exception? innerException) { }
         public PcreSubstituteException(PCRE.PcreErrorCode errorCode, string message, System.Exception? innerException) { }
     }
     [System.Flags]

@@ -3,7 +3,7 @@
 
 typedef struct
 {
-    uint16_t* pattern;
+    PCRE2_SPTR pattern;
     uint32_t pattern_length;
     uint32_t options;
     uint32_t glob_escape;
@@ -12,7 +12,7 @@ typedef struct
 
 typedef struct
 {
-    uint16_t* output;
+    PCRE2_UCHAR* output;
     uint32_t output_length;
 } convert_result;
 
@@ -42,7 +42,7 @@ PCRENET_EXPORT(int32_t, convert)(const convert_input* input, convert_result* res
     return error_code;
 }
 
-PCRENET_EXPORT(void, convert_result_free)(uint16_t* str)
+PCRENET_EXPORT(void, convert_result_free)(PCRE2_UCHAR* str)
 {
     if (str)
         pcre2_converted_pattern_free(str);

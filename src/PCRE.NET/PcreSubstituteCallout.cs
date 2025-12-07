@@ -14,11 +14,11 @@ public delegate PcreSubstituteCalloutResult PcreSubstituteCalloutFunc(PcreSubsti
 /// <seealso cref="PcreRegex.Substitute(string,string)"/>
 public readonly unsafe ref struct PcreSubstituteCallout
 {
-    private readonly InternalRegex _regex;
+    private readonly InternalRegex16Bit _regex;
     private readonly ReadOnlySpan<char> _subject;
     private readonly Native.pcre2_substitute_callout_block* _callout;
 
-    internal PcreSubstituteCallout(InternalRegex regex,
+    internal PcreSubstituteCallout(InternalRegex16Bit regex,
                                    ReadOnlySpan<char> subject,
                                    Native.pcre2_substitute_callout_block* callout)
     {
@@ -45,7 +45,7 @@ public readonly unsafe ref struct PcreSubstituteCallout
     /// <summary>
     /// The current substitution result.
     /// </summary>
-    public ReadOnlySpan<char> Substitution => new(_callout->output + (int)_callout->output_offset_start, (int)_callout->output_offset_end - (int)_callout->output_offset_start);
+    public ReadOnlySpan<char> Substitution => new((char*)_callout->output + (int)_callout->output_offset_start, (int)_callout->output_offset_end - (int)_callout->output_offset_start);
 
     /// <summary>
     /// The total substitution count. It is 1 for the first callout, 2 for the second, and so on.

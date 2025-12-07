@@ -26,5 +26,9 @@ public enum ApiKind
 {
     String,
     Span,
-    MatchBuffer
+    MatchBuffer,
+    Utf8,
+    Utf8MatchBuffer,
+    Byte,
+    ByteMatchBuffer
 }

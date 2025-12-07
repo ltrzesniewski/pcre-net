@@ -21,7 +21,7 @@ public sealed class PcreRegexSettings
     private uint? _maxVarLookbehind;
     private PcreExtraCompileOptions _extraCompileOptions;
     private PcreJitCompileOptions _jitCompileOptions;
-    private readonly IList<PcreOptimizationDirective> _optimizationDirectives;
+    private IList<PcreOptimizationDirective>? _optimizationDirectives;
 
     /// <summary>
     /// The options to apply to the regex.
@@ -157,9 +157,9 @@ public sealed class PcreRegexSettings
     /// </summary>
     /// <remarks>
     /// By default, all available optimizations are enabled. However, in rare cases, one might wish to disable specific optimizations.
-    /// For example, if it is known that some optimizations cannot benefit a certain regex, it might be desirable to disable them, in order to speed up compilation.
+    /// For example, if it is known that some optimizations cannot benefit a certain regex, it might be desirable to disable them to speed up compilation.
     /// </remarks>
-    public IList<PcreOptimizationDirective> OptimizationDirectives => _optimizationDirectives;
+    public IList<PcreOptimizationDirective> OptimizationDirectives => _optimizationDirectives ??= new List<PcreOptimizationDirective>();
 
     internal bool ReadOnlySettings { get; }
 
@@ -168,7 +168,6 @@ public sealed class PcreRegexSettings
     /// </summary>
     public PcreRegexSettings()
     {
-        _optimizationDirectives = new List<PcreOptimizationDirective>();
     }
 
     internal PcreRegexSettings(PcreOptions options)
@@ -177,9 +176,9 @@ public sealed class PcreRegexSettings
         _options = options;
     }
 
-    private PcreRegexSettings(PcreRegexSettings settings, bool readOnly)
+    private PcreRegexSettings(PcreRegexSettings settings, bool readOnly, PcreOptions additionalOptions)
     {
-        _options = settings._options;
+        _options = settings._options | additionalOptions;
         _newLine = settings._newLine;
         _backslashR = settings._backslashR;
         _parensLimit = settings._parensLimit;
@@ -190,8 +189,10 @@ public sealed class PcreRegexSettings
         _jitCompileOptions = settings._jitCompileOptions;
 
         _optimizationDirectives = readOnly
-            ? new ReadOnlyCollection<PcreOptimizationDirective>(settings._optimizationDirectives.ToArray())
-            : settings._optimizationDirectives.ToList();
+            ? settings._optimizationDirectives?.Count is not (null or 0)
+                ? new ReadOnlyCollection<PcreOptimizationDirective>(settings._optimizationDirectives.ToArray())
+                : Array.Empty<PcreOptimizationDirective>()
+            : settings._optimizationDirectives?.ToList();
 
         ReadOnlySettings = readOnly;
     }
@@ -207,15 +208,15 @@ public sealed class PcreRegexSettings
                && MaxVarLookbehind == other.MaxVarLookbehind
                && ExtraCompileOptions == other.ExtraCompileOptions
                && JitCompileOptions == other.JitCompileOptions
-               && OptimizationDirectives.SequenceEqual(other.OptimizationDirectives);
+               && (_optimizationDirectives ?? Enumerable.Empty<PcreOptimizationDirective>()).SequenceEqual(other._optimizationDirectives ?? Enumerable.Empty<PcreOptimizationDirective>());
     }
 
-    internal PcreRegexSettings AsReadOnly()
+    internal PcreRegexSettings ToReadOnlySnapshot(PcreOptions additionalOptions)
     {
-        if (ReadOnlySettings)
+        if (ReadOnlySettings && (Options & additionalOptions) == additionalOptions)
             return this;
 
-        return new PcreRegexSettings(this, true);
+        return new PcreRegexSettings(this, true, additionalOptions);
     }
 
     private void EnsureIsMutable()
@@ -235,9 +236,9 @@ public sealed class PcreRegexSettings
         input.max_pattern_compiled_length = _maxPatternCompiledLength.GetValueOrDefault();
         input.max_var_lookbehind = MaxVarLookbehind;
         input.compile_extra_options = (uint)_extraCompileOptions;
-        input.optimization_directives_count = (uint)_optimizationDirectives.Count;
+        input.optimization_directives_count = (uint)(_optimizationDirectives?.Count ?? 0);
 
-        if (_optimizationDirectives.Count == 0)
+        if (_optimizationDirectives?.Count is null or 0)
         {
             input.optimization_directives = null;
             return null;

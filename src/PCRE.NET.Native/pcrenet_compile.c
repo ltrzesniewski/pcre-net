@@ -4,7 +4,7 @@ c_static_assert(sizeof(uint32_t) <= sizeof(PCRE2_SIZE), "Parameter size must fit
 
 typedef struct
 {
-    uint16_t* pattern;
+    PCRE2_SPTR pattern;
     uint32_t pattern_length;
     uint32_t flags;
     uint32_t flags_jit;
@@ -27,7 +27,7 @@ typedef struct
     uint32_t capture_count;
     uint32_t name_count;
     uint32_t name_entry_size;
-    uint16_t* name_entry_table;
+    PCRE2_SPTR name_entry_table;
 } pcrenet_compile_result;
 
 PCRENET_EXPORT(void, compile)(const pcrenet_compile_input* input, pcrenet_compile_result* result)

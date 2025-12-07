@@ -10,14 +10,20 @@ namespace PCRE.Internal;
 internal static unsafe class CalloutInterop
 {
 #if NET
-    private static readonly delegate* unmanaged[Cdecl]<Native.pcre2_callout_block*, void*, int> _calloutHandlerFnPtr = &CalloutHandler;
+    private static readonly delegate* unmanaged[Cdecl]<Native.pcre2_callout_block*, void*, int> _calloutHandlerFnPtr8Bit = &CalloutHandler8Bit;
+    private static readonly delegate* unmanaged[Cdecl]<Native.pcre2_callout_block*, void*, int> _calloutHandlerFnPtr16Bit = &CalloutHandler16Bit;
+
     private static readonly delegate* unmanaged[Cdecl]<Native.pcre2_callout_block*, void*, int> _substituteMatchCalloutHandlerFnPtr = &SubstituteMatchCalloutHandler;
     private static readonly delegate* unmanaged[Cdecl]<Native.pcre2_substitute_callout_block*, void*, int> _substituteCalloutHandlerFnPtr = &SubstituteCalloutHandler;
     private static readonly delegate* unmanaged[Cdecl]<char*, nuint, char*, nuint, int, void*, nuint> _substituteCaseCalloutHandlerFnPtr = &SubstituteCaseCalloutHandler;
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
-    private static int CalloutHandler(Native.pcre2_callout_block* callout, void* data)
-        => ToInteropInfo(data).Call(callout);
+    private static int CalloutHandler8Bit(Native.pcre2_callout_block* callout, void* data)
+        => ToInteropInfo<byte>(data).Call(callout);
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static int CalloutHandler16Bit(Native.pcre2_callout_block* callout, void* data)
+        => ToInteropInfo<char>(data).Call(callout);
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
     private static int SubstituteMatchCalloutHandler(Native.pcre2_callout_block* callout, void* data)
@@ -43,8 +49,10 @@ internal static unsafe class CalloutInterop
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate nuint SubstituteCaseCalloutHandlerFunc(char* input, nuint inputLength, char* output, nuint outputLength, int targetCase, void* data);
 
-    private static readonly CalloutHandlerFunc _calloutHandlerDelegate = CalloutHandler; // GC root
-    private static readonly void* _calloutHandlerFnPtr = Marshal.GetFunctionPointerForDelegate(_calloutHandlerDelegate).ToPointer();
+    private static readonly CalloutHandlerFunc _calloutHandlerDelegate8Bit = CalloutHandler8Bit; // GC root
+    private static readonly CalloutHandlerFunc _calloutHandlerDelegate16Bit = CalloutHandler16Bit; // GC root
+    private static readonly void* _calloutHandlerFnPtr8Bit = Marshal.GetFunctionPointerForDelegate(_calloutHandlerDelegate8Bit).ToPointer();
+    private static readonly void* _calloutHandlerFnPtr16Bit = Marshal.GetFunctionPointerForDelegate(_calloutHandlerDelegate16Bit).ToPointer();
 
     private static readonly SubstituteMatchCalloutHandlerFunc _substituteMatchCalloutHandlerDelegate = SubstituteMatchCalloutHandler; // GC root
     private static readonly void* _substituteMatchCalloutHandlerFnPtr = Marshal.GetFunctionPointerForDelegate(_substituteMatchCalloutHandlerDelegate).ToPointer();
@@ -55,8 +63,11 @@ internal static unsafe class CalloutInterop
     private static readonly SubstituteCaseCalloutHandlerFunc _substituteCaseCalloutHandlerDelegate = SubstituteCaseCalloutHandler; // GC root
     private static readonly void* _substituteCaseCalloutHandlerFnPtr = Marshal.GetFunctionPointerForDelegate(_substituteCaseCalloutHandlerDelegate).ToPointer();
 
-    private static int CalloutHandler(Native.pcre2_callout_block* callout, void* data)
-        => ToInteropInfo(data).Call(callout);
+    private static int CalloutHandler8Bit(Native.pcre2_callout_block* callout, void* data)
+        => ToInteropInfo<byte>(data).Call(callout);
+
+    private static int CalloutHandler16Bit(Native.pcre2_callout_block* callout, void* data)
+        => ToInteropInfo<char>(data).Call(callout);
 
     private static int SubstituteMatchCalloutHandler(Native.pcre2_callout_block* callout, void* data)
         => ToSubstituteInteropInfo(data).CallMatchCallout(callout);
@@ -68,17 +79,39 @@ internal static unsafe class CalloutInterop
         => ToSubstituteInteropInfo(data).CallSubstituteCaseCallout(input, inputLength, output, outputLength, targetCase);
 #endif
 
-    public static void Prepare(string subject,
-                               InternalRegex regex,
-                               scoped ref Native.match_input input,
-                               out CalloutInteropInfo interopInfo,
-                               Func<PcreCallout, PcreCalloutResult>? callout)
+    private delegate (string, Func<PcreCallout, PcreCalloutResult>) StringCalloutWrapper();
+
+    public static void StringToSpanCallout(string subject,
+                                           Func<PcreCallout, PcreCalloutResult>? callout,
+                                           out Delegate? spanCallout,
+                                           out nuint[]? calloutOutputVector)
+    {
+        spanCallout = callout is not null
+            ? new StringCalloutWrapper(() => (subject, callout))
+            : null;
+
+        calloutOutputVector = []; // Return an empty non-null instance to avoid allocating an unused one later.
+    }
+
+    public static void PrepareForSpan<TChar>(ReadOnlySpan<TChar> subject,
+                                             InternalRegex<TChar> regex,
+                                             scoped ref Native.match_input input,
+                                             out CalloutInteropInfo<TChar> interopInfo,
+                                             Delegate? callout,
+                                             nuint[]? calloutOutputVector)
+        where TChar : unmanaged
     {
         if (callout != null)
         {
-            interopInfo = new CalloutInteropInfo(subject, regex, callout);
+            interopInfo = new CalloutInteropInfo<TChar>(subject, regex, callout, calloutOutputVector);
 
-            input.callout = _calloutHandlerFnPtr;
+            input.callout = sizeof(TChar) switch
+            {
+                sizeof(byte) => _calloutHandlerFnPtr8Bit,
+                sizeof(char) => _calloutHandlerFnPtr16Bit,
+                _            => null
+            };
+
             input.callout_data = interopInfo.ToPointer();
         }
         else
@@ -88,18 +121,24 @@ internal static unsafe class CalloutInterop
         }
     }
 
-    public static void Prepare(ReadOnlySpan<char> subject,
-                               InternalRegex regex,
-                               scoped ref Native.match_input input,
-                               out CalloutInteropInfo interopInfo,
-                               PcreRefCalloutFunc? callout,
-                               nuint[]? calloutOutputVector)
+    public static void PrepareForBuffer<TChar>(ReadOnlySpan<TChar> subject,
+                                               IPcreMatchBuffer buffer,
+                                               scoped ref Native.buffer_match_input input,
+                                               out CalloutInteropInfo<TChar> interopInfo,
+                                               Delegate? callout)
+        where TChar : unmanaged
     {
         if (callout != null)
         {
-            interopInfo = new CalloutInteropInfo(subject, regex, callout, calloutOutputVector);
+            interopInfo = new CalloutInteropInfo<TChar>(subject, (InternalRegex<TChar>)buffer.Regex, callout, buffer.CalloutOutputVector);
 
-            input.callout = _calloutHandlerFnPtr;
+            input.callout = sizeof(TChar) switch
+            {
+                sizeof(byte) => _calloutHandlerFnPtr8Bit,
+                sizeof(char) => _calloutHandlerFnPtr16Bit,
+                _            => null
+            };
+
             input.callout_data = interopInfo.ToPointer();
         }
         else
@@ -109,17 +148,18 @@ internal static unsafe class CalloutInterop
         }
     }
 
-    public static void Prepare(ReadOnlySpan<char> subject,
-                               PcreMatchBuffer buffer,
-                               scoped ref Native.buffer_match_input input,
-                               out CalloutInteropInfo interopInfo,
-                               PcreRefCalloutFunc? callout)
+    public static void PrepareForDfa(string subject,
+                                     InternalRegex16Bit regex,
+                                     scoped ref Native.dfa_match_input input,
+                                     out CalloutInteropInfo<char> interopInfo,
+                                     Func<PcreCallout, PcreCalloutResult>? callout)
     {
         if (callout != null)
         {
-            interopInfo = new CalloutInteropInfo(subject, buffer.Regex, callout, buffer.CalloutOutputVector);
+            var wrapper = new StringCalloutWrapper(() => (subject, callout));
+            interopInfo = new CalloutInteropInfo<char>([], regex, wrapper, []);
 
-            input.callout = _calloutHandlerFnPtr;
+            input.callout = _calloutHandlerFnPtr16Bit;
             input.callout_data = interopInfo.ToPointer();
         }
         else
@@ -129,33 +169,13 @@ internal static unsafe class CalloutInterop
         }
     }
 
-    public static void Prepare(string subject,
-                               InternalRegex regex,
-                               scoped ref Native.dfa_match_input input,
-                               out CalloutInteropInfo interopInfo,
-                               Func<PcreCallout, PcreCalloutResult>? callout)
-    {
-        if (callout != null)
-        {
-            interopInfo = new CalloutInteropInfo(subject, regex, callout);
-
-            input.callout = _calloutHandlerFnPtr;
-            input.callout_data = interopInfo.ToPointer();
-        }
-        else
-        {
-            interopInfo = default;
-            input.callout = null;
-        }
-    }
-
-    public static void PrepareSubstitute(InternalRegex regex,
-                                         ReadOnlySpan<char> subject,
-                                         scoped ref Native.substitute_input input,
-                                         out SubstituteCalloutInteropInfo interopInfo,
-                                         PcreRefCalloutFunc? matchCallout,
-                                         PcreSubstituteCalloutFunc? substituteCallout,
-                                         PcreSubstituteCaseCalloutFunc? substituteCaseCallout)
+    public static void PrepareForSubstitute(InternalRegex16Bit regex,
+                                            ReadOnlySpan<char> subject,
+                                            scoped ref Native.substitute_input input,
+                                            out SubstituteCalloutInteropInfo interopInfo,
+                                            PcreRefCalloutFunc? matchCallout,
+                                            PcreSubstituteCalloutFunc? substituteCallout,
+                                            PcreSubstituteCaseCalloutFunc? substituteCaseCallout)
     {
         input.match_callout = matchCallout is not null ? _substituteMatchCalloutHandlerFnPtr : null;
         input.substitute_callout = substituteCallout is not null ? _substituteCalloutHandlerFnPtr : null;
@@ -174,7 +194,8 @@ internal static unsafe class CalloutInterop
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [SuppressMessage("ReSharper", "EntityNameCapturedOnly.Local")]
-    private static void* ToPointer(this ref CalloutInteropInfo value)
+    private static void* ToPointer<TChar>(this ref CalloutInteropInfo<TChar> value)
+        where TChar : unmanaged
     {
         Ldarg(nameof(value));
         Conv_U();
@@ -191,7 +212,8 @@ internal static unsafe class CalloutInterop
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static ref CalloutInteropInfo ToInteropInfo(void* data)
+    private static ref CalloutInteropInfo<TChar> ToInteropInfo<TChar>(void* data)
+        where TChar : unmanaged
     {
 #if NET
         IL.Push(data);
@@ -234,31 +256,19 @@ internal static unsafe class CalloutInterop
 #endif
     }
 
-    public ref struct CalloutInteropInfo
+    public ref struct CalloutInteropInfo<TChar>
+        where TChar : unmanaged
     {
-        private readonly string? _subject;
-        private readonly ReadOnlySpan<char> _subjectSpan;
-        private readonly InternalRegex _regex;
+        private readonly ReadOnlySpan<TChar> _subject;
+        private readonly InternalRegex<TChar> _regex;
         private readonly Delegate _callout;
         private readonly nuint[]? _outputVector;
 
         public Exception? Exception { get; private set; }
 
-        public CalloutInteropInfo(string subject, InternalRegex regex, Func<PcreCallout, PcreCalloutResult> callout)
+        public CalloutInteropInfo(ReadOnlySpan<TChar> subject, InternalRegex<TChar> regex, Delegate callout, nuint[]? outputVector)
         {
             _subject = subject;
-            _subjectSpan = default;
-            _regex = regex;
-            _callout = callout;
-            _outputVector = null;
-
-            Exception = null;
-        }
-
-        public CalloutInteropInfo(ReadOnlySpan<char> subject, InternalRegex regex, PcreRefCalloutFunc callout, nuint[]? outputVector)
-        {
-            _subject = null;
-            _subjectSpan = subject;
             _regex = regex;
             _callout = callout;
             _outputVector = outputVector;
@@ -271,22 +281,55 @@ internal static unsafe class CalloutInterop
         {
             try
             {
-                if (_subject != null)
-                {
-                    var func = (Func<PcreCallout, PcreCalloutResult>)_callout;
-                    return (int)func(new PcreCallout(_subject, _regex, callout));
-                }
-                else
-                {
-                    var outputVector = _outputVector ?? (
-                        callout->capture_top <= InternalRegex.MaxStackAllocCaptureCount
-                            ? stackalloc nuint[(int)callout->capture_top * 2]
-                            : Span<nuint>.Empty
-                    );
+                var outputVector = _outputVector ?? (
+                    callout->capture_top <= InternalRegex.MaxStackAllocCaptureCount
+                        ? stackalloc nuint[(int)callout->capture_top * 2]
+                        : Span<nuint>.Empty
+                );
 
-                    var func = (PcreRefCalloutFunc)_callout;
-                    return (int)func(new PcreRefCallout(_subjectSpan, _regex, callout, outputVector));
+                if (typeof(TChar) == typeof(byte))
+                {
+                    switch (_callout)
+                    {
+                        case PcreRefCalloutFunc8Bit func:
+                        {
+                            return (int)func(
+                                new PcreRefCallout8Bit(
+                                    MemoryMarshal.Cast<TChar, byte>(_subject),
+                                    (InternalRegex8Bit)(object)_regex,
+                                    callout,
+                                    outputVector
+                                )
+                            );
+                        }
+                    }
                 }
+
+                if (typeof(TChar) == typeof(char))
+                {
+                    switch (_callout)
+                    {
+                        case PcreRefCalloutFunc func:
+                        {
+                            return (int)func(
+                                new PcreRefCallout(
+                                    MemoryMarshal.Cast<TChar, char>(_subject),
+                                    (InternalRegex16Bit)(object)_regex,
+                                    callout,
+                                    outputVector
+                                )
+                            );
+                        }
+
+                        case StringCalloutWrapper wrapper:
+                        {
+                            var (subject, func) = wrapper();
+                            return (int)func(new PcreCallout(subject, _regex, callout));
+                        }
+                    }
+                }
+
+                throw new InvalidOperationException("Unreachable code path");
             }
             catch (Exception ex)
             {
@@ -298,7 +341,7 @@ internal static unsafe class CalloutInterop
 
     public ref struct SubstituteCalloutInteropInfo
     {
-        private readonly InternalRegex _regex;
+        private readonly InternalRegex16Bit _regex;
         private readonly ReadOnlySpan<char> _subject;
         private readonly PcreRefCalloutFunc? _matchCallout;
         private readonly PcreSubstituteCalloutFunc? _substituteCallout;
@@ -306,7 +349,7 @@ internal static unsafe class CalloutInterop
 
         public Exception? Exception { get; private set; }
 
-        public SubstituteCalloutInteropInfo(InternalRegex regex,
+        public SubstituteCalloutInteropInfo(InternalRegex16Bit regex,
                                             ReadOnlySpan<char> subject,
                                             PcreRefCalloutFunc? matchCallout,
                                             PcreSubstituteCalloutFunc? substituteCallout,

@@ -10,10 +10,11 @@ namespace PCRE;
 /// <summary>
 /// The result of a match.
 /// </summary>
+[ForwardTo8Bit]
 [DebuggerTypeProxy(typeof(DebugProxy))]
 public unsafe ref struct PcreRefMatch
 {
-    private readonly InternalRegex? _regex;
+    private readonly IRegexHolder16Bit? _owner; // Needs to be kept alive as long as this match is used
     internal Span<nuint> OutputVector; // Can be empty when there is no match
     private int _resultCode;
     private char* _markPtr;
@@ -26,16 +27,14 @@ public unsafe ref struct PcreRefMatch
     /// <typeparam name="T">The output value type.</typeparam>
     public delegate T Func<out T>(PcreRefMatch match);
 
-    internal PcreRefMatch(InternalRegex regex, Span<nuint> oVector)
+    [ForwardTo8Bit]
+    internal PcreRefMatch(IRegexHolder16Bit owner, Span<nuint> oVector)
     {
         // Empty match
 
-#if DEBUG
-        if (oVector.Length != 0 && oVector.Length != regex.OutputVectorSize)
-            throw new InvalidOperationException("Unexpected output vector size.");
-#endif
+        Debug.Assert(oVector.Length == 0 || oVector.Length == owner.Regex.OutputVectorSize);
 
-        _regex = regex;
+        _owner = owner;
         OutputVector = oVector;
 
         Subject = default;
@@ -43,27 +42,34 @@ public unsafe ref struct PcreRefMatch
         _resultCode = 0;
     }
 
-    internal PcreRefMatch(ReadOnlySpan<char> subject, InternalRegex regex, Span<nuint> oVector, char* mark)
+    [ForwardTo8Bit]
+    internal PcreRefMatch(ReadOnlySpan<char> subject, InternalRegex16Bit regex, Span<nuint> oVector, char* mark)
     {
         // Callout
 
         Subject = subject;
-        _regex = regex;
+        _owner = regex;
         OutputVector = oVector;
         _markPtr = mark;
 
         _resultCode = oVector.Length / 2;
     }
 
-    internal readonly bool IsInitialized => _regex != null;
+    [ForwardTo8Bit]
+    private readonly InternalRegex16Bit? Regex => _owner?.Regex;
+
+    [ForwardTo8Bit]
+    internal readonly bool IsInitialized => _owner != null;
 
     /// <inheritdoc cref="PcreMatch.CaptureCount"/>
-    public readonly int CaptureCount => _regex?.CaptureCount ?? 0;
+    [ForwardTo8Bit]
+    public readonly int CaptureCount => Regex?.CaptureCount ?? 0;
 
     /// <summary>
     /// Returns the capturing group at a given index.
     /// </summary>
     /// <param name="index">The index of the capturing group.</param>
+    [ForwardTo8Bit]
     public readonly PcreRefGroup this[int index]
         => GetGroup(index);
 
@@ -71,33 +77,40 @@ public unsafe ref struct PcreRefMatch
     /// Returns the capturing group of a given name.
     /// </summary>
     /// <param name="name">The name of the capturing group.</param>
+    [ForwardTo8Bit]
     public readonly PcreRefGroup this[string name]
         => GetGroup(name);
 
     /// <inheritdoc cref="PcreMatch.Index"/>
-    public readonly int Index => _regex is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL
+    [ForwardTo8Bit]
+    public readonly int Index => _owner is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL
         ? (int)OutputVector[0]
         : -1;
 
     /// <inheritdoc cref="PcreMatch.EndIndex"/>
-    public readonly int EndIndex => _regex is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL
+    [ForwardTo8Bit]
+    public readonly int EndIndex => _owner is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL
         ? (int)OutputVector[1]
         : -1;
 
     /// <inheritdoc cref="PcreMatch.Length"/>
-    public readonly int Length => _regex is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL && OutputVector[1] > OutputVector[0]
+    [ForwardTo8Bit]
+    public readonly int Length => _owner is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL && OutputVector[1] > OutputVector[0]
         ? (int)(OutputVector[1] - OutputVector[0])
         : 0;
 
     /// <inheritdoc cref="PcreMatch.Success"/>
+    [ForwardTo8Bit]
     public readonly bool Success => _resultCode > 0;
 
     /// <inheritdoc cref="PcreMatch.Value"/>
-    public readonly ReadOnlySpan<char> Value => _regex is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL && OutputVector[1] > OutputVector[0]
+    [ForwardTo8Bit]
+    public readonly ReadOnlySpan<char> Value => _owner is not null && _resultCode is > 0 or PcreConstants.PCRE2_ERROR_PARTIAL && OutputVector[1] > OutputVector[0]
         ? Subject.Slice((int)OutputVector[0], (int)(OutputVector[1] - OutputVector[0]))
         : ReadOnlySpan<char>.Empty;
 
     /// <inheritdoc cref="PcreMatch.Mark"/>
+    [ForwardTo8Bit]
     public readonly ReadOnlySpan<char> Mark
     {
         get
@@ -115,16 +128,20 @@ public unsafe ref struct PcreRefMatch
     }
 
     /// <inheritdoc cref="PcreMatch.Groups"/>
+    [ForwardTo8Bit]
     public readonly GroupList Groups => new(this);
 
     /// <inheritdoc cref="PcreMatch.IsPartialMatch"/>
+    [ForwardTo8Bit]
     public readonly bool IsPartialMatch => _resultCode == PcreConstants.PCRE2_ERROR_PARTIAL;
 
     /// <inheritdoc cref="PcreMatch.GetEnumerator"/>
+    [ForwardTo8Bit]
     public readonly GroupEnumerator GetEnumerator()
         => new(this);
 
     /// <inheritdoc cref="PcreMatch.TryGetGroup(int,out PCRE.PcreGroup)"/>
+    [ForwardTo8Bit]
     public readonly bool TryGetGroup(int index, out PcreRefGroup result)
     {
         result = GetGroup(index);
@@ -132,18 +149,20 @@ public unsafe ref struct PcreRefMatch
     }
 
     /// <inheritdoc cref="PcreMatch.TryGetGroup(string,out PCRE.PcreGroup)"/>
+    [ForwardTo8Bit]
     public readonly bool TryGetGroup(string name, out PcreRefGroup result)
     {
         result = GetGroup(name);
         return result.IsDefined;
     }
 
+    [ForwardTo8Bit]
     private readonly PcreRefGroup GetGroup(int index)
     {
-        if (_regex == null)
+        if (Regex is not { } regex)
             return PcreRefGroup.Undefined;
 
-        if (index < 0 || index > _regex.CaptureCount)
+        if (index < 0 || index > regex.CaptureCount)
             return PcreRefGroup.Undefined;
 
         var isAvailable = index < _resultCode || IsPartialMatch && index == 0;
@@ -160,15 +179,16 @@ public unsafe ref struct PcreRefMatch
 
         var endOffset = (int)OutputVector[index + 1];
 
-        return new PcreRefGroup(Subject, startOffset, endOffset);
+        return CreatePcreRefGroup(startOffset, endOffset);
     }
 
+    [ForwardTo8Bit]
     private readonly PcreRefGroup GetGroup(string name)
     {
-        if (_regex == null)
+        if (Regex is not { } regex)
             return PcreRefGroup.Undefined;
 
-        if (!_regex.CaptureNames.TryGetValue(name, out var indexes))
+        if (!regex.CaptureNames.TryGetValue(name, out var indexes))
             return PcreRefGroup.Undefined;
 
         if (indexes.Length == 1)
@@ -184,18 +204,23 @@ public unsafe ref struct PcreRefMatch
         return PcreRefGroup.Empty;
     }
 
+    private readonly PcreRefGroup CreatePcreRefGroup(int startOffset, int endOffset)
+        => new(Subject, startOffset, endOffset);
+
     /// <inheritdoc cref="PcreMatch.GetDuplicateNamedGroups"/>
+    [ForwardTo8Bit]
     public readonly DuplicateNamedGroupEnumerable GetDuplicateNamedGroups(string name)
     {
-        if (_regex == null)
+        if (Regex is not { } regex)
             return default;
 
-        if (!_regex.CaptureNames.TryGetValue(name, out var indexes))
+        if (!regex.CaptureNames.TryGetValue(name, out var indexes))
             return default;
 
         return new DuplicateNamedGroupEnumerable(this, indexes);
     }
 
+    [ForwardTo8Bit]
     internal void FirstMatch(ReadOnlySpan<char> subject,
                              PcreMatchSettings settings,
                              int startIndex,
@@ -203,17 +228,22 @@ public unsafe ref struct PcreRefMatch
                              PcreRefCalloutFunc? callout,
                              nuint[]? calloutOutputVector)
     {
-        _regex!.Match(
-            ref this,
+        Subject = subject;
+
+        Regex!.Match(
+            ref OutputVector,
             subject,
             settings,
             startIndex,
             options.ToPatternOptions(),
             callout,
-            calloutOutputVector
+            calloutOutputVector,
+            out _markPtr,
+            out _resultCode
         );
     }
 
+    [ForwardTo8Bit]
     internal void NextMatch(PcreMatchSettings settings,
                             PcreMatchOptions options,
                             PcreRefCalloutFunc? callout,
@@ -224,17 +254,40 @@ public unsafe ref struct PcreRefMatch
 
         OutputVector = Span<nuint>.Empty;
 
-        _regex!.Match(
-            ref this,
+        Regex!.Match(
+            ref OutputVector,
             Subject,
             settings,
             startOfNextMatchIndex,
             nextOptions,
             callout,
-            calloutOutputVector
+            calloutOutputVector,
+            out _markPtr,
+            out _resultCode
         );
     }
 
+    [ForwardTo8Bit]
+    internal void FirstMatch(PcreMatchBuffer buffer,
+                             ReadOnlySpan<char> subject,
+                             int startIndex,
+                             PcreMatchOptions options,
+                             PcreRefCalloutFunc? callout)
+    {
+        Subject = subject;
+
+        Regex!.BufferMatch(
+            Subject,
+            buffer,
+            startIndex,
+            options.ToPatternOptions(),
+            callout,
+            out _markPtr,
+            out _resultCode
+        );
+    }
+
+    [ForwardTo8Bit]
     internal void NextMatch(PcreMatchBuffer buffer,
                             PcreMatchOptions options,
                             PcreRefCalloutFunc? callout)
@@ -242,26 +295,18 @@ public unsafe ref struct PcreRefMatch
         var startOfNextMatchIndex = GetStartOfNextMatchIndex();
         var nextOptions = options.ToPatternOptions() | PcreConstants.PCRE2_NO_UTF_CHECK | (Length == 0 ? PcreConstants.PCRE2_NOTEMPTY_ATSTART : 0);
 
-        _regex!.BufferMatch(
-            ref this,
+        Regex!.BufferMatch(
             Subject,
             buffer,
             startOfNextMatchIndex,
             nextOptions,
-            callout
+            callout,
+            out _markPtr,
+            out _resultCode
         );
     }
 
-    internal void Update(ReadOnlySpan<char> subject, scoped in Native.match_result result, nuint[]? outputVector)
-    {
-        Subject = subject;
-        _markPtr = result.mark;
-        _resultCode = result.result_code;
-
-        if (outputVector != null)
-            OutputVector = outputVector;
-    }
-
+    [ForwardTo8Bit]
     private readonly int GetStartOfNextMatchIndex()
     {
         // It's possible to have EndIndex < Index
@@ -271,32 +316,41 @@ public unsafe ref struct PcreRefMatch
 
     /// <inheritdoc cref="PcreMatch.ToString"/>
     public readonly override string ToString()
-        => Value.ToString();
+    {
+        GC.KeepAlive(_owner); // Good enough place to keep the object alive, I suppose.
+        return Value.ToString();
+    }
 
     /// <summary>
     /// The list of groups in a match.
     /// </summary>
+    [ForwardTo8Bit]
     public readonly ref struct GroupList
     {
         private readonly PcreRefMatch _match;
 
+        [ForwardTo8Bit]
         internal GroupList(PcreRefMatch match)
             => _match = match;
 
         /// <summary>
         /// Returns the capture count.
         /// </summary>
-        public int Count => _match._regex?.CaptureCount + 1 ?? 0;
+        [ForwardTo8Bit]
+        public int Count => _match.Regex?.CaptureCount + 1 ?? 0;
 
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
+        [ForwardTo8Bit]
         public GroupEnumerator GetEnumerator()
             => new(_match);
 
         /// <inheritdoc cref="PcreMatch.get_Item(int)"/>
+        [ForwardTo8Bit]
         public PcreRefGroup this[int index]
             => _match[index];
 
         /// <inheritdoc cref="PcreMatch.get_Item(string)"/>
+        [ForwardTo8Bit]
         public PcreRefGroup this[string name]
             => _match[name];
 
@@ -305,6 +359,7 @@ public unsafe ref struct PcreRefMatch
         /// </summary>
         /// <param name="selector">The selector that converts a group to a list item.</param>
         /// <typeparam name="T">The type of list items.</typeparam>
+        [ForwardTo8Bit]
         [SuppressMessage("Microsoft.Design", "CA1002")]
         [SuppressMessage("Microsoft.Design", "CA1062")]
         public List<T> ToList<T>(PcreRefGroup.Func<T> selector)
@@ -321,11 +376,13 @@ public unsafe ref struct PcreRefMatch
     /// <summary>
     /// A capturing group enumerator.
     /// </summary>
+    [ForwardTo8Bit]
     public ref struct GroupEnumerator
     {
         private readonly PcreRefMatch _match;
         private int _index;
 
+        [ForwardTo8Bit]
         internal GroupEnumerator(PcreRefMatch match)
         {
             _match = match;
@@ -333,9 +390,11 @@ public unsafe ref struct PcreRefMatch
         }
 
         /// <inheritdoc cref="IEnumerator{T}.Current"/>
+        [ForwardTo8Bit]
         public readonly PcreRefGroup Current => _match[_index];
 
         /// <inheritdoc cref="IEnumerator.MoveNext"/>
+        [ForwardTo8Bit]
         public bool MoveNext()
             => ++_index <= _match.CaptureCount;
     }
@@ -343,11 +402,13 @@ public unsafe ref struct PcreRefMatch
     /// <summary>
     /// An enumerable of duplicated named groups.
     /// </summary>
+    [ForwardTo8Bit]
     public readonly ref struct DuplicateNamedGroupEnumerable
     {
         private readonly PcreRefMatch _match;
         private readonly int[]? _groupIndexes;
 
+        [ForwardTo8Bit]
         internal DuplicateNamedGroupEnumerable(PcreRefMatch match, int[] groupIndexes)
         {
             _match = match;
@@ -355,6 +416,7 @@ public unsafe ref struct PcreRefMatch
         }
 
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
+        [ForwardTo8Bit]
         public DuplicateNamedGroupEnumerator GetEnumerator()
             => new(_match, _groupIndexes);
 
@@ -363,6 +425,7 @@ public unsafe ref struct PcreRefMatch
         /// </summary>
         /// <param name="selector">The selector that converts a group to a list item.</param>
         /// <typeparam name="T">The type of list items.</typeparam>
+        [ForwardTo8Bit]
         [SuppressMessage("Microsoft.Design", "CA1002")]
         [SuppressMessage("Microsoft.Design", "CA1062")]
         public List<T> ToList<T>(PcreRefGroup.Func<T> selector)
@@ -379,12 +442,14 @@ public unsafe ref struct PcreRefMatch
     /// <summary>
     /// An enumerator of duplicated named groups.
     /// </summary>
+    [ForwardTo8Bit]
     public ref struct DuplicateNamedGroupEnumerator
     {
         private readonly PcreRefMatch _match;
         private readonly int[]? _groupIndexes;
         private int _index;
 
+        [ForwardTo8Bit]
         internal DuplicateNamedGroupEnumerator(PcreRefMatch match, int[]? groupIndexes)
         {
             _match = match;
@@ -393,9 +458,11 @@ public unsafe ref struct PcreRefMatch
         }
 
         /// <inheritdoc cref="IEnumerator{T}.Current"/>
+        [ForwardTo8Bit]
         public readonly PcreRefGroup Current => _groupIndexes != null ? _match.GetGroup(_groupIndexes[_index]) : PcreRefGroup.Undefined;
 
         /// <inheritdoc cref="IEnumerator.MoveNext"/>
+        [ForwardTo8Bit]
         public bool MoveNext()
         {
             if (_groupIndexes is null)

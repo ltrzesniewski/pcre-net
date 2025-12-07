@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using NUnit.Framework;
+using PCRE.Tests.Support;
 
 namespace PCRE.Tests.PcreNet;
 
@@ -18,6 +20,24 @@ public class IsMatchTests
     }
 
     [Test]
+    [TestCase(@"^A.*Z$")]
+    [TestCase(@"Foo$")]
+    public void should_compile_correct_pattern_utf8(string pattern)
+    {
+        _ = new PcreRegexUtf8(pattern);
+        Assert.Pass();
+    }
+
+    [Test]
+    [TestCase(@"^A.*Z$")]
+    [TestCase(@"Foo$")]
+    public void should_compile_correct_pattern_8bit(string pattern)
+    {
+        _ = new PcreRegex8Bit(pattern.ToLatin1Bytes(), TestSupport.Latin1Encoding);
+        Assert.Pass();
+    }
+
+    [Test]
     [TestCase(@"A(B")]
     [TestCase(@"A{3,2}")]
     [TestCase(@"A[B")]
@@ -28,9 +48,46 @@ public class IsMatchTests
         {
             _ = new PcreRegex(pattern);
         }
-        catch (PcrePatternException ex)
+        catch (PcrePatternException)
         {
-            Console.WriteLine(ex.Message);
+            Assert.Pass();
+        }
+
+        Assert.Fail();
+    }
+
+    [Test]
+    [TestCase(@"A(B")]
+    [TestCase(@"A{3,2}")]
+    [TestCase(@"A[B")]
+    [TestCase(@"\p{Foo}")]
+    public void should_throw_on_invalid_pattern_utf8(string pattern)
+    {
+        try
+        {
+            _ = new PcreRegexUtf8(pattern);
+        }
+        catch (PcrePatternException)
+        {
+            Assert.Pass();
+        }
+
+        Assert.Fail();
+    }
+
+    [Test]
+    [TestCase(@"A(B")]
+    [TestCase(@"A{3,2}")]
+    [TestCase(@"A[B")]
+    [TestCase(@"\p{Foo}")]
+    public void should_throw_on_invalid_pattern_8bit(string pattern)
+    {
+        try
+        {
+            _ = new PcreRegex8Bit(pattern.ToLatin1Bytes(), TestSupport.Latin1Encoding);
+        }
+        catch (PcrePatternException)
+        {
             Assert.Pass();
         }
 
@@ -52,6 +109,39 @@ public class IsMatchTests
     }
 
     [Test]
+    [TestCase(@"^A.*Z$", "AfooZ")]
+    [TestCase(@"^A(.*)Z$", "AfooZ")]
+    [TestCase(@"^\p{L}+$", "Abçdë")]
+    public void should_match_pattern_utf8(string pattern, string subjectString)
+    {
+        var subject = Encoding.UTF8.GetBytes(subjectString);
+
+        Assert.That(new PcreRegexUtf8(pattern).IsMatch(subject), Is.True);
+        Assert.That(new PcreRegexUtf8(pattern).IsMatch(subject.AsSpan()), Is.True);
+        Assert.That(new PcreRegexUtf8(pattern).CreateMatchBuffer().IsMatch(subject.AsSpan()), Is.True);
+        Assert.That(new PcreRegexUtf8(pattern, PcreOptions.Compiled).IsMatch(subject), Is.True);
+        Assert.That(new PcreRegexUtf8(pattern, PcreOptions.Compiled).IsMatch(subject.AsSpan()), Is.True);
+        Assert.That(new PcreRegexUtf8(pattern, PcreOptions.Compiled).CreateMatchBuffer().IsMatch(subject.AsSpan()), Is.True);
+    }
+
+    [Test]
+    [TestCase(@"^A.*Z$", "AfooZ")]
+    [TestCase(@"^A(.*)Z$", "AfooZ")]
+    [TestCase(@"^\p{L}+$", "Abçdë")]
+    public void should_match_pattern_8bit(string patternString, string subjectString)
+    {
+        var pattern = patternString.ToLatin1Bytes();
+        var subject = subjectString.ToLatin1Bytes();
+
+        Assert.That(new PcreRegex8Bit(pattern, TestSupport.Latin1Encoding).IsMatch(subject), Is.True);
+        Assert.That(new PcreRegex8Bit(pattern, TestSupport.Latin1Encoding).IsMatch(subject.AsSpan()), Is.True);
+        Assert.That(new PcreRegex8Bit(pattern, TestSupport.Latin1Encoding).CreateMatchBuffer().IsMatch(subject.AsSpan()), Is.True);
+        Assert.That(new PcreRegex8Bit(pattern, TestSupport.Latin1Encoding, PcreOptions.Compiled).IsMatch(subject), Is.True);
+        Assert.That(new PcreRegex8Bit(pattern, TestSupport.Latin1Encoding, PcreOptions.Compiled).IsMatch(subject.AsSpan()), Is.True);
+        Assert.That(new PcreRegex8Bit(pattern, TestSupport.Latin1Encoding, PcreOptions.Compiled).CreateMatchBuffer().IsMatch(subject.AsSpan()), Is.True);
+    }
+
+    [Test]
     [TestCase(@"^A.*Z$", "Afoo")]
     [TestCase(@"^\p{L}+$", "Abc123abc")]
     public void should_not_match_pattern(string pattern, string subject)
@@ -62,6 +152,37 @@ public class IsMatchTests
         Assert.That(new PcreRegex(pattern, PcreOptions.Compiled).IsMatch(subject), Is.False);
         Assert.That(new PcreRegex(pattern, PcreOptions.Compiled).IsMatch(subject.AsSpan()), Is.False);
         Assert.That(new PcreRegex(pattern, PcreOptions.Compiled).CreateMatchBuffer().IsMatch(subject.AsSpan()), Is.False);
+    }
+
+    [Test]
+    [TestCase(@"^A.*Z$", "Afoo")]
+    [TestCase(@"^\p{L}+$", "Abc123abc")]
+    public void should_not_match_pattern_utf8(string pattern, string subjectString)
+    {
+        var subject = Encoding.UTF8.GetBytes(subjectString);
+
+        Assert.That(new PcreRegexUtf8(pattern).IsMatch(subject), Is.False);
+        Assert.That(new PcreRegexUtf8(pattern).IsMatch(subject.AsSpan()), Is.False);
+        Assert.That(new PcreRegexUtf8(pattern).CreateMatchBuffer().IsMatch(subject.AsSpan()), Is.False);
+        Assert.That(new PcreRegexUtf8(pattern, PcreOptions.Compiled).IsMatch(subject), Is.False);
+        Assert.That(new PcreRegexUtf8(pattern, PcreOptions.Compiled).IsMatch(subject.AsSpan()), Is.False);
+        Assert.That(new PcreRegexUtf8(pattern, PcreOptions.Compiled).CreateMatchBuffer().IsMatch(subject.AsSpan()), Is.False);
+    }
+
+    [Test]
+    [TestCase(@"^A.*Z$", "Afoo")]
+    [TestCase(@"^\p{L}+$", "Abc123abc")]
+    public void should_not_match_pattern_8bit(string patternString, string subjectString)
+    {
+        var pattern = patternString.ToLatin1Bytes();
+        var subject = subjectString.ToLatin1Bytes();
+
+        Assert.That(new PcreRegex8Bit(pattern, TestSupport.Latin1Encoding).IsMatch(subject), Is.False);
+        Assert.That(new PcreRegex8Bit(pattern, TestSupport.Latin1Encoding).IsMatch(subject.AsSpan()), Is.False);
+        Assert.That(new PcreRegex8Bit(pattern, TestSupport.Latin1Encoding).CreateMatchBuffer().IsMatch(subject.AsSpan()), Is.False);
+        Assert.That(new PcreRegex8Bit(pattern, TestSupport.Latin1Encoding, PcreOptions.Compiled).IsMatch(subject), Is.False);
+        Assert.That(new PcreRegex8Bit(pattern, TestSupport.Latin1Encoding, PcreOptions.Compiled).IsMatch(subject.AsSpan()), Is.False);
+        Assert.That(new PcreRegex8Bit(pattern, TestSupport.Latin1Encoding, PcreOptions.Compiled).CreateMatchBuffer().IsMatch(subject.AsSpan()), Is.False);
     }
 
     [Test]
@@ -79,6 +200,30 @@ public class IsMatchTests
     }
 
     [Test]
+    public void should_handle_ignore_case_utf8()
+    {
+        var re = new PcreRegexUtf8("aBc"u8);
+        Assert.That(re.IsMatch("Abc"u8), Is.False);
+        Assert.That(re.CreateMatchBuffer().IsMatch("Abc"u8), Is.False);
+
+        re = new PcreRegexUtf8("aBc"u8, PcreOptions.IgnoreCase);
+        Assert.That(re.IsMatch("Abc"u8), Is.True);
+        Assert.That(re.CreateMatchBuffer().IsMatch("Abc"u8), Is.True);
+    }
+
+    [Test]
+    public void should_handle_ignore_case_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit("aBc");
+        Assert.That(re.IsMatch("Abc".ToLatin1Bytes()), Is.False);
+        Assert.That(re.CreateMatchBuffer().IsMatch("Abc".ToLatin1Bytes()), Is.False);
+
+        re = TestSupport.CreatePcreRegex8Bit("aBc", PcreOptions.IgnoreCase);
+        Assert.That(re.IsMatch("Abc".ToLatin1Bytes()), Is.True);
+        Assert.That(re.CreateMatchBuffer().IsMatch("Abc".ToLatin1Bytes()), Is.True);
+    }
+
+    [Test]
     public void should_handle_ignore_whitespace()
     {
         var re = new PcreRegex("^a b$");
@@ -90,6 +235,30 @@ public class IsMatchTests
         Assert.That(re.IsMatch("ab"), Is.True);
         Assert.That(re.IsMatch("ab".AsSpan()), Is.True);
         Assert.That(re.CreateMatchBuffer().IsMatch("ab".AsSpan()), Is.True);
+    }
+
+    [Test]
+    public void should_handle_ignore_whitespace_utf8()
+    {
+        var re = new PcreRegexUtf8("^a b$"u8);
+        Assert.That(re.IsMatch("ab"u8), Is.False);
+        Assert.That(re.CreateMatchBuffer().IsMatch("ab"u8), Is.False);
+
+        re = new PcreRegexUtf8("^a b$"u8, PcreOptions.IgnorePatternWhitespace);
+        Assert.That(re.IsMatch("ab"u8), Is.True);
+        Assert.That(re.CreateMatchBuffer().IsMatch("ab"u8), Is.True);
+    }
+
+    [Test]
+    public void should_handle_ignore_whitespace_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit("^a b$");
+        Assert.That(re.IsMatch("ab".ToLatin1Bytes()), Is.False);
+        Assert.That(re.CreateMatchBuffer().IsMatch("ab".ToLatin1Bytes()), Is.False);
+
+        re = TestSupport.CreatePcreRegex8Bit("^a b$", PcreOptions.IgnorePatternWhitespace);
+        Assert.That(re.IsMatch("ab".ToLatin1Bytes()), Is.True);
+        Assert.That(re.CreateMatchBuffer().IsMatch("ab".ToLatin1Bytes()), Is.True);
     }
 
     [Test]
@@ -107,6 +276,30 @@ public class IsMatchTests
     }
 
     [Test]
+    public void should_handle_singleline_utf8()
+    {
+        var re = new PcreRegexUtf8("^a.*b$"u8);
+        Assert.That(re.IsMatch("a\r\nb"u8), Is.False);
+        Assert.That(re.CreateMatchBuffer().IsMatch("a\r\nb"u8), Is.False);
+
+        re = new PcreRegexUtf8("^a.*b$"u8, PcreOptions.Singleline);
+        Assert.That(re.IsMatch("a\r\nb"u8), Is.True);
+        Assert.That(re.CreateMatchBuffer().IsMatch("a\r\nb"u8), Is.True);
+    }
+
+    [Test]
+    public void should_handle_singleline_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit("^a.*b$");
+        Assert.That(re.IsMatch("a\r\nb".ToLatin1Bytes()), Is.False);
+        Assert.That(re.CreateMatchBuffer().IsMatch("a\r\nb".ToLatin1Bytes()), Is.False);
+
+        re = TestSupport.CreatePcreRegex8Bit("^a.*b$", PcreOptions.Singleline);
+        Assert.That(re.IsMatch("a\r\nb".ToLatin1Bytes()), Is.True);
+        Assert.That(re.CreateMatchBuffer().IsMatch("a\r\nb".ToLatin1Bytes()), Is.True);
+    }
+
+    [Test]
     public void should_handle_multiline()
     {
         var re = new PcreRegex("^aaa$");
@@ -121,6 +314,30 @@ public class IsMatchTests
     }
 
     [Test]
+    public void should_handle_multiline_utf8()
+    {
+        var re = new PcreRegexUtf8("^aaa$"u8);
+        Assert.That(re.IsMatch("aaa\r\nbbb"u8), Is.False);
+        Assert.That(re.CreateMatchBuffer().IsMatch("aaa\r\nbbb"u8), Is.False);
+
+        re = new PcreRegexUtf8("^aaa$"u8, PcreOptions.MultiLine);
+        Assert.That(re.IsMatch("aaa\r\nbbb"u8), Is.True);
+        Assert.That(re.CreateMatchBuffer().IsMatch("aaa\r\nbbb"u8), Is.True);
+    }
+
+    [Test]
+    public void should_handle_multiline_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit("^aaa$");
+        Assert.That(re.IsMatch("aaa\r\nbbb".ToLatin1Bytes()), Is.False);
+        Assert.That(re.CreateMatchBuffer().IsMatch("aaa\r\nbbb".ToLatin1Bytes()), Is.False);
+
+        re = TestSupport.CreatePcreRegex8Bit("^aaa$", PcreOptions.MultiLine);
+        Assert.That(re.IsMatch("aaa\r\nbbb".ToLatin1Bytes()), Is.True);
+        Assert.That(re.CreateMatchBuffer().IsMatch("aaa\r\nbbb".ToLatin1Bytes()), Is.True);
+    }
+
+    [Test]
     public void should_handle_javascript()
     {
         var re = new PcreRegex(@"^\U$", PcreOptions.JavaScript);
@@ -129,6 +346,28 @@ public class IsMatchTests
         Assert.That(re.CreateMatchBuffer().IsMatch("U".AsSpan()), Is.True);
 
         var ex = Assert.Throws<PcrePatternException>(() => _ = new PcreRegex(@"^\U$"));
+        Assert.That(ex!.ErrorCode, Is.EqualTo(PcreErrorCode.UnsupportedEscapeSequence));
+    }
+
+    [Test]
+    public void should_handle_javascript_utf8()
+    {
+        var re = new PcreRegexUtf8(@"^\U$"u8, PcreOptions.JavaScript);
+        Assert.That(re.IsMatch("U"u8), Is.True);
+        Assert.That(re.CreateMatchBuffer().IsMatch("U"u8), Is.True);
+
+        var ex = Assert.Throws<PcrePatternException>(() => _ = new PcreRegexUtf8(@"^\U$"u8));
+        Assert.That(ex!.ErrorCode, Is.EqualTo(PcreErrorCode.UnsupportedEscapeSequence));
+    }
+
+    [Test]
+    public void should_handle_javascript_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"^\U$", PcreOptions.JavaScript);
+        Assert.That(re.IsMatch("U".ToLatin1Bytes()), Is.True);
+        Assert.That(re.CreateMatchBuffer().IsMatch("U".ToLatin1Bytes()), Is.True);
+
+        var ex = Assert.Throws<PcrePatternException>(() => _ = TestSupport.CreatePcreRegex8Bit(@"^\U$"));
         Assert.That(ex!.ErrorCode, Is.EqualTo(PcreErrorCode.UnsupportedEscapeSequence));
     }
 
@@ -147,6 +386,32 @@ public class IsMatchTests
     }
 
     [Test]
+    public void should_handle_unicode_character_properties_utf8()
+    {
+        var re = new PcreRegexUtf8(@"^\w$"u8);
+        Assert.That(re.IsMatch("à"u8), Is.False);
+        Assert.That(re.CreateMatchBuffer().IsMatch("à"u8), Is.False);
+
+        re = new PcreRegexUtf8(@"^\w$"u8, PcreOptions.Unicode);
+        Assert.That(re.IsMatch("à"u8), Is.True);
+        Assert.That(re.CreateMatchBuffer().IsMatch("à"u8), Is.True);
+    }
+
+    [Test]
+    public void should_handle_unicode_character_properties_8bit()
+    {
+        var subject = "à".ToLatin1Bytes();
+
+        var re = TestSupport.CreatePcreRegex8Bit(@"^\w$");
+        Assert.That(re.IsMatch(subject), Is.False);
+        Assert.That(re.CreateMatchBuffer().IsMatch(subject), Is.False);
+
+        re = TestSupport.CreatePcreRegex8Bit(@"^\w$", PcreOptions.Unicode);
+        Assert.That(re.IsMatch(subject), Is.True);
+        Assert.That(re.CreateMatchBuffer().IsMatch(subject), Is.True);
+    }
+
+    [Test]
     public void should_match_from_index()
     {
         var re = new PcreRegex(@"a");
@@ -156,12 +421,44 @@ public class IsMatchTests
     }
 
     [Test]
+    public void should_match_from_index_utf8()
+    {
+        var re = new PcreRegexUtf8(@"a"u8);
+        Assert.That(re.IsMatch("foobar"u8, 5), Is.False);
+        Assert.That(re.CreateMatchBuffer().IsMatch("foobar"u8, 5), Is.False);
+    }
+
+    [Test]
+    public void should_match_from_index_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"a");
+        Assert.That(re.IsMatch("foobar".ToLatin1Bytes(), 5), Is.False);
+        Assert.That(re.CreateMatchBuffer().IsMatch("foobar".ToLatin1Bytes(), 5), Is.False);
+    }
+
+    [Test]
     public void should_match_starting_at_end_of_string()
     {
         var re = new PcreRegex(@"(?<=a)");
         Assert.That(re.IsMatch("xxa", 3), Is.True);
         Assert.That(re.IsMatch("xxa".AsSpan(), 3), Is.True);
         Assert.That(re.CreateMatchBuffer().IsMatch("xxa".AsSpan(), 3), Is.True);
+    }
+
+    [Test]
+    public void should_match_starting_at_end_of_string_utf8()
+    {
+        var re = new PcreRegexUtf8(@"(?<=a)"u8);
+        Assert.That(re.IsMatch("xxa"u8, 3), Is.True);
+        Assert.That(re.CreateMatchBuffer().IsMatch("xxa"u8, 3), Is.True);
+    }
+
+    [Test]
+    public void should_match_starting_at_end_of_string_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"(?<=a)");
+        Assert.That(re.IsMatch("xxa".ToLatin1Bytes(), 3), Is.True);
+        Assert.That(re.CreateMatchBuffer().IsMatch("xxa".ToLatin1Bytes(), 3), Is.True);
     }
 
     [Test]
@@ -190,5 +487,43 @@ public class IsMatchTests
         var re = new PcreRegex(@"a");
         var buffer = re.CreateMatchBuffer();
         Assert.Throws<ArgumentOutOfRangeException>(() => buffer.IsMatch("a".AsSpan(), startIndex));
+    }
+
+    [Test]
+    [TestCase(-1)]
+    [TestCase(2)]
+    public void should_throw_on_invalid_start_index_utf8(int startIndex)
+    {
+        var re = new PcreRegexUtf8(@"a"u8);
+        Assert.Throws<ArgumentOutOfRangeException>(() => re.IsMatch("a"u8, startIndex));
+    }
+
+    [Test]
+    [TestCase(-1)]
+    [TestCase(2)]
+    public void should_throw_on_invalid_start_index_buf_utf8(int startIndex)
+    {
+        var re = new PcreRegexUtf8(@"a"u8);
+        var buffer = re.CreateMatchBuffer();
+        Assert.Throws<ArgumentOutOfRangeException>(() => buffer.IsMatch("a"u8, startIndex));
+    }
+
+    [Test]
+    [TestCase(-1)]
+    [TestCase(2)]
+    public void should_throw_on_invalid_start_index_8bit(int startIndex)
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"a");
+        Assert.Throws<ArgumentOutOfRangeException>(() => re.IsMatch("a".ToLatin1Bytes(), startIndex));
+    }
+
+    [Test]
+    [TestCase(-1)]
+    [TestCase(2)]
+    public void should_throw_on_invalid_start_index_buf_8bit(int startIndex)
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"a");
+        var buffer = re.CreateMatchBuffer();
+        Assert.Throws<ArgumentOutOfRangeException>(() => buffer.IsMatch("a".ToLatin1Bytes(), startIndex));
     }
 }

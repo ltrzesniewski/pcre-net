@@ -18,7 +18,7 @@ public sealed class PcrePatternInfo
     /// <summary>
     /// Returns the regex pattern string.
     /// </summary>
-    public string PatternString => _re.Pattern;
+    public string PatternString => _re.PatternString;
 
     /// <summary>
     /// Returns the advanced settings that were used.

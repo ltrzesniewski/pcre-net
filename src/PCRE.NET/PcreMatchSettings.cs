@@ -6,7 +6,7 @@ namespace PCRE;
 /// <summary>
 /// Advanced match settings.
 /// </summary>
-public sealed class PcreMatchSettings
+public sealed unsafe class PcreMatchSettings
 {
     internal static PcreMatchSettings Default { get; } = new();
 
@@ -151,7 +151,7 @@ public sealed class PcreMatchSettings
         settings.depth_limit = _depthLimit.GetValueOrDefault();
         settings.heap_limit = _heapLimit.GetValueOrDefault();
         settings.offset_limit = OffsetLimit.GetValueOrDefault();
-        settings.jit_stack = JitStack?.GetStack() ?? IntPtr.Zero;
+        settings.jit_stack = JitStack is { } stack ? stack.GetStack() : null;
 
         jitStack = JitStack;
     }

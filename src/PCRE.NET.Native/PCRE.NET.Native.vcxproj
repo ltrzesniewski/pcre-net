@@ -19,41 +19,52 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\PCRE\src\pcre2_auto_possess.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_chartables.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_chkdint.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_compile.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_compile_cgroup.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_compile_class.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_config.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_context.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_convert.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_dfa_match.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_error.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_extuni.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_find_bracket.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_jit_compile.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_maketables.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_match.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_match_data.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_match_next.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_newline.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_ord2utf.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_pattern_info.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_script_run.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_string_utils.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_study.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_substitute.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_substring.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_tables.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_ucd.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_valid_utf.c" />
-    <ClCompile Include="..\PCRE\src\pcre2_xclass.c" />
-    <ClCompile Include="pcrenet_compile.c" />
-    <ClCompile Include="pcrenet_convert.c" />
-    <ClCompile Include="pcrenet_match.c" />
-    <ClCompile Include="pcrenet_info.c" />
-    <ClCompile Include="pcrenet_substitute.c" />
+    <Pcre2Source Include="pcre2_auto_possess.c" />
+    <Pcre2Source Include="pcre2_chartables.c" />
+    <Pcre2Source Include="pcre2_chkdint.c" />
+    <Pcre2Source Include="pcre2_compile.c" />
+    <Pcre2Source Include="pcre2_compile_class.c" />
+    <Pcre2Source Include="pcre2_compile_cgroup.c" />
+    <Pcre2Source Include="pcre2_config.c" />
+    <Pcre2Source Include="pcre2_context.c" />
+    <Pcre2Source Include="pcre2_convert.c" />
+    <Pcre2Source Include="pcre2_dfa_match.c" />
+    <Pcre2Source Include="pcre2_error.c" />
+    <Pcre2Source Include="pcre2_extuni.c" />
+    <Pcre2Source Include="pcre2_find_bracket.c" />
+    <Pcre2Source Include="pcre2_jit_compile.c" />
+    <Pcre2Source Include="pcre2_maketables.c" />
+    <Pcre2Source Include="pcre2_match.c" />
+    <Pcre2Source Include="pcre2_match_data.c" />
+    <Pcre2Source Include="pcre2_match_next.c" />
+    <Pcre2Source Include="pcre2_newline.c" />
+    <Pcre2Source Include="pcre2_ord2utf.c" />
+    <Pcre2Source Include="pcre2_pattern_info.c" />
+    <Pcre2Source Include="pcre2_script_run.c" />
+    <Pcre2Source Include="pcre2_string_utils.c" />
+    <Pcre2Source Include="pcre2_study.c" />
+    <Pcre2Source Include="pcre2_substitute.c" />
+    <Pcre2Source Include="pcre2_substring.c" />
+    <Pcre2Source Include="pcre2_tables.c" />
+    <Pcre2Source Include="pcre2_ucd.c" />
+    <Pcre2Source Include="pcre2_valid_utf.c" />
+    <Pcre2Source Include="pcre2_xclass.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <PcreNetSource Include="pcrenet_compile.c" />
+    <PcreNetSource Include="pcrenet_convert.c" />
+    <PcreNetSource Include="pcrenet_match.c" />
+    <PcreNetSource Include="pcrenet_info.c" />
+    <PcreNetSource Include="pcrenet_substitute.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="@(Pcre2Source->'compile\%(Filename).8bit%(Extension)')" />
+    <ClCompile Include="@(Pcre2Source->'compile\%(Filename).16bit%(Extension)')" />
+    <ClCompile Include="@(PcreNetSource->'compile\%(Filename).8bit%(Extension)')" />
+    <ClCompile Include="@(PcreNetSource->'compile\%(Filename).16bit%(Extension)')" />
+    <ClInclude Include="compile\config.8bit.h" />
+    <ClInclude Include="compile\config.16bit.h" />
+    <Pcre2Source Update="@(Pcre2Source)" Visible="false" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\PCRE\src\config.h" />
@@ -137,7 +148,6 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>HAVE_CONFIG_H;PCRE2_CODE_UNIT_WIDTH=16;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4244;4267;4146</DisableSpecificWarnings>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -153,7 +163,6 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>HAVE_CONFIG_H;PCRE2_CODE_UNIT_WIDTH=16;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4244;4267;4146</DisableSpecificWarnings>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <TreatWarningAsError>true</TreatWarningAsError>
@@ -170,7 +179,6 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>HAVE_CONFIG_H;PCRE2_CODE_UNIT_WIDTH=16;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4244;4267;4146</DisableSpecificWarnings>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
@@ -193,7 +201,6 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>HAVE_CONFIG_H;PCRE2_CODE_UNIT_WIDTH=16;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4244;4267;4146</DisableSpecificWarnings>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>

@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
+using PCRE.Tests.Support;
 
 namespace PCRE.Tests.Pcre;
 
@@ -42,14 +44,37 @@ public class PcreTests
 
         options = (options | pattern.PatternOptions) & ~pattern.ResetOptionBits;
 
-        PcreRegex regex;
+        PcreRegex regex = null!;
+        PcreRegex8Bit regex8Bit = null!;
+        PcreRegexUtf8 regexUtf8 = null!;
+
         try
         {
             var patternStr = pattern.HexEncoding
                 ? pattern.Pattern.UnescapeBinaryString()
                 : pattern.Pattern;
 
-            regex = new PcreRegex(patternStr, options);
+            switch (apiKind)
+            {
+                case ApiKind.String:
+                case ApiKind.Span:
+                case ApiKind.MatchBuffer:
+                    regex = new PcreRegex(patternStr, options);
+                    break;
+
+                case ApiKind.Utf8:
+                case ApiKind.Utf8MatchBuffer:
+                    regexUtf8 = new PcreRegexUtf8(patternStr, options);
+                    break;
+
+                case ApiKind.Byte:
+                case ApiKind.ByteMatchBuffer:
+                    regex8Bit = new PcreRegex8Bit(TestSupport.Latin1Encoding.GetBytes(patternStr), TestSupport.Latin1Encoding, options);
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(apiKind), apiKind, null);
+            }
         }
         catch (Exception ex)
         {
@@ -165,6 +190,119 @@ public class PcreTests
                         Assert.That(matchCount, Is.EqualTo(expected.Matches.Count));
                         break;
                     }
+
+                    case ApiKind.Utf8:
+                    {
+                        var matchCount = 0;
+
+                        foreach (var actualMatch in regexUtf8.Matches(Encoding.UTF8.GetBytes(subject), 0, PcreMatchOptions.None, null, matchSettings))
+                        {
+                            Assert.That(matchCount, Is.LessThan(expected.Matches.Count));
+
+                            var expectedMatch = expected.Matches[matchCount];
+                            ++matchCount;
+
+                            CompareGroups(pattern, actualMatch, expectedMatch, Encoding.UTF8);
+
+                            if (pattern.ExtractMarks)
+                                CompareMark(actualMatch, expectedMatch, Encoding.UTF8);
+
+                            if (pattern.GetRemainingString)
+                                CompareRemainingString(actualMatch, expectedMatch, Encoding.UTF8);
+
+                            if (!pattern.AllMatches)
+                                break;
+                        }
+
+                        Assert.That(matchCount, Is.EqualTo(expected.Matches.Count));
+                        break;
+                    }
+
+                    case ApiKind.Utf8MatchBuffer:
+                    {
+                        var matchCount = 0;
+                        using var buffer = regexUtf8.CreateMatchBuffer(matchSettings);
+
+                        foreach (var actualMatch in buffer.Matches(Encoding.UTF8.GetBytes(subject)))
+                        {
+                            Assert.That(matchCount, Is.LessThan(expected.Matches.Count));
+
+                            var expectedMatch = expected.Matches[matchCount];
+                            ++matchCount;
+
+                            CompareGroups(pattern, actualMatch, expectedMatch, Encoding.UTF8);
+
+                            if (pattern.ExtractMarks)
+                                CompareMark(actualMatch, expectedMatch, Encoding.UTF8);
+
+                            if (pattern.GetRemainingString)
+                                CompareRemainingString(actualMatch, expectedMatch, Encoding.UTF8);
+
+                            if (!pattern.AllMatches)
+                                break;
+                        }
+
+                        Assert.That(matchCount, Is.EqualTo(expected.Matches.Count));
+                        break;
+                    }
+
+                    case ApiKind.Byte:
+                    {
+                        var matchCount = 0;
+
+                        foreach (var actualMatch in regex8Bit.Matches(TestSupport.Latin1Encoding.GetBytes(subject), 0, PcreMatchOptions.None, null, matchSettings))
+                        {
+                            Assert.That(matchCount, Is.LessThan(expected.Matches.Count));
+
+                            var expectedMatch = expected.Matches[matchCount];
+                            ++matchCount;
+
+                            CompareGroups(pattern, actualMatch, expectedMatch, TestSupport.Latin1Encoding);
+
+                            if (pattern.ExtractMarks)
+                                CompareMark(actualMatch, expectedMatch, TestSupport.Latin1Encoding);
+
+                            if (pattern.GetRemainingString)
+                                CompareRemainingString(actualMatch, expectedMatch, TestSupport.Latin1Encoding);
+
+                            if (!pattern.AllMatches)
+                                break;
+                        }
+
+                        Assert.That(matchCount, Is.EqualTo(expected.Matches.Count));
+                        break;
+                    }
+
+                    case ApiKind.ByteMatchBuffer:
+                    {
+                        var matchCount = 0;
+                        using var buffer = regex8Bit.CreateMatchBuffer(matchSettings);
+
+                        foreach (var actualMatch in buffer.Matches(TestSupport.Latin1Encoding.GetBytes(subject)))
+                        {
+                            Assert.That(matchCount, Is.LessThan(expected.Matches.Count));
+
+                            var expectedMatch = expected.Matches[matchCount];
+                            ++matchCount;
+
+                            CompareGroups(pattern, actualMatch, expectedMatch, TestSupport.Latin1Encoding);
+
+                            if (pattern.ExtractMarks)
+                                CompareMark(actualMatch, expectedMatch, TestSupport.Latin1Encoding);
+
+                            if (pattern.GetRemainingString)
+                                CompareRemainingString(actualMatch, expectedMatch, TestSupport.Latin1Encoding);
+
+                            if (!pattern.AllMatches)
+                                break;
+                        }
+
+                        Assert.That(matchCount, Is.EqualTo(expected.Matches.Count));
+                        break;
+                    }
+
+                    default:
+                        throw new InvalidOperationException("Unknown API kind");
                 }
             }
         }
@@ -224,6 +362,32 @@ public class PcreTests
         }
     }
 
+    private static void CompareGroups(TestPattern pattern, PcreRefMatch8Bit actualMatch, ExpectedMatch expectedMatch, Encoding encoding)
+    {
+        var expectedGroups = expectedMatch.Groups.ToList();
+
+        Assert.That(actualMatch.Groups.Count, Is.GreaterThanOrEqualTo(expectedGroups.Count));
+
+        for (var groupIndex = 0; groupIndex < actualMatch.Groups.Count; ++groupIndex)
+        {
+            var actualGroup = actualMatch.Groups[groupIndex];
+            var expectedGroup = groupIndex < expectedGroups.Count
+                ? expectedGroups[groupIndex]
+                : ExpectedGroup.Unset;
+
+            Assert.That(actualGroup.Success, Is.EqualTo(expectedGroup.IsMatch));
+
+            if (expectedGroup.IsMatch)
+            {
+                var expectedValue = pattern.SubjectLiteral
+                    ? expectedGroup.Value
+                    : expectedGroup.Value.UnescapeGroup();
+
+                CompareGroupsAssert(encoding.GetString(actualGroup.Value.ToArray()), expectedValue);
+            }
+        }
+    }
+
     private static void CompareGroupsAssert(string actual, string expected)
     {
         // The testinput/testoutput parsing is flawed in some ways, and it causes mess such as this
@@ -239,11 +403,17 @@ public class PcreTests
     private static void CompareMark(PcreRefMatch actualMatch, ExpectedMatch expectedMatch)
         => Assert.That(actualMatch.Mark.ToString(), Is.EqualTo(expectedMatch.Mark?.UnescapeGroup() ?? string.Empty));
 
+    private static void CompareMark(PcreRefMatch8Bit actualMatch, ExpectedMatch expectedMatch, Encoding encoding)
+        => Assert.That(encoding.GetString(actualMatch.Mark.ToArray()), Is.EqualTo(expectedMatch.Mark?.UnescapeGroup() ?? string.Empty));
+
     private static void CompareRemainingString(PcreMatch actualMatch, ExpectedMatch expectedMatch)
         => Assert.That(actualMatch.Subject.Substring(actualMatch.Index + actualMatch.Length), Is.EqualTo(expectedMatch.RemainingString?.UnescapeGroup()));
 
     private static void CompareRemainingString(PcreRefMatch actualMatch, ExpectedMatch expectedMatch)
         => Assert.That(actualMatch.Subject.Slice(actualMatch.Index + actualMatch.Length).ToString(), Is.EqualTo(expectedMatch.RemainingString?.UnescapeGroup()));
+
+    private static void CompareRemainingString(PcreRefMatch8Bit actualMatch, ExpectedMatch expectedMatch, Encoding encoding)
+        => Assert.That(encoding.GetString(actualMatch.Subject.Slice(actualMatch.Index + actualMatch.Length).ToArray()), Is.EqualTo(expectedMatch.RemainingString?.UnescapeGroup()));
 
     private class PcreTestsSource : IEnumerable<ITestCaseData>
     {
@@ -267,16 +437,19 @@ public class PcreTests
                 using (var inputReader = new TestInputReader(inputFs))
                 using (var outputReader = new TestOutputReader(outputFs))
                 {
-                    var tests = inputReader.ReadTestInputs().Zip(outputReader.ReadTestOutputs(), (i, o) => new
-                    {
-                        input = i,
-                        expectedResult = o
-                    });
+                    var tests = inputReader.ReadTestInputs().Zip(
+                        outputReader.ReadTestOutputs(),
+                        (i, o) => new
+                        {
+                            input = i,
+                            expectedResult = o
+                        }
+                    );
 
                     var testCases =
                         from test in tests
                         from jit in new[] { false, true }
-                        from apiKind in new[] { ApiKind.String, ApiKind.Span, ApiKind.MatchBuffer }
+                        from apiKind in new[] { ApiKind.String, ApiKind.Span, ApiKind.MatchBuffer, ApiKind.Utf8, ApiKind.Utf8MatchBuffer, ApiKind.Byte, ApiKind.ByteMatchBuffer }
                         let testCase = new TestCase(testFilePath, test.input, test.expectedResult, jit, apiKind)
                         select new TestCaseData(testCase)
                                .SetCategory(testFileName)

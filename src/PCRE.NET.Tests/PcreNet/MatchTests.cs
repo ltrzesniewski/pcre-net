@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using NUnit.Framework;
 using PCRE.Internal;
+using PCRE.Tests.Support;
 
 namespace PCRE.Tests.PcreNet;
 
@@ -76,6 +77,90 @@ public class MatchTests
 
         Assert.That(match[1].Success, Is.True);
         Assert.That(match[1].Value.ToString(), Is.EqualTo("bb"));
+        Assert.That(match[1].Index, Is.EqualTo(6));
+        Assert.That(match[1].Length, Is.EqualTo(2));
+
+        Assert.That(match[2].Success, Is.False);
+    }
+
+    [Test]
+    public void should_match_pattern_utf8()
+    {
+        var re = new PcreRegexUtf8(@"a+(b+)c+"u8);
+        var match = re.Match("xxxaaabbccczzz"u8);
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.CaptureCount, Is.EqualTo(1));
+        Assert.That(match.Value.SequenceEqual("aaabbccc"u8));
+        Assert.That(match.Index, Is.EqualTo(3));
+        Assert.That(match.EndIndex, Is.EqualTo(11));
+        Assert.That(match.Length, Is.EqualTo(8));
+
+        Assert.That(match[1].Success, Is.True);
+        Assert.That(match[1].Value.SequenceEqual("bb"u8));
+        Assert.That(match[1].Index, Is.EqualTo(6));
+        Assert.That(match[1].Length, Is.EqualTo(2));
+
+        Assert.That(match[2].Success, Is.False);
+    }
+
+    [Test]
+    public void should_match_pattern_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@"a+(b+)c+"u8);
+        var match = re.CreateMatchBuffer().Match("xxxaaabbccczzz"u8);
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.CaptureCount, Is.EqualTo(1));
+        Assert.That(match.Value.SequenceEqual("aaabbccc"u8));
+        Assert.That(match.Index, Is.EqualTo(3));
+        Assert.That(match.EndIndex, Is.EqualTo(11));
+        Assert.That(match.Length, Is.EqualTo(8));
+
+        Assert.That(match[1].Success, Is.True);
+        Assert.That(match[1].Value.SequenceEqual("bb"u8));
+        Assert.That(match[1].Index, Is.EqualTo(6));
+        Assert.That(match[1].Length, Is.EqualTo(2));
+
+        Assert.That(match[2].Success, Is.False);
+    }
+
+    [Test]
+    public void should_match_pattern_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"a+(b+)c+".ToLatin1Bytes());
+        var match = re.Match("xxxaaabbccczzz".ToLatin1Bytes());
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.CaptureCount, Is.EqualTo(1));
+        Assert.That(match.Value.SequenceEqual("aaabbccc".ToLatin1Bytes()));
+        Assert.That(match.Index, Is.EqualTo(3));
+        Assert.That(match.EndIndex, Is.EqualTo(11));
+        Assert.That(match.Length, Is.EqualTo(8));
+
+        Assert.That(match[1].Success, Is.True);
+        Assert.That(match[1].Value.SequenceEqual("bb".ToLatin1Bytes()));
+        Assert.That(match[1].Index, Is.EqualTo(6));
+        Assert.That(match[1].Length, Is.EqualTo(2));
+
+        Assert.That(match[2].Success, Is.False);
+    }
+
+    [Test]
+    public void should_match_pattern_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"a+(b+)c+".ToLatin1Bytes());
+        var match = re.CreateMatchBuffer().Match("xxxaaabbccczzz".ToLatin1Bytes());
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.CaptureCount, Is.EqualTo(1));
+        Assert.That(match.Value.SequenceEqual("aaabbccc".ToLatin1Bytes()));
+        Assert.That(match.Index, Is.EqualTo(3));
+        Assert.That(match.EndIndex, Is.EqualTo(11));
+        Assert.That(match.Length, Is.EqualTo(8));
+
+        Assert.That(match[1].Success, Is.True);
+        Assert.That(match[1].Value.SequenceEqual("bb".ToLatin1Bytes()));
         Assert.That(match[1].Index, Is.EqualTo(6));
         Assert.That(match[1].Length, Is.EqualTo(2));
 
@@ -238,6 +323,210 @@ public class MatchTests
     }
 
     [Test]
+    public void should_support_multiple_groups_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@"a+(b+)(c+)?(d+)e+"u8);
+        var match = re.CreateMatchBuffer().Match("xxxaaabbddeeezzz"u8);
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.CaptureCount, Is.EqualTo(3));
+        Assert.That(match.Value.SequenceEqual("aaabbddeee"u8));
+        Assert.That(match.Index, Is.EqualTo(3));
+        Assert.That(match.Length, Is.EqualTo(10));
+
+        Assert.That(match[1].Success, Is.True);
+        Assert.That(match[1].IsDefined, Is.True);
+        Assert.That(match[1].Value.SequenceEqual("bb"u8));
+        Assert.That(match[1].Index, Is.EqualTo(6));
+        Assert.That(match[1].Length, Is.EqualTo(2));
+
+        Assert.That(match[2].Success, Is.False);
+        Assert.That(match[2].IsDefined, Is.True);
+        Assert.That(match[2].Value.IsEmpty);
+        Assert.That(match[2].Index, Is.EqualTo(-1));
+        Assert.That(match[2].Length, Is.EqualTo(0));
+
+        Assert.That(match[3].Success, Is.True);
+        Assert.That(match[3].IsDefined, Is.True);
+        Assert.That(match[3].Value.SequenceEqual("dd"u8));
+        Assert.That(match[3].Index, Is.EqualTo(8));
+        Assert.That(match[3].Length, Is.EqualTo(2));
+
+        Assert.That(match[4].Success, Is.False);
+        Assert.That(match[4].IsDefined, Is.False);
+        Assert.That(match[4].Value.IsEmpty);
+        Assert.That(match[4].Index, Is.EqualTo(-1));
+        Assert.That(match[4].Length, Is.EqualTo(0));
+
+        Assert.That(match.TryGetGroup(1, out var group), Is.True);
+        Assert.That(group.Success, Is.True);
+        Assert.That(group.IsDefined, Is.True);
+        Assert.That(group.Value.SequenceEqual("bb"u8));
+        Assert.That(group.Index, Is.EqualTo(6));
+        Assert.That(group.Length, Is.EqualTo(2));
+
+        Assert.That(match.TryGetGroup(4, out group), Is.False);
+        Assert.That(group.Success, Is.False);
+        Assert.That(group.IsDefined, Is.False);
+        Assert.That(group.Value.IsEmpty);
+        Assert.That(group.Index, Is.EqualTo(-1));
+        Assert.That(group.Length, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void should_support_multiple_groups_utf8()
+    {
+        var re = new PcreRegexUtf8(@"a+(b+)(c+)?(d+)e+"u8);
+        var match = re.Match("xxxaaabbddeeezzz"u8);
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.CaptureCount, Is.EqualTo(3));
+        Assert.That(match.Value.SequenceEqual("aaabbddeee"u8));
+        Assert.That(match.Index, Is.EqualTo(3));
+        Assert.That(match.Length, Is.EqualTo(10));
+
+        Assert.That(match[1].Success, Is.True);
+        Assert.That(match[1].IsDefined, Is.True);
+        Assert.That(match[1].Value.SequenceEqual("bb"u8));
+        Assert.That(match[1].Index, Is.EqualTo(6));
+        Assert.That(match[1].Length, Is.EqualTo(2));
+
+        Assert.That(match[2].Success, Is.False);
+        Assert.That(match[2].IsDefined, Is.True);
+        Assert.That(match[2].Value.IsEmpty);
+        Assert.That(match[2].Index, Is.EqualTo(-1));
+        Assert.That(match[2].Length, Is.EqualTo(0));
+
+        Assert.That(match[3].Success, Is.True);
+        Assert.That(match[3].IsDefined, Is.True);
+        Assert.That(match[3].Value.SequenceEqual("dd"u8));
+        Assert.That(match[3].Index, Is.EqualTo(8));
+        Assert.That(match[3].Length, Is.EqualTo(2));
+
+        Assert.That(match[4].Success, Is.False);
+        Assert.That(match[4].IsDefined, Is.False);
+        Assert.That(match[4].Value.IsEmpty);
+        Assert.That(match[4].Index, Is.EqualTo(-1));
+        Assert.That(match[4].Length, Is.EqualTo(0));
+
+        Assert.That(match.TryGetGroup(1, out var group), Is.True);
+        Assert.That(group.Success, Is.True);
+        Assert.That(group.IsDefined, Is.True);
+        Assert.That(group.Value.SequenceEqual("bb"u8));
+        Assert.That(group.Index, Is.EqualTo(6));
+        Assert.That(group.Length, Is.EqualTo(2));
+
+        Assert.That(match.TryGetGroup(4, out group), Is.False);
+        Assert.That(group.Success, Is.False);
+        Assert.That(group.IsDefined, Is.False);
+        Assert.That(group.Value.IsEmpty);
+        Assert.That(group.Index, Is.EqualTo(-1));
+        Assert.That(group.Length, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void should_support_multiple_groups_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"a+(b+)(c+)?(d+)e+".ToLatin1Bytes());
+        var match = re.Match("xxxaaabbddeeezzz".ToLatin1Bytes());
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.CaptureCount, Is.EqualTo(3));
+        Assert.That(match.Value.SequenceEqual("aaabbddeee".ToLatin1Bytes()));
+        Assert.That(match.Index, Is.EqualTo(3));
+        Assert.That(match.Length, Is.EqualTo(10));
+
+        Assert.That(match[1].Success, Is.True);
+        Assert.That(match[1].IsDefined, Is.True);
+        Assert.That(match[1].Value.SequenceEqual("bb".ToLatin1Bytes()));
+        Assert.That(match[1].Index, Is.EqualTo(6));
+        Assert.That(match[1].Length, Is.EqualTo(2));
+
+        Assert.That(match[2].Success, Is.False);
+        Assert.That(match[2].IsDefined, Is.True);
+        Assert.That(match[2].Value.IsEmpty);
+        Assert.That(match[2].Index, Is.EqualTo(-1));
+        Assert.That(match[2].Length, Is.EqualTo(0));
+
+        Assert.That(match[3].Success, Is.True);
+        Assert.That(match[3].IsDefined, Is.True);
+        Assert.That(match[3].Value.SequenceEqual("dd".ToLatin1Bytes()));
+        Assert.That(match[3].Index, Is.EqualTo(8));
+        Assert.That(match[3].Length, Is.EqualTo(2));
+
+        Assert.That(match[4].Success, Is.False);
+        Assert.That(match[4].IsDefined, Is.False);
+        Assert.That(match[4].Value.IsEmpty);
+        Assert.That(match[4].Index, Is.EqualTo(-1));
+        Assert.That(match[4].Length, Is.EqualTo(0));
+
+        Assert.That(match.TryGetGroup(1, out var group), Is.True);
+        Assert.That(group.Success, Is.True);
+        Assert.That(group.IsDefined, Is.True);
+        Assert.That(group.Value.SequenceEqual("bb".ToLatin1Bytes()));
+        Assert.That(group.Index, Is.EqualTo(6));
+        Assert.That(group.Length, Is.EqualTo(2));
+
+        Assert.That(match.TryGetGroup(4, out group), Is.False);
+        Assert.That(group.Success, Is.False);
+        Assert.That(group.IsDefined, Is.False);
+        Assert.That(group.Value.IsEmpty);
+        Assert.That(group.Index, Is.EqualTo(-1));
+        Assert.That(group.Length, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void should_support_multiple_groups_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"a+(b+)(c+)?(d+)e+".ToLatin1Bytes());
+        var match = re.CreateMatchBuffer().Match("xxxaaabbddeeezzz".ToLatin1Bytes());
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.CaptureCount, Is.EqualTo(3));
+        Assert.That(match.Value.SequenceEqual("aaabbddeee".ToLatin1Bytes()));
+        Assert.That(match.Index, Is.EqualTo(3));
+        Assert.That(match.Length, Is.EqualTo(10));
+
+        Assert.That(match[1].Success, Is.True);
+        Assert.That(match[1].IsDefined, Is.True);
+        Assert.That(match[1].Value.SequenceEqual("bb".ToLatin1Bytes()));
+        Assert.That(match[1].Index, Is.EqualTo(6));
+        Assert.That(match[1].Length, Is.EqualTo(2));
+
+        Assert.That(match[2].Success, Is.False);
+        Assert.That(match[2].IsDefined, Is.True);
+        Assert.That(match[2].Value.IsEmpty);
+        Assert.That(match[2].Index, Is.EqualTo(-1));
+        Assert.That(match[2].Length, Is.EqualTo(0));
+
+        Assert.That(match[3].Success, Is.True);
+        Assert.That(match[3].IsDefined, Is.True);
+        Assert.That(match[3].Value.SequenceEqual("dd".ToLatin1Bytes()));
+        Assert.That(match[3].Index, Is.EqualTo(8));
+        Assert.That(match[3].Length, Is.EqualTo(2));
+
+        Assert.That(match[4].Success, Is.False);
+        Assert.That(match[4].IsDefined, Is.False);
+        Assert.That(match[4].Value.IsEmpty);
+        Assert.That(match[4].Index, Is.EqualTo(-1));
+        Assert.That(match[4].Length, Is.EqualTo(0));
+
+        Assert.That(match.TryGetGroup(1, out var group), Is.True);
+        Assert.That(group.Success, Is.True);
+        Assert.That(group.IsDefined, Is.True);
+        Assert.That(group.Value.SequenceEqual("bb".ToLatin1Bytes()));
+        Assert.That(group.Index, Is.EqualTo(6));
+        Assert.That(group.Length, Is.EqualTo(2));
+
+        Assert.That(match.TryGetGroup(4, out group), Is.False);
+        Assert.That(group.Success, Is.False);
+        Assert.That(group.IsDefined, Is.False);
+        Assert.That(group.Value.IsEmpty);
+        Assert.That(group.Index, Is.EqualTo(-1));
+        Assert.That(group.Length, Is.EqualTo(0));
+    }
+
+    [Test]
     public void should_support_unmatched_groups_before_matched_groups()
     {
         var re = new PcreRegex(@"(a|(z))(bc)");
@@ -316,6 +605,81 @@ public class MatchTests
     }
 
     [Test]
+    public void should_support_unmatched_groups_before_matched_groups_utf8()
+    {
+        var re = new PcreRegexUtf8(@"(a|(z))(bc)"u8);
+        var match = re.Match("abc"u8);
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.CaptureCount, Is.EqualTo(3));
+
+        Assert.That(match[1].Success, Is.True);
+        Assert.That(match[1].Index, Is.EqualTo(0));
+        Assert.That(match[1].EndIndex, Is.EqualTo(1));
+        Assert.That(match[1].Value.SequenceEqual("a"u8));
+
+        Assert.That(match[2].Success, Is.False);
+        Assert.That(match[2].Index, Is.EqualTo(-1));
+        Assert.That(match[2].EndIndex, Is.EqualTo(-1));
+        Assert.That(match[2].Value.IsEmpty);
+
+        Assert.That(match[3].Success, Is.True);
+        Assert.That(match[3].Index, Is.EqualTo(1));
+        Assert.That(match[3].Length, Is.EqualTo(2));
+        Assert.That(match[3].Value.SequenceEqual("bc"u8));
+    }
+
+    [Test]
+    public void should_support_unmatched_groups_before_matched_groups_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@"(a|(z))(bc)"u8);
+        var match = re.CreateMatchBuffer().Match("abc"u8);
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.CaptureCount, Is.EqualTo(3));
+
+        Assert.That(match[1].Success, Is.True);
+        Assert.That(match[1].Index, Is.EqualTo(0));
+        Assert.That(match[1].EndIndex, Is.EqualTo(1));
+        Assert.That(match[1].Value.SequenceEqual("a"u8));
+
+        Assert.That(match[2].Success, Is.False);
+        Assert.That(match[2].Index, Is.EqualTo(-1));
+        Assert.That(match[2].EndIndex, Is.EqualTo(-1));
+        Assert.That(match[2].Value.IsEmpty);
+
+        Assert.That(match[3].Success, Is.True);
+        Assert.That(match[3].Index, Is.EqualTo(1));
+        Assert.That(match[3].Length, Is.EqualTo(2));
+        Assert.That(match[3].Value.SequenceEqual("bc"u8));
+    }
+
+    [Test]
+    public void should_support_unmatched_groups_before_matched_groups_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"(a|(z))(bc)".ToLatin1Bytes());
+        var match = re.CreateMatchBuffer().Match("abc".ToLatin1Bytes());
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.CaptureCount, Is.EqualTo(3));
+
+        Assert.That(match[1].Success, Is.True);
+        Assert.That(match[1].Index, Is.EqualTo(0));
+        Assert.That(match[1].EndIndex, Is.EqualTo(1));
+        Assert.That(match[1].Value.SequenceEqual("a".ToLatin1Bytes()));
+
+        Assert.That(match[2].Success, Is.False);
+        Assert.That(match[2].Index, Is.EqualTo(-1));
+        Assert.That(match[2].EndIndex, Is.EqualTo(-1));
+        Assert.That(match[2].Value.IsEmpty);
+
+        Assert.That(match[3].Success, Is.True);
+        Assert.That(match[3].Index, Is.EqualTo(1));
+        Assert.That(match[3].Length, Is.EqualTo(2));
+        Assert.That(match[3].Value.SequenceEqual("bc".ToLatin1Bytes()));
+    }
+
+    [Test]
     public void should_match_starting_at_end_of_string()
     {
         var re = new PcreRegex(@"(?<=a)");
@@ -339,6 +703,42 @@ public class MatchTests
     {
         var re = new PcreRegex(@"(?<=a)");
         var match = re.CreateMatchBuffer().Match("xxa".AsSpan(), 3);
+
+        Assert.That(match.Success, Is.True);
+    }
+
+    [Test]
+    public void should_match_starting_at_end_of_string_utf8()
+    {
+        var re = new PcreRegexUtf8(@"(?<=a)"u8);
+        var match = re.Match("xxa"u8, 3);
+
+        Assert.That(match.Success, Is.True);
+    }
+
+    [Test]
+    public void should_match_starting_at_end_of_string_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@"(?<=a)"u8);
+        var match = re.CreateMatchBuffer().Match("xxa"u8, 3);
+
+        Assert.That(match.Success, Is.True);
+    }
+
+    [Test]
+    public void should_match_starting_at_end_of_string_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"(?<=a)".ToLatin1Bytes());
+        var match = re.Match("xxa".ToLatin1Bytes(), 3);
+
+        Assert.That(match.Success, Is.True);
+    }
+
+    [Test]
+    public void should_match_starting_at_end_of_string_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"(?<=a)".ToLatin1Bytes());
+        var match = re.CreateMatchBuffer().Match("xxa".ToLatin1Bytes(), 3);
 
         Assert.That(match.Success, Is.True);
     }
@@ -498,6 +898,206 @@ public class MatchTests
     }
 
     [Test]
+    public void should_handle_named_groups_utf8()
+    {
+        var re = new PcreRegexUtf8(@"a+(?<bees>b+)(c+)(?<dees>d+)e+"u8);
+
+        var match = re.Match("xxxaaabbcccddeeezzz"u8);
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.CaptureCount, Is.EqualTo(3));
+        Assert.That(match.Value.SequenceEqual("aaabbcccddeee"u8));
+        Assert.That(match.Index, Is.EqualTo(3));
+        Assert.That(match.Length, Is.EqualTo(13));
+
+        Assert.That(match["bees"].Success, Is.True);
+        Assert.That(match["bees"].IsDefined, Is.True);
+        Assert.That(match["bees"].Value.SequenceEqual("bb"u8));
+        Assert.That(match["bees"].Index, Is.EqualTo(6));
+        Assert.That(match["bees"].Length, Is.EqualTo(2));
+
+        Assert.That(match[2].Value.SequenceEqual("ccc"u8));
+        Assert.That(match[2].Index, Is.EqualTo(8));
+        Assert.That(match[2].Length, Is.EqualTo(3));
+
+        Assert.That(match["dees"].Success, Is.True);
+        Assert.That(match["dees"].IsDefined, Is.True);
+        Assert.That(match["dees"].Value.SequenceEqual("dd"u8));
+        Assert.That(match["dees"].Index, Is.EqualTo(11));
+        Assert.That(match["dees"].Length, Is.EqualTo(2));
+
+        Assert.That(match["nope"].Success, Is.False);
+        Assert.That(match["nope"].IsDefined, Is.False);
+        Assert.That(match["nope"].Value.IsEmpty);
+        Assert.That(match["nope"].Index, Is.EqualTo(-1));
+        Assert.That(match["nope"].Length, Is.EqualTo(0));
+
+        Assert.That(match.TryGetGroup("bees", out var group), Is.True);
+        Assert.That(group.Success, Is.True);
+        Assert.That(group.IsDefined, Is.True);
+        Assert.That(group.Value.SequenceEqual("bb"u8));
+        Assert.That(group.Index, Is.EqualTo(6));
+        Assert.That(group.Length, Is.EqualTo(2));
+
+        Assert.That(match.TryGetGroup("nope", out group), Is.False);
+        Assert.That(group.Success, Is.False);
+        Assert.That(group.IsDefined, Is.False);
+        Assert.That(group.Value.IsEmpty);
+        Assert.That(group.Index, Is.EqualTo(-1));
+        Assert.That(group.Length, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void should_handle_named_groups_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@"a+(?<bees>b+)(c+)(?<dees>d+)e+"u8);
+
+        var match = re.CreateMatchBuffer().Match("xxxaaabbcccddeeezzz"u8);
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.CaptureCount, Is.EqualTo(3));
+        Assert.That(match.Value.SequenceEqual("aaabbcccddeee"u8));
+        Assert.That(match.Index, Is.EqualTo(3));
+        Assert.That(match.Length, Is.EqualTo(13));
+
+        Assert.That(match["bees"].Success, Is.True);
+        Assert.That(match["bees"].IsDefined, Is.True);
+        Assert.That(match["bees"].Value.SequenceEqual("bb"u8));
+        Assert.That(match["bees"].Index, Is.EqualTo(6));
+        Assert.That(match["bees"].Length, Is.EqualTo(2));
+
+        Assert.That(match[2].Value.SequenceEqual("ccc"u8));
+        Assert.That(match[2].Index, Is.EqualTo(8));
+        Assert.That(match[2].Length, Is.EqualTo(3));
+
+        Assert.That(match["dees"].Success, Is.True);
+        Assert.That(match["dees"].IsDefined, Is.True);
+        Assert.That(match["dees"].Value.SequenceEqual("dd"u8));
+        Assert.That(match["dees"].Index, Is.EqualTo(11));
+        Assert.That(match["dees"].Length, Is.EqualTo(2));
+
+        Assert.That(match["nope"].Success, Is.False);
+        Assert.That(match["nope"].IsDefined, Is.False);
+        Assert.That(match["nope"].Value.IsEmpty);
+        Assert.That(match["nope"].Index, Is.EqualTo(-1));
+        Assert.That(match["nope"].Length, Is.EqualTo(0));
+
+        Assert.That(match.TryGetGroup("bees", out var group), Is.True);
+        Assert.That(group.Success, Is.True);
+        Assert.That(group.IsDefined, Is.True);
+        Assert.That(group.Value.SequenceEqual("bb"u8));
+        Assert.That(group.Index, Is.EqualTo(6));
+        Assert.That(group.Length, Is.EqualTo(2));
+
+        Assert.That(match.TryGetGroup("nope", out group), Is.False);
+        Assert.That(group.Success, Is.False);
+        Assert.That(group.IsDefined, Is.False);
+        Assert.That(group.Value.IsEmpty);
+        Assert.That(group.Index, Is.EqualTo(-1));
+        Assert.That(group.Length, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void should_handle_named_groups_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"a+(?<bees>b+)(c+)(?<dees>d+)e+".ToLatin1Bytes());
+
+        var match = re.Match("xxxaaabbcccddeeezzz".ToLatin1Bytes());
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.CaptureCount, Is.EqualTo(3));
+        Assert.That(match.Value.SequenceEqual("aaabbcccddeee".ToLatin1Bytes()));
+        Assert.That(match.Index, Is.EqualTo(3));
+        Assert.That(match.Length, Is.EqualTo(13));
+
+        Assert.That(match["bees"].Success, Is.True);
+        Assert.That(match["bees"].IsDefined, Is.True);
+        Assert.That(match["bees"].Value.SequenceEqual("bb".ToLatin1Bytes()));
+        Assert.That(match["bees"].Index, Is.EqualTo(6));
+        Assert.That(match["bees"].Length, Is.EqualTo(2));
+
+        Assert.That(match[2].Value.SequenceEqual("ccc".ToLatin1Bytes()));
+        Assert.That(match[2].Index, Is.EqualTo(8));
+        Assert.That(match[2].Length, Is.EqualTo(3));
+
+        Assert.That(match["dees"].Success, Is.True);
+        Assert.That(match["dees"].IsDefined, Is.True);
+        Assert.That(match["dees"].Value.SequenceEqual("dd".ToLatin1Bytes()));
+        Assert.That(match["dees"].Index, Is.EqualTo(11));
+        Assert.That(match["dees"].Length, Is.EqualTo(2));
+
+        Assert.That(match["nope"].Success, Is.False);
+        Assert.That(match["nope"].IsDefined, Is.False);
+        Assert.That(match["nope"].Value.IsEmpty);
+        Assert.That(match["nope"].Index, Is.EqualTo(-1));
+        Assert.That(match["nope"].Length, Is.EqualTo(0));
+
+        Assert.That(match.TryGetGroup("bees", out var group), Is.True);
+        Assert.That(group.Success, Is.True);
+        Assert.That(group.IsDefined, Is.True);
+        Assert.That(group.Value.SequenceEqual("bb".ToLatin1Bytes()));
+        Assert.That(group.Index, Is.EqualTo(6));
+        Assert.That(group.Length, Is.EqualTo(2));
+
+        Assert.That(match.TryGetGroup("nope", out group), Is.False);
+        Assert.That(group.Success, Is.False);
+        Assert.That(group.IsDefined, Is.False);
+        Assert.That(group.Value.IsEmpty);
+        Assert.That(group.Index, Is.EqualTo(-1));
+        Assert.That(group.Length, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void should_handle_named_groups_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"a+(?<bees>b+)(c+)(?<dees>d+)e+".ToLatin1Bytes());
+
+        var match = re.CreateMatchBuffer().Match("xxxaaabbcccddeeezzz".ToLatin1Bytes());
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.CaptureCount, Is.EqualTo(3));
+        Assert.That(match.Value.SequenceEqual("aaabbcccddeee".ToLatin1Bytes()));
+        Assert.That(match.Index, Is.EqualTo(3));
+        Assert.That(match.Length, Is.EqualTo(13));
+
+        Assert.That(match["bees"].Success, Is.True);
+        Assert.That(match["bees"].IsDefined, Is.True);
+        Assert.That(match["bees"].Value.SequenceEqual("bb".ToLatin1Bytes()));
+        Assert.That(match["bees"].Index, Is.EqualTo(6));
+        Assert.That(match["bees"].Length, Is.EqualTo(2));
+
+        Assert.That(match[2].Value.SequenceEqual("ccc".ToLatin1Bytes()));
+        Assert.That(match[2].Index, Is.EqualTo(8));
+        Assert.That(match[2].Length, Is.EqualTo(3));
+
+        Assert.That(match["dees"].Success, Is.True);
+        Assert.That(match["dees"].IsDefined, Is.True);
+        Assert.That(match["dees"].Value.SequenceEqual("dd".ToLatin1Bytes()));
+        Assert.That(match["dees"].Index, Is.EqualTo(11));
+        Assert.That(match["dees"].Length, Is.EqualTo(2));
+
+        Assert.That(match["nope"].Success, Is.False);
+        Assert.That(match["nope"].IsDefined, Is.False);
+        Assert.That(match["nope"].Value.IsEmpty);
+        Assert.That(match["nope"].Index, Is.EqualTo(-1));
+        Assert.That(match["nope"].Length, Is.EqualTo(0));
+
+        Assert.That(match.TryGetGroup("bees", out var group), Is.True);
+        Assert.That(group.Success, Is.True);
+        Assert.That(group.IsDefined, Is.True);
+        Assert.That(group.Value.SequenceEqual("bb".ToLatin1Bytes()));
+        Assert.That(group.Index, Is.EqualTo(6));
+        Assert.That(group.Length, Is.EqualTo(2));
+
+        Assert.That(match.TryGetGroup("nope", out group), Is.False);
+        Assert.That(group.Success, Is.False);
+        Assert.That(group.IsDefined, Is.False);
+        Assert.That(group.Value.IsEmpty);
+        Assert.That(group.Index, Is.EqualTo(-1));
+        Assert.That(group.Length, Is.EqualTo(0));
+    }
+
+    [Test]
     public void should_handle_case_sensitive_group_names()
     {
         var re = new PcreRegex(@"a+(?<grp>b+)(?<GRP>c+)(?<GrP>d+)e+");
@@ -564,6 +1164,86 @@ public class MatchTests
     }
 
     [Test]
+    public void should_handle_case_sensitive_group_names_utf8()
+    {
+        var re = new PcreRegexUtf8(@"a+(?<grp>b+)(?<GRP>c+)(?<GrP>d+)e+"u8);
+
+        var match = re.Match("xxxaaabbcccddeeezzz"u8);
+
+        Assert.That(match["grp"].Value.SequenceEqual("bb"u8));
+        Assert.That(match["grp"].Index, Is.EqualTo(6));
+        Assert.That(match["grp"].Length, Is.EqualTo(2));
+
+        Assert.That(match["GRP"].Value.SequenceEqual("ccc"u8));
+        Assert.That(match["GRP"].Index, Is.EqualTo(8));
+        Assert.That(match["GRP"].Length, Is.EqualTo(3));
+
+        Assert.That(match["GrP"].Value.SequenceEqual("dd"u8));
+        Assert.That(match["GrP"].Index, Is.EqualTo(11));
+        Assert.That(match["GrP"].Length, Is.EqualTo(2));
+    }
+
+    [Test]
+    public void should_handle_case_sensitive_group_names_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@"a+(?<grp>b+)(?<GRP>c+)(?<GrP>d+)e+"u8);
+
+        var match = re.CreateMatchBuffer().Match("xxxaaabbcccddeeezzz"u8);
+
+        Assert.That(match["grp"].Value.SequenceEqual("bb"u8));
+        Assert.That(match["grp"].Index, Is.EqualTo(6));
+        Assert.That(match["grp"].Length, Is.EqualTo(2));
+
+        Assert.That(match["GRP"].Value.SequenceEqual("ccc"u8));
+        Assert.That(match["GRP"].Index, Is.EqualTo(8));
+        Assert.That(match["GRP"].Length, Is.EqualTo(3));
+
+        Assert.That(match["GrP"].Value.SequenceEqual("dd"u8));
+        Assert.That(match["GrP"].Index, Is.EqualTo(11));
+        Assert.That(match["GrP"].Length, Is.EqualTo(2));
+    }
+
+    [Test]
+    public void should_handle_case_sensitive_group_names_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"a+(?<grp>b+)(?<GRP>c+)(?<GrP>d+)e+".ToLatin1Bytes());
+
+        var match = re.Match("xxxaaabbcccddeeezzz".ToLatin1Bytes());
+
+        Assert.That(match["grp"].Value.SequenceEqual("bb".ToLatin1Bytes()));
+        Assert.That(match["grp"].Index, Is.EqualTo(6));
+        Assert.That(match["grp"].Length, Is.EqualTo(2));
+
+        Assert.That(match["GRP"].Value.SequenceEqual("ccc".ToLatin1Bytes()));
+        Assert.That(match["GRP"].Index, Is.EqualTo(8));
+        Assert.That(match["GRP"].Length, Is.EqualTo(3));
+
+        Assert.That(match["GrP"].Value.SequenceEqual("dd".ToLatin1Bytes()));
+        Assert.That(match["GrP"].Index, Is.EqualTo(11));
+        Assert.That(match["GrP"].Length, Is.EqualTo(2));
+    }
+
+    [Test]
+    public void should_handle_case_sensitive_group_names_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"a+(?<grp>b+)(?<GRP>c+)(?<GrP>d+)e+".ToLatin1Bytes());
+
+        var match = re.CreateMatchBuffer().Match("xxxaaabbcccddeeezzz".ToLatin1Bytes());
+
+        Assert.That(match["grp"].Value.SequenceEqual("bb".ToLatin1Bytes()));
+        Assert.That(match["grp"].Index, Is.EqualTo(6));
+        Assert.That(match["grp"].Length, Is.EqualTo(2));
+
+        Assert.That(match["GRP"].Value.SequenceEqual("ccc".ToLatin1Bytes()));
+        Assert.That(match["GRP"].Index, Is.EqualTo(8));
+        Assert.That(match["GRP"].Length, Is.EqualTo(3));
+
+        Assert.That(match["GrP"].Value.SequenceEqual("dd".ToLatin1Bytes()));
+        Assert.That(match["GrP"].Index, Is.EqualTo(11));
+        Assert.That(match["GrP"].Length, Is.EqualTo(2));
+    }
+
+    [Test]
     public void should_allow_duplicate_names()
     {
         var re = new PcreRegex(@"(?<g>a)?(?<g>b)?(?<g>c)?", PcreOptions.DupNames);
@@ -622,6 +1302,78 @@ public class MatchTests
     }
 
     [Test]
+    public void should_allow_duplicate_names_utf8()
+    {
+        var re = new PcreRegexUtf8(@"(?<g>a)?(?<g>b)?(?<g>c)?"u8, PcreOptions.DupNames);
+        var match = re.Match("b"u8);
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match["g"].Value.SequenceEqual("b"u8));
+
+        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, false]));
+
+        match = re.Match("bc"u8);
+        Assert.That(match.Success, Is.True);
+        Assert.That(match["g"].Value.SequenceEqual("b"u8));
+
+        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
+    }
+
+    [Test]
+    public void should_allow_duplicate_names_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@"(?<g>a)?(?<g>b)?(?<g>c)?"u8, PcreOptions.DupNames);
+        var match = re.CreateMatchBuffer().Match("b"u8);
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match["g"].Value.SequenceEqual("b"u8));
+
+        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, false]));
+
+        match = re.Match("bc"u8);
+        Assert.That(match.Success, Is.True);
+        Assert.That(match["g"].Value.SequenceEqual("b"u8));
+
+        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
+    }
+
+    [Test]
+    public void should_allow_duplicate_names_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"(?<g>a)?(?<g>b)?(?<g>c)?".ToLatin1Bytes(), PcreOptions.DupNames);
+        var match = re.Match("b".ToLatin1Bytes());
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match["g"].Value.SequenceEqual("b".ToLatin1Bytes()));
+
+        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, false]));
+
+        match = re.Match("bc".ToLatin1Bytes());
+        Assert.That(match.Success, Is.True);
+        Assert.That(match["g"].Value.SequenceEqual("b".ToLatin1Bytes()));
+
+        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
+    }
+
+    [Test]
+    public void should_allow_duplicate_names_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"(?<g>a)?(?<g>b)?(?<g>c)?".ToLatin1Bytes(), PcreOptions.DupNames);
+        var match = re.CreateMatchBuffer().Match("b".ToLatin1Bytes());
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match["g"].Value.SequenceEqual("b".ToLatin1Bytes()));
+
+        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, false]));
+
+        match = re.Match("bc".ToLatin1Bytes());
+        Assert.That(match.Success, Is.True);
+        Assert.That(match["g"].Value.SequenceEqual("b".ToLatin1Bytes()));
+
+        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
+    }
+
+    [Test]
     public void should_detect_duplicate_names()
     {
         var re = new PcreRegex(@"(?J)(?<g>a)?(?<g>b)?(?<g>c)?");
@@ -658,7 +1410,58 @@ public class MatchTests
         Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
     }
 
+    [Test]
+    public void should_detect_duplicate_names_utf8()
+    {
+        var re = new PcreRegexUtf8(@"(?J)(?<g>a)?(?<g>b)?(?<g>c)?"u8);
+
+        var match = re.Match("bc"u8);
+        Assert.That(match.Success, Is.True);
+        Assert.That(match["g"].Value.SequenceEqual("b"u8));
+
+        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
+    }
+
+    [Test]
+    public void should_detect_duplicate_names_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@"(?J)(?<g>a)?(?<g>b)?(?<g>c)?"u8);
+
+        var match = re.CreateMatchBuffer().Match("bc"u8);
+        Assert.That(match.Success, Is.True);
+        Assert.That(match["g"].Value.SequenceEqual("b"u8));
+
+        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
+    }
+
+    [Test]
+    public void should_detect_duplicate_names_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"(?J)(?<g>a)?(?<g>b)?(?<g>c)?".ToLatin1Bytes());
+
+        var match = re.Match("bc".ToLatin1Bytes());
+        Assert.That(match.Success, Is.True);
+        Assert.That(match["g"].Value.SequenceEqual("b".ToLatin1Bytes()));
+
+        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
+    }
+
+    [Test]
+    public void should_detect_duplicate_names_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"(?J)(?<g>a)?(?<g>b)?(?<g>c)?".ToLatin1Bytes());
+
+        var match = re.CreateMatchBuffer().Match("bc".ToLatin1Bytes());
+        Assert.That(match.Success, Is.True);
+        Assert.That(match["g"].Value.SequenceEqual("b".ToLatin1Bytes()));
+
+        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
+    }
+
     private static List<bool> GetDuplicateNamedGroupsSuccesses(PcreRefMatch match, string groupName)
+        => match.GetDuplicateNamedGroups(groupName).ToList(i => i.Success);
+
+    private static List<bool> GetDuplicateNamedGroupsSuccesses(PcreRefMatch8Bit match, string groupName)
         => match.GetDuplicateNamedGroups(groupName).ToList(i => i.Success);
 
     [Test]
@@ -676,6 +1479,32 @@ public class MatchTests
         _ = match.Value; // Reading the string value shouldn't change the span target
 
         valueRef = ref MemoryMarshal.GetReference(match.ValueSpan);
+        Assert.That(Unsafe.AreSame(ref valueRef, ref subjectRef), Is.True);
+    }
+
+    [Test]
+    public void should_return_value_span_from_subject_reference_utf8()
+    {
+        var subject = Encoding.UTF8.GetBytes("foo" + "bar");
+        var re = new PcreRegexUtf8(@"b(a)(r)"u8);
+
+        var match = re.Match(subject);
+
+        ref var subjectRef = ref MemoryMarshal.GetReference(subject.AsSpan(3));
+        ref var valueRef = ref MemoryMarshal.GetReference(match.Value);
+        Assert.That(Unsafe.AreSame(ref valueRef, ref subjectRef), Is.True);
+    }
+
+    [Test]
+    public void should_return_value_span_from_subject_reference_8bit()
+    {
+        var subject = "foobar".ToLatin1Bytes();
+        var re = new PcreRegex8Bit(@"b(a)(r)".ToLatin1Bytes(), TestSupport.Latin1Encoding);
+
+        var match = re.Match(subject);
+
+        ref var subjectRef = ref MemoryMarshal.GetReference(subject.AsSpan(3));
+        ref var valueRef = ref MemoryMarshal.GetReference(match.Value);
         Assert.That(Unsafe.AreSame(ref valueRef, ref subjectRef), Is.True);
     }
 
@@ -724,6 +1553,62 @@ public class MatchTests
     }
 
     [Test]
+    public void should_return_marks_utf8()
+    {
+        var re = new PcreRegexUtf8(@"a(?:(*MARK:foo)b(*MARK:bar)|c)"u8);
+        var match = re.Match("ab"u8);
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.Mark.SequenceEqual("bar"u8));
+
+        match = re.Match("ac"u8);
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.Mark.IsEmpty);
+    }
+
+    [Test]
+    public void should_return_marks_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@"a(?:(*MARK:foo)b(*MARK:bar)|c)"u8);
+        var match = re.CreateMatchBuffer().Match("ab"u8);
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.Mark.SequenceEqual("bar"u8));
+
+        match = re.Match("ac"u8);
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.Mark.IsEmpty);
+    }
+
+    [Test]
+    public void should_return_marks_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"a(?:(*MARK:foo)b(*MARK:bar)|c)".ToLatin1Bytes());
+        var match = re.Match("ab".ToLatin1Bytes());
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.Mark.SequenceEqual("bar".ToLatin1Bytes()));
+
+        match = re.Match("ac".ToLatin1Bytes());
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.Mark.IsEmpty);
+    }
+
+    [Test]
+    public void should_return_marks_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"a(?:(*MARK:foo)b(*MARK:bar)|c)".ToLatin1Bytes());
+        var match = re.CreateMatchBuffer().Match("ab".ToLatin1Bytes());
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.Mark.SequenceEqual("bar".ToLatin1Bytes()));
+
+        match = re.Match("ac".ToLatin1Bytes());
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.Mark.IsEmpty);
+    }
+
+    [Test]
     public void should_use_callout_result()
     {
         var regex = new PcreRegex(@"(\d+)(*SKIP)(?C1):\s*(\w+)");
@@ -766,6 +1651,66 @@ public class MatchTests
                 : PcreCalloutResult.Fail);
 
         Assert.That(match[2].Value.ToString(), Is.EqualTo("hello"));
+    }
+
+    [Test]
+    public void should_use_callout_result_utf8()
+    {
+        var regex = new PcreRegexUtf8(@"(\d+)(*SKIP)(?C1):\s*(\w+)"u8);
+
+        var match = regex.Match(
+            "1542: not_this, 1764: hello"u8,
+            data => data.Number == 1
+                    && int.Parse(data.Match[1].ToString()) % 42 == 0
+                ? PcreCalloutResult.Pass
+                : PcreCalloutResult.Fail);
+
+        Assert.That(match[2].Value.SequenceEqual("hello"u8));
+    }
+
+    [Test]
+    public void should_use_callout_result_buf_utf8()
+    {
+        var regex = new PcreRegexUtf8(@"(\d+)(*SKIP)(?C1):\s*(\w+)"u8);
+
+        var match = regex.CreateMatchBuffer().Match(
+            "1542: not_this, 1764: hello"u8,
+            data => data.Number == 1
+                    && int.Parse(data.Match[1].ToString()) % 42 == 0
+                ? PcreCalloutResult.Pass
+                : PcreCalloutResult.Fail);
+
+        Assert.That(match[2].Value.SequenceEqual("hello"u8));
+    }
+
+    [Test]
+    public void should_use_callout_result_8bit()
+    {
+        var regex = TestSupport.CreatePcreRegex8Bit(@"(\d+)(*SKIP)(?C1):\s*(\w+)".ToLatin1Bytes());
+
+        var match = regex.Match(
+            "1542: not_this, 1764: hello".ToLatin1Bytes(),
+            data => data.Number == 1
+                    && int.Parse(data.Match[1].ToString()) % 42 == 0
+                ? PcreCalloutResult.Pass
+                : PcreCalloutResult.Fail);
+
+        Assert.That(match[2].Value.SequenceEqual("hello".ToLatin1Bytes()));
+    }
+
+    [Test]
+    public void should_use_callout_result_buf_8bit()
+    {
+        var regex = TestSupport.CreatePcreRegex8Bit(@"(\d+)(*SKIP)(?C1):\s*(\w+)".ToLatin1Bytes());
+
+        var match = regex.CreateMatchBuffer().Match(
+            "1542: not_this, 1764: hello".ToLatin1Bytes(),
+            data => data.Number == 1
+                    && int.Parse(data.Match[1].ToString()) % 42 == 0
+                ? PcreCalloutResult.Pass
+                : PcreCalloutResult.Fail);
+
+        Assert.That(match[2].Value.SequenceEqual("hello".ToLatin1Bytes()));
     }
 
     [Test]
@@ -881,6 +1826,160 @@ public class MatchTests
     }
 
     [Test]
+    public void should_execute_passing_callout_utf8()
+    {
+        static ReadOnlySpan<byte> GetPattern() => @"(a)(*MARK:foo)(x)?(?C42)(bc)"u8;
+        var re = new PcreRegexUtf8(GetPattern());
+
+        var calls = 0;
+
+        var match = re.Match(
+            "abc"u8,
+            data =>
+            {
+                Assert.That(data.Number, Is.EqualTo(42));
+                Assert.That(data.CurrentOffset, Is.EqualTo(1));
+                Assert.That(data.PatternPosition, Is.EqualTo(GetPattern().IndexOf("(?C42)"u8) + 6));
+                Assert.That(data.StartOffset, Is.EqualTo(0));
+                Assert.That(data.LastCapture, Is.EqualTo(1));
+                Assert.That(data.MaxCapture, Is.EqualTo(2));
+                Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
+                Assert.That(data.StringOffset, Is.EqualTo(0));
+                Assert.That(data.String, Is.Null);
+
+                Assert.That(data.Match.Value.SequenceEqual("a"u8));
+                Assert.That(data.Match[1].Value.SequenceEqual("a"u8));
+                Assert.That(data.Match[2].Success, Is.False);
+                Assert.That(data.Match[2].Value.IsEmpty);
+                Assert.That(data.Match[3].Success, Is.False);
+                Assert.That(data.Match[3].Value.IsEmpty);
+
+                Assert.That(data.Match.Mark.SequenceEqual("foo"u8));
+
+                ++calls;
+                return PcreCalloutResult.Pass;
+            }
+        );
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(calls, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void should_execute_passing_callout_buf_utf8()
+    {
+        static ReadOnlySpan<byte> GetPattern() => @"(a)(*MARK:foo)(x)?(?C42)(bc)"u8;
+        var re = new PcreRegexUtf8(GetPattern());
+
+        var calls = 0;
+
+        var match = re.CreateMatchBuffer().Match("abc"u8, data =>
+        {
+            Assert.That(data.Number, Is.EqualTo(42));
+            Assert.That(data.CurrentOffset, Is.EqualTo(1));
+            Assert.That(data.PatternPosition, Is.EqualTo(GetPattern().IndexOf("(?C42)"u8) + 6));
+            Assert.That(data.StartOffset, Is.EqualTo(0));
+            Assert.That(data.LastCapture, Is.EqualTo(1));
+            Assert.That(data.MaxCapture, Is.EqualTo(2));
+            Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
+            Assert.That(data.StringOffset, Is.EqualTo(0));
+            Assert.That(data.String, Is.Null);
+
+            Assert.That(data.Match.Value.SequenceEqual("a"u8));
+            Assert.That(data.Match[1].Value.SequenceEqual("a"u8));
+            Assert.That(data.Match[2].Success, Is.False);
+            Assert.That(data.Match[2].Value.IsEmpty);
+            Assert.That(data.Match[3].Success, Is.False);
+            Assert.That(data.Match[3].Value.IsEmpty);
+
+            Assert.That(data.Match.Mark.SequenceEqual("foo"u8));
+
+            ++calls;
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(calls, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void should_execute_passing_callout_8bit()
+    {
+        static ReadOnlySpan<byte> GetPattern() => @"(a)(*MARK:foo)(x)?(?C42)(bc)".ToLatin1Bytes();
+        var re = TestSupport.CreatePcreRegex8Bit(GetPattern());
+
+        var calls = 0;
+
+        var match = re.Match(
+            "abc".ToLatin1Bytes(),
+            data =>
+            {
+                Assert.That(data.Number, Is.EqualTo(42));
+                Assert.That(data.CurrentOffset, Is.EqualTo(1));
+                Assert.That(data.PatternPosition, Is.EqualTo(GetPattern().IndexOf("(?C42)".ToLatin1Bytes()) + 6));
+                Assert.That(data.StartOffset, Is.EqualTo(0));
+                Assert.That(data.LastCapture, Is.EqualTo(1));
+                Assert.That(data.MaxCapture, Is.EqualTo(2));
+                Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
+                Assert.That(data.StringOffset, Is.EqualTo(0));
+                Assert.That(data.String, Is.Null);
+
+                Assert.That(data.Match.Value.SequenceEqual("a".ToLatin1Bytes()));
+                Assert.That(data.Match[1].Value.SequenceEqual("a".ToLatin1Bytes()));
+                Assert.That(data.Match[2].Success, Is.False);
+                Assert.That(data.Match[2].Value.IsEmpty);
+                Assert.That(data.Match[3].Success, Is.False);
+                Assert.That(data.Match[3].Value.IsEmpty);
+
+                Assert.That(data.Match.Mark.SequenceEqual("foo".ToLatin1Bytes()));
+
+                ++calls;
+                return PcreCalloutResult.Pass;
+            }
+        );
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(calls, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void should_execute_passing_callout_buf_8bit()
+    {
+        static ReadOnlySpan<byte> GetPattern() => @"(a)(*MARK:foo)(x)?(?C42)(bc)".ToLatin1Bytes();
+        var re = TestSupport.CreatePcreRegex8Bit(GetPattern());
+
+        var calls = 0;
+
+        var match = re.CreateMatchBuffer().Match("abc".ToLatin1Bytes(), data =>
+        {
+            Assert.That(data.Number, Is.EqualTo(42));
+            Assert.That(data.CurrentOffset, Is.EqualTo(1));
+            Assert.That(data.PatternPosition, Is.EqualTo(GetPattern().IndexOf("(?C42)".ToLatin1Bytes()) + 6));
+            Assert.That(data.StartOffset, Is.EqualTo(0));
+            Assert.That(data.LastCapture, Is.EqualTo(1));
+            Assert.That(data.MaxCapture, Is.EqualTo(2));
+            Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
+            Assert.That(data.StringOffset, Is.EqualTo(0));
+            Assert.That(data.String, Is.Null);
+
+            Assert.That(data.Match.Value.SequenceEqual("a".ToLatin1Bytes()));
+            Assert.That(data.Match[1].Value.SequenceEqual("a".ToLatin1Bytes()));
+            Assert.That(data.Match[2].Success, Is.False);
+            Assert.That(data.Match[2].Value.IsEmpty);
+            Assert.That(data.Match[3].Success, Is.False);
+            Assert.That(data.Match[3].Value.IsEmpty);
+
+            Assert.That(data.Match.Mark.SequenceEqual("foo".ToLatin1Bytes()));
+
+            ++calls;
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(calls, Is.EqualTo(1));
+    }
+
+    [Test]
     public void should_execute_failing_callout()
     {
         var re = new PcreRegex(@".(?C42)");
@@ -951,6 +2050,98 @@ public class MatchTests
     }
 
     [Test]
+    public void should_execute_failing_callout_utf8()
+    {
+        var re = new PcreRegexUtf8(@".(?C42)"u8);
+
+        var first = true;
+
+        var match = re.Match("ab"u8, data =>
+        {
+            Assert.That(data.Number, Is.EqualTo(42));
+            if (first)
+            {
+                first = false;
+                return PcreCalloutResult.Fail;
+            }
+
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.Value.SequenceEqual("b"u8));
+    }
+
+    [Test]
+    public void should_execute_failing_callout_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@".(?C42)"u8);
+
+        var first = true;
+
+        var match = re.CreateMatchBuffer().Match("ab"u8, data =>
+        {
+            Assert.That(data.Number, Is.EqualTo(42));
+            if (first)
+            {
+                first = false;
+                return PcreCalloutResult.Fail;
+            }
+
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.Value.SequenceEqual("b"u8));
+    }
+
+    [Test]
+    public void should_execute_failing_callout_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@".(?C42)".ToLatin1Bytes());
+
+        var first = true;
+
+        var match = re.Match("ab".ToLatin1Bytes(), data =>
+        {
+            Assert.That(data.Number, Is.EqualTo(42));
+            if (first)
+            {
+                first = false;
+                return PcreCalloutResult.Fail;
+            }
+
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.Value.SequenceEqual("b".ToLatin1Bytes()));
+    }
+
+    [Test]
+    public void should_execute_failing_callout_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@".(?C42)".ToLatin1Bytes());
+
+        var first = true;
+
+        var match = re.CreateMatchBuffer().Match("ab".ToLatin1Bytes(), data =>
+        {
+            Assert.That(data.Number, Is.EqualTo(42));
+            if (first)
+            {
+                first = false;
+                return PcreCalloutResult.Fail;
+            }
+
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.Value.SequenceEqual("b".ToLatin1Bytes()));
+    }
+
+    [Test]
     public void should_execute_aborting_callout()
     {
         var re = new PcreRegex(@".(?C42)");
@@ -994,6 +2185,62 @@ public class MatchTests
     }
 
     [Test]
+    public void should_execute_aborting_callout_utf8()
+    {
+        var re = new PcreRegexUtf8(@".(?C42)"u8);
+
+        var match = re.Match("ab"u8, data =>
+        {
+            Assert.That(data.Number, Is.EqualTo(42));
+            return PcreCalloutResult.Abort;
+        });
+
+        Assert.That(match.Success, Is.False);
+    }
+
+    [Test]
+    public void should_execute_aborting_callout_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@".(?C42)"u8);
+
+        var match = re.CreateMatchBuffer().Match("ab"u8, data =>
+        {
+            Assert.That(data.Number, Is.EqualTo(42));
+            return PcreCalloutResult.Abort;
+        });
+
+        Assert.That(match.Success, Is.False);
+    }
+
+    [Test]
+    public void should_execute_aborting_callout_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@".(?C42)".ToLatin1Bytes());
+
+        var match = re.Match("ab".ToLatin1Bytes(), data =>
+        {
+            Assert.That(data.Number, Is.EqualTo(42));
+            return PcreCalloutResult.Abort;
+        });
+
+        Assert.That(match.Success, Is.False);
+    }
+
+    [Test]
+    public void should_execute_aborting_callout_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@".(?C42)".ToLatin1Bytes());
+
+        var match = re.CreateMatchBuffer().Match("ab".ToLatin1Bytes(), data =>
+        {
+            Assert.That(data.Number, Is.EqualTo(42));
+            return PcreCalloutResult.Abort;
+        });
+
+        Assert.That(match.Success, Is.False);
+    }
+
+    [Test]
     public void should_throw_when_callout_throws()
     {
         var re = new PcreRegex(@".(?C42)");
@@ -1022,6 +2269,52 @@ public class MatchTests
 
         var buffer = re.CreateMatchBuffer();
         var ex = Assert.Throws<PcreCalloutException>(() => buffer.Match("ab".AsSpan(), _ => throw new DivideByZeroException("test")))!;
+
+        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Callout));
+        Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
+    }
+
+    [Test]
+    public void should_throw_when_callout_throws_utf8()
+    {
+        var re = new PcreRegexUtf8(@".(?C42)"u8);
+
+        var ex = Assert.Throws<PcreCalloutException>(() => re.Match("ab"u8, _ => throw new DivideByZeroException("test")))!;
+
+        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Callout));
+        Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
+    }
+
+    [Test]
+    public void should_throw_when_callout_throws_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@".(?C42)"u8);
+
+        var buffer = re.CreateMatchBuffer();
+        var ex = Assert.Throws<PcreCalloutException>(() => buffer.Match("ab"u8, _ => throw new DivideByZeroException("test")))!;
+
+        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Callout));
+        Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
+    }
+
+    [Test]
+    public void should_throw_when_callout_throws_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@".(?C42)".ToLatin1Bytes());
+
+        var ex = Assert.Throws<PcreCalloutException>(() => re.Match("ab".ToLatin1Bytes(), _ => throw new DivideByZeroException("test")))!;
+
+        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Callout));
+        Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
+    }
+
+    [Test]
+    public void should_throw_when_callout_throws_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@".(?C42)".ToLatin1Bytes());
+
+        var buffer = re.CreateMatchBuffer();
+        var ex = Assert.Throws<PcreCalloutException>(() => buffer.Match("ab".ToLatin1Bytes(), _ => throw new DivideByZeroException("test")))!;
 
         Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Callout));
         Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
@@ -1083,6 +2376,78 @@ public class MatchTests
     }
 
     [Test]
+    public void should_auto_callout_utf8()
+    {
+        var re = new PcreRegexUtf8(@"a.c"u8, PcreOptions.AutoCallout);
+
+        var count = 0;
+
+        var match = re.Match("abc"u8, data =>
+        {
+            Assert.That(data.Number, Is.EqualTo(255));
+            ++count;
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(count, Is.EqualTo(4));
+    }
+
+    [Test]
+    public void should_auto_callout_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@"a.c"u8, PcreOptions.AutoCallout);
+
+        var count = 0;
+
+        var match = re.CreateMatchBuffer().Match("abc"u8, data =>
+        {
+            Assert.That(data.Number, Is.EqualTo(255));
+            ++count;
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(count, Is.EqualTo(4));
+    }
+
+    [Test]
+    public void should_auto_callout_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"a.c".ToLatin1Bytes(), PcreOptions.AutoCallout);
+
+        var count = 0;
+
+        var match = re.Match("abc".ToLatin1Bytes(), data =>
+        {
+            Assert.That(data.Number, Is.EqualTo(255));
+            ++count;
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(count, Is.EqualTo(4));
+    }
+
+    [Test]
+    public void should_auto_callout_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"a.c".ToLatin1Bytes(), PcreOptions.AutoCallout);
+
+        var count = 0;
+
+        var match = re.CreateMatchBuffer().Match("abc".ToLatin1Bytes(), data =>
+        {
+            Assert.That(data.Number, Is.EqualTo(255));
+            ++count;
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(count, Is.EqualTo(4));
+    }
+
+    [Test]
     public void should_get_info_for_auto_callouts()
     {
         var re = new PcreRegex(@"a.c", PcreOptions.AutoCallout);
@@ -1090,6 +2455,42 @@ public class MatchTests
         var count = 0;
 
         var match = re.Match("abc", data =>
+        {
+            ++count;
+            Assert.That(data.Info, Is.Not.Null);
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(count, Is.EqualTo(4));
+    }
+
+    [Test]
+    public void should_get_info_for_auto_callouts_utf8()
+    {
+        var re = new PcreRegexUtf8(@"a.c"u8, PcreOptions.AutoCallout);
+
+        var count = 0;
+
+        var match = re.Match("abc"u8, data =>
+        {
+            ++count;
+            Assert.That(data.Info, Is.Not.Null);
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(count, Is.EqualTo(4));
+    }
+
+    [Test]
+    public void should_get_info_for_auto_callouts_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"a.c".ToLatin1Bytes(), PcreOptions.AutoCallout);
+
+        var count = 0;
+
+        var match = re.Match("abc".ToLatin1Bytes(), data =>
         {
             ++count;
             Assert.That(data.Info, Is.Not.Null);
@@ -1147,6 +2548,82 @@ public class MatchTests
         var backtrackList = new List<bool>();
 
         re.CreateMatchBuffer().Match("abc".AsSpan(), data =>
+        {
+            startMatchList.Add(data.StartMatch);
+            backtrackList.Add(data.Backtrack);
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(startMatchList, Is.EqualTo([true, false, false]));
+        Assert.That(backtrackList, Is.EqualTo([false, false, true]));
+    }
+
+    [Test]
+    public void should_provide_callout_flags_utf8()
+    {
+        var re = new PcreRegexUtf8(@"a(?C1)(?:(?C2)(*FAIL)|b)(?C3)"u8);
+
+        var startMatchList = new List<bool>();
+        var backtrackList = new List<bool>();
+
+        re.Match("abc"u8, data =>
+        {
+            startMatchList.Add(data.StartMatch);
+            backtrackList.Add(data.Backtrack);
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(startMatchList, Is.EqualTo([true, false, false]));
+        Assert.That(backtrackList, Is.EqualTo([false, false, true]));
+    }
+
+    [Test]
+    public void should_provide_callout_flags_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@"a(?C1)(?:(?C2)(*FAIL)|b)(?C3)"u8);
+
+        var startMatchList = new List<bool>();
+        var backtrackList = new List<bool>();
+
+        re.CreateMatchBuffer().Match("abc"u8, data =>
+        {
+            startMatchList.Add(data.StartMatch);
+            backtrackList.Add(data.Backtrack);
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(startMatchList, Is.EqualTo([true, false, false]));
+        Assert.That(backtrackList, Is.EqualTo([false, false, true]));
+    }
+
+    [Test]
+    public void should_provide_callout_flags_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"a(?C1)(?:(?C2)(*FAIL)|b)(?C3)".ToLatin1Bytes());
+
+        var startMatchList = new List<bool>();
+        var backtrackList = new List<bool>();
+
+        re.Match("abc".ToLatin1Bytes(), data =>
+        {
+            startMatchList.Add(data.StartMatch);
+            backtrackList.Add(data.Backtrack);
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(startMatchList, Is.EqualTo([true, false, false]));
+        Assert.That(backtrackList, Is.EqualTo([false, false, true]));
+    }
+
+    [Test]
+    public void should_provide_callout_flags_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"a(?C1)(?:(?C2)(*FAIL)|b)(?C3)".ToLatin1Bytes());
+
+        var startMatchList = new List<bool>();
+        var backtrackList = new List<bool>();
+
+        re.CreateMatchBuffer().Match("abc".ToLatin1Bytes(), data =>
         {
             startMatchList.Add(data.StartMatch);
             backtrackList.Add(data.Backtrack);
@@ -1270,6 +2747,154 @@ public class MatchTests
     }
 
     [Test]
+    public void should_execute_string_callout_utf8()
+    {
+        static ReadOnlySpan<byte> GetPattern() => @"(a)(*MARK:foo)(x)?(?C{bar})(bc)"u8;
+        var re = new PcreRegexUtf8(GetPattern());
+
+        var calls = 0;
+
+        var match = re.Match("abc"u8, data =>
+        {
+            Assert.That(data.Number, Is.EqualTo(0));
+            Assert.That(data.CurrentOffset, Is.EqualTo(1));
+            Assert.That(data.PatternPosition, Is.EqualTo(GetPattern().IndexOf("(?C{bar})"u8) + 9));
+            Assert.That(data.StartOffset, Is.EqualTo(0));
+            Assert.That(data.LastCapture, Is.EqualTo(1));
+            Assert.That(data.MaxCapture, Is.EqualTo(2));
+            Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
+            Assert.That(data.StringOffset, Is.EqualTo(GetPattern().IndexOf("(?C{bar})"u8) + 4));
+            Assert.That(data.String, Is.EqualTo("bar"));
+
+            Assert.That(data.Match.Value.SequenceEqual("a"u8));
+            Assert.That(data.Match[1].Value.SequenceEqual("a"u8));
+            Assert.That(data.Match[2].Success, Is.False);
+            Assert.That(data.Match[2].Value.IsEmpty);
+            Assert.That(data.Match[3].Success, Is.False);
+            Assert.That(data.Match[3].Value.IsEmpty);
+
+            Assert.That(data.Match.Mark.SequenceEqual("foo"u8));
+
+            ++calls;
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(calls, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void should_execute_string_callout_buf_utf8()
+    {
+        static ReadOnlySpan<byte> GetPattern() => @"(a)(*MARK:foo)(x)?(?C{bar})(bc)"u8;
+        var re = new PcreRegexUtf8(GetPattern());
+
+        var calls = 0;
+
+        var match = re.CreateMatchBuffer().Match("abc"u8, data =>
+        {
+            Assert.That(data.Number, Is.EqualTo(0));
+            Assert.That(data.CurrentOffset, Is.EqualTo(1));
+            Assert.That(data.PatternPosition, Is.EqualTo(GetPattern().IndexOf("(?C{bar})"u8) + 9));
+            Assert.That(data.StartOffset, Is.EqualTo(0));
+            Assert.That(data.LastCapture, Is.EqualTo(1));
+            Assert.That(data.MaxCapture, Is.EqualTo(2));
+            Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
+            Assert.That(data.StringOffset, Is.EqualTo(GetPattern().IndexOf("(?C{bar})"u8) + 4));
+            Assert.That(data.String, Is.EqualTo("bar"));
+
+            Assert.That(data.Match.Value.SequenceEqual("a"u8));
+            Assert.That(data.Match[1].Value.SequenceEqual("a"u8));
+            Assert.That(data.Match[2].Success, Is.False);
+            Assert.That(data.Match[2].Value.IsEmpty);
+            Assert.That(data.Match[3].Success, Is.False);
+            Assert.That(data.Match[3].Value.IsEmpty);
+
+            Assert.That(data.Match.Mark.SequenceEqual("foo"u8));
+
+            ++calls;
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(calls, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void should_execute_string_callout_8bit()
+    {
+        static ReadOnlySpan<byte> GetPattern() => @"(a)(*MARK:foo)(x)?(?C{bar})(bc)".ToLatin1Bytes();
+        var re = TestSupport.CreatePcreRegex8Bit(GetPattern());
+
+        var calls = 0;
+
+        var match = re.Match("abc".ToLatin1Bytes(), data =>
+        {
+            Assert.That(data.Number, Is.EqualTo(0));
+            Assert.That(data.CurrentOffset, Is.EqualTo(1));
+            Assert.That(data.PatternPosition, Is.EqualTo(GetPattern().IndexOf("(?C{bar})".ToLatin1Bytes()) + 9));
+            Assert.That(data.StartOffset, Is.EqualTo(0));
+            Assert.That(data.LastCapture, Is.EqualTo(1));
+            Assert.That(data.MaxCapture, Is.EqualTo(2));
+            Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
+            Assert.That(data.StringOffset, Is.EqualTo(GetPattern().IndexOf("(?C{bar})".ToLatin1Bytes()) + 4));
+            Assert.That(data.String, Is.EqualTo("bar"));
+
+            Assert.That(data.Match.Value.SequenceEqual("a".ToLatin1Bytes()));
+            Assert.That(data.Match[1].Value.SequenceEqual("a".ToLatin1Bytes()));
+            Assert.That(data.Match[2].Success, Is.False);
+            Assert.That(data.Match[2].Value.IsEmpty);
+            Assert.That(data.Match[3].Success, Is.False);
+            Assert.That(data.Match[3].Value.IsEmpty);
+
+            Assert.That(data.Match.Mark.SequenceEqual("foo".ToLatin1Bytes()));
+
+            ++calls;
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(calls, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void should_execute_string_callout_buf_8bit()
+    {
+        static ReadOnlySpan<byte> GetPattern() => @"(a)(*MARK:foo)(x)?(?C{bar})(bc)".ToLatin1Bytes();
+        var re = TestSupport.CreatePcreRegex8Bit(GetPattern());
+
+        var calls = 0;
+
+        var match = re.CreateMatchBuffer().Match("abc".ToLatin1Bytes(), data =>
+        {
+            Assert.That(data.Number, Is.EqualTo(0));
+            Assert.That(data.CurrentOffset, Is.EqualTo(1));
+            Assert.That(data.PatternPosition, Is.EqualTo(GetPattern().IndexOf("(?C{bar})".ToLatin1Bytes()) + 9));
+            Assert.That(data.StartOffset, Is.EqualTo(0));
+            Assert.That(data.LastCapture, Is.EqualTo(1));
+            Assert.That(data.MaxCapture, Is.EqualTo(2));
+            Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
+            Assert.That(data.StringOffset, Is.EqualTo(GetPattern().IndexOf("(?C{bar})".ToLatin1Bytes()) + 4));
+            Assert.That(data.String, Is.EqualTo("bar"));
+
+            Assert.That(data.Match.Value.SequenceEqual("a".ToLatin1Bytes()));
+            Assert.That(data.Match[1].Value.SequenceEqual("a".ToLatin1Bytes()));
+            Assert.That(data.Match[2].Success, Is.False);
+            Assert.That(data.Match[2].Value.IsEmpty);
+            Assert.That(data.Match[3].Success, Is.False);
+            Assert.That(data.Match[3].Value.IsEmpty);
+
+            Assert.That(data.Match.Mark.SequenceEqual("foo".ToLatin1Bytes()));
+
+            ++calls;
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(calls, Is.EqualTo(1));
+    }
+
+    [Test]
     public void should_support_unmatched_groups_before_matched_groups_in_callout()
     {
         var re = new PcreRegex(@"(a|(z))(bc)(?C42)");
@@ -1360,6 +2985,126 @@ public class MatchTests
     }
 
     [Test]
+    public void should_support_unmatched_groups_before_matched_groups_in_callout_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"(a|(z))(bc)(?C42)".ToLatin1Bytes());
+        var calls = 0;
+
+        re.Match("abc".ToLatin1Bytes(), data =>
+        {
+            Assert.That(data.Match[1].Success, Is.True);
+            Assert.That(data.Match[1].Index, Is.EqualTo(0));
+            Assert.That(data.Match[1].Length, Is.EqualTo(1));
+            Assert.That(data.Match[1].Value.SequenceEqual("a".ToLatin1Bytes()));
+
+            Assert.That(data.Match[2].Success, Is.False);
+            Assert.That(data.Match[2].Index, Is.EqualTo(-1));
+            Assert.That(data.Match[2].EndIndex, Is.EqualTo(-1));
+            Assert.That(data.Match[2].Value.IsEmpty);
+
+            Assert.That(data.Match[3].Success, Is.True);
+            Assert.That(data.Match[3].Index, Is.EqualTo(1));
+            Assert.That(data.Match[3].Length, Is.EqualTo(2));
+            Assert.That(data.Match[3].Value.SequenceEqual("bc".ToLatin1Bytes()));
+
+            ++calls;
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(calls, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void should_support_unmatched_groups_before_matched_groups_in_callout_utf8()
+    {
+        var re = new PcreRegexUtf8(@"(a|(z))(bc)(?C42)"u8);
+        var calls = 0;
+
+        re.Match("abc"u8, data =>
+        {
+            Assert.That(data.Match[1].Success, Is.True);
+            Assert.That(data.Match[1].Index, Is.EqualTo(0));
+            Assert.That(data.Match[1].Length, Is.EqualTo(1));
+            Assert.That(data.Match[1].Value.SequenceEqual("a"u8));
+
+            Assert.That(data.Match[2].Success, Is.False);
+            Assert.That(data.Match[2].Index, Is.EqualTo(-1));
+            Assert.That(data.Match[2].EndIndex, Is.EqualTo(-1));
+            Assert.That(data.Match[2].Value.IsEmpty);
+
+            Assert.That(data.Match[3].Success, Is.True);
+            Assert.That(data.Match[3].Index, Is.EqualTo(1));
+            Assert.That(data.Match[3].Length, Is.EqualTo(2));
+            Assert.That(data.Match[3].Value.SequenceEqual("bc"u8));
+
+            ++calls;
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(calls, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void should_support_unmatched_groups_before_matched_groups_in_callout_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@"(a|(z))(bc)(?C42)"u8);
+        var calls = 0;
+
+        re.CreateMatchBuffer().Match("abc"u8, data =>
+        {
+            Assert.That(data.Match[1].Success, Is.True);
+            Assert.That(data.Match[1].Index, Is.EqualTo(0));
+            Assert.That(data.Match[1].Length, Is.EqualTo(1));
+            Assert.That(data.Match[1].Value.SequenceEqual("a"u8));
+
+            Assert.That(data.Match[2].Success, Is.False);
+            Assert.That(data.Match[2].Index, Is.EqualTo(-1));
+            Assert.That(data.Match[2].EndIndex, Is.EqualTo(-1));
+            Assert.That(data.Match[2].Value.IsEmpty);
+
+            Assert.That(data.Match[3].Success, Is.True);
+            Assert.That(data.Match[3].Index, Is.EqualTo(1));
+            Assert.That(data.Match[3].Length, Is.EqualTo(2));
+            Assert.That(data.Match[3].Value.SequenceEqual("bc"u8));
+
+            ++calls;
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(calls, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void should_support_unmatched_groups_before_matched_groups_in_callout_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"(a|(z))(bc)(?C42)".ToLatin1Bytes());
+        var calls = 0;
+
+        re.CreateMatchBuffer().Match("abc".ToLatin1Bytes(), data =>
+        {
+            Assert.That(data.Match[1].Success, Is.True);
+            Assert.That(data.Match[1].Index, Is.EqualTo(0));
+            Assert.That(data.Match[1].Length, Is.EqualTo(1));
+            Assert.That(data.Match[1].Value.SequenceEqual("a".ToLatin1Bytes()));
+
+            Assert.That(data.Match[2].Success, Is.False);
+            Assert.That(data.Match[2].Index, Is.EqualTo(-1));
+            Assert.That(data.Match[2].EndIndex, Is.EqualTo(-1));
+            Assert.That(data.Match[2].Value.IsEmpty);
+
+            Assert.That(data.Match[3].Success, Is.True);
+            Assert.That(data.Match[3].Index, Is.EqualTo(1));
+            Assert.That(data.Match[3].Length, Is.EqualTo(2));
+            Assert.That(data.Match[3].Value.SequenceEqual("bc".ToLatin1Bytes()));
+
+            ++calls;
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(calls, Is.EqualTo(1));
+    }
+
+    [Test]
     public void should_handle_callouts_with_many_captures_ref()
     {
         var sb = new StringBuilder();
@@ -1414,6 +3159,118 @@ public class MatchTests
     }
 
     [Test]
+    public void should_handle_callouts_with_many_captures_utf8()
+    {
+        var sb = new StringBuilder();
+        const int length = InternalRegex.MaxStackAllocCaptureCount * 2;
+
+        for (var i = 0; i < length; ++i)
+            sb.Append("(a)");
+
+        sb.Append("(?C)");
+
+        var re = new PcreRegexUtf8(sb.ToString());
+        var calls = 0;
+        var subject = new byte[length];
+        subject.AsSpan().Fill((byte)'a');
+
+        re.Match(subject, data =>
+        {
+            ++calls;
+            Assert.That(data.Match.Length, Is.EqualTo(length));
+            Assert.That(data.Match.Groups[1].Value.SequenceEqual("a"u8));
+            Assert.That(data.Match.Groups[length].Value.SequenceEqual("a"u8));
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(calls, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void should_handle_callouts_with_many_captures_buf_utf8()
+    {
+        var sb = new StringBuilder();
+        const int length = InternalRegex.MaxStackAllocCaptureCount * 2;
+
+        for (var i = 0; i < length; ++i)
+            sb.Append("(a)");
+
+        sb.Append("(?C)");
+
+        var re = new PcreRegexUtf8(sb.ToString());
+        var calls = 0;
+        var subject = new byte[length];
+        subject.AsSpan().Fill((byte)'a');
+
+        re.CreateMatchBuffer().Match(subject, data =>
+        {
+            ++calls;
+            Assert.That(data.Match.Length, Is.EqualTo(length));
+            Assert.That(data.Match.Groups[1].Value.SequenceEqual("a"u8));
+            Assert.That(data.Match.Groups[length].Value.SequenceEqual("a"u8));
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(calls, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void should_handle_callouts_with_many_captures_8bit()
+    {
+        var sb = new StringBuilder();
+        const int length = InternalRegex.MaxStackAllocCaptureCount * 2;
+
+        for (var i = 0; i < length; ++i)
+            sb.Append("(a)");
+
+        sb.Append("(?C)");
+
+        var re = TestSupport.CreatePcreRegex8Bit(sb.ToString());
+        var calls = 0;
+        var subject = new byte[length];
+        subject.AsSpan().Fill((byte)'a');
+
+        re.Match(subject, data =>
+        {
+            ++calls;
+            Assert.That(data.Match.Length, Is.EqualTo(length));
+            Assert.That(data.Match.Groups[1].Value.SequenceEqual("a".ToLatin1Bytes()));
+            Assert.That(data.Match.Groups[length].Value.SequenceEqual("a".ToLatin1Bytes()));
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(calls, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void should_handle_callouts_with_many_captures_buf_8bit()
+    {
+        var sb = new StringBuilder();
+        const int length = InternalRegex.MaxStackAllocCaptureCount * 2;
+
+        for (var i = 0; i < length; ++i)
+            sb.Append("(a)");
+
+        sb.Append("(?C)");
+
+        var re = TestSupport.CreatePcreRegex8Bit(sb.ToString());
+        var calls = 0;
+        var subject = new byte[length];
+        subject.AsSpan().Fill((byte)'a');
+
+        re.CreateMatchBuffer().Match(subject, data =>
+        {
+            ++calls;
+            Assert.That(data.Match.Length, Is.EqualTo(length));
+            Assert.That(data.Match.Groups[1].Value.SequenceEqual("a".ToLatin1Bytes()));
+            Assert.That(data.Match.Groups[length].Value.SequenceEqual("a".ToLatin1Bytes()));
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(calls, Is.EqualTo(1));
+    }
+
+    [Test]
     public void should_handle_end_before_start()
     {
         var re = new PcreRegex(@"(?=a+\K)", new PcreRegexSettings { ExtraCompileOptions = PcreExtraCompileOptions.AllowLookaroundBsK });
@@ -1454,6 +3311,62 @@ public class MatchTests
         Assert.That(match.EndIndex, Is.EqualTo(0));
         Assert.That(match.Length, Is.EqualTo(0));
         Assert.That(match.Value.ToString(), Is.EqualTo(string.Empty));
+    }
+
+    [Test]
+    public void should_handle_end_before_start_utf8()
+    {
+        var re = new PcreRegexUtf8(@"(?=a+\K)"u8, new PcreRegexSettings { ExtraCompileOptions = PcreExtraCompileOptions.AllowLookaroundBsK });
+
+        var match = re.Match("aaa"u8);
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.Index, Is.EqualTo(3));
+        Assert.That(match.EndIndex, Is.EqualTo(0));
+        Assert.That(match.Length, Is.EqualTo(0));
+        Assert.That(match.Value.IsEmpty);
+    }
+
+    [Test]
+    public void should_handle_end_before_start_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@"(?=a+\K)"u8, new PcreRegexSettings { ExtraCompileOptions = PcreExtraCompileOptions.AllowLookaroundBsK });
+
+        var match = re.CreateMatchBuffer().Match("aaa"u8);
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.Index, Is.EqualTo(3));
+        Assert.That(match.EndIndex, Is.EqualTo(0));
+        Assert.That(match.Length, Is.EqualTo(0));
+        Assert.That(match.Value.IsEmpty);
+    }
+
+    [Test]
+    public void should_handle_end_before_start_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"(?=a+\K)".ToLatin1Bytes(), new PcreRegexSettings { ExtraCompileOptions = PcreExtraCompileOptions.AllowLookaroundBsK });
+
+        var match = re.Match("aaa".ToLatin1Bytes());
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.Index, Is.EqualTo(3));
+        Assert.That(match.EndIndex, Is.EqualTo(0));
+        Assert.That(match.Length, Is.EqualTo(0));
+        Assert.That(match.Value.IsEmpty);
+    }
+
+    [Test]
+    public void should_handle_end_before_start_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"(?=a+\K)".ToLatin1Bytes(), new PcreRegexSettings { ExtraCompileOptions = PcreExtraCompileOptions.AllowLookaroundBsK });
+
+        var match = re.CreateMatchBuffer().Match("aaa".ToLatin1Bytes());
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.Index, Is.EqualTo(3));
+        Assert.That(match.EndIndex, Is.EqualTo(0));
+        Assert.That(match.Length, Is.EqualTo(0));
+        Assert.That(match.Value.IsEmpty);
     }
 
     [Test]
@@ -1500,6 +3413,64 @@ public class MatchTests
     }
 
     [Test]
+    public void should_handle_additional_options_utf8()
+    {
+        var re = new PcreRegexUtf8(@"bar"u8);
+
+        var match = re.Match("foobar"u8, PcreMatchOptions.None);
+
+        Assert.That(match.Success, Is.True);
+
+        match = re.Match("foobar"u8, PcreMatchOptions.Anchored);
+
+        Assert.That(match.Success, Is.False);
+    }
+
+    [Test]
+    public void should_handle_additional_options_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@"bar"u8);
+        var buffer = re.CreateMatchBuffer();
+
+        var match = buffer.Match("foobar"u8, PcreMatchOptions.None);
+
+        Assert.That(match.Success, Is.True);
+
+        match = buffer.Match("foobar"u8, PcreMatchOptions.Anchored);
+
+        Assert.That(match.Success, Is.False);
+    }
+
+    [Test]
+    public void should_handle_additional_options_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"bar".ToLatin1Bytes());
+
+        var match = re.Match("foobar".ToLatin1Bytes(), PcreMatchOptions.None);
+
+        Assert.That(match.Success, Is.True);
+
+        match = re.Match("foobar".ToLatin1Bytes(), PcreMatchOptions.Anchored);
+
+        Assert.That(match.Success, Is.False);
+    }
+
+    [Test]
+    public void should_handle_additional_options_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"bar".ToLatin1Bytes());
+        var buffer = re.CreateMatchBuffer();
+
+        var match = buffer.Match("foobar".ToLatin1Bytes(), PcreMatchOptions.None);
+
+        Assert.That(match.Success, Is.True);
+
+        match = buffer.Match("foobar".ToLatin1Bytes(), PcreMatchOptions.Anchored);
+
+        Assert.That(match.Success, Is.False);
+    }
+
+    [Test]
     public void should_handle_extra_options()
     {
         var re = new PcreRegex(@"bar", new PcreRegexSettings(PcreOptions.Literal)
@@ -1535,6 +3506,58 @@ public class MatchTests
 
         Assert.That(buffer.IsMatch("foo bar baz".AsSpan()), Is.True);
         Assert.That(buffer.IsMatch("foobar baz".AsSpan()), Is.False);
+    }
+
+    [Test]
+    public void should_handle_extra_options_utf8()
+    {
+        var re = new PcreRegexUtf8(@"bar"u8, new PcreRegexSettings(PcreOptions.Literal)
+        {
+            ExtraCompileOptions = PcreExtraCompileOptions.MatchWord
+        });
+
+        Assert.That(re.IsMatch("foo bar baz"u8), Is.True);
+        Assert.That(re.IsMatch("foobar baz"u8), Is.False);
+    }
+
+    [Test]
+    public void should_handle_extra_options_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@"bar"u8, new PcreRegexSettings(PcreOptions.Literal)
+        {
+            ExtraCompileOptions = PcreExtraCompileOptions.MatchWord
+        });
+
+        var buffer = re.CreateMatchBuffer();
+
+        Assert.That(buffer.IsMatch("foo bar baz"u8), Is.True);
+        Assert.That(buffer.IsMatch("foobar baz"u8), Is.False);
+    }
+
+    [Test]
+    public void should_handle_extra_options_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"bar".ToLatin1Bytes(), new PcreRegexSettings(PcreOptions.Literal)
+        {
+            ExtraCompileOptions = PcreExtraCompileOptions.MatchWord
+        });
+
+        Assert.That(re.IsMatch("foo bar baz".ToLatin1Bytes()), Is.True);
+        Assert.That(re.IsMatch("foobar baz".ToLatin1Bytes()), Is.False);
+    }
+
+    [Test]
+    public void should_handle_extra_options_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"bar".ToLatin1Bytes(), new PcreRegexSettings(PcreOptions.Literal)
+        {
+            ExtraCompileOptions = PcreExtraCompileOptions.MatchWord
+        });
+
+        var buffer = re.CreateMatchBuffer();
+
+        Assert.That(buffer.IsMatch("foo bar baz".ToLatin1Bytes()), Is.True);
+        Assert.That(buffer.IsMatch("foobar baz".ToLatin1Bytes()), Is.False);
     }
 
     [Test]
@@ -1589,6 +3612,74 @@ public class MatchTests
     }
 
     [Test]
+    [TestCase(PcreMatchOptions.PartialSoft)]
+    [TestCase(PcreMatchOptions.PartialHard)]
+    public void should_match_partially_utf8(PcreMatchOptions options)
+    {
+        var re = new PcreRegexUtf8(@"(?<=abc)123"u8);
+
+        var match = re.Match("xyzabc12"u8, options);
+
+        Assert.That(match.Success, Is.False);
+        Assert.That(match.IsPartialMatch, Is.True);
+        Assert.That(match.Index, Is.EqualTo(6));
+        Assert.That(match.EndIndex, Is.EqualTo(8));
+        Assert.That(match.Length, Is.EqualTo(2));
+        Assert.That(match.Value.SequenceEqual("12"u8));
+    }
+
+    [Test]
+    [TestCase(PcreMatchOptions.PartialSoft)]
+    [TestCase(PcreMatchOptions.PartialHard)]
+    public void should_match_partially_buf_utf8(PcreMatchOptions options)
+    {
+        var re = new PcreRegexUtf8(@"(?<=abc)123"u8);
+
+        var match = re.CreateMatchBuffer().Match("xyzabc12"u8, options);
+
+        Assert.That(match.Success, Is.False);
+        Assert.That(match.IsPartialMatch, Is.True);
+        Assert.That(match.Index, Is.EqualTo(6));
+        Assert.That(match.EndIndex, Is.EqualTo(8));
+        Assert.That(match.Length, Is.EqualTo(2));
+        Assert.That(match.Value.SequenceEqual("12"u8));
+    }
+
+    [Test]
+    [TestCase(PcreMatchOptions.PartialSoft)]
+    [TestCase(PcreMatchOptions.PartialHard)]
+    public void should_match_partially_8bit(PcreMatchOptions options)
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"(?<=abc)123".ToLatin1Bytes());
+
+        var match = re.Match("xyzabc12".ToLatin1Bytes(), options);
+
+        Assert.That(match.Success, Is.False);
+        Assert.That(match.IsPartialMatch, Is.True);
+        Assert.That(match.Index, Is.EqualTo(6));
+        Assert.That(match.EndIndex, Is.EqualTo(8));
+        Assert.That(match.Length, Is.EqualTo(2));
+        Assert.That(match.Value.SequenceEqual("12".ToLatin1Bytes()));
+    }
+
+    [Test]
+    [TestCase(PcreMatchOptions.PartialSoft)]
+    [TestCase(PcreMatchOptions.PartialHard)]
+    public void should_match_partially_buf_8bit(PcreMatchOptions options)
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"(?<=abc)123".ToLatin1Bytes());
+
+        var match = re.CreateMatchBuffer().Match("xyzabc12".ToLatin1Bytes(), options);
+
+        Assert.That(match.Success, Is.False);
+        Assert.That(match.IsPartialMatch, Is.True);
+        Assert.That(match.Index, Is.EqualTo(6));
+        Assert.That(match.EndIndex, Is.EqualTo(8));
+        Assert.That(match.Length, Is.EqualTo(2));
+        Assert.That(match.Value.SequenceEqual("12".ToLatin1Bytes()));
+    }
+
+    [Test]
     public void should_differentiate_soft_and_hard_partial_matching()
     {
         var re = new PcreRegex(@"dog(sbody)?");
@@ -1636,11 +3727,89 @@ public class MatchTests
     }
 
     [Test]
+    public void should_differentiate_soft_and_hard_partial_matching_utf8()
+    {
+        var re = new PcreRegexUtf8(@"dog(sbody)?"u8);
+
+        var softMatch = re.Match("dog"u8, PcreMatchOptions.PartialSoft);
+        var hardMatch = re.Match("dog"u8, PcreMatchOptions.PartialHard);
+
+        Assert.That(softMatch.Success, Is.True);
+        Assert.That(softMatch.IsPartialMatch, Is.False);
+
+        Assert.That(hardMatch.Success, Is.False);
+        Assert.That(hardMatch.IsPartialMatch, Is.True);
+    }
+
+    [Test]
+    public void should_differentiate_soft_and_hard_partial_matching_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@"dog(sbody)?"u8);
+        var buffer = re.CreateMatchBuffer();
+
+        var softMatch = buffer.Match("dog"u8, PcreMatchOptions.PartialSoft);
+
+        Assert.That(softMatch.Success, Is.True);
+        Assert.That(softMatch.IsPartialMatch, Is.False);
+
+        var hardMatch = buffer.Match("dog"u8, PcreMatchOptions.PartialHard);
+
+        Assert.That(hardMatch.Success, Is.False);
+        Assert.That(hardMatch.IsPartialMatch, Is.True);
+    }
+
+    [Test]
+    public void should_differentiate_soft_and_hard_partial_matching_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"dog(sbody)?".ToLatin1Bytes());
+
+        var softMatch = re.Match("dog".ToLatin1Bytes(), PcreMatchOptions.PartialSoft);
+        var hardMatch = re.Match("dog".ToLatin1Bytes(), PcreMatchOptions.PartialHard);
+
+        Assert.That(softMatch.Success, Is.True);
+        Assert.That(softMatch.IsPartialMatch, Is.False);
+
+        Assert.That(hardMatch.Success, Is.False);
+        Assert.That(hardMatch.IsPartialMatch, Is.True);
+    }
+
+    [Test]
+    public void should_differentiate_soft_and_hard_partial_matching_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"dog(sbody)?".ToLatin1Bytes());
+        var buffer = re.CreateMatchBuffer();
+
+        var softMatch = buffer.Match("dog".ToLatin1Bytes(), PcreMatchOptions.PartialSoft);
+
+        Assert.That(softMatch.Success, Is.True);
+        Assert.That(softMatch.IsPartialMatch, Is.False);
+
+        var hardMatch = buffer.Match("dog".ToLatin1Bytes(), PcreMatchOptions.PartialHard);
+
+        Assert.That(hardMatch.Success, Is.False);
+        Assert.That(hardMatch.IsPartialMatch, Is.True);
+    }
+
+    [Test]
     public void should_check_pattern_utf_validity()
     {
         var ex = Assert.Throws<PcrePatternException>(() => _ = new PcreRegex("A\uD800B"))!;
         Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Utf16Err2));
         Assert.That(ex.Message, Contains.Substring("invalid low surrogate"));
+    }
+
+    [Test]
+    public void should_check_pattern_utf_validity_utf8()
+    {
+        var ex = Assert.Throws<PcrePatternException>(() => _ = new PcreRegexUtf8([(byte)'A', (byte)'é' ,(byte)'B']))!;
+        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Utf8Err1));
+        Assert.That(ex.Message, Contains.Substring("1 byte missing at end at offset 1"));
+    }
+
+    [Test]
+    public void should_not_check_pattern_utf_validity_8bit()
+    {
+        _ = TestSupport.CreatePcreRegex8Bit([(byte)'A', (byte)'é', (byte)'B']);
     }
 
     [Test]
@@ -1670,6 +3839,41 @@ public class MatchTests
         var ex = Assert.Throws<PcreMatchException>(() => _ = buffer.Match("A\uD800B".AsSpan()))!;
         Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Utf16Err2));
         Assert.That(ex.Message, Contains.Substring("invalid low surrogate"));
+    }
+
+    [Test]
+    public void should_check_subject_utf_validity_utf8()
+    {
+        var re = new PcreRegexUtf8(@"A"u8);
+        var ex = Assert.Throws<PcreMatchException>(() => _ = re.Match([(byte)'A', (byte)'é' ,(byte)'B']))!;
+        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Utf8Err1));
+        Assert.That(ex.Message, Contains.Substring("1 byte missing at end"));
+    }
+
+    [Test]
+    public void should_check_subject_utf_validity_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@"A"u8);
+        var buffer = re.CreateMatchBuffer();
+
+        var ex = Assert.Throws<PcreMatchException>(() => _ = buffer.Match([(byte)'A', (byte)'é' ,(byte)'B']))!;
+        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Utf8Err1));
+        Assert.That(ex.Message, Contains.Substring("1 byte missing at end"));
+    }
+
+    [Test]
+    public void should_not_check_subject_utf_validity_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"A".ToLatin1Bytes());
+        _ = re.Match([(byte)'A', (byte)'é' ,(byte)'B']);
+    }
+
+    [Test]
+    public void should_not_check_subject_utf_validity_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"A".ToLatin1Bytes());
+        var buffer = re.CreateMatchBuffer();
+        _ = buffer.Match([(byte)'A', (byte)'é', (byte)'B']);
     }
 
     [Test]
@@ -1733,6 +3937,84 @@ public class MatchTests
     }
 
     [Test]
+    public void should_handle_offset_limit_utf8()
+    {
+        var re = new PcreRegexUtf8(@"bar"u8, PcreOptions.UseOffsetLimit);
+
+        var match = re.Match("foobar"u8);
+        Assert.That(match.Success, Is.True);
+
+        match = re.Match("foobar"u8, 0, PcreMatchOptions.None, null, new PcreMatchSettings
+        {
+            OffsetLimit = 3
+        });
+        Assert.That(match.Success, Is.True);
+
+        match = re.Match("foobar"u8, 0, PcreMatchOptions.None, null, new PcreMatchSettings
+        {
+            OffsetLimit = 2
+        });
+        Assert.That(match.Success, Is.False);
+    }
+
+    [Test]
+    public void should_handle_offset_limit_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@"bar"u8, PcreOptions.UseOffsetLimit);
+
+        var buffer = re.CreateMatchBuffer();
+        var match = buffer.Match("foobar"u8);
+        Assert.That(match.Success, Is.True);
+
+        buffer = re.CreateMatchBuffer(new PcreMatchSettings { OffsetLimit = 3 });
+        match = buffer.Match("foobar"u8);
+        Assert.That(match.Success, Is.True);
+
+        buffer = re.CreateMatchBuffer(new PcreMatchSettings { OffsetLimit = 2 });
+        match = buffer.Match("foobar"u8);
+        Assert.That(match.Success, Is.False);
+    }
+
+    [Test]
+    public void should_handle_offset_limit_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"bar".ToLatin1Bytes(), PcreOptions.UseOffsetLimit);
+
+        var match = re.Match("foobar".ToLatin1Bytes());
+        Assert.That(match.Success, Is.True);
+
+        match = re.Match("foobar".ToLatin1Bytes(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
+        {
+            OffsetLimit = 3
+        });
+        Assert.That(match.Success, Is.True);
+
+        match = re.Match("foobar".ToLatin1Bytes(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
+        {
+            OffsetLimit = 2
+        });
+        Assert.That(match.Success, Is.False);
+    }
+
+    [Test]
+    public void should_handle_offset_limit_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"bar".ToLatin1Bytes(), PcreOptions.UseOffsetLimit);
+
+        var buffer = re.CreateMatchBuffer();
+        var match = buffer.Match("foobar".ToLatin1Bytes());
+        Assert.That(match.Success, Is.True);
+
+        buffer = re.CreateMatchBuffer(new PcreMatchSettings { OffsetLimit = 3 });
+        match = buffer.Match("foobar".ToLatin1Bytes());
+        Assert.That(match.Success, Is.True);
+
+        buffer = re.CreateMatchBuffer(new PcreMatchSettings { OffsetLimit = 2 });
+        match = buffer.Match("foobar".ToLatin1Bytes());
+        Assert.That(match.Success, Is.False);
+    }
+
+    [Test]
     public void should_detect_invalid_offset_limit_usage()
     {
         var re = new PcreRegex(@"bar");
@@ -1768,6 +4050,58 @@ public class MatchTests
         });
 
         var ex = Assert.Throws<PcreMatchException>(() => buffer.Match("foobar".AsSpan()))!;
+        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.BadOffsetLimit));
+    }
+
+    [Test]
+    public void should_detect_invalid_offset_limit_usage_utf8()
+    {
+        var re = new PcreRegexUtf8(@"bar"u8);
+
+        var ex = Assert.Throws<PcreMatchException>(() => re.Match("foobar"u8, 0, PcreMatchOptions.None, null, new PcreMatchSettings
+        {
+            OffsetLimit = 3
+        }))!;
+
+        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.BadOffsetLimit));
+    }
+
+    [Test]
+    public void should_detect_invalid_offset_limit_usage_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(@"bar"u8);
+        var buffer = re.CreateMatchBuffer(new PcreMatchSettings
+        {
+            OffsetLimit = 3
+        });
+
+        var ex = Assert.Throws<PcreMatchException>(() => buffer.Match("foobar"u8))!;
+        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.BadOffsetLimit));
+    }
+
+    [Test]
+    public void should_detect_invalid_offset_limit_usage_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"bar".ToLatin1Bytes());
+
+        var ex = Assert.Throws<PcreMatchException>(() => re.Match("foobar".ToLatin1Bytes(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
+        {
+            OffsetLimit = 3
+        }))!;
+
+        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.BadOffsetLimit));
+    }
+
+    [Test]
+    public void should_detect_invalid_offset_limit_usage_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"bar".ToLatin1Bytes());
+        var buffer = re.CreateMatchBuffer(new PcreMatchSettings
+        {
+            OffsetLimit = 3
+        });
+
+        var ex = Assert.Throws<PcreMatchException>(() => buffer.Match("foobar".ToLatin1Bytes()))!;
         Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.BadOffsetLimit));
     }
 
@@ -1814,6 +4148,38 @@ public class MatchTests
         Assert.That(normal.Length, Is.EqualTo(subject.Length));
 
         var scriptRun = new PcreRegex(@"(*script_run:\d+)", PcreOptions.Unicode).CreateMatchBuffer().Match(subject.AsSpan());
+        Assert.That(scriptRun.Success, Is.True);
+        Assert.That(scriptRun.Index, Is.EqualTo(0));
+        Assert.That(scriptRun.Length, Is.EqualTo(3));
+    }
+
+    [Test]
+    public void should_match_script_run_utf8()
+    {
+         var subject = "123\U0001D7CF\U0001D7D0\U0001D7D1"u8;
+
+        var normal = new PcreRegexUtf8(@"\d+"u8, PcreOptions.Unicode).Match(subject);
+        Assert.That(normal.Success, Is.True);
+        Assert.That(normal.Index, Is.EqualTo(0));
+        Assert.That(normal.Length, Is.EqualTo(subject.Length));
+
+        var scriptRun = new PcreRegexUtf8(@"(*script_run:\d+)"u8, PcreOptions.Unicode).Match(subject);
+        Assert.That(scriptRun.Success, Is.True);
+        Assert.That(scriptRun.Index, Is.EqualTo(0));
+        Assert.That(scriptRun.Length, Is.EqualTo(3));
+    }
+
+    [Test]
+    public void should_match_script_run_buf_utf8()
+    {
+        var subject = "123\U0001D7CF\U0001D7D0\U0001D7D1"u8;
+
+        var normal = new PcreRegexUtf8(@"\d+"u8, PcreOptions.Unicode).CreateMatchBuffer().Match(subject);
+        Assert.That(normal.Success, Is.True);
+        Assert.That(normal.Index, Is.EqualTo(0));
+        Assert.That(normal.Length, Is.EqualTo(subject.Length));
+
+        var scriptRun = new PcreRegexUtf8(@"(*script_run:\d+)"u8, PcreOptions.Unicode).CreateMatchBuffer().Match(subject);
         Assert.That(scriptRun.Success, Is.True);
         Assert.That(scriptRun.Index, Is.EqualTo(0));
         Assert.That(scriptRun.Length, Is.EqualTo(3));
@@ -1885,6 +4251,90 @@ public class MatchTests
     }
 
     [Test]
+    public void should_match_empty_string_utf8()
+    {
+        var re = new PcreRegexUtf8(""u8);
+        var match = re.Match(default(ReadOnlySpan<byte>));
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.CaptureCount, Is.EqualTo(0));
+        Assert.That(match.Value.IsEmpty);
+        Assert.That(match.Index, Is.EqualTo(0));
+        Assert.That(match.EndIndex, Is.EqualTo(0));
+        Assert.That(match.Length, Is.EqualTo(0));
+
+        Assert.That(match[0].Success, Is.True);
+        Assert.That(match[0].IsDefined, Is.True);
+        Assert.That(match[0].Value.IsEmpty);
+        Assert.That(match[0].Index, Is.EqualTo(0));
+        Assert.That(match[0].EndIndex, Is.EqualTo(0));
+        Assert.That(match[0].Length, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void should_match_empty_string_buf_utf8()
+    {
+        var re = new PcreRegexUtf8(""u8);
+        var match = re.CreateMatchBuffer().Match(default(ReadOnlySpan<byte>));
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.CaptureCount, Is.EqualTo(0));
+        Assert.That(match.Value.IsEmpty);
+        Assert.That(match.Index, Is.EqualTo(0));
+        Assert.That(match.EndIndex, Is.EqualTo(0));
+        Assert.That(match.Length, Is.EqualTo(0));
+
+        Assert.That(match[0].Success, Is.True);
+        Assert.That(match[0].IsDefined, Is.True);
+        Assert.That(match[0].Value.IsEmpty);
+        Assert.That(match[0].Index, Is.EqualTo(0));
+        Assert.That(match[0].EndIndex, Is.EqualTo(0));
+        Assert.That(match[0].Length, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void should_match_empty_string_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit("".ToLatin1Bytes());
+        var match = re.Match(default(ReadOnlySpan<byte>));
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.CaptureCount, Is.EqualTo(0));
+        Assert.That(match.Value.IsEmpty);
+        Assert.That(match.Index, Is.EqualTo(0));
+        Assert.That(match.EndIndex, Is.EqualTo(0));
+        Assert.That(match.Length, Is.EqualTo(0));
+
+        Assert.That(match[0].Success, Is.True);
+        Assert.That(match[0].IsDefined, Is.True);
+        Assert.That(match[0].Value.IsEmpty);
+        Assert.That(match[0].Index, Is.EqualTo(0));
+        Assert.That(match[0].EndIndex, Is.EqualTo(0));
+        Assert.That(match[0].Length, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void should_match_empty_string_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit("".ToLatin1Bytes());
+        var match = re.CreateMatchBuffer().Match(default(ReadOnlySpan<byte>));
+
+        Assert.That(match.Success, Is.True);
+        Assert.That(match.CaptureCount, Is.EqualTo(0));
+        Assert.That(match.Value.IsEmpty);
+        Assert.That(match.Index, Is.EqualTo(0));
+        Assert.That(match.EndIndex, Is.EqualTo(0));
+        Assert.That(match.Length, Is.EqualTo(0));
+
+        Assert.That(match[0].Success, Is.True);
+        Assert.That(match[0].IsDefined, Is.True);
+        Assert.That(match[0].Value.IsEmpty);
+        Assert.That(match[0].Index, Is.EqualTo(0));
+        Assert.That(match[0].EndIndex, Is.EqualTo(0));
+        Assert.That(match[0].Length, Is.EqualTo(0));
+    }
+
+    [Test]
     public void should_have_undefined_value_in_default_ref_group()
     {
         var group = default(PcreRefGroup);
@@ -1892,6 +4342,19 @@ public class MatchTests
         Assert.That(group.Success, Is.False);
         Assert.That(group.IsDefined, Is.False);
         Assert.That(group.Value.ToString(), Is.SameAs(string.Empty));
+        Assert.That(group.Index, Is.EqualTo(-1));
+        Assert.That(group.EndIndex, Is.EqualTo(-1));
+        Assert.That(group.Length, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void should_have_undefined_value_in_default_ref_group_8bit()
+    {
+        var group = default(PcreRefGroup8Bit);
+
+        Assert.That(group.Success, Is.False);
+        Assert.That(group.IsDefined, Is.False);
+        Assert.That(group.Value.IsEmpty);
         Assert.That(group.Index, Is.EqualTo(-1));
         Assert.That(group.EndIndex, Is.EqualTo(-1));
         Assert.That(group.Length, Is.EqualTo(0));
@@ -1917,12 +4380,52 @@ public class MatchTests
     }
 
     [Test]
+    public void should_not_allocate_output_vector_for_no_match_utf8()
+    {
+        var re = new PcreRegexUtf8("foo"u8);
+        var match = re.Match("bar"u8);
+
+        Assert.That(match.OutputVector.Length, Is.Zero);
+    }
+
+    [Test]
+    public void should_not_allocate_output_vector_for_no_match_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit("foo".ToLatin1Bytes());
+        var match = re.Match("bar".ToLatin1Bytes());
+
+        Assert.That(match.OutputVector.Length, Is.Zero);
+    }
+
+    [Test]
     public unsafe void should_use_buffer_output_vector_for_no_match()
     {
         var re = new PcreRegex("foo");
         var buffer = re.CreateMatchBuffer();
 
         var match = buffer.Match("bar".AsSpan());
+
+        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]), Is.True);
+    }
+
+    [Test]
+    public unsafe void should_use_buffer_output_vector_for_no_match_utf8()
+    {
+        var re = new PcreRegexUtf8("foo"u8);
+        var buffer = re.CreateMatchBuffer();
+
+        var match = buffer.Match("bar"u8);
+
+        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]), Is.True);
+    }
+
+    [Test]
+    public unsafe void should_use_buffer_output_vector_for_no_match_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit("foo".ToLatin1Bytes());
+        var buffer = re.CreateMatchBuffer();
+
+        var match = buffer.Match("bar".ToLatin1Bytes());
 
         Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]), Is.True);
     }
@@ -1963,6 +4466,20 @@ public class MatchTests
     }
 
     [Test]
+    public void should_throw_on_null_settings_utf8()
+    {
+        var re = new PcreRegexUtf8("a"u8);
+        Assert.Throws<ArgumentNullException>(() => re.Match("a"u8, 0, PcreMatchOptions.None, null, default(PcreMatchSettings)!));
+    }
+
+    [Test]
+    public void should_throw_on_null_settings_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit("a".ToLatin1Bytes());
+        Assert.Throws<ArgumentNullException>(() => re.Match("a".ToLatin1Bytes(), 0, PcreMatchOptions.None, null, default(PcreMatchSettings)!));
+    }
+
+    [Test]
     [TestCase(-1)]
     [TestCase(2)]
     public void should_throw_on_invalid_start_index(int startIndex)
@@ -1991,10 +4508,75 @@ public class MatchTests
     }
 
     [Test]
+    [TestCase(-1)]
+    [TestCase(2)]
+    public void should_throw_on_invalid_start_index_utf8(int startIndex)
+    {
+        var re = new PcreRegexUtf8(@"a"u8);
+        Assert.Throws<ArgumentOutOfRangeException>(() => re.Match("a"u8, startIndex));
+    }
+
+    [Test]
+    [TestCase(-1)]
+    [TestCase(2)]
+    public void should_throw_on_invalid_start_index_buf_utf8(int startIndex)
+    {
+        var re = new PcreRegexUtf8(@"a"u8);
+        var buffer = re.CreateMatchBuffer();
+        Assert.Throws<ArgumentOutOfRangeException>(() => buffer.Match("a"u8, startIndex));
+    }
+
+    [Test]
+    [TestCase(-1)]
+    [TestCase(2)]
+    public void should_throw_on_invalid_start_index_8bit(int startIndex)
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"a".ToLatin1Bytes());
+        Assert.Throws<ArgumentOutOfRangeException>(() => re.Match("a".ToLatin1Bytes(), startIndex));
+    }
+
+    [Test]
+    [TestCase(-1)]
+    [TestCase(2)]
+    public void should_throw_on_invalid_start_index_buf_8bit(int startIndex)
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(@"a".ToLatin1Bytes());
+        var buffer = re.CreateMatchBuffer();
+        Assert.Throws<ArgumentOutOfRangeException>(() => buffer.Match("a".ToLatin1Bytes(), startIndex));
+    }
+
+    [Test]
     public void should_return_matched_string()
     {
         var re = new PcreRegex(".");
         var match = re.Match("ab");
+
+        Assert.That(match.ToString(), Is.EqualTo("a"));
+    }
+
+    [Test]
+    public void should_return_matched_string_ref()
+    {
+        var re = new PcreRegex(".");
+        var match = re.Match("ab".AsSpan());
+
+        Assert.That(match.ToString(), Is.EqualTo("a"));
+    }
+
+    [Test]
+    public void should_return_matched_string_utf8()
+    {
+        var re = new PcreRegexUtf8("."u8);
+        var match = re.Match("ab"u8);
+
+        Assert.That(match.ToString(), Is.EqualTo("a"));
+    }
+
+    [Test]
+    public void should_return_matched_string_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(".".ToLatin1Bytes());
+        var match = re.Match("ab".ToLatin1Bytes());
 
         Assert.That(match.ToString(), Is.EqualTo("a"));
     }
@@ -2009,10 +4591,105 @@ public class MatchTests
     }
 
     [Test]
+    public void should_return_matched_string_from_group_ref()
+    {
+        var re = new PcreRegex(".");
+        var match = re.Match("ab".AsSpan());
+
+        Assert.That(match[0].ToString(), Is.EqualTo("a"));
+    }
+
+    [Test]
+    public void should_return_matched_string_from_group_buf()
+    {
+        var re = new PcreRegex(".");
+        var buffer = re.CreateMatchBuffer();
+        var match = buffer.Match("ab".AsSpan());
+
+        Assert.That(match[0].ToString(), Is.EqualTo("a"));
+    }
+
+    [Test]
+    public void should_return_matched_string_from_group_utf8()
+    {
+        var re = new PcreRegexUtf8("."u8);
+        var match = re.Match("ab"u8);
+
+        Assert.That(match[0].ToString(), Is.EqualTo("a"));
+    }
+
+    [Test]
+    public void should_return_matched_string_from_group_buf_utf8()
+    {
+        var re = new PcreRegexUtf8("."u8);
+        var buffer = re.CreateMatchBuffer();
+        var match = buffer.Match("ab"u8);
+
+        Assert.That(match[0].ToString(), Is.EqualTo("a"));
+    }
+
+    [Test]
+    public void should_return_matched_string_from_group_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(".".ToLatin1Bytes());
+        var match = re.Match("ab".ToLatin1Bytes());
+
+        Assert.That(match[0].ToString(), Is.EqualTo("a"));
+    }
+
+    [Test]
+    public void should_return_matched_string_from_group_buf_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit(".".ToLatin1Bytes());
+        var buffer = re.CreateMatchBuffer();
+        var match = buffer.Match("ab".ToLatin1Bytes());
+
+        Assert.That(match[0].ToString(), Is.EqualTo("a"));
+    }
+
+    [Test]
     public void should_cast_group_to_string()
     {
         var re = new PcreRegex(".");
         var match = re.Match("ab");
+
+        Assert.That((string)match[0], Is.EqualTo("a"));
+    }
+
+    [Test]
+    public void should_cast_group_to_string_ref()
+    {
+        var re = new PcreRegex(".");
+        var match = re.Match("ab".AsSpan());
+
+        Assert.That((string)match[0], Is.EqualTo("a"));
+    }
+
+    [Test]
+    public void should_cast_group_to_string_buf()
+    {
+        var re = new PcreRegex(".");
+        var buffer = re.CreateMatchBuffer();
+        var match = buffer.Match("ab".AsSpan());
+
+        Assert.That((string)match[0], Is.EqualTo("a"));
+    }
+
+    [Test]
+    public void should_cast_group_to_string_utf8()
+    {
+        var re = new PcreRegexUtf8("."u8);
+        var match = re.Match("ab"u8);
+
+        Assert.That((string)match[0], Is.EqualTo("a"));
+    }
+
+    [Test]
+    public void should_cast_group_to_string_buf_utf8()
+    {
+        var re = new PcreRegexUtf8("."u8);
+        var buffer = re.CreateMatchBuffer();
+        var match = buffer.Match("ab"u8);
 
         Assert.That((string)match[0], Is.EqualTo("a"));
     }
@@ -2040,6 +4717,83 @@ public class MatchTests
 
         var calloutCount = 0;
         re.Match("aac", _ =>
+        {
+            ++calloutCount;
+            return PcreCalloutResult.Pass;
+        });
+
+        var autoPossess = calloutCount switch
+        {
+            3 => true,
+            4 => false,
+            _ => throw new InvalidOperationException($"Unexpected callout count: {calloutCount}.")
+        };
+
+        Assert.That(autoPossess, Is.EqualTo(expectedAutoPossess));
+    }
+
+    [Test]
+    [TestCase(new PcreOptimizationDirective[0], true)]
+    [TestCase(new[] { PcreOptimizationDirective.None }, false)]
+    [TestCase(new[] { PcreOptimizationDirective.Full }, true)]
+    [TestCase(new[] { PcreOptimizationDirective.AutoPossessOff }, false)]
+    [TestCase(new[] { PcreOptimizationDirective.AutoPossess }, true)]
+    [TestCase(new[] { PcreOptimizationDirective.None, PcreOptimizationDirective.AutoPossess }, true)]
+    [TestCase(new[] { PcreOptimizationDirective.Full, PcreOptimizationDirective.AutoPossessOff }, false)]
+    [TestCase(new[] { PcreOptimizationDirective.AutoPossess, PcreOptimizationDirective.None }, false)]
+    [TestCase(new[] { PcreOptimizationDirective.AutoPossessOff, PcreOptimizationDirective.Full }, true)]
+    [TestCase(new[] { PcreOptimizationDirective.AutoPossess, PcreOptimizationDirective.AutoPossessOff }, false)]
+    [TestCase(new[] { PcreOptimizationDirective.AutoPossessOff, PcreOptimizationDirective.AutoPossess }, true)]
+    public void should_use_optimization_settings_utf8(PcreOptimizationDirective[] directives, bool expectedAutoPossess)
+    {
+        var settings = new PcreRegexSettings(PcreOptions.AutoCallout | PcreOptions.NoStartOptimize);
+
+        foreach (var directive in directives)
+            settings.OptimizationDirectives.Add(directive);
+
+        var re = new PcreRegexUtf8("^a+b"u8, settings);
+
+        var calloutCount = 0;
+        re.Match("aac"u8, _ =>
+        {
+            ++calloutCount;
+            return PcreCalloutResult.Pass;
+        });
+
+        var autoPossess = calloutCount switch
+        {
+            3 => true,
+            4 => false,
+            _ => throw new InvalidOperationException($"Unexpected callout count: {calloutCount}.")
+        };
+
+        Assert.That(autoPossess, Is.EqualTo(expectedAutoPossess));
+    }
+
+
+    [Test]
+    [TestCase(new PcreOptimizationDirective[0], true)]
+    [TestCase(new[] { PcreOptimizationDirective.None }, false)]
+    [TestCase(new[] { PcreOptimizationDirective.Full }, true)]
+    [TestCase(new[] { PcreOptimizationDirective.AutoPossessOff }, false)]
+    [TestCase(new[] { PcreOptimizationDirective.AutoPossess }, true)]
+    [TestCase(new[] { PcreOptimizationDirective.None, PcreOptimizationDirective.AutoPossess }, true)]
+    [TestCase(new[] { PcreOptimizationDirective.Full, PcreOptimizationDirective.AutoPossessOff }, false)]
+    [TestCase(new[] { PcreOptimizationDirective.AutoPossess, PcreOptimizationDirective.None }, false)]
+    [TestCase(new[] { PcreOptimizationDirective.AutoPossessOff, PcreOptimizationDirective.Full }, true)]
+    [TestCase(new[] { PcreOptimizationDirective.AutoPossess, PcreOptimizationDirective.AutoPossessOff }, false)]
+    [TestCase(new[] { PcreOptimizationDirective.AutoPossessOff, PcreOptimizationDirective.AutoPossess }, true)]
+    public void should_use_optimization_settings_8bit(PcreOptimizationDirective[] directives, bool expectedAutoPossess)
+    {
+        var settings = new PcreRegexSettings(PcreOptions.AutoCallout | PcreOptions.NoStartOptimize);
+
+        foreach (var directive in directives)
+            settings.OptimizationDirectives.Add(directive);
+
+        var re = TestSupport.CreatePcreRegex8Bit("^a+b".ToLatin1Bytes(), settings);
+
+        var calloutCount = 0;
+        re.Match("aac".ToLatin1Bytes(), _ =>
         {
             ++calloutCount;
             return PcreCalloutResult.Pass;

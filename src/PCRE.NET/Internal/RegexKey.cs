@@ -5,7 +5,7 @@ namespace PCRE.Internal;
 internal readonly struct RegexKey(string pattern, PcreRegexSettings settings) : IEquatable<RegexKey>
 {
     public readonly string Pattern = pattern;
-    public readonly PcreRegexSettings Settings = settings.AsReadOnly();
+    public readonly PcreRegexSettings Settings = settings.ToReadOnlySnapshot(PcreOptions.None);
 
     public bool Equals(RegexKey other)
         => Pattern == other.Pattern

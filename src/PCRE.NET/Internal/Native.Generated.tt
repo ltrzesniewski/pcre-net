@@ -8,24 +8,24 @@
 
 var functions = ParseFunctions(
     """
-    int get_error_message(int errorCode, char* errorBuffer, uint bufferSize) no-gc;
-    void compile(compile_input* input, compile_result* result);
-    void code_free(IntPtr code);
-    int pattern_info(IntPtr code, uint key, void* data) no-gc;
+    int get_error_message(int errorCode, void* errorBuffer, uint bufferSize) no-gc;
+    void compile(Native.compile_input* input, Native.compile_result* result);
+    void code_free(void* code);
+    int pattern_info(void* code, uint key, void* data) no-gc;
     int config(uint key, void* data) no-gc;
-    void match(match_input* input, match_result* result);
-    void buffer_match(buffer_match_input* input, match_result* result);
-    void dfa_match(dfa_match_input* input, match_result* result);
-    void substitute(substitute_input* input, substitute_result* result);
-    void substitute_result_free(substitute_result* result);
-    IntPtr create_match_buffer(match_buffer_info* info);
-    void free_match_buffer(IntPtr buffer);
-    uint get_callout_count(IntPtr code) no-gc;
-    void get_callouts(IntPtr code, pcre2_callout_enumerate_block* data) no-gc;
-    IntPtr jit_stack_create(uint startSize, uint maxSize);
-    void jit_stack_free(IntPtr stack);
-    int convert(convert_input* input, convert_result* result);
-    void convert_result_free(char* str);
+    void match(Native.match_input* input, Native.match_result* result);
+    void buffer_match(Native.buffer_match_input* input, Native.match_result* result);
+    void dfa_match(Native.dfa_match_input* input, Native.match_result* result);
+    void substitute(Native.substitute_input* input, Native.substitute_result* result);
+    void substitute_result_free(Native.substitute_result* result);
+    void* create_match_buffer(Native.match_buffer_info* info);
+    void free_match_buffer(void* buffer);
+    uint get_callout_count(void* code) no-gc;
+    void get_callouts(void* code, Native.pcre2_callout_enumerate_block* data) no-gc;
+    void* jit_stack_create(uint startSize, uint maxSize);
+    void jit_stack_free(void* stack);
+    int convert(Native.convert_input* input, Native.convert_result* result);
+    void convert_result_free(void* str);
     """
 ).ToList();
 
@@ -51,52 +51,91 @@ using System.Runtime.InteropServices;
 using System.Security;
 
 #nullable enable
+#pragma warning disable CA5392
 
 namespace PCRE.Internal;
 
-unsafe partial class Native
+internal unsafe partial interface INative
+{
+<# foreach (var func in functions) { #>
+    <#= func.GetDeclaration() #>;
+<# } #>
+}
+<# foreach (var bit in new[] { 8, 16 }) { #>
+
+internal readonly unsafe partial struct Native<#= bit #>Bit : INative
 {
 #if NET
 
 <# foreach (var func in functions) { #>
+    public readonly <#= func.GetDeclaration() #>
+        => pcrenet_<#= func.GetCall() #>;
+
 <# if (func.SuppressGCTransition) { #>
     [SuppressGCTransition]
 <# } #>
-    [DllImport("<#= libName #>", EntryPoint = "pcrenet_<#= func.Name #>", CallingConvention = CallingConvention.Cdecl)]
-    public static extern <#= func.ReturnType #> <#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => p.GetPInvokeAttributes() + p.Declaration)) #>);
+    [DllImport("<#= libName #>", EntryPoint = "pcrenet_<#= func.Name #>_<#= bit #>", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+    private static extern <#= func.ReturnType #> pcrenet_<#= func.Name #>(<#= func.GetParametersDeclaration() #>);
 
 <# } #>
 #else
 
+    private static readonly Lib _lib = GetLib();
+
 <# foreach (var func in functions) { #>
-    public static <#= func.Declaration #>
-        => _impl.<#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => $"{p.Modifier}{p.Name}")) #>);
+    public readonly <#= func.GetDeclaration() #>
+        => _lib.<#= func.GetCall() #>;
 
 <# } #>
-    private abstract class LibImpl
+    private static Lib GetLib()
     {
-<# foreach (var func in functions) { #>
-        public abstract <#= func.Declaration #>;
-<# } #>
+        try
+        {
+            var lib = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? new WinLib()
+                : RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
+                    ? new LinuxLib()
+                    : RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+                        ? (Lib)new OSXLib()
+                        : throw new PlatformNotSupportedException();
+
+            lib.get_error_message(0, null, 0);
+            return lib;
+        }
+        catch (DllNotFoundException) when (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            // Used in the .NET Framework
+            return Environment.Is64BitProcess
+                ? new Win64Lib()
+                : new Win32Lib();
+        }
     }
 
+    private abstract class Lib
+    {
+<# foreach (var func in functions) { #>
+        public abstract <#= func.GetDeclaration() #>;
+<# } #>
+    }
 <# foreach (var platform in platforms) { #>
+
     [SuppressUnmanagedCodeSecurity]
-    private sealed class <#= platform.Name #>Impl : LibImpl
+    private sealed class <#= platform.Name #>Lib : Lib
     {
 <# foreach (var func in functions) { #>
-        public override <#= func.Declaration #>
-            => pcrenet_<#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => $"{p.Modifier}{p.Name}")) #>);
+        public override <#= func.GetDeclaration() #>
+            => pcrenet_<#= func.GetCall() #>;
 
-        [DllImport("<#= platform.LibName #>", CallingConvention = CallingConvention.Cdecl)]
-        private static extern <#= func.ReturnType #> pcrenet_<#= func.Name #>(<#= string.Join(", ", func.Parameters.Select(p => p.GetPInvokeAttributes() + p.Declaration)) #>);
+        [DllImport("<#= platform.LibName #>", EntryPoint = "pcrenet_<#= func.Name #>_<#= bit #>", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
+        private static extern <#= func.ReturnType #> pcrenet_<#= func.Name #>(<#= func.GetParametersDeclaration() #>);
 
 <# } #>
     }
-
 <# } #>
+
 #endif
 }
+<# } #>
 <#+
 
 private static IEnumerable<FuncDef> ParseFunctions(string functions)
@@ -151,8 +190,14 @@ private class FuncDef
     public readonly List<FuncParamDef> Parameters = new();
     public bool SuppressGCTransition;
 
-    public string Declaration => $"{ReturnType} {Name}({ParametersDeclaration})";
-    public string ParametersDeclaration => string.Join(", ", Parameters.Select(p => p.Declaration));
+    public string GetDeclaration()
+        => $"{ReturnType} {Name}({GetParametersDeclaration()})";
+
+    public string GetParametersDeclaration()
+        => string.Join(", ", Parameters.Select(p => p.GetDeclaration()));
+
+    public string GetCall()
+        => $"{Name}({string.Join(", ", Parameters.Select(p => p.GetCall()))})";
 }
 
 private class FuncParamDef
@@ -161,19 +206,11 @@ private class FuncParamDef
     public string Name;
     public string Modifier;
 
-    public string Declaration => $"{Modifier}{Type} {Name}";
+    public string GetDeclaration()
+        => $"{Modifier}{Type} {Name}";
 
-    public string GetPInvokeAttributes()
-    {
-        switch (Type)
-        {
-            case "string":
-                return "[In, MarshalAs(UnmanagedType.LPStr)] ";
-
-            default:
-                return string.Empty;
-        }
-    }
+    public string GetCall()
+        => $"{Modifier}{Name}";
 }
 
 private class PlatformDef(string name, string libName)
