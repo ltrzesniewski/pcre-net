@@ -2,6 +2,8 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>PCRE.Tests.Integration</RootNamespace>
+    <OutputType>Exe</OutputType>
+    <PublishAot>true</PublishAot>
     <DefineConstants Condition="'$(PcreNetIntegrationTest)' == 'true'">$(DefineConstants);PCRENET_INTEGRATION_TEST</DefineConstants>
   </PropertyGroup>
 
@@ -11,9 +13,6 @@
 
   <ItemGroup>
     <PackageReference Include="PCRE.NET" Version="$(PackageVersion)" Condition="'$(PcreNetIntegrationTest)' == 'true'" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
-    <PackageReference Include="NUnit" Version="4.4.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
   </ItemGroup>
 
 </Project>
