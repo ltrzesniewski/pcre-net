@@ -228,4 +228,4 @@ jobs:
           path: src/PCRE.NET.Tests.Integration/nuget
 
       - name: Integration Test
-        run: dotnet test src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj -p:PcreNetIntegrationTest=true
+        run: dotnet publish src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --output ./bin/aot -p:PcreNetIntegrationTest=true && ./bin/aot/PCRE.NET.Tests.Integration
