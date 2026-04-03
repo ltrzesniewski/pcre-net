@@ -1,4 +1,3 @@
-
 name: Build
 on: [push, pull_request]
 
@@ -42,10 +41,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.BUILD_NET_SDK }}
 
@@ -75,7 +74,7 @@ jobs:
         run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_NET_TEST_TARGET }} -- --allocations
 
       - name: Upload Native Lib
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: lib-${{ matrix.platform }}.${{ matrix.extension }}
           path: lib/PCRE.NET.Native.${{ matrix.platform }}.${{ matrix.extension }}
@@ -96,10 +95,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.BUILD_NET_SDK }}
 
@@ -141,7 +140,7 @@ jobs:
         if: ${{ matrix.platform == 'x64' }}
 
       - name: Upload Native Lib
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: lib-${{ matrix.platform }}.dll
           path: lib/PCRE.NET.Native.${{ matrix.platform }}.dll
@@ -156,21 +155,21 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.BUILD_NET_SDK }}
 
       - name: Download Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: lib
           merge-multiple: true
 
       - name: Delete Native Lib Artifacts
-        uses: geekyeggo/delete-artifact@v4
+        uses: geekyeggo/delete-artifact@v6
         with:
           name: lib-*
           failOnError: false
@@ -185,10 +184,11 @@ jobs:
         run: dotnet pack --configuration ${{ env.BUILD_CONFIGURATION }} --no-build src/PCRE.NET/PCRE.NET.csproj -p:PcreNetPackage=true
 
       - name: Upload NuGet
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: NuGet
           path: src/PCRE.NET/bin/${{ env.BUILD_CONFIGURATION }}/*.nupkg
+          archive: false
           if-no-files-found: error
 
   integration-tests:
@@ -217,18 +217,19 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.BUILD_NET_SDK }}
 
       - name: Download NuGet
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
-          name: NuGet
+          pattern: PCRE.NET.*.nupkg
           path: src/PCRE.NET.Tests.Integration/nuget
+          skip-decompress: true
 
       - name: Integration Test
         run: dotnet publish src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --output ./bin/aot -p:PcreNetIntegrationTest=true && ./bin/aot/PCRE.NET.Tests.Integration
