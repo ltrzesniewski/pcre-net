@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net9.0;net5.0;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net10.0;net9.0;net5.0;netstandard2.0</TargetFrameworks>
     <!--suppress MsbuildTargetFrameworkTagInspection -->
     <TargetFrameworks Condition="'$(ForceNetStandard)' == 'true'">netstandard2.0</TargetFrameworks>
     <RootNamespace>PCRE</RootNamespace>
@@ -9,6 +9,7 @@
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">true</IsAotCompatible>
+    <VerifyReferenceAotCompatibility>true</VerifyReferenceAotCompatibility>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(PcreNetTestBuild)' != 'true'">
@@ -38,7 +39,7 @@
 
   <ItemGroup>
     <PackageReference Include="Fody" Version="6.9.3" PrivateAssets="all" />
-    <PackageReference Include="InlineIL.Fody" Version="1.10.1" PrivateAssets="all" />
+    <PackageReference Include="InlineIL.Fody" Version="1.10.2" PrivateAssets="all" />
     <PackageReference Include="System.Memory" Version="4.6.0" Condition="'$(TargetFrameworkIdentifier)' == '.NETStandard'" />
   </ItemGroup>
 
