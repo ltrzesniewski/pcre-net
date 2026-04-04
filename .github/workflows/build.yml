@@ -82,7 +82,7 @@ jobs:
 
   windows:
     name: Windows ${{ matrix.platform }}
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
 
     strategy:
       matrix:
@@ -102,8 +102,10 @@ jobs:
         with:
           dotnet-version: ${{ env.BUILD_NET_SDK }}
 
-      - name: Setup VS Dev Tools
-        uses: ilammy/msvc-dev-cmd@v1
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v3
+        with:
+          msbuild-architecture: ${{ matrix.platform }}
 
       - name: Setup Environment
         run: |
@@ -121,7 +123,10 @@ jobs:
         run: msbuild src/PCRE.NET.Tests/PCRE.NET.Tests.csproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:Platform=${{ matrix.platform }} /p:PcreNetTestBuild=true /p:ExpectPlatform=${{ matrix.platform }}
 
       - name: Test .NET Framework
-        run: vstest.console src/PCRE.NET.Tests/bin/${{ matrix.platform }}/${{ env.BUILD_CONFIGURATION }}/${{ env.BUILD_NETFWK_TEST_TARGET }}/PCRE.NET.Tests.dll /Platform:${{ matrix.platform }}
+        run: |
+          $path = vswhere -latest -products * -requires Microsoft.VisualStudio.Workload.ManagedDesktop Microsoft.VisualStudio.Workload.Web -requiresAny -property installationPath
+          $path = join-path $path 'Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe'
+          & $path src/PCRE.NET.Tests/bin/${{ matrix.platform }}/${{ env.BUILD_CONFIGURATION }}/${{ env.BUILD_NETFWK_TEST_TARGET }}/PCRE.NET.Tests.dll /Platform:${{ matrix.platform }}
 
       - name: Test .NET
         run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} -p:PcreNetTestBuild=true -p:ExpectPlatform=${{ matrix.platform }}
