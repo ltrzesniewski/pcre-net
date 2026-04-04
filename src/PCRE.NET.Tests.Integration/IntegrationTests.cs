@@ -23,8 +23,10 @@ public class IntegrationTests
     {
         _success = true;
 
-        Safe(() => RunTest(PcreOptions.None));
-        Safe(() => RunTest(PcreOptions.Compiled));
+        Safe(() => RunTestUtf16(PcreOptions.None));
+        Safe(() => RunTestUtf16(PcreOptions.Compiled));
+        Safe(() => RunTestUtf8(PcreOptions.None));
+        Safe(() => RunTestUtf8(PcreOptions.Compiled));
         RunBuildTest();
 
         Console.WriteLine();
@@ -34,9 +36,9 @@ public class IntegrationTests
         return _success;
     }
 
-    private void RunTest(PcreOptions options)
+    private void RunTestUtf16(PcreOptions options)
     {
-        Header($"Options: {options}");
+        Header($"UTF-16, Options: {options}");
 
         var re = new PcreRegex("a+(b+)c+", options);
         var match = re.Match("xxxaaabbccczzz");
@@ -56,6 +58,56 @@ public class IntegrationTests
         Check(match[1].Length == 2);
 
         Check(ReferenceEquals(match.Groups[1], match[1]));
+
+        using var matchBuffer = re.CreateMatchBuffer();
+        var bufferedMatch = matchBuffer.Match("xxxaaabbccczzz");
+
+        Check(bufferedMatch.Success);
+        Check(bufferedMatch.CaptureCount == 1);
+        Check(bufferedMatch.Value is "aaabbccc");
+        Check(bufferedMatch.Index == 3);
+        Check(bufferedMatch.EndIndex == 11);
+        Check(bufferedMatch.Length == 8);
+
+        Check(bufferedMatch[1].Success);
+        Check(bufferedMatch[1].Value is "bb");
+        Check(bufferedMatch[1].Index == 6);
+        Check(bufferedMatch[1].Length == 2);
+    }
+
+    private void RunTestUtf8(PcreOptions options)
+    {
+        Header($"UTF-8, Options: {options}");
+
+        var re = new PcreRegexUtf8("a+(b+)c+"u8, options);
+        var match = re.Match("xxxaaabbccczzz"u8);
+
+        Check(match.Success);
+        Check(match.CaptureCount == 1);
+        Check(match.Value.SequenceEqual("aaabbccc"u8));
+        Check(match.Index == 3);
+        Check(match.EndIndex == 11);
+        Check(match.Length == 8);
+
+        Check(match[1].Success);
+        Check(match[1].Value.SequenceEqual("bb"u8));
+        Check(match[1].Index == 6);
+        Check(match[1].Length == 2);
+
+        using var matchBuffer = re.CreateMatchBuffer();
+        var bufferedMatch = matchBuffer.Match("xxxaaabbccczzz"u8);
+
+        Check(bufferedMatch.Success);
+        Check(bufferedMatch.CaptureCount == 1);
+        Check(bufferedMatch.Value.SequenceEqual("aaabbccc"u8));
+        Check(bufferedMatch.Index == 3);
+        Check(bufferedMatch.EndIndex == 11);
+        Check(bufferedMatch.Length == 8);
+
+        Check(bufferedMatch[1].Success);
+        Check(bufferedMatch[1].Value.SequenceEqual("bb"u8));
+        Check(bufferedMatch[1].Index == 6);
+        Check(bufferedMatch[1].Length == 2);
     }
 
     private void RunBuildTest()
@@ -65,9 +117,14 @@ public class IntegrationTests
         Check(!RuntimeFeature.IsDynamicCodeSupported);
         Check(string.IsNullOrEmpty(GetAssemblyLocation()));
 
-#if !PCRENET_INTEGRATION_TEST
-        Fail("Not in integration tests mode");
+        const bool isInIntegrationTest =
+#if PCRENET_INTEGRATION_TEST
+            true;
+#else
+            false;
 #endif
+
+        Check(isInIntegrationTest, "Built in integration tests mode");
 
         [UnconditionalSuppressMessage("SingleFile", "IL3000")]
         static string GetAssemblyLocation()

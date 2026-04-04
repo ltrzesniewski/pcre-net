@@ -231,5 +231,8 @@ jobs:
           path: src/PCRE.NET.Tests.Integration/nuget
           skip-decompress: true
 
-      - name: Integration Test
-        run: dotnet publish src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --output ./bin/aot -p:PcreNetIntegrationTest=true && ./bin/aot/PCRE.NET.Tests.Integration
+      - name: Build Integration Test
+        run: dotnet publish src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --output ./bin/aot -p:PcreNetIntegrationTest=true
+
+      - name: Run Integration Test
+        run: ./bin/aot/PCRE.NET.Tests.Integration
