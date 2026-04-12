@@ -37,6 +37,7 @@ public class TestOutputReader : TestFileReader
                     {
                         line = ReadLine();
                     } while (line != _separator && line != null);
+
                     line = ReadLine();
                 }
 
@@ -81,8 +82,8 @@ public class TestOutputReader : TestFileReader
                             throw InvalidInputException("Invalid group index");
 
                         currentMatch.Groups.Add(match.Groups[2].Value == "<unset>"
-                            ? ExpectedGroup.Unset
-                            : new ExpectedGroup(match.Groups[2].Value));
+                                                    ? ExpectedGroup.Unset
+                                                    : new ExpectedGroup(match.Groups[2].Value));
 
                         continue;
                     }

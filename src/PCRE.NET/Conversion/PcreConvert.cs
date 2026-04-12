@@ -33,8 +33,10 @@ public static unsafe class PcreConvert
     /// </remarks>
     public static string FromGlob(string pattern, PcreGlobConversionOptions options)
     {
-        if (pattern == null) throw new ArgumentNullException(nameof(pattern));
-        if (options == null) throw new ArgumentNullException(nameof(options));
+        if (pattern == null)
+            throw new ArgumentNullException(nameof(pattern));
+        if (options == null)
+            throw new ArgumentNullException(nameof(options));
 
         Native.convert_input input;
         _ = &input;
@@ -46,7 +48,8 @@ public static unsafe class PcreConvert
 
     private static string BasicConvert(string pattern, uint options)
     {
-        if (pattern == null) throw new ArgumentNullException(nameof(pattern));
+        if (pattern == null)
+            throw new ArgumentNullException(nameof(pattern));
 
         Native.convert_input input;
         input.options = options;

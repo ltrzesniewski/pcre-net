@@ -3801,7 +3801,7 @@ public class MatchTests
     [Test]
     public void should_check_pattern_utf_validity_utf8()
     {
-        var ex = Assert.Throws<PcrePatternException>(() => _ = new PcreRegexUtf8([(byte)'A', (byte)'é' ,(byte)'B']))!;
+        var ex = Assert.Throws<PcrePatternException>(() => _ = new PcreRegexUtf8([(byte)'A', (byte)'é', (byte)'B']))!;
         Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Utf8Err1));
         Assert.That(ex.Message, Contains.Substring("1 byte missing at end at offset 1"));
     }
@@ -3845,7 +3845,7 @@ public class MatchTests
     public void should_check_subject_utf_validity_utf8()
     {
         var re = new PcreRegexUtf8(@"A"u8);
-        var ex = Assert.Throws<PcreMatchException>(() => _ = re.Match([(byte)'A', (byte)'é' ,(byte)'B']))!;
+        var ex = Assert.Throws<PcreMatchException>(() => _ = re.Match([(byte)'A', (byte)'é', (byte)'B']))!;
         Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Utf8Err1));
         Assert.That(ex.Message, Contains.Substring("1 byte missing at end"));
     }
@@ -3856,7 +3856,7 @@ public class MatchTests
         var re = new PcreRegexUtf8(@"A"u8);
         var buffer = re.CreateMatchBuffer();
 
-        var ex = Assert.Throws<PcreMatchException>(() => _ = buffer.Match([(byte)'A', (byte)'é' ,(byte)'B']))!;
+        var ex = Assert.Throws<PcreMatchException>(() => _ = buffer.Match([(byte)'A', (byte)'é', (byte)'B']))!;
         Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Utf8Err1));
         Assert.That(ex.Message, Contains.Substring("1 byte missing at end"));
     }
@@ -3865,7 +3865,7 @@ public class MatchTests
     public void should_not_check_subject_utf_validity_8bit()
     {
         var re = TestSupport.CreatePcreRegex8Bit(@"A".ToLatin1Bytes());
-        _ = re.Match([(byte)'A', (byte)'é' ,(byte)'B']);
+        _ = re.Match([(byte)'A', (byte)'é', (byte)'B']);
     }
 
     [Test]
@@ -4156,7 +4156,7 @@ public class MatchTests
     [Test]
     public void should_match_script_run_utf8()
     {
-         var subject = "123\U0001D7CF\U0001D7D0\U0001D7D1"u8;
+        var subject = "123\U0001D7CF\U0001D7D0\U0001D7D1"u8;
 
         var normal = new PcreRegexUtf8(@"\d+"u8, PcreOptions.Unicode).Match(subject);
         Assert.That(normal.Success, Is.True);
@@ -4769,7 +4769,6 @@ public class MatchTests
 
         Assert.That(autoPossess, Is.EqualTo(expectedAutoPossess));
     }
-
 
     [Test]
     [TestCase(new PcreOptimizationDirective[0], true)]

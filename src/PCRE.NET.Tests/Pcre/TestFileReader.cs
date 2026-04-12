@@ -267,6 +267,7 @@ public abstract class TestFileReader : IDisposable
                                 throw InvalidInputException("Unknown option: " + part);
                         }
                     }
+
                     break;
             }
         }
