@@ -1,0 +1,22 @@
+<Solution>
+  <Folder Name="/Build/">
+    <File Path="../.editorconfig" />
+    <File Path="../.gitattributes" />
+    <File Path="../.github/workflows/build.yml" />
+    <File Path="../.gitignore" />
+    <File Path="../README.md" />
+    <File Path="CMakeLists.txt" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="NuGetReadme.md" />
+    <File Path="update-pcre2.sh" />
+  </Folder>
+  <Project Path="PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj" />
+  <Project Path="PCRE.NET.InternalAnalyzers/PCRE.NET.InternalAnalyzers.csproj" />
+  <Project Path="PCRE.NET.Native/PCRE.NET.Native.vcxproj" />
+  <Project Path="PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj" />
+  <Project Path="PCRE.NET.Tests/PCRE.NET.Tests.csproj" />
+  <Project Path="PCRE.NET/PCRE.NET.csproj">
+    <BuildDependency Project="PCRE.NET.Native/PCRE.NET.Native.vcxproj" />
+  </Project>
+</Solution>

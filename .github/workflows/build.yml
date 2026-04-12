@@ -114,7 +114,7 @@ jobs:
         shell: bash
 
       - name: NuGet Restore
-        run: dotnet restore src/PCRE.NET.sln
+        run: dotnet restore src/PCRE.NET.slnx -p:DisableWarnForInvalidRestoreProjects=true
 
       - name: Build Native
         run: msbuild src/PCRE.NET.Native/PCRE.NET.Native.vcxproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:Platform=${{ matrix.msbuild-platform }}
