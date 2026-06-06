@@ -11,6 +11,7 @@
     <File Path="NuGetReadme.md" />
     <File Path="update-pcre2.sh" />
   </Folder>
+  <Project Path="PCRE.NET.Analyzers/PCRE.NET.Analyzers.csproj" />
   <Project Path="PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj" />
   <Project Path="PCRE.NET.InternalAnalyzers/PCRE.NET.InternalAnalyzers.csproj" />
   <Project Path="PCRE.NET.Native/PCRE.NET.Native.vcxproj" />

@@ -34,7 +34,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="../PCRE.NET.Analyzers/PCRE.NET.Analyzers.csproj" ReferenceOutputAssembly="false" />
     <ProjectReference Include="../PCRE.NET.InternalAnalyzers/PCRE.NET.InternalAnalyzers.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" OutputItemType="Analyzer" SetPlatform="Platform=AnyCPU" />
+
+    <None Include="../PCRE.NET.Analyzers/bin/$(Configuration)/roslyn5.0/PCRE.NET.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.0/cs" Visible="false" />
   </ItemGroup>
 
   <ItemGroup>
