@@ -17,7 +17,7 @@ namespace PCRE.Tests.Analyzers;
 public class StaticMatchInterceptorGeneratorTests
 {
     [Test]
-    public Task generates_intercepts()
+    public Task generates_intercepts_with_literals()
     {
         return Verify(
             """
@@ -26,7 +26,41 @@ public class StaticMatchInterceptorGeneratorTests
             class C
             {
                 void M()
-                    => PcreRegex.IsMatch("input", "pattern");
+                {
+                    _ = PcreRegex.Match("input", "pattern");
+                    _ = PcreRegex.IsMatch("input", "pattern");
+                    _ = PcreRegex.Match("input", "pattern", PcreOptions.Caseless);
+                    _ = PcreRegex.IsMatch("input", "pattern", PcreOptions.Caseless);
+                    _ = PcreRegex.Match("input", "pattern", PcreOptions.Caseless, 42);
+                    _ = PcreRegex.IsMatch("input", "pattern", PcreOptions.Caseless, 42);
+
+                    _ = PcreRegex.Match("input", "pattern");
+                    _ = PcreRegex.Match("input", "pattern", PcreOptions.Compiled);
+                    _ = PcreRegex.Match("input", "pattern2");
+                }
+            }
+            """
+        );
+    }
+
+    [Test]
+    public Task does_not_generate_intercepts_with_non_literals()
+    {
+        return Verify(
+            """
+            using PCRE;
+
+            class C
+            {
+                void M()
+                {
+                    _ = PcreRegex.Match(ToString(), ToString());
+                    _ = PcreRegex.IsMatch(ToString(), ToString());
+                    _ = PcreRegex.Match(ToString(), ToString(), PcreOptions.Caseless);
+                    _ = PcreRegex.IsMatch(ToString(), ToString(), PcreOptions.Caseless);
+                    _ = PcreRegex.Match(ToString(), ToString(), PcreOptions.Caseless, 42);
+                    _ = PcreRegex.IsMatch(ToString(), ToString(), PcreOptions.Caseless, 42);
+                }
             }
             """
         );

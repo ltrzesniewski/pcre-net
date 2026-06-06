@@ -140,7 +140,6 @@ public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenera
     private static void GenerateInterceptors(CodeWriter writer, ImmutableArray<InvocationModel> invocations)
     {
         var regexCounter = 0;
-        var invocationCounter = 0;
 
         foreach (var invocationGroup in invocations.GroupBy(i => (i.Pattern, i.Options)))
         {
@@ -156,6 +155,8 @@ public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenera
 
                 """
             );
+
+            var callCounter = 0;
 
             foreach (var interceptedMethodGroup in invocationGroup.GroupBy(i => i.Operation.TargetMethod, SymbolEqualityComparer.Default))
             {
@@ -173,13 +174,13 @@ public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenera
 
                 writer.AppendLine(
                     $"""
-                            public static {method.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} Intercept{invocationCounter}_{method.ToDisplayString(_parametersFormat)}
+                            public static {method.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} Regex{regexCounter}_Call{callCounter}_{method.ToDisplayString(_parametersFormat)}
                                 => Regex{regexCounter}.{method.Name}({method.Parameters.Where(p => p.Name is not ("pattern" or "options")).Select(p => $"{p.Name}: {p.Name}").Join(", ")});
 
                     """
                 );
 
-                ++invocationCounter;
+                ++callCounter;
             }
 
             ++regexCounter;

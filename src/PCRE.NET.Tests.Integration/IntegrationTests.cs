@@ -162,6 +162,13 @@ public class IntegrationTests
             ),
             "Multiline raw string"
         );
+
+        // Non-literal
+        Check(PcreRegex.IsMatch("baz", GetRegexPattern()));
+
+        return;
+
+        static string GetRegexPattern() => "baz";
     }
 
     private void RunBuildTest()
