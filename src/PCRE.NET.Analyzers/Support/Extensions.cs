@@ -1,15 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Operations;
 
-namespace PCRE.NET.InternalAnalyzers.Support;
+namespace PCRE.NET.Analyzers.Support;
 
 internal static class Extensions
 {
     public static IncrementalValuesProvider<T> WithLambdaComparer<T>(this IncrementalValuesProvider<T> source, Func<T, T, bool> equals, Func<T, int> getHashCode)
         => source.WithComparer(new LambdaComparer<T>(equals, getHashCode));
+
+    public static IncrementalValuesProvider<T> WhereNotNull<T>(this IncrementalValuesProvider<T?> provider)
+        where T : class
+        => provider.Where(static item => item is not null)!;
+
+    public static IArgumentOperation? GetArgument(this IInvocationOperation invocation, string parameterName)
+        => invocation.Arguments.FirstOrDefault(i => i.Parameter?.Name == parameterName);
+
+    public static string Join(this IEnumerable<string> items, string separator)
+        => string.Join(separator, items);
 
     public static AttributeData? GetAttribute(this ISymbol symbol, INamedTypeSymbol attributeType)
     {

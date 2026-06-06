@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using PCRE.Internal;
-using PCRE.NET.InternalAnalyzers.Support;
+using PCRE.NET.Analyzers.Support;
 
 namespace PCRE.NET.InternalAnalyzers;
 

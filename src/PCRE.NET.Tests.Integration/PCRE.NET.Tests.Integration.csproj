@@ -5,12 +5,17 @@
     <OutputType>Exe</OutputType>
     <PublishAot>true</PublishAot>
     <ControlFlowGuard>Guard</ControlFlowGuard>
-    <DefineConstants Condition="'$(PcreNetIntegrationTest)' == 'true'">$(DefineConstants);PCRENET_INTEGRATION_TEST</DefineConstants>
     <VerifyReferenceAotCompatibility>true</VerifyReferenceAotCompatibility>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <InterceptorsNamespaces Condition="'$(PcreNetIntegrationTest)' != 'true'">$(InterceptorsNamespaces);PCRE.Generated</InterceptorsNamespaces>
+    <DefineConstants Condition="'$(PcreNetIntegrationTest)' == 'true'">$(DefineConstants);PCRENET_INTEGRATION_TEST</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\PCRE.NET\PCRE.NET.csproj" Condition="'$(PcreNetIntegrationTest)' != 'true'" />
+    <ProjectReference Include="../PCRE.NET/PCRE.NET.csproj" Condition="'$(PcreNetIntegrationTest)' != 'true'" />
+    <ProjectReference Include="../PCRE.NET.Analyzers/PCRE.NET.Analyzers.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
   </ItemGroup>
 
   <ItemGroup>

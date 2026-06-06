@@ -27,6 +27,7 @@ public class IntegrationTests
         Safe(() => RunTestUtf16(PcreOptions.Compiled));
         Safe(() => RunTestUtf8(PcreOptions.None));
         Safe(() => RunTestUtf8(PcreOptions.Compiled));
+        Safe(RunStaticInterceptorTest);
         RunBuildTest();
 
         Console.WriteLine();
@@ -108,6 +109,59 @@ public class IntegrationTests
         Check(bufferedMatch[1].Value.SequenceEqual("bb"u8));
         Check(bufferedMatch[1].Index == 6);
         Check(bufferedMatch[1].Length == 2);
+    }
+
+    [SuppressMessage("ReSharper", "RedundantVerbatimStringPrefix")]
+    private void RunStaticInterceptorTest()
+    {
+        Header("Static Interceptor");
+
+        // subject, pattern
+        Check(PcreRegex.Match("foo", "f.o").Success);
+        Check(PcreRegex.Match("foo", "f.o").Success);
+        Check(!PcreRegex.Match("FOO", "f.o").Success);
+
+        Check(PcreRegex.IsMatch("foo", "f.o"));
+        Check(PcreRegex.IsMatch("foo", "f.o"));
+        Check(!PcreRegex.IsMatch("FOO", "f.o"));
+
+        // subject, pattern, options
+        Check(PcreRegex.Match("FOO", "f.o", PcreOptions.Caseless).Success);
+        Check(PcreRegex.Match("FOO", "f.o", PcreOptions.Caseless | PcreOptions.Compiled).Success);
+        Check(!PcreRegex.Match("FOO", "f.o", PcreOptions.None).Success);
+
+        Check(PcreRegex.IsMatch("FOO", "f.o", PcreOptions.Caseless));
+        Check(PcreRegex.IsMatch("FOO", "f.o", PcreOptions.Caseless | PcreOptions.Compiled));
+        Check(!PcreRegex.IsMatch("FOO", "f.o", PcreOptions.None));
+
+        // subject, pattern, options, startIndex
+        Check(PcreRegex.Match("FOO", "f.o", startIndex: 0, options: PcreOptions.Caseless).Success);
+        Check(!PcreRegex.Match("FOO", "f.o", startIndex: 1, options: PcreOptions.Caseless).Success);
+
+        Check(PcreRegex.IsMatch("FOO", "f.o", startIndex: 0, options: PcreOptions.Caseless));
+        Check(!PcreRegex.IsMatch("FOO", "f.o", startIndex: 1, options: PcreOptions.Caseless));
+
+        // Another regex
+        Check(PcreRegex.Match("bar", "b.r").Success);
+        Check(PcreRegex.IsMatch("bar", "b.r"));
+
+        // Other string literals
+        Check(PcreRegex.IsMatch("baz", @"(?x)baz"));
+        Check(PcreRegex.IsMatch("baz", """(?x)baz"""));
+        Check(
+            PcreRegex.IsMatch(
+                "baz",
+                """
+                  (?x)
+
+                  b
+                  a
+                  z
+
+                  """
+            ),
+            "Multiline raw string"
+        );
     }
 
     private void RunBuildTest()

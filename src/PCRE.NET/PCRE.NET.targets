@@ -1,4 +1,10 @@
 <Project>
+  <PropertyGroup>
+    <PcreNetAnalyzers Condition="'$(PcreNetAnalyzers)' == ''">true</PcreNetAnalyzers>
+    <PcreNetInterceptors Condition="'$(PcreNetInterceptors)' == ''">$(PcreNetAnalyzers)</PcreNetInterceptors>
+    <InterceptorsNamespaces Condition="'$(PcreNetInterceptors)' == 'true'">$(InterceptorsNamespaces);PCRE.Generated</InterceptorsNamespaces>
+  </PropertyGroup>
+
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
     <None Include="$(MSBuildThisFileDirectory)\..\runtimes\win-x64\native\PCRE.NET.Native.dll">
       <Link>PCRE.NET.Native.x64.dll</Link>
