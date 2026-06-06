@@ -13,13 +13,13 @@
     <DefineConstants Condition="'$(PcreNetIntegrationTest)' == 'true'">$(DefineConstants);PCRENET_INTEGRATION_TEST</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="../PCRE.NET/PCRE.NET.csproj" Condition="'$(PcreNetIntegrationTest)' != 'true'" />
+  <ItemGroup Condition="'$(PcreNetIntegrationTest)' != 'true'">
+    <ProjectReference Include="../PCRE.NET/PCRE.NET.csproj"  />
     <ProjectReference Include="../PCRE.NET.Analyzers/PCRE.NET.Analyzers.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="PCRE.NET" Version="$(PackageVersion)" Condition="'$(PcreNetIntegrationTest)' == 'true'" />
+  <ItemGroup Condition="'$(PcreNetIntegrationTest)' == 'true'">
+    <PackageReference Include="PCRE.NET" Version="$(PackageVersion)"  />
   </ItemGroup>
 
 </Project>

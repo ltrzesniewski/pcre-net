@@ -12,7 +12,7 @@ public static class ModuleInitializer
     public static void Initialize()
     {
         DiffRunner.Disabled = true;
-        //VerifySourceGenerators.Initialize();
+        VerifySourceGenerators.Initialize();
         VerifyDiffPlex.Initialize();
     }
 }
