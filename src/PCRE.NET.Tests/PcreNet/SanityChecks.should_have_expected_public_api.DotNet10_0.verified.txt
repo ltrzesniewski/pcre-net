@@ -828,26 +828,27 @@ namespace PCRE
         public string Replace(string subject, System.Func<PCRE.PcreMatch, string> replacementFunc, int count, int startIndex) { }
         public string Replace(string subject, string replacement, int count, int startIndex) { }
         public System.Collections.Generic.IEnumerable<string> Split(string subject) { }
-        public System.Collections.Generic.IEnumerable<string> Split(string subject, PCRE.PcreSplitOptions options) { }
+        public System.Collections.Generic.IEnumerable<string> Split(string subject, PCRE.PcreSplitOptions splitOptions) { }
         public System.Collections.Generic.IEnumerable<string> Split(string subject, int count) { }
+        public System.Collections.Generic.IEnumerable<string> Split(string subject, PCRE.PcreSplitOptions splitOptions, int count) { }
         public System.Collections.Generic.IEnumerable<string> Split(string subject, int count, int startIndex) { }
-        public System.Collections.Generic.IEnumerable<string> Split(string subject, PCRE.PcreSplitOptions options, int count, int startIndex) { }
+        public System.Collections.Generic.IEnumerable<string> Split(string subject, PCRE.PcreSplitOptions splitOptions, int count, int startIndex) { }
         public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement) { }
         public string Substitute(string subject, string replacement) { }
-        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement, PCRE.PcreSubstituteOptions options) { }
-        public string Substitute(string subject, string replacement, PCRE.PcreSubstituteOptions options) { }
-        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement, PCRE.PcreSubstituteOptions options, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout) { }
-        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement, int startIndex, PCRE.PcreSubstituteOptions options) { }
-        public string Substitute(string subject, string replacement, PCRE.PcreSubstituteOptions options, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout) { }
-        public string Substitute(string subject, string replacement, int startIndex, PCRE.PcreSubstituteOptions options) { }
-        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement, int startIndex, PCRE.PcreSubstituteOptions options, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout) { }
-        public string Substitute(string subject, string replacement, int startIndex, PCRE.PcreSubstituteOptions options, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout) { }
-        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement, int startIndex, PCRE.PcreSubstituteOptions options, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout, PCRE.PcreMatchSettings? settings) { }
-        public string Substitute(string subject, string replacement, int startIndex, PCRE.PcreSubstituteOptions options, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout, PCRE.PcreMatchSettings? settings) { }
-        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement, int startIndex, PCRE.PcreSubstituteOptions options, PCRE.PcreRefCalloutFunc? onMatchCallout, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout, PCRE.PcreMatchSettings? settings) { }
-        public string Substitute(string subject, string replacement, int startIndex, PCRE.PcreSubstituteOptions options, PCRE.PcreRefCalloutFunc? onMatchCallout, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout, PCRE.PcreMatchSettings? settings) { }
-        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement, int startIndex, PCRE.PcreSubstituteOptions options, PCRE.PcreRefCalloutFunc? onMatchCallout, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout, PCRE.PcreSubstituteCaseCalloutFunc? onSubstituteCaseCallout, PCRE.PcreMatchSettings? settings) { }
-        public string Substitute(string subject, string replacement, int startIndex, PCRE.PcreSubstituteOptions options, PCRE.PcreRefCalloutFunc? onMatchCallout, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout, PCRE.PcreSubstituteCaseCalloutFunc? onSubstituteCaseCallout, PCRE.PcreMatchSettings? settings) { }
+        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement, PCRE.PcreSubstituteOptions substituteOptions) { }
+        public string Substitute(string subject, string replacement, PCRE.PcreSubstituteOptions substituteOptions) { }
+        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement, PCRE.PcreSubstituteOptions substituteOptions, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout) { }
+        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement, int startIndex, PCRE.PcreSubstituteOptions substituteOptions) { }
+        public string Substitute(string subject, string replacement, PCRE.PcreSubstituteOptions substituteOptions, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout) { }
+        public string Substitute(string subject, string replacement, int startIndex, PCRE.PcreSubstituteOptions substituteOptions) { }
+        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement, int startIndex, PCRE.PcreSubstituteOptions substituteOptions, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout) { }
+        public string Substitute(string subject, string replacement, int startIndex, PCRE.PcreSubstituteOptions substituteOptions, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout) { }
+        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement, int startIndex, PCRE.PcreSubstituteOptions substituteOptions, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout, PCRE.PcreMatchSettings? settings) { }
+        public string Substitute(string subject, string replacement, int startIndex, PCRE.PcreSubstituteOptions substituteOptions, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout, PCRE.PcreMatchSettings? settings) { }
+        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement, int startIndex, PCRE.PcreSubstituteOptions substituteOptions, PCRE.PcreRefCalloutFunc? onMatchCallout, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout, PCRE.PcreMatchSettings? settings) { }
+        public string Substitute(string subject, string replacement, int startIndex, PCRE.PcreSubstituteOptions substituteOptions, PCRE.PcreRefCalloutFunc? onMatchCallout, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout, PCRE.PcreMatchSettings? settings) { }
+        public string Substitute(System.ReadOnlySpan<char> subject, System.ReadOnlySpan<char> replacement, int startIndex, PCRE.PcreSubstituteOptions substituteOptions, PCRE.PcreRefCalloutFunc? onMatchCallout, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout, PCRE.PcreSubstituteCaseCalloutFunc? onSubstituteCaseCallout, PCRE.PcreMatchSettings? settings) { }
+        public string Substitute(string subject, string replacement, int startIndex, PCRE.PcreSubstituteOptions substituteOptions, PCRE.PcreRefCalloutFunc? onMatchCallout, PCRE.PcreSubstituteCalloutFunc? onSubstituteCallout, PCRE.PcreSubstituteCaseCalloutFunc? onSubstituteCaseCallout, PCRE.PcreMatchSettings? settings) { }
         public override string ToString() { }
         public static bool IsMatch(string subject, string pattern) { }
         public static bool IsMatch(string subject, string pattern, PCRE.PcreOptions options) { }
@@ -873,7 +874,7 @@ namespace PCRE
         public static System.Collections.Generic.IEnumerable<string> Split(string subject, string pattern, PCRE.PcreOptions options, PCRE.PcreSplitOptions splitOptions, int count) { }
         public static System.Collections.Generic.IEnumerable<string> Split(string subject, string pattern, PCRE.PcreOptions options, PCRE.PcreSplitOptions splitOptions, int count, int startIndex) { }
         public static string Substitute(string subject, string pattern, string replacement) { }
-        public static string Substitute(string subject, string pattern, string replacement, PCRE.PcreOptions patternOptions, PCRE.PcreSubstituteOptions substituteOptions) { }
+        public static string Substitute(string subject, string pattern, string replacement, PCRE.PcreOptions options, PCRE.PcreSubstituteOptions substituteOptions) { }
         public readonly ref struct RefMatchEnumerable
         {
             public PCRE.PcreRegex.RefMatchEnumerator GetEnumerator() { }

@@ -1,39 +1,45 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace PCRE.Tests.Integration;
 
-public class IntegrationTests
+public partial class IntegrationTests
 {
-    private const string _reset = "\e[0m";
-    private const string _bold = "\e[1m";
-    private const string _red = "\e[91m";
-    private const string _green = "\e[92m";
-
-    private bool _success = true;
-
-    public static int Main()
+    public static int Main(string[] args)
     {
         var tests = new IntegrationTests();
-        return tests.Run() ? 0 : 1;
+        return tests.Run(args) ? 0 : 1;
     }
 
-    private bool Run()
+    private bool Run(string[] args)
     {
         _success = true;
 
+        CheckArgs(args, out var aot, out var build);
         Safe(() => RunTestUtf16(PcreOptions.None));
         Safe(() => RunTestUtf16(PcreOptions.Compiled));
         Safe(() => RunTestUtf8(PcreOptions.None));
         Safe(() => RunTestUtf8(PcreOptions.Compiled));
-        RunBuildTest();
+        Safe(RunStaticInterceptorTest);
+        Safe(RunReplacementPatternTest);
+        Safe(() => CheckAot(aot));
+        Safe(() => CheckBuild(build));
 
-        Console.WriteLine();
-        Console.WriteLine($"{_bold}Integration tests: {(_success ? $"{_green}PASSED" : $"{_red}FAILED")}{_reset}");
-        Console.WriteLine();
-
+        PrintSummary();
         return _success;
+    }
+
+    private void CheckArgs(string[] args, out bool aot, out bool build)
+    {
+        Header("Arguments");
+
+        var full = args.Contains("--full");
+        aot = full || args.Contains("--aot");
+        build = full || args.Contains("--build");
+
+        Check(args.All(arg => arg is "--full" or "--aot" or "--build"));
     }
 
     private void RunTestUtf16(PcreOptions options)
@@ -110,12 +116,188 @@ public class IntegrationTests
         Check(bufferedMatch[1].Length == 2);
     }
 
-    private void RunBuildTest()
+    [SuppressMessage("ReSharper", "RedundantVerbatimStringPrefix")]
+    private void RunStaticInterceptorTest()
     {
-        Header("Build");
+        Header("Static Interceptor");
+
+        // subject, pattern
+        Check(PcreRegex.Match("foo", "f.o").Success);
+        Check(PcreRegex.Match("foo", "f.o").Success);
+        Check(!PcreRegex.Match("FOO", "f.o").Success);
+
+        Check(PcreRegex.IsMatch("foo", "f.o"));
+        Check(PcreRegex.IsMatch("foo", "f.o"));
+        Check(!PcreRegex.IsMatch("FOO", "f.o"));
+
+        Check(PcreRegex.Matches("foo", "f.o").Any());
+        Check(PcreRegex.Matches("foo", "f.o").Any());
+        Check(!PcreRegex.Matches("FOO", "f.o").Any());
+
+        // subject, pattern, options
+        Check(PcreRegex.Match("FOO", "f.o", PcreOptions.Caseless).Success);
+        Check(PcreRegex.Match("FOO", "f.o", PcreOptions.Caseless | PcreOptions.Compiled).Success);
+        Check(!PcreRegex.Match("FOO", "f.o", PcreOptions.None).Success);
+
+        Check(PcreRegex.IsMatch("FOO", "f.o", PcreOptions.Caseless));
+        Check(PcreRegex.IsMatch("FOO", "f.o", PcreOptions.Caseless | PcreOptions.Compiled));
+        Check(!PcreRegex.IsMatch("FOO", "f.o", PcreOptions.None));
+
+        Check(PcreRegex.Matches("FOO", "f.o", PcreOptions.Caseless).Any());
+        Check(PcreRegex.Matches("FOO", "f.o", PcreOptions.Caseless | PcreOptions.Compiled).Any());
+        Check(!PcreRegex.Matches("FOO", "f.o", PcreOptions.None).Any());
+
+        // subject, pattern, options, startIndex
+        Check(PcreRegex.Match("FOO", "f.o", startIndex: 0, options: PcreOptions.Caseless).Success);
+        Check(!PcreRegex.Match("FOO", "f.o", startIndex: 1, options: PcreOptions.Caseless).Success);
+
+        Check(PcreRegex.IsMatch("FOO", "f.o", startIndex: 0, options: PcreOptions.Caseless));
+        Check(!PcreRegex.IsMatch("FOO", "f.o", startIndex: 1, options: PcreOptions.Caseless));
+
+        Check(PcreRegex.Matches("FOO", "f.o", startIndex: 0, options: PcreOptions.Caseless).Any());
+        Check(!PcreRegex.Matches("FOO", "f.o", startIndex: 1, options: PcreOptions.Caseless).Any());
+
+        // Another regex
+        Check(PcreRegex.Match("bar", "b.r").Success);
+        Check(PcreRegex.IsMatch("bar", "b.r"));
+        Check(PcreRegex.Matches("bar", "b.r").Any());
+
+        // Other string literals
+        const string pattern = @"(?x)baz";
+        Check(PcreRegex.IsMatch("baz", pattern));
+        Check(PcreRegex.IsMatch("baz", @"(?x)baz"));
+        Check(PcreRegex.IsMatch("baz", """(?x)baz"""));
+        Check(
+            PcreRegex.IsMatch(
+                "baz",
+                """
+                  (?x)
+
+                  b
+                  a
+                  z
+
+                  """
+            ),
+            "Multiline raw string"
+        );
+
+        // Non-literal
+        Check(PcreRegex.IsMatch("baz", GetRegexPattern()));
+
+        // Split
+        Check(PcreRegex.Split("a b c", @"\s+").ToList() is ["a", "b", "c"]);
+        Check(PcreRegex.Split("a b c", @"\s+", PcreOptions.Caseless).ToList() is ["a", "b", "c"]);
+        Check(PcreRegex.Split("a b c", @"\s+", PcreOptions.Compiled).ToList() is ["a", "b", "c"]);
+        Check(PcreRegex.Split("a b c", @"\s+", 1).ToList() is ["a", "b c"]);
+        Check(PcreRegex.Split("a b c", @"\s+", PcreOptions.Compiled, PcreSplitOptions.None).ToList() is ["a", "b", "c"]);
+        Check(PcreRegex.Split("a b c", @"\s+", PcreOptions.Compiled, PcreSplitOptions.None, 1).ToList() is ["a", "b c"]);
+        Check(PcreRegex.Split("a b c", @"\s+", PcreOptions.Compiled, PcreSplitOptions.None, 1, 2).ToList() is ["a b", "c"]);
+
+        // Substitute
+        Check(PcreRegex.Substitute("a b c", @"\s+", "-") == "a-b c");
+        Check(PcreRegex.Substitute("a b c", @"\s+", "-", PcreOptions.Compiled, PcreSubstituteOptions.SubstituteGlobal) == "a-b-c");
+
+        return;
+
+        static string GetRegexPattern() => "baz";
+    }
+
+    [SuppressMessage("ReSharper", "RedundantVerbatimStringPrefix")]
+    private void RunReplacementPatternTest()
+    {
+        Header("Replacement Pattern Interceptor");
+
+        var regex = new PcreRegex("a+(?<group>b+)(c+)");
+
+        Check(regex.Replace("abbcbar", "foo") == "foobar");
+
+        Check(regex.Replace("<abc>", "") == "<>");
+        Check(regex.Replace("<abc>", "replacement") == "<replacement>");
+        Check(regex.Replace("<abc>", "[$$]") == "<[$]>");
+        Check(regex.Replace("<abc>", "[$&]") == "<[abc]>");
+        Check(regex.Replace("<abc>", "[$0]") == "<[abc]>");
+        Check(regex.Replace("<abc>", "[$1]") == "<[b]>");
+        Check(regex.Replace("<abc>", "[$2]") == "<[c]>");
+        Check(regex.Replace("<abc>", "[$3]") == "<[$3]>");
+        Check(regex.Replace("<abc>", "[${group}]") == "<[b]>");
+        Check(regex.Replace("<abc>", "[${other}]") == "<[${other}]>");
+        Check(regex.Replace("<abc>", "[${2}]") == "<[c]>");
+        Check(regex.Replace("<abc>", "[$`]") == "<[<]>");
+        Check(regex.Replace("<abc>", "[$']") == "<[>]>");
+        Check(regex.Replace("<abc>", "[$_]") == "<[<abc>]>");
+        Check(regex.Replace("<abc>", "[$+]") == "<[c]>");
+        Check(regex.Replace("<abc>", "[$+]") == "<[c]>");
+
+        Check(NonInterceptedReplace("<abc>", "") == "<>");
+        Check(NonInterceptedReplace("<abc>", "replacement") == "<replacement>");
+        Check(NonInterceptedReplace("<abc>", "[$$]") == "<[$]>");
+        Check(NonInterceptedReplace("<abc>", "[$&]") == "<[abc]>");
+        Check(NonInterceptedReplace("<abc>", "[$0]") == "<[abc]>");
+        Check(NonInterceptedReplace("<abc>", "[$1]") == "<[b]>");
+        Check(NonInterceptedReplace("<abc>", "[$2]") == "<[c]>");
+        Check(NonInterceptedReplace("<abc>", "[$3]") == "<[$3]>");
+        Check(NonInterceptedReplace("<abc>", "[${group}]") == "<[b]>");
+        Check(NonInterceptedReplace("<abc>", "[${other}]") == "<[${other}]>");
+        Check(NonInterceptedReplace("<abc>", "[${2}]") == "<[c]>");
+        Check(NonInterceptedReplace("<abc>", "[$`]") == "<[<]>");
+        Check(NonInterceptedReplace("<abc>", "[$']") == "<[>]>");
+        Check(NonInterceptedReplace("<abc>", "[$_]") == "<[<abc>]>");
+        Check(NonInterceptedReplace("<abc>", "[$+]") == "<[c]>");
+        Check(NonInterceptedReplace("<abc>", "[$+]") == "<[c]>");
+
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "") == "<>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "replacement") == "<replacement>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$$]") == "<[$]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$&]") == "<[abc]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$0]") == "<[abc]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$1]") == "<[b]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$2]") == "<[c]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$3]") == "<[$3]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[${group}]") == "<[b]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[${other}]") == "<[${other}]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[${2}]") == "<[c]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$`]") == "<[<]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$']") == "<[>]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$_]") == "<[<abc>]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$+]") == "<[c]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$+]") == "<[c]>");
+
+        return;
+
+        string NonInterceptedReplace(string input, string replacement)
+            => regex.Replace(input, replacement);
+    }
+
+    private void CheckAot(bool run)
+    {
+        Header("AOT");
+
+        if (!run)
+        {
+            Ignore();
+            return;
+        }
 
         Check(!RuntimeFeature.IsDynamicCodeSupported);
         Check(string.IsNullOrEmpty(GetAssemblyLocation()));
+
+        return;
+
+        [UnconditionalSuppressMessage("SingleFile", "IL3000")]
+        static string GetAssemblyLocation()
+            => typeof(IntegrationTests).Assembly.Location;
+    }
+
+    private void CheckBuild(bool run)
+    {
+        Header("Build");
+
+        if (!run)
+        {
+            Ignore();
+            return;
+        }
 
         const bool isInIntegrationTest =
 #if PCRENET_INTEGRATION_TEST
@@ -125,46 +307,5 @@ public class IntegrationTests
 #endif
 
         Check(isInIntegrationTest, "Built in integration tests mode");
-
-        [UnconditionalSuppressMessage("SingleFile", "IL3000")]
-        static string GetAssemblyLocation()
-            => typeof(IntegrationTests).Assembly.Location;
-    }
-
-    private static void Header(string title)
-    {
-        Console.WriteLine();
-        Console.WriteLine($"{_bold}{title}{_reset}");
-    }
-
-    private void Check(bool success, [CallerArgumentExpression(nameof(success))] string? code = null)
-    {
-        if (success)
-            Pass(code);
-        else
-            Fail(code);
-    }
-
-    private static void Pass(string? message)
-    {
-        Console.WriteLine($"  {_green}PASSED:{_reset} {message}");
-    }
-
-    private void Fail(string? message)
-    {
-        Console.WriteLine($"  {_red}FAILED:{_reset} {message}");
-        _success = false;
-    }
-
-    private void Safe(Action action)
-    {
-        try
-        {
-            action();
-        }
-        catch (Exception ex)
-        {
-            Fail(ex.Message);
-        }
     }
 }

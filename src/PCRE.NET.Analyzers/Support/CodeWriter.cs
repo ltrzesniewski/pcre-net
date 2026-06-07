@@ -1,7 +1,8 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-namespace PCRE.NET.InternalAnalyzers;
+namespace PCRE.NET.Analyzers.Support;
 
 internal class CodeWriter
 {
@@ -18,7 +19,7 @@ internal class CodeWriter
         return this;
     }
 
-    public CodeWriter Append(string? value)
+    public CodeWriter Append([StringSyntax("csharp")] string? value)
     {
         if (!string.IsNullOrEmpty(value))
         {
@@ -35,7 +36,7 @@ internal class CodeWriter
         return this;
     }
 
-    public CodeWriter AppendLine(string? value = null)
+    public CodeWriter AppendLine([StringSyntax("csharp")] string? value = null)
     {
         if (!string.IsNullOrEmpty(value))
         {
@@ -45,6 +46,17 @@ internal class CodeWriter
 
         _sb.AppendLine();
         _isAtStartOfLine = true;
+
+        return this;
+    }
+
+    public CodeWriter TrimComma()
+    {
+        while (_sb.Length >= 1 && _sb[_sb.Length - 1] == ' ')
+            _sb.Remove(_sb.Length - 1, 1);
+
+        if (_sb.Length >= 1 && _sb[_sb.Length - 1] == ',')
+            _sb.Remove(_sb.Length - 1, 1);
 
         return this;
     }

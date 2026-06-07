@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 
 namespace PCRE.Internal;
 
-internal static class ReplacementPattern
+internal static partial class ReplacementPattern
 {
-    public static Func<PcreMatch, string> Parse(string replacementPattern)
+    private static bool TryParse(string? replacementPattern, out List<ReplacementPart> parts)
     {
-        if (replacementPattern == null)
-            throw new ArgumentNullException(nameof(replacementPattern));
+        parts = [];
+
+        if (replacementPattern is null)
+            return false;
 
         if (replacementPattern.Length == 0)
-            return _ => string.Empty;
+            return true;
 
 #if NET
         var placeholderIndex = replacementPattern.IndexOf('$', StringComparison.Ordinal);
@@ -22,9 +23,11 @@ internal static class ReplacementPattern
 #endif
 
         if (placeholderIndex < 0)
-            return _ => replacementPattern;
+        {
+            parts.Add(new LiteralPart(replacementPattern));
+            return true;
+        }
 
-        var parts = new List<ReplacementPart>();
         var idx = 0;
 
         if (placeholderIndex > 0)
@@ -89,7 +92,7 @@ internal static class ReplacementPattern
                         if (idx < replacementPattern.Length && replacementPattern[idx] == '}' && idx > startIdx + 1)
                         {
                             var groupName = replacementPattern.Substring(startIdx + 1, idx - startIdx - 1);
-                            var fallback = new LiteralPart(replacementPattern, startIdx - 1, idx - startIdx + 2);
+                            var fallback = replacementPattern.Substring(startIdx - 1, idx - startIdx + 2);
                             parts.Add(new NamedGroupPart(groupName, fallback));
                             ++idx;
                             break;
@@ -114,7 +117,7 @@ internal static class ReplacementPattern
                         while (idx < replacementPattern.Length && replacementPattern[idx] is >= '0' and <= '9')
                             ++idx;
 
-                        var fallback = new LiteralPart(replacementPattern, startIdx - 1, idx - startIdx + 1);
+                        var fallback = replacementPattern.Substring(startIdx - 1, idx - startIdx + 1);
 
 #if NET
                         var groupIndexString = replacementPattern.AsSpan(startIdx, idx - startIdx);
@@ -128,7 +131,7 @@ internal static class ReplacementPattern
                             break;
                         }
 
-                        parts.Add(fallback);
+                        parts.Add(new LiteralPart(fallback));
                         break;
                     }
 
@@ -148,22 +151,15 @@ internal static class ReplacementPattern
             }
         }
 
-        return match =>
-        {
-            var sb = new StringBuilder();
-            foreach (var part in parts)
-                part.Append(match, sb);
-            return sb.ToString();
-        };
+        return true;
     }
 
-    private abstract class ReplacementPart
+    internal abstract partial class ReplacementPart
     {
-        public abstract void Append(PcreMatch match, StringBuilder sb);
         public abstract override string ToString();
     }
 
-    private sealed class LiteralPart : ReplacementPart
+    internal sealed partial class LiteralPart : ReplacementPart
     {
         public static readonly LiteralPart Dollar = new("$");
 
@@ -171,7 +167,7 @@ internal static class ReplacementPattern
         private readonly int _startIndex;
         private readonly int _length;
 
-        private LiteralPart(string text)
+        public LiteralPart(string text)
         {
             _text = text;
             _startIndex = 0;
@@ -185,37 +181,24 @@ internal static class ReplacementPattern
             _length = length;
         }
 
-        public override void Append(PcreMatch match, StringBuilder sb)
-            => sb.Append(_text, _startIndex, _length);
+        public string GetText()
+            => _text.Substring(_startIndex, _length);
 
         public override string ToString()
-            => $"Literal: {_text.Substring(_startIndex, _length)}";
+            => $"Literal: {GetText()}";
     }
 
-    private sealed class IndexedGroupPart : ReplacementPart
+    internal sealed partial class IndexedGroupPart : ReplacementPart
     {
         public static readonly IndexedGroupPart FullMatch = new(0, null);
 
         private readonly int _index;
-        private readonly ReplacementPart? _fallback;
+        private readonly string? _fallback;
 
-        public IndexedGroupPart(int index, ReplacementPart? fallback)
+        public IndexedGroupPart(int index, string? fallback)
         {
             _index = index;
             _fallback = fallback;
-        }
-
-        public override void Append(PcreMatch match, StringBuilder sb)
-        {
-            if (match.TryGetGroup(_index, out var group))
-            {
-                if (group.Success)
-                    sb.Append(match.Subject, group.Index, group.Length);
-            }
-            else
-            {
-                _fallback?.Append(match, sb);
-            }
         }
 
         public override string ToString()
@@ -224,13 +207,13 @@ internal static class ReplacementPattern
                 : $"Group: #{_index}";
     }
 
-    private sealed class NamedGroupPart : ReplacementPart
+    internal sealed partial class NamedGroupPart : ReplacementPart
     {
         private readonly string _name;
         private readonly int _index;
-        private readonly ReplacementPart? _fallback;
+        private readonly string? _fallback;
 
-        public NamedGroupPart(string name, ReplacementPart? fallback)
+        public NamedGroupPart(string name, string? fallback)
         {
             _name = name;
             _fallback = fallback;
@@ -239,74 +222,37 @@ internal static class ReplacementPattern
                 _index = -1;
         }
 
-        public override void Append(PcreMatch match, StringBuilder sb)
-        {
-            if (match.TryGetGroup(_name, out var group) || match.TryGetGroup(_index, out group))
-            {
-                if (group.Success)
-                    sb.Append(match.Subject, group.Index, group.Length);
-            }
-            else
-            {
-                _fallback?.Append(match, sb);
-            }
-        }
-
         public override string ToString()
             => $"Group: {_name}";
     }
 
-    private sealed class PreMatchPart : ReplacementPart
+    internal sealed partial class PreMatchPart : ReplacementPart
     {
         public static readonly PreMatchPart Instance = new();
-
-        public override void Append(PcreMatch match, StringBuilder sb)
-            => sb.Append(match.Subject, 0, match.Index);
 
         public override string ToString()
             => "Pre match";
     }
 
-    private sealed class PostMatchPart : ReplacementPart
+    internal sealed partial class PostMatchPart : ReplacementPart
     {
         public static readonly PostMatchPart Instance = new();
-
-        public override void Append(PcreMatch match, StringBuilder sb)
-        {
-            var endOfMatch = match.EndIndex;
-            sb.Append(match.Subject, endOfMatch, match.Subject.Length - endOfMatch);
-        }
 
         public override string ToString()
             => "Post match";
     }
 
-    private sealed class FullInputPart : ReplacementPart
+    internal sealed partial class FullInputPart : ReplacementPart
     {
         public static readonly FullInputPart Instance = new();
-
-        public override void Append(PcreMatch match, StringBuilder sb)
-            => sb.Append(match.Subject);
 
         public override string ToString()
             => "Full input";
     }
 
-    private sealed class LastMatchedGroupPart : ReplacementPart
+    internal sealed partial class LastMatchedGroupPart : ReplacementPart
     {
         public static readonly LastMatchedGroupPart Instance = new();
-
-        public override void Append(PcreMatch match, StringBuilder sb)
-        {
-            for (var i = match.CaptureCount; i > 0; --i)
-            {
-                if (match.TryGetGroup(i, out var group) && group.Success)
-                {
-                    sb.Append(match.Subject, group.Index, group.Length);
-                    return;
-                }
-            }
-        }
 
         public override string ToString()
             => "Last matched group";

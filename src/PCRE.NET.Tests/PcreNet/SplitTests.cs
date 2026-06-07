@@ -70,6 +70,15 @@ public class SplitTests
     }
 
     [Test]
+    public void should_include_captured_groups_in_result_with_count()
+    {
+        var re = new PcreRegex(@"<(\d)?(.+?)>");
+        var result = re.Split("foo<bar>baz<42>a", PcreSplitOptions.IncludeGroupValues, 1).ToList();
+
+        Assert.That(result, Is.EqualTo(["foo", "bar", "baz<42>a"]));
+    }
+
+    [Test]
     public void should_not_include_captured_groups_in_result_if_not_specified()
     {
         var re = new PcreRegex(@"<(\d)?(.+?)>");
