@@ -70,6 +70,7 @@ public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenera
                 method,
                 pattern,
                 optionsArg?.Value.ConstantValue.Value as long? ?? 0,
+                method.Name is "Replace" ? invocation.GetArgument("replacement")?.Value.ConstantValue.Value as string : null,
                 location
             );
         }
@@ -108,6 +109,7 @@ public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenera
 
     private static void GenerateInterceptors(CodeWriter writer, ImmutableArray<InvocationModel> invocations)
     {
+        var replacementPatterns = new ReplacementPatternSet();
         var regexCounter = 0;
 
         foreach (var invocationGroup in invocations.GroupBy(i => (i.Pattern, i.Options)))
@@ -131,22 +133,47 @@ public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenera
             {
                 var method = (IMethodSymbol)interceptedMethodGroup.Key!;
 
-                foreach (var interceptedMethod in interceptedMethodGroup)
-                    writer.Append("        ").AppendInterceptsLocationAttribute(interceptedMethod.Location);
+                foreach (var invocationsGroup in interceptedMethodGroup.GroupBy(i => i.ReplacementPattern))
+                {
+                    var replacementPattern = invocationsGroup.Key;
 
-                writer.AppendLine(
-                    $"""
-                            public static {method.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} Regex{regexCounter}_Call{callCounter}_{method.ToDisplayString(GeneratorHelpers.ParametersFormat)}
-                                => Regex{regexCounter}.{method.Name}({method.Parameters.Where(p => p.Name is not ("pattern" or "options")).Select(p => $"{p.Name}: {p.Name}").Join(", ")});
+                    foreach (var interceptedMethod in invocationsGroup)
+                        writer.Append("        ").AppendInterceptsLocationAttribute(interceptedMethod.Location);
 
-                    """
-                );
+                    writer.Append(
+                        $"""
+                                public static {method.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} Regex{regexCounter}_Call{callCounter}_{method.ToDisplayString(GeneratorHelpers.ParametersFormat)}
+                                    => Regex{regexCounter}.{method.Name}(
+                        """
+                    );
 
-                ++callCounter;
+                    foreach (var param in method.Parameters)
+                    {
+                        if (param.Name is "pattern" or "options")
+                            continue;
+
+                        if (param.Name is "replacement" && method.Name is "Replace" && replacementPatterns.GetOrAdd(replacementPattern, out _) is { } replacement)
+                        {
+                            writer.Append($"replacementFunc: {replacement.GetReplacementFuncCall()}, ");
+                            continue;
+                        }
+
+                        writer.Append($"{param.Name}: {param.Name}, ");
+                    }
+
+                    writer.TrimComma()
+                          .AppendLine(");")
+                          .AppendLine();
+
+                    ++callCounter;
+                }
             }
 
             ++regexCounter;
         }
+
+        replacementPatterns.AppendFields(writer);
+        replacementPatterns.AppendHelpers(writer);
     }
 
     [SuppressMessage("ReSharper", "PartialMethodWithSinglePart")]
@@ -156,6 +183,7 @@ public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenera
         IMethodSymbol Method,
         string Pattern,
         long Options,
+        string? ReplacementPattern,
         InterceptableLocation Location
     );
 }

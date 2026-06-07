@@ -8,16 +8,17 @@ namespace PCRE.Internal;
 
 internal partial class ReplacementPattern
 {
-    public static ParseResult? TryParse(string replacementPattern)
-        => TryParse(replacementPattern, out var parts) ? new ParseResult(parts) : null;
+    public static PatternModel? Parse(string? replacementPattern)
+        => TryParse(replacementPattern, out var parts) ? new PatternModel(parts) : null;
 
-    public sealed class ParseResult
+    public sealed class PatternModel
     {
         private readonly List<ReplacementPart> _parts;
 
+        public IReadOnlyList<ReplacementPart> Parts => _parts;
         public bool NeedsSubject { get; }
 
-        public ParseResult(List<ReplacementPart> parts)
+        public PatternModel(List<ReplacementPart> parts)
         {
             _parts = parts;
             NeedsSubject = _parts.Any(static i => i.NeedsSubject);
@@ -47,12 +48,6 @@ internal partial class ReplacementPattern
 
             sb.Append('"');
             return sb.ToString();
-        }
-
-        public static void AppendHelpers(CodeWriter writer, IEnumerable<ParseResult> parseResults)
-        {
-            foreach (var part in parseResults.SelectMany(i => i._parts).DistinctBy(p => p.GetType()))
-                part.AppendHelpers(writer);
         }
     }
 

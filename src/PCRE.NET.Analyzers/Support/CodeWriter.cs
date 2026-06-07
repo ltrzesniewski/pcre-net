@@ -50,6 +50,17 @@ internal class CodeWriter
         return this;
     }
 
+    public CodeWriter TrimComma()
+    {
+        while (_sb.Length >= 1 && _sb[_sb.Length - 1] == ' ')
+            _sb.Remove(_sb.Length - 1, 1);
+
+        if (_sb.Length >= 1 && _sb[_sb.Length - 1] == ',')
+            _sb.Remove(_sb.Length - 1, 1);
+
+        return this;
+    }
+
     public override string ToString()
         => _sb.ToString();
 

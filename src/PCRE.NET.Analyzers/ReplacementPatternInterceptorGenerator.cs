@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -7,7 +6,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
-using PCRE.Internal;
 using PCRE.NET.Analyzers.Support;
 
 namespace PCRE.NET.Analyzers;
@@ -108,23 +106,15 @@ public partial class ReplacementPatternInterceptorGenerator : IIncrementalGenera
 
     private static void GenerateInterceptors(CodeWriter writer, ImmutableArray<InvocationModel> invocations)
     {
-        var patterns = new List<ReplacementPattern.ParseResult>();
+        var replacementPatterns = new ReplacementPatternSet();
 
         foreach (var replacementGroup in invocations.GroupBy(i => i.Replacement))
         {
-            if (ReplacementPattern.TryParse(replacementGroup.Key) is not { } pattern)
+            if (replacementPatterns.GetOrAdd(replacementGroup.Key, out var added) is not { } pattern)
                 continue;
 
-            var patternCounter = patterns.Count;
-            patterns.Add(pattern);
-
-            writer.AppendLine(
-                $"""
-                        private static readonly {pattern.GetLambdaType()} _replacementFunc{patternCounter}
-                            = {pattern.GetLambda()};
-
-                """
-            );
+            if (added)
+                pattern.AppendField(writer);
 
             var callCounter = 0;
 
@@ -143,13 +133,11 @@ public partial class ReplacementPatternInterceptorGenerator : IIncrementalGenera
                 foreach (var interceptedMethod in interceptedMethodGroup)
                     writer.Append("        ").AppendInterceptsLocationAttribute(interceptedMethod.Location);
 
-                var lambdaCall = pattern.NeedsSubject
-                    ? $"match => _replacementFunc{patternCounter}(match, subject)"
-                    : $"_replacementFunc{patternCounter}";
+                var lambdaCall = pattern.GetReplacementFuncCall();
 
                 writer.AppendLine(
                     $"""
-                            public static {method.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} Replace{patternCounter}_Call{callCounter}{paramsSignature}
+                            public static {method.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} Replace{pattern.PatternId}_Call{callCounter}{paramsSignature}
                                 => regex.{method.Name}({method.Parameters.Where(p => p.Name is not "replacement").Select(p => $"{p.Name}: {p.Name}").Join(", ")}, replacementFunc: {lambdaCall});
 
                     """
@@ -159,7 +147,7 @@ public partial class ReplacementPatternInterceptorGenerator : IIncrementalGenera
             }
         }
 
-        ReplacementPattern.ParseResult.AppendHelpers(writer, patterns);
+        replacementPatterns.AppendHelpers(writer);
     }
 
     [SuppressMessage("ReSharper", "PartialMethodWithSinglePart")]

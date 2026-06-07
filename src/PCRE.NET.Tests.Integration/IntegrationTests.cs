@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace PCRE.Tests.Integration;
@@ -126,6 +127,10 @@ public class IntegrationTests
         Check(PcreRegex.IsMatch("foo", "f.o"));
         Check(!PcreRegex.IsMatch("FOO", "f.o"));
 
+        Check(PcreRegex.Matches("foo", "f.o").Any());
+        Check(PcreRegex.Matches("foo", "f.o").Any());
+        Check(!PcreRegex.Matches("FOO", "f.o").Any());
+
         // subject, pattern, options
         Check(PcreRegex.Match("FOO", "f.o", PcreOptions.Caseless).Success);
         Check(PcreRegex.Match("FOO", "f.o", PcreOptions.Caseless | PcreOptions.Compiled).Success);
@@ -135,6 +140,10 @@ public class IntegrationTests
         Check(PcreRegex.IsMatch("FOO", "f.o", PcreOptions.Caseless | PcreOptions.Compiled));
         Check(!PcreRegex.IsMatch("FOO", "f.o", PcreOptions.None));
 
+        Check(PcreRegex.Matches("FOO", "f.o", PcreOptions.Caseless).Any());
+        Check(PcreRegex.Matches("FOO", "f.o", PcreOptions.Caseless | PcreOptions.Compiled).Any());
+        Check(!PcreRegex.Matches("FOO", "f.o", PcreOptions.None).Any());
+
         // subject, pattern, options, startIndex
         Check(PcreRegex.Match("FOO", "f.o", startIndex: 0, options: PcreOptions.Caseless).Success);
         Check(!PcreRegex.Match("FOO", "f.o", startIndex: 1, options: PcreOptions.Caseless).Success);
@@ -142,9 +151,13 @@ public class IntegrationTests
         Check(PcreRegex.IsMatch("FOO", "f.o", startIndex: 0, options: PcreOptions.Caseless));
         Check(!PcreRegex.IsMatch("FOO", "f.o", startIndex: 1, options: PcreOptions.Caseless));
 
+        Check(PcreRegex.Matches("FOO", "f.o", startIndex: 0, options: PcreOptions.Caseless).Any());
+        Check(!PcreRegex.Matches("FOO", "f.o", startIndex: 1, options: PcreOptions.Caseless).Any());
+
         // Another regex
         Check(PcreRegex.Match("bar", "b.r").Success);
         Check(PcreRegex.IsMatch("bar", "b.r"));
+        Check(PcreRegex.Matches("bar", "b.r").Any());
 
         // Other string literals
         const string pattern = @"(?x)baz";
@@ -168,6 +181,19 @@ public class IntegrationTests
 
         // Non-literal
         Check(PcreRegex.IsMatch("baz", GetRegexPattern()));
+
+        // Split
+        Check(PcreRegex.Split("a b c", @"\s+").ToList() is ["a", "b", "c"]);
+        Check(PcreRegex.Split("a b c", @"\s+", PcreOptions.Caseless).ToList() is ["a", "b", "c"]);
+        Check(PcreRegex.Split("a b c", @"\s+", PcreOptions.Compiled).ToList() is ["a", "b", "c"]);
+        Check(PcreRegex.Split("a b c", @"\s+", 1).ToList() is ["a", "b c"]);
+        Check(PcreRegex.Split("a b c", @"\s+", PcreOptions.Compiled, PcreSplitOptions.None).ToList() is ["a", "b", "c"]);
+        Check(PcreRegex.Split("a b c", @"\s+", PcreOptions.Compiled, PcreSplitOptions.None, 1).ToList() is ["a", "b c"]);
+        Check(PcreRegex.Split("a b c", @"\s+", PcreOptions.Compiled, PcreSplitOptions.None, 1, 2).ToList() is ["a b", "c"]);
+
+        // Substitute
+        Check(PcreRegex.Substitute("a b c", @"\s+", "-") == "a-b c");
+        Check(PcreRegex.Substitute("a b c", @"\s+", "-", PcreOptions.Compiled, PcreSubstituteOptions.SubstituteGlobal) == "a-b-c");
 
         return;
 
@@ -216,6 +242,23 @@ public class IntegrationTests
         Check(NonInterceptedReplace("<abc>", "[$_]") == "<[<abc>]>");
         Check(NonInterceptedReplace("<abc>", "[$+]") == "<[c]>");
         Check(NonInterceptedReplace("<abc>", "[$+]") == "<[c]>");
+
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "") == "<>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "replacement") == "<replacement>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$$]") == "<[$]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$&]") == "<[abc]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$0]") == "<[abc]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$1]") == "<[b]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$2]") == "<[c]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$3]") == "<[$3]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[${group}]") == "<[b]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[${other}]") == "<[${other}]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[${2}]") == "<[c]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$`]") == "<[<]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$']") == "<[>]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$_]") == "<[<abc>]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$+]") == "<[c]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$+]") == "<[c]>");
 
         return;
 

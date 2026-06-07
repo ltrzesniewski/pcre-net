@@ -39,7 +39,7 @@ namespace PCRE.Generated
 
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
         public static string Regex0_Call3_Replace(string subject, string pattern, string replacement)
-            => Regex0.Replace(subject: subject, replacement: replacement);
+            => Regex0.Replace(subject: subject, replacementFunc: _replacementFunc0);
 
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
         public static string Regex0_Call4_Replace(string subject, string pattern, global::System.Func<global::PCRE.PcreMatch, string> replacementFunc)
@@ -89,15 +89,15 @@ namespace PCRE.Generated
 
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
         public static string Regex1_Call6_Replace(string subject, string pattern, string replacement, global::PCRE.PcreOptions options)
-            => Regex1.Replace(subject: subject, replacement: replacement);
+            => Regex1.Replace(subject: subject, replacementFunc: _replacementFunc0);
 
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
         public static string Regex1_Call7_Replace(string subject, string pattern, string replacement, global::PCRE.PcreOptions options, int count)
-            => Regex1.Replace(subject: subject, replacement: replacement, count: count);
+            => Regex1.Replace(subject: subject, replacementFunc: _replacementFunc0, count: count);
 
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
         public static string Regex1_Call8_Replace(string subject, string pattern, string replacement, global::PCRE.PcreOptions options, int count, int startIndex)
-            => Regex1.Replace(subject: subject, replacement: replacement, count: count, startIndex: startIndex);
+            => Regex1.Replace(subject: subject, replacementFunc: _replacementFunc0, count: count, startIndex: startIndex);
 
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
         public static string Regex1_Call9_Replace(string subject, string pattern, global::System.Func<global::PCRE.PcreMatch, string> replacementFunc, global::PCRE.PcreOptions options)
@@ -130,6 +130,9 @@ namespace PCRE.Generated
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
         public static string Regex1_Call16_Substitute(string subject, string pattern, string replacement, global::PCRE.PcreOptions options, global::PCRE.PcreSubstituteOptions substituteOptions)
             => Regex1.Substitute(subject: subject, replacement: replacement, substituteOptions: substituteOptions);
+
+        private static readonly global::System.Func<global::PCRE.PcreMatch, string> _replacementFunc0
+            = static _ => "replacement";
 
     }
 }
