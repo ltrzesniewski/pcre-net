@@ -32,7 +32,7 @@ public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenera
     {
         var source = context.SyntaxProvider
                             .CreateSyntaxProvider(SyntaxPredicate, SyntaxTransform)
-                            .WhereNotNull()
+                            .WhereNotNullAndInterceptorsEnabled(context)
                             .Collect();
 
         context.RegisterImplementationSourceOutput(

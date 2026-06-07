@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Operations;
@@ -20,6 +21,21 @@ internal static class Extensions
 
     public static string Join(this IEnumerable<string> items, string separator)
         => string.Join(separator, items);
+
+    private static IncrementalValueProvider<bool> AreInterceptorsEnabled(this IncrementalGeneratorInitializationContext context)
+        => context.ParseOptionsProvider
+                  .Select(static (i, _) => i.Features.TryGetValue("InterceptorsNamespaces", out var value) && value.Split(';').Any(static i => i.Trim() == "PCRE.Generated"));
+
+    public static IncrementalValuesProvider<T> WhereNotNullAndInterceptorsEnabled<T>(this IncrementalValuesProvider<T?> source, IncrementalGeneratorInitializationContext context)
+        where T : class
+    {
+        return source.Combine(context.AreInterceptorsEnabled())
+                     .SelectMany(static (pair, _) =>
+                     {
+                         var (item, isEnabled) = pair;
+                         return isEnabled && item is not null ? ImmutableArray.Create(item) : ImmutableArray<T>.Empty;
+                     });
+    }
 
     public static AttributeData? GetAttribute(this ISymbol symbol, INamedTypeSymbol attributeType)
     {
