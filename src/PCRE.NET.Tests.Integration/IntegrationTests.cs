@@ -28,6 +28,7 @@ public class IntegrationTests
         Safe(() => RunTestUtf8(PcreOptions.None));
         Safe(() => RunTestUtf8(PcreOptions.Compiled));
         Safe(RunStaticInterceptorTest);
+        Safe(RunReplacementPatternTest);
         RunBuildTest();
 
         Console.WriteLine();
@@ -146,6 +147,8 @@ public class IntegrationTests
         Check(PcreRegex.IsMatch("bar", "b.r"));
 
         // Other string literals
+        const string pattern = @"(?x)baz";
+        Check(PcreRegex.IsMatch("baz", pattern));
         Check(PcreRegex.IsMatch("baz", @"(?x)baz"));
         Check(PcreRegex.IsMatch("baz", """(?x)baz"""));
         Check(
@@ -169,6 +172,51 @@ public class IntegrationTests
         return;
 
         static string GetRegexPattern() => "baz";
+    }
+
+    [SuppressMessage("ReSharper", "RedundantVerbatimStringPrefix")]
+    private void RunReplacementPatternTest()
+    {
+        Header("Replacement Pattern Interceptor");
+
+        var regex = new PcreRegex("a+(?<group>b+)(c+)");
+
+        Check(regex.Replace("abbcbar", "foo") == "foobar");
+
+        Check(regex.Replace("<abc>", "") == "<>");
+        Check(regex.Replace("<abc>", "replacement") == "<replacement>");
+        Check(regex.Replace("<abc>", "[$$]") == "<[$]>");
+        Check(regex.Replace("<abc>", "[$&]") == "<[abc]>");
+        Check(regex.Replace("<abc>", "[$0]") == "<[abc]>");
+        Check(regex.Replace("<abc>", "[$1]") == "<[b]>");
+        Check(regex.Replace("<abc>", "[$2]") == "<[c]>");
+        Check(regex.Replace("<abc>", "[$3]") == "<[$3]>");
+        Check(regex.Replace("<abc>", "[${group}]") == "<[b]>");
+        Check(regex.Replace("<abc>", "[${other}]") == "<[${other}]>");
+        Check(regex.Replace("<abc>", "[$`]") == "<[<]>");
+        Check(regex.Replace("<abc>", "[$']") == "<[>]>");
+        Check(regex.Replace("<abc>", "[$_]") == "<[<abc>]>");
+        Check(regex.Replace("<abc>", "[$+]") == "<[c]>");
+
+        Check(NonInterceptedReplace("<abc>", "") == "<>");
+        Check(NonInterceptedReplace("<abc>", "replacement") == "<replacement>");
+        Check(NonInterceptedReplace("<abc>", "[$$]") == "<[$]>");
+        Check(NonInterceptedReplace("<abc>", "[$&]") == "<[abc]>");
+        Check(NonInterceptedReplace("<abc>", "[$0]") == "<[abc]>");
+        Check(NonInterceptedReplace("<abc>", "[$1]") == "<[b]>");
+        Check(NonInterceptedReplace("<abc>", "[$2]") == "<[c]>");
+        Check(NonInterceptedReplace("<abc>", "[$3]") == "<[$3]>");
+        Check(NonInterceptedReplace("<abc>", "[${group}]") == "<[b]>");
+        Check(NonInterceptedReplace("<abc>", "[${other}]") == "<[${other}]>");
+        Check(NonInterceptedReplace("<abc>", "[$`]") == "<[<]>");
+        Check(NonInterceptedReplace("<abc>", "[$']") == "<[>]>");
+        Check(NonInterceptedReplace("<abc>", "[$_]") == "<[<abc>]>");
+        Check(NonInterceptedReplace("<abc>", "[$+]") == "<[c]>");
+
+        return;
+
+        string NonInterceptedReplace(string input, string replacement)
+            => regex.Replace(input, replacement);
     }
 
     private void RunBuildTest()

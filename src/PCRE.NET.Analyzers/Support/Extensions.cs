@@ -16,6 +16,17 @@ internal static class Extensions
         where T : class
         => provider.Where(static item => item is not null)!;
 
+    public static IEnumerable<T> DistinctBy<T, TKey>(this IEnumerable<T> source, Func<T, TKey> keySelector)
+    {
+        var hashSet = new HashSet<TKey>();
+
+        foreach (var item in source)
+        {
+            if (hashSet.Add(keySelector(item)))
+                yield return item;
+        }
+    }
+
     public static IArgumentOperation? GetArgument(this IInvocationOperation invocation, string parameterName)
         => invocation.Arguments.FirstOrDefault(i => i.Parameter?.Name == parameterName);
 

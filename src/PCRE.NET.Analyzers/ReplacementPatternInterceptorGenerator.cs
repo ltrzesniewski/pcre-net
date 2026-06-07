@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
@@ -6,12 +7,13 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
+using PCRE.Internal;
 using PCRE.NET.Analyzers.Support;
 
 namespace PCRE.NET.Analyzers;
 
 [Generator]
-public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenerator
+public partial class ReplacementPatternInterceptorGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -28,7 +30,7 @@ public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenera
                     return;
 
                 context.AddSource(
-                    "StaticMatchInterceptor.g.cs",
+                    "ReplacementPatternInterceptor.g.cs",
                     Generate(invocations)
                 );
             }
@@ -47,7 +49,7 @@ public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenera
             _                              => null
         };
 
-        return methodName is "Match" or "IsMatch" or "Matches" or "Replace" or "Split" or "Substitute";
+        return methodName is "Replace";
     }
 
     private static InvocationModel? SyntaxTransform(GeneratorSyntaxContext context, CancellationToken cancellationToken)
@@ -57,19 +59,17 @@ public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenera
             {
                 TargetMethod:
                 {
-                    IsStatic: true,
+                    IsStatic: false,
                     ContainingType.Name: "PcreRegex"
-                }
+                } method
             } invocation
-            && invocation.GetArgument("pattern")?.Value.ConstantValue is { HasValue: true, Value: string pattern }
-            && invocation.GetArgument("options") is var optionsArg and (null or { Value.ConstantValue.HasValue: true })
+            && invocation.GetArgument("replacement")?.Value.ConstantValue is { HasValue: true, Value: string replacement }
             && context.SemanticModel.GetInterceptableLocation(invocationSyntax, cancellationToken) is { } location
            )
         {
             return new InvocationModel(
-                invocation.TargetMethod,
-                pattern,
-                optionsArg?.Value.ConstantValue.Value as long? ?? 0,
+                method,
+                replacement,
                 location
             );
         }
@@ -89,7 +89,7 @@ public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenera
             """
             namespace PCRE.Generated
             {
-                file static class StaticMatchInterceptor
+                file static class ReplacementPatternInterceptor
                 {
             """
         );
@@ -108,45 +108,58 @@ public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenera
 
     private static void GenerateInterceptors(CodeWriter writer, ImmutableArray<InvocationModel> invocations)
     {
-        var regexCounter = 0;
+        var patterns = new List<ReplacementPattern.ParseResult>();
 
-        foreach (var invocationGroup in invocations.GroupBy(i => (i.Pattern, i.Options)))
+        foreach (var replacementGroup in invocations.GroupBy(i => i.Replacement))
         {
-            var (pattern, options) = invocationGroup.Key;
+            if (ReplacementPattern.TryParse(replacementGroup.Key) is not { } pattern)
+                continue;
+
+            var patternCounter = patterns.Count;
+            patterns.Add(pattern);
 
             writer.AppendLine(
                 $"""
-                        private static global::PCRE.PcreRegex? _regex{regexCounter};
-                        private static global::PCRE.PcreRegex Regex{regexCounter} => _regex{regexCounter} ??= new global::PCRE.PcreRegex(
-                            {SymbolDisplay.FormatLiteral(pattern, true)},
-                            (global::PCRE.PcreOptions){SymbolDisplay.FormatPrimitive(options, false, true)}
-                        );
+                        private static readonly {pattern.GetLambdaType()} _replacementFunc{patternCounter}
+                            = {pattern.GetLambda()};
 
                 """
             );
 
             var callCounter = 0;
 
-            foreach (var interceptedMethodGroup in invocationGroup.GroupBy(i => i.Method, SymbolEqualityComparer.Default))
+            foreach (var interceptedMethodGroup in replacementGroup.GroupBy(i => i.Method, SymbolEqualityComparer.Default))
             {
                 var method = (IMethodSymbol)interceptedMethodGroup.Key!;
+
+                var paramsSignature = method.ToDisplayString(GeneratorHelpers.ParametersFormat);
+
+                const string prefix = "Replace(";
+                if (!paramsSignature.StartsWith(prefix))
+                    continue; // Shouldn't happen
+
+                paramsSignature = $"(this global::PCRE.PcreRegex regex, {paramsSignature.Substring(prefix.Length)}";
 
                 foreach (var interceptedMethod in interceptedMethodGroup)
                     writer.Append("        ").AppendInterceptsLocationAttribute(interceptedMethod.Location);
 
+                var lambdaCall = pattern.NeedsSubject
+                    ? $"match => _replacementFunc{patternCounter}(match, subject)"
+                    : $"_replacementFunc{patternCounter}";
+
                 writer.AppendLine(
                     $"""
-                            public static {method.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} Regex{regexCounter}_Call{callCounter}_{method.ToDisplayString(GeneratorHelpers.ParametersFormat)}
-                                => Regex{regexCounter}.{method.Name}({method.Parameters.Where(p => p.Name is not ("pattern" or "options")).Select(p => $"{p.Name}: {p.Name}").Join(", ")});
+                            public static {method.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} Replace{patternCounter}_Call{callCounter}{paramsSignature}
+                                => regex.{method.Name}({method.Parameters.Where(p => p.Name is not "replacement").Select(p => $"{p.Name}: {p.Name}").Join(", ")}, replacementFunc: {lambdaCall});
 
                     """
                 );
 
                 ++callCounter;
             }
-
-            ++regexCounter;
         }
+
+        ReplacementPattern.ParseResult.AppendHelpers(writer, patterns);
     }
 
     [SuppressMessage("ReSharper", "PartialMethodWithSinglePart")]
@@ -154,8 +167,7 @@ public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenera
 
     private sealed record InvocationModel(
         IMethodSymbol Method,
-        string Pattern,
-        long Options,
+        string Replacement,
         InterceptableLocation Location
     );
 }

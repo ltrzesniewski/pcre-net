@@ -10,9 +10,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="../PCRE.NET.Analyzers/Support/*.cs" Link="Support/%(FileName)%(Extension)" />
-    <Compile Include="../PCRE.NET/Support/CompilerServices.cs" Link="Support/%(FileName)%(Extension)" />
-    <Compile Include="../PCRE.NET/Internal/AnalyzerAttributes.cs" Link="Support/%(FileName)%(Extension)" />
+    <Compile Include="../PCRE.NET.Analyzers/Support/*.cs" Link="Imported/%(FileName)%(Extension)" />
+    <Compile Include="../PCRE.NET/Support/CompilerServices.cs" Link="Imported/%(FileName)%(Extension)" />
+    <Compile Include="../PCRE.NET/Internal/AnalyzerAttributes.cs" Link="Imported/%(FileName)%(Extension)" />
   </ItemGroup>
 
 </Project>
