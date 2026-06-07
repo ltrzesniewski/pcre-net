@@ -17,16 +17,22 @@ public partial class PcreRegex
         => Split(subject, PcreSplitOptions.None, -1, 0);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Split"]/*'/>
-    /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="options"]'/>
+    /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="splitOptions"]'/>
     [Pure]
-    public IEnumerable<string> Split(string subject, PcreSplitOptions options)
-        => Split(subject, options, -1, 0);
+    public IEnumerable<string> Split(string subject, PcreSplitOptions splitOptions)
+        => Split(subject, splitOptions, -1, 0);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Split"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="count"]'/>
     [Pure]
     public IEnumerable<string> Split(string subject, int count)
         => Split(subject, PcreSplitOptions.None, count, 0);
+
+    /// <include file='PcreRegex.xml' path='/doc/method[@name="Split"]/*'/>
+    /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="splitOptions" or @name="count"]'/>
+    [Pure]
+    public IEnumerable<string> Split(string subject, PcreSplitOptions splitOptions, int count)
+        => Split(subject, splitOptions, count, 0);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Split"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="count" or @name="startIndex"]'/>
@@ -38,19 +44,19 @@ public partial class PcreRegex
         => Split(subject, PcreSplitOptions.None, count, startIndex);
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="Split"]/*'/>
-    /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="options" or @name="count" or @name="startIndex"]'/>
+    /// <include file='PcreRegex.xml' path='/doc/param[@name="subject" or @name="splitOptions" or @name="count" or @name="startIndex"]'/>
     /// <remarks>
     /// <include file='PcreRegex.xml' path='/doc/remarks[@name="startIndex"]/*'/>
     /// </remarks>
     [Pure]
-    public IEnumerable<string> Split(string subject, PcreSplitOptions options, int count, int startIndex)
+    public IEnumerable<string> Split(string subject, PcreSplitOptions splitOptions, int count, int startIndex)
     {
         if (subject == null)
             throw new ArgumentNullException(nameof(subject));
         if (startIndex < 0 || startIndex > subject.Length)
             throw new ArgumentOutOfRangeException(nameof(startIndex));
 
-        return SplitIterator(subject, options, count, startIndex);
+        return SplitIterator(subject, splitOptions, count, startIndex);
     }
 
     private IEnumerable<string> SplitIterator(string subject, PcreSplitOptions options, int count, int startIndex)

@@ -52,17 +52,17 @@ public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenera
 
     private static bool SyntaxPredicate(SyntaxNode node, CancellationToken cancellationToken)
     {
-        return node is InvocationExpressionSyntax
+        if (!node.IsKind(SyntaxKind.InvocationExpression))
+            return false;
+
+        var methodName = (node as InvocationExpressionSyntax)?.Expression switch
         {
-            Expression: MemberAccessExpressionSyntax
-            {
-                Name.Identifier.ValueText: "Match" or "IsMatch"
-            }
-            or IdentifierNameSyntax
-            {
-                Identifier.ValueText: "Match" or "IsMatch"
-            }
+            MemberAccessExpressionSyntax i => i.Name.Identifier.ValueText,
+            IdentifierNameSyntax i         => i.Identifier.ValueText,
+            _                              => null
         };
+
+        return methodName is "Match" or "IsMatch" or "Matches" or "Replace" or "Split" or "Substitute";
     }
 
     private static InvocationModel? SyntaxTransform(GeneratorSyntaxContext context, CancellationToken cancellationToken)
@@ -73,7 +73,6 @@ public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenera
                 TargetMethod:
                 {
                     IsStatic: true,
-                    Name: "Match" or "IsMatch",
                     ContainingType.Name: "PcreRegex"
                 }
             } invocation
