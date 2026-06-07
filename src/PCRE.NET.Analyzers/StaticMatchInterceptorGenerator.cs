@@ -59,7 +59,7 @@ public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenera
                 {
                     IsStatic: true,
                     ContainingType.Name: "PcreRegex"
-                }
+                } method
             } invocation
             && invocation.GetArgument("pattern")?.Value.ConstantValue is { HasValue: true, Value: string pattern }
             && invocation.GetArgument("options") is var optionsArg and (null or { Value.ConstantValue.HasValue: true })
@@ -67,7 +67,7 @@ public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenera
            )
         {
             return new InvocationModel(
-                invocation.TargetMethod,
+                method,
                 pattern,
                 optionsArg?.Value.ConstantValue.Value as long? ?? 0,
                 location

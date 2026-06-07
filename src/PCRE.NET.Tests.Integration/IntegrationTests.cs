@@ -193,9 +193,11 @@ public class IntegrationTests
         Check(regex.Replace("<abc>", "[$3]") == "<[$3]>");
         Check(regex.Replace("<abc>", "[${group}]") == "<[b]>");
         Check(regex.Replace("<abc>", "[${other}]") == "<[${other}]>");
+        Check(regex.Replace("<abc>", "[${2}]") == "<[c]>");
         Check(regex.Replace("<abc>", "[$`]") == "<[<]>");
         Check(regex.Replace("<abc>", "[$']") == "<[>]>");
         Check(regex.Replace("<abc>", "[$_]") == "<[<abc>]>");
+        Check(regex.Replace("<abc>", "[$+]") == "<[c]>");
         Check(regex.Replace("<abc>", "[$+]") == "<[c]>");
 
         Check(NonInterceptedReplace("<abc>", "") == "<>");
@@ -208,9 +210,11 @@ public class IntegrationTests
         Check(NonInterceptedReplace("<abc>", "[$3]") == "<[$3]>");
         Check(NonInterceptedReplace("<abc>", "[${group}]") == "<[b]>");
         Check(NonInterceptedReplace("<abc>", "[${other}]") == "<[${other}]>");
+        Check(NonInterceptedReplace("<abc>", "[${2}]") == "<[c]>");
         Check(NonInterceptedReplace("<abc>", "[$`]") == "<[<]>");
         Check(NonInterceptedReplace("<abc>", "[$']") == "<[>]>");
         Check(NonInterceptedReplace("<abc>", "[$_]") == "<[<abc>]>");
+        Check(NonInterceptedReplace("<abc>", "[$+]") == "<[c]>");
         Check(NonInterceptedReplace("<abc>", "[$+]") == "<[c]>");
 
         return;

@@ -33,6 +33,7 @@ public class ReplacementPattern : BaseInterceptorTests<ReplacementPatternInterce
                     _ = regex.Replace("subject", "a $' b");
                     _ = regex.Replace("subject", "a $_ b");
                     _ = regex.Replace("subject", "a $+ b");
+                    _ = regex.Replace("subject", "a $+ b");
                 }
             }
             """

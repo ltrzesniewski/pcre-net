@@ -79,8 +79,8 @@ internal partial class ReplacementPattern
         {
             writer.Append($$"""{GetGroup(match, {{_index}})""");
 
-            if (_fallback?.GetText() is { } fallback)
-                writer.Append(" ?? ").Append(SymbolDisplay.FormatLiteral(fallback, true));
+            if (_fallback?.Length > 0)
+                writer.Append(" ?? ").Append(SymbolDisplay.FormatLiteral(_fallback, true));
 
             writer.Append("}");
         }
@@ -107,8 +107,8 @@ internal partial class ReplacementPattern
         {
             writer.Append($$"""{GetGroup(match, {{SymbolDisplay.FormatLiteral(_name, true)}}, {{_index}})""");
 
-            if (_fallback?.GetText() is { } fallback)
-                writer.Append(" ?? ").Append(SymbolDisplay.FormatLiteral(fallback, true));
+            if (_fallback?.Length > 0)
+                writer.Append(" ?? ").Append(SymbolDisplay.FormatLiteral(_fallback, true));
 
             writer.Append("}");
         }

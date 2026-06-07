@@ -92,7 +92,7 @@ internal static partial class ReplacementPattern
                         if (idx < replacementPattern.Length && replacementPattern[idx] == '}' && idx > startIdx + 1)
                         {
                             var groupName = replacementPattern.Substring(startIdx + 1, idx - startIdx - 1);
-                            var fallback = new LiteralPart(replacementPattern, startIdx - 1, idx - startIdx + 2);
+                            var fallback = replacementPattern.Substring(startIdx - 1, idx - startIdx + 2);
                             parts.Add(new NamedGroupPart(groupName, fallback));
                             ++idx;
                             break;
@@ -117,7 +117,7 @@ internal static partial class ReplacementPattern
                         while (idx < replacementPattern.Length && replacementPattern[idx] is >= '0' and <= '9')
                             ++idx;
 
-                        var fallback = new LiteralPart(replacementPattern, startIdx - 1, idx - startIdx + 1);
+                        var fallback = replacementPattern.Substring(startIdx - 1, idx - startIdx + 1);
 
 #if NET
                         var groupIndexString = replacementPattern.AsSpan(startIdx, idx - startIdx);
@@ -131,7 +131,7 @@ internal static partial class ReplacementPattern
                             break;
                         }
 
-                        parts.Add(fallback);
+                        parts.Add(new LiteralPart(fallback));
                         break;
                     }
 
@@ -193,9 +193,9 @@ internal static partial class ReplacementPattern
         public static readonly IndexedGroupPart FullMatch = new(0, null);
 
         private readonly int _index;
-        private readonly LiteralPart? _fallback;
+        private readonly string? _fallback;
 
-        public IndexedGroupPart(int index, LiteralPart? fallback)
+        public IndexedGroupPart(int index, string? fallback)
         {
             _index = index;
             _fallback = fallback;
@@ -211,9 +211,9 @@ internal static partial class ReplacementPattern
     {
         private readonly string _name;
         private readonly int _index;
-        private readonly LiteralPart? _fallback;
+        private readonly string? _fallback;
 
-        public NamedGroupPart(string name, LiteralPart? fallback)
+        public NamedGroupPart(string name, string? fallback)
         {
             _name = name;
             _fallback = fallback;

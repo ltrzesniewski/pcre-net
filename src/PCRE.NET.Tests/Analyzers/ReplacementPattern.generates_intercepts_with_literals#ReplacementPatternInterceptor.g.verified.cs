@@ -107,6 +107,7 @@ namespace PCRE.Generated
             = static match => $"a {GetLastMatchedGroup(match)} b";
 
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
         public static string Replace12_Call0(this global::PCRE.PcreRegex regex, string subject, string replacement)
             => regex.Replace(subject: subject, replacementFunc: _replacementFunc12);
 

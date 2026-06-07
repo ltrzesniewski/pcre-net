@@ -5,7 +5,7 @@ namespace PCRE.Internal;
 
 internal partial class ReplacementPattern
 {
-    public static Func<PcreMatch, string> ParseToFunc(string replacementPattern)
+    public static Func<PcreMatch, string> Parse(string replacementPattern)
     {
         if (ReferenceEquals(replacementPattern, null))
             throw new ArgumentNullException(nameof(replacementPattern));
@@ -52,7 +52,7 @@ internal partial class ReplacementPattern
             }
             else
             {
-                _fallback?.Append(match, sb);
+                sb.Append(_fallback);
             }
         }
     }
@@ -68,7 +68,7 @@ internal partial class ReplacementPattern
             }
             else
             {
-                _fallback?.Append(match, sb);
+                sb.Append(_fallback);
             }
         }
     }
