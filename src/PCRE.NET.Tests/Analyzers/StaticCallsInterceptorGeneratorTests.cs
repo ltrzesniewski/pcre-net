@@ -10,7 +10,7 @@ using PCRE.NET.Analyzers;
 namespace PCRE.Tests.Analyzers;
 
 [TestFixture]
-public class StaticMatchInterceptorGeneratorTests : BaseInterceptorTests<StaticMatchInterceptorGenerator>
+public class StaticCallsInterceptorGeneratorTests : BaseInterceptorTests<StaticCallsInterceptorGenerator>
 {
     [Test]
     public Task generates_intercepts_with_literals()

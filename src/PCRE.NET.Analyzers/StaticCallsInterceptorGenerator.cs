@@ -11,7 +11,7 @@ using PCRE.NET.Analyzers.Support;
 namespace PCRE.NET.Analyzers;
 
 [Generator]
-public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenerator
+public sealed partial class StaticCallsInterceptorGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -28,7 +28,7 @@ public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenera
                     return;
 
                 context.AddSource(
-                    "StaticMatchInterceptor.g.cs",
+                    "StaticCallsInterceptor.g.cs",
                     Generate(invocations)
                 );
             }
@@ -90,7 +90,7 @@ public sealed partial class StaticMatchInterceptorGenerator : IIncrementalGenera
             """
             namespace PCRE.Generated
             {
-                file static class StaticMatchInterceptor
+                file static class StaticCallsInterceptor
                 {
             """
         );
