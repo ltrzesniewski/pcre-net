@@ -5,38 +5,41 @@ using System.Runtime.CompilerServices;
 
 namespace PCRE.Tests.Integration;
 
-public class IntegrationTests
+public partial class IntegrationTests
 {
-    private const string _reset = "\e[0m";
-    private const string _bold = "\e[1m";
-    private const string _red = "\e[91m";
-    private const string _green = "\e[92m";
-
-    private bool _success = true;
-
-    public static int Main()
+    public static int Main(string[] args)
     {
         var tests = new IntegrationTests();
-        return tests.Run() ? 0 : 1;
+        return tests.Run(args) ? 0 : 1;
     }
 
-    private bool Run()
+    private bool Run(string[] args)
     {
         _success = true;
 
+        CheckArgs(args, out var aot, out var build);
         Safe(() => RunTestUtf16(PcreOptions.None));
         Safe(() => RunTestUtf16(PcreOptions.Compiled));
         Safe(() => RunTestUtf8(PcreOptions.None));
         Safe(() => RunTestUtf8(PcreOptions.Compiled));
         Safe(RunStaticInterceptorTest);
         Safe(RunReplacementPatternTest);
-        RunBuildTest();
+        Safe(() => CheckAot(aot));
+        Safe(() => CheckBuild(build));
 
-        Console.WriteLine();
-        Console.WriteLine($"{_bold}Integration tests: {(_success ? $"{_green}PASSED" : $"{_red}FAILED")}{_reset}");
-        Console.WriteLine();
-
+        PrintSummary();
         return _success;
+    }
+
+    private void CheckArgs(string[] args, out bool aot, out bool build)
+    {
+        Header("Arguments");
+
+        var full = args.Contains("--full");
+        aot = full || args.Contains("--aot");
+        build = full || args.Contains("--build");
+
+        Check(args.All(arg => arg is "--full" or "--aot" or "--build"));
     }
 
     private void RunTestUtf16(PcreOptions options)
@@ -266,12 +269,35 @@ public class IntegrationTests
             => regex.Replace(input, replacement);
     }
 
-    private void RunBuildTest()
+    private void CheckAot(bool run)
     {
-        Header("Build");
+        Header("AOT");
+
+        if (!run)
+        {
+            Ignore();
+            return;
+        }
 
         Check(!RuntimeFeature.IsDynamicCodeSupported);
         Check(string.IsNullOrEmpty(GetAssemblyLocation()));
+
+        return;
+
+        [UnconditionalSuppressMessage("SingleFile", "IL3000")]
+        static string GetAssemblyLocation()
+            => typeof(IntegrationTests).Assembly.Location;
+    }
+
+    private void CheckBuild(bool run)
+    {
+        Header("Build");
+
+        if (!run)
+        {
+            Ignore();
+            return;
+        }
 
         const bool isInIntegrationTest =
 #if PCRENET_INTEGRATION_TEST
@@ -281,46 +307,5 @@ public class IntegrationTests
 #endif
 
         Check(isInIntegrationTest, "Built in integration tests mode");
-
-        [UnconditionalSuppressMessage("SingleFile", "IL3000")]
-        static string GetAssemblyLocation()
-            => typeof(IntegrationTests).Assembly.Location;
-    }
-
-    private static void Header(string title)
-    {
-        Console.WriteLine();
-        Console.WriteLine($"{_bold}{title}{_reset}");
-    }
-
-    private void Check(bool success, [CallerArgumentExpression(nameof(success))] string? code = null)
-    {
-        if (success)
-            Pass(code);
-        else
-            Fail(code);
-    }
-
-    private static void Pass(string? message)
-    {
-        Console.WriteLine($"  {_green}PASSED:{_reset} {message}");
-    }
-
-    private void Fail(string? message)
-    {
-        Console.WriteLine($"  {_red}FAILED:{_reset} {message}");
-        _success = false;
-    }
-
-    private void Safe(Action action)
-    {
-        try
-        {
-            action();
-        }
-        catch (Exception ex)
-        {
-            Fail(ex.Message);
-        }
     }
 }

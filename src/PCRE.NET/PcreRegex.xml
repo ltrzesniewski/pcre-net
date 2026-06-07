@@ -86,10 +86,7 @@
 
   <remarks name="static">
     <para>
-      Note that using a static matching method is not efficient. For best performance,
-      create a
-      <see cref="PcreRegex" />
-      object and use its instance methods.
+      Note that using a static matching method may be inefficient when building with a Roslyn version prior to 5.0.
     </para>
   </remarks>
 
