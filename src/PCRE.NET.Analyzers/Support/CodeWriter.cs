@@ -31,7 +31,7 @@ internal sealed class CodeWriter
             var nextNewLine = value.IndexOf('\n', position);
             if (nextNewLine >= 0)
             {
-                if (value.AsSpan(position, nextNewLine - position).TrimStart().Length == 0)
+                if (nextNewLine == position || nextNewLine == position + 1 && value[position] == '\r')
                 {
                     _sb.AppendLine();
                 }

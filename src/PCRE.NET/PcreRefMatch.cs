@@ -120,8 +120,7 @@ public unsafe ref struct PcreRefMatch
 
             char* markEnd;
             for (markEnd = _markPtr; *markEnd != 0; ++markEnd)
-            {
-            }
+            { }
 
             return new ReadOnlySpan<char>(_markPtr, (int)(markEnd - _markPtr));
         }

@@ -167,8 +167,7 @@ public sealed class PcreRegexSettings
     /// Creates a new <see cref="PcreRegexSettings"/> object.
     /// </summary>
     public PcreRegexSettings()
-    {
-    }
+    { }
 
     internal PcreRegexSettings(PcreOptions options)
         : this()

@@ -57,8 +57,7 @@ public partial class PcreRegex
     [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
     public PcreRegex(string pattern)
         : this(pattern, DefaultSettings)
-    {
-    }
+    { }
 
     /// <summary>
     /// Creates a PCRE2 regex for UTF-16.
@@ -67,8 +66,7 @@ public partial class PcreRegex
     /// <param name="options">Pattern options.</param>
     public PcreRegex(string pattern, PcreOptions options)
         : this(pattern, OptionsToSettings(options))
-    {
-    }
+    { }
 
     /// <summary>
     /// Creates a PCRE2 regex for UTF-16.

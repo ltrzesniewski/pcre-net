@@ -10,8 +10,7 @@ public class TestOutputReader : TestFileReader
 
     public TestOutputReader(Stream inputStream)
         : base(inputStream)
-    {
-    }
+    { }
 
     public IEnumerable<TestOutput> ReadTestOutputs()
     {

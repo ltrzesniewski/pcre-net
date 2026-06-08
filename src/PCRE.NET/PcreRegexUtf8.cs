@@ -25,8 +25,7 @@ public sealed class PcreRegexUtf8 : PcreRegex8Bit
     [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
     public PcreRegexUtf8(ReadOnlySpan<byte> pattern)
         : this(pattern, GetString(pattern), DefaultSettings)
-    {
-    }
+    { }
 
     /// <summary>
     /// Creates a PCRE2 regex for UTF-8.
@@ -35,8 +34,7 @@ public sealed class PcreRegexUtf8 : PcreRegex8Bit
     [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
     public PcreRegexUtf8(string pattern)
         : this(GetBytes(pattern), pattern, DefaultSettings)
-    {
-    }
+    { }
 
     /// <summary>
     /// Creates a PCRE2 regex for UTF-8.
@@ -45,8 +43,7 @@ public sealed class PcreRegexUtf8 : PcreRegex8Bit
     /// <param name="options">Pattern options.</param>
     public PcreRegexUtf8(ReadOnlySpan<byte> pattern, PcreOptions options)
         : this(pattern, GetString(pattern), OptionsToSettings(options))
-    {
-    }
+    { }
 
     /// <summary>
     /// Creates a PCRE2 regex for UTF-8.
@@ -55,8 +52,7 @@ public sealed class PcreRegexUtf8 : PcreRegex8Bit
     /// <param name="options">Pattern options.</param>
     public PcreRegexUtf8(string pattern, PcreOptions options)
         : this(GetBytes(pattern), pattern, OptionsToSettings(options))
-    {
-    }
+    { }
 
     /// <summary>
     /// Creates a PCRE2 regex for UTF-8.
@@ -65,8 +61,7 @@ public sealed class PcreRegexUtf8 : PcreRegex8Bit
     /// <param name="settings">Additional advanced settings.</param>
     public PcreRegexUtf8(ReadOnlySpan<byte> pattern, PcreRegexSettings settings)
         : this(pattern, GetString(pattern), settings)
-    {
-    }
+    { }
 
     /// <summary>
     /// Creates a PCRE2 regex for UTF-8.
@@ -75,13 +70,11 @@ public sealed class PcreRegexUtf8 : PcreRegex8Bit
     /// <param name="settings">Additional advanced settings.</param>
     public PcreRegexUtf8(string pattern, PcreRegexSettings settings)
         : this(GetBytes(pattern), pattern, settings)
-    {
-    }
+    { }
 
     private PcreRegexUtf8(ReadOnlySpan<byte> pattern, string patternString, PcreRegexSettings settings)
         : base(CreateRegex(pattern, patternString, settings))
-    {
-    }
+    { }
 
     private static InternalRegex8Bit CreateRegex(ReadOnlySpan<byte> pattern, string patternString, PcreRegexSettings settings)
     {

@@ -9,8 +9,7 @@ namespace System.Diagnostics.CodeAnalysis;
 internal sealed class StringSyntaxAttribute : Attribute
 {
     public StringSyntaxAttribute(string syntax)
-    {
-    }
+    { }
 }
 
 #endif

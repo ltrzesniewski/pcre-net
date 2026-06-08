@@ -28,8 +28,7 @@ public partial class PcreRegex8Bit
     [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
     public PcreRegex8Bit(ReadOnlySpan<byte> pattern, Encoding encoding)
         : this(pattern, encoding, DefaultSettings)
-    {
-    }
+    { }
 
     /// <summary>
     /// Creates a PCRE2 regex for the 8-bit PCRE2 library.
@@ -39,8 +38,7 @@ public partial class PcreRegex8Bit
     /// <param name="options">Pattern options.</param>
     public PcreRegex8Bit(ReadOnlySpan<byte> pattern, Encoding encoding, PcreOptions options)
         : this(pattern, encoding, OptionsToSettings(options))
-    {
-    }
+    { }
 
     /// <summary>
     /// Creates a PCRE2 regex for the 8-bit PCRE2 library.
