@@ -46,8 +46,7 @@ internal static class GeneratorHelpers
                     file sealed class InterceptsLocationAttribute : global::System.Attribute
                     {
                         public InterceptsLocationAttribute(int version, string data)
-                        {
-                        }
+                        { }
                     }
                 }
 

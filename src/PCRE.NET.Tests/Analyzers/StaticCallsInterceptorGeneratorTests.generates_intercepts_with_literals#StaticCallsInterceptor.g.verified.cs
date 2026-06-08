@@ -10,8 +10,7 @@ namespace System.Runtime.CompilerServices
     file sealed class InterceptsLocationAttribute : global::System.Attribute
     {
         public InterceptsLocationAttribute(int version, string data)
-        {
-        }
+        { }
     }
 }
 
@@ -24,7 +23,7 @@ namespace PCRE.Generated
             "pattern",
             (global::PCRE.PcreOptions)0x0000000000000000
         );
-        
+
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
         public static global::PCRE.PcreMatch Regex0_Call0_Match(string subject, string pattern)
@@ -39,7 +38,7 @@ namespace PCRE.Generated
             "pattern",
             (global::PCRE.PcreOptions)0x0000000000000008
         );
-        
+
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
         public static global::PCRE.PcreMatch Regex1_Call0_Match(string subject, string pattern, global::PCRE.PcreOptions options)
             => Regex1.Match(subject: subject);
@@ -61,7 +60,7 @@ namespace PCRE.Generated
             "pattern",
             (global::PCRE.PcreOptions)0x0000000100000000
         );
-        
+
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
         public static global::PCRE.PcreMatch Regex2_Call0_Match(string subject, string pattern, global::PCRE.PcreOptions options)
             => Regex2.Match(subject: subject);
@@ -71,10 +70,9 @@ namespace PCRE.Generated
             "pattern2",
             (global::PCRE.PcreOptions)0x0000000000000000
         );
-        
+
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
         public static global::PCRE.PcreMatch Regex3_Call0_Match(string subject, string pattern)
             => Regex3.Match(subject: subject);
-
     }
 }

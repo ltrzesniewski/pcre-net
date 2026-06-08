@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PCRE.NET.Analyzers.Support;
 
-internal class CodeWriter
+internal sealed class CodeWriter
 {
     private const int _indentWidth = 4;
 
@@ -28,19 +28,30 @@ internal class CodeWriter
 
         while (true)
         {
-            AppendPendingIndent();
-
             var nextNewLine = value.IndexOf('\n', position);
             if (nextNewLine >= 0)
             {
-                _sb.Append(value, position, nextNewLine + 1 - position);
-                _isAtStartOfLine = true;
+                if (value.AsSpan(position, nextNewLine - position).TrimStart().Length == 0)
+                {
+                    _sb.AppendLine();
+                }
+                else
+                {
+                    AppendPendingIndent();
+                    _sb.Append(value, position, nextNewLine + 1 - position);
+                }
 
+                _isAtStartOfLine = true;
                 position = nextNewLine + 1;
                 continue;
             }
 
-            _sb.Append(value, position, value.Length - position);
+            if (position < value.Length)
+            {
+                AppendPendingIndent();
+                _sb.Append(value, position, value.Length - position);
+            }
+
             break;
         }
 
@@ -63,33 +74,22 @@ internal class CodeWriter
         return this;
     }
 
-    public CodeWriter TrimComma()
+    private CodeWriter TrimEnd()
     {
-        while (_sb.Length >= 1 && _sb[_sb.Length - 1] == ' ')
-            _sb.Remove(_sb.Length - 1, 1);
-
-        if (_sb.Length >= 1 && _sb[_sb.Length - 1] == ',')
+        while (_sb.Length > 0 && char.IsWhiteSpace(_sb[_sb.Length - 1]))
             _sb.Remove(_sb.Length - 1, 1);
 
         return this;
     }
 
-    public override string ToString()
-        => _sb.ToString();
-
-    public BlockScope WriteBlock([StringSyntax("csharp")] string? header = null)
+    public CodeWriter TrimComma()
     {
-        Append(header);
-        EnsureIsOnNewLine();
-        AppendLine("{");
-        Indent++;
-        return new BlockScope(this);
-    }
+        TrimEnd();
 
-    private void EnsureIsOnNewLine()
-    {
-        if (!_isAtStartOfLine)
-            AppendLine();
+        if (_sb.Length > 0 && _sb[_sb.Length - 1] == ',')
+            _sb.Remove(_sb.Length - 1, 1);
+
+        return this;
     }
 
     public CodeWriter AppendPendingIndent()
@@ -101,13 +101,29 @@ internal class CodeWriter
         return this;
     }
 
+    public override string ToString()
+        => _sb.ToString();
+
+    public BlockScope WriteBlock([StringSyntax("csharp")] string? header = null)
+    {
+        Append(header);
+
+        if (!_isAtStartOfLine)
+            AppendLine();
+
+        AppendLine("{");
+        Indent++;
+        return new BlockScope(this);
+    }
+
     public readonly struct BlockScope(CodeWriter writer) : IDisposable
     {
         public void Dispose()
         {
-            writer.EnsureIsOnNewLine();
             writer.Indent--;
-            writer.AppendLine("}");
+            writer.TrimEnd()
+                  .AppendLine()
+                  .AppendLine("}");
         }
     }
 }

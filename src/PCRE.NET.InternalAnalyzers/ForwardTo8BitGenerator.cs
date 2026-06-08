@@ -63,7 +63,8 @@ public class ForwardTo8BitGenerator : IIncrementalGenerator
               .AppendLine()
               .AppendLine($"namespace {model.RootTypeSymbol.ContainingNamespace.ToDisplayString()};")
               .AppendLine()
-              .AppendLine("#nullable enable");
+              .AppendLine("#nullable enable")
+              .AppendLine();
 
         GenerateType(writer, model, model.RootTypeNode, false, "8Bit", cancellationToken);
 
@@ -79,8 +80,7 @@ public class ForwardTo8BitGenerator : IIncrementalGenerator
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        writer.AppendLine()
-              .Append(node.Modifiers)
+        writer.Append(node.Modifiers)
               .Append(node.Modifiers.Any(SyntaxKind.PartialKeyword) ? "" : " partial")
               .Append(' ')
               .Append(node.Keyword)
@@ -112,6 +112,7 @@ public class ForwardTo8BitGenerator : IIncrementalGenerator
                     case SyntaxKind.ClassDeclaration:
                     case SyntaxKind.StructDeclaration:
                         GenerateType(writer, model, (TypeDeclarationSyntax)memberNode, true, suffix, cancellationToken);
+                        writer.AppendLine();
                         break;
                 }
             }
@@ -133,8 +134,6 @@ public class ForwardTo8BitGenerator : IIncrementalGenerator
         memberText = _regexRemoveAttribute.Replace(memberText, "");
         memberText = _regexTypeNamesToSuffix.Replace(memberText, m => _typeNamesToSuffix.Contains(m.Value) ? $"{m.Value}{suffix}" : m.Value);
 
-        writer.AppendLine();
-
         if (model.SemanticModel.GetDeclaredSymbol(member) is { DeclaredAccessibility: Accessibility.Public or Accessibility.Protected } symbol
             && DocumentationCommentId.CreateDeclarationId(symbol) is { } cref)
         {
@@ -150,6 +149,7 @@ public class ForwardTo8BitGenerator : IIncrementalGenerator
 
         writer.AppendPendingIndent()
               .AppendRaw(memberText.Trim())
+              .AppendLine()
               .AppendLine();
     }
 

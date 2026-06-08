@@ -10,8 +10,7 @@ namespace System.Runtime.CompilerServices
     file sealed class InterceptsLocationAttribute : global::System.Attribute
     {
         public InterceptsLocationAttribute(int version, string data)
-        {
-        }
+        { }
     }
 }
 
@@ -24,7 +23,7 @@ namespace PCRE.Generated
             "pattern",
             (global::PCRE.PcreOptions)0x0000000000000000
         );
-        
+
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
         public static bool Regex0_Call0_IsMatch(string subject, string pattern)
             => Regex0.IsMatch(subject: subject);
@@ -62,7 +61,7 @@ namespace PCRE.Generated
             "pattern",
             (global::PCRE.PcreOptions)0x0000000000000008
         );
-        
+
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
         public static bool Regex1_Call0_IsMatch(string subject, string pattern, global::PCRE.PcreOptions options)
             => Regex1.IsMatch(subject: subject);
@@ -133,6 +132,5 @@ namespace PCRE.Generated
 
         private static readonly global::System.Func<global::PCRE.PcreMatch, string> _replacementFunc0
             = static _ => "replacement";
-        
     }
 }

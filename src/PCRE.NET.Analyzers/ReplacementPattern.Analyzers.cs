@@ -31,23 +31,25 @@ internal partial class ReplacementPattern
 
         public string GetLambda()
         {
-            if (_parts.Count == 0)
-                return "static _ => string.Empty";
+            switch (_parts.Count)
+            {
+                case 0:
+                    return "static _ => string.Empty";
 
-            if (_parts.Count == 1 && _parts[0] is LiteralPart literalPart)
-                return $"static _ => {SymbolDisplay.FormatLiteral(literalPart.GetText(), true)}";
+                case 1 when _parts[0] is LiteralPart literalPart:
+                    return $"static _ => {SymbolDisplay.FormatLiteral(literalPart.GetText(), true)}";
+            }
 
-            var sb = new CodeWriter();
+            var writer = new CodeWriter();
 
-            sb.Append("static ")
-              .Append(NeedsSubject ? "(match, subject)" : "match")
-              .Append(" => $\"");
+            writer.Append("static ")
+                  .Append(NeedsSubject ? "(match, subject)" : "match")
+                  .Append(" => $\"");
 
             foreach (var part in _parts)
-                part.AppendCode(sb);
+                part.AppendCode(writer);
 
-            sb.Append('"');
-            return sb.ToString();
+            return writer.Append('"').ToString();
         }
     }
 
@@ -56,10 +58,7 @@ internal partial class ReplacementPattern
         public virtual bool NeedsSubject => false;
 
         public abstract void AppendCode(CodeWriter writer);
-
-        public virtual void AppendHelpers(CodeWriter writer)
-        {
-        }
+        public virtual void AppendHelpers(CodeWriter writer) { }
     }
 
     internal partial class LiteralPart
