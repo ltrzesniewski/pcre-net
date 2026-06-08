@@ -55,7 +55,7 @@ internal static class GeneratorHelpers
             );
         }
 
-        public void AppendInterceptsLocationAttribute(InterceptableLocation location)
+        public void AppendInterceptsLocationAttributeLine(InterceptableLocation location)
         {
             writer.Append(location.GetInterceptsLocationAttributeSyntax())
 #if DEBUG

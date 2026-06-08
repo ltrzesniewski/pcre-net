@@ -55,8 +55,8 @@ internal sealed class ReplacementPatternSet
         {
             writer.AppendLine(
                 $"""
-                        private static readonly {PatternModel.GetLambdaType()} _replacementFunc{PatternId}
-                            = {PatternModel.GetLambda()};
+                private static readonly {PatternModel.GetLambdaType()} _replacementFunc{PatternId}
+                    = {PatternModel.GetLambda()};
 
                 """
             );

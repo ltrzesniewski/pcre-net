@@ -86,23 +86,9 @@ public sealed partial class StaticCallsInterceptorGenerator : IIncrementalGenera
         var writer = new CodeWriter();
         writer.AppendInterceptorHeader();
 
-        writer.AppendLine(
-            """
-            namespace PCRE.Generated
-            {
-                file static class StaticCallsInterceptor
-                {
-            """
-        );
-
-        GenerateInterceptors(writer, invocations);
-
-        writer.AppendLine(
-            """
-                }
-            }
-            """
-        );
+        using (writer.WriteBlock("namespace PCRE.Generated"))
+        using (writer.WriteBlock("file static class StaticCallsInterceptor"))
+            GenerateInterceptors(writer, invocations);
 
         return writer.ToString();
     }
@@ -118,11 +104,11 @@ public sealed partial class StaticCallsInterceptorGenerator : IIncrementalGenera
 
             writer.AppendLine(
                 $"""
-                        private static global::PCRE.PcreRegex? _regex{regexCounter};
-                        private static global::PCRE.PcreRegex Regex{regexCounter} => _regex{regexCounter} ??= new global::PCRE.PcreRegex(
-                            {SymbolDisplay.FormatLiteral(pattern, true)},
-                            (global::PCRE.PcreOptions){SymbolDisplay.FormatPrimitive(options, false, true)}
-                        );
+                private static global::PCRE.PcreRegex? _regex{regexCounter};
+                private static global::PCRE.PcreRegex Regex{regexCounter} => _regex{regexCounter} ??= new global::PCRE.PcreRegex(
+                    {SymbolDisplay.FormatLiteral(pattern, true)},
+                    (global::PCRE.PcreOptions){SymbolDisplay.FormatPrimitive(options, false, true)}
+                );
 
                 """
             );
@@ -138,12 +124,12 @@ public sealed partial class StaticCallsInterceptorGenerator : IIncrementalGenera
                     var replacementPattern = invocationsGroup.Key;
 
                     foreach (var interceptedMethod in invocationsGroup)
-                        writer.Append("        ").AppendInterceptsLocationAttribute(interceptedMethod.Location);
+                        writer.AppendInterceptsLocationAttributeLine(interceptedMethod.Location);
 
                     writer.Append(
                         $"""
-                                public static {method.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} Regex{regexCounter}_Call{callCounter}_{method.ToDisplayString(GeneratorHelpers.ParametersFormat)}
-                                    => Regex{regexCounter}.{method.Name}(
+                        public static {method.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} Regex{regexCounter}_Call{callCounter}_{method.ToDisplayString(GeneratorHelpers.ParametersFormat)}
+                            => Regex{regexCounter}.{method.Name}(
                         """
                     );
 

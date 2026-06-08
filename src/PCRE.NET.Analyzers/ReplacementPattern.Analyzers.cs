@@ -84,12 +84,8 @@ internal partial class ReplacementPattern
         {
             writer.AppendLine(
                 """
-                        private static string? GetGroup(global::PCRE.PcreMatch match, int index)
-                        {
-                            return match.TryGetGroup(index, out var group)
-                                ? group.Value
-                                : null;
-                        }
+                private static string? GetGroup(global::PCRE.PcreMatch match, int index)
+                    => match.TryGetGroup(index, out var group) ? group.Value : null;
 
                 """
             );
@@ -112,12 +108,8 @@ internal partial class ReplacementPattern
         {
             writer.AppendLine(
                 """
-                        private static string? GetGroup(global::PCRE.PcreMatch match, string name, int index)
-                        {
-                            return match.TryGetGroup(name, out var group) || match.TryGetGroup(index, out group)
-                                ? group.Value
-                                : null;
-                        }
+                private static string? GetGroup(global::PCRE.PcreMatch match, string name, int index)
+                    => match.TryGetGroup(name, out var group) || match.TryGetGroup(index, out group) ? group.Value : null;
 
                 """
             );
@@ -157,16 +149,16 @@ internal partial class ReplacementPattern
         {
             writer.AppendLine(
                 """
-                        private static string GetLastMatchedGroup(global::PCRE.PcreMatch match)
-                        {
-                            for (var i = match.CaptureCount; i > 0; --i)
-                            {
-                                if (match.TryGetGroup(i, out var group) && group.Success)
-                                    return group.Value;
-                            }
+                private static string GetLastMatchedGroup(global::PCRE.PcreMatch match)
+                {
+                    for (var i = match.CaptureCount; i > 0; --i)
+                    {
+                        if (match.TryGetGroup(i, out var group) && group.Success)
+                            return group.Value;
+                    }
 
-                            return string.Empty;
-                        }
+                    return string.Empty;
+                }
 
                 """
             );

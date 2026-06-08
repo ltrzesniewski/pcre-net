@@ -148,7 +148,9 @@ public class ForwardTo8BitGenerator : IIncrementalGenerator
             writer.AppendLine($"""/// <inheritdoc cref="{cref}" />""");
         }
 
-        writer.AppendLine(memberText.Trim());
+        writer.AppendPendingIndent()
+              .AppendRaw(memberText.Trim())
+              .AppendLine();
     }
 
     private sealed record GeneratorModel(

@@ -14,35 +14,48 @@ internal class CodeWriter
     public int Indent { get; set; }
 
     public CodeWriter Append<T>(T? value)
-    {
-        Append(value?.ToString());
-        return this;
-    }
+        => Append(value?.ToString());
+
+    public CodeWriter AppendLine<T>(T? value)
+        => AppendLine(value?.ToString());
 
     public CodeWriter Append([StringSyntax("csharp")] string? value)
     {
-        if (!string.IsNullOrEmpty(value))
+        if (value is null or "")
+            return this;
+
+        var position = 0;
+
+        while (true)
         {
-            WriteIndent();
-            _sb.Append(value);
+            AppendPendingIndent();
+
+            var nextNewLine = value.IndexOf('\n', position);
+            if (nextNewLine >= 0)
+            {
+                _sb.Append(value, position, nextNewLine + 1 - position);
+                _isAtStartOfLine = true;
+
+                position = nextNewLine + 1;
+                continue;
+            }
+
+            _sb.Append(value, position, value.Length - position);
+            break;
         }
 
         return this;
     }
 
-    public CodeWriter AppendLine<T>(T? value)
+    public CodeWriter AppendRaw([StringSyntax("csharp")] string? value)
     {
-        AppendLine(value?.ToString());
+        _sb.Append(value);
         return this;
     }
 
     public CodeWriter AppendLine([StringSyntax("csharp")] string? value = null)
     {
-        if (!string.IsNullOrEmpty(value))
-        {
-            WriteIndent();
-            _sb.Append(value);
-        }
+        Append(value);
 
         _sb.AppendLine();
         _isAtStartOfLine = true;
@@ -64,8 +77,9 @@ internal class CodeWriter
     public override string ToString()
         => _sb.ToString();
 
-    public BlockScope WriteBlock()
+    public BlockScope WriteBlock([StringSyntax("csharp")] string? header = null)
     {
+        Append(header);
         EnsureIsOnNewLine();
         AppendLine("{");
         Indent++;
@@ -78,12 +92,13 @@ internal class CodeWriter
             AppendLine();
     }
 
-    private void WriteIndent()
+    public CodeWriter AppendPendingIndent()
     {
         if (_isAtStartOfLine)
             _sb.Append(' ', Indent * _indentWidth);
 
         _isAtStartOfLine = false;
+        return this;
     }
 
     public readonly struct BlockScope(CodeWriter writer) : IDisposable

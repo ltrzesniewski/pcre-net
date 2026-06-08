@@ -83,23 +83,9 @@ public partial class ReplacementPatternInterceptorGenerator : IIncrementalGenera
         var writer = new CodeWriter();
         writer.AppendInterceptorHeader();
 
-        writer.AppendLine(
-            """
-            namespace PCRE.Generated
-            {
-                file static class ReplacementPatternInterceptor
-                {
-            """
-        );
-
-        GenerateInterceptors(writer, invocations);
-
-        writer.AppendLine(
-            """
-                }
-            }
-            """
-        );
+        using (writer.WriteBlock("namespace PCRE.Generated"))
+        using (writer.WriteBlock("file static class ReplacementPatternInterceptor"))
+            GenerateInterceptors(writer, invocations);
 
         return writer.ToString();
     }
@@ -131,14 +117,14 @@ public partial class ReplacementPatternInterceptorGenerator : IIncrementalGenera
                 paramsSignature = $"(this global::PCRE.PcreRegex regex, {paramsSignature.Substring(prefix.Length)}";
 
                 foreach (var interceptedMethod in interceptedMethodGroup)
-                    writer.Append("        ").AppendInterceptsLocationAttribute(interceptedMethod.Location);
+                    writer.AppendInterceptsLocationAttributeLine(interceptedMethod.Location);
 
                 var lambdaCall = pattern.GetReplacementFuncCall();
 
                 writer.AppendLine(
                     $"""
-                            public static {method.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} Replace{pattern.PatternId}_Call{callCounter}{paramsSignature}
-                                => regex.{method.Name}({method.Parameters.Where(p => p.Name is not "replacement").Select(p => $"{p.Name}: {p.Name}").Join(", ")}, replacementFunc: {lambdaCall});
+                    public static {method.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} Replace{pattern.PatternId}_Call{callCounter}{paramsSignature}
+                        => regex.{method.Name}({method.Parameters.Where(p => p.Name is not "replacement").Select(p => $"{p.Name}: {p.Name}").Join(", ")}, replacementFunc: {lambdaCall});
 
                     """
                 );
