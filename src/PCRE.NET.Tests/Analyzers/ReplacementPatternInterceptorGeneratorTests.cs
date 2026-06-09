@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using NUnit.Framework;
-using PCRE.NET.Analyzers;
+using PCRE.Analyzers;
 
 namespace PCRE.Tests.Analyzers;
 

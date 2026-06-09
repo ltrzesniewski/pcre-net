@@ -1,6 +1,10 @@
 <Project>
 
   <PropertyGroup>
+    <Version>1.4.1</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <LangVersion>14.0</LangVersion>
     <AnalysisLevel>10.0</AnalysisLevel>
     <AnalysisModeStyle>None</AnalysisModeStyle>
@@ -16,10 +20,6 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' != ''">true</ContinuousIntegrationBuild>
     <NoWarn>$(NoWarn);CA1510</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <Version>1.4.1</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(NCrunch)' == '1'">

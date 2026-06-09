@@ -6,9 +6,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
-using PCRE.NET.Analyzers.Support;
 
-namespace PCRE.NET.Analyzers;
+namespace PCRE.Analyzers;
 
 [Generator]
 public sealed partial class StaticCallsInterceptorGenerator : IIncrementalGenerator

@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 
-namespace PCRE.NET.Benchmarks;
+namespace PCRE.Benchmarks;
 
 [MemoryDiagnoser]
 [ReturnValueValidator]

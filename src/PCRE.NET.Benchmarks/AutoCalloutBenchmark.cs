@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 
-namespace PCRE.NET.Benchmarks;
+namespace PCRE.Benchmarks;
 
 [Config(typeof(NetCoreStandardConfig))]
 public class AutoCalloutBenchmark

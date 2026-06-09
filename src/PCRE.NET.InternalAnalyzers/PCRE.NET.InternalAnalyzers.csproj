@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>PCRE</RootNamespace>
     <IsRoslynComponent>true</IsRoslynComponent>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
   </PropertyGroup>
@@ -10,9 +11,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="../PCRE.NET.Analyzers/Support/*.cs" Link="Imported/%(FileName)%(Extension)" />
-    <Compile Include="../PCRE.NET/Support/CompilerServices.cs" Link="Imported/%(FileName)%(Extension)" />
-    <Compile Include="../PCRE.NET/Internal/AnalyzerAttributes.cs" Link="Imported/%(FileName)%(Extension)" />
+    <ImportedFile Include="../PCRE.NET.Analyzers/Analyzers/CodeWriter.cs" />
+    <ImportedFile Include="../PCRE.NET.Analyzers/Analyzers/Extensions.cs" />
+    <ImportedFile Include="../PCRE.NET.Analyzers/Support/CodeAnalysis.cs" />
+    <ImportedFile Include="../PCRE.NET/Support/CompilerServices.cs" />
+    <ImportedFile Include="../PCRE.NET/Internal/AnalyzerAttributes.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="@(ImportedFile)" Link="Imported/%(FileName)%(Extension)" />
+    <ImportedFile Update="@(ImportedFile)" Visible="false" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace PCRE.NET.Benchmarks;
+namespace PCRE.Benchmarks;
 
 /// <summary>
 /// This data is from the regex-redux benchmark by the Benchmark's Game.

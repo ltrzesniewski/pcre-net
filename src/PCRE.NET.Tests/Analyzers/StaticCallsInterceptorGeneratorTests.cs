@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using PCRE.NET.Analyzers;
+using PCRE.Analyzers;
 
 namespace PCRE.Tests.Analyzers;
 
@@ -123,6 +123,4 @@ public class StaticCallsInterceptorGeneratorTests : BaseInterceptorTests<StaticC
 
         Assert.That(interceptedCount, Is.EqualTo(methods.Count), "Not all methods were intercepted");
     }
-
-
 }

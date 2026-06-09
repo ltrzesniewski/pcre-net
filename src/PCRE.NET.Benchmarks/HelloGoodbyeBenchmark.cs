@@ -3,7 +3,7 @@
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Attributes;
 
-namespace PCRE.NET.Benchmarks;
+namespace PCRE.Benchmarks;
 
 [MemoryDiagnoser]
 public class HelloGoodbyeBenchmark

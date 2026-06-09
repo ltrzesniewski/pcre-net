@@ -2,7 +2,7 @@
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 
-namespace PCRE.NET.Benchmarks;
+namespace PCRE.Benchmarks;
 
 internal class NetCoreStandardConfig : ManualConfig
 {

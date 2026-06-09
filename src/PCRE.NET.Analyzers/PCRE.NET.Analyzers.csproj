@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>roslyn5.0</TargetFramework>
+    <RootNamespace>PCRE</RootNamespace>
     <IsRoslynComponent>true</IsRoslynComponent>
     <DefineConstants>$(DefineConstants);PCRENET_ANALYZERS</DefineConstants>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
@@ -21,8 +22,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="../PCRE.NET/Support/CompilerServices.cs" Link="Imported/%(FileName)%(Extension)" />
-    <Compile Include="../PCRE.NET/Internal/ReplacementPattern.cs" Link="Imported/%(FileName)%(Extension)" />
+    <ImportedFile Include="../PCRE.NET/Support/CompilerServices.cs" />
+    <ImportedFile Include="../PCRE.NET/Internal/ReplacementPattern.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="@(ImportedFile)" Link="Imported/%(FileName)%(Extension)" />
+    <ImportedFile Update="@(ImportedFile)" Visible="false" />
   </ItemGroup>
 
 </Project>

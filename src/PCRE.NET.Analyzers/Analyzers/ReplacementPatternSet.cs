@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using PCRE.Internal;
-using PCRE.NET.Analyzers.Support;
 
-namespace PCRE.NET.Analyzers;
+namespace PCRE.Analyzers;
 
 internal sealed class ReplacementPatternSet
 {

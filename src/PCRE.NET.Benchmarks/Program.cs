@@ -1,7 +1,7 @@
 ﻿using System;
 using BenchmarkDotNet.Running;
 
-namespace PCRE.NET.Benchmarks;
+namespace PCRE.Benchmarks;
 
 internal class Program
 {

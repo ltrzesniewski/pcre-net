@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-namespace PCRE.NET.Analyzers.Support;
+namespace PCRE.Analyzers;
 
 internal sealed class CodeWriter
 {
@@ -26,33 +26,26 @@ internal sealed class CodeWriter
 
         var position = 0;
 
-        while (true)
+        while (value.IndexOf('\n', position) is var nextLineFeed and >= 0)
         {
-            var nextNewLine = value.IndexOf('\n', position);
-            if (nextNewLine >= 0)
+            if (nextLineFeed == position || nextLineFeed == position + 1 && value[position] == '\r')
             {
-                if (nextNewLine == position || nextNewLine == position + 1 && value[position] == '\r')
-                {
-                    _sb.AppendLine();
-                }
-                else
-                {
-                    AppendPendingIndent();
-                    _sb.Append(value, position, nextNewLine + 1 - position);
-                }
-
-                _isAtStartOfLine = true;
-                position = nextNewLine + 1;
-                continue;
+                _sb.AppendLine();
             }
-
-            if (position < value.Length)
+            else
             {
                 AppendPendingIndent();
-                _sb.Append(value, position, value.Length - position);
+                _sb.Append(value, position, nextLineFeed + 1 - position);
             }
 
-            break;
+            _isAtStartOfLine = true;
+            position = nextLineFeed + 1;
+        }
+
+        if (position < value.Length)
+        {
+            AppendPendingIndent();
+            _sb.Append(value, position, value.Length - position);
         }
 
         return this;

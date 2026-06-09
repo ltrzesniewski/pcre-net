@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace PCRE.NET.Analyzers.Support;
+namespace PCRE.Analyzers;
 
 internal static class GeneratorHelpers
 {

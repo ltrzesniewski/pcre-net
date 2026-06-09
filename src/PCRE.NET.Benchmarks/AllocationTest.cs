@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using PCRE.Internal;
 
-namespace PCRE.NET.Benchmarks;
+namespace PCRE.Benchmarks;
 
 internal static class AllocationTest
 {

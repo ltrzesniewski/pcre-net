@@ -5,7 +5,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Operations;
 
-namespace PCRE.NET.Analyzers.Support;
+namespace PCRE.Analyzers;
 
 internal static class Extensions
 {
