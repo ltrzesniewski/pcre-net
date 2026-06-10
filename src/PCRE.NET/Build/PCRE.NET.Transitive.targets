@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <PcreNetAnalyzers Condition="'$(PcreNetAnalyzers)' == ''">true</PcreNetAnalyzers>
+    <PcreNetInterceptors Condition="'$(PcreNetInterceptors)' == ''">$(PcreNetAnalyzers)</PcreNetInterceptors>
+    <InterceptorsNamespaces Condition="'$(PcreNetInterceptors)' == 'true'">$(InterceptorsNamespaces);PCRE.Generated</InterceptorsNamespaces>
+  </PropertyGroup>
+</Project>

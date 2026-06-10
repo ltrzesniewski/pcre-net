@@ -89,7 +89,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="PCRE.NET.targets" Pack="true" PackagePath="build" />
+    <None Include="Build/PCRE.NET.targets" Pack="true" PackagePath="build/PCRE.NET.targets" />
+    <None Include="Build/PCRE.NET.Transitive.targets" Pack="true" PackagePath="buildTransitive/PCRE.NET.targets" />
     <None Include="../../icon.png" Pack="true" PackagePath="/" Visible="false" />
     <None Include="../NuGetReadme.md" Pack="true" PackagePath="/README.md" Visible="false" />
   </ItemGroup>
