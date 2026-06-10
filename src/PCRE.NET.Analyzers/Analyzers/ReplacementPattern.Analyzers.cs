@@ -29,20 +29,22 @@ internal partial class ReplacementPattern
                 ? "global::System.Func<global::PCRE.PcreMatch, string, string>"
                 : "global::System.Func<global::PCRE.PcreMatch, string>";
 
-        public string GetLambda()
+        public string GetLambda(LanguageVersion languageVersion)
         {
+            var prefix = languageVersion.SupportsStaticAnonymousFunctions ? "static " : string.Empty;
+
             switch (_parts.Count)
             {
                 case 0:
-                    return "static _ => string.Empty";
+                    return $"{prefix}_ => string.Empty";
 
                 case 1 when _parts[0] is LiteralPart literalPart:
-                    return $"static _ => {SymbolDisplay.FormatLiteral(literalPart.GetText(), true)}";
+                    return $"{prefix}_ => {SymbolDisplay.FormatLiteral(literalPart.GetText(), true)}";
             }
 
             var writer = new CodeWriter();
 
-            writer.Append("static ")
+            writer.Append(prefix)
                   .Append(NeedsSubject ? "(match, subject)" : "match")
                   .Append(" => $\"");
 
@@ -58,7 +60,10 @@ internal partial class ReplacementPattern
         public virtual bool NeedsSubject => false;
 
         public abstract void AppendCode(CodeWriter writer);
-        public virtual void AppendHelpers(CodeWriter writer) { }
+        public virtual void AppendHelpers(CodeWriter writer, LanguageVersion languageVersion) { }
+
+        protected static string NullableSuffix(LanguageVersion languageVersion)
+            => languageVersion.SupportsNullableReferenceTypes ? "?" : string.Empty;
     }
 
     internal partial class LiteralPart
@@ -79,11 +84,11 @@ internal partial class ReplacementPattern
             writer.Append("}");
         }
 
-        public override void AppendHelpers(CodeWriter writer)
+        public override void AppendHelpers(CodeWriter writer, LanguageVersion languageVersion)
         {
             writer.AppendLine(
-                """
-                private static string? GetGroup(global::PCRE.PcreMatch match, int index)
+                $"""
+                private static string{NullableSuffix(languageVersion)} GetGroup(global::PCRE.PcreMatch match, int index)
                     => match.TryGetGroup(index, out var group) ? group.Value : null;
 
                 """
@@ -103,14 +108,14 @@ internal partial class ReplacementPattern
             writer.Append("}");
         }
 
-        public override void AppendHelpers(CodeWriter writer)
+        public override void AppendHelpers(CodeWriter writer, LanguageVersion languageVersion)
         {
             writer.AppendLine(
-                """
-                private static string? GetGroup(global::PCRE.PcreMatch match, string name, int index)
-                    => match.TryGetGroup(name, out var group) || match.TryGetGroup(index, out group) ? group.Value : null;
+                $"""
+                 private static string{NullableSuffix(languageVersion)} GetGroup(global::PCRE.PcreMatch match, string name, int index)
+                     => match.TryGetGroup(name, out var group) || match.TryGetGroup(index, out group) ? group.Value : null;
 
-                """
+                 """
             );
         }
     }
@@ -144,7 +149,7 @@ internal partial class ReplacementPattern
         public override void AppendCode(CodeWriter writer)
             => writer.Append("{GetLastMatchedGroup(match)}");
 
-        public override void AppendHelpers(CodeWriter writer)
+        public override void AppendHelpers(CodeWriter writer, LanguageVersion languageVersion)
         {
             writer.AppendLine(
                 """

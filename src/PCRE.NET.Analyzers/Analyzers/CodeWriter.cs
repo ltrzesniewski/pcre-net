@@ -67,6 +67,12 @@ internal sealed class CodeWriter
         return this;
     }
 
+    public CodeWriter Clear()
+    {
+        _sb.Clear();
+        return this;
+    }
+
     private CodeWriter TrimEnd()
     {
         while (_sb.Length > 0 && char.IsWhiteSpace(_sb[_sb.Length - 1]))

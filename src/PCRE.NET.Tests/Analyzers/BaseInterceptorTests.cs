@@ -13,13 +13,14 @@ using VerifyNUnit;
 namespace PCRE.Tests.Analyzers;
 
 public abstract class BaseInterceptorTests<TGenerator>
-     where TGenerator : IIncrementalGenerator, new()
+    where TGenerator : IIncrementalGenerator, new()
 {
     protected static GeneratorDriverRunResult Generate(string input)
     {
         var runtimeDir = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
 
         var parseOptions = CSharpParseOptions.Default
+                                             .WithLanguageVersion(LanguageVersion.CSharp14)
                                              .WithFeatures([new("InterceptorsNamespaces", "PCRE.Generated")]);
 
         var compilation = CSharpCompilation.Create("TestAssembly")
