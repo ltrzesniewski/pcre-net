@@ -134,6 +134,7 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
         private readonly LanguageVersion _languageVersion;
 
         private string TypeModifier => _languageVersion.SupportsFileModifier ? "file" : "internal";
+        private string NullableSuffix => _languageVersion.SupportsNullableReferenceTypes ? "?" : string.Empty;
 
         public Generator(LanguageVersion languageVersion)
         {
@@ -216,8 +217,8 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
                 invocations.OfType<InstanceReplaceInvocationModel>()
             );
 
-            replacementPatterns.AppendFields(_writer);
-            replacementPatterns.AppendHelpers(_writer);
+            replacementPatterns.AppendFields(_writer, _languageVersion);
+            replacementPatterns.AppendHelpers(_writer, _languageVersion);
         }
 
         private void GenerateStaticCalls(ReplacementPatternSet replacementPatterns, IEnumerable<StaticInvocationModel> invocations)
@@ -228,10 +229,14 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
             {
                 var (pattern, options) = regexGroup.Key;
 
+                var assignment = _languageVersion.SupportsCoalescingAssignments
+                    ? "??="
+                    : $"!= null ? _regex{regexCounter} : _regex{regexCounter} =";
+
                 _writer.AppendLine(
                     $"""
-                    private static global::PCRE.PcreRegex? _regex{regexCounter};
-                    private static global::PCRE.PcreRegex Regex{regexCounter} => _regex{regexCounter} ??= new global::PCRE.PcreRegex(
+                    private static global::PCRE.PcreRegex{NullableSuffix} _regex{regexCounter};
+                    private static global::PCRE.PcreRegex Regex{regexCounter} => _regex{regexCounter} {assignment} new global::PCRE.PcreRegex(
                         {SymbolDisplay.FormatLiteral(pattern, true)},
                         (global::PCRE.PcreOptions){SymbolDisplay.FormatPrimitive(options, false, true)}
                     );
@@ -264,7 +269,7 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
                             if (param.Name is "pattern" or "options")
                                 continue;
 
-                            if (param.Name is "replacement" && method.Name is "Replace" && replacementPatterns.GetOrAdd(replacementPattern, out _) is { } replacement)
+                            if (param.Name is "replacement" && method.Name is "Replace" && replacementPatterns.GetOrAdd(replacementPattern) is { } replacement)
                             {
                                 _writer.Append($"replacementFunc: {replacement.GetReplacementFuncCall()}, ");
                                 continue;
@@ -289,7 +294,7 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
         {
             foreach (var replacementPatternGroup in invocations.GroupBy(i => i.ReplacementPattern))
             {
-                if (replacementPatterns.GetOrAdd(replacementPatternGroup.Key, out _) is not { } replacement)
+                if (replacementPatterns.GetOrAdd(replacementPatternGroup.Key) is not { } replacement)
                     continue;
 
                 var callCounter = 0;
