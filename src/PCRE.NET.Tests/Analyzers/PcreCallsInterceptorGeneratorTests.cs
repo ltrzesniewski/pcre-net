@@ -10,10 +10,10 @@ using PCRE.Analyzers;
 namespace PCRE.Tests.Analyzers;
 
 [TestFixture]
-public class StaticCallsInterceptorGeneratorTests : BaseInterceptorTests<StaticCallsInterceptorGenerator>
+public class PcreCallsInterceptorGeneratorTests : BaseInterceptorTests<PcreCallsInterceptorGenerator>
 {
     [Test]
-    public Task generates_intercepts_with_literals()
+    public Task generates_static_intercepts_with_literals()
     {
         return Verify(
             """
@@ -40,7 +40,7 @@ public class StaticCallsInterceptorGeneratorTests : BaseInterceptorTests<StaticC
     }
 
     [Test]
-    public Task does_not_generate_intercepts_with_non_literals()
+    public Task does_not_generate_static_intercepts_with_non_literals()
     {
         return Verify(
             """
@@ -59,6 +59,39 @@ public class StaticCallsInterceptorGeneratorTests : BaseInterceptorTests<StaticC
                 }
 
                 static string GetString() => "foo";
+            }
+            """
+        );
+    }
+
+    [Test]
+    public Task generates_instance_replace_intercepts_with_literals()
+    {
+        return Verify(
+            """
+            using PCRE;
+
+            class C
+            {
+                void M()
+                {
+                    var regex = new PcreRegex("foo(?<group>bar)baz");
+
+                    _ = regex.Replace("subject", "");
+                    _ = regex.Replace("subject", "replacement");
+                    _ = regex.Replace("subject", "a $$ b");
+                    _ = regex.Replace("subject", "a $& b");
+                    _ = regex.Replace("subject", "a $0 b");
+                    _ = regex.Replace("subject", "a $1 b");
+                    _ = regex.Replace("subject", "a $2 b");
+                    _ = regex.Replace("subject", "a ${group} b");
+                    _ = regex.Replace("subject", "a ${other} b");
+                    _ = regex.Replace("subject", "a $` b");
+                    _ = regex.Replace("subject", "a $' b");
+                    _ = regex.Replace("subject", "a $_ b");
+                    _ = regex.Replace("subject", "a $+ b");
+                    _ = regex.Replace("subject", "a $+ b");
+                }
             }
             """
         );
