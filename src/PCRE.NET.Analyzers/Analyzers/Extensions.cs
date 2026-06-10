@@ -11,10 +11,8 @@ internal static class Extensions
 {
     extension(LanguageVersion languageVersion)
     {
-        private bool SupportsFileModifier => languageVersion >= LanguageVersion.CSharp11;
+        public bool SupportsFileModifier => languageVersion >= LanguageVersion.CSharp11;
         public bool SupportsNullableReferenceTypes => languageVersion >= LanguageVersion.CSharp8;
-
-        public string GeneratedTypeModifier => languageVersion.SupportsFileModifier ? "file" : "internal";
     }
 
     public static IncrementalValuesProvider<T> WithLambdaComparer<T>(this IncrementalValuesProvider<T> source, Func<T, T, bool> equals, Func<T, int> getHashCode)
