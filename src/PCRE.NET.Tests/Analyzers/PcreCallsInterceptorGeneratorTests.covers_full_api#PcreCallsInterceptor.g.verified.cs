@@ -138,6 +138,18 @@ namespace PCRE.Generated
         public static string Regex1_Call16_Substitute(string subject, string pattern, string replacement, global::PCRE.PcreOptions options, global::PCRE.PcreSubstituteOptions substituteOptions)
             => Regex1.Substitute(subject: subject, replacement: replacement, substituteOptions: substituteOptions);
 
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
+        public static string Replace0_Call0(this global::PCRE.PcreRegex regex, string subject, string replacement)
+            => regex.Replace(subject: subject, replacementFunc: _replacementFunc0);
+
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
+        public static string Replace0_Call1(this global::PCRE.PcreRegex regex, string subject, string replacement, int count)
+            => regex.Replace(subject: subject, replacementFunc: _replacementFunc0, count: count);
+
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
+        public static string Replace0_Call2(this global::PCRE.PcreRegex regex, string subject, string replacement, int count, int startIndex)
+            => regex.Replace(subject: subject, replacementFunc: _replacementFunc0, count: count, startIndex: startIndex);
+
         private static readonly global::System.Func<global::PCRE.PcreMatch, string> _replacementFunc0
             = static _ => "replacement";
     }

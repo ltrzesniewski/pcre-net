@@ -100,9 +100,14 @@ public class PcreCallsInterceptorGeneratorTests : BaseInterceptorTests<PcreCalls
     [Test]
     public async Task covers_full_api()
     {
-        var methods = typeof(PcreRegex).GetMethods(BindingFlags.Public | BindingFlags.Static)
-                                       .Where(static m => m.GetParameters().Any(static i => i.Name is "pattern"))
-                                       .OrderBy(static m => $"{m.Name} {string.Join(", ", m.GetParameters().Select(static p => $"{p.Name} {p.ParameterType.Name}"))}")
+        var methods = typeof(PcreRegex).GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance)
+                                       .Where(
+                                           static m => m.IsStatic
+                                               ? m.GetParameters().Any(static i => i.Name is "pattern")
+                                               : m.Name is "Replace" && m.GetParameters().Any(static i => i.Name is "replacement")
+                                       )
+                                       .OrderBy(static m => m.IsStatic ? 0 : 1)
+                                       .ThenBy(static m => $"{m.Name} {string.Join(", ", m.GetParameters().Select(static p => $"{p.Name} {p.ParameterType.Name}"))}")
                                        .ToList();
 
         var sb = new StringBuilder();
@@ -112,14 +117,17 @@ public class PcreCallsInterceptorGeneratorTests : BaseInterceptorTests<PcreCalls
 
             class C
             {
-                void M()
+                void M(PcreRegex regex)
                 {
             """
         );
 
         foreach (var method in methods)
         {
-            sb.Append("        _ = PcreRegex.").Append(method.Name).Append('(');
+            sb.Append("        _ = ")
+              .Append(method.IsStatic ? "PcreRegex." : "regex.")
+              .Append(method.Name)
+              .Append('(');
 
             foreach (var parameter in method.GetParameters())
             {
