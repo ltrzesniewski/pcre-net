@@ -9,26 +9,44 @@ using Microsoft.CodeAnalysis.Operations;
 
 namespace PCRE.Analyzers;
 
-[Generator]
+[Generator(LanguageNames.CSharp)]
 public sealed partial class StaticCallsInterceptorGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var source = context.SyntaxProvider
-                            .CreateSyntaxProvider(SyntaxPredicate, SyntaxTransform)
-                            .WhereNotNullAndInterceptorsEnabled(context)
-                            .Collect();
+        var invocations = context.SyntaxProvider
+                                 .CreateSyntaxProvider(SyntaxPredicate, SyntaxTransform);
+
+        var isEnabled = context.ParseOptionsProvider
+                               .Select(static (parseOptions, _) => parseOptions.Features.TryGetValue("InterceptorsNamespaces", out var value) ? value : string.Empty)
+                               .Select(static (namespaces, _) => namespaces.Split(';').Any(static i => i.Trim() == "PCRE.Generated"));
+
+        var languageVersion = context.CompilationProvider
+                                     .Select(static (compilation, _) => ((CSharpCompilation)compilation).LanguageVersion);
+
+        var pipeline = invocations.Combine(isEnabled)
+                                  .SelectMany(static (pair, _) =>
+                                  {
+                                      var (invocation, isEnabled) = pair;
+                                      return isEnabled && invocation is not null
+                                          ? ImmutableArray.Create(invocation)
+                                          : ImmutableArray<InvocationModel>.Empty;
+                                  })
+                                  .Collect()
+                                  .Combine(languageVersion);
 
         context.RegisterImplementationSourceOutput(
-            source,
-            static (context, invocations) =>
+            pipeline,
+            static (context, pair) =>
             {
+                var (invocations, languageVersion) = pair;
+
                 if (invocations.Length == 0)
                     return;
 
                 context.AddSource(
                     "StaticCallsInterceptor.g.cs",
-                    Generate(invocations)
+                    Generate(invocations, languageVersion)
                 );
             }
         );
@@ -77,16 +95,16 @@ public sealed partial class StaticCallsInterceptorGenerator : IIncrementalGenera
         return null;
     }
 
-    private static string Generate(ImmutableArray<InvocationModel> invocations)
+    private static string Generate(ImmutableArray<InvocationModel> invocations, LanguageVersion languageVersion)
     {
         // ReSharper disable once InvocationIsSkipped
         OnGenerate();
 
         var writer = new CodeWriter();
-        writer.AppendInterceptorHeader();
+        writer.AppendInterceptorHeader(languageVersion);
 
         using (writer.WriteBlock("namespace PCRE.Generated"))
-        using (writer.WriteBlock("file static class StaticCallsInterceptor"))
+        using (writer.AppendEmbeddedAttributeLine().WriteBlock($"{languageVersion.GeneratedTypeModifier} static class StaticCallsInterceptor"))
             GenerateInterceptors(writer, invocations);
 
         return writer.ToString();
