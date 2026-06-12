@@ -20,7 +20,7 @@ public abstract class BaseInterceptorTests<TGenerator>
         var runtimeDir = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
 
         var parseOptions = CSharpParseOptions.Default
-                                             .WithLanguageVersion(LanguageVersion.CSharp14)
+                                             .WithLanguageVersion(LanguageVersion.CSharp11)
                                              .WithFeatures([new("InterceptorsNamespaces", "PCRE.Generated")]);
 
         var compilation = CSharpCompilation.Create("TestAssembly")

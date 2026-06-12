@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.CodeAnalysis.CSharp;
 using PCRE.Internal;
 
 namespace PCRE.Analyzers;
@@ -27,26 +26,26 @@ internal sealed class ReplacementPatternSet
         return item;
     }
 
-    internal void AppendFields(CodeWriter writer, LanguageVersion languageVersion)
+    internal void AppendFields(CodeWriter writer)
     {
         foreach (var item in _replacementPatterns.Values.OrderBy(i => i.PatternId))
-            item.AppendField(writer, languageVersion);
+            item.AppendField(writer);
     }
 
-    public void AppendHelpers(CodeWriter writer, LanguageVersion languageVersion)
+    public void AppendHelpers(CodeWriter writer)
     {
         foreach (var part in _replacementPatterns.Values.SelectMany(i => i.PatternModel.Parts).DistinctBy(p => p.GetType()))
-            part.AppendHelpers(writer, languageVersion);
+            part.AppendHelpers(writer);
     }
 
     public sealed record PatternItem(int PatternId, ReplacementPattern.PatternModel PatternModel)
     {
-        public void AppendField(CodeWriter writer, LanguageVersion languageVersion)
+        public void AppendField(CodeWriter writer)
         {
             writer.AppendLine(
                 $"""
                 private static readonly {PatternModel.GetLambdaType()} _replacementFunc{PatternId}
-                    = {PatternModel.GetLambda(languageVersion)};
+                    = {PatternModel.GetLambda()};
 
                 """
             );

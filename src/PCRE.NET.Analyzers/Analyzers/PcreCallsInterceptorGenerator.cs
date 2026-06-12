@@ -13,6 +13,8 @@ namespace PCRE.Analyzers;
 [Generator(LanguageNames.CSharp)]
 public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
 {
+    private const string _generatedNamespace = "PCRE.Generated";
+
     [SuppressMessage("ReSharper", "UseCollectionExpression")]
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -20,11 +22,7 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
                                  .CreateSyntaxProvider(SyntaxPredicate, SyntaxTransform);
 
         var isEnabled = context.ParseOptionsProvider
-                               .Select(static (parseOptions, _) => parseOptions.Features.TryGetValue("InterceptorsNamespaces", out var value) ? value : string.Empty)
-                               .Select(static (namespaces, _) => namespaces.Split(';').Any(static i => i.Trim() == "PCRE.Generated"));
-
-        var languageVersion = context.CompilationProvider
-                                     .Select(static (compilation, _) => ((CSharpCompilation)compilation).LanguageVersion);
+                               .Select(static (parseOptions, _) => IsEnabled(parseOptions));
 
         var pipeline = invocations.Combine(isEnabled)
                                   .SelectMany(static (pair, _) =>
@@ -34,26 +32,35 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
                                           ? ImmutableArray.Create(invocation)
                                           : ImmutableArray<InvocationModel>.Empty;
                                   })
-                                  .Collect()
-                                  .Combine(languageVersion);
+                                  .Collect();
 
         context.RegisterImplementationSourceOutput(
             pipeline,
-            static (context, pair) =>
+            static (context, invocations) =>
             {
-                var (invocations, languageVersion) = pair;
-
                 if (invocations.Length == 0)
                     return;
 
-                var generator = new Generator(languageVersion);
-
                 context.AddSource(
                     "PcreCallsInterceptor.g.cs",
-                    generator.Generate(invocations)
+                    new Generator().Generate(invocations)
                 );
             }
         );
+    }
+
+    private static bool IsEnabled(ParseOptions parseOptions)
+    {
+        // The generator requires file-local type support, which was added in C# 11.
+        if (parseOptions is not CSharpParseOptions { LanguageVersion: >= LanguageVersion.CSharp11 })
+            return false;
+
+        if (!parseOptions.Features.TryGetValue("InterceptorsNamespaces", out var namespaces))
+            return false;
+
+        return namespaces.Split(';')
+                         .Select(i => i.Trim())
+                         .Contains(_generatedNamespace);
     }
 
     private static bool SyntaxPredicate(SyntaxNode node, CancellationToken cancellationToken)
@@ -131,35 +138,22 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
             );
 
         private readonly CodeWriter _writer = new();
-        private readonly LanguageVersion _languageVersion;
-
-        private string TypeModifier => _languageVersion.SupportsFileModifier ? "file" : "internal";
-        private string NullableSuffix => _languageVersion.SupportsNullableReferenceTypes ? "?" : string.Empty;
-
-        public Generator(LanguageVersion languageVersion)
-        {
-            _languageVersion = languageVersion;
-        }
 
         public string Generate(ImmutableArray<InvocationModel> invocations)
         {
             _writer.Clear();
-            AppendHeader(_languageVersion);
+            AppendHeader();
 
-            using (_writer.WriteBlock("namespace PCRE.Generated"))
+            using (_writer.WriteBlock($"namespace {_generatedNamespace}"))
+            using (_writer.WriteBlock("file static class PcreCallsInterceptor"))
             {
-                _writer.AppendLine("[global::Microsoft.CodeAnalysis.Embedded]");
-
-                using (_writer.WriteBlock($"{TypeModifier} static class PcreCallsInterceptor"))
-                {
-                    GenerateInterceptors(invocations);
-                }
+                GenerateInterceptors(invocations);
             }
 
             return _writer.ToString();
         }
 
-        private void AppendHeader(LanguageVersion languageVersion)
+        private void AppendHeader()
         {
             _writer.AppendLine(
                 """
@@ -170,33 +164,17 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
                 //   <PcreNetInterceptors>false</PcreNetInterceptors>
                 // </auto-generated>
 
-                """
-            );
+                #nullable enable
 
-            if (languageVersion.SupportsNullableReferenceTypes)
-            {
-                _writer.AppendLine("#nullable enable")
-                       .AppendLine();
-            }
-
-            _writer.AppendLine(
-                $$"""
                 namespace System.Runtime.CompilerServices
                 {
-                    [global::Microsoft.CodeAnalysis.Embedded]
                     [global::System.Diagnostics.Conditional("PCRE_GENERATED")]
                     [global::System.AttributeUsage(global::System.AttributeTargets.Method, AllowMultiple = true)]
-                    {{TypeModifier}} sealed class InterceptsLocationAttribute : global::System.Attribute
+                    file sealed class InterceptsLocationAttribute : global::System.Attribute
                     {
                         public InterceptsLocationAttribute(int version, string data)
                         { }
                     }
-                }
-
-                namespace Microsoft.CodeAnalysis
-                {
-                    internal sealed partial class EmbeddedAttribute : global::System.Attribute
-                    { }
                 }
 
                 """
@@ -226,8 +204,8 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
                 invocations.OfType<InstanceReplaceInvocationModel>()
             );
 
-            replacementPatterns.AppendFields(_writer, _languageVersion);
-            replacementPatterns.AppendHelpers(_writer, _languageVersion);
+            replacementPatterns.AppendFields(_writer);
+            replacementPatterns.AppendHelpers(_writer);
         }
 
         private void GenerateStaticCalls(ReplacementPatternSet replacementPatterns, IEnumerable<StaticInvocationModel> invocations)
@@ -238,14 +216,10 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
             {
                 var (pattern, options) = regexGroup.Key;
 
-                var assignment = _languageVersion.SupportsCoalescingAssignments
-                    ? "??="
-                    : $"!= null ? _regex{regexCounter} : _regex{regexCounter} =";
-
                 _writer.AppendLine(
                     $"""
-                    private static global::PCRE.PcreRegex{NullableSuffix} _regex{regexCounter};
-                    private static global::PCRE.PcreRegex Regex{regexCounter} => _regex{regexCounter} {assignment} new global::PCRE.PcreRegex(
+                    private static global::PCRE.PcreRegex? _regex{regexCounter};
+                    private static global::PCRE.PcreRegex Regex{regexCounter} => _regex{regexCounter} ??= new global::PCRE.PcreRegex(
                         {SymbolDisplay.FormatLiteral(pattern, true)},
                         (global::PCRE.PcreOptions){SymbolDisplay.FormatPrimitive(options, false, true)}
                     );

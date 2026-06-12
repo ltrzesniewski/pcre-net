@@ -10,7 +10,6 @@
 
 namespace System.Runtime.CompilerServices
 {
-    [global::Microsoft.CodeAnalysis.Embedded]
     [global::System.Diagnostics.Conditional("PCRE_GENERATED")]
     [global::System.AttributeUsage(global::System.AttributeTargets.Method, AllowMultiple = true)]
     file sealed class InterceptsLocationAttribute : global::System.Attribute
@@ -20,15 +19,8 @@ namespace System.Runtime.CompilerServices
     }
 }
 
-namespace Microsoft.CodeAnalysis
-{
-    internal sealed partial class EmbeddedAttribute : global::System.Attribute
-    { }
-}
-
 namespace PCRE.Generated
 {
-    [global::Microsoft.CodeAnalysis.Embedded]
     file static class PcreCallsInterceptor
     {
         private static global::PCRE.PcreRegex? _regex0;

@@ -2,21 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Operations;
 
 namespace PCRE.Analyzers;
 
 internal static class Extensions
 {
-    extension(LanguageVersion languageVersion)
-    {
-        public bool SupportsFileModifier => languageVersion >= LanguageVersion.CSharp11;
-        public bool SupportsStaticAnonymousFunctions => languageVersion >= LanguageVersion.CSharp9;
-        public bool SupportsNullableReferenceTypes => languageVersion >= LanguageVersion.CSharp8;
-        public bool SupportsCoalescingAssignments => languageVersion >= LanguageVersion.CSharp8;
-    }
-
     public static IncrementalValuesProvider<T> WithLambdaComparer<T>(this IncrementalValuesProvider<T> source, Func<T, T, bool> equals, Func<T, int> getHashCode)
         => source.WithComparer(new LambdaComparer<T>(equals, getHashCode));
 
