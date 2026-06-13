@@ -1,3 +1,3 @@
 <Project>
-  <Import Project="$(MSBuildThisFileDirectory)../build/PCRE.NET.targets" />
+  <Import Project="../build/PCRE.NET.targets" />
 </Project>

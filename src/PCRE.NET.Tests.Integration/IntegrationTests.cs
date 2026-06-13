@@ -198,9 +198,18 @@ public partial class IntegrationTests
         Check(PcreRegex.Substitute("a b c", @"\s+", "-") == "a-b c");
         Check(PcreRegex.Substitute("a b c", @"\s+", "-", PcreOptions.Compiled, PcreSubstituteOptions.SubstituteGlobal) == "a-b-c");
 
+        // Out-of-order parameters
+        Check(PcreRegex.IsMatch(pattern: "f.o", startIndex: GetSubjectAndStartIndex(out var subject), options: PcreOptions.Caseless, subject: subject));
+
         return;
 
         static string GetRegexPattern() => "baz";
+
+        static int GetSubjectAndStartIndex(out string subject)
+        {
+            subject = "FOO";
+            return 0;
+        }
     }
 
     [SuppressMessage("ReSharper", "RedundantVerbatimStringPrefix")]

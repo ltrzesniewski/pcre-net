@@ -5,11 +5,11 @@ namespace PCRE.Tests.Integration;
 
 public partial class IntegrationTests
 {
-    private const string _reset = "\e[0m";
-    private const string _bold = "\e[1m";
-    private const string _red = "\e[91m";
-    private const string _green = "\e[92m";
-    private const string _yellow = "\e[93m";
+    private const string _reset = "\x1B[0m";
+    private const string _bold = "\x1B[1m";
+    private const string _red = "\x1B[91m";
+    private const string _green = "\x1B[92m";
+    private const string _yellow = "\x1B[93m";
 
     private bool _success = true;
 
