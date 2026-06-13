@@ -98,6 +98,24 @@ public class PcreCallsInterceptorGeneratorTests : BaseInterceptorTests<PcreCalls
     }
 
     [Test]
+    public Task intercepts_only_expected_types()
+    {
+        return Verify(
+            """
+            class PcreRegex
+            {
+                void M()
+                {
+                    PcreRegex.Match("subject", "pattern");
+                }
+
+                static void Match(string subject, string pattern) { }
+            }
+            """
+        );
+    }
+
+    [Test]
     public async Task covers_full_api()
     {
         var methods = typeof(PcreRegex).GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance)

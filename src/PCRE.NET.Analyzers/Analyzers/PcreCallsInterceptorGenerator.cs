@@ -85,7 +85,11 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
             {
                 TargetMethod:
                 {
-                    ContainingType.Name: "PcreRegex"
+                    ContainingType:
+                    {
+                        Name: "PcreRegex",
+                        ContainingNamespace: { Name: "PCRE", ContainingNamespace.IsGlobalNamespace: true }
+                    }
                 } method
             } invocation
             && context.SemanticModel.GetInterceptableLocation(invocationSyntax, cancellationToken) is { } location)
