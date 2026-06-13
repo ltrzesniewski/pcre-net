@@ -86,6 +86,7 @@ public class PcreCallsInterceptorGeneratorTests : BaseInterceptorTests<PcreCalls
                     _ = regex.Replace("subject", "a $2 b");
                     _ = regex.Replace("subject", "a ${group} b");
                     _ = regex.Replace("subject", "a ${other} b");
+                    _ = regex.Replace("subject", "a ${1} b");
                     _ = regex.Replace("subject", "a $` b");
                     _ = regex.Replace("subject", "a $' b");
                     _ = regex.Replace("subject", "a $_ b");

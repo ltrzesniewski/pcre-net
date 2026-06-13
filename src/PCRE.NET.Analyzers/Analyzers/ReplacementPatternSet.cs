@@ -34,8 +34,10 @@ internal sealed class ReplacementPatternSet
 
     public void AppendHelpers(CodeWriter writer)
     {
-        foreach (var part in _replacementPatterns.Values.SelectMany(i => i.PatternModel.Parts).DistinctBy(p => p.GetType()))
-            part.AppendHelpers(writer);
+        var appendedHelpers = ReplacementPattern.AppendedHelpers.None;
+
+        foreach (var part in _replacementPatterns.Values.SelectMany(i => i.PatternModel.Parts))
+            part.AppendHelpers(writer, ref appendedHelpers);
     }
 
     public sealed record PatternItem(int PatternId, ReplacementPattern.PatternModel PatternModel)

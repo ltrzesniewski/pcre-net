@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis.CSharp;
@@ -58,7 +59,16 @@ internal partial class ReplacementPattern
         public virtual bool NeedsSubject => false;
 
         public abstract void AppendCode(CodeWriter writer);
-        public virtual void AppendHelpers(CodeWriter writer) { }
+        public virtual void AppendHelpers(CodeWriter writer, ref AppendedHelpers appendedHelpers) { }
+
+        protected static bool CanAppendHelper(AppendedHelpers helper, ref AppendedHelpers appendedHelpers)
+        {
+            if ((appendedHelpers & helper) != 0)
+                return false;
+
+            appendedHelpers |= helper;
+            return true;
+        }
     }
 
     internal partial class LiteralPart
@@ -79,8 +89,11 @@ internal partial class ReplacementPattern
             writer.Append("}");
         }
 
-        public override void AppendHelpers(CodeWriter writer)
+        public override void AppendHelpers(CodeWriter writer, ref AppendedHelpers appendedHelpers)
         {
+            if (!CanAppendHelper(AppendedHelpers.GetGroupByIndex, ref appendedHelpers))
+                return;
+
             writer.AppendLine(
                 """
                 private static string? GetGroup(global::PCRE.PcreMatch match, int index)
@@ -95,7 +108,11 @@ internal partial class ReplacementPattern
     {
         public override void AppendCode(CodeWriter writer)
         {
-            writer.Append($$"""{GetGroup(match, {{SymbolDisplay.FormatLiteral(_name, true)}}, {{_index}})""");
+            writer.Append(
+                _index >= 0
+                    ? $$"""{GetGroup(match, {{SymbolDisplay.FormatLiteral(_name, true)}}, {{_index}})"""
+                    : $$"""{GetGroup(match, {{SymbolDisplay.FormatLiteral(_name, true)}})"""
+            );
 
             if (_fallback?.Length > 0)
                 writer.Append(" ?? ").Append(SymbolDisplay.FormatLiteral(_fallback, true));
@@ -103,15 +120,34 @@ internal partial class ReplacementPattern
             writer.Append("}");
         }
 
-        public override void AppendHelpers(CodeWriter writer)
+        public override void AppendHelpers(CodeWriter writer, ref AppendedHelpers appendedHelpers)
         {
-            writer.AppendLine(
-                """
-                 private static string? GetGroup(global::PCRE.PcreMatch match, string name, int index)
-                     => match.TryGetGroup(name, out var group) || match.TryGetGroup(index, out group) ? group.Value : null;
+            if (_index >= 0)
+            {
+                if (CanAppendHelper(AppendedHelpers.GetGroupByNameAndIndex, ref appendedHelpers))
+                {
+                    writer.AppendLine(
+                        """
+                         private static string? GetGroup(global::PCRE.PcreMatch match, string name, int index)
+                             => match.TryGetGroup(name, out var group) || match.TryGetGroup(index, out group) ? group.Value : null;
 
-                 """
-            );
+                         """
+                    );
+                }
+            }
+            else
+            {
+                if (CanAppendHelper(AppendedHelpers.GetGroupByName, ref appendedHelpers))
+                {
+                    writer.AppendLine(
+                        """
+                        private static string? GetGroup(global::PCRE.PcreMatch match, string name)
+                            => match.TryGetGroup(name, out var group) ? group.Value : null;
+
+                        """
+                    );
+                }
+            }
         }
     }
 
@@ -144,8 +180,11 @@ internal partial class ReplacementPattern
         public override void AppendCode(CodeWriter writer)
             => writer.Append("{GetLastMatchedGroup(match)}");
 
-        public override void AppendHelpers(CodeWriter writer)
+        public override void AppendHelpers(CodeWriter writer, ref AppendedHelpers appendedHelpers)
         {
+            if (!CanAppendHelper(AppendedHelpers.GetLastMatchedGroup, ref appendedHelpers))
+                return;
+
             writer.AppendLine(
                 """
                 private static string GetLastMatchedGroup(global::PCRE.PcreMatch match)
@@ -162,5 +201,15 @@ internal partial class ReplacementPattern
                 """
             );
         }
+    }
+
+    [Flags]
+    internal enum AppendedHelpers
+    {
+        None = 0,
+        GetGroupByIndex = 1 << 0,
+        GetGroupByName = 1 << 1,
+        GetGroupByNameAndIndex = 1 << 2,
+        GetLastMatchedGroup = 1 << 3
     }
 }
