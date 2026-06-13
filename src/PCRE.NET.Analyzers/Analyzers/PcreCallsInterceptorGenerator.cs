@@ -100,7 +100,7 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
                     && invocation.GetArgument("options") is var optionsArg and (null or { Value.ConstantValue.HasValue: true }))
                 {
                     return new StaticInvocationModel(
-                        method,
+                        new PcreMethod(method),
                         location,
                         pattern,
                         optionsArg?.Value.ConstantValue.Value as long? ?? 0,
@@ -114,7 +114,7 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
                     && invocation.GetArgument("replacement")?.Value.ConstantValue is { HasValue: true, Value: string replacement })
                 {
                     return new InstanceReplaceInvocationModel(
-                        method,
+                        new PcreMethod(method),
                         location,
                         replacement
                     );
@@ -127,20 +127,6 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
 
     private class Generator
     {
-        private static readonly SymbolDisplayFormat _parametersFormat
-            = new(
-                globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Included,
-                typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
-                genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
-                memberOptions: SymbolDisplayMemberOptions.IncludeParameters,
-                parameterOptions: SymbolDisplayParameterOptions.IncludeName
-                                  | SymbolDisplayParameterOptions.IncludeType
-                                  | SymbolDisplayParameterOptions.IncludeModifiers,
-                miscellaneousOptions: SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers
-                                      | SymbolDisplayMiscellaneousOptions.UseSpecialTypes
-                                      | SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier
-            );
-
         private readonly CodeWriter _writer = new();
 
         public string Generate(ImmutableArray<InvocationModel> invocations)
@@ -233,9 +219,9 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
 
                 var callCounter = 0;
 
-                foreach (var methodGroup in regexGroup.GroupBy(i => i.Method, SymbolEqualityComparer.Default))
+                foreach (var methodGroup in regexGroup.GroupBy(i => i.Method))
                 {
-                    var method = (IMethodSymbol)methodGroup.Key!;
+                    var method = methodGroup.Key;
 
                     foreach (var replacementPatternGroup in methodGroup.GroupBy(i => i.ReplacementPattern))
                     {
@@ -246,23 +232,23 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
 
                         _writer.Append(
                             $"""
-                            public static {method.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} Regex{regexCounter}_Call{callCounter}_{method.ToDisplayString(_parametersFormat)}
+                            public static {method.ReturnType} Regex{regexCounter}_Call{callCounter}_{method.ParametersSignature}
                                 => Regex{regexCounter}.{method.Name}(
                             """
                         );
 
-                        foreach (var param in method.Parameters)
+                        foreach (var paramName in method.ParameterNames.Split(','))
                         {
-                            if (param.Name is "pattern" or "options")
+                            if (paramName is "pattern" or "options")
                                 continue;
 
-                            if (param.Name is "replacement" && method.Name is "Replace" && replacementPatterns.GetOrAdd(replacementPattern) is { } replacement)
+                            if (paramName is "replacement" && method.Name is "Replace" && replacementPatterns.GetOrAdd(replacementPattern) is { } replacement)
                             {
                                 _writer.Append($"replacementFunc: {replacement.GetReplacementFuncCall()}, ");
                                 continue;
                             }
 
-                            _writer.Append($"{param.Name}: {param.Name}, ");
+                            _writer.Append($"{paramName}: {paramName}, ");
                         }
 
                         _writer.TrimComma()
@@ -286,11 +272,11 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
 
                 var callCounter = 0;
 
-                foreach (var methodGroup in replacementPatternGroup.GroupBy(i => i.Method, SymbolEqualityComparer.Default))
+                foreach (var methodGroup in replacementPatternGroup.GroupBy(i => i.Method))
                 {
-                    var method = (IMethodSymbol)methodGroup.Key!;
+                    var method = methodGroup.Key;
 
-                    var paramsSignature = method.ToDisplayString(_parametersFormat);
+                    var paramsSignature = method.ParametersSignature;
 
                     const string prefix = "Replace(";
                     if (!paramsSignature.StartsWith(prefix))
@@ -303,20 +289,20 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
 
                     _writer.Append(
                         $"""
-                        public static {method.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} Replace{replacement.PatternId}_Call{callCounter}{paramsSignature}
+                        public static {method.ReturnType} Replace{replacement.PatternId}_Call{callCounter}{paramsSignature}
                             => regex.{method.Name}(
                         """
                     );
 
-                    foreach (var param in method.Parameters)
+                    foreach (var paramName in method.ParameterNames.Split(','))
                     {
-                        if (param.Name is "replacement")
+                        if (paramName is "replacement")
                         {
                             _writer.Append($"replacementFunc: {replacement.GetReplacementFuncCall()}, ");
                             continue;
                         }
 
-                        _writer.Append($"{param.Name}: {param.Name}, ");
+                        _writer.Append($"{paramName}: {paramName}, ");
                     }
 
                     _writer.TrimComma()
@@ -329,13 +315,44 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
         }
     }
 
+    private record struct PcreMethod(
+        string Name,
+        string ReturnType,
+        string ParametersSignature,
+        string ParameterNames
+    )
+    {
+        private static readonly SymbolDisplayFormat _parametersFormat
+            = new(
+                globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Included,
+                typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
+                genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
+                memberOptions: SymbolDisplayMemberOptions.IncludeParameters,
+                parameterOptions: SymbolDisplayParameterOptions.IncludeName
+                                  | SymbolDisplayParameterOptions.IncludeType
+                                  | SymbolDisplayParameterOptions.IncludeModifiers,
+                miscellaneousOptions: SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers
+                                      | SymbolDisplayMiscellaneousOptions.UseSpecialTypes
+                                      | SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier
+            );
+
+        public PcreMethod(IMethodSymbol method)
+            : this(
+                method.Name,
+                method.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+                method.ToDisplayString(_parametersFormat),
+                string.Join(",", method.Parameters.Select(i => i.Name))
+            )
+        { }
+    }
+
     private abstract record InvocationModel(
-        IMethodSymbol Method,
+        PcreMethod Method,
         InterceptableLocation Location
     );
 
     private sealed record StaticInvocationModel(
-        IMethodSymbol Method,
+        PcreMethod Method,
         InterceptableLocation Location,
         string Pattern,
         long Options,
@@ -343,7 +360,7 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
     ) : InvocationModel(Method, Location);
 
     private sealed record InstanceReplaceInvocationModel(
-        IMethodSymbol Method,
+        PcreMethod Method,
         InterceptableLocation Location,
         string ReplacementPattern
     ) : InvocationModel(Method, Location);
