@@ -237,6 +237,7 @@ public partial class IntegrationTests
         Check(regex.Replace("<abc>", "[$_]") == "<[<abc>]>");
         Check(regex.Replace("<abc>", "[$+]") == "<[c]>");
         Check(regex.Replace("<abc>", "[$+]") == "<[c]>");
+        Check(regex.Replace("<abc>", "{}[$1]\"\n") == "<{}[b]\"\n>");
 
         Check(NonInterceptedReplace("<abc>", "") == "<>");
         Check(NonInterceptedReplace("<abc>", "replacement") == "<replacement>");
@@ -271,6 +272,7 @@ public partial class IntegrationTests
         Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$_]") == "<[<abc>]>");
         Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$+]") == "<[c]>");
         Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "[$+]") == "<[c]>");
+        Check(PcreRegex.Replace("<abc>", "a+(?<group>b+)(c+)", "{}[$1]\"\n") == "<{}[b]\"\n>");
 
         return;
 

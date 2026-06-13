@@ -167,6 +167,8 @@ internal static partial class ReplacementPattern
         private readonly int _startIndex;
         private readonly int _length;
 
+        public string LiteralText => _text.Substring(_startIndex, _length);
+
         public LiteralPart(string text)
         {
             _text = text;
@@ -181,11 +183,8 @@ internal static partial class ReplacementPattern
             _length = length;
         }
 
-        public string GetText()
-            => _text.Substring(_startIndex, _length);
-
         public override string ToString()
-            => $"Literal: {GetText()}";
+            => $"Literal: {LiteralText}";
     }
 
     internal sealed partial class IndexedGroupPart : ReplacementPart

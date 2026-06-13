@@ -33,6 +33,23 @@ public class PcreCallsInterceptorGeneratorTests : BaseInterceptorTests<PcreCalls
                     _ = PcreRegex.Match("subject", "pattern");
                     _ = PcreRegex.Match("subject", "pattern", PcreOptions.Compiled);
                     _ = PcreRegex.Match("subject", "pattern2");
+
+                    _ = PcreRegex.Match("subject", "foo \n bar");
+                    _ = PcreRegex.Match("subject", "foo \r\n bar");
+
+                    _ = PcreRegex.Replace("subject", "pattern", "a \" b");
+                    _ = PcreRegex.Replace("subject", "pattern", @"a "" b");
+                    _ = PcreRegex.Replace("subject", "pattern", "a {} b");
+                    _ = PcreRegex.Replace("subject", "pattern", "a {{}} b");
+                    _ = PcreRegex.Replace("subject", "pattern", "a \n b");
+                    _ = PcreRegex.Replace("subject", "pattern", "a \r\n b");
+
+                    _ = PcreRegex.Replace("subject", "pattern", "a $1 \" b");
+                    _ = PcreRegex.Replace("subject", "pattern", @"a $1 "" b");
+                    _ = PcreRegex.Replace("subject", "pattern", "a $1 {} b");
+                    _ = PcreRegex.Replace("subject", "pattern", "a $1 {{}} b");
+                    _ = PcreRegex.Replace("subject", "foo \n bar", "a $1 \n b");
+                    _ = PcreRegex.Replace("subject", "foo \r\n bar", "a $1 \r\n b");
                 }
             }
             """
@@ -79,6 +96,7 @@ public class PcreCallsInterceptorGeneratorTests : BaseInterceptorTests<PcreCalls
 
                     _ = regex.Replace("subject", "");
                     _ = regex.Replace("subject", "replacement");
+
                     _ = regex.Replace("subject", "a $$ b");
                     _ = regex.Replace("subject", "a $& b");
                     _ = regex.Replace("subject", "a $0 b");
@@ -92,6 +110,19 @@ public class PcreCallsInterceptorGeneratorTests : BaseInterceptorTests<PcreCalls
                     _ = regex.Replace("subject", "a $_ b");
                     _ = regex.Replace("subject", "a $+ b");
                     _ = regex.Replace("subject", "a $+ b");
+
+                    _ = regex.Replace("subject", "a \" b");
+                    _ = regex.Replace("subject", @"a "" b");
+                    _ = regex.Replace("subject", "a {} b");
+                    _ = regex.Replace("subject", "a \n b");
+                    _ = regex.Replace("subject", "a \r\n b");
+
+                    _ = regex.Replace("subject", "a $1 \" b");
+                    _ = regex.Replace("subject", @"a $1 "" b");
+                    _ = regex.Replace("subject", "a $1 {} b");
+                    _ = regex.Replace("subject", "a $1 {{}} b");
+                    _ = regex.Replace("subject", "a $1 \n b");
+                    _ = regex.Replace("subject", "a $1 \r\n b");
                 }
             }
             """

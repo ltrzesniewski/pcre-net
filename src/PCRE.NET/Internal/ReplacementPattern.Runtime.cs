@@ -1,10 +1,13 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Text;
 
 namespace PCRE.Internal;
 
 internal partial class ReplacementPattern
 {
+    [SuppressMessage("ReSharper", "MergeIntoPattern")]
     public static Func<PcreMatch, string> Parse(string replacementPattern)
     {
         if (ReferenceEquals(replacementPattern, null))
@@ -17,7 +20,16 @@ internal partial class ReplacementPattern
             return static _ => string.Empty;
 
         if (parts.Count == 1 && parts[0] is LiteralPart literalPart)
-            return _ => literalPart.GetText();
+        {
+            var value = literalPart.LiteralText;
+            return _ => value;
+        }
+
+        if (parts.TrueForAll(static part => part is LiteralPart))
+        {
+            var value = string.Concat(parts.Select(static part => ((LiteralPart)part).LiteralText));
+            return _ => value;
+        }
 
         return match =>
         {

@@ -32,14 +32,8 @@ internal partial class ReplacementPattern
 
         public string GetLambda()
         {
-            switch (_parts.Count)
-            {
-                case 0:
-                    return "static _ => string.Empty";
-
-                case 1 when _parts[0] is LiteralPart literalPart:
-                    return $"static _ => {SymbolDisplay.FormatLiteral(literalPart.GetText(), true)}";
-            }
+            if (_parts.TrueForAll(static part => part is LiteralPart))
+                return $"static _ => {SymbolDisplay.FormatLiteral(string.Concat(_parts.Cast<LiteralPart>().Select(static i => i.LiteralText)), true)}";
 
             var writer = new CodeWriter();
 
@@ -74,7 +68,16 @@ internal partial class ReplacementPattern
     internal partial class LiteralPart
     {
         public override void AppendCode(CodeWriter writer)
-            => writer.Append(SymbolDisplay.FormatLiteral(GetText(), false));
+        {
+            // NOTE: With `quote: false`, SymbolDisplay.FormatLiteral does not escape double quotes.
+            var quotedValue = SymbolDisplay.FormatLiteral(LiteralText, true);
+
+            writer.Append(
+                quotedValue.Substring(1, quotedValue.Length - 2)
+                           .Replace("{", "{{")
+                           .Replace("}", "}}")
+            );
+        }
     }
 
     internal partial class IndexedGroupPart

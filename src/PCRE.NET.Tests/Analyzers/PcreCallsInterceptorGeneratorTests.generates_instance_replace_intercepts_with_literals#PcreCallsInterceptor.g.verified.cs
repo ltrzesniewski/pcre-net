@@ -80,14 +80,52 @@ namespace PCRE.Generated
         public static string Replace13_Call0(this global::PCRE.PcreRegex regex, string subject, string replacement)
             => regex.Replace(subject: subject, replacementFunc: _replacementFunc13);
 
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
+        public static string Replace14_Call0(this global::PCRE.PcreRegex regex, string subject, string replacement)
+            => regex.Replace(subject: subject, replacementFunc: _replacementFunc14);
+
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
+        public static string Replace15_Call0(this global::PCRE.PcreRegex regex, string subject, string replacement)
+            => regex.Replace(subject: subject, replacementFunc: _replacementFunc15);
+
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
+        public static string Replace16_Call0(this global::PCRE.PcreRegex regex, string subject, string replacement)
+            => regex.Replace(subject: subject, replacementFunc: _replacementFunc16);
+
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
+        public static string Replace17_Call0(this global::PCRE.PcreRegex regex, string subject, string replacement)
+            => regex.Replace(subject: subject, replacementFunc: _replacementFunc17);
+
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
+        public static string Replace18_Call0(this global::PCRE.PcreRegex regex, string subject, string replacement)
+            => regex.Replace(subject: subject, replacementFunc: _replacementFunc18);
+
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
+        public static string Replace19_Call0(this global::PCRE.PcreRegex regex, string subject, string replacement)
+            => regex.Replace(subject: subject, replacementFunc: _replacementFunc19);
+
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
+        public static string Replace20_Call0(this global::PCRE.PcreRegex regex, string subject, string replacement)
+            => regex.Replace(subject: subject, replacementFunc: _replacementFunc20);
+
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
+        public static string Replace21_Call0(this global::PCRE.PcreRegex regex, string subject, string replacement)
+            => regex.Replace(subject: subject, replacementFunc: _replacementFunc21);
+
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
+        public static string Replace22_Call0(this global::PCRE.PcreRegex regex, string subject, string replacement)
+            => regex.Replace(subject: subject, replacementFunc: _replacementFunc22);
+
         private static readonly global::System.Func<global::PCRE.PcreMatch, string> _replacementFunc0
-            = static _ => string.Empty;
+            = static _ => "";
 
         private static readonly global::System.Func<global::PCRE.PcreMatch, string> _replacementFunc1
             = static _ => "replacement";
 
         private static readonly global::System.Func<global::PCRE.PcreMatch, string> _replacementFunc2
-            = static match => $"a $ b";
+            = static _ => "a $ b";
 
         private static readonly global::System.Func<global::PCRE.PcreMatch, string> _replacementFunc3
             = static match => $"a {GetGroup(match, 0)} b";
@@ -121,6 +159,33 @@ namespace PCRE.Generated
 
         private static readonly global::System.Func<global::PCRE.PcreMatch, string> _replacementFunc13
             = static match => $"a {GetLastMatchedGroup(match)} b";
+
+        private static readonly global::System.Func<global::PCRE.PcreMatch, string> _replacementFunc14
+            = static _ => "a \" b";
+
+        private static readonly global::System.Func<global::PCRE.PcreMatch, string> _replacementFunc15
+            = static _ => "a {} b";
+
+        private static readonly global::System.Func<global::PCRE.PcreMatch, string> _replacementFunc16
+            = static _ => "a \n b";
+
+        private static readonly global::System.Func<global::PCRE.PcreMatch, string> _replacementFunc17
+            = static _ => "a \r\n b";
+
+        private static readonly global::System.Func<global::PCRE.PcreMatch, string> _replacementFunc18
+            = static match => $"a {GetGroup(match, 1) ?? "$1"} \" b";
+
+        private static readonly global::System.Func<global::PCRE.PcreMatch, string> _replacementFunc19
+            = static match => $"a {GetGroup(match, 1) ?? "$1"} {{}} b";
+
+        private static readonly global::System.Func<global::PCRE.PcreMatch, string> _replacementFunc20
+            = static match => $"a {GetGroup(match, 1) ?? "$1"} {{{{}}}} b";
+
+        private static readonly global::System.Func<global::PCRE.PcreMatch, string> _replacementFunc21
+            = static match => $"a {GetGroup(match, 1) ?? "$1"} \n b";
+
+        private static readonly global::System.Func<global::PCRE.PcreMatch, string> _replacementFunc22
+            = static match => $"a {GetGroup(match, 1) ?? "$1"} \r\n b";
 
         private static string? GetGroup(global::PCRE.PcreMatch match, int index)
             => match.TryGetGroup(index, out var group) ? group.Value : null;
