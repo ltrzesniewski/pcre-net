@@ -116,7 +116,7 @@ namespace PCRE.Generated
 
         private static global::PCRE.PcreRegex? _regex4;
         private static global::PCRE.PcreRegex Regex4 => _regex4 ??= new global::PCRE.PcreRegex(
-            "foo \n bar",
+            ")(",
             (global::PCRE.PcreOptions)0x0000000000000000
         );
 
@@ -124,13 +124,9 @@ namespace PCRE.Generated
         public static global::PCRE.PcreMatch Regex4_Call0_Match(string subject, string pattern)
             => Regex4.Match(subject: subject);
 
-        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
-        public static string Regex4_Call1_Replace(string subject, string pattern, string replacement)
-            => Regex4.Replace(subject: subject, replacementFunc: _replacementFunc8);
-
         private static global::PCRE.PcreRegex? _regex5;
         private static global::PCRE.PcreRegex Regex5 => _regex5 ??= new global::PCRE.PcreRegex(
-            "foo \r\n bar",
+            "foo \n bar",
             (global::PCRE.PcreOptions)0x0000000000000000
         );
 
@@ -140,7 +136,21 @@ namespace PCRE.Generated
 
         [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
         public static string Regex5_Call1_Replace(string subject, string pattern, string replacement)
-            => Regex5.Replace(subject: subject, replacementFunc: _replacementFunc9);
+            => Regex5.Replace(subject: subject, replacementFunc: _replacementFunc8);
+
+        private static global::PCRE.PcreRegex? _regex6;
+        private static global::PCRE.PcreRegex Regex6 => _regex6 ??= new global::PCRE.PcreRegex(
+            "foo \r\n bar",
+            (global::PCRE.PcreOptions)0x0000000000000000
+        );
+
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
+        public static global::PCRE.PcreMatch Regex6_Call0_Match(string subject, string pattern)
+            => Regex6.Match(subject: subject);
+
+        [global::System.Runtime.CompilerServices.InterceptsLocationAttribute(0, "...")]
+        public static string Regex6_Call1_Replace(string subject, string pattern, string replacement)
+            => Regex6.Replace(subject: subject, replacementFunc: _replacementFunc9);
 
         private static readonly global::System.Func<global::PCRE.PcreMatch, string> _replacementFunc0
             = static _ => "a \" b";

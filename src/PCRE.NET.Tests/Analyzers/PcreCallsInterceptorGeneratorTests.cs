@@ -34,6 +34,8 @@ public class PcreCallsInterceptorGeneratorTests : BaseInterceptorTests<PcreCalls
                     _ = PcreRegex.Match("subject", "pattern", PcreOptions.Compiled);
                     _ = PcreRegex.Match("subject", "pattern2");
 
+                    _ = PcreRegex.Match("subject", ")("); // Invalid pattern
+
                     _ = PcreRegex.Match("subject", "foo \n bar");
                     _ = PcreRegex.Match("subject", "foo \r\n bar");
 
@@ -73,9 +75,15 @@ public class PcreCallsInterceptorGeneratorTests : BaseInterceptorTests<PcreCalls
                     _ = PcreRegex.IsMatch(GetString(), GetString(), PcreOptions.Caseless);
                     _ = PcreRegex.Match(GetString(), GetString(), PcreOptions.Caseless, 42);
                     _ = PcreRegex.IsMatch(GetString(), GetString(), PcreOptions.Caseless, 42);
+
+                    _ = PcreRegex.Match(GetString(), "pattern", GetPcreOptions());
+                    _ = PcreRegex.IsMatch(GetString(), "pattern", GetPcreOptions());
+                    _ = PcreRegex.Match(GetString(), "pattern", GetPcreOptions(), 42);
+                    _ = PcreRegex.IsMatch(GetString(), "pattern", GetPcreOptions(), 42);
                 }
 
                 static string GetString() => "foo";
+                static PcreOptions GetPcreOptions() => PCRE.PcreOptions.None;
             }
             """
         );

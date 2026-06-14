@@ -198,6 +198,11 @@ public partial class IntegrationTests
         Check(PcreRegex.Substitute("a b c", @"\s+", "-") == "a-b c");
         Check(PcreRegex.Substitute("a b c", @"\s+", "-", PcreOptions.Compiled, PcreSubstituteOptions.SubstituteGlobal) == "a-b-c");
 
+        // Invalid pattern
+        Check(FailsToCompile(")("));
+        Check(FailsToCompile(")("));
+        Check(PcreRegex.IsMatch("foo", "()"));
+
         // Out-of-order parameters
         Check(PcreRegex.IsMatch(pattern: "f.o", startIndex: GetSubjectAndStartIndex(out var subject), options: PcreOptions.Caseless, subject: subject));
 
@@ -209,6 +214,19 @@ public partial class IntegrationTests
         {
             subject = "FOO";
             return 0;
+        }
+
+        static bool FailsToCompile(string pattern)
+        {
+            try
+            {
+                _ = PcreRegex.IsMatch("foo", pattern);
+                return false;
+            }
+            catch (PcrePatternException)
+            {
+                return true;
+            }
         }
     }
 
