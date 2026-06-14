@@ -55,6 +55,9 @@ internal partial class ReplacementPattern
         public abstract void AppendCode(CodeWriter writer);
         public virtual void AppendHelpers(CodeWriter writer, ref AppendedHelpers appendedHelpers) { }
 
+        protected static string StringLiteral(string value)
+            => SymbolDisplay.FormatLiteral(value, true);
+
         protected static bool CanAppendHelper(AppendedHelpers helper, ref AppendedHelpers appendedHelpers)
         {
             if ((appendedHelpers & helper) != 0)
@@ -69,8 +72,9 @@ internal partial class ReplacementPattern
     {
         public override void AppendCode(CodeWriter writer)
         {
-            // NOTE: With `quote: false`, SymbolDisplay.FormatLiteral does not escape double quotes.
-            var quotedValue = SymbolDisplay.FormatLiteral(LiteralText, true);
+            // NOTE: With `quote: false`, SymbolDisplay.FormatLiteral does not escape double quotes,
+            // so we go through a literal.
+            var quotedValue = StringLiteral(LiteralText);
 
             writer.Append(
                 quotedValue.Substring(1, quotedValue.Length - 2)
@@ -87,7 +91,7 @@ internal partial class ReplacementPattern
             writer.Append($$"""{GetGroup(match, {{_index}})""");
 
             if (_fallback?.Length > 0)
-                writer.Append(" ?? ").Append(SymbolDisplay.FormatLiteral(_fallback, true));
+                writer.Append(" ?? ").Append(StringLiteral(_fallback));
 
             writer.Append("}");
         }
@@ -113,12 +117,12 @@ internal partial class ReplacementPattern
         {
             writer.Append(
                 _index >= 0
-                    ? $$"""{GetGroup(match, {{SymbolDisplay.FormatLiteral(_name, true)}}, {{_index}})"""
-                    : $$"""{GetGroup(match, {{SymbolDisplay.FormatLiteral(_name, true)}})"""
+                    ? $$"""{GetGroup(match, {{StringLiteral(_name)}}, {{_index}})"""
+                    : $$"""{GetGroup(match, {{StringLiteral(_name)}})"""
             );
 
             if (_fallback?.Length > 0)
-                writer.Append(" ?? ").Append(SymbolDisplay.FormatLiteral(_fallback, true));
+                writer.Append(" ?? ").Append(StringLiteral(_fallback));
 
             writer.Append("}");
         }

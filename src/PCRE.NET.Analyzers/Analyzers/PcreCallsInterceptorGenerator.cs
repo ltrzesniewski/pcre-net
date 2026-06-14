@@ -237,7 +237,7 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
                             """
                         );
 
-                        foreach (var paramName in method.ParameterNames.Split(','))
+                        foreach (var paramName in method.GetParameterNames())
                         {
                             if (paramName is "pattern" or "options")
                                 continue;
@@ -294,7 +294,7 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
                         """
                     );
 
-                    foreach (var paramName in method.ParameterNames.Split(','))
+                    foreach (var paramName in method.GetParameterNames())
                     {
                         if (paramName is "replacement")
                         {
@@ -315,14 +315,14 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
         }
     }
 
-    private record struct PcreMethod(
+    private readonly record struct PcreMethod(
         string Name,
         string ReturnType,
         string ParametersSignature,
         string ParameterNames
     )
     {
-        private static readonly SymbolDisplayFormat _parametersFormat
+        private static readonly SymbolDisplayFormat _parametersSignatureFormat
             = new(
                 globalNamespaceStyle: SymbolDisplayGlobalNamespaceStyle.Included,
                 typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
@@ -340,10 +340,13 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
             : this(
                 method.Name,
                 method.ReturnType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-                method.ToDisplayString(_parametersFormat),
+                method.ToDisplayString(_parametersSignatureFormat),
                 string.Join(",", method.Parameters.Select(i => i.Name))
             )
         { }
+
+        public string[] GetParameterNames()
+            => ParameterNames.Split(',');
     }
 
     private abstract record InvocationModel(
