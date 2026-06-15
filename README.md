@@ -41,6 +41,10 @@ This is a friendly API that is very similar to .NET's `System.Text.RegularExpres
       - Callouts for matches and substitutions
 - String splitting on matches: `Split`
 
+A source generator is provided from v1.5.0 for Roslyn 5.0 using C# 11 and above:
+- Static calls such as `PcreRegex.IsMatch(subject, pattern)` with *constant* patterns and options will be permanently cached on their first use
+- Constant replacement strings used in `Replace` methods will be pre-compiled
+
 ### The Span API
 
 `PcreRegex` objects provide overloads which take a `ReadOnlySpan<char>` parameter for the following methods:
