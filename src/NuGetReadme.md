@@ -11,6 +11,7 @@ The following systems are supported:
 
 - Windows x64
 - Windows x86
+- Windows arm64
 - Linux x64
 - Linux arm64
 - macOS arm64
