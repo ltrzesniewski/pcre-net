@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>PCRE.Benchmarks</RootNamespace>
     <DefaultItemExcludes>$(DefaultItemExcludes);BenchmarkDotNet.Artifacts/**</DefaultItemExcludes>
+    <PreferNativeArm64 Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">true</PreferNativeArm64>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(PcreNetTestBuild)' != 'true'">

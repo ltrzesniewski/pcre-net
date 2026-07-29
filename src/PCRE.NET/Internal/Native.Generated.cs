@@ -214,25 +214,31 @@ internal readonly unsafe partial struct Native8Bit : INative
     {
         try
         {
-            var lib = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            Lib lib = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 ? new WinLib()
                 : RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
                     ? new LinuxLib()
                     : RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
-                        ? (Lib)new OSXLib()
+                        ? new OSXLib()
                         : throw new PlatformNotSupportedException();
 
             lib.get_error_message(0, null, 0);
             return lib;
         }
-        catch (DllNotFoundException) when (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        catch (Exception ex) when (ex is DllNotFoundException or BadImageFormatException && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             // Used in the .NET Framework
-            return Environment.Is64BitProcess
-                ? RuntimeInformation.ProcessArchitecture == Architecture.Arm64
-                    ? new WinArm64Lib()
-                    : new Win64Lib()
-                : new Win32Lib();
+
+            Lib lib = RuntimeInformation.ProcessArchitecture switch
+            {
+                Architecture.X86   => new Win32Lib(),
+                Architecture.X64   => new Win64Lib(),
+                Architecture.Arm64 => new WinArm64Lib(),
+                _                  => throw new PlatformNotSupportedException()
+            };
+
+            lib.get_error_message(0, null, 0);
+            return lib;
         }
     }
 
@@ -1118,25 +1124,31 @@ internal readonly unsafe partial struct Native16Bit : INative
     {
         try
         {
-            var lib = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            Lib lib = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 ? new WinLib()
                 : RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
                     ? new LinuxLib()
                     : RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
-                        ? (Lib)new OSXLib()
+                        ? new OSXLib()
                         : throw new PlatformNotSupportedException();
 
             lib.get_error_message(0, null, 0);
             return lib;
         }
-        catch (DllNotFoundException) when (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        catch (Exception ex) when (ex is DllNotFoundException or BadImageFormatException && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             // Used in the .NET Framework
-            return Environment.Is64BitProcess
-                ? RuntimeInformation.ProcessArchitecture == Architecture.Arm64
-                    ? new WinArm64Lib()
-                    : new Win64Lib()
-                : new Win32Lib();
+
+            Lib lib = RuntimeInformation.ProcessArchitecture switch
+            {
+                Architecture.X86   => new Win32Lib(),
+                Architecture.X64   => new Win64Lib(),
+                Architecture.Arm64 => new WinArm64Lib(),
+                _                  => throw new PlatformNotSupportedException()
+            };
+
+            lib.get_error_message(0, null, 0);
+            return lib;
         }
     }
 
