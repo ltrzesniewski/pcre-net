@@ -99,7 +99,7 @@ jobs:
             msbuild-platform: x64
 
           - platform: arm64
-            runner: windows-11-vs2026-arm64
+            runner: windows-11-vs2026-arm
             msbuild-platform: ARM64
 
     steps:
