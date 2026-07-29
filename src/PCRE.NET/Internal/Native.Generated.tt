@@ -35,6 +35,7 @@ var platforms = new[] {
     new PlatformDef("Win", libName + ".dll"),
     new PlatformDef("Win32", libName + ".x86.dll"),
     new PlatformDef("Win64", libName + ".x64.dll"),
+    new PlatformDef("WinArm64", libName + ".arm64.dll"),
     new PlatformDef("Linux", libName + ".so"),
     new PlatformDef("OSX", libName + ".dylib")
 };
@@ -106,7 +107,9 @@ internal readonly unsafe partial struct Native<#= bit #>Bit : INative
         {
             // Used in the .NET Framework
             return Environment.Is64BitProcess
-                ? new Win64Lib()
+                ? RuntimeInformation.ProcessArchitecture == Architecture.Arm64
+                    ? new WinArm64Lib()
+                    : new Win64Lib()
                 : new Win32Lib();
         }
     }
