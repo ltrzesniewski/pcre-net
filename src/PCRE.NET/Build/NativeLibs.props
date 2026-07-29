@@ -1,0 +1,34 @@
+<Project>
+  <ItemGroup>
+    <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\..\..\lib\PCRE.NET.Native.x86.dll" Platform="win-x86" />
+    <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\..\..\lib\PCRE.NET.Native.x64.dll" Platform="win-x64" />
+    <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\..\..\lib\PCRE.NET.Native.arm64.dll" Platform="win-arm64" />
+    <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\..\..\lib\PCRE.NET.Native.x64.so" Platform="linux-x64" />
+    <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\..\..\lib\PCRE.NET.Native.arm64.so" Platform="linux-arm64" />
+    <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\..\..\lib\PCRE.NET.Native.arm64.dylib" Platform="osx-arm64" />
+    <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\..\..\lib\PCRE.NET.Native.x64.dylib" Platform="osx-x64" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <UseCurrentRuntimeIdentifier Condition="'$(PcreNetOutputNativeLibs)' == 'true'">true</UseCurrentRuntimeIdentifier>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PcreNetNativeLib Update="@(PcreNetNativeLib)" Exists="$([System.IO.File]::Exists('%(FullPath)'))" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(PcreNetOutputNativeLibs)' == 'true'">
+    <None Include="@(PcreNetNativeLib->WithMetadataValue('Exists', 'true'))"
+          Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'"
+          Link="%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest"
+          Visible="false" />
+
+    <None Include="@(PcreNetNativeLib->WithMetadataValue('Exists', 'true')->WithMetadataValue('Platform', '$(RuntimeIdentifier)'))"
+          Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'"
+          Link="PCRE.NET.Native%(Extension)"
+          CopyToOutputDirectory="PreserveNewest"
+          Visible="false" />
+  </ItemGroup>
+
+</Project>

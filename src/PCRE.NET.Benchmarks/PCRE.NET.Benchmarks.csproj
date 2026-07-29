@@ -3,6 +3,7 @@
     <TargetFrameworks>net10.0;net481</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <RootNamespace>PCRE.Benchmarks</RootNamespace>
+    <PcreNetOutputNativeLibs>true</PcreNetOutputNativeLibs>
     <DefaultItemExcludes>$(DefaultItemExcludes);BenchmarkDotNet.Artifacts/**</DefaultItemExcludes>
     <PreferNativeArm64 Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">true</PreferNativeArm64>
   </PropertyGroup>
@@ -20,20 +21,11 @@
     <PackageReference Include="BenchmarkDotNet" Version="0.15.8" />
   </ItemGroup>
 
+  <Import Project="..\PCRE.NET\Build\NativeLibs.props" />
+
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
     <!-- Needed for binding redirects -->
     <PackageReference Include="System.Reflection.Metadata" Version="10.0.8" />
-
-    <PcreNetNative Include="..\..\lib\PCRE.NET.Native.x86.dll" />
-    <PcreNetNative Include="..\..\lib\PCRE.NET.Native.x64.dll" />
-    <PcreNetNative Include="..\..\lib\PCRE.NET.Native.arm64.dll" />
-
-    <PcreNetNative Update="@(PcreNetNative)" Exists="$([System.IO.File]::Exists('%(FullPath)'))" Visible="false" />
-
-    <None Include="@(PcreNetNative->WithMetadataValue('Exists', 'true'))"
-          Link="%(Filename)%(Extension)"
-          CopyToOutputDirectory="PreserveNewest"
-          Visible="false" />
   </ItemGroup>
 
 </Project>
