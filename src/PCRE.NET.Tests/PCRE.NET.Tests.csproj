@@ -4,6 +4,7 @@
     <RootNamespace>PCRE.Tests</RootNamespace>
     <PcreNetOutputNativeLibs>true</PcreNetOutputNativeLibs>
     <DefineConstants Condition="'$(ForceNetStandard)' == 'true'">$(DefineConstants);FORCE_NET_STANDARD</DefineConstants>
+    <UseCurrentRuntimeIdentifier Condition="'$(TargetFramework)' != 'net481' and '$(PlatformTarget)' == ''">true</UseCurrentRuntimeIdentifier>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(PcreNetTestBuild)' != 'true'">
@@ -27,6 +28,8 @@
     <PackageReference Include="Verify.NUnit" Version="31.19.0" />
     <PackageReference Include="Verify.SourceGenerators" Version="2.5.0" />
   </ItemGroup>
+
+  <Import Project="../PCRE.NET/Build/NativeLibs.props" />
 
   <ItemGroup>
     <None Include="..\PCRE\testdata\test*" Link="Pcre/TestCases/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />

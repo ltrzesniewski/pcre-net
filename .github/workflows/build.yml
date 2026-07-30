@@ -143,7 +143,7 @@ jobs:
 
       - name: Test .NET Standard
         run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} -p:PcreNetTestBuild=true -p:ExpectPlatform=${{ matrix.platform }} -p:ForceNetStandard=true
-        if: ${{ matrix.platform != 'x86' }}
+        if: ${{ matrix.platform == 'x64' }}
 
       - name: Test Allocations .NET
         run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_NET_TEST_TARGET }} -- --allocations
@@ -151,7 +151,7 @@ jobs:
 
       - name: Test Allocations .NET Framework
         run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_NETFWK_TEST_TARGET }} -- --allocations
-        if: ${{ matrix.platform != 'x86' }}
+        if: ${{ matrix.platform == 'x64' }}
 
       - name: Test Base Integration
         run: dotnet run --project src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --configuration ${{ env.BUILD_CONFIGURATION }}

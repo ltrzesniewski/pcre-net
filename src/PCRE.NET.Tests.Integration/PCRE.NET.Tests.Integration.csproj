@@ -9,6 +9,7 @@
     <PublishAot>true</PublishAot>
     <ControlFlowGuard>Guard</ControlFlowGuard>
     <VerifyReferenceAotCompatibility>true</VerifyReferenceAotCompatibility>
+    <UseCurrentRuntimeIdentifier>true</UseCurrentRuntimeIdentifier>
     <!-- <PreferNativeArm64>true</PreferNativeArm64> TODO: Add .NET Framework integration tests -->
   </PropertyGroup>
 

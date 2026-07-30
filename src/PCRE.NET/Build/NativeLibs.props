@@ -9,10 +9,6 @@
     <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\..\..\lib\PCRE.NET.Native.x64.dylib" Platform="osx-x64" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <UseCurrentRuntimeIdentifier Condition="'$(PcreNetOutputNativeLibs)' == 'true'">true</UseCurrentRuntimeIdentifier>
-  </PropertyGroup>
-
   <ItemGroup>
     <PcreNetNativeLib Update="@(PcreNetNativeLib)" Exists="$([System.IO.File]::Exists('%(FullPath)'))" Visible="false" />
   </ItemGroup>
