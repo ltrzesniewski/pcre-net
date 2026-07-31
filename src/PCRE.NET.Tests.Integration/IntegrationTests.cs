@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace PCRE.Tests.Integration;
 
@@ -17,6 +18,7 @@ public partial class IntegrationTests
     {
         _success = true;
 
+        WriteRuntimeInformation();
         CheckArgs(args, out var aot, out var build);
         Safe(() => RunTestUtf16(PcreOptions.None));
         Safe(() => RunTestUtf16(PcreOptions.Compiled));
@@ -29,6 +31,19 @@ public partial class IntegrationTests
 
         PrintSummary();
         return _success;
+    }
+
+    private static void WriteRuntimeInformation()
+    {
+        Header("Runtime Information");
+
+        Info("Framework", $"{RuntimeInformation.FrameworkDescription} ({(Environment.Is64BitProcess ? 64 : 32)}-bit)");
+        Info("Operating System", RuntimeInformation.OSDescription);
+        Info("Architecture", $"{RuntimeInformation.ProcessArchitecture} process on {RuntimeInformation.OSArchitecture} OS");
+#if NET
+        Info("Runtime Identifier", RuntimeInformation.RuntimeIdentifier);
+        Info("Dynamic Code", $"{(RuntimeFeature.IsDynamicCodeSupported ? "Supported" : "Not supported")}, {(RuntimeFeature.IsDynamicCodeCompiled ? "compiled" : "not compiled")}");
+#endif
     }
 
     private void CheckArgs(string[] args, out bool aot, out bool build)

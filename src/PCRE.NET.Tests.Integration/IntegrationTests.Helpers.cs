@@ -15,9 +15,12 @@ public partial class IntegrationTests
 
     private static void Header(string title)
     {
-        Console.WriteLine();
-        Console.WriteLine($"{_bold}{title}{_reset}");
+        WriteLine();
+        WriteLine($"{_bold}{title}{_reset}");
     }
+
+    private static void Info(string label, string? value)
+        => WriteLine($"  {_green}{label}:{_reset} {value}");
 
     private void Check(bool success, [CallerArgumentExpression(nameof(success))] string? code = null)
     {
@@ -29,18 +32,18 @@ public partial class IntegrationTests
 
     private static void Pass(string? message)
     {
-        Console.WriteLine($"  {_green}PASSED:{_reset} {message}");
+        WriteLine($"  {_green}PASSED:{_reset} {message}");
     }
 
     private void Fail(string? message)
     {
-        Console.WriteLine($"  {_red}FAILED:{_reset} {message}");
+        WriteLine($"  {_red}FAILED:{_reset} {message}");
         _success = false;
     }
 
     private static void Ignore()
     {
-        Console.WriteLine($"  {_yellow}IGNORED{_reset}");
+        WriteLine($"  {_yellow}IGNORED{_reset}");
     }
 
     private void Safe(Action action)
@@ -57,8 +60,11 @@ public partial class IntegrationTests
 
     private void PrintSummary()
     {
-        Console.WriteLine();
-        Console.WriteLine($"{_bold}Integration tests: {(_success ? $"{_green}PASSED" : $"{_red}FAILED")}{_reset}");
-        Console.WriteLine();
+        WriteLine();
+        WriteLine($"{_bold}Integration tests: {(_success ? $"{_green}PASSED" : $"{_red}FAILED")}{_reset}");
+        WriteLine();
     }
+
+    private static void WriteLine(string? message = null)
+        => Console.WriteLine(message);
 }
