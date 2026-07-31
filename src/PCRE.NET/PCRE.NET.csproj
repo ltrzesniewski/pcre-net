@@ -76,7 +76,7 @@
 
     <None Include="@(PcreNetNativeLib->WithMetadataValue('ToPackage', 'true'))"
           Pack="true"
-          PackagePath="runtimes\%(Platform)\native\PCRE.NET.Native%(Extension)"
+          PackagePath="runtimes\%(RuntimeIdentifier)\native\PCRE.NET.Native%(Extension)"
           Visible="false" />
   </ItemGroup>
 
