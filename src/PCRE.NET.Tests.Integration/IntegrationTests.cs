@@ -18,7 +18,8 @@ public partial class IntegrationTests
     {
         _success = true;
 
-        WriteRuntimeInformation();
+        Safe(WriteRuntimeInformation);
+        Safe(PcreBuildInformation);
         CheckArgs(args, out var aot, out var build);
         Safe(() => RunTestUtf16(PcreOptions.None));
         Safe(() => RunTestUtf16(PcreOptions.Compiled));
@@ -44,6 +45,38 @@ public partial class IntegrationTests
         Info("Runtime Identifier", RuntimeInformation.RuntimeIdentifier);
         Info("Dynamic Code", $"{(RuntimeFeature.IsDynamicCodeSupported ? "Supported" : "Not supported")}, {(RuntimeFeature.IsDynamicCodeCompiled ? "compiled" : "not compiled")}");
 #endif
+    }
+
+    private static void PcreBuildInformation()
+    {
+        Header("PCRE2 Build Information");
+
+        Info("Version", PcreBuildInfo.Version);
+        Info("JIT", PcreBuildInfo.Jit ? PcreBuildInfo.JitTarget : "Not supported");
+        Info("Unicode", PcreBuildInfo.Unicode ? PcreBuildInfo.UnicodeVersion : "Not supported");
+        WriteLine();
+        Info("Default Newline", PcreBuildInfo.NewLine.ToString());
+        Info("Default \\R", PcreBuildInfo.BackslashR.ToString());
+        Info("Compiled widths", string.Join(", ", new[]
+        {
+            (PcreBuildInfo.CompiledWidths & 1 << 0) != 0 ? "8-bit" : null,
+            (PcreBuildInfo.CompiledWidths & 1 << 1) != 0 ? "16-bit" : null,
+            (PcreBuildInfo.CompiledWidths & 1 << 2) != 0 ? "32-bit" : null
+        }.Where(i => i is not null)));
+        WriteLine();
+        PcreInfo(PcreBuildInfo.DepthLimit);
+        PcreInfo(PcreBuildInfo.EffectiveLinkSize);
+        PcreInfo(PcreBuildInfo.HeapLimit);
+        PcreInfo(PcreBuildInfo.LinkSize);
+        PcreInfo(PcreBuildInfo.MatchLimit);
+        PcreInfo(PcreBuildInfo.NeverBackslashC);
+        PcreInfo(PcreBuildInfo.ParensLimit);
+        PcreInfo(PcreBuildInfo.TablesLength);
+
+        return;
+
+        void PcreInfo<T>(T value, [CallerArgumentExpression(nameof(value))] string? code = null)
+            => Info(code?.StartsWith(nameof(PcreBuildInfo)) is true ? code.Substring(nameof(PcreBuildInfo).Length + 1) : "Unknown", value?.ToString());
     }
 
     private void CheckArgs(string[] args, out bool aot, out bool build)
