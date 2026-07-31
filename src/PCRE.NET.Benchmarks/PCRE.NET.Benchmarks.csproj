@@ -3,7 +3,6 @@
     <TargetFrameworks>net10.0;$(NetFrameworkTarget)</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <RootNamespace>PCRE.Benchmarks</RootNamespace>
-    <PcreNetOutputNativeLibs>true</PcreNetOutputNativeLibs>
     <DefaultItemExcludes>$(DefaultItemExcludes);BenchmarkDotNet.Artifacts/**</DefaultItemExcludes>
   </PropertyGroup>
 

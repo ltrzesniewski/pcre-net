@@ -10,7 +10,7 @@
     <DefineConstants Condition="'$(ExpectPlatform)' == 'arm64'">$(DefineConstants);EXPECT_ARM64</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(PcreNetOutputNativeLibs)' == 'true'">
+  <ItemGroup Condition="'$(OutputType)' == 'Exe' or '$(IsTestProject)' == 'true'">
     <None Include="@(PcreNetNativeLib->WithMetadataValue('Exists', 'true'))"
           Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'"
           Link="%(Filename)%(Extension)"
