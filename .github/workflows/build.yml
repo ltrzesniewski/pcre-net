@@ -17,6 +17,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
 
     strategy:
+      fail-fast: false
       matrix:
         include:
           - name: Linux x64
@@ -88,6 +89,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
 
     strategy:
+      fail-fast: false
       matrix:
         include:
           - platform: x86
@@ -210,31 +212,54 @@ jobs:
           if-no-files-found: error
 
   integration-tests:
-    name: Integration Tests ${{ matrix.name }}
+    name: ${{ matrix.name }}
     runs-on: ${{ matrix.runner }}
     needs:
       - pack
 
     strategy:
+      fail-fast: false
       matrix:
         include:
           - name: Linux x64
             runner: ubuntu-latest
+            build-args: ""
+            run-args: --full
 
           - name: Linux arm64
             runner: ubuntu-24.04-arm
+            build-args: ""
+            run-args: --full
 
           - name: macOS arm64
             runner: macos-15
+            build-args: ""
+            run-args: --full
 
           - name: macOS x64
             runner: macos-15-intel
+            build-args: ""
+            run-args: --full
 
           - name: Windows x64
             runner: windows-latest
+            build-args: ""
+            run-args: --full
+
+          - name: Windows x64, .NET Framework
+            runner: windows-latest
+            build-args: -p:PcreNetIntegrationTestNetFramework=net481
+            run-args: --build
 
           - name: Windows arm64
             runner: windows-11-vs2026-arm
+            build-args: ""
+            run-args: --full
+
+          - name: Windows arm64, .NET Framework
+            runner: windows-11-vs2026-arm
+            build-args: -p:PcreNetIntegrationTestNetFramework=net481
+            run-args: --build
 
     steps:
       - name: Checkout
@@ -253,7 +278,7 @@ jobs:
           skip-decompress: true
 
       - name: Build Integration Tests
-        run: dotnet publish src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --output ./bin/aot -p:PcreNetIntegrationTest=true
+        run: dotnet publish src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --output ./bin/publish -p:PcreNetIntegrationTest=true ${{ matrix.build-args }}
 
       - name: Run Integration Tests
-        run: ./bin/aot/PCRE.NET.Tests.Integration --full
+        run: ./bin/publish/PCRE.NET.Tests.Integration ${{ matrix.run-args }}

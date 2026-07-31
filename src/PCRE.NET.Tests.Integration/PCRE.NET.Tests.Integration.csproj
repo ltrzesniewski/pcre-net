@@ -1,12 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework Condition="'$(PcreNetIntegrationTestNetFramework)' != ''">$(PcreNetIntegrationTestNetFramework)</TargetFramework>
     <LangVersion>11.0</LangVersion>
     <Nullable>enable</Nullable>
     <RootNamespace>PCRE.Tests.Integration</RootNamespace>
     <OutputType>Exe</OutputType>
-    <PublishAot>true</PublishAot>
     <ControlFlowGuard>Guard</ControlFlowGuard>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(PcreNetIntegrationTestNetFramework)' == ''">
+    <PublishAot>true</PublishAot>
+    <SelfContained>true</SelfContained>
     <VerifyReferenceAotCompatibility>true</VerifyReferenceAotCompatibility>
     <UseCurrentRuntimeIdentifier>true</UseCurrentRuntimeIdentifier>
     <!-- <PreferNativeArm64>true</PreferNativeArm64> TODO: Add .NET Framework integration tests -->
