@@ -13,6 +13,8 @@
     <!-- <PreferNativeArm64>true</PreferNativeArm64> TODO: Add .NET Framework integration tests -->
   </PropertyGroup>
 
+  <Import Project="../Version.props" />
+
   <Choose>
     <When Condition="'$(PcreNetIntegrationTest)' == 'true'">
       <PropertyGroup>
@@ -20,7 +22,7 @@
       </PropertyGroup>
 
       <ItemGroup>
-        <PackageReference Include="PCRE.NET" Version="$(PackageVersion)" />
+        <PackageReference Include="PCRE.NET" Version="[$(Version)]" />
       </ItemGroup>
     </When>
 
