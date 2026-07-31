@@ -29,8 +29,6 @@
     <PackageReference Include="Verify.SourceGenerators" Version="2.5.0" />
   </ItemGroup>
 
-  <Import Project="../PCRE.NET/Build/NativeLibs.props" />
-
   <ItemGroup>
     <None Include="..\PCRE\testdata\test*" Link="Pcre/TestCases/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     <None Include="..\NuGetReadme.md" CopyToOutputDirectory="PreserveNewest" Visible="false" />

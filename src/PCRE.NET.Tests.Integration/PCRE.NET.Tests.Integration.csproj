@@ -34,7 +34,6 @@
     </Otherwise>
   </Choose>
 
-  <Import Project="../PCRE.NET/Build/NativeLibs.props" Condition="'$(PcreNetIntegrationTest)' != 'true'" />
   <Import Project="../PCRE.NET/Build/PCRE.NET.targets" Condition="'$(PcreNetIntegrationTest)' != 'true'" />
 
 </Project>
