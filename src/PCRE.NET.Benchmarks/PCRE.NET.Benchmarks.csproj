@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net10.0;net481</TargetFrameworks>
+    <TargetFrameworks>net10.0;$(NetFrameworkTarget)</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <RootNamespace>PCRE.Benchmarks</RootNamespace>
     <PcreNetOutputNativeLibs>true</PcreNetOutputNativeLibs>
@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <UseCurrentRuntimeIdentifier Condition="'$(TargetFramework)' != 'net481'">true</UseCurrentRuntimeIdentifier>
-    <PreferNativeArm64 Condition="'$(TargetFramework)' == 'net481'">true</PreferNativeArm64>
+    <UseCurrentRuntimeIdentifier Condition="'$(TargetFramework)' != '$(NetFrameworkTarget)'">true</UseCurrentRuntimeIdentifier>
+    <PreferNativeArm64 Condition="'$(TargetFramework)' == '$(NetFrameworkTarget)'">true</PreferNativeArm64>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(PcreNetTestBuild)' != 'true'">

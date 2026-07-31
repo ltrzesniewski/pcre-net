@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net10.0;net481</TargetFrameworks>
+    <TargetFrameworks>net10.0;$(NetFrameworkTarget)</TargetFrameworks>
     <RootNamespace>PCRE.Tests</RootNamespace>
     <PcreNetOutputNativeLibs>true</PcreNetOutputNativeLibs>
     <DefineConstants Condition="'$(ForceNetStandard)' == 'true'">$(DefineConstants);FORCE_NET_STANDARD</DefineConstants>
-    <UseCurrentRuntimeIdentifier Condition="'$(TargetFramework)' != 'net481' and '$(PlatformTarget)' == ''">true</UseCurrentRuntimeIdentifier>
+    <UseCurrentRuntimeIdentifier Condition="'$(TargetFramework)' != '$(NetFrameworkTarget)' and '$(PlatformTarget)' == ''">true</UseCurrentRuntimeIdentifier>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(PcreNetTestBuild)' != 'true'">

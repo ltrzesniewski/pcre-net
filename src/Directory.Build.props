@@ -18,6 +18,7 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' != ''">true</ContinuousIntegrationBuild>
     <NoWarn>$(NoWarn);CA1510</NoWarn>
+    <NetFrameworkTarget>net481</NetFrameworkTarget>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(NCrunch)' == '1'">
