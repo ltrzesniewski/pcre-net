@@ -1,1 +1,3 @@
-<Project />
+<Project>
+  <Import Project="../Directory.Build.props" Condition="'$(PcreNetIntegrationTest)' != 'true'" />
+</Project>

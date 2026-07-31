@@ -12,26 +12,24 @@
     <!-- <PreferNativeArm64>true</PreferNativeArm64> TODO: Add .NET Framework integration tests -->
   </PropertyGroup>
 
-  <Import Project="../Version.props" />
+  <!-- Integration Test Mode -->
 
-  <Choose>
-    <When Condition="'$(PcreNetIntegrationTest)' == 'true'">
-      <PropertyGroup>
-        <DefineConstants>$(DefineConstants);PCRENET_INTEGRATION_TEST</DefineConstants>
-      </PropertyGroup>
+  <Import Project="../Version.props" Condition="'$(PcreNetIntegrationTest)' == 'true'" />
 
-      <ItemGroup>
-        <PackageReference Include="PCRE.NET" Version="[$(Version)]" />
-      </ItemGroup>
-    </When>
+  <PropertyGroup Condition="'$(PcreNetIntegrationTest)' == 'true'">
+    <DefineConstants>$(DefineConstants);PCRENET_INTEGRATION_TEST</DefineConstants>
+  </PropertyGroup>
 
-    <Otherwise>
-      <ItemGroup>
-        <ProjectReference Include="../PCRE.NET/PCRE.NET.csproj" />
-        <ProjectReference Include="../PCRE.NET.Analyzers/PCRE.NET.Analyzers.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
-      </ItemGroup>
-    </Otherwise>
-  </Choose>
+  <ItemGroup Condition="'$(PcreNetIntegrationTest)' == 'true'">
+    <PackageReference Include="PCRE.NET" Version="[$(Version)]" />
+  </ItemGroup>
+
+  <!-- Local Test Mode -->
+
+  <ItemGroup Condition="'$(PcreNetIntegrationTest)' != 'true'">
+    <ProjectReference Include="../PCRE.NET/PCRE.NET.csproj" />
+    <ProjectReference Include="../PCRE.NET.Analyzers/PCRE.NET.Analyzers.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+  </ItemGroup>
 
   <Import Project="../PCRE.NET/Build/PCRE.NET.targets" Condition="'$(PcreNetIntegrationTest)' != 'true'" />
 
