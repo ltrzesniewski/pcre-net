@@ -8,6 +8,8 @@
     <File Path="CMakeLists.txt" />
     <File Path="Directory.Build.props" />
     <File Path="Directory.Build.targets" />
+    <File Path="NativeLibs.props" />
+    <File Path="NativeLibs.targets" />
     <File Path="NuGetReadme.md" />
     <File Path="update-pcre2.sh" />
     <File Path="Version.props" />

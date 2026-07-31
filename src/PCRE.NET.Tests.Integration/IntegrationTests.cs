@@ -114,7 +114,7 @@ public partial class IntegrationTests
         Check(ReferenceEquals(match.Groups[1], match[1]));
 
         using var matchBuffer = re.CreateMatchBuffer();
-        var bufferedMatch = matchBuffer.Match("xxxaaabbccczzz");
+        var bufferedMatch = matchBuffer.Match("xxxaaabbccczzz".AsSpan());
 
         Check(bufferedMatch.Success);
         Check(bufferedMatch.CaptureCount == 1);
@@ -233,6 +233,7 @@ public partial class IntegrationTests
         // Non-literal
         Check(PcreRegex.IsMatch("baz", GetRegexPattern()));
 
+#if NET
         // Split
         Check(PcreRegex.Split("a b c", @"\s+").ToList() is ["a", "b", "c"]);
         Check(PcreRegex.Split("a b c", @"\s+", PcreOptions.Caseless).ToList() is ["a", "b", "c"]);
@@ -241,6 +242,7 @@ public partial class IntegrationTests
         Check(PcreRegex.Split("a b c", @"\s+", PcreOptions.Compiled, PcreSplitOptions.None).ToList() is ["a", "b", "c"]);
         Check(PcreRegex.Split("a b c", @"\s+", PcreOptions.Compiled, PcreSplitOptions.None, 1).ToList() is ["a", "b c"]);
         Check(PcreRegex.Split("a b c", @"\s+", PcreOptions.Compiled, PcreSplitOptions.None, 1, 2).ToList() is ["a b", "c"]);
+#endif
 
         // Substitute
         Check(PcreRegex.Substitute("a b c", @"\s+", "-") == "a-b c");
@@ -356,6 +358,7 @@ public partial class IntegrationTests
             return;
         }
 
+#if NET
         Check(!RuntimeFeature.IsDynamicCodeSupported);
         Check(string.IsNullOrEmpty(GetAssemblyLocation()));
 
@@ -364,6 +367,9 @@ public partial class IntegrationTests
         [UnconditionalSuppressMessage("SingleFile", "IL3000")]
         static string GetAssemblyLocation()
             => typeof(IntegrationTests).Assembly.Location;
+#else
+        Ignore();
+#endif
     }
 
     private void CheckBuild(bool run)

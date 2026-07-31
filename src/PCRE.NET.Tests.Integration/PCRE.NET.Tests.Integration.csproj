@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <TargetFramework Condition="'$(PcreNetIntegrationTestNetFramework)' != ''">$(PcreNetIntegrationTestNetFramework)</TargetFramework>
+    <NetCoreTargetFramework>net10.0</NetCoreTargetFramework>
+    <TargetFramework Condition="'$(TargetFramework)' == ''">$(NetCoreTargetFramework)</TargetFramework>
     <LangVersion>11.0</LangVersion>
     <Nullable>enable</Nullable>
     <RootNamespace>PCRE.Tests.Integration</RootNamespace>
@@ -9,17 +9,14 @@
     <ControlFlowGuard>Guard</ControlFlowGuard>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(PcreNetIntegrationTestNetFramework)' == ''">
+  <PropertyGroup Condition="'$(TargetFramework)' == '$(NetCoreTargetFramework)'">
     <PublishAot>true</PublishAot>
     <SelfContained>true</SelfContained>
     <VerifyReferenceAotCompatibility>true</VerifyReferenceAotCompatibility>
     <UseCurrentRuntimeIdentifier>true</UseCurrentRuntimeIdentifier>
-    <!-- <PreferNativeArm64>true</PreferNativeArm64> TODO: Add .NET Framework integration tests -->
   </PropertyGroup>
 
   <!-- Integration Test Mode -->
-
-  <Import Project="../Version.props" Condition="'$(PcreNetIntegrationTest)' == 'true'" />
 
   <PropertyGroup Condition="'$(PcreNetIntegrationTest)' == 'true'">
     <DefineConstants>$(DefineConstants);PCRENET_INTEGRATION_TEST</DefineConstants>

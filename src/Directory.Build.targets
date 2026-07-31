@@ -10,18 +10,6 @@
     <DefineConstants Condition="'$(ExpectPlatform)' == 'arm64'">$(DefineConstants);EXPECT_ARM64</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(OutputType)' == 'Exe' or '$(IsTestProject)' == 'true'">
-    <None Include="@(PcreNetNativeLib->WithMetadataValue('Exists', 'true'))"
-          Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'"
-          Link="%(Filename)%(Extension)"
-          CopyToOutputDirectory="PreserveNewest"
-          Visible="false" />
-
-    <None Include="@(PcreNetNativeLib->WithMetadataValue('Exists', 'true')->WithMetadataValue('RuntimeIdentifier', '$(RuntimeIdentifier)'))"
-          Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'"
-          Link="PCRE.NET.Native%(Extension)"
-          CopyToOutputDirectory="PreserveNewest"
-          Visible="false" />
-  </ItemGroup>
+  <Import Project="NativeLibs.targets" />
 
 </Project>

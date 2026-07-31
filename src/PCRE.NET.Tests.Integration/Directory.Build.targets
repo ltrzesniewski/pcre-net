@@ -1,3 +1,3 @@
 <Project>
-  <Import Project="../Directory.Build.targets" Condition="'$(PcreNetIntegrationTest)' != 'true'" />
+  <Import Project="../NativeLibs.targets" Condition="'$(PcreNetIntegrationTest)' != 'true'" />
 </Project>

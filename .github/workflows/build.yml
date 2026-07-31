@@ -13,7 +13,7 @@ env:
 
 jobs:
   unix:
-    name: ${{ matrix.name }}
+    name: Build ${{ matrix.name }}
     runs-on: ${{ matrix.runner }}
 
     strategy:
@@ -74,8 +74,8 @@ jobs:
       - name: Test Allocations
         run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_NET_TEST_TARGET }} -- --allocations
 
-      - name: Test Base Integration
-        run: dotnet run --project src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --configuration ${{ env.BUILD_CONFIGURATION }}
+      - name: Test Local Integration
+        run: dotnet run --project src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_NET_TEST_TARGET }}
 
       - name: Upload Native Lib
         uses: actions/upload-artifact@v7
@@ -85,7 +85,7 @@ jobs:
           if-no-files-found: error
 
   windows:
-    name: Windows ${{ matrix.platform }}
+    name: Build Windows ${{ matrix.platform }}
     runs-on: ${{ matrix.runner }}
 
     strategy:
@@ -155,9 +155,8 @@ jobs:
         run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_NETFWK_TEST_TARGET }} -- --allocations
         if: ${{ matrix.platform == 'x64' }}
 
-      - name: Test Base Integration
-        run: dotnet run --project src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --configuration ${{ env.BUILD_CONFIGURATION }}
-        if: ${{ matrix.platform != 'x86' }}
+      - name: Test Local Integration
+        run: dotnet run --project src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_NET_TEST_TARGET }} --runtime win-${{ matrix.platform }}
 
       - name: Upload Native Lib
         uses: actions/upload-artifact@v7
@@ -212,7 +211,7 @@ jobs:
           if-no-files-found: error
 
   integration-tests:
-    name: ${{ matrix.name }}
+    name: Test ${{ matrix.name }}
     runs-on: ${{ matrix.runner }}
     needs:
       - pack
@@ -223,42 +222,57 @@ jobs:
         include:
           - name: Linux x64
             runner: ubuntu-latest
-            build-args: ""
+            build-args: -r linux-x64
             run-args: --full
 
           - name: Linux arm64
             runner: ubuntu-24.04-arm
-            build-args: ""
+            build-args: -r linux-arm64
             run-args: --full
 
           - name: macOS arm64
             runner: macos-15
-            build-args: ""
+            build-args: -r osx-arm64
             run-args: --full
 
           - name: macOS x64
             runner: macos-15-intel
-            build-args: ""
+            build-args: -r osx-x64
+            run-args: --full
+
+          - name: Windows x86
+            runner: windows-latest
+            build-args: -r win-x86
             run-args: --full
 
           - name: Windows x64
             runner: windows-latest
-            build-args: ""
+            build-args: -r win-x64
             run-args: --full
-
-          - name: Windows x64, .NET Framework
-            runner: windows-latest
-            build-args: -p:PcreNetIntegrationTestNetFramework=net481
-            run-args: --build
 
           - name: Windows arm64
             runner: windows-11-vs2026-arm
-            build-args: ""
+            build-args: -r win-arm64
             run-args: --full
 
-          - name: Windows arm64, .NET Framework
+          - name: Windows x86, .NET Framework
+            runner: windows-latest
+            build-args: -p:TargetFramework=net481 -p:Prefer32Bit=true
+            run-args: --build
+
+          - name: Windows x64, .NET Framework
+            runner: windows-latest
+            build-args: -p:TargetFramework=net481 -p:Prefer32Bit=false
+            run-args: --build
+
+          - name: Windows arm64, .NET Framework, Native
             runner: windows-11-vs2026-arm
-            build-args: -p:PcreNetIntegrationTestNetFramework=net481
+            build-args: -p:TargetFramework=net481 -p:Prefer32Bit=false -p:PreferNativeArm64=true
+            run-args: --build
+
+          - name: Windows arm64, .NET Framework, Emulation
+            runner: windows-11-vs2026-arm
+            build-args: -p:TargetFramework=net481 -p:Prefer32Bit=false -p:PreferNativeArm64=false
             run-args: --build
 
     steps:
@@ -277,8 +291,14 @@ jobs:
           path: src/PCRE.NET.Tests.Integration/nuget
           skip-decompress: true
 
-      - name: Build Integration Tests
-        run: dotnet publish src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --output ./bin/publish -p:PcreNetIntegrationTest=true ${{ matrix.build-args }}
+      - name: Restore
+        run: dotnet restore src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj -p:PcreNetIntegrationTest=true ${{ matrix.build-args }}
 
-      - name: Run Integration Tests
+      - name: Build
+        run: dotnet build src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --no-restore -p:PcreNetIntegrationTest=true ${{ matrix.build-args }}
+
+      - name: Publish
+        run: dotnet publish src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --no-build --output ./bin/publish -p:PcreNetIntegrationTest=true ${{ matrix.build-args }}
+
+      - name: Run
         run: ./bin/publish/PCRE.NET.Tests.Integration ${{ matrix.run-args }}
