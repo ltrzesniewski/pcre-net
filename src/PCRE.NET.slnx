@@ -10,6 +10,7 @@
     <File Path="Directory.Build.targets" />
     <File Path="NuGetReadme.md" />
     <File Path="update-pcre2.sh" />
+    <File Path="Version.props" />
   </Folder>
   <Project Path="PCRE.NET.Analyzers/PCRE.NET.Analyzers.csproj" />
   <Project Path="PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj" />

@@ -5,7 +5,7 @@ env:
   BUILD_CONFIGURATION: Release
   BUILD_NET_SDK: 10.0.x
   BUILD_NET_TEST_TARGET: net10.0
-  BUILD_NETFWK_TEST_TARGET: net48
+  BUILD_NETFWK_TEST_TARGET: net481
   DOTNET_NOLOGO: 1
   NUGET_CERT_REVOCATION_MODE: offline
   DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION: 1
@@ -85,16 +85,22 @@ jobs:
 
   windows:
     name: Windows ${{ matrix.platform }}
-    runs-on: windows-2025-vs2026
+    runs-on: ${{ matrix.runner }}
 
     strategy:
       matrix:
         include:
           - platform: x86
+            runner: windows-2025-vs2026
             msbuild-platform: Win32
 
           - platform: x64
+            runner: windows-2025-vs2026
             msbuild-platform: x64
+
+          - platform: arm64
+            runner: windows-11-vs2026-arm
+            msbuild-platform: ARM64
 
     steps:
       - name: Checkout
@@ -133,7 +139,7 @@ jobs:
 
       - name: Test .NET
         run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} -p:PcreNetTestBuild=true -p:ExpectPlatform=${{ matrix.platform }}
-        if: ${{ matrix.platform == 'x64' }}
+        if: ${{ matrix.platform != 'x86' }}
 
       - name: Test .NET Standard
         run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} -p:PcreNetTestBuild=true -p:ExpectPlatform=${{ matrix.platform }} -p:ForceNetStandard=true
@@ -141,7 +147,7 @@ jobs:
 
       - name: Test Allocations .NET
         run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_NET_TEST_TARGET }} -- --allocations
-        if: ${{ matrix.platform == 'x64' }}
+        if: ${{ matrix.platform != 'x86' }}
 
       - name: Test Allocations .NET Framework
         run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_NETFWK_TEST_TARGET }} -- --allocations
@@ -149,7 +155,7 @@ jobs:
 
       - name: Test Base Integration
         run: dotnet run --project src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --configuration ${{ env.BUILD_CONFIGURATION }}
-        if: ${{ matrix.platform == 'x64' }}
+        if: ${{ matrix.platform != 'x86' }}
 
       - name: Upload Native Lib
         uses: actions/upload-artifact@v7
@@ -226,6 +232,9 @@ jobs:
 
           - name: Windows x64
             runner: windows-latest
+
+          - name: Windows arm64
+            runner: windows-11-vs2026-arm
 
     steps:
       - name: Checkout

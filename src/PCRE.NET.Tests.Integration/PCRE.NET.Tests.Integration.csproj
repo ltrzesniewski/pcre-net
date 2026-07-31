@@ -4,11 +4,16 @@
     <LangVersion>11.0</LangVersion>
     <Nullable>enable</Nullable>
     <RootNamespace>PCRE.Tests.Integration</RootNamespace>
+    <PcreNetOutputNativeLibs>true</PcreNetOutputNativeLibs>
     <OutputType>Exe</OutputType>
     <PublishAot>true</PublishAot>
     <ControlFlowGuard>Guard</ControlFlowGuard>
     <VerifyReferenceAotCompatibility>true</VerifyReferenceAotCompatibility>
+    <UseCurrentRuntimeIdentifier>true</UseCurrentRuntimeIdentifier>
+    <!-- <PreferNativeArm64>true</PreferNativeArm64> TODO: Add .NET Framework integration tests -->
   </PropertyGroup>
+
+  <Import Project="../Version.props" />
 
   <Choose>
     <When Condition="'$(PcreNetIntegrationTest)' == 'true'">
@@ -17,7 +22,7 @@
       </PropertyGroup>
 
       <ItemGroup>
-        <PackageReference Include="PCRE.NET" Version="$(PackageVersion)" />
+        <PackageReference Include="PCRE.NET" Version="[$(Version)]" />
       </ItemGroup>
     </When>
 
@@ -29,6 +34,7 @@
     </Otherwise>
   </Choose>
 
+  <Import Project="../PCRE.NET/Build/NativeLibs.props" Condition="'$(PcreNetIntegrationTest)' != 'true'" />
   <Import Project="../PCRE.NET/Build/PCRE.NET.targets" Condition="'$(PcreNetIntegrationTest)' != 'true'" />
 
 </Project>

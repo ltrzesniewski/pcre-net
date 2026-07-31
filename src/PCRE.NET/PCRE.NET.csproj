@@ -10,6 +10,7 @@
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
     <IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">true</IsAotCompatible>
     <VerifyReferenceAotCompatibility>true</VerifyReferenceAotCompatibility>
+    <NoWarn Condition="'$(TargetFramework)' == 'net5.0'">$(NoWarn);CA1708</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(PcreNetTestBuild)' != 'true'">
@@ -67,25 +68,16 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <PcreNetNative Include="..\..\lib\PCRE.NET.Native.x86.dll" Platform="win-x86" />
-    <PcreNetNative Include="..\..\lib\PCRE.NET.Native.x64.dll" Platform="win-x64" />
-    <PcreNetNative Include="..\..\lib\PCRE.NET.Native.x64.so" Platform="linux-x64" />
-    <PcreNetNative Include="..\..\lib\PCRE.NET.Native.arm64.so" Platform="linux-arm64" />
-    <PcreNetNative Include="..\..\lib\PCRE.NET.Native.arm64.dylib" Platform="osx-arm64" />
-    <PcreNetNative Include="..\..\lib\PCRE.NET.Native.x64.dylib" Platform="osx-x64" />
-
-    <PcreNetNative Update="@(PcreNetNative)" ToInclude="$([System.IO.File]::Exists('%(FullPath)'))" Visible="false" />
-    <PcreNetNative Update="@(PcreNetNative)" ToInclude="true" Condition="'$(PcreNetPackage)' == 'true'" />
-  </ItemGroup>
+  <Import Project="Build/NativeLibs.props" />
 
   <ItemGroup>
-    <None Include="@(PcreNetNative->WithMetadataValue('ToInclude', 'true'))"
-          Link="PCRE.NET.Native%(Extension)"
-          CopyToOutputDirectory="PreserveNewest"
-          Visible="false"
+    <PcreNetNativeLib Update="@(PcreNetNativeLib)" ToPackage="%(Exists)" />
+    <PcreNetNativeLib Update="@(PcreNetNativeLib)" ToPackage="true" Condition="'$(PcreNetPackage)' == 'true'" />
+
+    <None Include="@(PcreNetNativeLib->WithMetadataValue('ToPackage', 'true'))"
           Pack="true"
-          PackagePath="runtimes\%(Platform)\native\PCRE.NET.Native%(Extension)" />
+          PackagePath="runtimes\%(Platform)\native\PCRE.NET.Native%(Extension)"
+          Visible="false" />
   </ItemGroup>
 
   <ItemGroup>

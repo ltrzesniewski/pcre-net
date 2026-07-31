@@ -5,12 +5,13 @@
 
 PCRE.NET is a .NET wrapper for the [PCRE2 library](https://github.com/PCRE2Project/pcre2).
 
-**v1.5.0** is based on PCRE2 **v10.47**.
+**v1.6.0** is based on PCRE2 **v10.47**.
 
 The following systems are supported:
 
 - Windows x64
 - Windows x86
+- Windows arm64
 - Linux x64
 - Linux arm64
 - macOS arm64
