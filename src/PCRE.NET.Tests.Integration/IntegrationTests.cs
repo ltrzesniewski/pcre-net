@@ -14,21 +14,21 @@ public partial class IntegrationTests
         return tests.Run(args) ? 0 : 1;
     }
 
-    private bool Run(string[] args)
+    private bool Run(string[] commandLineArgs)
     {
         _success = true;
+        var args = Safe(() => IntegrationTestsArgs.Parse(commandLineArgs)) ?? IntegrationTestsArgs.Default;
 
         Safe(WriteRuntimeInformation);
         Safe(PcreBuildInformation);
-        CheckArgs(args, out var aot, out var build);
         Safe(() => RunTestUtf16(PcreOptions.None));
         Safe(() => RunTestUtf16(PcreOptions.Compiled));
         Safe(() => RunTestUtf8(PcreOptions.None));
         Safe(() => RunTestUtf8(PcreOptions.Compiled));
         Safe(RunStaticInterceptorTest);
         Safe(RunReplacementPatternTest);
-        Safe(() => CheckAot(aot));
-        Safe(() => CheckBuild(build));
+        Safe(() => CheckAot(args));
+        Safe(() => CheckBuild(args));
 
         PrintSummary();
         return _success;
@@ -77,17 +77,6 @@ public partial class IntegrationTests
 
         void PcreInfo<T>(T value, [CallerArgumentExpression(nameof(value))] string? code = null)
             => Info(code?.StartsWith(nameof(PcreBuildInfo)) is true ? code.Substring(nameof(PcreBuildInfo).Length + 1) : "Unknown", value?.ToString());
-    }
-
-    private void CheckArgs(string[] args, out bool aot, out bool build)
-    {
-        Header("Arguments");
-
-        var full = args.Contains("--full");
-        aot = full || args.Contains("--aot");
-        build = full || args.Contains("--build");
-
-        Check(args.All(arg => arg is "--full" or "--aot" or "--build"));
     }
 
     private void RunTestUtf16(PcreOptions options)
@@ -348,19 +337,13 @@ public partial class IntegrationTests
             => regex.Replace(input, replacement);
     }
 
-    private void CheckAot(bool run)
+    private void CheckAot(IntegrationTestsArgs args)
     {
         Header("AOT");
 
-        if (!run)
-        {
-            Ignore();
-            return;
-        }
-
 #if NET
-        Check(!RuntimeFeature.IsDynamicCodeSupported);
-        Check(string.IsNullOrEmpty(GetAssemblyLocation()));
+        Check(!RuntimeFeature.IsDynamicCodeSupported, args.Aot);
+        Check(string.IsNullOrEmpty(GetAssemblyLocation()), args.Aot);
 
         return;
 
@@ -368,27 +351,34 @@ public partial class IntegrationTests
         static string GetAssemblyLocation()
             => typeof(IntegrationTests).Assembly.Location;
 #else
-        Ignore();
+        Fail("Target runtime doesn't support AOT", false);
 #endif
     }
 
-    private void CheckBuild(bool run)
+    private void CheckBuild(IntegrationTestsArgs args)
     {
         Header("Build");
 
-        if (!run)
-        {
-            Ignore();
-            return;
-        }
-
-        const bool isInIntegrationTest =
+        const bool usesNuGetPackage =
 #if PCRENET_INTEGRATION_TEST
             true;
 #else
             false;
 #endif
+        Check(usesNuGetPackage, args.Build, "Uses NuGet package");
 
-        Check(isInIntegrationTest, "Built in integration tests mode");
+        var rid =
+#if NET
+            RuntimeInformation.RuntimeIdentifier;
+#elif NETFRAMEWORK
+            $"win-{RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant()}";
+#else
+            "(unknown)";
+#endif
+        Check(
+            string.Equals(rid, args.Rid, StringComparison.OrdinalIgnoreCase),
+            args.Rid is not null,
+            $"RID is {rid}, expected {args.Rid ?? "(not provided)"}"
+        );
     }
 }
