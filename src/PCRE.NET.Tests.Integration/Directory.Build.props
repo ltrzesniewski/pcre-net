@@ -1,4 +1,4 @@
 <Project>
   <Import Project="../Version.props" />
-  <Import Project="../NativeLibs.props" Condition="'$(PcreNetIntegrationTest)' != 'true'" />
+  <Import Project="../NativeLibs.props" Condition="'$(UsePcreNetNuGetPackage)' != 'true'" />
 </Project>

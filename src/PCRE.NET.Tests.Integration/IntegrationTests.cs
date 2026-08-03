@@ -360,12 +360,12 @@ public partial class IntegrationTests
         Header("Build");
 
         const bool usesNuGetPackage =
-#if PCRENET_INTEGRATION_TEST
+#if PCRENET_NUGET
             true;
 #else
             false;
 #endif
-        Check(usesNuGetPackage, args.Build, "Uses NuGet package");
+        Check(usesNuGetPackage, args.NuGet, "Uses NuGet package");
 
         var rid =
 #if NET

@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <NetCoreTargetFramework>net10.0</NetCoreTargetFramework>
-    <TargetFramework Condition="'$(TargetFramework)' == ''">$(NetCoreTargetFramework)</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <LangVersion>11.0</LangVersion>
     <Nullable>enable</Nullable>
     <RootNamespace>PCRE.Tests.Integration</RootNamespace>
@@ -9,30 +8,30 @@
     <ControlFlowGuard>Guard</ControlFlowGuard>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == '$(NetCoreTargetFramework)'">
+  <PropertyGroup Condition="'$([MSBuild]::GetTargetFrameworkIdentifier($(TargetFramework)))' == '.NETCoreApp'">
     <PublishAot>true</PublishAot>
     <SelfContained>true</SelfContained>
     <VerifyReferenceAotCompatibility>true</VerifyReferenceAotCompatibility>
     <UseCurrentRuntimeIdentifier>true</UseCurrentRuntimeIdentifier>
   </PropertyGroup>
 
-  <!-- Integration Test Mode -->
+  <!-- Full integration test mode: use the PCRE.NET NuGet package -->
 
-  <PropertyGroup Condition="'$(PcreNetIntegrationTest)' == 'true'">
-    <DefineConstants>$(DefineConstants);PCRENET_INTEGRATION_TEST</DefineConstants>
+  <PropertyGroup Condition="'$(UsePcreNetNuGetPackage)' == 'true'">
+    <DefineConstants>$(DefineConstants);PCRENET_NUGET</DefineConstants>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(PcreNetIntegrationTest)' == 'true'">
+  <ItemGroup Condition="'$(UsePcreNetNuGetPackage)' == 'true'">
     <PackageReference Include="PCRE.NET" Version="[$(Version)]" />
   </ItemGroup>
 
-  <!-- Local Test Mode -->
+  <!-- Local test mode: use project references -->
 
-  <ItemGroup Condition="'$(PcreNetIntegrationTest)' != 'true'">
+  <ItemGroup Condition="'$(UsePcreNetNuGetPackage)' != 'true'">
     <ProjectReference Include="../PCRE.NET/PCRE.NET.csproj" />
     <ProjectReference Include="../PCRE.NET.Analyzers/PCRE.NET.Analyzers.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
   </ItemGroup>
 
-  <Import Project="../PCRE.NET/Build/PCRE.NET.targets" Condition="'$(PcreNetIntegrationTest)' != 'true'" />
+  <Import Project="../PCRE.NET/Build/PCRE.NET.targets" Condition="'$(UsePcreNetNuGetPackage)' != 'true'" /> <!-- Only used to set the analyzer properties -->
 
 </Project>

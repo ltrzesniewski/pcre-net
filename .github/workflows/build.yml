@@ -223,57 +223,57 @@ jobs:
           - name: Linux x64
             runner: ubuntu-latest
             build-args: -r linux-x64
-            run-args: --full --rid=linux-x64
+            run-args: --aot --rid=linux-x64
 
           - name: Linux arm64
             runner: ubuntu-24.04-arm
             build-args: -r linux-arm64
-            run-args: --full --rid=linux-arm64
+            run-args: --aot --rid=linux-arm64
 
           - name: macOS arm64
             runner: macos-15
             build-args: -r osx-arm64
-            run-args: --full --rid=osx-arm64
+            run-args: --aot --rid=osx-arm64
 
           - name: macOS x64
             runner: macos-15-intel
             build-args: -r osx-x64
-            run-args: --full --rid=osx-x64
+            run-args: --aot --rid=osx-x64
 
           - name: Windows x86
             runner: windows-latest
             build-args: -r win-x86
-            run-args: --full --rid=win-x86
+            run-args: --aot --rid=win-x86
 
           - name: Windows x64
             runner: windows-latest
             build-args: -r win-x64
-            run-args: --full --rid=win-x64
+            run-args: --aot --rid=win-x64
 
           - name: Windows arm64
             runner: windows-11-vs2026-arm
             build-args: -r win-arm64
-            run-args: --full --rid=win-arm64
+            run-args: --aot --rid=win-arm64
 
           - name: Windows x86, .NET Framework
             runner: windows-latest
             build-args: -p:TargetFramework=net481 -p:Prefer32Bit=true
-            run-args: --build --rid=win-x86
+            run-args: --rid=win-x86
 
           - name: Windows x64, .NET Framework
             runner: windows-latest
             build-args: -p:TargetFramework=net481 -p:Prefer32Bit=false
-            run-args: --build --rid=win-x64
+            run-args: --rid=win-x64
 
           - name: Windows arm64, .NET Framework, Native
             runner: windows-11-vs2026-arm
             build-args: -p:TargetFramework=net481 -p:Prefer32Bit=false -p:PreferNativeArm64=true
-            run-args: --build --rid=win-arm64
+            run-args: --rid=win-arm64
 
           - name: Windows arm64, .NET Framework, Emulation
             runner: windows-11-vs2026-arm
             build-args: -p:TargetFramework=net481 -p:Prefer32Bit=false -p:PreferNativeArm64=false
-            run-args: --build --rid=win-x64
+            run-args: --rid=win-x64
 
     steps:
       - name: Checkout
@@ -292,13 +292,13 @@ jobs:
           skip-decompress: true
 
       - name: Restore
-        run: dotnet restore src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj -p:PcreNetIntegrationTest=true ${{ matrix.build-args }}
+        run: dotnet restore src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj -p:UsePcreNetNuGetPackage=true ${{ matrix.build-args }}
 
       - name: Build
-        run: dotnet build src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --no-restore -p:PcreNetIntegrationTest=true ${{ matrix.build-args }}
+        run: dotnet build src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --no-restore -p:UsePcreNetNuGetPackage=true ${{ matrix.build-args }}
 
       - name: Publish
-        run: dotnet publish src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --no-build --output ./bin/publish -p:PcreNetIntegrationTest=true ${{ matrix.build-args }}
+        run: dotnet publish src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --no-build --output ./bin/publish -p:UsePcreNetNuGetPackage=true ${{ matrix.build-args }}
 
       - name: Run
-        run: ./bin/publish/PCRE.NET.Tests.Integration ${{ matrix.run-args }}
+        run: ./bin/publish/PCRE.NET.Tests.Integration --nuget ${{ matrix.run-args }}

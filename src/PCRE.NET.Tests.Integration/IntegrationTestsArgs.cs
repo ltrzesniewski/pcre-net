@@ -8,7 +8,7 @@ internal sealed class IntegrationTestsArgs
     public static IntegrationTestsArgs Default { get; } = new();
 
     public bool Aot { get; private set; }
-    public bool Build { get; private set; }
+    public bool NuGet { get; private set; }
     public string? Rid { get; private set; }
 
     private IntegrationTestsArgs()
@@ -26,13 +26,8 @@ internal sealed class IntegrationTestsArgs
                     args.Aot = true;
                     break;
 
-                case "--build":
-                    args.Build = true;
-                    break;
-
-                case "--full":
-                    args.Aot = true;
-                    args.Build = true;
+                case "--nuget":
+                    args.NuGet = true;
                     break;
 
                 case { } when HasValue("--rid") is { } rid:
