@@ -24,42 +24,51 @@ internal sealed class IntegrationTestsArgs
 
         foreach (var arg in inputArgs)
         {
-            switch (arg)
+            if (arg.IndexOf('=') is var equalIndex and >= 0)
             {
-                case "--aot":
-                    args.Aot = true;
-                    break;
+                var flag = arg.Substring(0, equalIndex);
+                var value = arg.Substring(equalIndex + 1);
 
-                case "--nuget":
-                    args.NuGet = true;
-                    break;
+                switch (flag)
+                {
+                    case "--rid":
+                        args.Rid = value;
+                        break;
 
-                case { } when HasValue("--rid") is { } rid:
-                    args.Rid = rid;
-                    break;
+                    case "--net":
+                        args.Net = Enum.TryParse<NetType>(value, true, out var parsedNet) || Enum.TryParse($"Net{value}", true, out parsedNet) ? parsedNet : InvalidEnumValue<NetType>();
+                        break;
 
-                case { } when HasValue("--net") is { } net:
-                    args.Net = Enum.TryParse<NetType>(net, true, out var parsedNet) || Enum.TryParse($"Net{net}", true, out parsedNet) ? parsedNet : InvalidValue<NetType>();
-                    break;
+                    case "--arch":
+                        args.Arch = Enum.TryParse<Architecture>(value, true, out var parsedArch) ? parsedArch : InvalidEnumValue<Architecture>();
+                        break;
 
-                case { } when HasValue("--arch") is { } arch:
-                    args.Arch = Enum.TryParse<Architecture>(arch, true, out var parsedArch) ? parsedArch : InvalidValue<Architecture>();
-                    break;
-
-                default:
-                    throw new ArgumentException($"Unknown argument: {arg}");
+                    default:
+                        throw new ArgumentException($"Unknown argument: {arg}");
+                }
             }
+            else
+            {
+                switch (arg)
+                {
+                    case "--aot":
+                        args.Aot = true;
+                        break;
 
-            continue;
+                    case "--nuget":
+                        args.NuGet = true;
+                        break;
 
-            string? HasValue(string flag)
-                => arg.StartsWith($"{flag}=") ? arg.Substring(flag.Length + 1) : null;
+                    default:
+                        throw new ArgumentException($"Unknown argument: {arg}");
+                }
+            }
         }
 
         return args;
     }
 
-    private static T InvalidValue<T>()
+    private static T InvalidEnumValue<T>()
         where T : struct, Enum
         => (T)(object)int.MinValue;
 
@@ -69,7 +78,7 @@ internal sealed class IntegrationTestsArgs
     public static string Display<T>(T? value)
         where T : struct, Enum
         => value is { } providedValue
-            ? !providedValue.Equals(InvalidValue<T>())
+            ? !providedValue.Equals(InvalidEnumValue<T>())
                 ? providedValue.ToString()
                 : "<invalid>"
             : "<not provided>";
