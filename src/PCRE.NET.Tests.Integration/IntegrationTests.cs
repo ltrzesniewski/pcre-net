@@ -269,7 +269,6 @@ public partial class IntegrationTests
         }
     }
 
-    [SuppressMessage("ReSharper", "RedundantVerbatimStringPrefix")]
     private void RunReplacementPatternTest()
     {
         Header("Replacement Pattern Interceptor");
@@ -367,18 +366,27 @@ public partial class IntegrationTests
 #endif
         Check(usesNuGetPackage, args.NuGet, "Uses NuGet package");
 
-        var rid =
 #if NET
-            RuntimeInformation.RuntimeIdentifier;
+        var rid = RuntimeInformation.RuntimeIdentifier;
+        var net = IntegrationTestsArgs.NetType.NetCore;
 #elif NETFRAMEWORK
-            $"win-{RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant()}";
+        var rid = $"win-{RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant()}";
+        var net = IntegrationTestsArgs.NetType.NetFramework;
 #else
-            "(unknown)";
+        var rid = "<unknown>";
+        var net = IntegrationTestsArgs.NetType.Invalid;
 #endif
+
         Check(
             string.Equals(rid, args.Rid, StringComparison.OrdinalIgnoreCase),
             args.Rid is not null,
-            $"RID is {rid}, expected {args.Rid ?? "(not provided)"}"
+            $"RID is {rid}, expected {args.Rid ?? "<not provided>"}"
+        );
+
+        Check(
+            net == args.Net,
+            args.Net is not IntegrationTestsArgs.NetType.None,
+            $"Framework is {net}, expected {args.Net}"
         );
     }
 }
