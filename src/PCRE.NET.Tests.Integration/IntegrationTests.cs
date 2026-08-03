@@ -380,13 +380,19 @@ public partial class IntegrationTests
         Check(
             string.Equals(rid, args.Rid, StringComparison.OrdinalIgnoreCase),
             args.Rid is not null,
-            $"RID is {rid}, expected {args.Rid ?? "<not provided>"}"
+            $"RID is {rid}, expected {IntegrationTestsArgs.Display(args.Rid)}"
         );
 
         Check(
             net == args.Net,
-            args.Net is not IntegrationTestsArgs.NetType.None,
-            $"Framework is {net}, expected {args.Net}"
+            args.Net is not null,
+            $"Framework is {net}, expected {IntegrationTestsArgs.Display(args.Net)}"
+        );
+
+        Check(
+            RuntimeInformation.ProcessArchitecture == args.Arch,
+            args.Arch is not null,
+            $"Architecture is {RuntimeInformation.ProcessArchitecture}, expected {IntegrationTestsArgs.Display(args.Arch)}"
         );
     }
 }
