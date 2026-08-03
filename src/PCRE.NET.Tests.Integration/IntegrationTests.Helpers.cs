@@ -45,7 +45,7 @@ public partial class IntegrationTests
         }
         else
         {
-            WriteLine($"  {_yellow}FAILED: Ignored:{_reset} {message}");
+            WriteLine($"  {_yellow}FAILED:{_reset} {message} {_yellow}(ignored){_reset}");
         }
     }
 

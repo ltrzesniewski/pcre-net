@@ -394,5 +394,8 @@ public partial class IntegrationTests
             args.Arch is not null,
             $"Architecture is {RuntimeInformation.ProcessArchitecture}, expected {IntegrationTestsArgs.Display(args.Arch)}"
         );
+
+        Check(PcreBuildInfo.Jit);
+        Check(PcreBuildInfo.Unicode);
     }
 }
