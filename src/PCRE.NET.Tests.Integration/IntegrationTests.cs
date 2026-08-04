@@ -14,20 +14,21 @@ public partial class IntegrationTests
         return tests.Run(args) ? 0 : 1;
     }
 
-    private bool Run(string[] args)
+    private bool Run(string[] commandLineArgs)
     {
         _success = true;
+        var args = Safe(() => IntegrationTestsArgs.Parse(commandLineArgs)) ?? IntegrationTestsArgs.Default;
 
-        WriteRuntimeInformation();
-        CheckArgs(args, out var aot, out var build);
+        Safe(WriteRuntimeInformation);
+        Safe(PcreBuildInformation);
         Safe(() => RunTestUtf16(PcreOptions.None));
         Safe(() => RunTestUtf16(PcreOptions.Compiled));
         Safe(() => RunTestUtf8(PcreOptions.None));
         Safe(() => RunTestUtf8(PcreOptions.Compiled));
         Safe(RunStaticInterceptorTest);
         Safe(RunReplacementPatternTest);
-        Safe(() => CheckAot(aot));
-        Safe(() => CheckBuild(build));
+        Safe(() => CheckAot(args));
+        Safe(() => CheckBuild(args));
 
         PrintSummary();
         return _success;
@@ -46,15 +47,36 @@ public partial class IntegrationTests
 #endif
     }
 
-    private void CheckArgs(string[] args, out bool aot, out bool build)
+    private static void PcreBuildInformation()
     {
-        Header("Arguments");
+        Header("PCRE2 Build Information");
 
-        var full = args.Contains("--full");
-        aot = full || args.Contains("--aot");
-        build = full || args.Contains("--build");
+        Info("Version", PcreBuildInfo.Version);
+        Info("JIT", PcreBuildInfo.Jit ? PcreBuildInfo.JitTarget : "Not supported");
+        Info("Unicode", PcreBuildInfo.Unicode ? PcreBuildInfo.UnicodeVersion : "Not supported");
+        WriteLine();
+        Info("Default Newline", PcreBuildInfo.NewLine.ToString());
+        Info("Default \\R", PcreBuildInfo.BackslashR.ToString());
+        Info("Compiled widths", string.Join(", ", new[]
+        {
+            (PcreBuildInfo.CompiledWidths & 1 << 0) != 0 ? "8-bit" : null,
+            (PcreBuildInfo.CompiledWidths & 1 << 1) != 0 ? "16-bit" : null,
+            (PcreBuildInfo.CompiledWidths & 1 << 2) != 0 ? "32-bit" : null
+        }.Where(i => i is not null)));
+        WriteLine();
+        PcreInfo(PcreBuildInfo.DepthLimit);
+        PcreInfo(PcreBuildInfo.EffectiveLinkSize);
+        PcreInfo(PcreBuildInfo.HeapLimit);
+        PcreInfo(PcreBuildInfo.LinkSize);
+        PcreInfo(PcreBuildInfo.MatchLimit);
+        PcreInfo(PcreBuildInfo.NeverBackslashC);
+        PcreInfo(PcreBuildInfo.ParensLimit);
+        PcreInfo(PcreBuildInfo.TablesLength);
 
-        Check(args.All(arg => arg is "--full" or "--aot" or "--build"));
+        return;
+
+        void PcreInfo<T>(T value, [CallerArgumentExpression(nameof(value))] string? code = null)
+            => Info(code?.StartsWith(nameof(PcreBuildInfo)) is true ? code.Substring(nameof(PcreBuildInfo).Length + 1) : "Unknown", value?.ToString());
     }
 
     private void RunTestUtf16(PcreOptions options)
@@ -81,7 +103,7 @@ public partial class IntegrationTests
         Check(ReferenceEquals(match.Groups[1], match[1]));
 
         using var matchBuffer = re.CreateMatchBuffer();
-        var bufferedMatch = matchBuffer.Match("xxxaaabbccczzz");
+        var bufferedMatch = matchBuffer.Match("xxxaaabbccczzz".AsSpan());
 
         Check(bufferedMatch.Success);
         Check(bufferedMatch.CaptureCount == 1);
@@ -200,6 +222,7 @@ public partial class IntegrationTests
         // Non-literal
         Check(PcreRegex.IsMatch("baz", GetRegexPattern()));
 
+#if NET
         // Split
         Check(PcreRegex.Split("a b c", @"\s+").ToList() is ["a", "b", "c"]);
         Check(PcreRegex.Split("a b c", @"\s+", PcreOptions.Caseless).ToList() is ["a", "b", "c"]);
@@ -208,6 +231,7 @@ public partial class IntegrationTests
         Check(PcreRegex.Split("a b c", @"\s+", PcreOptions.Compiled, PcreSplitOptions.None).ToList() is ["a", "b", "c"]);
         Check(PcreRegex.Split("a b c", @"\s+", PcreOptions.Compiled, PcreSplitOptions.None, 1).ToList() is ["a", "b c"]);
         Check(PcreRegex.Split("a b c", @"\s+", PcreOptions.Compiled, PcreSplitOptions.None, 1, 2).ToList() is ["a b", "c"]);
+#endif
 
         // Substitute
         Check(PcreRegex.Substitute("a b c", @"\s+", "-") == "a-b c");
@@ -245,7 +269,6 @@ public partial class IntegrationTests
         }
     }
 
-    [SuppressMessage("ReSharper", "RedundantVerbatimStringPrefix")]
     private void RunReplacementPatternTest()
     {
         Header("Replacement Pattern Interceptor");
@@ -313,43 +336,66 @@ public partial class IntegrationTests
             => regex.Replace(input, replacement);
     }
 
-    private void CheckAot(bool run)
+    private void CheckAot(IntegrationTestsArgs args)
     {
         Header("AOT");
 
-        if (!run)
-        {
-            Ignore();
-            return;
-        }
-
-        Check(!RuntimeFeature.IsDynamicCodeSupported);
-        Check(string.IsNullOrEmpty(GetAssemblyLocation()));
+#if NET
+        Check(!RuntimeFeature.IsDynamicCodeSupported, args.Aot);
+        Check(string.IsNullOrEmpty(GetAssemblyLocation()), args.Aot);
 
         return;
 
         [UnconditionalSuppressMessage("SingleFile", "IL3000")]
         static string GetAssemblyLocation()
             => typeof(IntegrationTests).Assembly.Location;
+#else
+        Fail("Target runtime doesn't support AOT", false);
+#endif
     }
 
-    private void CheckBuild(bool run)
+    private void CheckBuild(IntegrationTestsArgs args)
     {
         Header("Build");
 
-        if (!run)
-        {
-            Ignore();
-            return;
-        }
-
-        const bool isInIntegrationTest =
-#if PCRENET_INTEGRATION_TEST
+        const bool usesNuGetPackage =
+#if PCRENET_NUGET
             true;
 #else
             false;
 #endif
+        Check(usesNuGetPackage, args.NuGet, "Uses NuGet package");
 
-        Check(isInIntegrationTest, "Built in integration tests mode");
+#if NET
+        var rid = RuntimeInformation.RuntimeIdentifier;
+        var net = IntegrationTestsArgs.NetType.NetCore;
+#elif NETFRAMEWORK
+        var rid = $"win-{RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant()}";
+        var net = IntegrationTestsArgs.NetType.NetFramework;
+#else
+        var rid = "<unknown>";
+        var net = IntegrationTestsArgs.NetType.Invalid;
+#endif
+
+        Check(
+            string.Equals(rid, args.Rid, StringComparison.OrdinalIgnoreCase),
+            args.Rid is not null,
+            $"RID is {rid}, expected {IntegrationTestsArgs.Display(args.Rid)}"
+        );
+
+        Check(
+            net == args.Net,
+            args.Net is not null,
+            $"Framework is {net}, expected {IntegrationTestsArgs.Display(args.Net)}"
+        );
+
+        Check(
+            RuntimeInformation.ProcessArchitecture == args.Arch,
+            args.Arch is not null,
+            $"Architecture is {RuntimeInformation.ProcessArchitecture}, expected {IntegrationTestsArgs.Display(args.Arch)}"
+        );
+
+        Check(PcreBuildInfo.Jit);
+        Check(PcreBuildInfo.Unicode);
     }
 }

@@ -1,0 +1,17 @@
+<Project>
+
+  <ItemGroup>
+    <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\lib\PCRE.NET.Native.x86.dll" RuntimeIdentifier="win-x86" />
+    <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\lib\PCRE.NET.Native.x64.dll" RuntimeIdentifier="win-x64" />
+    <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\lib\PCRE.NET.Native.arm64.dll" RuntimeIdentifier="win-arm64" />
+    <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\lib\PCRE.NET.Native.x64.so" RuntimeIdentifier="linux-x64" />
+    <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\lib\PCRE.NET.Native.arm64.so" RuntimeIdentifier="linux-arm64" />
+    <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\lib\PCRE.NET.Native.arm64.dylib" RuntimeIdentifier="osx-arm64" />
+    <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\lib\PCRE.NET.Native.x64.dylib" RuntimeIdentifier="osx-x64" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PcreNetNativeLib Update="@(PcreNetNativeLib)" Exists="$([System.IO.File]::Exists('%(FullPath)'))" Visible="false" />
+  </ItemGroup>
+
+</Project>

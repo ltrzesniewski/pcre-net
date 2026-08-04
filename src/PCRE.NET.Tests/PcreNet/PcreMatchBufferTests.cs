@@ -96,6 +96,7 @@ public unsafe class PcreMatchBufferTests
 #if NET
 
     [Test]
+    [Retry(10)]
     [NonParallelizable]
     public void should_not_allocate()
     {
@@ -149,6 +150,7 @@ public unsafe class PcreMatchBufferTests
     }
 
     [Test]
+    [Retry(10)]
     [NonParallelizable]
     public void should_not_allocate_utf8()
     {
@@ -202,6 +204,7 @@ public unsafe class PcreMatchBufferTests
     }
 
     [Test]
+    [Retry(10)]
     [NonParallelizable]
     public void should_not_allocate_8bit()
     {

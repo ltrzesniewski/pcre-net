@@ -68,15 +68,13 @@
     </None>
   </ItemGroup>
 
-  <Import Project="Build/NativeLibs.props" />
-
   <ItemGroup>
     <PcreNetNativeLib Update="@(PcreNetNativeLib)" ToPackage="%(Exists)" />
     <PcreNetNativeLib Update="@(PcreNetNativeLib)" ToPackage="true" Condition="'$(PcreNetPackage)' == 'true'" />
 
     <None Include="@(PcreNetNativeLib->WithMetadataValue('ToPackage', 'true'))"
           Pack="true"
-          PackagePath="runtimes\%(Platform)\native\PCRE.NET.Native%(Extension)"
+          PackagePath="runtimes\%(RuntimeIdentifier)\native\PCRE.NET.Native%(Extension)"
           Visible="false" />
   </ItemGroup>
 

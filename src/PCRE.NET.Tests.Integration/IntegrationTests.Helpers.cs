@@ -23,27 +23,30 @@ public partial class IntegrationTests
         => WriteLine($"  {_green}{label}:{_reset} {value}");
 
     private void Check(bool success, [CallerArgumentExpression(nameof(success))] string? code = null)
+        => Check(success, true, code);
+
+    private void Check(bool success, bool enforce, [CallerArgumentExpression(nameof(success))] string? code = null)
     {
         if (success)
             Pass(code);
         else
-            Fail(code);
+            Fail(code, enforce);
     }
 
     private static void Pass(string? message)
-    {
-        WriteLine($"  {_green}PASSED:{_reset} {message}");
-    }
+        => WriteLine($"  {_green}PASSED:{_reset} {message}");
 
-    private void Fail(string? message)
+    private void Fail(string? message, bool enforced)
     {
-        WriteLine($"  {_red}FAILED:{_reset} {message}");
-        _success = false;
-    }
-
-    private static void Ignore()
-    {
-        WriteLine($"  {_yellow}IGNORED{_reset}");
+        if (enforced)
+        {
+            WriteLine($"  {_red}FAILED:{_reset} {message}");
+            _success = false;
+        }
+        else
+        {
+            WriteLine($"  {_yellow}FAILED:{_reset} {message} {_yellow}(ignored){_reset}");
+        }
     }
 
     private void Safe(Action action)
@@ -54,7 +57,20 @@ public partial class IntegrationTests
         }
         catch (Exception ex)
         {
-            Fail(ex.Message);
+            Fail(ex.Message, true);
+        }
+    }
+
+    private T? Safe<T>(Func<T> action)
+    {
+        try
+        {
+            return action();
+        }
+        catch (Exception ex)
+        {
+            Fail(ex.Message, true);
+            return default;
         }
     }
 

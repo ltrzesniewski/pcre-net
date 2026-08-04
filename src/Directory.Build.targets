@@ -10,4 +10,6 @@
     <DefineConstants Condition="'$(ExpectPlatform)' == 'arm64'">$(DefineConstants);EXPECT_ARM64</DefineConstants>
   </PropertyGroup>
 
+  <Import Project="NativeLibs.targets" />
+
 </Project>
