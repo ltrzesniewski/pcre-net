@@ -66,16 +66,39 @@ jobs:
           cp src/cmake/PCRE.NET.Native.${{ matrix.extension }} lib/PCRE.NET.Native.${{ matrix.platform }}.${{ matrix.extension }}
 
       - name: Test .NET
-        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_NET_TEST_TARGET }} -p:PcreNetTestBuild=true -p:ExpectPlatform=${{ matrix.platform }}
+        run: >-
+          dotnet run
+          --project src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
+          --configuration ${{ env.BUILD_CONFIGURATION }}
+          --framework ${{ env.BUILD_NET_TEST_TARGET }}
+          -p:PcreNetTestBuild=true
+          -p:ExpectPlatform=${{ matrix.platform }}
 
       - name: Test .NET Standard
-        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_NET_TEST_TARGET }} -p:PcreNetTestBuild=true -p:ExpectPlatform=${{ matrix.platform }} -p:ForceNetStandard=true
+        run: >-
+          dotnet run
+          --project src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
+          --configuration ${{ env.BUILD_CONFIGURATION }}
+          --framework ${{ env.BUILD_NET_TEST_TARGET }}
+          -p:PcreNetTestBuild=true
+          -p:ExpectPlatform=${{ matrix.platform }}
+          -p:ForceNetStandard=true
 
       - name: Test Allocations
-        run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_NET_TEST_TARGET }} -- --allocations
+        run: >-
+          dotnet run
+          --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj
+          --configuration ${{ env.BUILD_CONFIGURATION }}
+          --framework ${{ env.BUILD_NET_TEST_TARGET }}
+          --
+          --allocations
 
       - name: Test Local Integration
-        run: dotnet run --project src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_NET_TEST_TARGET }}
+        run: >-
+          dotnet run
+          --project src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj
+          --configuration ${{ env.BUILD_CONFIGURATION }}
+          --framework ${{ env.BUILD_NET_TEST_TARGET }}
 
       - name: Upload Native Lib
         uses: actions/upload-artifact@v7
@@ -112,51 +135,83 @@ jobs:
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.BUILD_NET_SDK }}
+          architecture: ${{ matrix.platform }}
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v3
         with:
           msbuild-architecture: ${{ matrix.platform }}
 
-      - name: Setup Environment
-        run: |
-          echo 'BUILD_COMMON_MSBUILD_ARGS=/v:m /m /p:Configuration=${{ env.BUILD_CONFIGURATION }}' >> $GITHUB_ENV
-          echo 'Platform=' >> $GITHUB_ENV
-        shell: bash
-
       - name: NuGet Restore
-        run: dotnet restore src/PCRE.NET.slnx -p:DisableWarnForInvalidRestoreProjects=true
+        run: >-
+          dotnet restore
+          src/PCRE.NET.slnx
+          -p:DisableWarnForInvalidRestoreProjects=true
 
       - name: Build Native
-        run: msbuild src/PCRE.NET.Native/PCRE.NET.Native.vcxproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:Platform=${{ matrix.msbuild-platform }}
-
-      - name: Build Tests
-        run: msbuild src/PCRE.NET.Tests/PCRE.NET.Tests.csproj ${{ env.BUILD_COMMON_MSBUILD_ARGS }} /p:Platform=${{ matrix.platform }} /p:PcreNetTestBuild=true /p:ExpectPlatform=${{ matrix.platform }}
-
-      - name: Test .NET Framework
-        run: |
-          $path = vswhere -latest -products * -requires Microsoft.VisualStudio.Workload.ManagedDesktop Microsoft.VisualStudio.Workload.Web -requiresAny -property installationPath
-          $path = join-path $path 'Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe'
-          & $path src/PCRE.NET.Tests/bin/${{ matrix.platform }}/${{ env.BUILD_CONFIGURATION }}/${{ env.BUILD_NETFWK_TEST_TARGET }}/PCRE.NET.Tests.dll /Platform:${{ matrix.platform }}
+        run: >-
+          msbuild src/PCRE.NET.Native/PCRE.NET.Native.vcxproj
+          -p:Configuration=${{ env.BUILD_CONFIGURATION }}
+          -p:Platform=${{ matrix.msbuild-platform }}
 
       - name: Test .NET
-        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} -p:PcreNetTestBuild=true -p:ExpectPlatform=${{ matrix.platform }}
-        if: ${{ matrix.platform != 'x86' }}
+        run: >-
+          dotnet run
+          --project src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
+          --configuration ${{ env.BUILD_CONFIGURATION }}
+          --framework ${{ env.BUILD_NET_TEST_TARGET }}
+          --runtime win-${{ matrix.platform }}
+          -p:PcreNetTestBuild=true
+          -p:ExpectPlatform=${{ matrix.platform }}
 
       - name: Test .NET Standard
-        run: dotnet test src/PCRE.NET.Tests/PCRE.NET.Tests.csproj --configuration ${{ env.BUILD_CONFIGURATION }} -p:PcreNetTestBuild=true -p:ExpectPlatform=${{ matrix.platform }} -p:ForceNetStandard=true
-        if: ${{ matrix.platform == 'x64' }}
+        run: >-
+          dotnet run
+          --project src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
+          --configuration ${{ env.BUILD_CONFIGURATION }}
+          --framework ${{ env.BUILD_NET_TEST_TARGET }}
+          --runtime win-${{ matrix.platform }}
+          -p:PcreNetTestBuild=true
+          -p:ExpectPlatform=${{ matrix.platform }}
+          -p:ForceNetStandard=true
+
+      - name: Test .NET Framework
+        run: >-
+          dotnet run
+          --project src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
+          --configuration ${{ env.BUILD_CONFIGURATION }}
+          --framework ${{ env.BUILD_NETFWK_TEST_TARGET }}
+          --runtime win-${{ matrix.platform }}
+          -p:PcreNetTestBuild=true
+          -p:ExpectPlatform=${{ matrix.platform }}
 
       - name: Test Allocations .NET
-        run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_NET_TEST_TARGET }} -- --allocations
-        if: ${{ matrix.platform != 'x86' }}
+        run: >-
+          dotnet run
+          --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj
+          --configuration ${{ env.BUILD_CONFIGURATION }}
+          --framework ${{ env.BUILD_NET_TEST_TARGET }}
+          --runtime win-${{ matrix.platform }}
+          --
+          --allocations
 
       - name: Test Allocations .NET Framework
-        run: dotnet run --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_NETFWK_TEST_TARGET }} -- --allocations
-        if: ${{ matrix.platform == 'x64' }}
+        run: >-
+          dotnet run
+          --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj
+          --configuration ${{ env.BUILD_CONFIGURATION }}
+          --framework ${{ env.BUILD_NETFWK_TEST_TARGET }}
+          --runtime win-${{ matrix.platform }}
+          --
+          --allocations
 
       - name: Test Local Integration
-        run: dotnet run --project src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --configuration ${{ env.BUILD_CONFIGURATION }} --framework ${{ env.BUILD_NET_TEST_TARGET }} --runtime win-${{ matrix.platform }}
+        run: >-
+          dotnet run
+          --project src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj
+          --configuration ${{ env.BUILD_CONFIGURATION }}
+          --framework ${{ env.BUILD_NET_TEST_TARGET }}
+          --runtime win-${{ matrix.platform }}
 
       - name: Upload Native Lib
         uses: actions/upload-artifact@v7
@@ -197,10 +252,20 @@ jobs:
         run: dotnet restore src/PCRE.NET/PCRE.NET.csproj
 
       - name: Build PCRE.NET
-        run: dotnet build --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore src/PCRE.NET/PCRE.NET.csproj -p:PcreNetPackage=true
+        run: >-
+          dotnet build
+          src/PCRE.NET/PCRE.NET.csproj
+          --configuration ${{ env.BUILD_CONFIGURATION }}
+          --no-restore
+          -p:PcreNetPackage=true
 
       - name: NuGet Pack
-        run: dotnet pack --configuration ${{ env.BUILD_CONFIGURATION }} --no-build src/PCRE.NET/PCRE.NET.csproj -p:PcreNetPackage=true
+        run: >-
+          dotnet pack
+          src/PCRE.NET/PCRE.NET.csproj
+          --configuration ${{ env.BUILD_CONFIGURATION }}
+          --no-build
+          -p:PcreNetPackage=true
 
       - name: Upload NuGet
         uses: actions/upload-artifact@v7
@@ -292,13 +357,31 @@ jobs:
           skip-decompress: true
 
       - name: Restore
-        run: dotnet restore src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj -p:UsePcreNetNuGetPackage=true ${{ matrix.build-args }}
+        run: >-
+          dotnet restore
+          src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj
+          -p:UsePcreNetNuGetPackage=true
+          ${{ matrix.build-args }}
 
       - name: Build
-        run: dotnet build src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --no-restore -p:UsePcreNetNuGetPackage=true ${{ matrix.build-args }}
+        run: >-
+          dotnet build
+          src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj
+          --no-restore
+          -p:UsePcreNetNuGetPackage=true
+          ${{ matrix.build-args }}
 
       - name: Publish
-        run: dotnet publish src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj --no-build --output ./bin/publish -p:UsePcreNetNuGetPackage=true ${{ matrix.build-args }}
+        run: >-
+          dotnet publish
+          src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj
+          --no-build
+          --output ./bin/publish
+          -p:UsePcreNetNuGetPackage=true
+          ${{ matrix.build-args }}
 
       - name: Run
-        run: ./bin/publish/PCRE.NET.Tests.Integration --nuget ${{ matrix.run-args }}
+        run: >-
+          ./bin/publish/PCRE.NET.Tests.Integration
+          --nuget
+          ${{ matrix.run-args }}
