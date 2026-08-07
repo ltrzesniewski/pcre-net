@@ -11,7 +11,7 @@ namespace PCRE.Tests;
 [TestFixture, Explicit]
 public class ManualTests
 {
-    [Test]
+    // [Test]
     public void generate_error_codes()
     {
         const string errorPrefix = "ERROR_";
