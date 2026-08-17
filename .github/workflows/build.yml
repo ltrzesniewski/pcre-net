@@ -65,8 +65,15 @@ jobs:
           mkdir lib
           cp src/cmake/PCRE.NET.Native.${{ matrix.extension }} lib/PCRE.NET.Native.${{ matrix.platform }}.${{ matrix.extension }}
 
+      - name: Upload Native Lib
+        uses: actions/upload-artifact@v7
+        with:
+          name: lib-${{ matrix.platform }}.${{ matrix.extension }}
+          path: lib/PCRE.NET.Native.${{ matrix.platform }}.${{ matrix.extension }}
+          if-no-files-found: error
+
       - name: Test .NET
-        run: >-
+        run: >
           dotnet run
           --project src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
@@ -75,7 +82,7 @@ jobs:
           -p:ExpectPlatform=${{ matrix.platform }}
 
       - name: Test .NET Standard
-        run: >-
+        run: >
           dotnet run
           --project src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
@@ -85,7 +92,7 @@ jobs:
           -p:ForceNetStandard=true
 
       - name: Test Allocations
-        run: >-
+        run: >
           dotnet run
           --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
@@ -94,18 +101,11 @@ jobs:
           --allocations
 
       - name: Test Local Integration
-        run: >-
+        run: >
           dotnet run
           --project src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
           --framework ${{ env.BUILD_NET_TEST_TARGET }}
-
-      - name: Upload Native Lib
-        uses: actions/upload-artifact@v7
-        with:
-          name: lib-${{ matrix.platform }}.${{ matrix.extension }}
-          path: lib/PCRE.NET.Native.${{ matrix.platform }}.${{ matrix.extension }}
-          if-no-files-found: error
 
   windows:
     name: Build Windows ${{ matrix.platform }}
@@ -143,19 +143,26 @@ jobs:
           msbuild-architecture: ${{ matrix.platform }}
 
       - name: NuGet Restore
-        run: >-
+        run: >
           dotnet restore
           src/PCRE.NET.slnx
           -p:DisableWarnForInvalidRestoreProjects=true
 
       - name: Build Native
-        run: >-
+        run: >
           msbuild src/PCRE.NET.Native/PCRE.NET.Native.vcxproj
           -p:Configuration=${{ env.BUILD_CONFIGURATION }}
           -p:Platform=${{ matrix.msbuild-platform }}
 
+      - name: Upload Native Lib
+        uses: actions/upload-artifact@v7
+        with:
+          name: lib-${{ matrix.platform }}.dll
+          path: lib/PCRE.NET.Native.${{ matrix.platform }}.dll
+          if-no-files-found: error
+
       - name: Test .NET
-        run: >-
+        run: >
           dotnet run
           --project src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
@@ -165,7 +172,7 @@ jobs:
           -p:ExpectPlatform=${{ matrix.platform }}
 
       - name: Test .NET Standard
-        run: >-
+        run: >
           dotnet run
           --project src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
@@ -176,7 +183,7 @@ jobs:
           -p:ForceNetStandard=true
 
       - name: Test .NET Framework
-        run: >-
+        run: >
           dotnet run
           --project src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
@@ -186,7 +193,7 @@ jobs:
           -p:ExpectPlatform=${{ matrix.platform }}
 
       - name: Test Allocations .NET
-        run: >-
+        run: >
           dotnet run
           --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
@@ -196,7 +203,7 @@ jobs:
           --allocations
 
       - name: Test Allocations .NET Framework
-        run: >-
+        run: >
           dotnet run
           --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
@@ -206,19 +213,12 @@ jobs:
           --allocations
 
       - name: Test Local Integration
-        run: >-
+        run: >
           dotnet run
           --project src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
           --framework ${{ env.BUILD_NET_TEST_TARGET }}
           --runtime win-${{ matrix.platform }}
-
-      - name: Upload Native Lib
-        uses: actions/upload-artifact@v7
-        with:
-          name: lib-${{ matrix.platform }}.dll
-          path: lib/PCRE.NET.Native.${{ matrix.platform }}.dll
-          if-no-files-found: error
 
   pack:
     name: Pack
@@ -242,17 +242,11 @@ jobs:
           path: lib
           merge-multiple: true
 
-      - name: Delete Native Lib Artifacts
-        uses: geekyeggo/delete-artifact@v6
-        with:
-          name: lib-*
-          failOnError: false
-
       - name: NuGet Restore
         run: dotnet restore src/PCRE.NET/PCRE.NET.csproj
 
       - name: Build PCRE.NET
-        run: >-
+        run: >
           dotnet build
           src/PCRE.NET/PCRE.NET.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
@@ -260,7 +254,7 @@ jobs:
           -p:PcreNetPackage=true
 
       - name: NuGet Pack
-        run: >-
+        run: >
           dotnet pack
           src/PCRE.NET/PCRE.NET.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
@@ -274,6 +268,12 @@ jobs:
           path: src/PCRE.NET/bin/${{ env.BUILD_CONFIGURATION }}/*.nupkg
           archive: false
           if-no-files-found: error
+
+      - name: Delete Native Lib Artifacts
+        uses: geekyeggo/delete-artifact@v6
+        with:
+          name: lib-*
+          failOnError: false
 
   integration-tests:
     name: Test ${{ matrix.name }}
@@ -357,14 +357,14 @@ jobs:
           skip-decompress: true
 
       - name: Restore
-        run: >-
+        run: >
           dotnet restore
           src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj
           -p:UsePcreNetNuGetPackage=true
           ${{ matrix.build-args }}
 
       - name: Build
-        run: >-
+        run: >
           dotnet build
           src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj
           --no-restore
@@ -372,7 +372,7 @@ jobs:
           ${{ matrix.build-args }}
 
       - name: Publish
-        run: >-
+        run: >
           dotnet publish
           src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj
           --no-build
@@ -381,7 +381,7 @@ jobs:
           ${{ matrix.build-args }}
 
       - name: Run
-        run: >-
+        run: >
           ./bin/publish/PCRE.NET.Tests.Integration
           --nuget
           ${{ matrix.run-args }}
