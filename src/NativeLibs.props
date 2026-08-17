@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PcreNetNativeLib Update="@(PcreNetNativeLib)" Exists="$([System.IO.File]::Exists('%(FullPath)'))" Visible="false" />
+    <PcreNetNativeLib Update="@(PcreNetNativeLib)" Visible="false" />
   </ItemGroup>
 
 </Project>

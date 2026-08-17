@@ -1,13 +1,13 @@
 <Project>
 
   <ItemGroup Condition="'$(OutputType)' == 'Exe' or '$(IsTestProject)' == 'true'">
-    <None Include="@(PcreNetNativeLib->WithMetadataValue('Exists', 'true'))"
+    <None Include="@(PcreNetNativeLib->Exists())"
           Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'"
           Link="%(Filename)%(Extension)"
           CopyToOutputDirectory="PreserveNewest"
           Visible="false" />
 
-    <None Include="@(PcreNetNativeLib->WithMetadataValue('Exists', 'true')->WithMetadataValue('RuntimeIdentifier', '$(RuntimeIdentifier)'))"
+    <None Include="@(PcreNetNativeLib->Exists()->WithMetadataValue('RuntimeIdentifier', '$(RuntimeIdentifier)'))"
           Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'"
           Link="PCRE.NET.Native%(Extension)"
           CopyToOutputDirectory="PreserveNewest"

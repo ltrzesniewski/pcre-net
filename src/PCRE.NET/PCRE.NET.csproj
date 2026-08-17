@@ -69,7 +69,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PcreNetNativeLib Update="@(PcreNetNativeLib)" ToPackage="%(Exists)" />
+    <PcreNetNativeLib Update="@(PcreNetNativeLib)" ToPackage="false" />
+    <PcreNetNativeLib Update="@(PcreNetNativeLib->Exists())" ToPackage="true" />
     <PcreNetNativeLib Update="@(PcreNetNativeLib)" ToPackage="true" Condition="'$(PcreNetPackage)' == 'true'" />
 
     <None Include="@(PcreNetNativeLib->WithMetadataValue('ToPackage', 'true'))"
