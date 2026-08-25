@@ -295,11 +295,29 @@
 /abc/
     abc
     abc\=no_jit 
-    
+
+/(*NO_JIT)abc/
+    abc
+
 /abc/jitfast
     abc
     abc\=no_jit 
-    
+
+/(*NO_JIT)abc/jitfast
+\= Expect error
+    abc
+
+# Do not leak a previously copied subject with jitfast (#920)
+
+/abc/jitfast
+    abc\=copy_matched_subject,no_jit
+    abc
+
+/abc/jitfast
+    abc\=copy_matched_subject
+    abc\=null_context
+    abc\=null_context,no_jit
+
 # ---- 
 
 /[aC]/mg,firstline,newline=lf
@@ -334,5 +352,15 @@
 /(?C1)abc/jitfast,replace=yy
     zabcz\=callout_error=1
     zabcz\=callout_error=1,substitute_matched
+
+# Check UTF validation when falling back from a partially-compiled JIT pattern
+# to the interpreter
+
+#if unicode
+
+/\b/B,utf,ucp,jit=1
+    \xff\x00\x00\=offset=2,ps
+
+#endif
 
 # End of testinput17
