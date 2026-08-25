@@ -160,6 +160,7 @@ namespace PCRE
     public enum PcreErrorCode
     {
         None = 0,
+        ConditionAtomicAssertionExpected = 198,
         EndBackslash = 101,
         EndBackslashC = 102,
         UnknownEscape = 103,
@@ -258,7 +259,6 @@ namespace PCRE
         ScriptRunNotAvailable = 196,
         TooManyCaptures = 197,
         MissingOctalDigit = 198,
-        ConditionAtomicAssertionExpected = 198,
         BackslashKInLookaround = 199,
         MaxVarLookbehindExceeded = 200,
         PatternCompiledSizeTooBig = 201,
@@ -356,6 +356,7 @@ namespace PCRE
         DiffSubsOffset = -73,
         DiffSubsOptions = -74,
         BadBackslashK = -75,
+        PartialSubs = -76,
     }
     public class PcreException : System.Exception
     {

@@ -292,6 +292,7 @@ internal static class PcreConstants
     public const int PCRE2_ERROR_DIFFSUBSOFFSET = -73;
     public const int PCRE2_ERROR_DIFFSUBSOPTIONS = -74;
     public const int PCRE2_ERROR_BAD_BACKSLASH_K = -75;
+    public const int PCRE2_ERROR_PARTIALSUBS = -76;
     public const uint PCRE2_INFO_ALLOPTIONS = 0;
     public const uint PCRE2_INFO_ARGOPTIONS = 1;
     public const uint PCRE2_INFO_BACKREFMAX = 2;
