@@ -13,7 +13,7 @@ public class PcreErrorCodeTests
     public void should_have_all_error_codes()
     {
         var codes = typeof(PcreConstants).GetFields(BindingFlags.Public | BindingFlags.Static)
-                                         .Where(i => i.Name.StartsWith("ERROR_"))
+                                         .Where(i => i.Name.StartsWith("PCRE2_ERROR_"))
                                          .Select(i => (name: i.Name, value: (int)i.GetValue(null)!));
 
         var errors = Enum.GetValues(typeof(PcreErrorCode))

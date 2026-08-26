@@ -70,6 +70,8 @@ internal sealed class CodeWriter
     public CodeWriter Clear()
     {
         _sb.Clear();
+        _isAtStartOfLine = true;
+        Indent = 0;
         return this;
     }
 
@@ -103,6 +105,15 @@ internal sealed class CodeWriter
     public override string ToString()
         => _sb.ToString();
 
+    public IndentScope Indented()
+    {
+        if (!_isAtStartOfLine)
+            AppendLine();
+
+        Indent++;
+        return new IndentScope(this);
+    }
+
     public BlockScope WriteBlock([StringSyntax("csharp")] string? header = null)
     {
         Append(header);
@@ -113,6 +124,15 @@ internal sealed class CodeWriter
         AppendLine("{");
         Indent++;
         return new BlockScope(this);
+    }
+
+    public readonly struct IndentScope(CodeWriter writer) : IDisposable
+    {
+        public void Dispose()
+        {
+            writer.Indent--;
+            writer.TrimEnd().AppendLine();
+        }
     }
 
     public readonly struct BlockScope(CodeWriter writer) : IDisposable

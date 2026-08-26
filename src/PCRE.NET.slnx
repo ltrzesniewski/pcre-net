@@ -12,7 +12,8 @@
     <File Path="NativeLibs.props" />
     <File Path="NativeLibs.targets" />
     <File Path="NuGetReadme.md" />
-    <File Path="update-pcre2.sh" />
+    <File Path="Tools/UpdatePcre2.cs" />
+    <File Path="Tools/UpdatePcre2.Data.cs" />
     <File Path="Version.props" />
   </Folder>
   <Project Path="PCRE.NET.Analyzers/PCRE.NET.Analyzers.csproj" />

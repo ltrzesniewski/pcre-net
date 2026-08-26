@@ -53,18 +53,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Native.Generated.tt</DependentUpon>
     </Compile>
-    <Compile Update="Internal\PcreConstants.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>PcreConstants.tt</DependentUpon>
-    </Compile>
     <None Update="Internal\Native.Generated.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Native.Generated.cs</LastGenOutput>
-    </None>
-    <None Update="Internal\PcreConstants.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>PcreConstants.cs</LastGenOutput>
     </None>
   </ItemGroup>
 

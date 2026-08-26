@@ -4,6 +4,8 @@ using PCRE.Internal;
 
 namespace PCRE;
 
+#pragma warning disable CA1069
+
 /// <summary>
 /// An error code returned by PCRE.
 /// </summary>
@@ -16,6 +18,14 @@ public enum PcreErrorCode
     /// No error.
     /// </summary>
     None = 0,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_CONDITION_ATOMIC_ASSERTION_EXPECTED</c> - Atomic assertion expected after <c>(?(</c> or <c>(?(?C)</c>
+    /// </summary>
+    [Obsolete($"Not used anymore, shares the code with {nameof(MissingOctalDigit)}")]
+    ConditionAtomicAssertionExpected = MissingOctalDigit,
+
+    #region Generated
 
     /// <summary>
     /// <c>PCRE2_ERROR_END_BACKSLASH</c> - <c>\</c> at end of pattern.
@@ -93,7 +103,7 @@ public enum PcreErrorCode
     BadSubpatternReference = PcreConstants.PCRE2_ERROR_BAD_SUBPATTERN_REFERENCE,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_NULL_PATTERN</c> - Pattern passed as NULL.
+    /// <c>PCRE2_ERROR_NULL_PATTERN</c> - Pattern passed as <c>NULL</c> with non-zero length.
     /// </summary>
     NullPattern = PcreConstants.PCRE2_ERROR_NULL_PATTERN,
 
@@ -138,7 +148,7 @@ public enum PcreErrorCode
     MissingConditionClosing = PcreConstants.PCRE2_ERROR_MISSING_CONDITION_CLOSING,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_LOOKBEHIND_NOT_FIXED_LENGTH</c> - Lookbehind assertion is not fixed length.
+    /// <c>PCRE2_ERROR_LOOKBEHIND_NOT_FIXED_LENGTH</c> - Length of lookbehind assertion is not limited.
     /// </summary>
     LookbehindNotFixedLength = PcreConstants.PCRE2_ERROR_LOOKBEHIND_NOT_FIXED_LENGTH,
 
@@ -153,12 +163,12 @@ public enum PcreErrorCode
     TooManyConditionBranches = PcreConstants.PCRE2_ERROR_TOO_MANY_CONDITION_BRANCHES,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_CONDITION_ASSERTION_EXPECTED</c> - Assertion expected after <c>(?(</c> or <c>(?(?C)</c>
+    /// <c>PCRE2_ERROR_CONDITION_ASSERTION_EXPECTED</c> - Atomic assertion expected after <c>(?(</c> or <c>(?(?C)</c>
     /// </summary>
     ConditionAssertionExpected = PcreConstants.PCRE2_ERROR_CONDITION_ASSERTION_EXPECTED,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_BAD_RELATIVE_REFERENCE</c> - Digit expected after <c>(?+</c> or <c>(?-</c>
+    /// <c>PCRE2_ERROR_BAD_RELATIVE_REFERENCE</c> - Digit expected after <c>(?+</c>
     /// </summary>
     BadRelativeReference = PcreConstants.PCRE2_ERROR_BAD_RELATIVE_REFERENCE,
 
@@ -193,7 +203,7 @@ public enum PcreErrorCode
     LookbehindTooComplicated = PcreConstants.PCRE2_ERROR_LOOKBEHIND_TOO_COMPLICATED,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_LOOKBEHIND_INVALID_BACKSLASH_C</c> - <c>\C</c> is not allowed in a lookbehind assertion in UTF-16 mode.
+    /// <c>PCRE2_ERROR_LOOKBEHIND_INVALID_BACKSLASH_C</c> - <c>\C</c> is not allowed in a lookbehind assertion in the used UTF mode.
     /// </summary>
     LookbehindInvalidBackslashC = PcreConstants.PCRE2_ERROR_LOOKBEHIND_INVALID_BACKSLASH_C,
 
@@ -238,7 +248,7 @@ public enum PcreErrorCode
     InvalidSubpatternName = PcreConstants.PCRE2_ERROR_INVALID_SUBPATTERN_NAME,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_UNICODE_PROPERTIES_UNAVAILABLE</c> - This version of PCRE2 does not have support for <c>\P</c>, \p, or <c>\X</c>
+    /// <c>PCRE2_ERROR_UNICODE_PROPERTIES_UNAVAILABLE</c> - This version of PCRE2 does not have support for <c>\P</c>, <c>\p</c>, or <c>\X</c>
     /// </summary>
     UnicodePropertiesUnavailable = PcreConstants.PCRE2_ERROR_UNICODE_PROPERTIES_UNAVAILABLE,
 
@@ -248,17 +258,17 @@ public enum PcreErrorCode
     MalformedUnicodeProperty = PcreConstants.PCRE2_ERROR_MALFORMED_UNICODE_PROPERTY,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_UNKNOWN_UNICODE_PROPERTY</c> - Unknown property name after <c>\P</c> or <c>\p</c>
+    /// <c>PCRE2_ERROR_UNKNOWN_UNICODE_PROPERTY</c> - Unknown property after <c>\P</c> or <c>\p</c>
     /// </summary>
     UnknownUnicodeProperty = PcreConstants.PCRE2_ERROR_UNKNOWN_UNICODE_PROPERTY,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_SUBPATTERN_NAME_TOO_LONG</c> - Subpattern name is too long (maximum 32 code units).
+    /// <c>PCRE2_ERROR_SUBPATTERN_NAME_TOO_LONG</c> - Subpattern name is too long.
     /// </summary>
     SubpatternNameTooLong = PcreConstants.PCRE2_ERROR_SUBPATTERN_NAME_TOO_LONG,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_TOO_MANY_NAMED_SUBPATTERNS</c> - Too many named subpatterns (maximum 10000).
+    /// <c>PCRE2_ERROR_TOO_MANY_NAMED_SUBPATTERNS</c> - Too many named subpatterns.
     /// </summary>
     TooManyNamedSubpatterns = PcreConstants.PCRE2_ERROR_TOO_MANY_NAMED_SUBPATTERNS,
 
@@ -403,7 +413,7 @@ public enum PcreErrorCode
     BackslashUCodePointTooBig = PcreConstants.PCRE2_ERROR_BACKSLASH_U_CODE_POINT_TOO_BIG,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_MISSING_OCTAL_OR_HEX_DIGITS</c> - Digits missing in <c>\x{}</c> or <c>\o{}</c> or <c>\N{U+}</c>
+    /// <c>PCRE2_ERROR_MISSING_OCTAL_OR_HEX_DIGITS</c> - Digits missing after <c>\x</c> or in <c>\x{}</c> or <c>\o{}</c> or <c>\N{U+}</c>
     /// </summary>
     MissingOctalOrHexDigits = PcreConstants.PCRE2_ERROR_MISSING_OCTAL_OR_HEX_DIGITS,
 
@@ -508,12 +518,6 @@ public enum PcreErrorCode
     MissingOctalDigit = PcreConstants.PCRE2_ERROR_MISSING_OCTAL_DIGIT,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_CONDITION_ATOMIC_ASSERTION_EXPECTED</c> - Atomic assertion expected after <c>(?(</c> or <c>(?(?C)</c>
-    /// </summary>
-    [Obsolete($"Not used anymore, shares the code with {nameof(MissingOctalDigit)}")]
-    ConditionAtomicAssertionExpected = MissingOctalDigit,
-
-    /// <summary>
     /// <c>PCRE2_ERROR_BACKSLASH_K_IN_LOOKAROUND</c> - <c>\K</c> is not allowed in lookarounds (but see <see cref="PcreExtraCompileOptions.AllowLookaroundBsK"/>).
     /// </summary>
     BackslashKInLookaround = PcreConstants.PCRE2_ERROR_BACKSLASH_K_IN_LOOKAROUND,
@@ -579,7 +583,7 @@ public enum PcreErrorCode
     EClassMixedOperators = PcreConstants.PCRE2_ERROR_ECLASS_MIXED_OPERATORS,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_ECLASS_HINT_SQUARE_BRACKET</c> - Missing terminating <c>]</c> for extended character class (note <c>[</c> must be escaped under <see cref="PcreOptions.AltExtendedClass"/>).
+    /// <c>PCRE2_ERROR_ECLASS_HINT_SQUARE_BRACKET</c> - Missing terminating <c>]</c> for extended character class (note <c>'['</c> must be escaped under <see cref="PcreOptions.AltExtendedClass"/>).
     /// </summary>
     EClassHintSquareBracket = PcreConstants.PCRE2_ERROR_ECLASS_HINT_SQUARE_BRACKET,
 
@@ -594,7 +598,7 @@ public enum PcreErrorCode
     PerlEClassEmptyExpr = PcreConstants.PCRE2_ERROR_PERL_ECLASS_EMPTY_EXPR,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_PERL_ECLASS_MISSING_CLOSE</c> - Terminating <c>]</c> with no following closing parenthesis in <c>(?[...]</c>.
+    /// <c>PCRE2_ERROR_PERL_ECLASS_MISSING_CLOSE</c> - Terminating <c>]</c> with no following closing parenthesis in <c>(?[...]</c>
     /// </summary>
     PerlEClassMissingClose = PcreConstants.PCRE2_ERROR_PERL_ECLASS_MISSING_CLOSE,
 
@@ -619,7 +623,7 @@ public enum PcreErrorCode
     MissingNumberTerminator = PcreConstants.PCRE2_ERROR_MISSING_NUMBER_TERMINATOR,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_NULL_ERROROFFSET</c> - <c>NULL</c> - <c>erroroffset</c> passed as NULL.
+    /// <c>PCRE2_ERROR_NULL_ERROROFFSET</c> - <c>erroroffset</c> passed as <c>NULL</c>
     /// </summary>
     NullErrorOffset = PcreConstants.PCRE2_ERROR_NULL_ERROROFFSET,
 
@@ -874,7 +878,7 @@ public enum PcreErrorCode
     NoUniqueSubstring = PcreConstants.PCRE2_ERROR_NOUNIQUESUBSTRING,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_NULL</c> - NULL argument passed.
+    /// <c>PCRE2_ERROR_NULL</c> - <c>NULL</c> argument passed with non-zero length.
     /// </summary>
     Null = PcreConstants.PCRE2_ERROR_NULL,
 
@@ -899,7 +903,7 @@ public enum PcreErrorCode
     Unset = PcreConstants.PCRE2_ERROR_UNSET,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_BADOFFSETLIMIT</c> - Offset limit set without <see cref="PcreOptions.UseOffsetLimit"/>
+    /// <c>PCRE2_ERROR_BADOFFSETLIMIT</c> - Offset limit set without <see cref="PcreOptions.UseOffsetLimit"/>.
     /// </summary>
     BadOffsetLimit = PcreConstants.PCRE2_ERROR_BADOFFSETLIMIT,
 
@@ -924,7 +928,7 @@ public enum PcreErrorCode
     BadSubsPattern = PcreConstants.PCRE2_ERROR_BADSUBSPATTERN,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_TOOMANYREPLACE</c> - Too many replacements (more than <see cref="int.MaxValue"/>)
+    /// <c>PCRE2_ERROR_TOOMANYREPLACE</c> - Too many replacements (more than <see cref="int.MaxValue"/>).
     /// </summary>
     TooManyReplace = PcreConstants.PCRE2_ERROR_TOOMANYREPLACE,
 
@@ -944,7 +948,7 @@ public enum PcreErrorCode
     ConvertSyntax = PcreConstants.PCRE2_ERROR_CONVERT_SYNTAX,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_INTERNAL_DUPMATCH</c> - Internal error - duplicate substitution match.
+    /// <c>PCRE2_ERROR_INTERNAL_DUPMATCH</c> - Internal error: duplicate substitution match.
     /// </summary>
     InternalDupMatch = PcreConstants.PCRE2_ERROR_INTERNAL_DUPMATCH,
 
@@ -954,23 +958,23 @@ public enum PcreErrorCode
     DfaUInvalidUtf = PcreConstants.PCRE2_ERROR_DFA_UINVALID_UTF,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_INVALIDOFFSET</c> - Invalid offset value.
+    /// <c>PCRE2_ERROR_INVALIDOFFSET</c> - Internal error: invalid substring offset.
     /// </summary>
     InvalidOffset = PcreConstants.PCRE2_ERROR_INVALIDOFFSET,
 
-    ///<summary>
-    ///<c>PCRE2_ERROR_JIT_UNSUPPORTED</c> - Feature is not supported by the JIT compiler.
-    ///</summary>
+    /// <summary>
+    /// <c>PCRE2_ERROR_JIT_UNSUPPORTED</c> - Feature is not supported by the JIT compiler.
+    /// </summary>
     JitUnsupported = PcreConstants.PCRE2_ERROR_JIT_UNSUPPORTED,
 
-    ///<summary>
-    ///<c>PCRE2_ERROR_REPLACECASE</c> - Error performing replacement case transformation.
-    ///</summary>
+    /// <summary>
+    /// <c>PCRE2_ERROR_REPLACECASE</c> - Error performing replacement case transformation.
+    /// </summary>
     ReplaceCase = PcreConstants.PCRE2_ERROR_REPLACECASE,
 
-    ///<summary>
-    ///<c>PCRE2_ERROR_TOOLARGEREPLACE</c> - Replacement too large (longer than <c>PCRE2_SIZE</c>).
-    ///</summary>
+    /// <summary>
+    /// <c>PCRE2_ERROR_TOOLARGEREPLACE</c> - Replacement too large (longer than <c>PCRE2_SIZE</c>).
+    /// </summary>
     TooLargeReplace = PcreConstants.PCRE2_ERROR_TOOLARGEREPLACE,
 
     /// <summary>
@@ -997,4 +1001,11 @@ public enum PcreErrorCode
     /// <c>PCRE2_ERROR_BAD_BACKSLASH_K</c> - Disallowed use of <c>\K</c> in lookaround.
     /// </summary>
     BadBackslashK = PcreConstants.PCRE2_ERROR_BAD_BACKSLASH_K,
+
+    /// <summary>
+    /// <c>PCRE2_ERROR_PARTIALSUBS</c> - Replacement <c>$'</c> or <c>$_</c> not supported with partial match.
+    /// </summary>
+    PartialSubs = PcreConstants.PCRE2_ERROR_PARTIALSUBS,
+
+    #endregion
 }

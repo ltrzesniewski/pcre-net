@@ -281,6 +281,7 @@ static struct regression_test_case regression_test_cases[] = {
 	{ CM, A, 0, 0, "a1277|a1377|bx487", "bX487" },
 	{ 0, A, 0, 0, "(a|)b*+a", "a" },
 	{ 0, A, 0, 0 | F_NOMATCH, "(.|.|.|.|.)(|.|.|.|.)(.||.|.|.)(.|.||.|.)(.|.|.||.)(.|.|.|.|)(A|.|.|.|.)(.|A|.|.|.)(.|.|A|.|.)(.|.|.|A|.)(.|.|.|.|A)(B|.|.|.|.)(.|B|.|.|.)(.|.|B|.|.)(.|.|.|B|.)(.|.|.|.|B)xa", "1234567890123456ax" },
+	{ 0, A, 0, 0, "(CHAN|LINE)[ab]{0,2}", "LINE" },
 
 	/* Greedy and non-greedy ? operators. */
 	{ MU, A, 0, 0, "(?:a)?a", "laab" },
@@ -656,6 +657,7 @@ static struct regression_test_case regression_test_cases[] = {
 	{ MU, A, 0, 0 | F_NOMATCH, "a(?!)b", "ab" },
 	{ MU, A, 0, 0, "(?(?<!|(|a)))", "a" },
 	{ MU, A, 0, 0, "(?=((?|(a)(.)|(b)(..)|(c)(...)))(?1(2,3))).x", "b12c123bx2c123" },
+	{ MU, A, 0, 3, "(?<*(.).{,2})\\1", "BABA" },
 
 	/* Not empty, ACCEPT, FAIL */
 	{ MU, A, PCRE2_NOTEMPTY, 0 | F_NOMATCH, "a*", "bcx" },

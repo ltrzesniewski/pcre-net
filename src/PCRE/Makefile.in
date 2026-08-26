@@ -157,10 +157,11 @@ noinst_PROGRAMS = $(am__EXEEXT_2) $(am__EXEEXT_3) $(am__EXEEXT_4) \
 @WITH_GCOV_FALSE@am__append_55 = coverage-distclean
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ax_check_vscript.m4 \
-	$(top_srcdir)/m4/ax_pthread.m4 $(top_srcdir)/m4/libtool.m4 \
-	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
-	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/ax_pthread.m4 \
+	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
+	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
+	$(top_srcdir)/m4/lt~obsolete.m4 \
+	$(top_srcdir)/m4/pcre2_check_vscript.m4 \
 	$(top_srcdir)/m4/pcre2_visibility.m4 \
 	$(top_srcdir)/m4/pcre2_zos.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -174,7 +175,8 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES = libpcre2-8.pc libpcre2-16.pc libpcre2-32.pc \
-	libpcre2-posix.pc pcre2-config src/pcre2.h
+	libpcre2-posix.pc pcre2-config src/pcre2.h src/libpcre2-8.sym \
+	src/libpcre2-16.sym src/libpcre2-32.sym src/libpcre2-posix.sym
 CONFIG_CLEAN_VPATH_FILES =
 @WITH_PCRE2_8_TRUE@am__EXEEXT_1 = pcre2grep$(EXEEXT)
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libdir)" \
@@ -895,6 +897,10 @@ am__DIST_COMMON = $(dist_man_MANS) $(srcdir)/Makefile.in \
 	$(srcdir)/libpcre2-16.pc.in $(srcdir)/libpcre2-32.pc.in \
 	$(srcdir)/libpcre2-8.pc.in $(srcdir)/libpcre2-posix.pc.in \
 	$(srcdir)/pcre2-config.in $(top_srcdir)/src/config.h.in \
+	$(top_srcdir)/src/libpcre2-16.sym.in \
+	$(top_srcdir)/src/libpcre2-32.sym.in \
+	$(top_srcdir)/src/libpcre2-8.sym.in \
+	$(top_srcdir)/src/libpcre2-posix.sym.in \
 	$(top_srcdir)/src/pcre2.h.in AUTHORS.md COPYING ChangeLog \
 	INSTALL NEWS README ar-lib compile config.guess config.sub \
 	depcomp install-sh ltmain.sh missing test-driver
@@ -998,6 +1004,7 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PCRE2POSIX_CFLAG = @PCRE2POSIX_CFLAG@
 PCRE2_DATE = @PCRE2_DATE@
+PCRE2_EXTRA_LOCAL_SYMS = @PCRE2_EXTRA_LOCAL_SYMS@
 PCRE2_MAJOR = @PCRE2_MAJOR@
 PCRE2_MINOR = @PCRE2_MINOR@
 PCRE2_PRERELEASE = @PCRE2_PRERELEASE@
@@ -1019,7 +1026,6 @@ VALGRIND_CFLAGS = @VALGRIND_CFLAGS@
 VALGRIND_LIBS = @VALGRIND_LIBS@
 VERSION = @VERSION@
 VISIBILITY_CFLAGS = @VISIBILITY_CFLAGS@
-VSCRIPT_LDFLAGS = @VSCRIPT_LDFLAGS@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
@@ -1091,6 +1097,7 @@ dist_doc_DATA = \
   NEWS \
   README \
   SECURITY.md \
+  SUPPORT-LIFECYCLE.md \
   doc/pcre2.txt \
   doc/pcre2-config.txt \
   doc/pcre2grep.txt \
@@ -1335,6 +1342,8 @@ MAINTAINERCLEANFILES = src/pcre2.h.generic src/config.h.generic
 
 # These files contain maintenance information
 
+# These are patches containing backports for older versions of PCRE2
+
 # These are support files for building with Bazel or Zig
 
 # These are support files for building under VMS
@@ -1352,10 +1361,20 @@ MAINTAINERCLEANFILES = src/pcre2.h.generic src/config.h.generic
 # PCRE2 demonstration program. Not built automatically. The point is that the
 # users should build it themselves. So just distribute the source.
 
-# Symbol version files for use with GNU and Sun ld.
-EXTRA_DIST = m4/ax_check_vscript.m4 m4/ax_pthread.m4 \
+# Symbol version template files for use with GNU and Sun ld.
+EXTRA_DIST = m4/ax_pthread.m4 m4/pcre2_check_vscript.m4 \
 	m4/pcre2_visibility.m4 m4/pcre2_zos.m4 NON-AUTOTOOLS-BUILD \
-	HACKING BUILD.bazel MODULE.bazel build.zig vms/configure.com \
+	HACKING patches/pcre2-10.37-Remove-real-POSIX.patch \
+	patches/pcre2-10.39-Fix-incorrect-detection.patch \
+	patches/pcre2-10.40-A-Fixed-a-unicode.patch \
+	patches/pcre2-10.40-B-Fixed-an-issue-affecting.patch \
+	patches/pcre2-10.43-Avoid-LIMIT_HEAP-integer.patch \
+	patches/pcre2-10.43-Fix-heapframe-overflow.patch \
+	patches/pcre2-10.44-Fix-incorrect-compiling.patch \
+	patches/pcre2-10.44-Fix-locking-region.patch \
+	patches/pcre2-10.45-Memory-reports-only-compiled.patch \
+	patches/pcre2-10.47-Fix-for-callback.patch BUILD.bazel \
+	MODULE.bazel build.zig build.zig.zon vms/configure.com \
 	vms/openvms_readme.txt vms/pcre2.h_patch vms/stdint.h \
 	src/pcre2.h.generic src/config.h.generic \
 	src/pcre2_chartables.c.dist \
@@ -1440,8 +1459,8 @@ EXTRA_DIST = m4/ax_check_vscript.m4 m4/ax_pthread.m4 \
 	testdata/testoutputheap-16 testdata/testoutputheap-32 \
 	testdata/testoutputheap-8 testdata/valgrind-jit.supp \
 	testdata/wintestinput3 testdata/wintestoutput3 perltest.sh \
-	src/pcre2demo.c src/libpcre2-8.sym src/libpcre2-16.sym \
-	src/libpcre2-32.sym src/libpcre2-posix.sym \
+	src/pcre2demo.c src/libpcre2-8.sym.in src/libpcre2-16.sym.in \
+	src/libpcre2-32.sym.in src/libpcre2-posix.sym.in \
 	cmake/COPYING-CMAKE-SCRIPTS cmake/FindEditline.cmake \
 	cmake/FindReadline.cmake cmake/pcre2-config.cmake.in \
 	cmake/PCRE2CheckVscript.cmake \
@@ -1692,6 +1711,14 @@ libpcre2-posix.pc: $(top_builddir)/config.status $(srcdir)/libpcre2-posix.pc.in
 pcre2-config: $(top_builddir)/config.status $(srcdir)/pcre2-config.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 src/pcre2.h: $(top_builddir)/config.status $(top_srcdir)/src/pcre2.h.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+src/libpcre2-8.sym: $(top_builddir)/config.status $(top_srcdir)/src/libpcre2-8.sym.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+src/libpcre2-16.sym: $(top_builddir)/config.status $(top_srcdir)/src/libpcre2-16.sym.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+src/libpcre2-32.sym: $(top_builddir)/config.status $(top_srcdir)/src/libpcre2-32.sym.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+src/libpcre2-posix.sym: $(top_builddir)/config.status $(top_srcdir)/src/libpcre2-posix.sym.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
