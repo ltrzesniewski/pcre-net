@@ -25,11 +25,7 @@ public enum PcreErrorCode
     [Obsolete($"Not used anymore, shares the code with {nameof(MissingOctalDigit)}")]
     ConditionAtomicAssertionExpected = MissingOctalDigit,
 
-    // ====================================================
-    //
-    // /!\ Use generate_error_codes to update from here.
-    //
-    // ====================================================
+    #region Generated
 
     /// <summary>
     /// <c>PCRE2_ERROR_END_BACKSLASH</c> - <c>\</c> at end of pattern.
@@ -207,7 +203,7 @@ public enum PcreErrorCode
     LookbehindTooComplicated = PcreConstants.PCRE2_ERROR_LOOKBEHIND_TOO_COMPLICATED,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_LOOKBEHIND_INVALID_BACKSLASH_C</c> - <c>\C</c> is not allowed in a lookbehind assertion in UTF-16 mode.
+    /// <c>PCRE2_ERROR_LOOKBEHIND_INVALID_BACKSLASH_C</c> - <c>\C</c> is not allowed in a lookbehind assertion in the used UTF mode.
     /// </summary>
     LookbehindInvalidBackslashC = PcreConstants.PCRE2_ERROR_LOOKBEHIND_INVALID_BACKSLASH_C,
 
@@ -267,12 +263,12 @@ public enum PcreErrorCode
     UnknownUnicodeProperty = PcreConstants.PCRE2_ERROR_UNKNOWN_UNICODE_PROPERTY,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_SUBPATTERN_NAME_TOO_LONG</c> - Subpattern name is too long (maximum 128 code units).
+    /// <c>PCRE2_ERROR_SUBPATTERN_NAME_TOO_LONG</c> - Subpattern name is too long.
     /// </summary>
     SubpatternNameTooLong = PcreConstants.PCRE2_ERROR_SUBPATTERN_NAME_TOO_LONG,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_TOO_MANY_NAMED_SUBPATTERNS</c> - Too many named subpatterns (maximum 10000).
+    /// <c>PCRE2_ERROR_TOO_MANY_NAMED_SUBPATTERNS</c> - Too many named subpatterns.
     /// </summary>
     TooManyNamedSubpatterns = PcreConstants.PCRE2_ERROR_TOO_MANY_NAMED_SUBPATTERNS,
 
@@ -1010,4 +1006,6 @@ public enum PcreErrorCode
     /// <c>PCRE2_ERROR_PARTIALSUBS</c> - Replacement <c>$'</c> or $_ not supported with partial match.
     /// </summary>
     PartialSubs = PcreConstants.PCRE2_ERROR_PARTIALSUBS,
+
+    #endregion
 }
