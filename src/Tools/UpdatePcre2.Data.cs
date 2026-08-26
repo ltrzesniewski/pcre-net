@@ -221,7 +221,8 @@ internal readonly record struct PcreErrorMessage(int Value, string Message)
 
         var message = match.Groups["message"].Value;
 
-        message = message.Replace("""\\""", """\""")
+        message = message.Replace("\\\"", "\"")
+                         .Replace("""\\""", """\""")
                          .Replace("""in UTF-" XSTRING(PCRE2_CODE_UNIT_WIDTH) " mode""", "in the used UTF mode")
                          .Replace(""" (maximum " XSTRING(MAX_NAME_SIZE) " code units)""", string.Empty)
                          .Replace(""" (maximum " XSTRING(MAX_NAME_COUNT) ")""", string.Empty);
@@ -240,16 +241,17 @@ internal readonly record struct PcreErrorMessage(int Value, string Message)
         errorMessage = Regex.Replace(
             errorMessage,
             """
-            (?<=^|[ ])
+            (?<=^|[ (])
             (?:
                 [a-z0-9]+_[a-z0-9_]+ \(\)  # Function
                 | \\   [^ ]+               # Escape
                 | \(\? [^ ]+               # Group
                 | \(\* [a-zA-Z_]+ \)       # Verb
                 | { [^}]+ }                # Braces
-                | (?! POSIX | ASCII | UTF | UCP | DFA | JIT) [A-Z]{2,}
+                | (?! POSIX | ASCII | UTF | UCP | DFA | JIT | RFC ) [A-Z]{2,}
                 | (?! - ) \W+
                 | ^erroroffset
+                | \$_
             )
             (?=[ :),]|$)
             """,
@@ -257,7 +259,8 @@ internal readonly record struct PcreErrorMessage(int Value, string Message)
             RegexOptions.CultureInvariant | RegexOptions.IgnorePatternWhitespace
         );
 
-        errorMessage = errorMessage.Replace(",</c>", "</c>,");
+        errorMessage = errorMessage.Replace("</c><c>", string.Empty)
+                                   .Replace(",</c>", "</c>,");
 
         if (char.IsLower(errorMessage[0]))
             errorMessage = char.ToUpperInvariant(errorMessage[0]) + errorMessage.Substring(1);

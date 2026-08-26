@@ -1003,7 +1003,7 @@ public enum PcreErrorCode
     BadBackslashK = PcreConstants.PCRE2_ERROR_BAD_BACKSLASH_K,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_PARTIALSUBS</c> - Replacement <c>$'</c> or $_ not supported with partial match.
+    /// <c>PCRE2_ERROR_PARTIALSUBS</c> - Replacement <c>$'</c> or <c>$_</c> not supported with partial match.
     /// </summary>
     PartialSubs = PcreConstants.PCRE2_ERROR_PARTIALSUBS,
 
