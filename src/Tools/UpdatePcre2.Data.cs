@@ -1,9 +1,83 @@
-using System.Globalization;
+using System.Net;
 using System.Text.RegularExpressions;
 
-internal static class UpdateData
+internal readonly record struct PcreConstant(string Type, string Name, string Value)
 {
-    public static readonly string[] CutPositions =
+    private const string _errorPrefix = "PCRE2_ERROR_";
+
+    public bool IsError => Name.StartsWith(_errorPrefix, StringComparison.Ordinal);
+
+    public static IEnumerable<PcreConstant> ParsePcre2Header(string headerPath)
+    {
+        var commentRe = new Regex(
+            @"/\* .*? \*/",
+            RegexOptions.CultureInvariant | RegexOptions.IgnorePatternWhitespace
+        );
+
+        var defineRe = new Regex(
+            """
+            ^ \s* \# \s* define \s+
+            (?<name>PCRE2_\w+) \s+
+            \(? \s*
+            (?<value> -? (?:0x)? [0-9]+ )
+            [uU]?
+            \s* \)?
+            \s* $
+            """,
+            RegexOptions.CultureInvariant | RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline
+        );
+
+        foreach (var rawLine in File.ReadLines(headerPath))
+        {
+            if (rawLine.Contains("Obsolete", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            var line = commentRe.Replace(rawLine, string.Empty);
+            var match = defineRe.Match(line);
+
+            if (!match.Success)
+                continue;
+
+            var (name, value) = (match.Groups["name"].Value, match.Groups["value"].Value);
+
+            if (name is "PCRE2_MAJOR" or "PCRE2_MINOR" or "PCRE2_LOCAL_WIDTH")
+                continue;
+
+            var type = name.StartsWith(_errorPrefix) ? "int" : "uint";
+
+            yield return new PcreConstant(type, name, value);
+        }
+    }
+
+    public string ToMemberName()
+    {
+        var memberName = Name;
+
+        if (IsError)
+        {
+            var constantNameWithoutPrefix = Name[_errorPrefix.Length..];
+            memberName = constantNameWithoutPrefix;
+
+            foreach (var cut in _errorCutPositions)
+            {
+                if (constantNameWithoutPrefix == cut.Replace("|", string.Empty))
+                {
+                    memberName = cut.Replace("|", "_");
+                    break;
+                }
+            }
+        }
+
+        memberName = Regex.Replace(
+            memberName.ToLowerInvariant(),
+            @"(?:^|_)(?<char>\w)",
+            m => m.Groups["char"].Value.ToUpperInvariant()
+        );
+
+        return memberName;
+    }
+
+    private static readonly string[] _errorCutPositions =
     [
         "QUERY_BAR|JX_NEST_TOO_DEEP",
         "E|CLASS_NEST_TOO_DEEP",
@@ -62,58 +136,6 @@ internal static class UpdateData
         "BAD|BACKSLASH|K",
         "PARTIAL|SUBS",
     ];
-}
-
-internal readonly record struct PcreConstant(string Type, string Name, string Value)
-{
-    public static IEnumerable<PcreConstant> ParsePcre2Header(string headerPath)
-    {
-        var commentRe = new Regex(
-            @"/\* .*? \*/",
-            RegexOptions.CultureInvariant | RegexOptions.IgnorePatternWhitespace
-        );
-
-        var defineRe = new Regex(
-            """
-        ^ \s* \# \s* define \s+
-        (?<name>PCRE2_\w+) \s+
-        \(? \s*
-        (?<value> -? (?:0x)? [0-9]+ )
-        [uU]?
-        \s* \)?
-        \s* $
-        """,
-            RegexOptions.CultureInvariant | RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline
-        );
-
-        var toIgnore = new HashSet<string>
-        {
-            "PCRE2_MAJOR",
-            "PCRE2_MINOR",
-            "PCRE2_LOCAL_WIDTH"
-        };
-
-        foreach (var fileLine in File.ReadLines(headerPath))
-        {
-            if (fileLine.IndexOf("Obsolete", StringComparison.OrdinalIgnoreCase) >= 0)
-                continue;
-
-            var line = commentRe.Replace(fileLine, string.Empty);
-            var m = defineRe.Match(line);
-
-            if (!m.Success)
-                continue;
-
-            var (name, value) = (m.Groups["name"].Value, m.Groups["value"].Value);
-
-            if (toIgnore.Contains(name))
-                continue;
-
-            var type = name.StartsWith("PCRE2_ERROR_") ? "int" : "uint";
-
-            yield return new PcreConstant(type, name, value);
-        }
-    }
 }
 
 internal readonly record struct PcreErrorMessage(int Value, string Message)
@@ -208,6 +230,43 @@ internal readonly record struct PcreErrorMessage(int Value, string Message)
             throw new InvalidOperationException($"Unexpected XSTRING in message: {message}");
 
         return message;
+    }
+
+    public string ToXmlDocComment()
+    {
+        var errorMessage = WebUtility.HtmlEncode(Message)
+                                     .Replace("&#39;", "'");
+
+        errorMessage = Regex.Replace(
+            errorMessage,
+            """
+            (?<=^|[ ])
+            (?:
+                [a-z0-9]+_[a-z0-9_]+ \(\)  # Function
+                | \\   [^ ]+               # Escape
+                | \(\? [^ ]+               # Group
+                | \(\* [a-zA-Z_]+ \)       # Verb
+                | { [^}]+ }                # Braces
+                | (?! POSIX | ASCII | UTF | UCP | DFA | JIT) [A-Z]{2,}
+                | (?! - ) \W+
+                | ^erroroffset
+            )
+            (?=[ :),]|$)
+            """,
+            "<c>$0</c>",
+            RegexOptions.CultureInvariant | RegexOptions.IgnorePatternWhitespace
+        );
+
+        errorMessage = errorMessage.Replace(",</c>", "</c>,");
+
+        if (char.IsLower(errorMessage[0]))
+            errorMessage = char.ToUpperInvariant(errorMessage[0]) + errorMessage.Substring(1);
+
+        var lastChar = errorMessage[^1];
+        if ((!char.IsPunctuation(lastChar) || lastChar is ')') && (!errorMessage.EndsWith("</c>") || errorMessage.EndsWith("()</c>")))
+            errorMessage += ".";
+
+        return errorMessage;
     }
 }
 
