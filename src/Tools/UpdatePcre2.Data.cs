@@ -1,13 +1,13 @@
 using System.Net;
 using System.Text.RegularExpressions;
 
-internal readonly record struct PcreConstant(string Type, string Name, string Value)
+internal readonly record struct PcreConstant(string Type, string Name, string Value, string? OptionFullName)
 {
     private const string _errorPrefix = "PCRE2_ERROR_";
 
     public bool IsError => Name.StartsWith(_errorPrefix, StringComparison.Ordinal);
 
-    public static IEnumerable<PcreConstant> ParsePcre2Header(string headerPath)
+    public static IEnumerable<PcreConstant> Parse(string headerPath, string optionsPath, string extraOptionsPath)
     {
         var commentRe = new Regex(
             @"/\* .*? \*/",
@@ -27,6 +27,13 @@ internal readonly record struct PcreConstant(string Type, string Name, string Va
             RegexOptions.CultureInvariant | RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline
         );
 
+        var options = ParseOptions(
+                optionsPath,
+                extraOptionsPath
+            ).Reverse()
+             .DistinctBy(i => i.ConstantName)
+             .ToDictionary(i => i.ConstantName, i => i.OptionFullName, StringComparer.Ordinal);
+
         foreach (var rawLine in File.ReadLines(headerPath))
         {
             if (rawLine.Contains("Obsolete", StringComparison.OrdinalIgnoreCase))
@@ -45,7 +52,33 @@ internal readonly record struct PcreConstant(string Type, string Name, string Va
 
             var type = name.StartsWith(_errorPrefix) ? "int" : "uint";
 
-            yield return new PcreConstant(type, name, value);
+            yield return new PcreConstant(type, name, value, options.GetValueOrDefault(name));
+        }
+    }
+
+    private static IEnumerable<(string ConstantName, string OptionFullName)> ParseOptions(string optionsPath, string extraOptionsPath)
+    {
+        var regex = new Regex(
+            """
+            ^ \s*(?<optionName>\w+)\s*=\s*PcreConstants\.(?<constantName>\w+)
+            """,
+            RegexOptions.CultureInvariant | RegexOptions.IgnorePatternWhitespace
+        );
+
+        foreach (var line in File.ReadLines(optionsPath))
+        {
+            var match = regex.Match(line);
+
+            if (match.Success)
+                yield return (match.Groups["constantName"].Value, $"PcreOptions.{match.Groups["optionName"].Value}");
+        }
+
+        foreach (var line in File.ReadLines(extraOptionsPath))
+        {
+            var match = regex.Match(line);
+
+            if (match.Success)
+                yield return (match.Groups["constantName"].Value, $"PcreExtraCompileOptions.{match.Groups["optionName"].Value}");
         }
     }
 

@@ -56,7 +56,12 @@ Console.WriteLine($"Updating PCRE2 in repository: {rootPath}");
     Console.WriteLine(" ✅ PCRE2 patched");
 }
 
-var constants = PcreConstant.ParsePcre2Header(Path.Combine(pcre2SrcDir, "pcre2.h")).ToArray();
+var constants = PcreConstant.Parse(
+    Path.Combine(pcre2SrcDir, "pcre2.h"),
+    Path.Combine(rootPath, "src", "PCRE.NET", "PcreOptions.cs"),
+    Path.Combine(rootPath, "src", "PCRE.NET", "PcreExtraCompileOptions.cs")
+).ToArray();
+
 var writer = new CodeWriter();
 
 // Update PcreConstants.cs
@@ -78,7 +83,7 @@ var writer = new CodeWriter();
 
     using (writer.WriteBlock("internal static class PcreConstants"))
     {
-        foreach (var (type, name, value) in constants)
+        foreach (var (type, name, value, _) in constants)
             writer.AppendLine($"public const {type} {name} = {value};");
     }
 
@@ -115,12 +120,25 @@ var writer = new CodeWriter();
         var errorMessages = PcreErrorMessage.ParseErrorFile(Path.Combine(pcre2SrcDir, "pcre2_error.c"))
                                             .ToDictionary(i => i.Value);
 
+        var constantMapping = constants.Where(i => i.OptionFullName is not null)
+                                       .ToDictionary(i => i.Name, i => i.OptionFullName);
+
         foreach (var constant in constants.Where(i => i.IsError))
         {
-            var errorMessage = errorMessages[int.Parse(constant.Value)];
+            var errorMessage = errorMessages[int.Parse(constant.Value)].ToXmlDocComment();
+
+            errorMessage = Regex.Replace(
+                errorMessage,
+                @"\bPCRE2_[A-Z0-9_]+",
+                m => constantMapping.TryGetValue(m.Value, out var optionFullName)
+                    ? $"<see cref=\"{optionFullName}\"/>"
+                    : $"<c>{m.Value}</c>"
+            );
+
+            errorMessage = errorMessage.Replace("INT_MAX", "<see cref=\"int.MaxValue\"/>");
 
             writer.AppendLine("/// <summary>");
-            writer.AppendLine($"/// <c>{constant.Name}</c> - {errorMessage.ToXmlDocComment()}");
+            writer.AppendLine($"/// <c>{constant.Name}</c> - {errorMessage}");
             writer.AppendLine("/// </summary>");
             writer.AppendLine($"{constant.ToMemberName()} = PcreConstants.{constant.Name},");
             writer.AppendLine();

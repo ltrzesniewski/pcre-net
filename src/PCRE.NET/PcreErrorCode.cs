@@ -238,7 +238,7 @@ public enum PcreErrorCode
     MissingNameTerminator = PcreConstants.PCRE2_ERROR_MISSING_NAME_TERMINATOR,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_DUPLICATE_SUBPATTERN_NAME</c> - Two named subpatterns have the same name (PCRE2_DUPNAMES not set).
+    /// <c>PCRE2_ERROR_DUPLICATE_SUBPATTERN_NAME</c> - Two named subpatterns have the same name (<see cref="PcreOptions.DupNames"/> not set).
     /// </summary>
     DuplicateSubpatternName = PcreConstants.PCRE2_ERROR_DUPLICATE_SUBPATTERN_NAME,
 
@@ -478,12 +478,12 @@ public enum PcreErrorCode
     InternalBadCodeInSkip = PcreConstants.PCRE2_ERROR_INTERNAL_BAD_CODE_IN_SKIP,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_NO_SURROGATES_IN_UTF16</c> - PCRE2_EXTRA_ALLOW_SURROGATE_ESCAPES is not allowed in UTF-16 mode.
+    /// <c>PCRE2_ERROR_NO_SURROGATES_IN_UTF16</c> - <see cref="PcreExtraCompileOptions.AllowSurrogateEscapes"/> is not allowed in UTF-16 mode.
     /// </summary>
     NoSurrogatesInUtf16 = PcreConstants.PCRE2_ERROR_NO_SURROGATES_IN_UTF16,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_BAD_LITERAL_OPTIONS</c> - Invalid option bits with PCRE2_LITERAL.
+    /// <c>PCRE2_ERROR_BAD_LITERAL_OPTIONS</c> - Invalid option bits with <see cref="PcreOptions.Literal"/>.
     /// </summary>
     BadLiteralOptions = PcreConstants.PCRE2_ERROR_BAD_LITERAL_OPTIONS,
 
@@ -513,12 +513,12 @@ public enum PcreErrorCode
     TooManyCaptures = PcreConstants.PCRE2_ERROR_TOO_MANY_CAPTURES,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_MISSING_OCTAL_DIGIT</c> - Octal digit missing after <c>\0</c> (PCRE2_EXTRA_NO_BS0 is set).
+    /// <c>PCRE2_ERROR_MISSING_OCTAL_DIGIT</c> - Octal digit missing after <c>\0</c> (<see cref="PcreExtraCompileOptions.NoBs0"/> is set).
     /// </summary>
     MissingOctalDigit = PcreConstants.PCRE2_ERROR_MISSING_OCTAL_DIGIT,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_BACKSLASH_K_IN_LOOKAROUND</c> - <c>\K</c> is not allowed in lookarounds (but see PCRE2_EXTRA_ALLOW_LOOKAROUND_BSK).
+    /// <c>PCRE2_ERROR_BACKSLASH_K_IN_LOOKAROUND</c> - <c>\K</c> is not allowed in lookarounds (but see <see cref="PcreExtraCompileOptions.AllowLookaroundBsK"/>).
     /// </summary>
     BackslashKInLookaround = PcreConstants.PCRE2_ERROR_BACKSLASH_K_IN_LOOKAROUND,
 
@@ -533,7 +533,7 @@ public enum PcreErrorCode
     PatternCompiledSizeTooBig = PcreConstants.PCRE2_ERROR_PATTERN_COMPILED_SIZE_TOO_BIG,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_OVERSIZE_PYTHON_OCTAL</c> - Octal value given by <c>\ddd</c> is greater than <c>\377</c> (forbidden by PCRE2_EXTRA_PYTHON_OCTAL).
+    /// <c>PCRE2_ERROR_OVERSIZE_PYTHON_OCTAL</c> - Octal value given by <c>\ddd</c> is greater than <c>\377</c> (forbidden by <see cref="PcreExtraCompileOptions.PythonOctal"/>).
     /// </summary>
     OversizePythonOctal = PcreConstants.PCRE2_ERROR_OVERSIZE_PYTHON_OCTAL,
 
@@ -543,17 +543,17 @@ public enum PcreErrorCode
     CalloutCallerDisabled = PcreConstants.PCRE2_ERROR_CALLOUT_CALLER_DISABLED,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_EXTRA_CASING_REQUIRES_UNICODE</c> - PCRE2_EXTRA_TURKISH_CASING require Unicode (UTF or UCP) mode.
+    /// <c>PCRE2_ERROR_EXTRA_CASING_REQUIRES_UNICODE</c> - <see cref="PcreExtraCompileOptions.TurkishCasing"/> require Unicode (UTF or UCP) mode.
     /// </summary>
     ExtraCasingRequiresUnicode = PcreConstants.PCRE2_ERROR_EXTRA_CASING_REQUIRES_UNICODE,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_TURKISH_CASING_REQUIRES_UTF</c> - PCRE2_EXTRA_TURKISH_CASING requires UTF in 8-bit mode.
+    /// <c>PCRE2_ERROR_TURKISH_CASING_REQUIRES_UTF</c> - <see cref="PcreExtraCompileOptions.TurkishCasing"/> requires UTF in 8-bit mode.
     /// </summary>
     TurkishCasingRequiresUtf = PcreConstants.PCRE2_ERROR_TURKISH_CASING_REQUIRES_UTF,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_EXTRA_CASING_INCOMPATIBLE</c> - PCRE2_EXTRA_TURKISH_CASING and PCRE2_EXTRA_CASELESS_RESTRICT are not compatible.
+    /// <c>PCRE2_ERROR_EXTRA_CASING_INCOMPATIBLE</c> - <see cref="PcreExtraCompileOptions.TurkishCasing"/> and <see cref="PcreExtraCompileOptions.CaselessRestrict"/> are not compatible.
     /// </summary>
     ExtraCasingIncompatible = PcreConstants.PCRE2_ERROR_EXTRA_CASING_INCOMPATIBLE,
 
@@ -583,7 +583,7 @@ public enum PcreErrorCode
     EClassMixedOperators = PcreConstants.PCRE2_ERROR_ECLASS_MIXED_OPERATORS,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_ECLASS_HINT_SQUARE_BRACKET</c> - Missing terminating <c>]</c> for extended character class (note <c>'['</c> must be escaped under PCRE2_ALT_EXTENDED_CLASS).
+    /// <c>PCRE2_ERROR_ECLASS_HINT_SQUARE_BRACKET</c> - Missing terminating <c>]</c> for extended character class (note <c>'['</c> must be escaped under <see cref="PcreOptions.AltExtendedClass"/>).
     /// </summary>
     EClassHintSquareBracket = PcreConstants.PCRE2_ERROR_ECLASS_HINT_SQUARE_BRACKET,
 
@@ -903,7 +903,7 @@ public enum PcreErrorCode
     Unset = PcreConstants.PCRE2_ERROR_UNSET,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_BADOFFSETLIMIT</c> - Offset limit set without PCRE2_USE_OFFSET_LIMIT.
+    /// <c>PCRE2_ERROR_BADOFFSETLIMIT</c> - Offset limit set without <see cref="PcreOptions.UseOffsetLimit"/>.
     /// </summary>
     BadOffsetLimit = PcreConstants.PCRE2_ERROR_BADOFFSETLIMIT,
 
@@ -928,7 +928,7 @@ public enum PcreErrorCode
     BadSubsPattern = PcreConstants.PCRE2_ERROR_BADSUBSPATTERN,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_TOOMANYREPLACE</c> - Too many replacements (more than INT_MAX).
+    /// <c>PCRE2_ERROR_TOOMANYREPLACE</c> - Too many replacements (more than <see cref="int.MaxValue"/>).
     /// </summary>
     TooManyReplace = PcreConstants.PCRE2_ERROR_TOOMANYREPLACE,
 
@@ -953,7 +953,7 @@ public enum PcreErrorCode
     InternalDupMatch = PcreConstants.PCRE2_ERROR_INTERNAL_DUPMATCH,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_DFA_UINVALID_UTF</c> - PCRE2_MATCH_INVALID_UTF is not supported for DFA matching.
+    /// <c>PCRE2_ERROR_DFA_UINVALID_UTF</c> - <see cref="PcreOptions.MatchInvalidUtf"/> is not supported for DFA matching.
     /// </summary>
     DfaUInvalidUtf = PcreConstants.PCRE2_ERROR_DFA_UINVALID_UTF,
 
@@ -973,7 +973,7 @@ public enum PcreErrorCode
     ReplaceCase = PcreConstants.PCRE2_ERROR_REPLACECASE,
 
     /// <summary>
-    /// <c>PCRE2_ERROR_TOOLARGEREPLACE</c> - Replacement too large (longer than PCRE2_SIZE).
+    /// <c>PCRE2_ERROR_TOOLARGEREPLACE</c> - Replacement too large (longer than <c>PCRE2_SIZE</c>).
     /// </summary>
     TooLargeReplace = PcreConstants.PCRE2_ERROR_TOOLARGEREPLACE,
 
