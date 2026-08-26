@@ -105,18 +105,22 @@ public static unsafe class PcreBuildInfo
         var size = default(Native16Bit).config(key, &result);
 
         if (size < 0)
-            throw new PcreException((PcreErrorCode)size, "Could not retrieve the configuration property: " + key);
+            throw new PcreException((PcreErrorCode)size, $"Could not retrieve the configuration property: {key}");
 
         return result;
     }
 
     private static string GetConfigString(uint key)
     {
-        var buffer = stackalloc char[256];
+        var requiredSize = default(Native16Bit).config(key, null);
+        if (requiredSize is <= 0 or > 1024)
+            throw new PcreException(PcreErrorCode.BadOption, $"Required size for the configuration property {key} is invalid: {requiredSize}");
+
+        var buffer = stackalloc char[requiredSize + 1];
         var messageLength = default(Native16Bit).config(key, buffer);
 
         return messageLength >= 0
             ? new string(buffer, 0, messageLength - 1)
-            : throw new PcreException((PcreErrorCode)messageLength, "Could not retrieve the configuration property: " + key);
+            : throw new PcreException((PcreErrorCode)messageLength, $"Could not retrieve the configuration property: {key}");
     }
 }
