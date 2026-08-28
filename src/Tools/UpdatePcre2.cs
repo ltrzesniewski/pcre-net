@@ -13,26 +13,30 @@ using PCRE.Analyzers;
 
 var rootPath = GetRepositoryRootPath();
 var pcre2SrcDir = Path.Combine(rootPath, "src", "PCRE", "src");
-string pcre2Version;
 
 Console.WriteLine();
 Console.WriteLine($"Updating PCRE2 in repository: {rootPath}");
 
-var constants = PcreConstant.Parse(
-    Path.Combine(pcre2SrcDir, "pcre2.h.generic"),
-    Path.Combine(rootPath, "src", "PCRE.NET", "PcreOptions.cs"),
-    Path.Combine(rootPath, "src", "PCRE.NET", "PcreExtraCompileOptions.cs")
-).ToArray();
-
+string pcre2Version;
+PcreConstant[] constants;
 var writer = new CodeWriter();
 
-PatchPcre2();
-UpdatePcreConstants();
-UpdatePcreErrorCode();
+try
+{
+    PatchPcre2();
+    UpdatePcreConstants();
+    UpdatePcreErrorCode();
 
-Console.WriteLine();
-Console.WriteLine($"PCRE2 successfully updated to version {pcre2Version}");
-return;
+    Console.WriteLine();
+    Console.WriteLine($"PCRE2 successfully updated to version {pcre2Version}");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($" ❌ Error: {ex}");
+    return 1;
+}
+
+return 0;
 
 static string GetRepositoryRootPath()
 {
@@ -106,6 +110,15 @@ void PatchPcre2()
 
 void UpdatePcreConstants()
 {
+    constants =
+    [
+        .. PcreConstant.Parse(
+            Path.Combine(pcre2SrcDir, "pcre2.h.generic"),
+            Path.Combine(rootPath, "src", "PCRE.NET", "PcreOptions.cs"),
+            Path.Combine(rootPath, "src", "PCRE.NET", "PcreExtraCompileOptions.cs")
+        )
+    ];
+
     writer.Clear().AppendLine(
         """
         //------------------------------------------------------------------------------
@@ -139,12 +152,13 @@ void UpdatePcreErrorCode()
 {
     var errorCodeFilePath = Path.Combine(rootPath, "src", "PCRE.NET", "PcreErrorCode.cs");
     var fileContents = File.ReadAllText(errorCodeFilePath);
+
     var match = Regex.Match(
         fileContents,
         """
-        ^[ ]*\#region[ ]+Generated\r?\n
+        ^[ ]*\#region[ ]+Generated\b.*?\n
         (?<generated>.*?)
-        ^[ ]*\#endregion\r?\n
+        ^[ ]*\#endregion\b.*?\n
         """,
         RegexOptions.CultureInvariant | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.Multiline
     );
@@ -209,8 +223,8 @@ internal readonly record struct PcreConstant(string Type, string Name, string Va
             ^ \s* \# \s* define \s+
             (?<name>PCRE2_\w+) \s+
             \(? \s*
-            (?<value> -? (?:0x)? [0-9]+ )
-            [uU]?
+                (?<value> -? (?:0x)? [0-9]+ )
+                [uU]?
             \s* \)?
             \s* $
             """,
@@ -250,7 +264,7 @@ internal readonly record struct PcreConstant(string Type, string Name, string Va
     {
         var regex = new Regex(
             """
-            ^ \s*(?<optionName>\w+)\s*=\s*PcreConstants\.(?<constantName>\w+)
+            ^ \s* (?<optionName>\w+) \s* = \s* PcreConstants\.(?<constantName>\w+)
             """,
             RegexOptions.CultureInvariant | RegexOptions.IgnorePatternWhitespace
         );
@@ -486,7 +500,7 @@ internal readonly record struct PcreErrorMessage(int Value, string Message)
                                    .Replace(",</c>", "</c>,");
 
         if (char.IsLower(errorMessage[0]))
-            errorMessage = char.ToUpperInvariant(errorMessage[0]) + errorMessage.Substring(1);
+            errorMessage = char.ToUpperInvariant(errorMessage[0]) + errorMessage[1..];
 
         var lastChar = errorMessage[^1];
         if ((!char.IsPunctuation(lastChar) || lastChar is ')') && (!errorMessage.EndsWith("</c>") || errorMessage.EndsWith("()</c>")))
