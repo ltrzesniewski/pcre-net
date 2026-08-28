@@ -18,38 +18,78 @@ string pcre2Version;
 Console.WriteLine();
 Console.WriteLine($"Updating PCRE2 in repository: {rootPath}");
 
-// Patch PCRE2
+var constants = PcreConstant.Parse(
+    Path.Combine(pcre2SrcDir, "pcre2.h.generic"),
+    Path.Combine(rootPath, "src", "PCRE.NET", "PcreOptions.cs"),
+    Path.Combine(rootPath, "src", "PCRE.NET", "PcreExtraCompileOptions.cs")
+).ToArray();
+
+var writer = new CodeWriter();
+
+PatchPcre2();
+UpdatePcreConstants();
+UpdatePcreErrorCode();
+
+Console.WriteLine();
+Console.WriteLine($"PCRE2 successfully updated to version {pcre2Version}");
+return;
+
+static string GetRepositoryRootPath()
 {
-    File.WriteAllText(
-        Path.Combine(pcre2SrcDir, "pcre2.h"),
-        // language=cpp
-        """
+    for (var path = Environment.CurrentDirectory; path is not null; path = Path.GetDirectoryName(path))
+    {
+        if (Directory.Exists(Path.Combine(path, ".git")))
+            return path;
+    }
 
-        #include "pcre2.h.generic"
+    throw new InvalidOperationException("Could not find the repository root path.");
+}
 
-        """
-    );
+void PatchPcre2()
+{
+    (string fileName, string[] includes)[] patches =
+    [
+        ("pcre2.h", ["pcre2.h.generic"]),
+        ("pcre2_chartables.c", ["pcre2_chartables.c.dist"]),
+        ("config.h", ["../../PCRE.NET.Native/pcre2config.h", "config.h.generic"])
+    ];
 
-    File.WriteAllText(
-        Path.Combine(pcre2SrcDir, "pcre2_chartables.c"),
-        // language=cpp
-        """
+    foreach (var (fileName, filesToInclude) in patches)
+    {
+        var identifier = $"PCRENET_{fileName.Replace('.', '_').ToUpperInvariant()}";
+        var isHeaderFile = fileName.EndsWith(".h", StringComparison.Ordinal);
 
-        #include "pcre2_chartables.c.dist"
+        writer.Clear()
+              .AppendLine()
+              .AppendLine("/* Generated with UpdatePcre2.cs */")
+              .AppendLine();
 
-        """
-    );
+        if (isHeaderFile)
+        {
+            writer.AppendLine($"#ifndef {identifier}")
+                  .AppendLine($"#define {identifier}")
+                  .AppendLine();
+        }
 
-    File.WriteAllText(
-        Path.Combine(pcre2SrcDir, "config.h"),
-        // language=cpp
-        """
+        foreach (var fileToInclude in filesToInclude)
+        {
+            writer.AppendLine($"""
+                #include "{fileToInclude}"
+                """
+            );
+        }
 
-         #include "../../PCRE.NET.Native/pcre2config.h"
-         #include "config.h.generic"
+        if (isHeaderFile)
+        {
+            writer.AppendLine()
+                  .AppendLine($"#endif /* {identifier} */");
+        }
 
-         """.ReplaceLineEndings("\n")
-    );
+        File.WriteAllText(
+            Path.Combine(pcre2SrcDir, fileName),
+            writer.ToString().ReplaceLineEndings("\n")
+        );
+    }
 
     var configFile = File.ReadAllText(Path.Combine(pcre2SrcDir, "config.h.generic"));
 
@@ -64,15 +104,7 @@ Console.WriteLine($"Updating PCRE2 in repository: {rootPath}");
     Console.WriteLine(" ✅ PCRE2 patched");
 }
 
-var constants = PcreConstant.Parse(
-    Path.Combine(pcre2SrcDir, "pcre2.h.generic"),
-    Path.Combine(rootPath, "src", "PCRE.NET", "PcreOptions.cs"),
-    Path.Combine(rootPath, "src", "PCRE.NET", "PcreExtraCompileOptions.cs")
-).ToArray();
-
-var writer = new CodeWriter();
-
-// Update PcreConstants.cs
+void UpdatePcreConstants()
 {
     writer.Clear().AppendLine(
         """
@@ -103,7 +135,7 @@ var writer = new CodeWriter();
     Console.WriteLine(" ✅ PcreConstants.cs updated");
 }
 
-// Update PcreErrorCode.cs
+void UpdatePcreErrorCode()
 {
     var errorCodeFilePath = Path.Combine(rootPath, "src", "PCRE.NET", "PcreErrorCode.cs");
     var fileContents = File.ReadAllText(errorCodeFilePath);
@@ -157,19 +189,4 @@ var writer = new CodeWriter();
     File.WriteAllText(errorCodeFilePath, writer.ToString());
 
     Console.WriteLine(" ✅ PcreErrorCode.cs updated");
-}
-
-Console.WriteLine();
-Console.WriteLine($"PCRE2 successfully updated to version {pcre2Version}");
-return;
-
-static string GetRepositoryRootPath()
-{
-    for (var path = Environment.CurrentDirectory; path is not null; path = Path.GetDirectoryName(path))
-    {
-        if (Directory.Exists(Path.Combine(path, ".git")))
-            return path;
-    }
-
-    throw new InvalidOperationException("Could not find the repository root path.");
 }
