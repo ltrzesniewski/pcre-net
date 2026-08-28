@@ -20,30 +20,38 @@ Console.WriteLine($"Updating PCRE2 in repository: {rootPath}");
 
 // Patch PCRE2
 {
-    File.Copy(
-        Path.Combine(pcre2SrcDir, "pcre2.h.generic"),
+    File.WriteAllText(
         Path.Combine(pcre2SrcDir, "pcre2.h"),
-        overwrite: true
+        // language=cpp
+        """
+
+        #include "pcre2.h.generic"
+
+        """
     );
 
-    File.Copy(
-        Path.Combine(pcre2SrcDir, "pcre2_chartables.c.dist"),
+    File.WriteAllText(
         Path.Combine(pcre2SrcDir, "pcre2_chartables.c"),
-        overwrite: true
-    );
+        // language=cpp
+        """
 
-    var configFile = File.ReadAllText(Path.Combine(pcre2SrcDir, "config.h.generic"));
+        #include "pcre2_chartables.c.dist"
+
+        """
+    );
 
     File.WriteAllText(
         Path.Combine(pcre2SrcDir, "config.h"),
         // language=cpp
-        $"""
+        """
 
          #include "../../PCRE.NET.Native/pcre2config.h"
+         #include "config.h.generic"
 
-         {configFile}
          """.ReplaceLineEndings("\n")
     );
+
+    var configFile = File.ReadAllText(Path.Combine(pcre2SrcDir, "config.h.generic"));
 
     pcre2Version = Regex.Match(
         configFile,
@@ -57,7 +65,7 @@ Console.WriteLine($"Updating PCRE2 in repository: {rootPath}");
 }
 
 var constants = PcreConstant.Parse(
-    Path.Combine(pcre2SrcDir, "pcre2.h"),
+    Path.Combine(pcre2SrcDir, "pcre2.h.generic"),
     Path.Combine(rootPath, "src", "PCRE.NET", "PcreOptions.cs"),
     Path.Combine(rootPath, "src", "PCRE.NET", "PcreExtraCompileOptions.cs")
 ).ToArray();

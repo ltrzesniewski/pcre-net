@@ -76,7 +76,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\PCRE\src\config.h" />
+    <ClInclude Include="..\PCRE\src\config.h.generic" />
     <ClInclude Include="..\PCRE\src\pcre2.h" />
+    <ClInclude Include="..\PCRE\src\pcre2.h.generic" />
     <ClInclude Include="..\PCRE\src\pcre2_internal.h" />
     <ClInclude Include="..\PCRE\src\pcre2_intmodedep.h" />
     <ClInclude Include="..\PCRE\src\pcre2_ucp.h" />
