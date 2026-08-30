@@ -22,7 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(UsePcreNetNuGetPackage)' == 'true'">
-    <PackageReference Include="PCRE.NET" Version="[$(Version)]" />
+    <PackageReference Include="PCRE.NET" VersionOverride="[$(Version)]" />
   </ItemGroup>
 
   <!-- Local test mode: use project references -->

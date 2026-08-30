@@ -9,6 +9,7 @@
     <File Path="CMakeLists.txt" />
     <File Path="Directory.Build.props" />
     <File Path="Directory.Build.targets" />
+    <File Path="Directory.Packages.props" />
     <File Path="NativeLibs.props" />
     <File Path="NativeLibs.targets" />
     <File Path="NuGetReadme.md" />

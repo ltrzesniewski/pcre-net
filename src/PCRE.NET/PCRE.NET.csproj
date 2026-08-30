@@ -42,9 +42,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Fody" Version="6.9.3" PrivateAssets="all" />
-    <PackageReference Include="InlineIL.Fody" Version="1.10.2" PrivateAssets="all" />
-    <PackageReference Include="System.Memory" Version="4.6.0" Condition="'$(TargetFrameworkIdentifier)' == '.NETStandard'" />
+    <PackageReference Include="Fody" PrivateAssets="all" />
+    <PackageReference Include="InlineIL.Fody" PrivateAssets="all" />
+    <PackageReference Include="System.Memory" VersionOverride="4.6.0" Condition="'$(TargetFrameworkIdentifier)' == '.NETStandard'" />
   </ItemGroup>
 
   <ItemGroup>
