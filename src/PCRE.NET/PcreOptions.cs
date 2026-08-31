@@ -68,7 +68,7 @@ public enum PcreOptions : long
     /// It is equivalent to Perl's <c>/i</c> option, and it can be changed within a pattern by a <c>(?i)</c> option setting.
     /// </para>
     /// <para>
-    /// If either <see cref="Utf"/> or <see cref="Ucp"/> is set, Unicode properties are used for all characters with more than one other case,and for all characters whose code points are greater than U+007F.
+    /// If either <see cref="Utf"/> or <see cref="Ucp"/> is set, Unicode properties are used for all characters with more than one other case, and for all characters whose code points are greater than U+007F.
     /// Note that there are two ASCII characters, K and S, that, in addition to their lower case ASCII equivalents, are case-equivalent with U+212A (Kelvin sign) and U+017F (long S) respectively.
     /// For lower valued characters with only one other case, a lookup table is used for speed. When neither <see cref="Utf"/> nor <see cref="Ucp"/> is set,
     /// a lookup table is used for all code points less than 256, and higher code points (available only in 16-bit or 32-bit mode) are treated as not having another case.
@@ -88,7 +88,7 @@ public enum PcreOptions : long
     /// This behaviour (for <c>^</c>, <c>$</c>, and dot) is the same as Perl.
     /// </para>
     /// <para>
-    /// When <see cref="MultiLine"/> it is set, the "start of line" and "end of line" constructs match immediately following or immediately before internal newlines in the subject string,
+    /// When <see cref="MultiLine"/> is set, the "start of line" and "end of line" constructs match immediately following or immediately before internal newlines in the subject string,
     /// respectively, as well as at the very start and end.
     /// </para>
     /// <para>
@@ -507,7 +507,7 @@ public enum PcreOptions : long
     /// When it is set, the effect of passing an invalid UTF string as a pattern is undefined. It may cause your program to crash or loop.
     /// </para>
     /// <para>
-    /// Note that this option can also be passed to <c>pcre2_match()</c> and <c>pcre_dfa_match()</c>, to suppress UTF validity checking of the subject string.
+    /// Note that this option can also be passed to <c>pcre2_match()</c> and <c>pcre2_dfa_match()</c>, to suppress UTF validity checking of the subject string.
     /// Note also that setting <see cref="NoUtfCheck"/> at compile time does not disable the error that is given if an escape sequence for an invalid Unicode code point
     /// is encountered in the pattern. In particular, the so-called "surrogate" code points (0xd800 to 0xdfff) are invalid.
     /// If you want to allow escape sequences such as <c>\x{d800}</c> you can set the <see cref="PcreExtraCompileOptions.AllowSurrogateEscapes"/> extra option, as described in
