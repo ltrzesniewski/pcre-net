@@ -5,7 +5,7 @@
 [![Build](https://github.com/ltrzesniewski/pcre-net/actions/workflows/build.yml/badge.svg?branch=master&event=push)](https://github.com/ltrzesniewski/pcre-net/actions/workflows/build.yml)
 [![NuGet Package](https://img.shields.io/nuget/v/PCRE.NET.svg?logo=NuGet)](https://www.nuget.org/packages/PCRE.NET)
 [![GitHub release](https://img.shields.io/github/release/ltrzesniewski/pcre-net.svg?logo=GitHub)](https://github.com/ltrzesniewski/pcre-net/releases)
-[![PCRE2](https://img.shields.io/badge/pcre2-v10.48--RC1-blue.svg)](https://github.com/PCRE2Project/pcre2)
+[![PCRE2](https://img.shields.io/badge/pcre2-v10.48-blue.svg)](https://github.com/PCRE2Project/pcre2)
 [![License](https://img.shields.io/badge/license-BSD-blue.svg)](https://github.com/ltrzesniewski/pcre-net/blob/master/LICENCE)
 <br clear="right" />
 
@@ -17,7 +17,7 @@ The following systems are supported:
 
  - Windows x64
  - Windows x86
- - Windows arm64 (pre-release)
+ - Windows arm64
  - Linux x64
  - Linux arm64
  - macOS arm64
