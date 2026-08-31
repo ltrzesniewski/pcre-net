@@ -7,8 +7,11 @@
 
 #:include ../PCRE.NET.Analyzers/Analyzers/CodeWriter.cs
 
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
+using System.Xml.XPath;
 using PCRE.Analyzers;
 
 var rootPath = GetRepositoryRootPath();
@@ -17,17 +20,19 @@ var pcre2SrcDir = Path.Combine(rootPath, "src", "PCRE", "src");
 Console.WriteLine();
 Console.WriteLine($"Updating PCRE2 in repository: {rootPath}");
 
-string pcre2Version;
+string pcreNetVersion, pcre2Version;
 var writer = new CodeWriter();
 
 try
 {
+    ReadVersions();
     PatchPcre2();
     UpdatePcreConstants();
     UpdatePcreErrorCode();
+    UpdateReadme();
 
     Console.WriteLine();
-    Console.WriteLine($"PCRE2 was successfully updated to version {pcre2Version}");
+    Console.WriteLine($"PCRE.NET v{pcreNetVersion} was successfully updated to PCRE2 v{pcre2Version}");
 }
 catch (Exception ex)
 {
@@ -46,6 +51,28 @@ static string GetRepositoryRootPath()
     }
 
     throw new InvalidOperationException("Could not find the repository root path.");
+}
+
+void ReadVersions()
+{
+    pcreNetVersion = XDocument.Load(Path.Combine(rootPath, "src", "Version.props"))
+                              .XPathSelectElement("/Project/PropertyGroup/Version")?.Value.Trim() ?? string.Empty;
+
+    pcre2Version = Regex.Match(
+        File.ReadAllText(Path.Combine(pcre2SrcDir, "config.h.generic")),
+        """
+        ^\s*#define\s+PACKAGE_VERSION\s+"(?<version>[\w.-]+)"
+        """,
+        RegexOptions.CultureInvariant | RegexOptions.Multiline
+    ).Groups["version"].Value;
+
+    if (string.IsNullOrEmpty(pcreNetVersion))
+        throw new InvalidOperationException("Could not retrieve the PCRE.NET version.");
+
+    if (string.IsNullOrEmpty(pcre2Version))
+        throw new InvalidOperationException("Could not retrieve the PCRE2 version.");
+
+    ReportSuccess("Read version info");
 }
 
 void PatchPcre2()
@@ -93,16 +120,6 @@ void PatchPcre2()
             writer.ToString().ReplaceLineEndings("\n")
         );
     }
-
-    var configFile = File.ReadAllText(Path.Combine(pcre2SrcDir, "config.h.generic"));
-
-    pcre2Version = Regex.Match(
-        configFile,
-        """
-        ^\s*#define\s+PACKAGE_VERSION\s+"(?<version>[\w.-]+)"
-        """,
-        RegexOptions.CultureInvariant | RegexOptions.Multiline
-    ).Groups["version"].Value;
 
     ReportSuccess("PCRE2 patched");
 }
@@ -187,6 +204,40 @@ void UpdatePcreErrorCode()
     ReportSuccess("PcreErrorCode.cs updated");
 }
 
+void UpdateReadme()
+{
+    var readmePath = Path.Combine(rootPath, "README.md");
+    var nuGetReadmePath = Path.Combine(rootPath, "src", "NuGetReadme.md");
+
+    File.WriteAllText(
+        readmePath,
+        File.ReadAllText(readmePath)
+            .ForceReplaceRegex(
+                """https://img\.shields\.io/badge/pcre2-v(?<pcreVersion>[\d.]+(?:--RC\d+)?)-blue\.svg""",
+                _ => $"https://img.shields.io/badge/pcre2-v{pcre2Version.Replace("-", "--")}-blue.svg",
+                RegexOptions.CultureInvariant
+            )
+    );
+
+    File.WriteAllText(
+        nuGetReadmePath,
+        File.ReadAllText(nuGetReadmePath)
+            .ForceReplaceRegex(
+                """
+                (?<pre> ^ \*\*v )
+                (?<libVersion>   [\d.]+ (?:-\w+)? )
+                (?<mid> \*\*[ ]is[ ]based[ ]on[ ]PCRE2[ ]\*\*v )
+                (?<pcre2Version> [\d.]+ (?:-\w+)? )
+                (?<post> \*\*\. )
+                """,
+                m => $"{m.Groups["pre"].Value}{pcreNetVersion}{m.Groups["mid"].Value}{pcre2Version}{m.Groups["post"].Value}",
+                RegexOptions.CultureInvariant | RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline
+            )
+    );
+
+    ReportSuccess("Readme updated");
+}
+
 void ReportSuccess(string message)
     => Console.WriteLine($" ✅ {message}");
 
@@ -205,9 +256,9 @@ internal readonly record struct Pcre2ErrorMessage(int Value, string Message)
     {
         // That's not the cleanest method, but the native library is not compiled at this point...
 
-        using var enumerator = File.ReadAllLines(filePath).AsEnumerable().GetEnumerator();
+        using var enumerator = File.ReadLines(filePath).GetEnumerator();
 
-        enumerator.AdvanceToMatch("compile_error_texts[] =");
+        enumerator.AdvanceToLineContaining("compile_error_texts[] =");
         const int compileErrorBase = 100;
         var value = compileErrorBase;
 
@@ -215,7 +266,7 @@ internal readonly record struct Pcre2ErrorMessage(int Value, string Message)
         {
             var line = enumerator.AdvanceToNextLine().Trim();
 
-            if (ShouldStop(line))
+            if (ShouldStopAtLine(line))
                 break;
 
             if (ShouldSkipLine(line, value - compileErrorBase))
@@ -224,21 +275,21 @@ internal readonly record struct Pcre2ErrorMessage(int Value, string Message)
             if (line == "#ifndef EBCDIC")
             {
                 yield return new Pcre2ErrorMessage(value++, GetMessage(enumerator.AdvanceToNextLine()));
-                enumerator.AdvanceToMatch("#endif");
+                enumerator.AdvanceToLineContaining("#endif");
                 continue;
             }
 
             yield return new Pcre2ErrorMessage(value++, GetMessage(line));
         }
 
-        enumerator.AdvanceToMatch("match_error_texts[] =");
+        enumerator.AdvanceToLineContaining("match_error_texts[] =");
         value = 0;
 
         while (true)
         {
             var line = enumerator.AdvanceToNextLine().Trim();
 
-            if (ShouldStop(line))
+            if (ShouldStopAtLine(line))
                 break;
 
             if (ShouldSkipLine(line, -value))
@@ -248,7 +299,7 @@ internal readonly record struct Pcre2ErrorMessage(int Value, string Message)
         }
     }
 
-    private static bool ShouldStop(string line)
+    private static bool ShouldStopAtLine(string line)
         => line == ";";
 
     private static bool ShouldSkipLine(string line, int expectedIndex)
@@ -349,7 +400,7 @@ file static class Extensions
         public string AdvanceToNextLine()
             => enumerator.MoveNext() ? enumerator.Current : throw new InvalidOperationException("Could not advance to the next line.");
 
-        public void AdvanceToMatch(string content)
+        public void AdvanceToLineContaining(string content)
         {
             while (enumerator.MoveNext())
             {
@@ -358,6 +409,22 @@ file static class Extensions
             }
 
             throw new InvalidOperationException($"Could not find '{content}'.");
+        }
+    }
+
+    extension(string value)
+    {
+        public string ForceReplaceRegex([StringSyntax(StringSyntaxAttribute.Regex)] string regex, Func<Match, string> replacement, RegexOptions options)
+        {
+            var hasMatch = false;
+
+            var result = Regex.Replace(value, regex, match =>
+            {
+                hasMatch = true;
+                return replacement(match);
+            }, options);
+
+            return hasMatch ? result : throw new InvalidOperationException($"No matches found for regex: {regex}");
         }
     }
 }
