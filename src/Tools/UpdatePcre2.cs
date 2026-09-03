@@ -1,13 +1,16 @@
 #!/usr/bin/env dotnet
 
-// To update PCRE2:
-// - Delete the contents of the PCRE directory
-// - Extract the PCRE2 release into the PCRE directory
-// - Run this script: dotnet UpdatePcre2.cs
+// To update PCRE2, run this script:
+//
+// dotnet UpdatePcre2.cs -- path/to/pcre2.zip
+//
+// This will replace the contents of the src/PCRE directory and update the generated files.
+// Running this script without arguments will update the generated files from the existing directory.
 
 #:include ../PCRE.NET.Analyzers/Analyzers/CodeWriter.cs
 
 using System.Diagnostics.CodeAnalysis;
+using System.IO.Compression;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -20,11 +23,14 @@ var pcre2SrcDir = Path.Combine(rootPath, "src", "PCRE", "src");
 Console.WriteLine();
 Console.WriteLine($"Updating PCRE2 in repository: {rootPath}");
 
+string? packageFilePath;
 string pcreNetVersion, pcre2Version;
 var writer = new CodeWriter();
 
 try
 {
+    ParseArgs();
+    ExtractZip();
     ReadVersions();
     PatchPcre2();
     UpdatePcreConstants();
@@ -51,6 +57,38 @@ static string GetRepositoryRootPath()
     }
 
     throw new InvalidOperationException("Could not find the repository root path.");
+}
+
+void ParseArgs()
+{
+    packageFilePath = args.Length switch
+    {
+        0 => null,
+        1 => File.Exists(args[0]) ? args[0] : throw new ArgumentException($"The specified PCRE2 zip file does not exist: {args[0]}"),
+        _ => throw new ArgumentException("Invalid number of arguments.")
+    };
+}
+
+void ExtractZip()
+{
+    if (packageFilePath is null)
+        return;
+
+    var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+
+    try
+    {
+        ZipFile.ExtractToDirectory(packageFilePath, tempDir, overwriteFiles: true);
+        var targetDir = Path.Combine(rootPath, "src", "PCRE");
+        Directory.Delete(targetDir, recursive: true);
+        Directory.Move(Path.Combine(tempDir, Path.GetFileNameWithoutExtension(packageFilePath)), targetDir);
+    }
+    finally
+    {
+        Directory.Delete(tempDir, recursive: true);
+    }
+
+    ReportSuccess($"Extracted PCRE2 from {packageFilePath}");
 }
 
 void ReadVersions()
