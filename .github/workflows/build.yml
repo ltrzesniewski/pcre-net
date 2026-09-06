@@ -278,6 +278,7 @@ jobs:
   integration-tests:
     name: Test ${{ matrix.name }}
     runs-on: ${{ matrix.runner }}
+    container: ${{ matrix.container }}
     needs:
       - pack
 
@@ -294,6 +295,12 @@ jobs:
             runner: ubuntu-24.04-arm
             build-args: -r linux-arm64
             run-args: --net=core --rid=linux-arm64 --arch=arm64 --aot
+
+          - name: Linux x64, musl
+            runner: ubuntu-latest
+            container: alpine:latest
+            build-args: -r linux-musl-x64
+            run-args: --net=core --rid=linux-musl-x64 --arch=x64 --aot
 
           - name: macOS arm64
             runner: macos-15
@@ -343,6 +350,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+
+      - name: Install dependencies
+        if: ${{ matrix.container == 'alpine:latest' }}
+        run: apk add --no-cache bash gcompat libstdc++ clang build-base zlib-dev icu-libs
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
