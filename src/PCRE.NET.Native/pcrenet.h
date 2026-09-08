@@ -42,6 +42,7 @@ typedef struct
     uint32_t heap_limit;
     uint32_t offset_limit;
     pcre2_jit_stack* jit_stack;
+    uint32_t enabled_fields;
 } match_settings;
 
 void PCRENET_SUFFIX(apply_settings)(const match_settings* settings, pcre2_match_context* context);

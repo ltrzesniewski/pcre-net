@@ -1,5 +1,4 @@
-﻿using System;
-using PCRE.Internal;
+﻿using PCRE.Internal;
 
 namespace PCRE;
 
@@ -10,9 +9,12 @@ public sealed unsafe class PcreMatchSettings
 {
     internal static PcreMatchSettings Default { get; } = new();
 
+    private Native.match_settings.Fields _enabledFields = Native.match_settings.Fields.None;
     private uint? _matchLimit;
     private uint? _depthLimit;
     private uint? _heapLimit;
+    private uint? _offsetLimit;
+    private PcreJitStack? _jitStack;
 
     /// <summary>
     /// Limit for the amount of backtracking that can take place.
@@ -44,7 +46,11 @@ public sealed unsafe class PcreMatchSettings
     public uint MatchLimit
     {
         get => _matchLimit ?? PcreBuildInfo.MatchLimit;
-        set => _matchLimit = value;
+        set
+        {
+            _matchLimit = value;
+            _enabledFields |= Native.match_settings.Fields.MatchLimit;
+        }
     }
 
     /// <summary>
@@ -79,7 +85,11 @@ public sealed unsafe class PcreMatchSettings
     public uint DepthLimit
     {
         get => _depthLimit ?? PcreBuildInfo.DepthLimit;
-        set => _depthLimit = value;
+        set
+        {
+            _depthLimit = value;
+            _enabledFields |= Native.match_settings.Fields.DepthLimit;
+        }
     }
 
     /// <summary>
@@ -112,7 +122,11 @@ public sealed unsafe class PcreMatchSettings
     public uint HeapLimit
     {
         get => _heapLimit ?? PcreBuildInfo.HeapLimit;
-        set => _heapLimit = value;
+        set
+        {
+            _heapLimit = value;
+            _enabledFields |= Native.match_settings.Fields.HeapLimit;
+        }
     }
 
     /// <summary>
@@ -138,12 +152,32 @@ public sealed unsafe class PcreMatchSettings
     /// If this is set with an offset limit, a match must occur in the first line and also within the offset limit. In other words, whichever limit comes first is used.
     /// </para>
     /// </remarks>
-    public uint? OffsetLimit { get; set; }
+    public uint? OffsetLimit
+    {
+        get => _offsetLimit;
+        set
+        {
+            _offsetLimit = value;
+            _enabledFields = value is not null
+                ? _enabledFields | Native.match_settings.Fields.OffsetLimit
+                : _enabledFields & ~Native.match_settings.Fields.OffsetLimit;
+        }
+    }
 
     /// <summary>
     /// Assign a non-default stack for use by the JIT when matching a pattern.
     /// </summary>
-    public PcreJitStack? JitStack { get; set; }
+    public PcreJitStack? JitStack
+    {
+        get => _jitStack;
+        set
+        {
+            _jitStack = value;
+            _enabledFields = value is not null
+                ? _enabledFields | Native.match_settings.Fields.JitStack
+                : _enabledFields & ~Native.match_settings.Fields.JitStack;
+        }
+    }
 
     internal void FillMatchSettings(ref Native.match_settings settings, out PcreJitStack? jitStack)
     {
@@ -151,7 +185,8 @@ public sealed unsafe class PcreMatchSettings
         settings.depth_limit = _depthLimit.GetValueOrDefault();
         settings.heap_limit = _heapLimit.GetValueOrDefault();
         settings.offset_limit = OffsetLimit.GetValueOrDefault();
-        settings.jit_stack = JitStack is { } stack ? stack.GetStack() : null;
+        settings.jit_stack = _jitStack is { } stack ? stack.GetStack() : null;
+        settings.enabled_fields = _enabledFields;
 
         jitStack = JitStack;
     }

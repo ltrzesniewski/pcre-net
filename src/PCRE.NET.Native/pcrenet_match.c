@@ -78,19 +78,24 @@ static int callout_handler(pcre2_callout_block* block, void* data)
 
 void PCRENET_SUFFIX(apply_settings)(const match_settings* settings, pcre2_match_context* context)
 {
-    if (settings->match_limit)
+    const uint32_t enabled_fields = settings->enabled_fields;
+
+    if (!enabled_fields)
+        return;
+
+    if (enabled_fields & (1 << 0))
         pcre2_set_match_limit(context, settings->match_limit);
 
-    if (settings->depth_limit)
+    if (enabled_fields & (1 << 1))
         pcre2_set_depth_limit(context, settings->depth_limit);
 
-    if (settings->heap_limit)
+    if (enabled_fields & (1 << 2))
         pcre2_set_heap_limit(context, settings->heap_limit);
 
-    if (settings->offset_limit)
+    if (enabled_fields & (1 << 3))
         pcre2_set_offset_limit(context, settings->offset_limit);
 
-    if (settings->jit_stack)
+    if (enabled_fields & (1 << 4))
         pcre2_jit_stack_assign(context, NULL, settings->jit_stack);
 }
 

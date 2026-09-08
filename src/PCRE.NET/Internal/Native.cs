@@ -80,6 +80,18 @@ internal static unsafe class Native
         public uint heap_limit;
         public uint offset_limit;
         public void* jit_stack;
+        public Fields enabled_fields;
+
+        [Flags]
+        public enum Fields : uint
+        {
+            None = 0,
+            MatchLimit = 1 << 0,
+            DepthLimit = 1 << 1,
+            HeapLimit = 1 << 2,
+            OffsetLimit = 1 << 3,
+            JitStack = 1 << 4
+        }
     }
 
     [StructLayout(LayoutKind.Sequential)]

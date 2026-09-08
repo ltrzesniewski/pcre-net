@@ -4809,6 +4809,19 @@ public class MatchTests
     }
 
     [Test]
+    public void should_handle_zero_offset_limit()
+    {
+        var re = new PcreRegex("b", PcreOptions.UseOffsetLimit);
+
+        var match = re.Match("ab", 0, PcreMatchOptions.None, null, new PcreMatchSettings
+        {
+            OffsetLimit = 0
+        });
+
+        Assert.That(match.Success, Is.False);
+    }
+
+    [Test]
     public void readme_json_example()
     {
         const string jsonPattern =
