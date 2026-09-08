@@ -18,13 +18,14 @@ public sealed unsafe class PcreMatch : IPcreGroup, IPcreGroupList
 
     private PcreGroup?[]? _groups;
 
-    internal PcreMatch(InternalRegex regex)
+    internal PcreMatch(InternalRegex regex, char* markPtr)
     {
         // No match
 
         Subject = string.Empty;
         _regex = regex;
         _oVector = [];
+        _markPtr = markPtr;
         _resultCode = PcreConstants.PCRE2_ERROR_NOMATCH;
     }
 

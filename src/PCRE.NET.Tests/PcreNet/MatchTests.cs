@@ -4371,6 +4371,50 @@ public class MatchTests
     }
 
     [Test]
+    public void should_preserve_mark_on_no_match()
+    {
+        var re = new PcreRegex("a(*MARK:foo)b", PcreOptions.NoStartOptimize);
+
+        var match = re.Match("ac");
+
+        Assert.That(match.Success, Is.False);
+        Assert.That(match.Mark, Is.EqualTo("foo"));
+    }
+
+    [Test]
+    public void should_preserve_mark_on_no_match_ref()
+    {
+        var re = new PcreRegex("a(*MARK:foo)b", PcreOptions.NoStartOptimize);
+
+        var match = re.Match("ac".AsSpan());
+
+        Assert.That(match.Success, Is.False);
+        Assert.That(match.Mark.ToString(), Is.EqualTo("foo"));
+    }
+
+    [Test]
+    public void should_preserve_mark_on_no_match_utf8()
+    {
+        var re = new PcreRegexUtf8("a(*MARK:foo)b"u8, PcreOptions.NoStartOptimize);
+
+        var match = re.Match("ac"u8);
+
+        Assert.That(match.Success, Is.False);
+        Assert.That(match.Mark.SequenceEqual("foo"u8));
+    }
+
+    [Test]
+    public void should_preserve_mark_on_no_match_8bit()
+    {
+        var re = TestSupport.CreatePcreRegex8Bit("a(*MARK:foo)b".ToLatin1Bytes(), PcreOptions.NoStartOptimize);
+
+        var match = re.Match("ac".ToLatin1Bytes());
+
+        Assert.That(match.Success, Is.False);
+        Assert.That(match.Mark.SequenceEqual("foo".ToLatin1Bytes()));
+    }
+
+    [Test]
     public void should_not_allocate_output_vector_for_no_match_ref()
     {
         var re = new PcreRegex("foo");

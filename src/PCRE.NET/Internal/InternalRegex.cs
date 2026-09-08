@@ -445,7 +445,11 @@ internal sealed unsafe class InternalRegex16Bit(string pattern, PcreRegexSetting
         );
 
         if (resultCode == PcreConstants.PCRE2_ERROR_NOMATCH)
-            return _noMatch ??= new PcreMatch(this);
+        {
+            return markPtr is null
+                ? _noMatch ??= new PcreMatch(this, null)
+                : new PcreMatch(this, markPtr);
+        }
 
         return new PcreMatch(subject, this, markPtr, resultCode, oVectorArray);
     }
