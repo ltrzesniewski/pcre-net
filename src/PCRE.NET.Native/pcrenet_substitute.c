@@ -158,7 +158,7 @@ static int match_callout_handler(pcre2_callout_block* block, void* data_ptr)
     );
 
     replay_queue_try_enqueue(&data->match_callout_queue, result);
-    return result;
+    return map_callout_result_byte_to_int(result);
 }
 
 static int substitute_callout_handler(pcre2_substitute_callout_block* block, void* data_ptr)
@@ -174,7 +174,7 @@ static int substitute_callout_handler(pcre2_substitute_callout_block* block, voi
     );
 
     replay_queue_try_enqueue(&data->substitute_callout_queue, result);
-    return result;
+    return map_callout_result_byte_to_int(result);
 }
 
 static void call_substitute(const pcrenet_substitute_input* input,

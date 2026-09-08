@@ -483,6 +483,18 @@ public class SubstituteTests
     }
 
     [Test]
+    public void should_stop_replacing()
+    {
+        var re = new PcreRegex(".");
+
+        var calls = 0;
+        var result = re.Substitute("abc", "#", PcreSubstituteOptions.SubstituteGlobal, _ => ++calls == 1 ? PcreSubstituteCalloutResult.Abort : PcreSubstituteCalloutResult.Pass);
+
+        Assert.That(result, Is.EqualTo("abc"));
+        Assert.That(calls, Is.EqualTo(1));
+    }
+
+    [Test]
     public void readme_replace_example()
     {
         var result = PcreRegex.Substitute("hello, world!!!", @"\p{P}+", "<$0>", PcreOptions.None, PcreSubstituteOptions.SubstituteGlobal);
