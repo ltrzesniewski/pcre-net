@@ -136,4 +136,67 @@ public class DfaMatchTests
         valueRef = ref MemoryMarshal.GetReference(result.LongestMatch.ValueSpan);
         Assert.That(Unsafe.AreSame(ref valueRef, ref subjectRef), Is.True);
     }
+
+    [Test]
+    [TestCase(PcreDfaMatchOptions.PartialSoft)]
+    [TestCase(PcreDfaMatchOptions.PartialHard)]
+    public void should_match_partially(PcreDfaMatchOptions options)
+    {
+        var re = new PcreRegex(@"123");
+
+        var match = re.Dfa.Match("abc12", options);
+
+        Assert.That(match.Success, Is.False);
+        Assert.That(match.Index, Is.EqualTo(-1));
+        Assert.That(match.Count, Is.EqualTo(0));
+        Assert.That(match.LongestMatch.Success, Is.False);
+        Assert.That(match.ShortestMatch.Success, Is.False);
+
+        Assert.That(match.PartialMatch.Success, Is.True);
+        Assert.That(match.PartialMatch.Index, Is.EqualTo(3));
+        Assert.That(match.PartialMatch.EndIndex, Is.EqualTo(5));
+        Assert.That(match.PartialMatch.Length, Is.EqualTo(2));
+        Assert.That(match.PartialMatch.Value, Is.EqualTo("12"));
+    }
+
+    [Test]
+    public void should_differentiate_soft_and_hard_partial_matching()
+    {
+        var re = new PcreRegex(@"dog(sbody)?");
+
+        var softMatch = re.Dfa.Match("dog", PcreDfaMatchOptions.PartialSoft);
+        var hardMatch = re.Dfa.Match("dog", PcreDfaMatchOptions.PartialHard);
+
+        Assert.That(softMatch.Success, Is.True);
+        Assert.That(softMatch.PartialMatch.Success, Is.False);
+        Assert.That(softMatch.PartialMatch.Index, Is.EqualTo(-1));
+
+        Assert.That(hardMatch.Success, Is.False);
+        Assert.That(hardMatch.PartialMatch.Success, Is.True);
+        Assert.That(hardMatch.PartialMatch.Index, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void should_handle_unsuccessful_partial_matches()
+    {
+        var re = new PcreRegex(@"dog");
+
+        var match = re.Dfa.Match("cat", PcreDfaMatchOptions.PartialSoft);
+
+        Assert.That(match.Success, Is.False);
+        Assert.That(match.PartialMatch.Success, Is.False);
+        Assert.That(match.PartialMatch.Index, Is.EqualTo(-1));
+        Assert.That(match.PartialMatch.EndIndex, Is.EqualTo(-1));
+        Assert.That(match.PartialMatch.Length, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void should_cache_partial_match()
+    {
+        var re = new PcreRegex(@"123");
+
+        var match = re.Dfa.Match("abc12", PcreDfaMatchOptions.PartialSoft);
+
+        Assert.That(match.PartialMatch, Is.SameAs(match.PartialMatch));
+    }
 }

@@ -33,16 +33,12 @@ public sealed class PcreDfaMatchResult : IReadOnlyList<PcreDfaMatch>
         };
     }
 
-    private PcreDfaMatch GetMatch(int index)
+    private PcreDfaMatch GetSuccessfulMatch(int index)
     {
-        if (index < 0 || index >= Count)
+        if (index < 0 || index >= Count || _resultCode == PcreConstants.PCRE2_ERROR_PARTIAL)
             return PcreDfaMatch.Empty;
 
-        var match = _matches[index];
-        if (match == null)
-            _matches[index] = match = CreateMatch(index);
-
-        return match;
+        return _matches[index] ??= CreateMatch(index);
     }
 
     private PcreDfaMatch CreateMatch(int index)
@@ -60,10 +56,10 @@ public sealed class PcreDfaMatchResult : IReadOnlyList<PcreDfaMatch>
         return new PcreDfaMatch(Subject, startOffset, endOffset);
     }
 
-    private IEnumerable<PcreDfaMatch> GetMatches()
+    private IEnumerable<PcreDfaMatch> GetSuccessfulMatches()
     {
         for (var i = 0; i < Count; ++i)
-            yield return GetMatch(i);
+            yield return GetSuccessfulMatch(i);
     }
 
     /// <summary>
@@ -71,7 +67,7 @@ public sealed class PcreDfaMatchResult : IReadOnlyList<PcreDfaMatch>
     /// </summary>
     /// <returns></returns>
     public IEnumerator<PcreDfaMatch> GetEnumerator()
-        => GetMatches().GetEnumerator();
+        => GetSuccessfulMatches().GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator()
         => GetEnumerator();
@@ -81,7 +77,7 @@ public sealed class PcreDfaMatchResult : IReadOnlyList<PcreDfaMatch>
     /// </summary>
     /// <param name="index">The index of the match.</param>
     public PcreDfaMatch this[int index]
-        => GetMatch(index);
+        => GetSuccessfulMatch(index);
 
     /// <summary>
     /// The available match count.
@@ -101,12 +97,19 @@ public sealed class PcreDfaMatchResult : IReadOnlyList<PcreDfaMatch>
     /// <summary>
     /// Returns the longest match.
     /// </summary>
-    public PcreDfaMatch LongestMatch => GetMatch(0);
+    public PcreDfaMatch LongestMatch => GetSuccessfulMatch(0);
 
     /// <summary>
     /// Returns the shortest match.
     /// </summary>
-    public PcreDfaMatch ShortestMatch => GetMatch(Count - 1);
+    public PcreDfaMatch ShortestMatch => GetSuccessfulMatch(Count - 1);
+
+    /// <summary>
+    /// Returns the partial match when searching with partial match options.
+    /// </summary>
+    /// <seealso cref="PcreDfaMatchOptions.PartialSoft"/>
+    /// <seealso cref="PcreDfaMatchOptions.PartialHard"/>
+    public PcreDfaMatch PartialMatch => field ??= _resultCode == PcreConstants.PCRE2_ERROR_PARTIAL ? CreateMatch(0) : PcreDfaMatch.Empty;
 
     /// <summary>
     /// Returns the substring of the longest match in the subject string.

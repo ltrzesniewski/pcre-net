@@ -52,6 +52,7 @@ namespace PCRE.Dfa
         public int Index { get; }
         public PCRE.Dfa.PcreDfaMatch this[int index] { get; }
         public PCRE.Dfa.PcreDfaMatch LongestMatch { get; }
+        public PCRE.Dfa.PcreDfaMatch PartialMatch { get; }
         public PCRE.Dfa.PcreDfaMatch ShortestMatch { get; }
         public bool Success { get; }
         public System.Collections.Generic.IEnumerator<PCRE.Dfa.PcreDfaMatch> GetEnumerator() { }

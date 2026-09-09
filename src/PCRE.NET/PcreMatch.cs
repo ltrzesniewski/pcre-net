@@ -118,8 +118,10 @@ public sealed unsafe class PcreMatch : IPcreGroup, IPcreGroupList
     public IPcreGroupList Groups => this;
 
     /// <summary>
-    /// Indicates if the match is partial. See <see cref="PcreMatchOptions.PartialSoft"/>/<see cref="PcreMatchOptions.PartialHard"/>.
+    /// Indicates if the match is partial.
     /// </summary>
+    /// <seealso cref="PcreMatchOptions.PartialSoft"/>
+    /// <seealso cref="PcreMatchOptions.PartialHard"/>
     public bool IsPartialMatch => _resultCode == PcreConstants.PCRE2_ERROR_PARTIAL;
 
     /// <summary>
