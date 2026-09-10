@@ -11,7 +11,7 @@ public sealed unsafe class PcreCalloutInfo
     internal PcreCalloutInfo(InternalRegex regex, ref Native.pcre2_callout_enumerate_block info)
     {
         Number = (int)info.callout_number;
-        String = regex.GetString((void*)info.callout_string);
+        String = regex.GetString((void*)info.callout_string, info.callout_string_length);
         NextPatternItemLength = (int)info.next_item_length;
         PatternPosition = (int)info.pattern_position;
         StringOffset = (int)info.callout_string_offset;

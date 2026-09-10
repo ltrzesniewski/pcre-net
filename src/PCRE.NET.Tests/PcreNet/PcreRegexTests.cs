@@ -138,6 +138,33 @@ public class PcreRegexTests
     public void should_ignore_duplicate_callout_offsets(string pattern, PcreOptions options)
         => _ = new PcreRegex(pattern, options).PatternInfo.Callouts;
 
+    [Test]
+    public void should_allow_null_in_callout_names()
+    {
+        var re = new PcreRegex("(?C'foo\0bar🙂baz')");
+        var name = re.PatternInfo.Callouts[0].String;
+
+        Assert.That(name, Is.EqualTo("foo\0bar🙂baz"));
+    }
+
+    [Test]
+    public void should_allow_null_in_callout_names_8bit()
+    {
+        var re = new PcreRegex8Bit("(?C'foo\0bâr')".ToLatin1Bytes(), TestSupport.Latin1Encoding);
+        var name = re.PatternInfo.Callouts[0].String;
+
+        Assert.That(name, Is.EqualTo("foo\0bâr"));
+    }
+
+    [Test]
+    public void should_allow_null_in_callout_names_utf8()
+    {
+        var re = new PcreRegexUtf8("(?C'foo\0bar🙂baz')"u8);
+        var name = re.PatternInfo.Callouts[0].String;
+
+        Assert.That(name, Is.EqualTo("foo\0bar🙂baz"));
+    }
+
     private static PcreRegex? TryCompilePattern(string pattern, PcreRegexSettings settings)
     {
         try

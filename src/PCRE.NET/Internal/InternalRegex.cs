@@ -49,7 +49,7 @@ internal abstract unsafe class InternalRegex : IDisposable
     public abstract IReadOnlyList<PcreCalloutInfo> GetCallouts();
 
     [return: NotNullIfNotNull(nameof(ptr))]
-    public abstract string? GetString(void* ptr);
+    public abstract string? GetString(void* ptr, nuint length);
 
     public abstract uint GetInfoUInt32(uint key);
     public abstract nuint GetInfoNativeInt(uint key);
@@ -355,21 +355,21 @@ internal sealed unsafe class InternalRegex8Bit(ReadOnlySpan<byte> pattern, strin
 #endif
     }
 
-    public override string? GetString(void* ptr)
-        => GetString((byte*)ptr, Encoding);
+    public override string? GetString(void* ptr, nuint length)
+        => ptr is not null ? Encoding.GetString((byte*)ptr, (int)length) : null;
 
-    private static string? GetString(byte* ptr, Encoding encoding)
+    private string? GetString(byte* ptr)
     {
         if (ptr is null)
             return null;
 #if NET
-        if (ReferenceEquals(encoding, Encoding.UTF8))
+        if (ReferenceEquals(Encoding, Encoding.UTF8))
             return System.Runtime.InteropServices.Marshal.PtrToStringUTF8((IntPtr)ptr) ?? string.Empty;
 #endif
 #if NET9_0_OR_GREATER
-        return encoding.GetString(System.Runtime.InteropServices.MemoryMarshal.CreateReadOnlySpanFromNullTerminated(ptr));
+        return Encoding.GetString(System.Runtime.InteropServices.MemoryMarshal.CreateReadOnlySpanFromNullTerminated(ptr));
 #else
-        return encoding.GetString(ptr, GetStringLength(ptr));
+        return Encoding.GetString(ptr, GetStringLength(ptr));
 
         static int GetStringLength(byte* ptr)
         {
@@ -576,8 +576,8 @@ internal sealed unsafe class InternalRegex16Bit(string pattern, PcreRegexSetting
         }
     }
 
-    public override string? GetString(void* ptr)
-        => ptr is not null ? new string((char*)ptr) : null;
+    public override string? GetString(void* ptr, nuint length)
+        => ptr is not null ? new string((char*)ptr, 0, (int)length) : null;
 
     protected override Dictionary<string, int[]> GetCaptureNames(void* nameEntryTable, uint nameCount, uint nameEntrySize)
     {
