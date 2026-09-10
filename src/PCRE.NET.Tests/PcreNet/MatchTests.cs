@@ -4866,6 +4866,31 @@ public class MatchTests
     }
 
     [Test]
+    [TestCase("(?:(?C1)a){2}", PcreOptions.None)]
+    [TestCase("(a){2}", PcreOptions.AutoCallout)]
+    [TestCase("a(?C1)", PcreOptions.AutoCallout)]
+    public void should_ignore_duplicate_callout_offsets(string pattern, PcreOptions options)
+        => _ = new PcreRegex(pattern, options).PatternInfo.Callouts;
+
+    [Test]
+    public void pcre2_issue_976()
+    {
+        // This one should probably fail in a future version
+        // https://github.com/PCRE2Project/pcre2/issues/976
+
+        var regex = new PcreRegex("a(?C1)", PcreOptions.AutoCallout);
+        var callouts = new List<(int Number, int PatternPosition)>();
+
+        _ = regex.Match("a", callout =>
+        {
+            callouts.Add((callout.Number, callout.PatternPosition));
+            return PcreCalloutResult.Pass;
+        });
+
+        Assert.That(callouts, Is.EqualTo([(255, 0), (1, 6), (255, 6)]));
+    }
+
+    [Test]
     public void readme_json_example()
     {
         const string jsonPattern =

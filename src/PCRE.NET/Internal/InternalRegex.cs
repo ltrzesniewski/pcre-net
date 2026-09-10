@@ -61,7 +61,14 @@ internal abstract unsafe class InternalRegex : IDisposable
             var dict = new Dictionary<int, PcreCalloutInfo>();
 
             foreach (var info in GetCallouts())
-                dict.Add(info.PatternPosition, info);
+            {
+#if NET
+                dict.TryAdd(info.PatternPosition, info);
+#else
+                if (!dict.ContainsKey(info.PatternPosition))
+                    dict.Add(info.PatternPosition, info);
+#endif
+            }
 
             Thread.MemoryBarrier();
             _calloutInfoByPatternPosition = dict;
