@@ -131,6 +131,13 @@ public class PcreRegexTests
         return true;
     }
 
+    [Test]
+    [TestCase("(?:(?C1)a){2}", PcreOptions.None)]
+    [TestCase("(a){2}", PcreOptions.AutoCallout)]
+    [TestCase("a(?C1)", PcreOptions.AutoCallout)]
+    public void should_ignore_duplicate_callout_offsets(string pattern, PcreOptions options)
+        => _ = new PcreRegex(pattern, options).PatternInfo.Callouts;
+
     private static PcreRegex? TryCompilePattern(string pattern, PcreRegexSettings settings)
     {
         try

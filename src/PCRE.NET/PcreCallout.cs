@@ -91,7 +91,7 @@ public sealed unsafe class PcreCallout
     /// <summary>
     /// Returns information about the callout.
     /// </summary>
-    public PcreCalloutInfo Info => field ??= _regex.GetCalloutInfoByPatternPosition(PatternPosition);
+    public PcreCalloutInfo Info => field ??= _regex.GetCalloutInfo(Number, PatternPosition);
 
     /// <summary>
     /// <c>PCRE2_CALLOUT_STARTMATCH</c> - This is set for the first callout after the start of matching for each new starting position in the subject.

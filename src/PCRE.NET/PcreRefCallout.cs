@@ -94,7 +94,7 @@ public unsafe ref struct PcreRefCallout
 
     /// <inheritdoc cref="PcreCallout.Info"/>
     [ForwardTo8Bit]
-    public readonly PcreCalloutInfo Info => _regex.GetCalloutInfoByPatternPosition(PatternPosition);
+    public readonly PcreCalloutInfo Info => _regex.GetCalloutInfo(Number, PatternPosition);
 
     /// <inheritdoc cref="PcreCallout.StartMatch"/>
     [ForwardTo8Bit]

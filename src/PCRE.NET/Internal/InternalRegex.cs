@@ -13,7 +13,7 @@ internal abstract unsafe class InternalRegex : IDisposable
     internal const int MaxStackAllocCaptureCount = 32;
     internal const int SubstituteBufferSizeInChars = 4096;
 
-    private Dictionary<int, PcreCalloutInfo>? _calloutInfoByPatternPosition;
+    private Dictionary<(int number, int patternPosition), PcreCalloutInfo>? _calloutInfoMap;
 
     public void* Code { get; protected set; }
 
@@ -54,31 +54,31 @@ internal abstract unsafe class InternalRegex : IDisposable
     public abstract uint GetInfoUInt32(uint key);
     public abstract nuint GetInfoNativeInt(uint key);
 
-    public PcreCalloutInfo? TryGetCalloutInfoByPatternPosition(int patternPosition)
+    public PcreCalloutInfo? TryGetCalloutInfo(int number, int patternPosition)
     {
-        if (_calloutInfoByPatternPosition == null)
+        if (_calloutInfoMap == null)
         {
-            var dict = new Dictionary<int, PcreCalloutInfo>();
+            var dict = new Dictionary<(int number, int patternPosition), PcreCalloutInfo>();
 
             foreach (var info in GetCallouts())
             {
 #if NET
-                dict.TryAdd(info.PatternPosition, info);
+                dict.TryAdd((info.Number, info.PatternPosition), info);
 #else
-                if (!dict.ContainsKey(info.PatternPosition))
-                    dict.Add(info.PatternPosition, info);
+                if (!dict.ContainsKey((info.Number, info.PatternPosition)))
+                    dict.Add((info.Number, info.PatternPosition), info);
 #endif
             }
 
             Thread.MemoryBarrier();
-            _calloutInfoByPatternPosition = dict;
+            _calloutInfoMap = dict;
         }
 
-        return _calloutInfoByPatternPosition.TryGetValue(patternPosition, out var result) ? result : null;
+        return _calloutInfoMap.TryGetValue((number, patternPosition), out var result) ? result : null;
     }
 
-    public PcreCalloutInfo GetCalloutInfoByPatternPosition(int patternPosition)
-        => TryGetCalloutInfoByPatternPosition(patternPosition) ?? throw new InvalidOperationException($"Could not retrieve callout info at position {patternPosition}.");
+    public PcreCalloutInfo GetCalloutInfo(int number, int patternPosition)
+        => TryGetCalloutInfo(number, patternPosition) ?? throw new InvalidOperationException($"Could not retrieve callout info number {number} at position {patternPosition}.");
 }
 
 [SuppressMessage("ReSharper", "UnusedTypeParameter")]
