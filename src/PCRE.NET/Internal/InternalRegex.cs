@@ -13,8 +13,6 @@ internal abstract unsafe class InternalRegex : IDisposable
     internal const int MaxStackAllocCaptureCount = 32;
     internal const int SubstituteBufferSizeInChars = 4096;
 
-    private Dictionary<CalloutKey, PcreCalloutInfo>? _calloutInfoMap;
-
     public void* Code { get; protected set; }
 
     internal Dictionary<string, int[]> CaptureNames { get; init; } = null!;
@@ -25,6 +23,8 @@ internal abstract unsafe class InternalRegex : IDisposable
 
     public string PatternString { get; }
     public PcreRegexSettings Settings { get; }
+
+    public PcreCalloutInfo[] Callouts => field ??= GetCallouts();
 
     protected InternalRegex(string patternString, PcreRegexSettings settings)
     {
@@ -46,7 +46,7 @@ internal abstract unsafe class InternalRegex : IDisposable
 
     protected abstract void FreeCode();
 
-    public abstract IReadOnlyList<PcreCalloutInfo> GetCallouts();
+    protected abstract PcreCalloutInfo[] GetCallouts();
 
     [return: NotNullIfNotNull(nameof(ptr))]
     public abstract string? GetString(void* ptr, nuint length);
@@ -54,34 +54,19 @@ internal abstract unsafe class InternalRegex : IDisposable
     public abstract uint GetInfoUInt32(uint key);
     public abstract nuint GetInfoNativeInt(uint key);
 
-    public PcreCalloutInfo? TryGetCalloutInfo(int number, int patternPosition)
+    private PcreCalloutInfo? TryGetCalloutInfo(int number, int patternPosition)
     {
-        if (_calloutInfoMap == null)
+        foreach (var calloutInfo in Callouts)
         {
-            var dict = new Dictionary<CalloutKey, PcreCalloutInfo>();
-
-            foreach (var info in GetCallouts())
-            {
-                var key = new CalloutKey(info.Number, info.PatternPosition);
-#if NET
-                dict.TryAdd(key, info);
-#else
-                if (!dict.ContainsKey(key))
-                    dict.Add(key, info);
-#endif
-            }
-
-            Thread.MemoryBarrier();
-            _calloutInfoMap = dict;
+            if (calloutInfo.Number == number && calloutInfo.PatternPosition == patternPosition)
+                return calloutInfo;
         }
 
-        return _calloutInfoMap.TryGetValue(new CalloutKey(number, patternPosition), out var result) ? result : null;
+        return null;
     }
 
     public PcreCalloutInfo GetCalloutInfo(int number, int patternPosition)
         => TryGetCalloutInfo(number, patternPosition) ?? throw new InvalidOperationException($"Could not retrieve callout info number {number} at position {patternPosition}.");
-
-    private readonly record struct CalloutKey(int Number, int PatternPosition);
 }
 
 [SuppressMessage("ReSharper", "UnusedTypeParameter")]
@@ -291,26 +276,27 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
         return result;
     }
 
-    public override IReadOnlyList<PcreCalloutInfo> GetCallouts()
+    protected override PcreCalloutInfo[] GetCallouts()
     {
-        var calloutCount = default(TNative).get_callout_count(Code);
+        var calloutCount = (int)default(TNative).get_callout_count(Code);
         if (calloutCount == 0)
             return [];
 
         var data = calloutCount <= 16
-            ? stackalloc Native.pcre2_callout_enumerate_block[(int)calloutCount]
+            ? stackalloc Native.pcre2_callout_enumerate_block[calloutCount]
             : new Native.pcre2_callout_enumerate_block[calloutCount];
 
         fixed (Native.pcre2_callout_enumerate_block* pData = &data[0])
             default(TNative).get_callouts(Code, pData);
 
-        var result = new List<PcreCalloutInfo>((int)calloutCount);
+        var result = new PcreCalloutInfo[calloutCount];
 
-        for (var i = 0; i < data.Length; ++i)
-            result.Add(new PcreCalloutInfo(this, ref data[i]));
+        for (var i = 0; i < calloutCount; ++i)
+            result[i] = new PcreCalloutInfo(this, ref data[i]);
 
         GC.KeepAlive(this);
-        return result.AsReadOnly();
+        Thread.MemoryBarrier();
+        return result;
     }
 
     /// <summary>

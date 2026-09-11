@@ -44,7 +44,7 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
 
         CalloutOutputVector = new nuint[_outputVectorSize];
 
-        Regex.TryGetCalloutInfo(0, 0); // Make sure callout info is initialized
+        _ = Regex.Callouts; // Make sure callout info is initialized
 
         var info = new Native.match_buffer_info
         {
