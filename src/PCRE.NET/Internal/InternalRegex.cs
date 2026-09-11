@@ -13,7 +13,7 @@ internal abstract unsafe class InternalRegex : IDisposable
     internal const int MaxStackAllocCaptureCount = 32;
     internal const int SubstituteBufferSizeInChars = 4096;
 
-    private Dictionary<(int number, int patternPosition), PcreCalloutInfo>? _calloutInfoMap;
+    private Dictionary<CalloutKey, PcreCalloutInfo>? _calloutInfoMap;
 
     public void* Code { get; protected set; }
 
@@ -58,15 +58,16 @@ internal abstract unsafe class InternalRegex : IDisposable
     {
         if (_calloutInfoMap == null)
         {
-            var dict = new Dictionary<(int number, int patternPosition), PcreCalloutInfo>();
+            var dict = new Dictionary<CalloutKey, PcreCalloutInfo>();
 
             foreach (var info in GetCallouts())
             {
+                var key = new CalloutKey(info.Number, info.PatternPosition);
 #if NET
-                dict.TryAdd((info.Number, info.PatternPosition), info);
+                dict.TryAdd(key, info);
 #else
-                if (!dict.ContainsKey((info.Number, info.PatternPosition)))
-                    dict.Add((info.Number, info.PatternPosition), info);
+                if (!dict.ContainsKey(key))
+                    dict.Add(key, info);
 #endif
             }
 
@@ -74,11 +75,13 @@ internal abstract unsafe class InternalRegex : IDisposable
             _calloutInfoMap = dict;
         }
 
-        return _calloutInfoMap.TryGetValue((number, patternPosition), out var result) ? result : null;
+        return _calloutInfoMap.TryGetValue(new CalloutKey(number, patternPosition), out var result) ? result : null;
     }
 
     public PcreCalloutInfo GetCalloutInfo(int number, int patternPosition)
         => TryGetCalloutInfo(number, patternPosition) ?? throw new InvalidOperationException($"Could not retrieve callout info number {number} at position {patternPosition}.");
+
+    private readonly record struct CalloutKey(int Number, int PatternPosition);
 }
 
 [SuppressMessage("ReSharper", "UnusedTypeParameter")]
