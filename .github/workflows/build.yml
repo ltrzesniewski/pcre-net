@@ -15,6 +15,7 @@ jobs:
   unix:
     name: Build ${{ matrix.name }}
     runs-on: ${{ matrix.runner }}
+    container: ${{ matrix.container }}
 
     strategy:
       fail-fast: false
@@ -30,6 +31,12 @@ jobs:
             rid: linux-arm64
             extension: so
 
+          - name: Linux x64, musl
+            runner: ubuntu-latest
+            container: mcr.microsoft.com/dotnet/sdk:10.0-alpine
+            rid: linux-musl-x64
+            extension: so
+
           - name: macOS arm64
             runner: macos-15
             rid: osx-arm64
@@ -43,6 +50,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+
+      - name: Install dependencies
+        if: ${{ contains(matrix.container, 'alpine') }}
+        run: apk add --no-cache bash build-base cmake
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
