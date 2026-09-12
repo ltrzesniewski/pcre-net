@@ -15,6 +15,7 @@ jobs:
   unix:
     name: Build ${{ matrix.name }}
     runs-on: ${{ matrix.runner }}
+    concurrency: build-${{ matrix.container }}
 
     strategy:
       fail-fast: false
@@ -28,6 +29,12 @@ jobs:
           - name: Linux arm64
             runner: ubuntu-24.04-arm
             rid: linux-arm64
+            extension: so
+
+          - name: Linux x64, musl
+            runner: ubuntu-latest
+            container: mcr.microsoft.com/dotnet/sdk:10.0-alpine-aot
+            rid: linux-musl-x64
             extension: so
 
           - name: macOS arm64
