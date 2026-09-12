@@ -60,14 +60,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PcreNetNativeLib Update="@(PcreNetNativeLib)" ToPackage="false" />
-    <PcreNetNativeLib Update="@(PcreNetNativeLib->Exists())" ToPackage="true" />
-    <PcreNetNativeLib Update="@(PcreNetNativeLib)" ToPackage="true" Condition="'$(PcreNetPackage)' == 'true'" />
+    <PcreNetNativeLib Update="@(PcreNetNativeLib)" ToPack="false" />
+    <PcreNetNativeLib Update="@(PcreNetNativeLib->Exists())" ToPack="true" />
+    <PcreNetNativeLib Update="@(PcreNetNativeLib)" ToPack="true" Condition="'$(PcreNetPackage)' == 'true'" />
 
-    <None Include="@(PcreNetNativeLib->WithMetadataValue('ToPackage', 'true'))"
+    <None Include="@(PcreNetNativeLib->WithMetadataValue('ToPack', 'true'))"
           Pack="true"
-          PackagePath="runtimes\%(RuntimeIdentifier)\native\PCRE.NET.Native%(Extension)"
-          Visible="false" />
+          PackagePath="runtimes\%(RuntimeIdentifier)\native\PCRE.NET.Native%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>

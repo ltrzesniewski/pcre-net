@@ -1,17 +1,29 @@
 <Project>
 
   <ItemGroup>
-    <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\lib\PCRE.NET.Native.x86.dll" RuntimeIdentifier="win-x86" />
-    <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\lib\PCRE.NET.Native.x64.dll" RuntimeIdentifier="win-x64" />
-    <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\lib\PCRE.NET.Native.arm64.dll" RuntimeIdentifier="win-arm64" />
-    <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\lib\PCRE.NET.Native.x64.so" RuntimeIdentifier="linux-x64" />
-    <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\lib\PCRE.NET.Native.arm64.so" RuntimeIdentifier="linux-arm64" />
-    <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\lib\PCRE.NET.Native.arm64.dylib" RuntimeIdentifier="osx-arm64" />
-    <PcreNetNativeLib Include="$(MSBuildThisFileDirectory)..\lib\PCRE.NET.Native.x64.dylib" RuntimeIdentifier="osx-x64" />
+    <PcreNetNativeLibRid Include="win-x86" />
+    <PcreNetNativeLibRid Include="win-x64" />
+    <PcreNetNativeLibRid Include="win-arm64" />
+    <PcreNetNativeLibRid Include="linux-x64" />
+    <PcreNetNativeLibRid Include="linux-arm64" />
+    <PcreNetNativeLibRid Include="osx-arm64" />
+    <PcreNetNativeLibRid Include="osx-x64" />
   </ItemGroup>
 
   <ItemGroup>
-    <PcreNetNativeLib Update="@(PcreNetNativeLib)" Visible="false" />
+    <PcreNetNativeLibRid Update="win-*" LibExtension="dll" />
+    <PcreNetNativeLibRid Update="linux-*" LibExtension="so" />
+    <PcreNetNativeLibRid Update="osx-*" LibExtension="dylib" />
+
+    <PcreNetNativeLibRid Update="@(PcreNetNativeLibRid)"
+                         OperatingSystem="$([System.Text.RegularExpressions.Regex]::Match('%(Identity)', '^[^-]+').Value)"
+                         Architecture="$([System.Text.RegularExpressions.Regex]::Match('%(Identity)', '[^-]+$').Value)"
+                         RuntimeIdentifier="%(Identity)"
+                         Visible="false" />
+
+    <PcreNetNativeLib Include="@(PcreNetNativeLibRid->'$(MSBuildThisFileDirectory)../lib/PCRE.NET.Native.%(Identity).%(LibExtension)')" />
+
+    <PcreNetNativeLibRid Remove="@(PcreNetNativeLibRid)" />
   </ItemGroup>
 
 </Project>

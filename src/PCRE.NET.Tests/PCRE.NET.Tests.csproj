@@ -35,4 +35,8 @@
     <None Include="..\..\README.md" CopyToOutputDirectory="PreserveNewest" Visible="false" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AssemblyMetadata Include="ExpectedRid" Value="$(ExpectedRid)" Condition="'$(PcreNetTestBuild)' == 'true'" />
+  </ItemGroup>
+
 </Project>

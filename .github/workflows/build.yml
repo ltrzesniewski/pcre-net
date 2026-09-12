@@ -22,22 +22,22 @@ jobs:
         include:
           - name: Linux x64
             runner: ubuntu-latest
-            platform: x64
+            rid: linux-x64
             extension: so
 
           - name: Linux arm64
             runner: ubuntu-24.04-arm
-            platform: arm64
+            rid: linux-arm64
             extension: so
 
           - name: macOS arm64
             runner: macos-15
-            platform: arm64
+            rid: osx-arm64
             extension: dylib
 
           - name: macOS x64
             runner: macos-15-intel
-            platform: x64
+            rid: osx-x64
             extension: dylib
 
     steps:
@@ -63,13 +63,13 @@ jobs:
       - name: Copy Native Lib
         run: |
           mkdir lib
-          cp src/cmake/PCRE.NET.Native.${{ matrix.extension }} lib/PCRE.NET.Native.${{ matrix.platform }}.${{ matrix.extension }}
+          cp src/cmake/PCRE.NET.Native.${{ matrix.extension }} lib/PCRE.NET.Native.${{ matrix.rid }}.${{ matrix.extension }}
 
       - name: Upload Native Lib
         uses: actions/upload-artifact@v7
         with:
-          name: lib-${{ matrix.platform }}.${{ matrix.extension }}
-          path: lib/PCRE.NET.Native.${{ matrix.platform }}.${{ matrix.extension }}
+          name: lib-${{ matrix.rid }}.${{ matrix.extension }}
+          path: lib/PCRE.NET.Native.${{ matrix.rid }}.${{ matrix.extension }}
           if-no-files-found: error
 
       - name: Test .NET
@@ -79,7 +79,7 @@ jobs:
           --configuration ${{ env.BUILD_CONFIGURATION }}
           --framework ${{ env.BUILD_NET_TEST_TARGET }}
           -p:PcreNetTestBuild=true
-          -p:ExpectPlatform=${{ matrix.platform }}
+          -p:ExpectedRid=${{ matrix.rid }}
 
       - name: Test .NET Standard
         run: >
@@ -88,7 +88,7 @@ jobs:
           --configuration ${{ env.BUILD_CONFIGURATION }}
           --framework ${{ env.BUILD_NET_TEST_TARGET }}
           -p:PcreNetTestBuild=true
-          -p:ExpectPlatform=${{ matrix.platform }}
+          -p:ExpectedRid=${{ matrix.rid }}
           -p:ForceNetStandard=true
 
       - name: Test Allocations
@@ -118,14 +118,17 @@ jobs:
           - platform: x86
             runner: windows-2025-vs2026
             msbuild-platform: Win32
+            rid: win-x86
 
           - platform: x64
             runner: windows-2025-vs2026
             msbuild-platform: x64
+            rid: win-x64
 
           - platform: arm64
             runner: windows-11-vs2026-arm
             msbuild-platform: ARM64
+            rid: win-arm64
 
     steps:
       - name: Checkout
@@ -157,8 +160,8 @@ jobs:
       - name: Upload Native Lib
         uses: actions/upload-artifact@v7
         with:
-          name: lib-${{ matrix.platform }}.dll
-          path: lib/PCRE.NET.Native.${{ matrix.platform }}.dll
+          name: lib-${{ matrix.rid }}.dll
+          path: lib/PCRE.NET.Native.${{ matrix.rid }}.dll
           if-no-files-found: error
 
       - name: Test .NET
@@ -167,9 +170,9 @@ jobs:
           --project src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
           --framework ${{ env.BUILD_NET_TEST_TARGET }}
-          --runtime win-${{ matrix.platform }}
+          --runtime ${{ matrix.rid }}
           -p:PcreNetTestBuild=true
-          -p:ExpectPlatform=${{ matrix.platform }}
+          -p:ExpectedRid=${{ matrix.rid }}
 
       - name: Test .NET Standard
         run: >
@@ -177,9 +180,9 @@ jobs:
           --project src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
           --framework ${{ env.BUILD_NET_TEST_TARGET }}
-          --runtime win-${{ matrix.platform }}
+          --runtime ${{ matrix.rid }}
           -p:PcreNetTestBuild=true
-          -p:ExpectPlatform=${{ matrix.platform }}
+          -p:ExpectedRid=${{ matrix.rid }}
           -p:ForceNetStandard=true
 
       - name: Test .NET Framework
@@ -188,9 +191,9 @@ jobs:
           --project src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
           --framework ${{ env.BUILD_NET_FRAMEWORK_TEST_TARGET }}
-          --runtime win-${{ matrix.platform }}
+          --runtime ${{ matrix.rid }}
           -p:PcreNetTestBuild=true
-          -p:ExpectPlatform=${{ matrix.platform }}
+          -p:ExpectedRid=${{ matrix.rid }}
 
       - name: Test Allocations .NET
         run: >
@@ -198,7 +201,7 @@ jobs:
           --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
           --framework ${{ env.BUILD_NET_TEST_TARGET }}
-          --runtime win-${{ matrix.platform }}
+          --runtime ${{ matrix.rid }}
           --
           --allocations
 
@@ -208,7 +211,7 @@ jobs:
           --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
           --framework ${{ env.BUILD_NET_FRAMEWORK_TEST_TARGET }}
-          --runtime win-${{ matrix.platform }}
+          --runtime ${{ matrix.rid }}
           --
           --allocations
 
@@ -218,7 +221,7 @@ jobs:
           --project src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
           --framework ${{ env.BUILD_NET_TEST_TARGET }}
-          --runtime win-${{ matrix.platform }}
+          --runtime ${{ matrix.rid }}
 
   pack:
     name: Pack

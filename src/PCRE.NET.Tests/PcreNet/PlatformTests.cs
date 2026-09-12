@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using NUnit.Framework;
 
@@ -13,6 +14,26 @@ public class PlatformTests
     {
         Console.WriteLine("TESTS RUNNING IN {0}-bit mode", Environment.Is64BitProcess ? 64 : 32);
         Console.WriteLine("ARCHITECTURE: {0}", RuntimeInformation.ProcessArchitecture);
+    }
+
+    [Test]
+    public void validate_rid()
+    {
+#if !TEST_BUILD
+        Assert.Ignore("TEST_BUILD is not defined.");
+#endif
+        var expectedRid = typeof(PlatformTests).Assembly
+                                               .GetCustomAttributes<AssemblyMetadataAttribute>()
+                                               .SingleOrDefault(i => i.Key == "ExpectedRid")?
+                                               .Value;
+#if NET
+        var rid = RuntimeInformation.RuntimeIdentifier;
+#elif NETFRAMEWORK
+        var rid = $"win-{RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant()}";
+#else
+        var rid = "<unknown>";
+#endif
+        Assert.That(rid, Is.EqualTo(expectedRid));
     }
 
     [Test]
