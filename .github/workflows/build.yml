@@ -3,9 +3,8 @@ on: [ push, pull_request ]
 
 env:
   BUILD_CONFIGURATION: Release
-  BUILD_NET_SDK: 10.0.x
-  BUILD_NET_TEST_TARGET: net10.0
-  BUILD_NET_FRAMEWORK_TEST_TARGET: net481
+  BUILD_NET_TFM: net10.0
+  BUILD_NET_FRAMEWORK_TFM: net481
   DOTNET_NOLOGO: 1
   NUGET_CERT_REVOCATION_MODE: offline
   DOTNET_SYSTEM_CONSOLE_ALLOW_ANSI_COLOR_REDIRECTION: 1
@@ -58,7 +57,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: ${{ env.BUILD_NET_SDK }}
+          global-json-file: global.json
 
       - name: CMake
         run: |
@@ -88,7 +87,7 @@ jobs:
           dotnet run
           --project src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
-          --framework ${{ env.BUILD_NET_TEST_TARGET }}
+          --framework ${{ env.BUILD_NET_TFM }}
           -p:PcreNetTestBuild=true
           -p:ExpectedRid=${{ matrix.rid }}
 
@@ -97,7 +96,7 @@ jobs:
           dotnet run
           --project src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
-          --framework ${{ env.BUILD_NET_TEST_TARGET }}
+          --framework ${{ env.BUILD_NET_TFM }}
           -p:PcreNetTestBuild=true
           -p:ExpectedRid=${{ matrix.rid }}
           -p:ForceNetStandard=true
@@ -107,7 +106,7 @@ jobs:
           dotnet run
           --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
-          --framework ${{ env.BUILD_NET_TEST_TARGET }}
+          --framework ${{ env.BUILD_NET_TFM }}
           --
           --allocations
 
@@ -116,7 +115,7 @@ jobs:
           dotnet run
           --project src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
-          --framework ${{ env.BUILD_NET_TEST_TARGET }}
+          --framework ${{ env.BUILD_NET_TFM }}
 
   windows:
     name: Build Windows ${{ matrix.platform }}
@@ -148,7 +147,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: ${{ env.BUILD_NET_SDK }}
+          global-json-file: global.json
           architecture: ${{ matrix.platform }}
 
       - name: Setup MSBuild
@@ -180,7 +179,7 @@ jobs:
           dotnet run
           --project src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
-          --framework ${{ env.BUILD_NET_TEST_TARGET }}
+          --framework ${{ env.BUILD_NET_TFM }}
           --runtime ${{ matrix.rid }}
           -p:PcreNetTestBuild=true
           -p:ExpectedRid=${{ matrix.rid }}
@@ -190,7 +189,7 @@ jobs:
           dotnet run
           --project src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
-          --framework ${{ env.BUILD_NET_TEST_TARGET }}
+          --framework ${{ env.BUILD_NET_TFM }}
           --runtime ${{ matrix.rid }}
           -p:PcreNetTestBuild=true
           -p:ExpectedRid=${{ matrix.rid }}
@@ -201,7 +200,7 @@ jobs:
           dotnet run
           --project src/PCRE.NET.Tests/PCRE.NET.Tests.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
-          --framework ${{ env.BUILD_NET_FRAMEWORK_TEST_TARGET }}
+          --framework ${{ env.BUILD_NET_FRAMEWORK_TFM }}
           --runtime ${{ matrix.rid }}
           -p:PcreNetTestBuild=true
           -p:ExpectedRid=${{ matrix.rid }}
@@ -211,7 +210,7 @@ jobs:
           dotnet run
           --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
-          --framework ${{ env.BUILD_NET_TEST_TARGET }}
+          --framework ${{ env.BUILD_NET_TFM }}
           --runtime ${{ matrix.rid }}
           --
           --allocations
@@ -221,7 +220,7 @@ jobs:
           dotnet run
           --project src/PCRE.NET.Benchmarks/PCRE.NET.Benchmarks.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
-          --framework ${{ env.BUILD_NET_FRAMEWORK_TEST_TARGET }}
+          --framework ${{ env.BUILD_NET_FRAMEWORK_TFM }}
           --runtime ${{ matrix.rid }}
           --
           --allocations
@@ -231,7 +230,7 @@ jobs:
           dotnet run
           --project src/PCRE.NET.Tests.Integration/PCRE.NET.Tests.Integration.csproj
           --configuration ${{ env.BUILD_CONFIGURATION }}
-          --framework ${{ env.BUILD_NET_TEST_TARGET }}
+          --framework ${{ env.BUILD_NET_TFM }}
           --runtime ${{ matrix.rid }}
 
   pack:
@@ -248,7 +247,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: ${{ env.BUILD_NET_SDK }}
+          global-json-file: global.json
 
       - name: Download Artifacts
         uses: actions/download-artifact@v8
@@ -372,7 +371,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: ${{ env.BUILD_NET_SDK }}
+          global-json-file: global.json
 
       - name: Download NuGet
         uses: actions/download-artifact@v8
