@@ -6,6 +6,7 @@
     <PcreNetNativeLibRid Include="win-arm64" />
     <PcreNetNativeLibRid Include="linux-x64" />
     <PcreNetNativeLibRid Include="linux-arm64" />
+    <PcreNetNativeLibRid Include="linux-musl-x64" />
     <PcreNetNativeLibRid Include="osx-arm64" />
     <PcreNetNativeLibRid Include="osx-x64" />
   </ItemGroup>
