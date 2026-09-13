@@ -7,7 +7,7 @@ using static InlineIL.IL.Emit;
 
 namespace PCRE.Internal;
 
-internal static unsafe class CalloutInterop
+internal static class CalloutInterop
 {
 #if NET
     private static readonly delegate* unmanaged[Cdecl]<Native.pcre2_callout_block*, void*, int> _calloutHandlerFnPtr8Bit = &CalloutHandler8Bit;
@@ -51,17 +51,17 @@ internal static unsafe class CalloutInterop
 
     private static readonly CalloutHandlerFunc _calloutHandlerDelegate8Bit = CalloutHandler8Bit; // GC root
     private static readonly CalloutHandlerFunc _calloutHandlerDelegate16Bit = CalloutHandler16Bit; // GC root
-    private static readonly void* _calloutHandlerFnPtr8Bit = Marshal.GetFunctionPointerForDelegate(_calloutHandlerDelegate8Bit).ToPointer();
-    private static readonly void* _calloutHandlerFnPtr16Bit = Marshal.GetFunctionPointerForDelegate(_calloutHandlerDelegate16Bit).ToPointer();
+    private static readonly void* _calloutHandlerFnPtr8Bit = unsafe(Marshal.GetFunctionPointerForDelegate(_calloutHandlerDelegate8Bit).ToPointer());
+    private static readonly void* _calloutHandlerFnPtr16Bit = unsafe(Marshal.GetFunctionPointerForDelegate(_calloutHandlerDelegate16Bit).ToPointer());
 
     private static readonly SubstituteMatchCalloutHandlerFunc _substituteMatchCalloutHandlerDelegate = SubstituteMatchCalloutHandler; // GC root
-    private static readonly void* _substituteMatchCalloutHandlerFnPtr = Marshal.GetFunctionPointerForDelegate(_substituteMatchCalloutHandlerDelegate).ToPointer();
+    private static readonly void* _substituteMatchCalloutHandlerFnPtr = unsafe(Marshal.GetFunctionPointerForDelegate(_substituteMatchCalloutHandlerDelegate).ToPointer());
 
     private static readonly SubstituteCalloutHandlerFunc _substituteCalloutHandlerDelegate = SubstituteCalloutHandler; // GC root
-    private static readonly void* _substituteCalloutHandlerFnPtr = Marshal.GetFunctionPointerForDelegate(_substituteCalloutHandlerDelegate).ToPointer();
+    private static readonly void* _substituteCalloutHandlerFnPtr = unsafe(Marshal.GetFunctionPointerForDelegate(_substituteCalloutHandlerDelegate).ToPointer());
 
     private static readonly SubstituteCaseCalloutHandlerFunc _substituteCaseCalloutHandlerDelegate = SubstituteCaseCalloutHandler; // GC root
-    private static readonly void* _substituteCaseCalloutHandlerFnPtr = Marshal.GetFunctionPointerForDelegate(_substituteCaseCalloutHandlerDelegate).ToPointer();
+    private static readonly void* _substituteCaseCalloutHandlerFnPtr = unsafe(Marshal.GetFunctionPointerForDelegate(_substituteCaseCalloutHandlerDelegate).ToPointer());
 
     private static int CalloutHandler8Bit(Native.pcre2_callout_block* callout, void* data)
         => ToInteropInfo<byte>(data).Call(callout);
@@ -197,63 +197,75 @@ internal static unsafe class CalloutInterop
     private static void* ToPointer<TChar>(this ref CalloutInteropInfo<TChar> value)
         where TChar : unmanaged
     {
-        Ldarg(nameof(value));
-        Conv_U();
-        return IL.ReturnPointer();
+        unsafe
+        {
+            Ldarg(nameof(value));
+            Conv_U();
+            return IL.ReturnPointer();
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [SuppressMessage("ReSharper", "EntityNameCapturedOnly.Local")]
     private static void* ToPointer(this ref SubstituteCalloutInteropInfo value)
     {
-        Ldarg(nameof(value));
-        Conv_U();
-        return IL.ReturnPointer();
+        unsafe
+        {
+            Ldarg(nameof(value));
+            Conv_U();
+            return IL.ReturnPointer();
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ref CalloutInteropInfo<TChar> ToInteropInfo<TChar>(void* data)
         where TChar : unmanaged
     {
+        unsafe
+        {
 #if NET
-        IL.Push(data);
-        Ret();
-        throw IL.Unreachable();
+            IL.Push(data);
+            Ret();
+            throw IL.Unreachable();
 #else
-        // Roundtrip via a local to avoid type mismatch on return that the JIT inliner chokes on.
-        IL.DeclareLocals(
-            false,
-            new LocalVar("local", typeof(int).MakeByRefType())
-        );
+            // Roundtrip via a local to avoid type mismatch on return that the JIT inliner chokes on.
+            IL.DeclareLocals(
+                false,
+                new LocalVar("local", typeof(int).MakeByRefType())
+            );
 
-        IL.Push(data);
-        Stloc("local");
-        Ldloc("local");
-        Ret();
-        throw IL.Unreachable();
+            IL.Push(data);
+            Stloc("local");
+            Ldloc("local");
+            Ret();
+            throw IL.Unreachable();
 #endif
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static ref SubstituteCalloutInteropInfo ToSubstituteInteropInfo(void* data)
     {
+        unsafe
+        {
 #if NET
-        IL.Push(data);
-        Ret();
-        throw IL.Unreachable();
+            IL.Push(data);
+            Ret();
+            throw IL.Unreachable();
 #else
-        // Roundtrip via a local to avoid type mismatch on return that the JIT inliner chokes on.
-        IL.DeclareLocals(
-            false,
-            new LocalVar("local", typeof(int).MakeByRefType())
-        );
+            // Roundtrip via a local to avoid type mismatch on return that the JIT inliner chokes on.
+            IL.DeclareLocals(
+                false,
+                new LocalVar("local", typeof(int).MakeByRefType())
+            );
 
-        IL.Push(data);
-        Stloc("local");
-        Ldloc("local");
-        Ret();
-        throw IL.Unreachable();
+            IL.Push(data);
+            Stloc("local");
+            Ldloc("local");
+            Ret();
+            throw IL.Unreachable();
 #endif
+        }
     }
 
     public ref struct CalloutInteropInfo<TChar>
@@ -281,11 +293,11 @@ internal static unsafe class CalloutInterop
         {
             try
             {
-                var outputVector = _outputVector ?? (
+                var outputVector = _outputVector ?? unsafe(
                     callout->capture_top <= InternalRegex.MaxStackAllocCaptureCount
                         ? stackalloc nuint[(int)callout->capture_top * 2]
                         : Span<nuint>.Empty
-                );
+                    );
 
                 if (typeof(TChar) == typeof(byte))
                 {
@@ -369,9 +381,9 @@ internal static unsafe class CalloutInterop
         {
             try
             {
-                var outputVector = callout->capture_top <= InternalRegex.MaxStackAllocCaptureCount
+                var outputVector = unsafe(callout->capture_top <= InternalRegex.MaxStackAllocCaptureCount
                     ? stackalloc nuint[(int)callout->capture_top * 2]
-                    : Span<nuint>.Empty;
+                    : Span<nuint>.Empty);
 
                 return (int)(_matchCallout?.Invoke(new PcreRefCallout(_subject, _regex, callout, outputVector)) ?? PcreCalloutResult.Pass);
             }
@@ -404,13 +416,13 @@ internal static unsafe class CalloutInterop
                 if (_substituteCaseCallout is null)
                     return ~(nuint)0;
 
-                var result = _substituteCaseCallout(new ReadOnlySpan<char>(input, (int)inputLength), (PcreSubstituteCase)targetCase);
+                var result = unsafe(_substituteCaseCallout(new ReadOnlySpan<char>(input, (int)inputLength), (PcreSubstituteCase)targetCase));
 
                 if (ReferenceEquals(result, null))
                     return ~(nuint)0;
 
                 if ((nuint)result.Length <= outputLength)
-                    result.AsSpan().CopyTo(new Span<char>(output, result.Length));
+                    result.AsSpan().CopyTo(unsafe(new Span<char>(output, result.Length)));
 
                 return (nuint)result.Length;
             }

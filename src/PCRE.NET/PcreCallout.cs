@@ -6,7 +6,7 @@ namespace PCRE;
 /// <summary>
 /// Represents the state during a callout invocation.
 /// </summary>
-public sealed unsafe class PcreCallout
+public sealed class PcreCallout
 {
     private readonly string _subject;
     private readonly InternalRegex _regex;
@@ -16,25 +16,28 @@ public sealed unsafe class PcreCallout
 
     internal PcreCallout(string subject, InternalRegex regex, Native.pcre2_callout_block* callout)
     {
-        _subject = subject;
-        _regex = regex;
-        _flags = callout->callout_flags;
+        unsafe
+        {
+            _subject = subject;
+            _regex = regex;
+            _flags = callout->callout_flags;
 
-        Number = (int)callout->callout_number;
-        StartOffset = (int)callout->start_match;
-        CurrentOffset = (int)callout->current_position;
-        MaxCapture = (int)callout->capture_top;
-        LastCapture = (int)callout->capture_last;
-        PatternPosition = (int)callout->pattern_position;
-        NextPatternItemLength = (int)callout->next_item_length;
-        _markPtr = (char*)callout->mark;
+            Number = (int)callout->callout_number;
+            StartOffset = (int)callout->start_match;
+            CurrentOffset = (int)callout->current_position;
+            MaxCapture = (int)callout->capture_top;
+            LastCapture = (int)callout->capture_last;
+            PatternPosition = (int)callout->pattern_position;
+            NextPatternItemLength = (int)callout->next_item_length;
+            _markPtr = (char*)callout->mark;
 
-        _oVector = new nuint[callout->capture_top * 2];
-        _oVector[0] = callout->start_match;
-        _oVector[1] = callout->current_position;
+            _oVector = new nuint[callout->capture_top * 2];
+            _oVector[0] = callout->start_match;
+            _oVector[1] = callout->current_position;
 
-        for (var i = 2; i < _oVector.Length; ++i)
-            _oVector[i] = callout->offset_vector[i];
+            for (var i = 2; i < _oVector.Length; ++i)
+                _oVector[i] = callout->offset_vector[i];
+        }
     }
 
     /// <inheritdoc cref="PcreCalloutInfo.Number"/>

@@ -4442,36 +4442,36 @@ public class MatchTests
     }
 
     [Test]
-    public unsafe void should_use_buffer_output_vector_for_no_match()
+    public void should_use_buffer_output_vector_for_no_match()
     {
         var re = new PcreRegex("foo");
         var buffer = re.CreateMatchBuffer();
 
         var match = buffer.Match("bar".AsSpan());
 
-        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]), Is.True);
+        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref unsafe(buffer.OutputVector[0])), Is.True);
     }
 
     [Test]
-    public unsafe void should_use_buffer_output_vector_for_no_match_utf8()
+    public void should_use_buffer_output_vector_for_no_match_utf8()
     {
         var re = new PcreRegexUtf8("foo"u8);
         var buffer = re.CreateMatchBuffer();
 
         var match = buffer.Match("bar"u8);
 
-        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]), Is.True);
+        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref unsafe(buffer.OutputVector[0])), Is.True);
     }
 
     [Test]
-    public unsafe void should_use_buffer_output_vector_for_no_match_8bit()
+    public void should_use_buffer_output_vector_for_no_match_8bit()
     {
         var re = TestSupport.CreatePcreRegex8Bit("foo".ToLatin1Bytes());
         var buffer = re.CreateMatchBuffer();
 
         var match = buffer.Match("bar".ToLatin1Bytes());
 
-        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]), Is.True);
+        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref unsafe(buffer.OutputVector[0])), Is.True);
     }
 
     [Test]

@@ -11,7 +11,7 @@ public delegate PcreCalloutResult PcreRefCalloutFunc(PcreRefCallout callout);
 
 /// <inheritdoc cref="PcreCallout"/>
 [ForwardTo8Bit]
-public unsafe ref struct PcreRefCallout
+public ref struct PcreRefCallout
 {
     private readonly ReadOnlySpan<char> _subject;
     private readonly InternalRegex16Bit _regex;
@@ -32,7 +32,7 @@ public unsafe ref struct PcreRefCallout
 
     /// <inheritdoc cref="PcreCallout.Number"/>
     [ForwardTo8Bit]
-    public readonly int Number => (int)_callout->callout_number;
+    public readonly int Number => unsafe((int)_callout->callout_number);
 
     /// <inheritdoc cref="PcreCallout.Match"/>
     [ForwardTo8Bit]
@@ -40,48 +40,51 @@ public unsafe ref struct PcreRefCallout
     {
         get
         {
-            if (!_oVectorInitialized)
+            unsafe
             {
-                OutputVector = OutputVector.Length == 0
-                    ? new nuint[_callout->capture_top * 2]
-                    : OutputVector.Slice(0, (int)_callout->capture_top * 2);
+                if (!_oVectorInitialized)
+                {
+                    OutputVector = OutputVector.Length == 0
+                        ? new nuint[_callout->capture_top * 2]
+                        : OutputVector.Slice(0, (int)_callout->capture_top * 2);
 
-                OutputVector[0] = _callout->start_match;
-                OutputVector[1] = _callout->current_position;
+                    OutputVector[0] = _callout->start_match;
+                    OutputVector[1] = _callout->current_position;
 
-                for (var i = 2; i < OutputVector.Length; ++i)
-                    OutputVector[i] = _callout->offset_vector[i];
+                    for (var i = 2; i < OutputVector.Length; ++i)
+                        OutputVector[i] = _callout->offset_vector[i];
 
-                _oVectorInitialized = true;
+                    _oVectorInitialized = true;
+                }
+
+                return new PcreRefMatch(_subject, _regex, OutputVector, (char*)_callout->mark);
             }
-
-            return new PcreRefMatch(_subject, _regex, OutputVector, (char*)_callout->mark);
         }
     }
 
     /// <inheritdoc cref="PcreCallout.StartOffset"/>
     [ForwardTo8Bit]
-    public readonly int StartOffset => (int)_callout->start_match;
+    public readonly int StartOffset => unsafe((int)_callout->start_match);
 
     /// <inheritdoc cref="PcreCallout.CurrentOffset"/>
     [ForwardTo8Bit]
-    public readonly int CurrentOffset => (int)_callout->current_position;
+    public readonly int CurrentOffset => unsafe((int)_callout->current_position);
 
     /// <inheritdoc cref="PcreCallout.MaxCapture"/>
     [ForwardTo8Bit]
-    public readonly int MaxCapture => (int)_callout->capture_top;
+    public readonly int MaxCapture => unsafe((int)_callout->capture_top);
 
     /// <inheritdoc cref="PcreCallout.LastCapture"/>
     [ForwardTo8Bit]
-    public readonly int LastCapture => (int)_callout->capture_last;
+    public readonly int LastCapture => unsafe((int)_callout->capture_last);
 
     /// <inheritdoc cref="PcreCallout.PatternPosition"/>
     [ForwardTo8Bit]
-    public readonly int PatternPosition => (int)_callout->pattern_position;
+    public readonly int PatternPosition => unsafe((int)_callout->pattern_position);
 
     /// <inheritdoc cref="PcreCallout.NextPatternItemLength"/>
     [ForwardTo8Bit]
-    public readonly int NextPatternItemLength => (int)_callout->next_item_length;
+    public readonly int NextPatternItemLength => unsafe((int)_callout->next_item_length);
 
     /// <inheritdoc cref="PcreCallout.StringOffset"/>
     [ForwardTo8Bit]
@@ -98,9 +101,9 @@ public unsafe ref struct PcreRefCallout
 
     /// <inheritdoc cref="PcreCallout.StartMatch"/>
     [ForwardTo8Bit]
-    public readonly bool StartMatch => (_callout->callout_flags & PcreConstants.PCRE2_CALLOUT_STARTMATCH) != 0;
+    public readonly bool StartMatch => unsafe(_callout->callout_flags & PcreConstants.PCRE2_CALLOUT_STARTMATCH) != 0;
 
     /// <inheritdoc cref="PcreCallout.Backtrack"/>
     [ForwardTo8Bit]
-    public readonly bool Backtrack => (_callout->callout_flags & PcreConstants.PCRE2_CALLOUT_BACKTRACK) != 0;
+    public readonly bool Backtrack => unsafe(_callout->callout_flags & PcreConstants.PCRE2_CALLOUT_BACKTRACK) != 0;
 }

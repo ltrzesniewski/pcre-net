@@ -20,7 +20,7 @@ internal interface IPcreMatchBuffer
 /// Not thread-safe and not reentrant.
 /// </remarks>
 [ForwardTo8Bit]
-public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit, IDisposable
+public sealed class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit, IDisposable
 {
     internal readonly InternalRegex16Bit Regex;
     private readonly int _outputVectorSize;
@@ -53,7 +53,7 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
 
         settings.FillMatchSettings(ref info.settings, out _jitStack);
 
-        NativeBuffer = (IntPtr)default(Native16Bit).create_match_buffer(&info);
+        NativeBuffer = unsafe((IntPtr)default(Native16Bit).create_match_buffer(&info));
         if (NativeBuffer == IntPtr.Zero)
             throw new InvalidOperationException("Could not create match buffer");
 
@@ -83,12 +83,17 @@ public sealed unsafe class PcreMatchBuffer : IPcreMatchBuffer, IRegexHolder16Bit
 
         var buffer = Interlocked.Exchange(ref NativeBuffer, IntPtr.Zero);
         if (buffer != IntPtr.Zero)
-            default(Native16Bit).free_match_buffer((void*)buffer);
+        {
+            unsafe
+            {
+                default(Native16Bit).free_match_buffer((void*)buffer);
+            }
+        }
     }
 
     [ForwardTo8Bit]
     private Span<nuint> GetOutputVectorSpan()
-        => new(OutputVector, _outputVectorSize);
+        => unsafe(new(OutputVector, _outputVectorSize));
 
     /// <include file='PcreRegex.xml' path='/doc/method[@name="IsMatch"]/*'/>
     /// <include file='PcreRegex.xml' path='/doc/param[@name="subject"]'/>

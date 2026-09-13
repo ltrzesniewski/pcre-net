@@ -6,7 +6,7 @@ namespace PCRE;
 /// <summary>
 /// Information about a callout in the regex pattern.
 /// </summary>
-public sealed unsafe class PcreCalloutInfo
+public sealed class PcreCalloutInfo
 {
     internal PcreCalloutInfo(InternalRegex regex, ref Native.pcre2_callout_enumerate_block info)
     {

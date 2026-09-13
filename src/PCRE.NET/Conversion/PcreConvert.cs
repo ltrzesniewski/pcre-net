@@ -6,7 +6,7 @@ namespace PCRE.Conversion;
 /// <summary>
 /// Pattern conversions.
 /// </summary>
-public static unsafe class PcreConvert
+public static class PcreConvert
 {
     /// <summary>
     /// Converts a POSIX basic pattern to a PCRE pattern.
@@ -61,24 +61,27 @@ public static unsafe class PcreConvert
     {
         fixed (char* pPattern = pattern)
         {
-            input->pattern = pPattern;
-            input->pattern_length = (uint)pattern.Length;
-            input->options |= PcreConstants.PCRE2_CONVERT_UTF;
-
-            Native.convert_result result;
-            var errorCode = default(Native16Bit).convert(input, &result);
-
-            try
+            unsafe
             {
-                if (errorCode != 0)
-                    throw new PcreException((PcreErrorCode)errorCode, $"Could not convert pattern '{pattern}': {default(Native16Bit).GetErrorMessage(errorCode)} at offset {result.output_length}.");
+                input->pattern = pPattern;
+                input->pattern_length = (uint)pattern.Length;
+                input->options |= PcreConstants.PCRE2_CONVERT_UTF;
 
-                return new string((char*)result.output, 0, (int)result.output_length);
-            }
-            finally
-            {
-                if (result.output != null)
-                    default(Native16Bit).convert_result_free(result.output);
+                Native.convert_result result;
+                var errorCode = default(Native16Bit).convert(input, &result);
+
+                try
+                {
+                    if (errorCode != 0)
+                        throw new PcreException((PcreErrorCode)errorCode, $"Could not convert pattern '{pattern}': {default(Native16Bit).GetErrorMessage(errorCode)} at offset {result.output_length}.");
+
+                    return new string((char*)result.output, 0, (int)result.output_length);
+                }
+                finally
+                {
+                    if (result.output != null)
+                        default(Native16Bit).convert_result_free(result.output);
+                }
             }
         }
     }

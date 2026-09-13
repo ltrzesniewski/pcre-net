@@ -10,34 +10,40 @@ internal partial interface INative
     string GetErrorMessage(int errorCode);
 }
 
-internal readonly unsafe partial struct Native8Bit : INative
+internal readonly partial struct Native8Bit : INative
 {
     public string GetErrorMessage(int errorCode)
     {
-        const int bufferSize = 512;
-        var buffer = stackalloc byte[bufferSize];
-        var messageLength = get_error_message(errorCode, buffer, bufferSize);
-        return messageLength >= 0
-            ? Encoding.ASCII.GetString(buffer, messageLength)
-            : $"Unknown error, code: {errorCode}";
+        unsafe
+        {
+            const int bufferSize = 512;
+            var buffer = stackalloc byte[bufferSize];
+            var messageLength = get_error_message(errorCode, buffer, bufferSize);
+            return messageLength >= 0
+                ? Encoding.ASCII.GetString(buffer, messageLength)
+                : $"Unknown error, code: {errorCode}";
+        }
     }
 }
 
-internal readonly unsafe partial struct Native16Bit : INative
+internal readonly partial struct Native16Bit : INative
 {
     public string GetErrorMessage(int errorCode)
     {
-        const int bufferSize = 256;
-        var buffer = stackalloc char[bufferSize];
-        var messageLength = get_error_message(errorCode, buffer, bufferSize);
-        return messageLength >= 0
-            ? new string(buffer, 0, messageLength)
-            : $"Unknown error, code: {errorCode}";
+        unsafe
+        {
+            const int bufferSize = 256;
+            var buffer = stackalloc char[bufferSize];
+            var messageLength = get_error_message(errorCode, buffer, bufferSize);
+            return messageLength >= 0
+                ? new string(buffer, 0, messageLength)
+                : $"Unknown error, code: {errorCode}";
+        }
     }
 }
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-internal static unsafe class Native
+internal static class Native
 {
     // These structs need to be kept identical between the 8-bit and 16-bit versions:
     // same size, same alignment, no PCRE2_UCHAR field types without indirection.

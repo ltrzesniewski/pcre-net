@@ -8,7 +8,7 @@ using PCRE.Dfa;
 
 namespace PCRE.Internal;
 
-internal abstract unsafe class InternalRegex : IDisposable
+internal abstract class InternalRegex : IDisposable
 {
     internal const int MaxStackAllocCaptureCount = 32;
     internal const int SubstituteBufferSizeInChars = 4096;
@@ -74,7 +74,7 @@ internal abstract class InternalRegex<TChar>(string patternString, PcreRegexSett
     : InternalRegex(patternString, settings)
     where TChar : unmanaged;
 
-internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TChar>
+internal abstract class InternalRegex<TChar, TNative> : InternalRegex<TChar>
     where TChar : unmanaged
     where TNative : struct, INative
 {
@@ -106,7 +106,11 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
 
             using (Settings.FillCompileInput(ref input))
             {
-                default(TNative).compile(&input, &result);
+                unsafe
+                {
+                    default(TNative).compile(&input, &result);
+                }
+
                 Code = result.code;
             }
 
@@ -125,7 +129,11 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
     {
         if (Code != null)
         {
-            default(TNative).code_free(Code);
+            unsafe
+            {
+                default(TNative).code_free(Code);
+            }
+
             Code = null;
         }
     }
@@ -153,7 +161,7 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
         var oVector = matchOVector.Length == OutputVectorSize
             ? matchOVector
             : CanStackAllocOutputVector
-                ? stackalloc nuint[OutputVectorSize]
+                ? unsafe(stackalloc nuint[OutputVectorSize])
                 : oVectorArray = new nuint[OutputVectorSize];
 
         fixed (TChar* pSubject = subject)
@@ -168,7 +176,10 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
 
             CalloutInterop.PrepareForSpan(subject, this, ref input, out calloutInterop, callout, calloutOutputVector);
 
-            default(TNative).match(&input, &result);
+            unsafe
+            {
+                default(TNative).match(&input, &result);
+            }
 
             GC.KeepAlive(this);
             GC.KeepAlive(jitStack);
@@ -215,7 +226,10 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
 
             CalloutInterop.PrepareForBuffer(subject, buffer, ref input, out calloutInterop, callout);
 
-            default(TNative).buffer_match(&input, &result);
+            unsafe
+            {
+                default(TNative).buffer_match(&input, &result);
+            }
 
             GC.KeepAlive(buffer); // The buffer keeps alive all the other required stuff
         }
@@ -253,7 +267,7 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
     public override uint GetInfoUInt32(uint key)
     {
         uint result;
-        var errorCode = default(TNative).pattern_info(Code, key, &result);
+        var errorCode = unsafe(default(TNative).pattern_info(Code, key, &result));
 
         GC.KeepAlive(this);
 
@@ -266,7 +280,7 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
     public override nuint GetInfoNativeInt(uint key)
     {
         nuint result;
-        var errorCode = default(TNative).pattern_info(Code, key, &result);
+        var errorCode = unsafe(default(TNative).pattern_info(Code, key, &result));
 
         GC.KeepAlive(this);
 
@@ -278,16 +292,19 @@ internal abstract unsafe class InternalRegex<TChar, TNative> : InternalRegex<TCh
 
     protected override PcreCalloutInfo[] GetCallouts()
     {
-        var calloutCount = (int)default(TNative).get_callout_count(Code);
+        var calloutCount = unsafe((int)default(TNative).get_callout_count(Code));
         if (calloutCount == 0)
             return [];
 
         var data = calloutCount <= 16
-            ? stackalloc Native.pcre2_callout_enumerate_block[calloutCount]
+            ? unsafe(stackalloc Native.pcre2_callout_enumerate_block[calloutCount])
             : new Native.pcre2_callout_enumerate_block[calloutCount];
 
-        fixed (Native.pcre2_callout_enumerate_block* pData = &data[0])
-            default(TNative).get_callouts(Code, pData);
+        unsafe
+        {
+            fixed (Native.pcre2_callout_enumerate_block* pData = &data[0])
+                default(TNative).get_callouts(Code, pData);
+        }
 
         var result = new PcreCalloutInfo[calloutCount];
 
@@ -320,7 +337,7 @@ internal interface IRegexHolder8Bit
     InternalRegex8Bit Regex { get; }
 }
 
-internal sealed unsafe class InternalRegex8Bit(ReadOnlySpan<byte> pattern, string patternString, PcreRegexSettings settings, Encoding encoding)
+internal sealed class InternalRegex8Bit(ReadOnlySpan<byte> pattern, string patternString, PcreRegexSettings settings, Encoding encoding)
     : InternalRegex<byte, Native8Bit>(pattern, patternString, settings),
       IRegexHolder8Bit
 {
@@ -340,12 +357,12 @@ internal sealed unsafe class InternalRegex8Bit(ReadOnlySpan<byte> pattern, strin
         return encoding.GetString(value);
 #else
         fixed (byte* ptr = value)
-            return encoding.GetString(ptr, value.Length);
+            return unsafe(encoding.GetString(ptr, value.Length));
 #endif
     }
 
     public override string? GetString(void* ptr, nuint length)
-        => ptr is not null ? Encoding.GetString((byte*)ptr, (int)length) : null;
+        => ptr is not null ? unsafe(Encoding.GetString((byte*)ptr, (int)length)) : null;
 
     private string? GetString(byte* ptr)
     {
@@ -353,18 +370,18 @@ internal sealed unsafe class InternalRegex8Bit(ReadOnlySpan<byte> pattern, strin
             return null;
 #if NET
         if (ReferenceEquals(Encoding, Encoding.UTF8))
-            return System.Runtime.InteropServices.Marshal.PtrToStringUTF8((IntPtr)ptr) ?? string.Empty;
+            return unsafe(System.Runtime.InteropServices.Marshal.PtrToStringUTF8((IntPtr)ptr)) ?? string.Empty;
 #endif
 #if NET9_0_OR_GREATER
-        return Encoding.GetString(System.Runtime.InteropServices.MemoryMarshal.CreateReadOnlySpanFromNullTerminated(ptr));
+        return unsafe(Encoding.GetString(System.Runtime.InteropServices.MemoryMarshal.CreateReadOnlySpanFromNullTerminated(ptr)));
 #else
-        return Encoding.GetString(ptr, GetStringLength(ptr));
+        return unsafe(Encoding.GetString(ptr, GetStringLength(ptr)));
 
         static int GetStringLength(byte* ptr)
         {
             var start = ptr;
 
-            while (*ptr != 0)
+            while (unsafe(*ptr != 0))
                 ++ptr;
 
             return (int)(ptr - start);
@@ -383,7 +400,7 @@ internal sealed unsafe class InternalRegex8Bit(ReadOnlySpan<byte> pattern, strin
 
         for (var i = 0; i < nameCount; ++i)
         {
-            var groupIndex = currentItem[0] << 8 | currentItem[1];
+            var groupIndex = unsafe(currentItem[0] << 8 | currentItem[1]);
             var groupName = GetString(currentItem + 2) ?? string.Empty;
 
             if (captureNames.TryGetValue(groupName, out var indexes))
@@ -409,7 +426,7 @@ internal interface IRegexHolder16Bit
     InternalRegex16Bit Regex { get; }
 }
 
-internal sealed unsafe class InternalRegex16Bit(string pattern, PcreRegexSettings settings)
+internal sealed class InternalRegex16Bit(string pattern, PcreRegexSettings settings)
     : InternalRegex<char, Native16Bit>(pattern, pattern, settings),
       IRegexHolder16Bit
 {
@@ -473,7 +490,10 @@ internal sealed unsafe class InternalRegex16Bit(string pattern, PcreRegexSetting
 
             CalloutInterop.PrepareForDfa(subject, this, ref input, out calloutInterop, settings.Callout);
 
-            default(Native16Bit).dfa_match(&input, &result);
+            unsafe
+            {
+                default(Native16Bit).dfa_match(&input, &result);
+            }
 
             GC.KeepAlive(this);
         }
@@ -522,7 +542,10 @@ internal sealed unsafe class InternalRegex16Bit(string pattern, PcreRegexSetting
 
             CalloutInterop.PrepareForSubstitute(this, subject, ref input, out calloutInterop, matchCallout, substituteCallout, substituteCaseCallout);
 
-            default(Native16Bit).substitute(&input, &result);
+            unsafe
+            {
+                default(Native16Bit).substitute(&input, &result);
+            }
 
             GC.KeepAlive(this);
             GC.KeepAlive(jitStack);
@@ -555,18 +578,21 @@ internal sealed unsafe class InternalRegex16Bit(string pattern, PcreRegexSetting
                     if (result.output_length > int.MaxValue)
                         throw new PcreSubstituteException(PcreErrorCode.Internal, "Invalid output string length", null);
 
-                    return new string((char*)result.output, 0, (int)result.output_length);
+                    return unsafe(new string((char*)result.output, 0, (int)result.output_length));
             }
         }
         finally
         {
-            if (result.output != null && result.output_on_heap != 0)
-                default(Native16Bit).substitute_result_free(&result);
+            unsafe
+            {
+                if (result.output != null && result.output_on_heap != 0)
+                    default(Native16Bit).substitute_result_free(&result);
+            }
         }
     }
 
     public override string? GetString(void* ptr, nuint length)
-        => ptr is not null ? new string((char*)ptr, 0, (int)length) : null;
+        => ptr is not null ? unsafe(new string((char*)ptr, 0, (int)length)) : null;
 
     protected override Dictionary<string, int[]> GetCaptureNames(void* nameEntryTable, uint nameCount, uint nameEntrySize)
     {
@@ -579,8 +605,8 @@ internal sealed unsafe class InternalRegex16Bit(string pattern, PcreRegexSetting
 
         for (var i = 0; i < nameCount; ++i)
         {
-            var groupIndex = (int)*currentItem;
-            var groupName = new string(currentItem + 1);
+            var groupIndex = unsafe((int)*currentItem);
+            var groupName = unsafe(new string(currentItem + 1));
 
             if (captureNames.TryGetValue(groupName, out var indexes))
             {

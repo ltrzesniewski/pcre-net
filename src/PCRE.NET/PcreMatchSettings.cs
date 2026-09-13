@@ -5,7 +5,7 @@ namespace PCRE;
 /// <summary>
 /// Advanced match settings.
 /// </summary>
-public sealed unsafe class PcreMatchSettings
+public sealed class PcreMatchSettings
 {
     internal static PcreMatchSettings Default { get; } = new();
 

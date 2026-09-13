@@ -47,7 +47,7 @@ public partial class PcreRegex
             ThrowInvalidStartIndex();
 
         var outputVector = InternalRegex.CanStackAllocOutputVector
-            ? stackalloc nuint[InternalRegex.OutputVectorSize]
+            ? unsafe(stackalloc nuint[InternalRegex.OutputVectorSize])
             : new nuint[InternalRegex.OutputVectorSize];
 
         var match = new PcreRefMatch(InternalRegex, outputVector);

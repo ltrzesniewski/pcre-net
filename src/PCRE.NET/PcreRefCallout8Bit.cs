@@ -10,7 +10,7 @@ namespace PCRE;
 public delegate PcreCalloutResult PcreRefCalloutFunc8Bit(PcreRefCallout8Bit callout);
 
 /// <inheritdoc cref="PcreCallout"/>
-public unsafe ref partial struct PcreRefCallout8Bit
+public ref partial struct PcreRefCallout8Bit
 {
     private readonly ReadOnlySpan<byte> _subject;
     private readonly InternalRegex8Bit _regex;

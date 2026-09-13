@@ -3,8 +3,9 @@
   <Import Project="Version.props" />
 
   <PropertyGroup>
-    <LangVersion>14.0</LangVersion>
-    <AnalysisLevel>10.0</AnalysisLevel>
+    <LangVersion>preview</LangVersion>
+    <Features>$(Features);updated-memory-safety-rules</Features>
+    <AnalysisLevel>11.0</AnalysisLevel>
     <AnalysisModeStyle>None</AnalysisModeStyle>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

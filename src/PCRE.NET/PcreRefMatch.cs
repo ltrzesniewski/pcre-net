@@ -12,7 +12,7 @@ namespace PCRE;
 /// </summary>
 [ForwardTo8Bit]
 [DebuggerTypeProxy(typeof(DebugProxy))]
-public unsafe ref struct PcreRefMatch
+public ref struct PcreRefMatch
 {
     private readonly IRegexHolder16Bit? _owner; // Needs to be kept alive as long as this match is used
     internal Span<nuint> OutputVector; // Can be empty when there is no match
@@ -118,11 +118,14 @@ public unsafe ref struct PcreRefMatch
             if (_markPtr == null)
                 return default;
 
-            char* markEnd;
-            for (markEnd = _markPtr; *markEnd != 0; ++markEnd)
-            { }
+            unsafe
+            {
+                char* markEnd;
+                for (markEnd = _markPtr; *markEnd != 0; ++markEnd)
+                { }
 
-            return new ReadOnlySpan<char>(_markPtr, (int)(markEnd - _markPtr));
+                return new ReadOnlySpan<char>(_markPtr, (int)(markEnd - _markPtr));
+            }
         }
     }
 

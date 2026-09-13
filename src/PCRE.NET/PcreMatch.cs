@@ -9,7 +9,7 @@ namespace PCRE;
 /// <summary>
 /// The result of a match.
 /// </summary>
-public sealed unsafe class PcreMatch : IPcreGroup, IPcreGroupList
+public sealed class PcreMatch : IPcreGroup, IPcreGroupList
 {
     private readonly InternalRegex _regex;
     private readonly int _resultCode;
@@ -110,7 +110,7 @@ public sealed unsafe class PcreMatch : IPcreGroup, IPcreGroupList
     /// <remarks>
     /// Marks are defined with <c>(*MARK)</c>.
     /// </remarks>
-    public string? Mark => field ??= _markPtr != null ? new string(_markPtr) : null;
+    public string? Mark => field ??= _markPtr != null ? unsafe(new string(_markPtr)) : null;
 
     /// <summary>
     /// Returns the list of capturing groups.

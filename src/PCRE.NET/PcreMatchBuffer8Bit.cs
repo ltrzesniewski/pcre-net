@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Threading;
 using PCRE.Internal;
 
 namespace PCRE;
@@ -12,7 +9,7 @@ namespace PCRE;
 /// <remarks>
 /// Not thread-safe and not reentrant.
 /// </remarks>
-public sealed unsafe partial class PcreMatchBuffer8Bit : IPcreMatchBuffer, IRegexHolder8Bit, IDisposable
+public sealed partial class PcreMatchBuffer8Bit : IPcreMatchBuffer, IRegexHolder8Bit, IDisposable
 {
     internal readonly InternalRegex8Bit Regex;
     private readonly int _outputVectorSize;

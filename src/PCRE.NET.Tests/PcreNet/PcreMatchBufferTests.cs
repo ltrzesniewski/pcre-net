@@ -9,7 +9,7 @@ using PCRE.Tests.Support;
 namespace PCRE.Tests.PcreNet;
 
 [TestFixture]
-public unsafe class PcreMatchBufferTests
+public class PcreMatchBufferTests
 {
     [Test]
     public void should_use_match_buffer()
@@ -19,7 +19,7 @@ public unsafe class PcreMatchBufferTests
 
         var match = buffer.Match("foo".AsSpan());
 
-        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]), Is.True);
+        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref unsafe(buffer.OutputVector[0])), Is.True);
     }
 
     [Test]
@@ -30,7 +30,7 @@ public unsafe class PcreMatchBufferTests
 
         var match = buffer.Match("foo"u8);
 
-        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]), Is.True);
+        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref unsafe(buffer.OutputVector[0])), Is.True);
     }
 
     [Test]
@@ -41,7 +41,7 @@ public unsafe class PcreMatchBufferTests
 
         var match = buffer.Match("bar".AsSpan());
 
-        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]), Is.True);
+        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref unsafe(buffer.OutputVector[0])), Is.True);
     }
 
     [Test]
@@ -52,7 +52,7 @@ public unsafe class PcreMatchBufferTests
 
         var match = buffer.Match("bar"u8);
 
-        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]), Is.True);
+        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref unsafe(buffer.OutputVector[0])), Is.True);
     }
 
     [Test]
@@ -66,7 +66,7 @@ public unsafe class PcreMatchBufferTests
             Assert.That(data.Match.Value.ToString(), Is.EqualTo("fo"));
             Assert.That(data.Match[1].Value.ToString(), Is.EqualTo("o"));
 
-            Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(data.OutputVector), ref buffer.CalloutOutputVector[0]), Is.True);
+            Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(data.OutputVector), ref unsafe(buffer.CalloutOutputVector[0])), Is.True);
 
             return PcreCalloutResult.Pass;
         });
@@ -85,7 +85,7 @@ public unsafe class PcreMatchBufferTests
             Assert.That(data.Match.Value.SequenceEqual("fo"u8));
             Assert.That(data.Match[1].Value.SequenceEqual("o"u8));
 
-            Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(data.OutputVector), ref buffer.CalloutOutputVector[0]), Is.True);
+            Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(data.OutputVector), ref unsafe(buffer.CalloutOutputVector[0])), Is.True);
 
             return PcreCalloutResult.Pass;
         });

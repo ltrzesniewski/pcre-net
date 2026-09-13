@@ -9,7 +9,7 @@ namespace PCRE;
 /// The result of a match.
 /// </summary>
 [DebuggerTypeProxy(typeof(DebugProxy))]
-public unsafe ref partial struct PcreRefMatch8Bit
+public ref partial struct PcreRefMatch8Bit
 {
     private readonly IRegexHolder8Bit? _owner; // Needs to be kept alive as long as this match is used
     internal Span<nuint> OutputVector; // Can be empty when there is no match

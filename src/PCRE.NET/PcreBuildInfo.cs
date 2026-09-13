@@ -5,7 +5,7 @@ namespace PCRE;
 /// <summary>
 /// Returns information about the PCRE build.
 /// </summary>
-public static unsafe class PcreBuildInfo
+public static class PcreBuildInfo
 {
     /// <summary>
     /// <c>PCRE2_CONFIG_BSR</c> - Indicates what character sequences the <c>\R</c> escape sequence matches by default.
@@ -102,7 +102,7 @@ public static unsafe class PcreBuildInfo
     private static uint GetConfigUInt32(uint key)
     {
         uint result;
-        var size = default(Native16Bit).config(key, &result);
+        var size = unsafe(default(Native16Bit).config(key, &result));
 
         if (size < 0)
             throw new PcreException((PcreErrorCode)size, $"Could not retrieve the configuration property: {key}");
@@ -112,15 +112,18 @@ public static unsafe class PcreBuildInfo
 
     private static string GetConfigString(uint key)
     {
-        var requiredSize = default(Native16Bit).config(key, null);
-        if (requiredSize is <= 0 or > 1024)
-            throw new PcreException(PcreErrorCode.BadOption, $"Required size for the configuration property {key} is invalid: {requiredSize}");
+        unsafe
+        {
+            var requiredSize = default(Native16Bit).config(key, null);
+            if (requiredSize is <= 0 or > 1024)
+                throw new PcreException(PcreErrorCode.BadOption, $"Required size for the configuration property {key} is invalid: {requiredSize}");
 
-        var buffer = stackalloc char[requiredSize + 1];
-        var messageLength = default(Native16Bit).config(key, buffer);
+            var buffer = stackalloc char[requiredSize + 1];
+            var messageLength = default(Native16Bit).config(key, buffer);
 
-        return messageLength >= 0
-            ? new string(buffer, 0, messageLength - 1)
-            : throw new PcreException((PcreErrorCode)messageLength, $"Could not retrieve the configuration property: {key}");
+            return messageLength >= 0
+                ? new string(buffer, 0, messageLength - 1)
+                : throw new PcreException((PcreErrorCode)messageLength, $"Could not retrieve the configuration property: {key}");
+        }
     }
 }

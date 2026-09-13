@@ -56,27 +56,27 @@ using System.Security;
 
 namespace PCRE.Internal;
 
-internal unsafe partial interface INative
+internal partial interface INative
 {
 <# foreach (var func in functions) { #>
-    <#= func.GetDeclaration() #>;
+    unsafe <#= func.GetDeclaration() #>;
 <# } #>
 }
 <# foreach (var bit in new[] { 8, 16 }) { #>
 
-internal readonly unsafe partial struct Native<#= bit #>Bit : INative
+internal readonly partial struct Native<#= bit #>Bit : INative
 {
 #if NET
 
 <# foreach (var func in functions) { #>
-    public readonly <#= func.GetDeclaration() #>
+    public readonly unsafe <#= func.GetDeclaration() #>
         => pcrenet_<#= func.GetCall() #>;
 
 <# if (func.SuppressGCTransition) { #>
     [SuppressGCTransition]
 <# } #>
     [DllImport("<#= libName #>", EntryPoint = "pcrenet_<#= func.Name #>_<#= bit #>", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
-    private static extern <#= func.ReturnType #> pcrenet_<#= func.Name #>(<#= func.GetParametersDeclaration() #>);
+    private static extern safe <#= func.ReturnType #> pcrenet_<#= func.Name #>(<#= func.GetParametersDeclaration() #>);
 
 <# } #>
 #else
@@ -84,7 +84,7 @@ internal readonly unsafe partial struct Native<#= bit #>Bit : INative
     private static readonly Lib _lib = GetLib();
 
 <# foreach (var func in functions) { #>
-    public readonly <#= func.GetDeclaration() #>
+    public readonly unsafe <#= func.GetDeclaration() #>
         => _lib.<#= func.GetCall() #>;
 
 <# } #>
@@ -136,7 +136,7 @@ internal readonly unsafe partial struct Native<#= bit #>Bit : INative
             => pcrenet_<#= func.GetCall() #>;
 
         [DllImport("<#= platform.LibName #>", EntryPoint = "pcrenet_<#= func.Name #>_<#= bit #>", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
-        private static extern <#= func.ReturnType #> pcrenet_<#= func.Name #>(<#= func.GetParametersDeclaration() #>);
+        private static extern safe <#= func.ReturnType #> pcrenet_<#= func.Name #>(<#= func.GetParametersDeclaration() #>);
 
 <# } #>
     }
@@ -198,6 +198,8 @@ private class FuncDef
     public string Name;
     public readonly List<FuncParamDef> Parameters = new();
     public bool SuppressGCTransition;
+
+    public bool IsVoid => ReturnType == "void";
 
     public string GetDeclaration()
         => $"{ReturnType} {Name}({GetParametersDeclaration()})";

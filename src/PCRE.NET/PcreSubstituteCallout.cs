@@ -12,7 +12,7 @@ public delegate PcreSubstituteCalloutResult PcreSubstituteCalloutFunc(PcreSubsti
 /// A callout called after a substitution.
 /// </summary>
 /// <seealso cref="PcreRegex.Substitute(string,string)"/>
-public readonly unsafe ref struct PcreSubstituteCallout
+public readonly ref struct PcreSubstituteCallout
 {
     private readonly InternalRegex16Bit _regex;
     private readonly ReadOnlySpan<char> _subject;
@@ -30,7 +30,7 @@ public readonly unsafe ref struct PcreSubstituteCallout
     /// <summary>
     /// Returns the match associated with the substitution.
     /// </summary>
-    public PcreRefMatch Match => new(_subject, _regex, new Span<nuint>(_callout->ovector, 2 * (int)_callout->oveccount), null);
+    public PcreRefMatch Match => unsafe(new(_subject, _regex, new Span<nuint>(_callout->ovector, 2 * (int)_callout->oveccount), null));
 
     /// <summary>
     /// The subject string.
@@ -40,15 +40,15 @@ public readonly unsafe ref struct PcreSubstituteCallout
     /// <summary>
     /// The output so far.
     /// </summary>
-    public ReadOnlySpan<char> Output => new(_callout->output, (int)_callout->output_offset_end);
+    public ReadOnlySpan<char> Output => unsafe(new(_callout->output, (int)_callout->output_offset_end));
 
     /// <summary>
     /// The current substitution result.
     /// </summary>
-    public ReadOnlySpan<char> Substitution => new((char*)_callout->output + (int)_callout->output_offset_start, (int)_callout->output_offset_end - (int)_callout->output_offset_start);
+    public ReadOnlySpan<char> Substitution => unsafe(new((char*)_callout->output + (int)_callout->output_offset_start, (int)_callout->output_offset_end - (int)_callout->output_offset_start));
 
     /// <summary>
     /// The total substitution count. It is 1 for the first callout, 2 for the second, and so on.
     /// </summary>
-    public int SubstitutionCount => (int)_callout->subscount;
+    public int SubstitutionCount => unsafe((int)_callout->subscount);
 }

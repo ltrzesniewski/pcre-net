@@ -22,7 +22,7 @@ namespace PCRE;
 /// </para>
 /// </remarks>
 [SuppressMessage("Naming", "CA1711")]
-public sealed unsafe class PcreJitStack : IDisposable
+public sealed class PcreJitStack : IDisposable
 {
     private void* _stack;
 
@@ -34,7 +34,7 @@ public sealed unsafe class PcreJitStack : IDisposable
     public PcreJitStack(uint startSize, uint maxSize)
     {
         // The JIT stack is independent of the character width.
-        _stack = default(Native16Bit).jit_stack_create(startSize, maxSize);
+        _stack = unsafe(default(Native16Bit).jit_stack_create(startSize, maxSize));
     }
 
     /// <summary>
@@ -57,7 +57,11 @@ public sealed unsafe class PcreJitStack : IDisposable
         if (_stack == null)
             return;
 
-        default(Native16Bit).jit_stack_free(_stack);
+        unsafe
+        {
+            default(Native16Bit).jit_stack_free(_stack);
+        }
+
         _stack = null;
     }
 
