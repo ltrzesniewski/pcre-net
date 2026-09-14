@@ -144,7 +144,16 @@ public class PcreRegexTests
         var re = new PcreRegex("(?C'foo\0bar🙂baz')");
         var name = re.PatternInfo.Callouts[0].String;
 
+        var matched = "";
+
+        re.Match("a", callout =>
+        {
+            matched = callout.String;
+            return PcreCalloutResult.Pass;
+        });
+
         Assert.That(name, Is.EqualTo("foo\0bar🙂baz"));
+        Assert.That(matched, Is.EqualTo(name));
     }
 
     [Test]
@@ -153,7 +162,16 @@ public class PcreRegexTests
         var re = new PcreRegex8Bit("(?C'foo\0bâr')".ToLatin1Bytes(), TestSupport.Latin1Encoding);
         var name = re.PatternInfo.Callouts[0].String;
 
+        var matched = "";
+
+        re.Match("a".ToLatin1Bytes(), callout =>
+        {
+            matched = callout.String;
+            return PcreCalloutResult.Pass;
+        });
+
         Assert.That(name, Is.EqualTo("foo\0bâr"));
+        Assert.That(matched, Is.EqualTo(name));
     }
 
     [Test]
@@ -162,7 +180,16 @@ public class PcreRegexTests
         var re = new PcreRegexUtf8("(?C'foo\0bar🙂baz')"u8);
         var name = re.PatternInfo.Callouts[0].String;
 
+        var matched = "";
+
+        re.Match("a"u8, callout =>
+        {
+            matched = callout.String;
+            return PcreCalloutResult.Pass;
+        });
+
         Assert.That(name, Is.EqualTo("foo\0bar🙂baz"));
+        Assert.That(matched, Is.EqualTo(name));
     }
 
     private static PcreRegex? TryCompilePattern(string pattern, PcreRegexSettings settings)

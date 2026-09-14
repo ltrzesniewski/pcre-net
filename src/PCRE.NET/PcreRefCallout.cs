@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using PCRE.Internal;
 
 namespace PCRE;
@@ -19,6 +20,10 @@ public unsafe ref struct PcreRefCallout
 
     internal Span<nuint> OutputVector;
     private bool _oVectorInitialized;
+
+#if NET9_0_OR_GREATER
+    private PcreCalloutInfo? _calloutInfo;
+#endif
 
     [ForwardTo8Bit]
     internal PcreRefCallout(ReadOnlySpan<char> subject, InternalRegex16Bit regex, Native.pcre2_callout_block* callout, Span<nuint> outputVector)
@@ -94,7 +99,19 @@ public unsafe ref struct PcreRefCallout
 
     /// <inheritdoc cref="PcreCallout.Info"/>
     [ForwardTo8Bit]
-    public readonly PcreCalloutInfo Info => _regex.GetCalloutInfo(Number, PatternPosition);
+    public readonly PcreCalloutInfo Info
+    {
+        get
+        {
+#if NET9_0_OR_GREATER
+            // This is actually ok, since it's just caching and has no visible state change from the outside.
+            ref var thisRef = ref Unsafe.AsRef(in this);
+            return thisRef._calloutInfo ??= thisRef._regex.GetCalloutInfo(thisRef.Number, thisRef.PatternPosition);
+#else
+            return _regex.GetCalloutInfo(Number, PatternPosition);
+#endif
+        }
+    }
 
     /// <inheritdoc cref="PcreCallout.StartMatch"/>
     [ForwardTo8Bit]

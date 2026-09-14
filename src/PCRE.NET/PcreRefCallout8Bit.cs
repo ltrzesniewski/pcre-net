@@ -18,4 +18,8 @@ public unsafe ref partial struct PcreRefCallout8Bit
 
     internal Span<nuint> OutputVector;
     private bool _oVectorInitialized;
+
+#if NET9_0_OR_GREATER
+    private PcreCalloutInfo? _calloutInfo;
+#endif
 }
