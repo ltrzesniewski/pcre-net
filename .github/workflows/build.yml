@@ -56,8 +56,6 @@ jobs:
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
-        with:
-          global-json-file: global.json
 
       - name: CMake
         run: |
@@ -147,7 +145,6 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
-          global-json-file: global.json
           architecture: ${{ matrix.platform }}
 
       - name: Setup MSBuild
@@ -246,8 +243,6 @@ jobs:
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
-        with:
-          global-json-file: global.json
 
       - name: Download Artifacts
         uses: actions/download-artifact@v8
@@ -370,8 +365,6 @@ jobs:
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
-        with:
-          global-json-file: global.json
 
       - name: Download NuGet
         uses: actions/download-artifact@v8
