@@ -2,10 +2,10 @@
 
 // To update PCRE2, run this script:
 //
-// dotnet UpdatePcre2.cs -- path/to/pcre2.zip
+// dotnet UpdatePcre2.cs -- [--zip path/to/pcre2.zip] [--version x.y.z]
 //
 // This will replace the contents of the src/PCRE directory and update the generated files.
-// Running this script without arguments will update the generated files from the existing directory.
+// Running this script without --zip will update the generated files from the existing directory.
 
 #:include ../PCRE.NET.Analyzers/Analyzers/CodeWriter.cs
 
@@ -23,7 +23,7 @@ var pcre2SrcDir = Path.Combine(rootPath, "src", "PCRE", "src");
 Console.WriteLine();
 Console.WriteLine($"Updating PCRE2 in repository: {rootPath}");
 
-string? packageFilePath;
+string? argZip = null, argVersion = null;
 string pcreNetVersion, pcre2Version;
 var writer = new CodeWriter();
 
@@ -31,7 +31,8 @@ try
 {
     ParseArgs();
     ExtractZip();
-    ReadVersions();
+    ReadPcre2Version();
+    ReadOrPatchPcreNetVersion();
     PatchPcre2();
     UpdatePcreConstants();
     UpdatePcreErrorCode();
@@ -39,6 +40,11 @@ try
 
     Console.WriteLine();
     Console.WriteLine($"PCRE.NET v{pcreNetVersion} was successfully updated to PCRE2 v{pcre2Version}");
+}
+catch (ArgumentException ex)
+{
+    ReportError(ex.Message);
+    return 1;
 }
 catch (Exception ex)
 {
@@ -61,41 +67,58 @@ static string GetRepositoryRootPath()
 
 void ParseArgs()
 {
-    packageFilePath = args.Length switch
+    for (var i = 0; i < args.Length; ++i)
     {
-        0 => null,
-        1 => File.Exists(args[0]) ? args[0] : throw new ArgumentException($"The specified PCRE2 zip file does not exist: {args[0]}"),
-        _ => throw new ArgumentException("Invalid number of arguments.")
-    };
+        switch (args[i])
+        {
+            case "--zip" when argZip is null:
+                argZip = ReadNextArg() ?? throw new ArgumentException("--zip requires a path to the PCRE2 zip file.");
+                break;
+
+            case "--version" when argVersion is null:
+                argVersion = ReadNextArg() ?? throw new ArgumentException("--version requires a PCRE.NET version.");
+                break;
+
+            case "--help" or "-h":
+                Console.WriteLine("Usage: dotnet UpdatePcre2.cs -- [--zip path/to/pcre2.zip] [--version x.y.z]");
+                Environment.Exit(0);
+                break;
+
+            default:
+                throw new ArgumentException($"Unexpected argument: {args[i]}");
+        }
+
+        continue;
+
+        string? ReadNextArg()
+            => i + 1 < args.Length && !string.IsNullOrWhiteSpace(args[i + 1]) && !args[i + 1].StartsWith("--") ? args[++i] : null;
+    }
 }
 
 void ExtractZip()
 {
-    if (packageFilePath is null)
+    if (argZip is null)
         return;
 
     var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 
     try
     {
-        ZipFile.ExtractToDirectory(packageFilePath, tempDir, overwriteFiles: true);
+        ZipFile.ExtractToDirectory(argZip, tempDir, overwriteFiles: true);
         var targetDir = Path.Combine(rootPath, "src", "PCRE");
         Directory.Delete(targetDir, recursive: true);
-        Directory.Move(Path.Combine(tempDir, Path.GetFileNameWithoutExtension(packageFilePath)), targetDir);
+        Directory.Move(Path.Combine(tempDir, Path.GetFileNameWithoutExtension(argZip)), targetDir);
     }
     finally
     {
         Directory.Delete(tempDir, recursive: true);
     }
 
-    ReportSuccess($"Extracted PCRE2 from {packageFilePath}");
+    ReportSuccess($"Extracted PCRE2: {argZip}");
 }
 
-void ReadVersions()
+void ReadPcre2Version()
 {
-    pcreNetVersion = XDocument.Load(Path.Combine(rootPath, "src", "Version.props"))
-                              .XPathSelectElement("/Project/PropertyGroup/Version")?.Value.Trim() ?? string.Empty;
-
     pcre2Version = Regex.Match(
         File.ReadAllText(Path.Combine(pcre2SrcDir, "config.h.generic")),
         """
@@ -104,13 +127,40 @@ void ReadVersions()
         RegexOptions.CultureInvariant | RegexOptions.Multiline
     ).Groups["version"].Value;
 
-    if (string.IsNullOrEmpty(pcreNetVersion))
-        throw new InvalidOperationException("Could not retrieve the PCRE.NET version.");
-
     if (string.IsNullOrEmpty(pcre2Version))
         throw new InvalidOperationException("Could not retrieve the PCRE2 version.");
 
-    ReportSuccess("Read version info");
+    ReportSuccess($"PCRE2 version: {pcre2Version}");
+}
+
+void ReadOrPatchPcreNetVersion()
+{
+    var versionFilePath = Path.Combine(rootPath, "src", "Version.props");
+
+    var document = XDocument.Load(versionFilePath, LoadOptions.PreserveWhitespace);
+    var versionElement = document.XPathSelectElement("/Project/PropertyGroup/Version") ?? throw new InvalidOperationException("Could not retrieve the PCRE.NET version.");
+
+    if (argVersion is null)
+    {
+        pcreNetVersion = versionElement.Value.Trim();
+
+        if (string.IsNullOrEmpty(pcreNetVersion))
+            throw new InvalidOperationException("Could not retrieve the PCRE.NET version.");
+    }
+    else
+    {
+        if (!Regex.IsMatch(argVersion, @"^\d+\.\d+\.\d+(?:-\w+)?$", RegexOptions.CultureInvariant))
+            throw new ArgumentException($"Invalid version: {argVersion}");
+
+        pcreNetVersion = versionElement.Value = argVersion;
+
+        File.WriteAllLines(
+            versionFilePath,
+            [document.ToString(SaveOptions.DisableFormatting).Trim()]
+        );
+    }
+
+    ReportSuccess($"PCRE.NET version: {pcreNetVersion}");
 }
 
 void PatchPcre2()
@@ -517,7 +567,7 @@ file static class Pcre2Constants
     public static string ToMemberName(string constantName)
     {
         if (!constantName.StartsWith("PCRE2_", StringComparison.Ordinal))
-            throw new ArgumentException($"Invalid constant name: '{constantName}'", nameof(constantName));
+            throw new InvalidOperationException($"Invalid constant name: '{constantName}'");
 
         var memberName = constantName;
 
