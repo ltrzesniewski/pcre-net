@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using NUnit.Framework;
+using PCRE.Tests.Support;
 
 namespace PCRE.Tests.PcreNet;
 
@@ -22,10 +22,7 @@ public class PlatformTests
 #if !TEST_BUILD
         Assert.Ignore("TEST_BUILD is not defined.");
 #endif
-        var expectedRid = typeof(PlatformTests).Assembly
-                                               .GetCustomAttributes<AssemblyMetadataAttribute>()
-                                               .SingleOrDefault(i => i.Key == "ExpectedRid")?
-                                               .Value;
+        var expectedRid = typeof(PlatformTests).Assembly.GetMetadataValue("ExpectedRid");
 #if NET
         var rid = RuntimeInformation.RuntimeIdentifier;
 #elif NETFRAMEWORK

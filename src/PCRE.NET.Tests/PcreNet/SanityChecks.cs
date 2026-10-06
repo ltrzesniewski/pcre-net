@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using NUnit.Framework;
+using PCRE.Tests.Support;
 using PublicApiGenerator;
-using VerifyNUnit;
+using Shouldly;
 
 namespace PCRE.Tests.PcreNet;
 
@@ -11,36 +11,36 @@ namespace PCRE.Tests.PcreNet;
 public class SanityChecks
 {
     [Test]
-    public Task should_respect_verify_conventions()
-        => VerifyChecks.Run();
-
-    [Test]
-    public Task should_export_expected_namespaces()
+    public void should_export_expected_namespaces()
     {
-        return Verifier.Verify(
-            typeof(PcreRegex).Assembly
-                             .ExportedTypes
-                             .Select(i => i.Namespace)
-                             .OrderBy(i => i)
-                             .Distinct()
-        );
+        typeof(PcreRegex).Assembly
+                         .ExportedTypes
+                         .Select(i => i.Namespace)
+                         .Distinct()
+                         .ShouldBe([
+                             "PCRE",
+                             "PCRE.Conversion",
+                             "PCRE.Dfa"
+                         ], ignoreOrder: true);
     }
 
     [Test]
-    public Task should_have_expected_public_api()
+    public void should_have_expected_public_api()
     {
-        return Verifier.Verify(
-            typeof(PcreRegex).Assembly
-                             .GeneratePublicApi(
-                                 new ApiGeneratorOptions
-                                 {
-                                     IncludeAssemblyAttributes = false,
-                                     ExcludeAttributes =
-                                     [
-                                         typeof(ObsoleteAttribute).FullName!
-                                     ]
-                                 }
-                             )
-        ).UniqueForTargetFrameworkAndVersion();
+        typeof(PcreRegex).Assembly
+                         .GeneratePublicApi(
+                             new ApiGeneratorOptions
+                             {
+                                 IncludeAssemblyAttributes = false,
+                                 ExcludeAttributes =
+                                 [
+                                     typeof(ObsoleteAttribute).FullName!
+                                 ]
+                             }
+                         )
+                         .ShouldMatchApproved(
+                             cfg => cfg.WithFileExtension(".cs")
+                                       .WithDiscriminator(typeof(SanityChecks).Assembly.GetMetadataValue("TargetFramework") ?? throw new InvalidOperationException("TargetFramework metadata not found"))
+                         );
     }
 }

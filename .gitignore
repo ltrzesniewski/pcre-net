@@ -26,6 +26,5 @@ local-*
 Thumbs.db
 launchSettings.json
 
-# Verify
+# Shouldly
 *.received.*
-*.received/

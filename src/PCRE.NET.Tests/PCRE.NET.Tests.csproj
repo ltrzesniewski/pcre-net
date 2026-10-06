@@ -24,9 +24,8 @@
     <PackageReference Include="NUnit" />
     <PackageReference Include="NUnit3TestAdapter" />
     <PackageReference Include="PublicApiGenerator" />
-    <PackageReference Include="Verify.DiffPlex" />
-    <PackageReference Include="Verify.NUnit" />
-    <PackageReference Include="Verify.SourceGenerators" />
+    <PackageReference Include="Shouldly" />
+    <PackageReference Include="Shouldly.DiffEngine" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,7 +35,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AssemblyMetadata Include="TargetFramework" Value="$(TargetFramework)" />
     <AssemblyMetadata Include="ExpectedRid" Value="$(ExpectedRid)" Condition="'$(PcreNetTestBuild)' == 'true'" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Remove="**/*.received.cs" />
+    <Compile Remove="**/*.approved.cs" />
+    <None Include="**/*.received.cs" />
+    <None Include="**/*.approved.cs" />
   </ItemGroup>
 
 </Project>

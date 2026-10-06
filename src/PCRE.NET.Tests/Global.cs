@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 using NUnit.Framework;
+using Shouldly;
 
 // ReSharper disable CheckNamespace
 
@@ -36,5 +37,8 @@ public static class Global
 
            """
         );
+
+        // Uncomment to enable diffs
+        // ShouldMatchConfiguration.ShouldMatchApprovedDefaults.ConfigureDiffEngine();
     }
 }

@@ -3,12 +3,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
-using VerifyNUnit;
+using Shouldly;
 
 namespace PCRE.Tests.Analyzers;
 
@@ -59,29 +57,52 @@ public abstract class BaseInterceptorTests<TGenerator>
         return result;
     }
 
-    protected static Task Verify([StringSyntax("csharp")] string input)
+    protected static void Verify([StringSyntax("csharp")] string input)
     {
         var result = Generate(input);
-        return Verify(result);
+
+        var tree = result.GeneratedTrees.ShouldHaveSingleItem();
+
+        tree.ToString().ShouldMatchApproved(
+            ConfigureShouldlyOptions
+        );
     }
 
-    [MustUseReturnValue]
-    protected static Task Verify([StringSyntax("csharp")] GeneratorDriverRunResult result)
+    protected static void VerifyNone([StringSyntax("csharp")] string input)
     {
-        return Verifier.Verify(result)
-                       .ScrubLinesWithReplace(
-                           i => Regex.Replace(
-                               i,
-                               """
-                               (?x)
-                               (?<before>InterceptsLocationAttribute\()
-                               [0-9]+,[ ]
-                               "[^"]+"
-                               (?<after>\)\])
-                               (?:\s*//.*)? # Only in DEBUG mode
-                               """,
-                               """${before}0, "..."${after}"""
-                           )
-                       );
+        var result = Generate(input);
+        result.GeneratedTrees.ShouldBeEmpty();
+    }
+
+    protected static void Verify([StringSyntax("csharp")] GeneratorDriverRunResult result)
+    {
+        var tree = result.GeneratedTrees.ShouldHaveSingleItem();
+
+        tree.ToString().ShouldMatchApproved(
+            ConfigureShouldlyOptions
+        );
+    }
+
+    private static void ConfigureShouldlyOptions(ShouldMatchConfigurationBuilder builder)
+    {
+        builder.WithScrubber(Scrub)
+               .WithFileExtension(".cs")
+               .UseCallerLocation();
+    }
+
+    private static string Scrub(string input)
+    {
+        return Regex.Replace(
+            input,
+            """
+            (?x)
+            (?<before>InterceptsLocationAttribute\()
+            [0-9]+,[ ]
+            "[^"]+"
+            (?<after>\)\])
+            (?:\s*//.*)? # Only in DEBUG mode
+            """,
+            """${before}0, "..."${after}"""
+        );
     }
 }
