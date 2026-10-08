@@ -38,7 +38,11 @@
     <AssemblyMetadata Include="TargetFramework" Value="$(TargetFramework)" />
     <AssemblyMetadata Include="ExpectedRid" Value="$(ExpectedRid)" Condition="'$(PcreNetTestBuild)' == 'true'" />
   </ItemGroup>
-  
+
+  <!-- Shouldly -->
+  <PropertyGroup>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Remove="**/*.received.cs" />
     <Compile Remove="**/*.approved.cs" />

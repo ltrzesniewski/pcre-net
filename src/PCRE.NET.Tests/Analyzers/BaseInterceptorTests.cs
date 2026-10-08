@@ -57,37 +57,24 @@ public abstract class BaseInterceptorTests<TGenerator>
         return result;
     }
 
-    protected static void Verify([StringSyntax("csharp")] string input)
-    {
-        var result = Generate(input);
-
-        var tree = result.GeneratedTrees.ShouldHaveSingleItem();
-
-        tree.ToString().ShouldMatchApproved(
-            ConfigureShouldlyOptions
-        );
-    }
-
     protected static void VerifyNone([StringSyntax("csharp")] string input)
     {
         var result = Generate(input);
         result.GeneratedTrees.ShouldBeEmpty();
     }
 
+    protected static void Verify([StringSyntax("csharp")] string input)
+        => Verify(Generate(input));
+
     protected static void Verify([StringSyntax("csharp")] GeneratorDriverRunResult result)
     {
         var tree = result.GeneratedTrees.ShouldHaveSingleItem();
 
         tree.ToString().ShouldMatchApproved(
-            ConfigureShouldlyOptions
+            cfg => cfg.WithScrubber(Scrub)
+                      .WithFileExtension(".cs")
+                      .LocateTestMethodUsingAttribute<TestAttribute>()
         );
-    }
-
-    private static void ConfigureShouldlyOptions(ShouldMatchConfigurationBuilder builder)
-    {
-        builder.WithScrubber(Scrub)
-               .WithFileExtension(".cs")
-               .UseCallerLocation();
     }
 
     private static string Scrub(string input)
