@@ -20,9 +20,9 @@ public class PriorityCacheTests
     [Test]
     public void should_store_item()
     {
-        _cache.Count.ShouldBe(0);
+        _cache.ShouldBeEmpty();
         _cache.GetOrAdd(42).ShouldBe("42");
-        _cache.Count.ShouldBe(1);
+        _cache.ShouldHaveSingleItem();
 
         _cache.Select(i => i.Key).ShouldBe([42]);
         _cache.Select(i => i.Value).ShouldBe(["42"]);
@@ -36,7 +36,7 @@ public class PriorityCacheTests
         _cache.GetOrAdd(3);
         _cache.GetOrAdd(4);
 
-        _cache.Count.ShouldBe(3);
+        _cache.ShouldHaveCount(3);
 
         _cache.Select(i => i.Key).ShouldBe([4, 3, 2]);
         _cache.Select(i => i.Value).ShouldBe(["4", "3", "2"]);
@@ -51,7 +51,7 @@ public class PriorityCacheTests
         _cache.GetOrAdd(4);
         _cache.GetOrAdd(3);
 
-        _cache.Count.ShouldBe(3);
+        _cache.ShouldHaveCount(3);
 
         _cache.Select(i => i.Key).ShouldBe([3, 4, 2]);
         _cache.Select(i => i.Value).ShouldBe(["3", "4", "2"]);
@@ -76,7 +76,7 @@ public class PriorityCacheTests
 
         _cache.CacheSize = 1;
 
-        _cache.Count.ShouldBe(1);
+        _cache.ShouldHaveSingleItem();
         _cache.Select(i => i.Key).ShouldBe([3]);
         _cache.Select(i => i.Value).ShouldBe(["3"]);
 
@@ -97,7 +97,7 @@ public class PriorityCacheTests
 
         _cache.GetOrAdd(4);
 
-        _cache.Count.ShouldBe(4);
+        _cache.ShouldHaveCount(4);
 
         _cache.Select(i => i.Key).ShouldBe([4, 3, 2, 1]);
         _cache.Select(i => i.Value).ShouldBe(["4", "3", "2", "1"]);
@@ -113,6 +113,6 @@ public class PriorityCacheTests
                           .WithDegreeOfParallelism(20)
                           .ForAll(i => _cache.GetOrAdd(i).ShouldBe(i.ToString(CultureInfo.InvariantCulture)));
 
-        _cache.Count.ShouldBe(10);
+        _cache.ShouldHaveCount(10);
     }
 }

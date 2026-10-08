@@ -19,7 +19,7 @@ public class DfaMatchTests
         result.ShouldNotBeNull();
         result.Success.ShouldBeTrue();
 
-        result.Count.ShouldBe(3);
+        result.ShouldHaveCount(3);
         result.Index.ShouldBe(8);
 
         result.LongestMatch.ShouldNotBeNull();
@@ -39,7 +39,7 @@ public class DfaMatchTests
 
         result[3].ShouldNotBeNull();
         result[3].Value.ShouldBeSameAs(string.Empty);
-        result[3].ValueSpan.Length.ShouldBe(0);
+        result[3].ValueSpan.IsEmpty.ShouldBeTrue();
         result[3].Index.ShouldBe(-1);
         result[3].Length.ShouldBe(0);
     }
@@ -53,7 +53,7 @@ public class DfaMatchTests
         result.ShouldNotBeNull();
         result.Success.ShouldBeTrue();
 
-        result.Count.ShouldBe(1);
+        result.ShouldHaveSingleItem();
         result.Index.ShouldBe(8);
 
         result.ShortestMatch.ShouldNotBeNull();
@@ -73,7 +73,7 @@ public class DfaMatchTests
         result.ShouldNotBeNull();
         result.Success.ShouldBeTrue();
 
-        result.Count.ShouldBe(2);
+        result.ShouldHaveCount(2);
         result.Index.ShouldBe(8);
 
         result.LongestMatch.ShouldNotBeNull();
@@ -94,7 +94,7 @@ public class DfaMatchTests
         result.ShouldNotBeNull();
         result.Success.ShouldBeTrue();
 
-        result.Count.ShouldBe(2);
+        result.ShouldHaveCount(2);
         result.Index.ShouldBe(20);
 
         result.LongestMatch.ShouldNotBeNull();
@@ -115,7 +115,7 @@ public class DfaMatchTests
 
         var result = re.Dfa.Match("This is <something> <something else> <something further> no more", settings);
 
-        result.Count.ShouldBe(2);
+        result.ShouldHaveCount(2);
         result.LongestMatch.Value.ShouldBe("<something> <something else> <something further>");
         result.ShortestMatch.Value.ShouldBe("<something>");
     }
@@ -149,7 +149,7 @@ public class DfaMatchTests
 
         match.Success.ShouldBeFalse();
         match.Index.ShouldBe(-1);
-        match.Count.ShouldBe(0);
+        match.ShouldBeEmpty();
         match.LongestMatch.Success.ShouldBeFalse();
         match.ShortestMatch.Success.ShouldBeFalse();
 

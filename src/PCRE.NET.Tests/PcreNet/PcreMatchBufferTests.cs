@@ -83,8 +83,8 @@ public unsafe class PcreMatchBufferTests
 
         var match = buffer.Match("foo"u8, data =>
         {
-            data.Match.Value.SequenceEqual("fo"u8).ShouldBeTrue();
-            data.Match[1].Value.SequenceEqual("o"u8).ShouldBeTrue();
+            data.Match.Value.ShouldBe("fo"u8);
+            data.Match[1].Value.ShouldBe("o"u8);
 
             Unsafe.AreSame(ref MemoryMarshal.GetReference(data.OutputVector), ref buffer.CalloutOutputVector[0]).ShouldBeTrue();
 

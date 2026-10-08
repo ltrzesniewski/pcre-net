@@ -167,7 +167,7 @@ public class PcrePatternInfoTests
     {
         var re = new PcreRegex(@"a(?C42)bb(?C{ foo })(?:ccc)");
 
-        re.PatternInfo.Callouts.Count.ShouldBe(2);
+        re.PatternInfo.Callouts.ShouldHaveCount(2);
 
         re.PatternInfo.Callouts[0].Number.ShouldBe(42);
         re.PatternInfo.Callouts[0].String.ShouldBeNull();
@@ -187,7 +187,7 @@ public class PcrePatternInfoTests
     {
         var re = new PcreRegexUtf8(@"a(?C42)bb(?C{ foo })(?:ccc)"u8);
 
-        re.PatternInfo.Callouts.Count.ShouldBe(2);
+        re.PatternInfo.Callouts.ShouldHaveCount(2);
 
         re.PatternInfo.Callouts[0].Number.ShouldBe(42);
         re.PatternInfo.Callouts[0].String.ShouldBeNull();

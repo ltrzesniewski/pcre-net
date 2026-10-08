@@ -18,7 +18,7 @@ public class MatchesTests
         var re = new PcreRegex(@"a(b)a");
         var matches = re.Matches("foo aba bar aba baz").ToList();
 
-        matches.Count.ShouldBe(2);
+        matches.ShouldHaveCount(2);
 
         matches[0].Value.ShouldBe("aba");
         matches[0].ValueSpan.ShouldBe("aba");
@@ -48,7 +48,7 @@ public class MatchesTests
         var matches = re.Matches("foo aba bar aba baz".AsSpan())
                         .ToList(m => (Value: m.Value.ToString(), m.Index, m.Length, Groups: m.Groups.ToList(g => (Value: g.Value.ToString(), g.Index, g.Length))));
 
-        matches.Count.ShouldBe(2);
+        matches.ShouldHaveCount(2);
 
         matches[0].Value.ShouldBe("aba");
         matches[0].Index.ShouldBe(4);
@@ -75,7 +75,7 @@ public class MatchesTests
                         .Matches("foo aba bar aba baz".AsSpan())
                         .ToList(m => (Value: m.Value.ToString(), m.Index, m.Length, Groups: m.Groups.ToList(g => (Value: g.Value.ToString(), g.Index, g.Length))));
 
-        matches.Count.ShouldBe(2);
+        matches.ShouldHaveCount(2);
 
         matches[0].Value.ShouldBe("aba");
         matches[0].Index.ShouldBe(4);
@@ -101,7 +101,7 @@ public class MatchesTests
         var matches = re.Matches("foo aba bar aba baz"u8)
                         .ToList(m => (Value: m.ToString(), m.Index, m.Length, Groups: m.Groups.ToList(g => (Value: g.ToString(), g.Index, g.Length))));
 
-        matches.Count.ShouldBe(2);
+        matches.ShouldHaveCount(2);
 
         matches[0].Value.ShouldBe("aba");
         matches[0].Index.ShouldBe(4);
@@ -128,7 +128,7 @@ public class MatchesTests
                         .Matches("foo aba bar aba baz"u8)
                         .ToList(m => (Value: m.ToString(), m.Index, m.Length, Groups: m.Groups.ToList(g => (Value: g.ToString(), g.Index, g.Length))));
 
-        matches.Count.ShouldBe(2);
+        matches.ShouldHaveCount(2);
 
         matches[0].Value.ShouldBe("aba");
         matches[0].Index.ShouldBe(4);
@@ -154,7 +154,7 @@ public class MatchesTests
         var matches = re.Matches("foo aba bar aba baz".ToLatin1Bytes())
                         .ToList(m => (Value: m.ToString(), m.Index, m.Length, Groups: m.Groups.ToList(g => (Value: g.ToString(), g.Index, g.Length))));
 
-        matches.Count.ShouldBe(2);
+        matches.ShouldHaveCount(2);
 
         matches[0].Value.ShouldBe("aba");
         matches[0].Index.ShouldBe(4);
@@ -181,7 +181,7 @@ public class MatchesTests
                         .Matches("foo aba bar aba baz".ToLatin1Bytes())
                         .ToList(m => (Value: m.ToString(), m.Index, m.Length, Groups: m.Groups.ToList(g => (Value: g.ToString(), g.Index, g.Length))));
 
-        matches.Count.ShouldBe(2);
+        matches.ShouldHaveCount(2);
 
         matches[0].Value.ShouldBe("aba");
         matches[0].Index.ShouldBe(4);
@@ -206,7 +206,7 @@ public class MatchesTests
         var re = new PcreRegex(@"(?=(a))");
         var matches = re.Matches("aaabbaa").ToList();
 
-        matches.Count.ShouldBe(5);
+        matches.ShouldHaveCount(5);
 
         matches.Select(m => m.Index).ShouldBe([0, 1, 2, 5, 6]);
         matches.ShouldAllBe(m => m.Length == 0);
@@ -226,7 +226,7 @@ public class MatchesTests
         var matches = re.Matches("aaabbaa".AsSpan())
                         .ToList(m => (Value: m.Value.ToString(), m.Index, m.Length, Groups: m.Groups.ToList(g => (Value: g.Value.ToString(), g.Index, g.Length))));
 
-        matches.Count.ShouldBe(5);
+        matches.ShouldHaveCount(5);
 
         matches.Select(m => m.Index).ShouldBe([0, 1, 2, 5, 6]);
         matches.ShouldAllBe(m => m.Length == 0);
@@ -244,7 +244,7 @@ public class MatchesTests
         var matches = re.CreateMatchBuffer().Matches("aaabbaa".AsSpan())
                         .ToList(m => (Value: m.Value.ToString(), m.Index, m.Length, Groups: m.Groups.ToList(g => (Value: g.Value.ToString(), g.Index, g.Length))));
 
-        matches.Count.ShouldBe(5);
+        matches.ShouldHaveCount(5);
 
         matches.Select(m => m.Index).ShouldBe([0, 1, 2, 5, 6]);
         matches.ShouldAllBe(m => m.Length == 0);
@@ -262,7 +262,7 @@ public class MatchesTests
         var matches = re.Matches("aaabbaa"u8)
                         .ToList(m => (Value: m.ToString(), m.Index, m.Length, Groups: m.Groups.ToList(g => (Value: g.ToString(), g.Index, g.Length))));
 
-        matches.Count.ShouldBe(5);
+        matches.ShouldHaveCount(5);
 
         matches.Select(m => m.Index).ShouldBe([0, 1, 2, 5, 6]);
         matches.ShouldAllBe(m => m.Length == 0);
@@ -280,7 +280,7 @@ public class MatchesTests
         var matches = re.CreateMatchBuffer().Matches("aaabbaa"u8)
                         .ToList(m => (Value: m.ToString(), m.Index, m.Length, Groups: m.Groups.ToList(g => (Value: g.ToString(), g.Index, g.Length))));
 
-        matches.Count.ShouldBe(5);
+        matches.ShouldHaveCount(5);
 
         matches.Select(m => m.Index).ShouldBe([0, 1, 2, 5, 6]);
         matches.ShouldAllBe(m => m.Length == 0);
@@ -298,7 +298,7 @@ public class MatchesTests
         var matches = re.Matches("aaabbaa".ToLatin1Bytes())
                         .ToList(m => (Value: m.ToString(), m.Index, m.Length, Groups: m.Groups.ToList(g => (Value: g.ToString(), g.Index, g.Length))));
 
-        matches.Count.ShouldBe(5);
+        matches.ShouldHaveCount(5);
 
         matches.Select(m => m.Index).ShouldBe([0, 1, 2, 5, 6]);
         matches.ShouldAllBe(m => m.Length == 0);
@@ -316,7 +316,7 @@ public class MatchesTests
         var matches = re.CreateMatchBuffer().Matches("aaabbaa".ToLatin1Bytes())
                         .ToList(m => (Value: m.ToString(), m.Index, m.Length, Groups: m.Groups.ToList(g => (Value: g.ToString(), g.Index, g.Length))));
 
-        matches.Count.ShouldBe(5);
+        matches.ShouldHaveCount(5);
 
         matches.Select(m => m.Index).ShouldBe([0, 1, 2, 5, 6]);
         matches.ShouldAllBe(m => m.Length == 0);
@@ -459,21 +459,21 @@ public class MatchesTests
         var re = new PcreRegex(@"(?=a+b\K)", new PcreRegexSettings { ExtraCompileOptions = PcreExtraCompileOptions.AllowLookaroundBsK });
         var matches = re.Matches("aaabab").ToList();
 
-        matches.Count.ShouldBe(2);
+        matches.ShouldHaveCount(2);
 
         matches[0].ShouldNotBeNull();
         matches[0].Index.ShouldBe(4);
         matches[0].EndIndex.ShouldBe(0);
         matches[0].Length.ShouldBe(0);
-        matches[0].Value.ShouldBe(string.Empty);
-        matches[0].ValueSpan.Length.ShouldBe(0);
+        matches[0].Value.ShouldBeEmpty();
+        matches[0].ValueSpan.IsEmpty.ShouldBeTrue();
 
         matches[1].ShouldNotBeNull();
         matches[1].Index.ShouldBe(6);
         matches[1].EndIndex.ShouldBe(4);
         matches[1].Length.ShouldBe(0);
-        matches[1].Value.ShouldBe(string.Empty);
-        matches[1].ValueSpan.Length.ShouldBe(0);
+        matches[1].Value.ShouldBeEmpty();
+        matches[1].ValueSpan.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -483,17 +483,17 @@ public class MatchesTests
         var matches = re.Matches("aaabab".AsSpan())
                         .ToList(m => (Value: m.Value.ToString(), m.Index, m.EndIndex, m.Length, Groups: m.Groups.ToList(g => (Value: g.Value.ToString(), g.Index, g.Length))));
 
-        matches.Count.ShouldBe(2);
+        matches.ShouldHaveCount(2);
 
         matches[0].Index.ShouldBe(4);
         matches[0].EndIndex.ShouldBe(0);
         matches[0].Length.ShouldBe(0);
-        matches[0].Value.ShouldBe(string.Empty);
+        matches[0].Value.ShouldBeEmpty();
 
         matches[1].Index.ShouldBe(6);
         matches[1].EndIndex.ShouldBe(4);
         matches[1].Length.ShouldBe(0);
-        matches[1].Value.ShouldBe(string.Empty);
+        matches[1].Value.ShouldBeEmpty();
     }
 
     [Test]
@@ -503,17 +503,17 @@ public class MatchesTests
         var matches = re.CreateMatchBuffer().Matches("aaabab".AsSpan())
                         .ToList(m => (Value: m.Value.ToString(), m.Index, m.EndIndex, m.Length, Groups: m.Groups.ToList(g => (Value: g.Value.ToString(), g.Index, g.Length))));
 
-        matches.Count.ShouldBe(2);
+        matches.ShouldHaveCount(2);
 
         matches[0].Index.ShouldBe(4);
         matches[0].EndIndex.ShouldBe(0);
         matches[0].Length.ShouldBe(0);
-        matches[0].Value.ShouldBe(string.Empty);
+        matches[0].Value.ShouldBeEmpty();
 
         matches[1].Index.ShouldBe(6);
         matches[1].EndIndex.ShouldBe(4);
         matches[1].Length.ShouldBe(0);
-        matches[1].Value.ShouldBe(string.Empty);
+        matches[1].Value.ShouldBeEmpty();
     }
 
     [Test]
@@ -523,17 +523,17 @@ public class MatchesTests
         var matches = re.Matches("aaabab"u8)
                         .ToList(m => (Value: m.ToString(), m.Index, m.EndIndex, m.Length, Groups: m.Groups.ToList(g => (Value: g.ToString(), g.Index, g.Length))));
 
-        matches.Count.ShouldBe(2);
+        matches.ShouldHaveCount(2);
 
         matches[0].Index.ShouldBe(4);
         matches[0].EndIndex.ShouldBe(0);
         matches[0].Length.ShouldBe(0);
-        matches[0].Value.ShouldBe(string.Empty);
+        matches[0].Value.ShouldBeEmpty();
 
         matches[1].Index.ShouldBe(6);
         matches[1].EndIndex.ShouldBe(4);
         matches[1].Length.ShouldBe(0);
-        matches[1].Value.ShouldBe(string.Empty);
+        matches[1].Value.ShouldBeEmpty();
     }
 
     [Test]
@@ -543,17 +543,17 @@ public class MatchesTests
         var matches = re.CreateMatchBuffer().Matches("aaabab"u8)
                         .ToList(m => (Value: m.ToString(), m.Index, m.EndIndex, m.Length, Groups: m.Groups.ToList(g => (Value: g.ToString(), g.Index, g.Length))));
 
-        matches.Count.ShouldBe(2);
+        matches.ShouldHaveCount(2);
 
         matches[0].Index.ShouldBe(4);
         matches[0].EndIndex.ShouldBe(0);
         matches[0].Length.ShouldBe(0);
-        matches[0].Value.ShouldBe(string.Empty);
+        matches[0].Value.ShouldBeEmpty();
 
         matches[1].Index.ShouldBe(6);
         matches[1].EndIndex.ShouldBe(4);
         matches[1].Length.ShouldBe(0);
-        matches[1].Value.ShouldBe(string.Empty);
+        matches[1].Value.ShouldBeEmpty();
     }
 
     [Test]
@@ -563,17 +563,17 @@ public class MatchesTests
         var matches = re.Matches("aaabab".ToLatin1Bytes())
                         .ToList(m => (Value: m.ToString(), m.Index, m.EndIndex, m.Length, Groups: m.Groups.ToList(g => (Value: g.ToString(), g.Index, g.Length))));
 
-        matches.Count.ShouldBe(2);
+        matches.ShouldHaveCount(2);
 
         matches[0].Index.ShouldBe(4);
         matches[0].EndIndex.ShouldBe(0);
         matches[0].Length.ShouldBe(0);
-        matches[0].Value.ShouldBe(string.Empty);
+        matches[0].Value.ShouldBeEmpty();
 
         matches[1].Index.ShouldBe(6);
         matches[1].EndIndex.ShouldBe(4);
         matches[1].Length.ShouldBe(0);
-        matches[1].Value.ShouldBe(string.Empty);
+        matches[1].Value.ShouldBeEmpty();
     }
 
     [Test]
@@ -583,17 +583,17 @@ public class MatchesTests
         var matches = re.CreateMatchBuffer().Matches("aaabab".ToLatin1Bytes())
                         .ToList(m => (Value: m.ToString(), m.Index, m.EndIndex, m.Length, Groups: m.Groups.ToList(g => (Value: g.ToString(), g.Index, g.Length))));
 
-        matches.Count.ShouldBe(2);
+        matches.ShouldHaveCount(2);
 
         matches[0].Index.ShouldBe(4);
         matches[0].EndIndex.ShouldBe(0);
         matches[0].Length.ShouldBe(0);
-        matches[0].Value.ShouldBe(string.Empty);
+        matches[0].Value.ShouldBeEmpty();
 
         matches[1].Index.ShouldBe(6);
         matches[1].EndIndex.ShouldBe(4);
         matches[1].Length.ShouldBe(0);
-        matches[1].Value.ShouldBe(string.Empty);
+        matches[1].Value.ShouldBeEmpty();
     }
 
     [Test]

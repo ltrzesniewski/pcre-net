@@ -13,15 +13,15 @@ public class DfaMatchesTests
         var re = new PcreRegex(@"<.*>");
         var matches = re.Dfa.Matches("This is <something> <something else> <something further> no more").ToList();
 
-        matches.Count.ShouldBe(3);
+        matches.ShouldHaveCount(3);
 
         matches[0].Index.ShouldBe(8);
         matches[1].Index.ShouldBe(20);
         matches[2].Index.ShouldBe(37);
 
-        matches[0].Count.ShouldBe(3);
-        matches[1].Count.ShouldBe(2);
-        matches[2].Count.ShouldBe(1);
+        matches[0].ShouldHaveCount(3);
+        matches[1].ShouldHaveCount(2);
+        matches[2].ShouldHaveSingleItem();
 
         matches[0].LongestMatch.Value.ShouldBe("<something> <something else> <something further>");
         matches[1].LongestMatch.Value.ShouldBe("<something else> <something further>");
@@ -46,7 +46,7 @@ public class DfaMatchesTests
         var re = new PcreRegex(@".");
         var matches = re.Dfa.Matches("foo\uD83D\uDE0Ebar").ToList();
 
-        matches.Count.ShouldBe(7);
+        matches.ShouldHaveCount(7);
 
         matches[3].ShortestMatch.Index.ShouldBe(3);
         matches[3].ShortestMatch.Length.ShouldBe(2);
@@ -63,7 +63,7 @@ public class DfaMatchesTests
         var re = new PcreRegex(@"");
         var matches = re.Dfa.Matches("foo").ToList();
 
-        matches.Count.ShouldBe(4);
+        matches.ShouldHaveCount(4);
         matches.ShouldAllBe(i => i.LongestMatch.Length == 0);
     }
 }

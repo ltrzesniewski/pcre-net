@@ -92,13 +92,13 @@ public class MatchTests
 
         match.Success.ShouldBeTrue();
         match.CaptureCount.ShouldBe(1);
-        match.Value.SequenceEqual("aaabbccc"u8).ShouldBeTrue();
+        match.Value.ShouldBe("aaabbccc"u8);
         match.Index.ShouldBe(3);
         match.EndIndex.ShouldBe(11);
         match.Length.ShouldBe(8);
 
         match[1].Success.ShouldBeTrue();
-        match[1].Value.SequenceEqual("bb"u8).ShouldBeTrue();
+        match[1].Value.ShouldBe("bb"u8);
         match[1].Index.ShouldBe(6);
         match[1].Length.ShouldBe(2);
 
@@ -113,13 +113,13 @@ public class MatchTests
 
         match.Success.ShouldBeTrue();
         match.CaptureCount.ShouldBe(1);
-        match.Value.SequenceEqual("aaabbccc"u8).ShouldBeTrue();
+        match.Value.ShouldBe("aaabbccc"u8);
         match.Index.ShouldBe(3);
         match.EndIndex.ShouldBe(11);
         match.Length.ShouldBe(8);
 
         match[1].Success.ShouldBeTrue();
-        match[1].Value.SequenceEqual("bb"u8).ShouldBeTrue();
+        match[1].Value.ShouldBe("bb"u8);
         match[1].Index.ShouldBe(6);
         match[1].Length.ShouldBe(2);
 
@@ -134,13 +134,13 @@ public class MatchTests
 
         match.Success.ShouldBeTrue();
         match.CaptureCount.ShouldBe(1);
-        match.Value.SequenceEqual("aaabbccc".ToLatin1Bytes()).ShouldBeTrue();
+        match.Value.ShouldBe("aaabbccc".ToLatin1Bytes());
         match.Index.ShouldBe(3);
         match.EndIndex.ShouldBe(11);
         match.Length.ShouldBe(8);
 
         match[1].Success.ShouldBeTrue();
-        match[1].Value.SequenceEqual("bb".ToLatin1Bytes()).ShouldBeTrue();
+        match[1].Value.ShouldBe("bb".ToLatin1Bytes());
         match[1].Index.ShouldBe(6);
         match[1].Length.ShouldBe(2);
 
@@ -155,13 +155,13 @@ public class MatchTests
 
         match.Success.ShouldBeTrue();
         match.CaptureCount.ShouldBe(1);
-        match.Value.SequenceEqual("aaabbccc".ToLatin1Bytes()).ShouldBeTrue();
+        match.Value.ShouldBe("aaabbccc".ToLatin1Bytes());
         match.Index.ShouldBe(3);
         match.EndIndex.ShouldBe(11);
         match.Length.ShouldBe(8);
 
         match[1].Success.ShouldBeTrue();
-        match[1].Value.SequenceEqual("bb".ToLatin1Bytes()).ShouldBeTrue();
+        match[1].Value.ShouldBe("bb".ToLatin1Bytes());
         match[1].Index.ShouldBe(6);
         match[1].Length.ShouldBe(2);
 
@@ -194,7 +194,7 @@ public class MatchTests
         match[2].Success.ShouldBeFalse();
         match[2].IsDefined.ShouldBeTrue();
         match[2].Value.ShouldBeSameAs(string.Empty);
-        match[2].ValueSpan.Length.ShouldBe(0);
+        match[2].ValueSpan.IsEmpty.ShouldBeTrue();
         match[2].Index.ShouldBe(-1);
         match[2].Length.ShouldBe(0);
 
@@ -210,7 +210,7 @@ public class MatchTests
         match[4].Success.ShouldBeFalse();
         match[4].IsDefined.ShouldBeFalse();
         match[4].Value.ShouldBeSameAs(string.Empty);
-        match[4].ValueSpan.Length.ShouldBe(0);
+        match[4].ValueSpan.IsEmpty.ShouldBeTrue();
         match[4].Index.ShouldBe(-1);
         match[4].Length.ShouldBe(0);
 
@@ -331,13 +331,13 @@ public class MatchTests
 
         match.Success.ShouldBeTrue();
         match.CaptureCount.ShouldBe(3);
-        match.Value.SequenceEqual("aaabbddeee"u8).ShouldBeTrue();
+        match.Value.ShouldBe("aaabbddeee"u8);
         match.Index.ShouldBe(3);
         match.Length.ShouldBe(10);
 
         match[1].Success.ShouldBeTrue();
         match[1].IsDefined.ShouldBeTrue();
-        match[1].Value.SequenceEqual("bb"u8).ShouldBeTrue();
+        match[1].Value.ShouldBe("bb"u8);
         match[1].Index.ShouldBe(6);
         match[1].Length.ShouldBe(2);
 
@@ -349,7 +349,7 @@ public class MatchTests
 
         match[3].Success.ShouldBeTrue();
         match[3].IsDefined.ShouldBeTrue();
-        match[3].Value.SequenceEqual("dd"u8).ShouldBeTrue();
+        match[3].Value.ShouldBe("dd"u8);
         match[3].Index.ShouldBe(8);
         match[3].Length.ShouldBe(2);
 
@@ -362,7 +362,7 @@ public class MatchTests
         match.TryGetGroup(1, out var group).ShouldBeTrue();
         group.Success.ShouldBeTrue();
         group.IsDefined.ShouldBeTrue();
-        group.Value.SequenceEqual("bb"u8).ShouldBeTrue();
+        group.Value.ShouldBe("bb"u8);
         group.Index.ShouldBe(6);
         group.Length.ShouldBe(2);
 
@@ -382,13 +382,13 @@ public class MatchTests
 
         match.Success.ShouldBeTrue();
         match.CaptureCount.ShouldBe(3);
-        match.Value.SequenceEqual("aaabbddeee"u8).ShouldBeTrue();
+        match.Value.ShouldBe("aaabbddeee"u8);
         match.Index.ShouldBe(3);
         match.Length.ShouldBe(10);
 
         match[1].Success.ShouldBeTrue();
         match[1].IsDefined.ShouldBeTrue();
-        match[1].Value.SequenceEqual("bb"u8).ShouldBeTrue();
+        match[1].Value.ShouldBe("bb"u8);
         match[1].Index.ShouldBe(6);
         match[1].Length.ShouldBe(2);
 
@@ -400,7 +400,7 @@ public class MatchTests
 
         match[3].Success.ShouldBeTrue();
         match[3].IsDefined.ShouldBeTrue();
-        match[3].Value.SequenceEqual("dd"u8).ShouldBeTrue();
+        match[3].Value.ShouldBe("dd"u8);
         match[3].Index.ShouldBe(8);
         match[3].Length.ShouldBe(2);
 
@@ -413,7 +413,7 @@ public class MatchTests
         match.TryGetGroup(1, out var group).ShouldBeTrue();
         group.Success.ShouldBeTrue();
         group.IsDefined.ShouldBeTrue();
-        group.Value.SequenceEqual("bb"u8).ShouldBeTrue();
+        group.Value.ShouldBe("bb"u8);
         group.Index.ShouldBe(6);
         group.Length.ShouldBe(2);
 
@@ -433,13 +433,13 @@ public class MatchTests
 
         match.Success.ShouldBeTrue();
         match.CaptureCount.ShouldBe(3);
-        match.Value.SequenceEqual("aaabbddeee".ToLatin1Bytes()).ShouldBeTrue();
+        match.Value.ShouldBe("aaabbddeee".ToLatin1Bytes());
         match.Index.ShouldBe(3);
         match.Length.ShouldBe(10);
 
         match[1].Success.ShouldBeTrue();
         match[1].IsDefined.ShouldBeTrue();
-        match[1].Value.SequenceEqual("bb".ToLatin1Bytes()).ShouldBeTrue();
+        match[1].Value.ShouldBe("bb".ToLatin1Bytes());
         match[1].Index.ShouldBe(6);
         match[1].Length.ShouldBe(2);
 
@@ -451,7 +451,7 @@ public class MatchTests
 
         match[3].Success.ShouldBeTrue();
         match[3].IsDefined.ShouldBeTrue();
-        match[3].Value.SequenceEqual("dd".ToLatin1Bytes()).ShouldBeTrue();
+        match[3].Value.ShouldBe("dd".ToLatin1Bytes());
         match[3].Index.ShouldBe(8);
         match[3].Length.ShouldBe(2);
 
@@ -464,7 +464,7 @@ public class MatchTests
         match.TryGetGroup(1, out var group).ShouldBeTrue();
         group.Success.ShouldBeTrue();
         group.IsDefined.ShouldBeTrue();
-        group.Value.SequenceEqual("bb".ToLatin1Bytes()).ShouldBeTrue();
+        group.Value.ShouldBe("bb".ToLatin1Bytes());
         group.Index.ShouldBe(6);
         group.Length.ShouldBe(2);
 
@@ -484,13 +484,13 @@ public class MatchTests
 
         match.Success.ShouldBeTrue();
         match.CaptureCount.ShouldBe(3);
-        match.Value.SequenceEqual("aaabbddeee".ToLatin1Bytes()).ShouldBeTrue();
+        match.Value.ShouldBe("aaabbddeee".ToLatin1Bytes());
         match.Index.ShouldBe(3);
         match.Length.ShouldBe(10);
 
         match[1].Success.ShouldBeTrue();
         match[1].IsDefined.ShouldBeTrue();
-        match[1].Value.SequenceEqual("bb".ToLatin1Bytes()).ShouldBeTrue();
+        match[1].Value.ShouldBe("bb".ToLatin1Bytes());
         match[1].Index.ShouldBe(6);
         match[1].Length.ShouldBe(2);
 
@@ -502,7 +502,7 @@ public class MatchTests
 
         match[3].Success.ShouldBeTrue();
         match[3].IsDefined.ShouldBeTrue();
-        match[3].Value.SequenceEqual("dd".ToLatin1Bytes()).ShouldBeTrue();
+        match[3].Value.ShouldBe("dd".ToLatin1Bytes());
         match[3].Index.ShouldBe(8);
         match[3].Length.ShouldBe(2);
 
@@ -515,7 +515,7 @@ public class MatchTests
         match.TryGetGroup(1, out var group).ShouldBeTrue();
         group.Success.ShouldBeTrue();
         group.IsDefined.ShouldBeTrue();
-        group.Value.SequenceEqual("bb".ToLatin1Bytes()).ShouldBeTrue();
+        group.Value.ShouldBe("bb".ToLatin1Bytes());
         group.Index.ShouldBe(6);
         group.Length.ShouldBe(2);
 
@@ -546,7 +546,7 @@ public class MatchTests
         match[2].Index.ShouldBe(-1);
         match[2].EndIndex.ShouldBe(-1);
         match[2].Value.ShouldBeSameAs(string.Empty);
-        match[2].ValueSpan.Length.ShouldBe(0);
+        match[2].ValueSpan.IsEmpty.ShouldBeTrue();
 
         match[3].Success.ShouldBeTrue();
         match[3].Index.ShouldBe(1);
@@ -617,7 +617,7 @@ public class MatchTests
         match[1].Success.ShouldBeTrue();
         match[1].Index.ShouldBe(0);
         match[1].EndIndex.ShouldBe(1);
-        match[1].Value.SequenceEqual("a"u8).ShouldBeTrue();
+        match[1].Value.ShouldBe("a"u8);
 
         match[2].Success.ShouldBeFalse();
         match[2].Index.ShouldBe(-1);
@@ -627,7 +627,7 @@ public class MatchTests
         match[3].Success.ShouldBeTrue();
         match[3].Index.ShouldBe(1);
         match[3].Length.ShouldBe(2);
-        match[3].Value.SequenceEqual("bc"u8).ShouldBeTrue();
+        match[3].Value.ShouldBe("bc"u8);
     }
 
     [Test]
@@ -642,7 +642,7 @@ public class MatchTests
         match[1].Success.ShouldBeTrue();
         match[1].Index.ShouldBe(0);
         match[1].EndIndex.ShouldBe(1);
-        match[1].Value.SequenceEqual("a"u8).ShouldBeTrue();
+        match[1].Value.ShouldBe("a"u8);
 
         match[2].Success.ShouldBeFalse();
         match[2].Index.ShouldBe(-1);
@@ -652,7 +652,7 @@ public class MatchTests
         match[3].Success.ShouldBeTrue();
         match[3].Index.ShouldBe(1);
         match[3].Length.ShouldBe(2);
-        match[3].Value.SequenceEqual("bc"u8).ShouldBeTrue();
+        match[3].Value.ShouldBe("bc"u8);
     }
 
     [Test]
@@ -667,7 +667,7 @@ public class MatchTests
         match[1].Success.ShouldBeTrue();
         match[1].Index.ShouldBe(0);
         match[1].EndIndex.ShouldBe(1);
-        match[1].Value.SequenceEqual("a".ToLatin1Bytes()).ShouldBeTrue();
+        match[1].Value.ShouldBe("a".ToLatin1Bytes());
 
         match[2].Success.ShouldBeFalse();
         match[2].Index.ShouldBe(-1);
@@ -677,7 +677,7 @@ public class MatchTests
         match[3].Success.ShouldBeTrue();
         match[3].Index.ShouldBe(1);
         match[3].Length.ShouldBe(2);
-        match[3].Value.SequenceEqual("bc".ToLatin1Bytes()).ShouldBeTrue();
+        match[3].Value.ShouldBe("bc".ToLatin1Bytes());
     }
 
     [Test]
@@ -787,7 +787,7 @@ public class MatchTests
         match["nope"].Success.ShouldBeFalse();
         match["nope"].IsDefined.ShouldBeFalse();
         match["nope"].Value.ShouldBeSameAs(string.Empty);
-        match["nope"].ValueSpan.Length.ShouldBe(0);
+        match["nope"].ValueSpan.IsEmpty.ShouldBeTrue();
         match["nope"].Index.ShouldBe(-1);
         match["nope"].Length.ShouldBe(0);
 
@@ -907,23 +907,23 @@ public class MatchTests
 
         match.Success.ShouldBeTrue();
         match.CaptureCount.ShouldBe(3);
-        match.Value.SequenceEqual("aaabbcccddeee"u8).ShouldBeTrue();
+        match.Value.ShouldBe("aaabbcccddeee"u8);
         match.Index.ShouldBe(3);
         match.Length.ShouldBe(13);
 
         match["bees"].Success.ShouldBeTrue();
         match["bees"].IsDefined.ShouldBeTrue();
-        match["bees"].Value.SequenceEqual("bb"u8).ShouldBeTrue();
+        match["bees"].Value.ShouldBe("bb"u8);
         match["bees"].Index.ShouldBe(6);
         match["bees"].Length.ShouldBe(2);
 
-        match[2].Value.SequenceEqual("ccc"u8).ShouldBeTrue();
+        match[2].Value.ShouldBe("ccc"u8);
         match[2].Index.ShouldBe(8);
         match[2].Length.ShouldBe(3);
 
         match["dees"].Success.ShouldBeTrue();
         match["dees"].IsDefined.ShouldBeTrue();
-        match["dees"].Value.SequenceEqual("dd"u8).ShouldBeTrue();
+        match["dees"].Value.ShouldBe("dd"u8);
         match["dees"].Index.ShouldBe(11);
         match["dees"].Length.ShouldBe(2);
 
@@ -936,7 +936,7 @@ public class MatchTests
         match.TryGetGroup("bees", out var group).ShouldBeTrue();
         group.Success.ShouldBeTrue();
         group.IsDefined.ShouldBeTrue();
-        group.Value.SequenceEqual("bb"u8).ShouldBeTrue();
+        group.Value.ShouldBe("bb"u8);
         group.Index.ShouldBe(6);
         group.Length.ShouldBe(2);
 
@@ -957,23 +957,23 @@ public class MatchTests
 
         match.Success.ShouldBeTrue();
         match.CaptureCount.ShouldBe(3);
-        match.Value.SequenceEqual("aaabbcccddeee"u8).ShouldBeTrue();
+        match.Value.ShouldBe("aaabbcccddeee"u8);
         match.Index.ShouldBe(3);
         match.Length.ShouldBe(13);
 
         match["bees"].Success.ShouldBeTrue();
         match["bees"].IsDefined.ShouldBeTrue();
-        match["bees"].Value.SequenceEqual("bb"u8).ShouldBeTrue();
+        match["bees"].Value.ShouldBe("bb"u8);
         match["bees"].Index.ShouldBe(6);
         match["bees"].Length.ShouldBe(2);
 
-        match[2].Value.SequenceEqual("ccc"u8).ShouldBeTrue();
+        match[2].Value.ShouldBe("ccc"u8);
         match[2].Index.ShouldBe(8);
         match[2].Length.ShouldBe(3);
 
         match["dees"].Success.ShouldBeTrue();
         match["dees"].IsDefined.ShouldBeTrue();
-        match["dees"].Value.SequenceEqual("dd"u8).ShouldBeTrue();
+        match["dees"].Value.ShouldBe("dd"u8);
         match["dees"].Index.ShouldBe(11);
         match["dees"].Length.ShouldBe(2);
 
@@ -986,7 +986,7 @@ public class MatchTests
         match.TryGetGroup("bees", out var group).ShouldBeTrue();
         group.Success.ShouldBeTrue();
         group.IsDefined.ShouldBeTrue();
-        group.Value.SequenceEqual("bb"u8).ShouldBeTrue();
+        group.Value.ShouldBe("bb"u8);
         group.Index.ShouldBe(6);
         group.Length.ShouldBe(2);
 
@@ -1007,23 +1007,23 @@ public class MatchTests
 
         match.Success.ShouldBeTrue();
         match.CaptureCount.ShouldBe(3);
-        match.Value.SequenceEqual("aaabbcccddeee".ToLatin1Bytes()).ShouldBeTrue();
+        match.Value.ShouldBe("aaabbcccddeee".ToLatin1Bytes());
         match.Index.ShouldBe(3);
         match.Length.ShouldBe(13);
 
         match["bees"].Success.ShouldBeTrue();
         match["bees"].IsDefined.ShouldBeTrue();
-        match["bees"].Value.SequenceEqual("bb".ToLatin1Bytes()).ShouldBeTrue();
+        match["bees"].Value.ShouldBe("bb".ToLatin1Bytes());
         match["bees"].Index.ShouldBe(6);
         match["bees"].Length.ShouldBe(2);
 
-        match[2].Value.SequenceEqual("ccc".ToLatin1Bytes()).ShouldBeTrue();
+        match[2].Value.ShouldBe("ccc".ToLatin1Bytes());
         match[2].Index.ShouldBe(8);
         match[2].Length.ShouldBe(3);
 
         match["dees"].Success.ShouldBeTrue();
         match["dees"].IsDefined.ShouldBeTrue();
-        match["dees"].Value.SequenceEqual("dd".ToLatin1Bytes()).ShouldBeTrue();
+        match["dees"].Value.ShouldBe("dd".ToLatin1Bytes());
         match["dees"].Index.ShouldBe(11);
         match["dees"].Length.ShouldBe(2);
 
@@ -1036,7 +1036,7 @@ public class MatchTests
         match.TryGetGroup("bees", out var group).ShouldBeTrue();
         group.Success.ShouldBeTrue();
         group.IsDefined.ShouldBeTrue();
-        group.Value.SequenceEqual("bb".ToLatin1Bytes()).ShouldBeTrue();
+        group.Value.ShouldBe("bb".ToLatin1Bytes());
         group.Index.ShouldBe(6);
         group.Length.ShouldBe(2);
 
@@ -1057,23 +1057,23 @@ public class MatchTests
 
         match.Success.ShouldBeTrue();
         match.CaptureCount.ShouldBe(3);
-        match.Value.SequenceEqual("aaabbcccddeee".ToLatin1Bytes()).ShouldBeTrue();
+        match.Value.ShouldBe("aaabbcccddeee".ToLatin1Bytes());
         match.Index.ShouldBe(3);
         match.Length.ShouldBe(13);
 
         match["bees"].Success.ShouldBeTrue();
         match["bees"].IsDefined.ShouldBeTrue();
-        match["bees"].Value.SequenceEqual("bb".ToLatin1Bytes()).ShouldBeTrue();
+        match["bees"].Value.ShouldBe("bb".ToLatin1Bytes());
         match["bees"].Index.ShouldBe(6);
         match["bees"].Length.ShouldBe(2);
 
-        match[2].Value.SequenceEqual("ccc".ToLatin1Bytes()).ShouldBeTrue();
+        match[2].Value.ShouldBe("ccc".ToLatin1Bytes());
         match[2].Index.ShouldBe(8);
         match[2].Length.ShouldBe(3);
 
         match["dees"].Success.ShouldBeTrue();
         match["dees"].IsDefined.ShouldBeTrue();
-        match["dees"].Value.SequenceEqual("dd".ToLatin1Bytes()).ShouldBeTrue();
+        match["dees"].Value.ShouldBe("dd".ToLatin1Bytes());
         match["dees"].Index.ShouldBe(11);
         match["dees"].Length.ShouldBe(2);
 
@@ -1086,7 +1086,7 @@ public class MatchTests
         match.TryGetGroup("bees", out var group).ShouldBeTrue();
         group.Success.ShouldBeTrue();
         group.IsDefined.ShouldBeTrue();
-        group.Value.SequenceEqual("bb".ToLatin1Bytes()).ShouldBeTrue();
+        group.Value.ShouldBe("bb".ToLatin1Bytes());
         group.Index.ShouldBe(6);
         group.Length.ShouldBe(2);
 
@@ -1171,15 +1171,15 @@ public class MatchTests
 
         var match = re.Match("xxxaaabbcccddeeezzz"u8);
 
-        match["grp"].Value.SequenceEqual("bb"u8).ShouldBeTrue();
+        match["grp"].Value.ShouldBe("bb"u8);
         match["grp"].Index.ShouldBe(6);
         match["grp"].Length.ShouldBe(2);
 
-        match["GRP"].Value.SequenceEqual("ccc"u8).ShouldBeTrue();
+        match["GRP"].Value.ShouldBe("ccc"u8);
         match["GRP"].Index.ShouldBe(8);
         match["GRP"].Length.ShouldBe(3);
 
-        match["GrP"].Value.SequenceEqual("dd"u8).ShouldBeTrue();
+        match["GrP"].Value.ShouldBe("dd"u8);
         match["GrP"].Index.ShouldBe(11);
         match["GrP"].Length.ShouldBe(2);
     }
@@ -1191,15 +1191,15 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("xxxaaabbcccddeeezzz"u8);
 
-        match["grp"].Value.SequenceEqual("bb"u8).ShouldBeTrue();
+        match["grp"].Value.ShouldBe("bb"u8);
         match["grp"].Index.ShouldBe(6);
         match["grp"].Length.ShouldBe(2);
 
-        match["GRP"].Value.SequenceEqual("ccc"u8).ShouldBeTrue();
+        match["GRP"].Value.ShouldBe("ccc"u8);
         match["GRP"].Index.ShouldBe(8);
         match["GRP"].Length.ShouldBe(3);
 
-        match["GrP"].Value.SequenceEqual("dd"u8).ShouldBeTrue();
+        match["GrP"].Value.ShouldBe("dd"u8);
         match["GrP"].Index.ShouldBe(11);
         match["GrP"].Length.ShouldBe(2);
     }
@@ -1211,15 +1211,15 @@ public class MatchTests
 
         var match = re.Match("xxxaaabbcccddeeezzz".ToLatin1Bytes());
 
-        match["grp"].Value.SequenceEqual("bb".ToLatin1Bytes()).ShouldBeTrue();
+        match["grp"].Value.ShouldBe("bb".ToLatin1Bytes());
         match["grp"].Index.ShouldBe(6);
         match["grp"].Length.ShouldBe(2);
 
-        match["GRP"].Value.SequenceEqual("ccc".ToLatin1Bytes()).ShouldBeTrue();
+        match["GRP"].Value.ShouldBe("ccc".ToLatin1Bytes());
         match["GRP"].Index.ShouldBe(8);
         match["GRP"].Length.ShouldBe(3);
 
-        match["GrP"].Value.SequenceEqual("dd".ToLatin1Bytes()).ShouldBeTrue();
+        match["GrP"].Value.ShouldBe("dd".ToLatin1Bytes());
         match["GrP"].Index.ShouldBe(11);
         match["GrP"].Length.ShouldBe(2);
     }
@@ -1231,15 +1231,15 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("xxxaaabbcccddeeezzz".ToLatin1Bytes());
 
-        match["grp"].Value.SequenceEqual("bb".ToLatin1Bytes()).ShouldBeTrue();
+        match["grp"].Value.ShouldBe("bb".ToLatin1Bytes());
         match["grp"].Index.ShouldBe(6);
         match["grp"].Length.ShouldBe(2);
 
-        match["GRP"].Value.SequenceEqual("ccc".ToLatin1Bytes()).ShouldBeTrue();
+        match["GRP"].Value.ShouldBe("ccc".ToLatin1Bytes());
         match["GRP"].Index.ShouldBe(8);
         match["GRP"].Length.ShouldBe(3);
 
-        match["GrP"].Value.SequenceEqual("dd".ToLatin1Bytes()).ShouldBeTrue();
+        match["GrP"].Value.ShouldBe("dd".ToLatin1Bytes());
         match["GrP"].Index.ShouldBe(11);
         match["GrP"].Length.ShouldBe(2);
     }
@@ -1309,13 +1309,13 @@ public class MatchTests
         var match = re.Match("b"u8);
 
         match.Success.ShouldBeTrue();
-        match["g"].Value.SequenceEqual("b"u8).ShouldBeTrue();
+        match["g"].Value.ShouldBe("b"u8);
 
         GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, false]);
 
         match = re.Match("bc"u8);
         match.Success.ShouldBeTrue();
-        match["g"].Value.SequenceEqual("b"u8).ShouldBeTrue();
+        match["g"].Value.ShouldBe("b"u8);
 
         GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, true]);
     }
@@ -1327,13 +1327,13 @@ public class MatchTests
         var match = re.CreateMatchBuffer().Match("b"u8);
 
         match.Success.ShouldBeTrue();
-        match["g"].Value.SequenceEqual("b"u8).ShouldBeTrue();
+        match["g"].Value.ShouldBe("b"u8);
 
         GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, false]);
 
         match = re.Match("bc"u8);
         match.Success.ShouldBeTrue();
-        match["g"].Value.SequenceEqual("b"u8).ShouldBeTrue();
+        match["g"].Value.ShouldBe("b"u8);
 
         GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, true]);
     }
@@ -1345,13 +1345,13 @@ public class MatchTests
         var match = re.Match("b".ToLatin1Bytes());
 
         match.Success.ShouldBeTrue();
-        match["g"].Value.SequenceEqual("b".ToLatin1Bytes()).ShouldBeTrue();
+        match["g"].Value.ShouldBe("b".ToLatin1Bytes());
 
         GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, false]);
 
         match = re.Match("bc".ToLatin1Bytes());
         match.Success.ShouldBeTrue();
-        match["g"].Value.SequenceEqual("b".ToLatin1Bytes()).ShouldBeTrue();
+        match["g"].Value.ShouldBe("b".ToLatin1Bytes());
 
         GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, true]);
     }
@@ -1363,13 +1363,13 @@ public class MatchTests
         var match = re.CreateMatchBuffer().Match("b".ToLatin1Bytes());
 
         match.Success.ShouldBeTrue();
-        match["g"].Value.SequenceEqual("b".ToLatin1Bytes()).ShouldBeTrue();
+        match["g"].Value.ShouldBe("b".ToLatin1Bytes());
 
         GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, false]);
 
         match = re.Match("bc".ToLatin1Bytes());
         match.Success.ShouldBeTrue();
-        match["g"].Value.SequenceEqual("b".ToLatin1Bytes()).ShouldBeTrue();
+        match["g"].Value.ShouldBe("b".ToLatin1Bytes());
 
         GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, true]);
     }
@@ -1418,7 +1418,7 @@ public class MatchTests
 
         var match = re.Match("bc"u8);
         match.Success.ShouldBeTrue();
-        match["g"].Value.SequenceEqual("b"u8).ShouldBeTrue();
+        match["g"].Value.ShouldBe("b"u8);
 
         GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, true]);
     }
@@ -1430,7 +1430,7 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("bc"u8);
         match.Success.ShouldBeTrue();
-        match["g"].Value.SequenceEqual("b"u8).ShouldBeTrue();
+        match["g"].Value.ShouldBe("b"u8);
 
         GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, true]);
     }
@@ -1442,7 +1442,7 @@ public class MatchTests
 
         var match = re.Match("bc".ToLatin1Bytes());
         match.Success.ShouldBeTrue();
-        match["g"].Value.SequenceEqual("b".ToLatin1Bytes()).ShouldBeTrue();
+        match["g"].Value.ShouldBe("b".ToLatin1Bytes());
 
         GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, true]);
     }
@@ -1454,7 +1454,7 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("bc".ToLatin1Bytes());
         match.Success.ShouldBeTrue();
-        match["g"].Value.SequenceEqual("b".ToLatin1Bytes()).ShouldBeTrue();
+        match["g"].Value.ShouldBe("b".ToLatin1Bytes());
 
         GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, true]);
     }
@@ -1536,7 +1536,7 @@ public class MatchTests
 
         match = re.Match("ac".AsSpan());
         match.Success.ShouldBeTrue();
-        match.Mark.ShouldBe(string.Empty);
+        match.Mark.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -1550,7 +1550,7 @@ public class MatchTests
 
         match = re.Match("ac".AsSpan());
         match.Success.ShouldBeTrue();
-        match.Mark.ShouldBe(string.Empty);
+        match.Mark.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -1560,7 +1560,7 @@ public class MatchTests
         var match = re.Match("ab"u8);
 
         match.Success.ShouldBeTrue();
-        match.Mark.SequenceEqual("bar"u8).ShouldBeTrue();
+        match.Mark.ShouldBe("bar"u8);
 
         match = re.Match("ac"u8);
         match.Success.ShouldBeTrue();
@@ -1574,7 +1574,7 @@ public class MatchTests
         var match = re.CreateMatchBuffer().Match("ab"u8);
 
         match.Success.ShouldBeTrue();
-        match.Mark.SequenceEqual("bar"u8).ShouldBeTrue();
+        match.Mark.ShouldBe("bar"u8);
 
         match = re.Match("ac"u8);
         match.Success.ShouldBeTrue();
@@ -1588,7 +1588,7 @@ public class MatchTests
         var match = re.Match("ab".ToLatin1Bytes());
 
         match.Success.ShouldBeTrue();
-        match.Mark.SequenceEqual("bar".ToLatin1Bytes()).ShouldBeTrue();
+        match.Mark.ShouldBe("bar".ToLatin1Bytes());
 
         match = re.Match("ac".ToLatin1Bytes());
         match.Success.ShouldBeTrue();
@@ -1602,7 +1602,7 @@ public class MatchTests
         var match = re.CreateMatchBuffer().Match("ab".ToLatin1Bytes());
 
         match.Success.ShouldBeTrue();
-        match.Mark.SequenceEqual("bar".ToLatin1Bytes()).ShouldBeTrue();
+        match.Mark.ShouldBe("bar".ToLatin1Bytes());
 
         match = re.Match("ac".ToLatin1Bytes());
         match.Success.ShouldBeTrue();
@@ -1666,7 +1666,7 @@ public class MatchTests
                 ? PcreCalloutResult.Pass
                 : PcreCalloutResult.Fail);
 
-        match[2].Value.SequenceEqual("hello"u8).ShouldBeTrue();
+        match[2].Value.ShouldBe("hello"u8);
     }
 
     [Test]
@@ -1681,7 +1681,7 @@ public class MatchTests
                 ? PcreCalloutResult.Pass
                 : PcreCalloutResult.Fail);
 
-        match[2].Value.SequenceEqual("hello"u8).ShouldBeTrue();
+        match[2].Value.ShouldBe("hello"u8);
     }
 
     [Test]
@@ -1696,7 +1696,7 @@ public class MatchTests
                 ? PcreCalloutResult.Pass
                 : PcreCalloutResult.Fail);
 
-        match[2].Value.SequenceEqual("hello".ToLatin1Bytes()).ShouldBeTrue();
+        match[2].Value.ShouldBe("hello".ToLatin1Bytes());
     }
 
     [Test]
@@ -1711,7 +1711,7 @@ public class MatchTests
                 ? PcreCalloutResult.Pass
                 : PcreCalloutResult.Fail);
 
-        match[2].Value.SequenceEqual("hello".ToLatin1Bytes()).ShouldBeTrue();
+        match[2].Value.ShouldBe("hello".ToLatin1Bytes());
     }
 
     [Test]
@@ -1848,14 +1848,14 @@ public class MatchTests
                 data.StringOffset.ShouldBe(0);
                 data.String.ShouldBeNull();
 
-                data.Match.Value.SequenceEqual("a"u8).ShouldBeTrue();
-                data.Match[1].Value.SequenceEqual("a"u8).ShouldBeTrue();
+                data.Match.Value.ShouldBe("a"u8);
+                data.Match[1].Value.ShouldBe("a"u8);
                 data.Match[2].Success.ShouldBeFalse();
                 data.Match[2].Value.IsEmpty.ShouldBeTrue();
                 data.Match[3].Success.ShouldBeFalse();
                 data.Match[3].Value.IsEmpty.ShouldBeTrue();
 
-                data.Match.Mark.SequenceEqual("foo"u8).ShouldBeTrue();
+                data.Match.Mark.ShouldBe("foo"u8);
 
                 ++calls;
                 return PcreCalloutResult.Pass;
@@ -1886,14 +1886,14 @@ public class MatchTests
             data.StringOffset.ShouldBe(0);
             data.String.ShouldBeNull();
 
-            data.Match.Value.SequenceEqual("a"u8).ShouldBeTrue();
-            data.Match[1].Value.SequenceEqual("a"u8).ShouldBeTrue();
+            data.Match.Value.ShouldBe("a"u8);
+            data.Match[1].Value.ShouldBe("a"u8);
             data.Match[2].Success.ShouldBeFalse();
             data.Match[2].Value.IsEmpty.ShouldBeTrue();
             data.Match[3].Success.ShouldBeFalse();
             data.Match[3].Value.IsEmpty.ShouldBeTrue();
 
-            data.Match.Mark.SequenceEqual("foo"u8).ShouldBeTrue();
+            data.Match.Mark.ShouldBe("foo"u8);
 
             ++calls;
             return PcreCalloutResult.Pass;
@@ -1925,14 +1925,14 @@ public class MatchTests
                 data.StringOffset.ShouldBe(0);
                 data.String.ShouldBeNull();
 
-                data.Match.Value.SequenceEqual("a".ToLatin1Bytes()).ShouldBeTrue();
-                data.Match[1].Value.SequenceEqual("a".ToLatin1Bytes()).ShouldBeTrue();
+                data.Match.Value.ShouldBe("a".ToLatin1Bytes());
+                data.Match[1].Value.ShouldBe("a".ToLatin1Bytes());
                 data.Match[2].Success.ShouldBeFalse();
                 data.Match[2].Value.IsEmpty.ShouldBeTrue();
                 data.Match[3].Success.ShouldBeFalse();
                 data.Match[3].Value.IsEmpty.ShouldBeTrue();
 
-                data.Match.Mark.SequenceEqual("foo".ToLatin1Bytes()).ShouldBeTrue();
+                data.Match.Mark.ShouldBe("foo".ToLatin1Bytes());
 
                 ++calls;
                 return PcreCalloutResult.Pass;
@@ -1963,14 +1963,14 @@ public class MatchTests
             data.StringOffset.ShouldBe(0);
             data.String.ShouldBeNull();
 
-            data.Match.Value.SequenceEqual("a".ToLatin1Bytes()).ShouldBeTrue();
-            data.Match[1].Value.SequenceEqual("a".ToLatin1Bytes()).ShouldBeTrue();
+            data.Match.Value.ShouldBe("a".ToLatin1Bytes());
+            data.Match[1].Value.ShouldBe("a".ToLatin1Bytes());
             data.Match[2].Success.ShouldBeFalse();
             data.Match[2].Value.IsEmpty.ShouldBeTrue();
             data.Match[3].Success.ShouldBeFalse();
             data.Match[3].Value.IsEmpty.ShouldBeTrue();
 
-            data.Match.Mark.SequenceEqual("foo".ToLatin1Bytes()).ShouldBeTrue();
+            data.Match.Mark.ShouldBe("foo".ToLatin1Bytes());
 
             ++calls;
             return PcreCalloutResult.Pass;
@@ -2070,7 +2070,7 @@ public class MatchTests
         });
 
         match.Success.ShouldBeTrue();
-        match.Value.SequenceEqual("b"u8).ShouldBeTrue();
+        match.Value.ShouldBe("b"u8);
     }
 
     [Test]
@@ -2093,7 +2093,7 @@ public class MatchTests
         });
 
         match.Success.ShouldBeTrue();
-        match.Value.SequenceEqual("b"u8).ShouldBeTrue();
+        match.Value.ShouldBe("b"u8);
     }
 
     [Test]
@@ -2116,7 +2116,7 @@ public class MatchTests
         });
 
         match.Success.ShouldBeTrue();
-        match.Value.SequenceEqual("b".ToLatin1Bytes()).ShouldBeTrue();
+        match.Value.ShouldBe("b".ToLatin1Bytes());
     }
 
     [Test]
@@ -2139,7 +2139,7 @@ public class MatchTests
         });
 
         match.Success.ShouldBeTrue();
-        match.Value.SequenceEqual("b".ToLatin1Bytes()).ShouldBeTrue();
+        match.Value.ShouldBe("b".ToLatin1Bytes());
     }
 
     [Test]
@@ -2767,14 +2767,14 @@ public class MatchTests
             data.StringOffset.ShouldBe(GetPattern().IndexOf("(?C{bar})"u8) + 4);
             data.String.ShouldBe("bar");
 
-            data.Match.Value.SequenceEqual("a"u8).ShouldBeTrue();
-            data.Match[1].Value.SequenceEqual("a"u8).ShouldBeTrue();
+            data.Match.Value.ShouldBe("a"u8);
+            data.Match[1].Value.ShouldBe("a"u8);
             data.Match[2].Success.ShouldBeFalse();
             data.Match[2].Value.IsEmpty.ShouldBeTrue();
             data.Match[3].Success.ShouldBeFalse();
             data.Match[3].Value.IsEmpty.ShouldBeTrue();
 
-            data.Match.Mark.SequenceEqual("foo"u8).ShouldBeTrue();
+            data.Match.Mark.ShouldBe("foo"u8);
 
             ++calls;
             return PcreCalloutResult.Pass;
@@ -2804,14 +2804,14 @@ public class MatchTests
             data.StringOffset.ShouldBe(GetPattern().IndexOf("(?C{bar})"u8) + 4);
             data.String.ShouldBe("bar");
 
-            data.Match.Value.SequenceEqual("a"u8).ShouldBeTrue();
-            data.Match[1].Value.SequenceEqual("a"u8).ShouldBeTrue();
+            data.Match.Value.ShouldBe("a"u8);
+            data.Match[1].Value.ShouldBe("a"u8);
             data.Match[2].Success.ShouldBeFalse();
             data.Match[2].Value.IsEmpty.ShouldBeTrue();
             data.Match[3].Success.ShouldBeFalse();
             data.Match[3].Value.IsEmpty.ShouldBeTrue();
 
-            data.Match.Mark.SequenceEqual("foo"u8).ShouldBeTrue();
+            data.Match.Mark.ShouldBe("foo"u8);
 
             ++calls;
             return PcreCalloutResult.Pass;
@@ -2841,14 +2841,14 @@ public class MatchTests
             data.StringOffset.ShouldBe(GetPattern().IndexOf("(?C{bar})".ToLatin1Bytes()) + 4);
             data.String.ShouldBe("bar");
 
-            data.Match.Value.SequenceEqual("a".ToLatin1Bytes()).ShouldBeTrue();
-            data.Match[1].Value.SequenceEqual("a".ToLatin1Bytes()).ShouldBeTrue();
+            data.Match.Value.ShouldBe("a".ToLatin1Bytes());
+            data.Match[1].Value.ShouldBe("a".ToLatin1Bytes());
             data.Match[2].Success.ShouldBeFalse();
             data.Match[2].Value.IsEmpty.ShouldBeTrue();
             data.Match[3].Success.ShouldBeFalse();
             data.Match[3].Value.IsEmpty.ShouldBeTrue();
 
-            data.Match.Mark.SequenceEqual("foo".ToLatin1Bytes()).ShouldBeTrue();
+            data.Match.Mark.ShouldBe("foo".ToLatin1Bytes());
 
             ++calls;
             return PcreCalloutResult.Pass;
@@ -2878,14 +2878,14 @@ public class MatchTests
             data.StringOffset.ShouldBe(GetPattern().IndexOf("(?C{bar})".ToLatin1Bytes()) + 4);
             data.String.ShouldBe("bar");
 
-            data.Match.Value.SequenceEqual("a".ToLatin1Bytes()).ShouldBeTrue();
-            data.Match[1].Value.SequenceEqual("a".ToLatin1Bytes()).ShouldBeTrue();
+            data.Match.Value.ShouldBe("a".ToLatin1Bytes());
+            data.Match[1].Value.ShouldBe("a".ToLatin1Bytes());
             data.Match[2].Success.ShouldBeFalse();
             data.Match[2].Value.IsEmpty.ShouldBeTrue();
             data.Match[3].Success.ShouldBeFalse();
             data.Match[3].Value.IsEmpty.ShouldBeTrue();
 
-            data.Match.Mark.SequenceEqual("foo".ToLatin1Bytes()).ShouldBeTrue();
+            data.Match.Mark.ShouldBe("foo".ToLatin1Bytes());
 
             ++calls;
             return PcreCalloutResult.Pass;
@@ -2996,7 +2996,7 @@ public class MatchTests
             data.Match[1].Success.ShouldBeTrue();
             data.Match[1].Index.ShouldBe(0);
             data.Match[1].Length.ShouldBe(1);
-            data.Match[1].Value.SequenceEqual("a".ToLatin1Bytes()).ShouldBeTrue();
+            data.Match[1].Value.ShouldBe("a".ToLatin1Bytes());
 
             data.Match[2].Success.ShouldBeFalse();
             data.Match[2].Index.ShouldBe(-1);
@@ -3006,7 +3006,7 @@ public class MatchTests
             data.Match[3].Success.ShouldBeTrue();
             data.Match[3].Index.ShouldBe(1);
             data.Match[3].Length.ShouldBe(2);
-            data.Match[3].Value.SequenceEqual("bc".ToLatin1Bytes()).ShouldBeTrue();
+            data.Match[3].Value.ShouldBe("bc".ToLatin1Bytes());
 
             ++calls;
             return PcreCalloutResult.Pass;
@@ -3026,7 +3026,7 @@ public class MatchTests
             data.Match[1].Success.ShouldBeTrue();
             data.Match[1].Index.ShouldBe(0);
             data.Match[1].Length.ShouldBe(1);
-            data.Match[1].Value.SequenceEqual("a"u8).ShouldBeTrue();
+            data.Match[1].Value.ShouldBe("a"u8);
 
             data.Match[2].Success.ShouldBeFalse();
             data.Match[2].Index.ShouldBe(-1);
@@ -3036,7 +3036,7 @@ public class MatchTests
             data.Match[3].Success.ShouldBeTrue();
             data.Match[3].Index.ShouldBe(1);
             data.Match[3].Length.ShouldBe(2);
-            data.Match[3].Value.SequenceEqual("bc"u8).ShouldBeTrue();
+            data.Match[3].Value.ShouldBe("bc"u8);
 
             ++calls;
             return PcreCalloutResult.Pass;
@@ -3056,7 +3056,7 @@ public class MatchTests
             data.Match[1].Success.ShouldBeTrue();
             data.Match[1].Index.ShouldBe(0);
             data.Match[1].Length.ShouldBe(1);
-            data.Match[1].Value.SequenceEqual("a"u8).ShouldBeTrue();
+            data.Match[1].Value.ShouldBe("a"u8);
 
             data.Match[2].Success.ShouldBeFalse();
             data.Match[2].Index.ShouldBe(-1);
@@ -3066,7 +3066,7 @@ public class MatchTests
             data.Match[3].Success.ShouldBeTrue();
             data.Match[3].Index.ShouldBe(1);
             data.Match[3].Length.ShouldBe(2);
-            data.Match[3].Value.SequenceEqual("bc"u8).ShouldBeTrue();
+            data.Match[3].Value.ShouldBe("bc"u8);
 
             ++calls;
             return PcreCalloutResult.Pass;
@@ -3086,7 +3086,7 @@ public class MatchTests
             data.Match[1].Success.ShouldBeTrue();
             data.Match[1].Index.ShouldBe(0);
             data.Match[1].Length.ShouldBe(1);
-            data.Match[1].Value.SequenceEqual("a".ToLatin1Bytes()).ShouldBeTrue();
+            data.Match[1].Value.ShouldBe("a".ToLatin1Bytes());
 
             data.Match[2].Success.ShouldBeFalse();
             data.Match[2].Index.ShouldBe(-1);
@@ -3096,7 +3096,7 @@ public class MatchTests
             data.Match[3].Success.ShouldBeTrue();
             data.Match[3].Index.ShouldBe(1);
             data.Match[3].Length.ShouldBe(2);
-            data.Match[3].Value.SequenceEqual("bc".ToLatin1Bytes()).ShouldBeTrue();
+            data.Match[3].Value.ShouldBe("bc".ToLatin1Bytes());
 
             ++calls;
             return PcreCalloutResult.Pass;
@@ -3179,8 +3179,8 @@ public class MatchTests
         {
             ++calls;
             data.Match.Length.ShouldBe(length);
-            data.Match.Groups[1].Value.SequenceEqual("a"u8).ShouldBeTrue();
-            data.Match.Groups[length].Value.SequenceEqual("a"u8).ShouldBeTrue();
+            data.Match.Groups[1].Value.ShouldBe("a"u8);
+            data.Match.Groups[length].Value.ShouldBe("a"u8);
             return PcreCalloutResult.Pass;
         });
 
@@ -3207,8 +3207,8 @@ public class MatchTests
         {
             ++calls;
             data.Match.Length.ShouldBe(length);
-            data.Match.Groups[1].Value.SequenceEqual("a"u8).ShouldBeTrue();
-            data.Match.Groups[length].Value.SequenceEqual("a"u8).ShouldBeTrue();
+            data.Match.Groups[1].Value.ShouldBe("a"u8);
+            data.Match.Groups[length].Value.ShouldBe("a"u8);
             return PcreCalloutResult.Pass;
         });
 
@@ -3235,8 +3235,8 @@ public class MatchTests
         {
             ++calls;
             data.Match.Length.ShouldBe(length);
-            data.Match.Groups[1].Value.SequenceEqual("a".ToLatin1Bytes()).ShouldBeTrue();
-            data.Match.Groups[length].Value.SequenceEqual("a".ToLatin1Bytes()).ShouldBeTrue();
+            data.Match.Groups[1].Value.ShouldBe("a".ToLatin1Bytes());
+            data.Match.Groups[length].Value.ShouldBe("a".ToLatin1Bytes());
             return PcreCalloutResult.Pass;
         });
 
@@ -3263,8 +3263,8 @@ public class MatchTests
         {
             ++calls;
             data.Match.Length.ShouldBe(length);
-            data.Match.Groups[1].Value.SequenceEqual("a".ToLatin1Bytes()).ShouldBeTrue();
-            data.Match.Groups[length].Value.SequenceEqual("a".ToLatin1Bytes()).ShouldBeTrue();
+            data.Match.Groups[1].Value.ShouldBe("a".ToLatin1Bytes());
+            data.Match.Groups[length].Value.ShouldBe("a".ToLatin1Bytes());
             return PcreCalloutResult.Pass;
         });
 
@@ -3283,7 +3283,7 @@ public class MatchTests
         match.Index.ShouldBe(3);
         match.EndIndex.ShouldBe(0);
         match.Length.ShouldBe(0);
-        match.Value.ShouldBe(string.Empty);
+        match.Value.ShouldBeEmpty();
     }
 
     [Test]
@@ -3297,7 +3297,7 @@ public class MatchTests
         match.Index.ShouldBe(3);
         match.EndIndex.ShouldBe(0);
         match.Length.ShouldBe(0);
-        match.Value.ShouldBe(string.Empty);
+        match.Value.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -3311,7 +3311,7 @@ public class MatchTests
         match.Index.ShouldBe(3);
         match.EndIndex.ShouldBe(0);
         match.Length.ShouldBe(0);
-        match.Value.ShouldBe(string.Empty);
+        match.Value.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -3626,7 +3626,7 @@ public class MatchTests
         match.Index.ShouldBe(6);
         match.EndIndex.ShouldBe(8);
         match.Length.ShouldBe(2);
-        match.Value.SequenceEqual("12"u8).ShouldBeTrue();
+        match.Value.ShouldBe("12"u8);
     }
 
     [Test]
@@ -3643,7 +3643,7 @@ public class MatchTests
         match.Index.ShouldBe(6);
         match.EndIndex.ShouldBe(8);
         match.Length.ShouldBe(2);
-        match.Value.SequenceEqual("12"u8).ShouldBeTrue();
+        match.Value.ShouldBe("12"u8);
     }
 
     [Test]
@@ -3660,7 +3660,7 @@ public class MatchTests
         match.Index.ShouldBe(6);
         match.EndIndex.ShouldBe(8);
         match.Length.ShouldBe(2);
-        match.Value.SequenceEqual("12".ToLatin1Bytes()).ShouldBeTrue();
+        match.Value.ShouldBe("12".ToLatin1Bytes());
     }
 
     [Test]
@@ -3677,7 +3677,7 @@ public class MatchTests
         match.Index.ShouldBe(6);
         match.EndIndex.ShouldBe(8);
         match.Length.ShouldBe(2);
-        match.Value.SequenceEqual("12".ToLatin1Bytes()).ShouldBeTrue();
+        match.Value.ShouldBe("12".ToLatin1Bytes());
     }
 
     [Test]
@@ -3794,7 +3794,7 @@ public class MatchTests
     [Test]
     public void should_check_pattern_utf_validity()
     {
-        var ex = Should.Throw<PcrePatternException>(() => _ = new PcreRegex("A\uD800B"));
+        var ex = Should.Throw<PcrePatternException>(() => new PcreRegex("A\uD800B"));
         ex.ErrorCode.ShouldBe(PcreErrorCode.Utf16Err2);
         ex.Message.ShouldContain("invalid low surrogate");
     }
@@ -3802,7 +3802,7 @@ public class MatchTests
     [Test]
     public void should_check_pattern_utf_validity_utf8()
     {
-        var ex = Should.Throw<PcrePatternException>(() => _ = new PcreRegexUtf8([(byte)'A', (byte)'é', (byte)'B']));
+        var ex = Should.Throw<PcrePatternException>(() => new PcreRegexUtf8([(byte)'A', (byte)'é', (byte)'B']));
         ex.ErrorCode.ShouldBe(PcreErrorCode.Utf8Err1);
         ex.Message.ShouldContain("1 byte missing at end at offset 1");
     }
@@ -3810,14 +3810,14 @@ public class MatchTests
     [Test]
     public void should_not_check_pattern_utf_validity_8bit()
     {
-        _ = TestSupport.CreatePcreRegex8Bit([(byte)'A', (byte)'é', (byte)'B']);
+        Should.NotThrow(() => TestSupport.CreatePcreRegex8Bit([(byte)'A', (byte)'é', (byte)'B']));
     }
 
     [Test]
     public void should_check_subject_utf_validity()
     {
         var re = new PcreRegex(@"A");
-        var ex = Should.Throw<PcreMatchException>(() => _ = re.Match("A\uD800B"));
+        var ex = Should.Throw<PcreMatchException>(() => re.Match("A\uD800B"));
         ex.ErrorCode.ShouldBe(PcreErrorCode.Utf16Err2);
         ex.Message.ShouldContain("invalid low surrogate");
     }
@@ -3826,7 +3826,7 @@ public class MatchTests
     public void should_check_subject_utf_validity_ref()
     {
         var re = new PcreRegex(@"A");
-        var ex = Should.Throw<PcreMatchException>(() => _ = re.Match("A\uD800B".AsSpan()));
+        var ex = Should.Throw<PcreMatchException>(() => re.Match("A\uD800B".AsSpan()));
         ex.ErrorCode.ShouldBe(PcreErrorCode.Utf16Err2);
         ex.Message.ShouldContain("invalid low surrogate");
     }
@@ -3837,7 +3837,7 @@ public class MatchTests
         var re = new PcreRegex(@"A");
         var buffer = re.CreateMatchBuffer();
 
-        var ex = Should.Throw<PcreMatchException>(() => _ = buffer.Match("A\uD800B".AsSpan()));
+        var ex = Should.Throw<PcreMatchException>(() => buffer.Match("A\uD800B".AsSpan()));
         ex.ErrorCode.ShouldBe(PcreErrorCode.Utf16Err2);
         ex.Message.ShouldContain("invalid low surrogate");
     }
@@ -3846,7 +3846,7 @@ public class MatchTests
     public void should_check_subject_utf_validity_utf8()
     {
         var re = new PcreRegexUtf8(@"A"u8);
-        var ex = Should.Throw<PcreMatchException>(() => _ = re.Match([(byte)'A', (byte)'é', (byte)'B']));
+        var ex = Should.Throw<PcreMatchException>(() => re.Match([(byte)'A', (byte)'é', (byte)'B']));
         ex.ErrorCode.ShouldBe(PcreErrorCode.Utf8Err1);
         ex.Message.ShouldContain("1 byte missing at end");
     }
@@ -3857,7 +3857,7 @@ public class MatchTests
         var re = new PcreRegexUtf8(@"A"u8);
         var buffer = re.CreateMatchBuffer();
 
-        var ex = Should.Throw<PcreMatchException>(() => _ = buffer.Match([(byte)'A', (byte)'é', (byte)'B']));
+        var ex = Should.Throw<PcreMatchException>(() => buffer.Match([(byte)'A', (byte)'é', (byte)'B']));
         ex.ErrorCode.ShouldBe(PcreErrorCode.Utf8Err1);
         ex.Message.ShouldContain("1 byte missing at end");
     }
@@ -3866,7 +3866,7 @@ public class MatchTests
     public void should_not_check_subject_utf_validity_8bit()
     {
         var re = TestSupport.CreatePcreRegex8Bit(@"A".ToLatin1Bytes());
-        _ = re.Match([(byte)'A', (byte)'é', (byte)'B']);
+        Should.NotThrow(() => re.Match([(byte)'A', (byte)'é', (byte)'B']));
     }
 
     [Test]
@@ -3874,7 +3874,7 @@ public class MatchTests
     {
         var re = TestSupport.CreatePcreRegex8Bit(@"A".ToLatin1Bytes());
         var buffer = re.CreateMatchBuffer();
-        _ = buffer.Match([(byte)'A', (byte)'é', (byte)'B']);
+        Should.NotThrow(() => buffer.Match([(byte)'A', (byte)'é', (byte)'B']));
     }
 
     [Test]
@@ -4195,7 +4195,7 @@ public class MatchTests
         match.ShouldNotBeNull();
         match.Success.ShouldBeTrue();
         match.CaptureCount.ShouldBe(0);
-        match.Value.ShouldBe(string.Empty);
+        match.Value.ShouldBeEmpty();
         match.Index.ShouldBe(0);
         match.EndIndex.ShouldBe(0);
         match.Length.ShouldBe(0);
@@ -4203,7 +4203,7 @@ public class MatchTests
         match[0].ShouldNotBeNull();
         match[0].Success.ShouldBeTrue();
         match[0].IsDefined.ShouldBeTrue();
-        match[0].Value.ShouldBe(string.Empty);
+        match[0].Value.ShouldBeEmpty();
         match[0].Index.ShouldBe(0);
         match[0].EndIndex.ShouldBe(0);
         match[0].Length.ShouldBe(0);
@@ -4401,7 +4401,7 @@ public class MatchTests
         var match = re.Match("ac"u8);
 
         match.Success.ShouldBeFalse();
-        match.Mark.SequenceEqual("foo"u8).ShouldBeTrue();
+        match.Mark.ShouldBe("foo"u8);
     }
 
     [Test]
@@ -4412,7 +4412,7 @@ public class MatchTests
         var match = re.Match("ac".ToLatin1Bytes());
 
         match.Success.ShouldBeFalse();
-        match.Mark.SequenceEqual("foo".ToLatin1Bytes()).ShouldBeTrue();
+        match.Mark.ShouldBe("foo".ToLatin1Bytes());
     }
 
     [Test]
@@ -4421,7 +4421,7 @@ public class MatchTests
         var re = new PcreRegex("foo");
         var match = re.Match("bar".AsSpan());
 
-        match.OutputVector.Length.ShouldBe(0);
+        match.OutputVector.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -4430,7 +4430,7 @@ public class MatchTests
         var re = new PcreRegexUtf8("foo"u8);
         var match = re.Match("bar"u8);
 
-        match.OutputVector.Length.ShouldBe(0);
+        match.OutputVector.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -4439,7 +4439,7 @@ public class MatchTests
         var re = TestSupport.CreatePcreRegex8Bit("foo".ToLatin1Bytes());
         var match = re.Match("bar".ToLatin1Bytes());
 
-        match.OutputVector.Length.ShouldBe(0);
+        match.OutputVector.IsEmpty.ShouldBeTrue();
     }
 
     [Test]

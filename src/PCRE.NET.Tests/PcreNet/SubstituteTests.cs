@@ -273,7 +273,7 @@ public class SubstituteTests
                 data.Match.Groups[2].Index.ShouldBe(-1);
                 data.Match.Groups[2].Length.ShouldBe(0);
                 data.Match.Groups[2].EndIndex.ShouldBe(-1);
-                data.Match.Groups[2].Value.Length.ShouldBe(0);
+                data.Match.Groups[2].Value.IsEmpty.ShouldBeTrue();
 
                 data.Number.ShouldBe(42);
                 data.CurrentOffset.ShouldBe(13);
@@ -322,7 +322,7 @@ public class SubstituteTests
                 data.Match.Groups[2].Index.ShouldBe(-1);
                 data.Match.Groups[2].Length.ShouldBe(0);
                 data.Match.Groups[2].EndIndex.ShouldBe(-1);
-                data.Match.Groups[2].Value.Length.ShouldBe(0);
+                data.Match.Groups[2].Value.IsEmpty.ShouldBeTrue();
 
                 data.Subject.ShouldBe("abc foobarbaz def");
                 data.Output.ShouldBe("abc sub");

@@ -58,7 +58,7 @@ public class DocumentationTests
         if (member.Element("inheritdoc") != null)
         {
             member.Elements("inheritdoc").ShouldHaveSingleItem();
-            member.Elements().Count(i => i.Name.LocalName is not ("param" or "inheritdoc")).ShouldBe(0);
+            member.Elements().Where(i => i.Name.LocalName is not ("param" or "inheritdoc")).ShouldBeEmpty();
             return;
         }
 
