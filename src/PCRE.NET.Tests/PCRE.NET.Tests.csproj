@@ -44,10 +44,12 @@
     <Optimize>false</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="**/*.received.cs" />
-    <Compile Remove="**/*.approved.cs" />
-    <None Include="**/*.received.cs" />
-    <None Include="**/*.approved.cs" />
+    <ShouldlySnapshot Include="**\*.received.*" />
+    <ShouldlySnapshot Include="**\*.approved.*" />
+    <ShouldlySnapshot Update="@(ShouldlySnapshot)" DependentUpon="$([System.Text.RegularExpressions.Regex]::Match('%(Filename)', '^[^.]+')).cs" />
+    <Compile Remove="@(ShouldlySnapshot)" />
+    <None Include="@(ShouldlySnapshot)" />
+    <ShouldlySnapshot Remove="@(ShouldlySnapshot)" />
   </ItemGroup>
 
 </Project>
