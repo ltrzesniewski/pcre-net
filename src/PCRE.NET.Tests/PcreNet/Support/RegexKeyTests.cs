@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using PCRE.Internal;
+using Shouldly;
 
 namespace PCRE.Tests.PcreNet.Support;
 
@@ -10,11 +11,11 @@ public class RegexKeyTests
     public void should_freeze_settings()
     {
         var settings = new PcreRegexSettings();
-        Assert.That(settings.ReadOnlySettings, Is.False);
+        settings.ReadOnlySettings.ShouldBeFalse();
 
         var key = new RegexKey("test", settings);
-        Assert.That(key.Settings.ReadOnlySettings, Is.True);
-        Assert.That(settings.ReadOnlySettings, Is.False);
+        key.Settings.ReadOnlySettings.ShouldBeTrue();
+        settings.ReadOnlySettings.ShouldBeFalse();
     }
 
     [Test]
@@ -34,7 +35,7 @@ public class RegexKeyTests
         var keyA = new RegexKey("test", implicitDefaults);
         var keyB = new RegexKey("test", explicitDefaults);
 
-        Assert.That(keyA, Is.EqualTo(keyB));
+        keyA.ShouldBe(keyB);
     }
 
     [Test]
@@ -49,6 +50,6 @@ public class RegexKeyTests
         var keyA = new RegexKey("test", defaults);
         var keyB = new RegexKey("test", other);
 
-        Assert.That(keyA, Is.Not.EqualTo(keyB));
+        keyA.ShouldNotBe(keyB);
     }
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using NUnit.Framework;
 using PCRE.Tests.Support;
+using Shouldly;
 
 namespace PCRE.Tests.PcreNet;
 
@@ -30,7 +31,7 @@ public class PlatformTests
 #else
         var rid = "<unknown>";
 #endif
-        Assert.That(rid, Is.EqualTo(expectedRid));
+        rid.ShouldBe(expectedRid);
     }
 
     [Test]
@@ -43,23 +44,18 @@ public class PlatformTests
                                           .OrderBy(i => i, StringComparer.Ordinal)
                                           .ToList();
 
-        Assert.That(
-            namespaces,
-            Is.EqualTo(
-                [
-                    "PCRE",
-                    "PCRE.Conversion",
-                    "PCRE.Dfa"
-                ]
-            )
-        );
+        namespaces.ShouldBe([
+            "PCRE",
+            "PCRE.Conversion",
+            "PCRE.Dfa"
+        ]);
     }
 
 #if EXPECT_X86
     [Test]
     public void validate_platform_x86()
     {
-        Assert.That(RuntimeInformation.ProcessArchitecture, Is.EqualTo(Architecture.X86));
+        RuntimeInformation.ProcessArchitecture.ShouldBe(Architecture.X86);
     }
 #endif
 
@@ -67,7 +63,7 @@ public class PlatformTests
     [Test]
     public void validate_platform_x64()
     {
-        Assert.That(RuntimeInformation.ProcessArchitecture, Is.EqualTo(Architecture.X64));
+        RuntimeInformation.ProcessArchitecture.ShouldBe(Architecture.X64);
     }
 #endif
 
@@ -75,7 +71,7 @@ public class PlatformTests
     [Test]
     public void validate_platform_arm64()
     {
-        Assert.That(RuntimeInformation.ProcessArchitecture, Is.EqualTo(Architecture.Arm64));
+        RuntimeInformation.ProcessArchitecture.ShouldBe(Architecture.Arm64);
     }
 #endif
 }

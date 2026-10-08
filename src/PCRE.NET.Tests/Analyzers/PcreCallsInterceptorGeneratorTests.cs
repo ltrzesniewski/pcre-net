@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using PCRE.Analyzers;
+using Shouldly;
 
 namespace PCRE.Tests.Analyzers;
 
@@ -219,6 +220,6 @@ public class PcreCallsInterceptorGeneratorTests : BaseInterceptorTests<PcreCalls
         var output = result.GeneratedTrees.Single().GetText().ToString();
         var interceptedCount = Regex.Matches(output, @"\bpublic\b").Count - 1; // Subtract InterceptsLocationAttribute
 
-        Assert.That(interceptedCount, Is.EqualTo(methods.Count), "Not all methods were intercepted");
+        interceptedCount.ShouldBe(methods.Count, "Not all methods were intercepted");
     }
 }

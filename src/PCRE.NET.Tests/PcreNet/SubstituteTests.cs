@@ -1,6 +1,7 @@
 using System;
 using NUnit.Framework;
 using PCRE.Internal;
+using Shouldly;
 
 namespace PCRE.Tests.PcreNet;
 
@@ -18,17 +19,17 @@ public class SubstituteTests
     {
         var re = new PcreRegex("a(b+)c");
 
-        Assert.That(re.Substitute(subject, replacement), Is.EqualTo(result));
-        Assert.That(re.Substitute(_filler + subject, replacement), Is.EqualTo(_filler + result));
+        re.Substitute(subject, replacement).ShouldBe(result);
+        re.Substitute(_filler + subject, replacement).ShouldBe(_filler + result);
 
-        Assert.That(re.Substitute(subject.AsSpan(), replacement.AsSpan()), Is.EqualTo(result));
-        Assert.That(re.Substitute((_filler + subject).AsSpan(), replacement.AsSpan()), Is.EqualTo(_filler + result));
+        re.Substitute(subject.AsSpan(), replacement.AsSpan()).ShouldBe(result);
+        re.Substitute((_filler + subject).AsSpan(), replacement.AsSpan()).ShouldBe(_filler + result);
 
-        Assert.That(re.Substitute(subject, replacement, PcreSubstituteOptions.None, _ => PcreSubstituteCalloutResult.Pass), Is.EqualTo(result));
-        Assert.That(re.Substitute(_filler + subject, replacement, PcreSubstituteOptions.None, _ => PcreSubstituteCalloutResult.Pass), Is.EqualTo(_filler + result));
+        re.Substitute(subject, replacement, PcreSubstituteOptions.None, _ => PcreSubstituteCalloutResult.Pass).ShouldBe(result);
+        re.Substitute(_filler + subject, replacement, PcreSubstituteOptions.None, _ => PcreSubstituteCalloutResult.Pass).ShouldBe(_filler + result);
 
-        Assert.That(re.Substitute(subject.AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.None, _ => PcreSubstituteCalloutResult.Pass), Is.EqualTo(result));
-        Assert.That(re.Substitute((_filler + subject).AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.None, _ => PcreSubstituteCalloutResult.Pass), Is.EqualTo(_filler + result));
+        re.Substitute(subject.AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.None, _ => PcreSubstituteCalloutResult.Pass).ShouldBe(result);
+        re.Substitute((_filler + subject).AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.None, _ => PcreSubstituteCalloutResult.Pass).ShouldBe(_filler + result);
     }
 
     [Test]
@@ -41,17 +42,17 @@ public class SubstituteTests
     {
         var re = new PcreRegex("a(b+)c");
 
-        Assert.That(re.Substitute(subject, replacement, PcreSubstituteOptions.SubstituteGlobal), Is.EqualTo(result));
-        Assert.That(re.Substitute(_filler + subject, replacement, PcreSubstituteOptions.SubstituteGlobal), Is.EqualTo(_filler + result));
+        re.Substitute(subject, replacement, PcreSubstituteOptions.SubstituteGlobal).ShouldBe(result);
+        re.Substitute(_filler + subject, replacement, PcreSubstituteOptions.SubstituteGlobal).ShouldBe(_filler + result);
 
-        Assert.That(re.Substitute(subject.AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteGlobal), Is.EqualTo(result));
-        Assert.That(re.Substitute((_filler + subject).AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteGlobal), Is.EqualTo(_filler + result));
+        re.Substitute(subject.AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteGlobal).ShouldBe(result);
+        re.Substitute((_filler + subject).AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteGlobal).ShouldBe(_filler + result);
 
-        Assert.That(re.Substitute(subject, replacement, PcreSubstituteOptions.SubstituteGlobal, _ => PcreSubstituteCalloutResult.Pass), Is.EqualTo(result));
-        Assert.That(re.Substitute(_filler + subject, replacement, PcreSubstituteOptions.SubstituteGlobal, _ => PcreSubstituteCalloutResult.Pass), Is.EqualTo(_filler + result));
+        re.Substitute(subject, replacement, PcreSubstituteOptions.SubstituteGlobal, _ => PcreSubstituteCalloutResult.Pass).ShouldBe(result);
+        re.Substitute(_filler + subject, replacement, PcreSubstituteOptions.SubstituteGlobal, _ => PcreSubstituteCalloutResult.Pass).ShouldBe(_filler + result);
 
-        Assert.That(re.Substitute(subject.AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteGlobal, _ => PcreSubstituteCalloutResult.Pass), Is.EqualTo(result));
-        Assert.That(re.Substitute((_filler + subject).AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteGlobal, _ => PcreSubstituteCalloutResult.Pass), Is.EqualTo(_filler + result));
+        re.Substitute(subject.AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteGlobal, _ => PcreSubstituteCalloutResult.Pass).ShouldBe(result);
+        re.Substitute((_filler + subject).AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteGlobal, _ => PcreSubstituteCalloutResult.Pass).ShouldBe(_filler + result);
     }
 
     [Test]
@@ -62,17 +63,17 @@ public class SubstituteTests
     {
         var re = new PcreRegex("a(b+)c");
 
-        Assert.That(re.Substitute(subject, replacement, PcreSubstituteOptions.SubstituteLiteral), Is.EqualTo(result));
-        Assert.That(re.Substitute(_filler + subject, replacement, PcreSubstituteOptions.SubstituteLiteral), Is.EqualTo(_filler + result));
+        re.Substitute(subject, replacement, PcreSubstituteOptions.SubstituteLiteral).ShouldBe(result);
+        re.Substitute(_filler + subject, replacement, PcreSubstituteOptions.SubstituteLiteral).ShouldBe(_filler + result);
 
-        Assert.That(re.Substitute(subject.AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteLiteral), Is.EqualTo(result));
-        Assert.That(re.Substitute((_filler + subject).AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteLiteral), Is.EqualTo(_filler + result));
+        re.Substitute(subject.AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteLiteral).ShouldBe(result);
+        re.Substitute((_filler + subject).AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteLiteral).ShouldBe(_filler + result);
 
-        Assert.That(re.Substitute(subject, replacement, PcreSubstituteOptions.SubstituteLiteral, _ => PcreSubstituteCalloutResult.Pass), Is.EqualTo(result));
-        Assert.That(re.Substitute(_filler + subject, replacement, PcreSubstituteOptions.SubstituteLiteral, _ => PcreSubstituteCalloutResult.Pass), Is.EqualTo(_filler + result));
+        re.Substitute(subject, replacement, PcreSubstituteOptions.SubstituteLiteral, _ => PcreSubstituteCalloutResult.Pass).ShouldBe(result);
+        re.Substitute(_filler + subject, replacement, PcreSubstituteOptions.SubstituteLiteral, _ => PcreSubstituteCalloutResult.Pass).ShouldBe(_filler + result);
 
-        Assert.That(re.Substitute(subject.AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteLiteral, _ => PcreSubstituteCalloutResult.Pass), Is.EqualTo(result));
-        Assert.That(re.Substitute((_filler + subject).AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteLiteral, _ => PcreSubstituteCalloutResult.Pass), Is.EqualTo(_filler + result));
+        re.Substitute(subject.AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteLiteral, _ => PcreSubstituteCalloutResult.Pass).ShouldBe(result);
+        re.Substitute((_filler + subject).AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteLiteral, _ => PcreSubstituteCalloutResult.Pass).ShouldBe(_filler + result);
     }
 
     [Test]
@@ -83,31 +84,29 @@ public class SubstituteTests
     {
         var re = new PcreRegex("a(b+)c");
 
-        Assert.That(re.Substitute(subject, replacement, PcreSubstituteOptions.SubstituteReplacementOnly), Is.EqualTo(result));
-        Assert.That(re.Substitute(_filler + subject, replacement, PcreSubstituteOptions.SubstituteReplacementOnly), Is.EqualTo(result));
+        re.Substitute(subject, replacement, PcreSubstituteOptions.SubstituteReplacementOnly).ShouldBe(result);
+        re.Substitute(_filler + subject, replacement, PcreSubstituteOptions.SubstituteReplacementOnly).ShouldBe(result);
 
-        Assert.That(re.Substitute(subject.AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteReplacementOnly), Is.EqualTo(result));
-        Assert.That(re.Substitute((_filler + subject).AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteReplacementOnly), Is.EqualTo(result));
+        re.Substitute(subject.AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteReplacementOnly).ShouldBe(result);
+        re.Substitute((_filler + subject).AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteReplacementOnly).ShouldBe(result);
 
-        Assert.That(re.Substitute(subject, replacement, PcreSubstituteOptions.SubstituteReplacementOnly, _ => PcreSubstituteCalloutResult.Pass), Is.EqualTo(result));
-        Assert.That(re.Substitute(_filler + subject, replacement, PcreSubstituteOptions.SubstituteReplacementOnly, _ => PcreSubstituteCalloutResult.Pass), Is.EqualTo(result));
+        re.Substitute(subject, replacement, PcreSubstituteOptions.SubstituteReplacementOnly, _ => PcreSubstituteCalloutResult.Pass).ShouldBe(result);
+        re.Substitute(_filler + subject, replacement, PcreSubstituteOptions.SubstituteReplacementOnly, _ => PcreSubstituteCalloutResult.Pass).ShouldBe(result);
 
-        Assert.That(re.Substitute(subject.AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteReplacementOnly, _ => PcreSubstituteCalloutResult.Pass), Is.EqualTo(result));
-        Assert.That(re.Substitute((_filler + subject).AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteReplacementOnly, _ => PcreSubstituteCalloutResult.Pass), Is.EqualTo(result));
+        re.Substitute(subject.AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteReplacementOnly, _ => PcreSubstituteCalloutResult.Pass).ShouldBe(result);
+        re.Substitute((_filler + subject).AsSpan(), replacement.AsSpan(), PcreSubstituteOptions.SubstituteReplacementOnly, _ => PcreSubstituteCalloutResult.Pass).ShouldBe(result);
     }
 
     [Test]
     public void should_substitute_mark()
     {
-        Assert.That(
-            new PcreRegex("(*MARK:pear)apple|(*MARK:orange)lemon").Substitute("apple lemon", "${*MARK}", PcreSubstituteOptions.SubstituteGlobal),
-            Is.EqualTo("pear orange")
-        );
+        new PcreRegex("(*MARK:pear)apple|(*MARK:orange)lemon")
+            .Substitute("apple lemon", "${*MARK}", PcreSubstituteOptions.SubstituteGlobal)
+            .ShouldBe("pear orange");
 
-        Assert.That(
-            new PcreRegex("(*MARK:pear)apple|(*MARK:orange)lemon").Substitute("apple lemon", "${*MARK}", PcreSubstituteOptions.SubstituteGlobal, _ => PcreSubstituteCalloutResult.Pass),
-            Is.EqualTo("pear orange")
-        );
+        new PcreRegex("(*MARK:pear)apple|(*MARK:orange)lemon")
+            .Substitute("apple lemon", "${*MARK}", PcreSubstituteOptions.SubstituteGlobal, _ => PcreSubstituteCalloutResult.Pass)
+            .ShouldBe("pear orange");
     }
 
     [Test]
@@ -115,25 +114,10 @@ public class SubstituteTests
     {
         var re = new PcreRegex("(some)?(body)");
 
-        Assert.That(
-            re.Substitute("body", @"${1:+\U:\L}HeLLo", PcreSubstituteOptions.SubstituteExtended),
-            Is.EqualTo("hello")
-        );
-
-        Assert.That(
-            re.Substitute("somebody", @"${1:+\U:\L}HeLLo", PcreSubstituteOptions.SubstituteExtended),
-            Is.EqualTo("HELLO")
-        );
-
-        Assert.That(
-            re.Substitute("body", @"${1:+\U:\L}HeLLo", PcreSubstituteOptions.SubstituteExtended, _ => PcreSubstituteCalloutResult.Pass),
-            Is.EqualTo("hello")
-        );
-
-        Assert.That(
-            re.Substitute("somebody", @"${1:+\U:\L}HeLLo", PcreSubstituteOptions.SubstituteExtended, _ => PcreSubstituteCalloutResult.Pass),
-            Is.EqualTo("HELLO")
-        );
+        re.Substitute("body", @"${1:+\U:\L}HeLLo", PcreSubstituteOptions.SubstituteExtended).ShouldBe("hello");
+        re.Substitute("somebody", @"${1:+\U:\L}HeLLo", PcreSubstituteOptions.SubstituteExtended).ShouldBe("HELLO");
+        re.Substitute("body", @"${1:+\U:\L}HeLLo", PcreSubstituteOptions.SubstituteExtended, _ => PcreSubstituteCalloutResult.Pass).ShouldBe("hello");
+        re.Substitute("somebody", @"${1:+\U:\L}HeLLo", PcreSubstituteOptions.SubstituteExtended, _ => PcreSubstituteCalloutResult.Pass).ShouldBe("HELLO");
     }
 
     [Test]
@@ -141,15 +125,8 @@ public class SubstituteTests
     {
         var re = new PcreRegex("a(b+)c");
 
-        Assert.That(
-            re.Substitute("abc abc abc", "match", 4, PcreSubstituteOptions.SubstituteGlobal),
-            Is.EqualTo("abc match match")
-        );
-
-        Assert.That(
-            re.Substitute("abc abc abc".AsSpan(), "match".AsSpan(), 4, PcreSubstituteOptions.SubstituteGlobal),
-            Is.EqualTo("abc match match")
-        );
+        re.Substitute("abc abc abc", "match", 4, PcreSubstituteOptions.SubstituteGlobal).ShouldBe("abc match match");
+        re.Substitute("abc abc abc".AsSpan(), "match".AsSpan(), 4, PcreSubstituteOptions.SubstituteGlobal).ShouldBe("abc match match");
     }
 
     [Test]
@@ -158,7 +135,7 @@ public class SubstituteTests
         var re = new PcreRegex("a(b+)c");
         var subject = new string('_', 3);
 
-        Assert.That(re.Substitute(subject, "bar"), Is.SameAs(subject));
+        re.Substitute(subject, "bar").ShouldBeSameAs(subject);
     }
 
     [Test]
@@ -166,7 +143,7 @@ public class SubstituteTests
     {
         var re = new PcreRegex("a(b+)c");
 
-        Assert.Throws<PcreSubstituteException>(() => _ = re.Substitute("abc", "${4}"));
+        Should.Throw<PcreSubstituteException>(() => re.Substitute("abc", "${4}"));
     }
 
     [Test]
@@ -174,8 +151,8 @@ public class SubstituteTests
     {
         var re = new PcreRegex(@"bar", PcreOptions.UseOffsetLimit);
 
-        Assert.That(re.Substitute("foobar", "abc", 0, PcreSubstituteOptions.None, null, new PcreMatchSettings { OffsetLimit = 3 }), Is.EqualTo("fooabc"));
-        Assert.That(re.Substitute("foobar", "abc", 0, PcreSubstituteOptions.None, null, new PcreMatchSettings { OffsetLimit = 2 }), Is.EqualTo("foobar"));
+        re.Substitute("foobar", "abc", 0, PcreSubstituteOptions.None, null, new PcreMatchSettings { OffsetLimit = 3 }).ShouldBe("fooabc");
+        re.Substitute("foobar", "abc", 0, PcreSubstituteOptions.None, null, new PcreMatchSettings { OffsetLimit = 2 }).ShouldBe("foobar");
     }
 
     [Test]
@@ -183,22 +160,19 @@ public class SubstituteTests
     {
         var re = new PcreRegex(@".(?C1)");
 
-        Assert.That(
-            re.Substitute(
-                "abcdefghijklmn",
-                "#",
-                0,
-                PcreSubstituteOptions.SubstituteGlobal,
-                data => data.CurrentOffset > 10
-                    ? PcreCalloutResult.Abort
-                    : data.CurrentOffset % 3 == 0
-                        ? PcreCalloutResult.Pass
-                        : PcreCalloutResult.Fail,
-                null,
-                null
-            ),
-            Is.EqualTo("ab#de#gh#jklmn")
-        );
+        re.Substitute(
+            "abcdefghijklmn",
+            "#",
+            0,
+            PcreSubstituteOptions.SubstituteGlobal,
+            data => data.CurrentOffset > 10
+                ? PcreCalloutResult.Abort
+                : data.CurrentOffset % 3 == 0
+                    ? PcreCalloutResult.Pass
+                    : PcreCalloutResult.Fail,
+            null,
+            null
+        ).ShouldBe("ab#de#gh#jklmn");
     }
 
     [Test]
@@ -206,19 +180,16 @@ public class SubstituteTests
     {
         var re = new PcreRegex(@".");
 
-        Assert.That(
-            re.Substitute(
-                "abcdefghijklmn",
-                "#",
-                PcreSubstituteOptions.SubstituteGlobal,
-                data => data.SubstitutionCount > 10
-                    ? PcreSubstituteCalloutResult.Abort
-                    : data.SubstitutionCount % 3 == 0
-                        ? PcreSubstituteCalloutResult.Pass
-                        : PcreSubstituteCalloutResult.Fail
-            ),
-            Is.EqualTo("ab#de#gh#jklmn")
-        );
+        re.Substitute(
+            "abcdefghijklmn",
+            "#",
+            PcreSubstituteOptions.SubstituteGlobal,
+            data => data.SubstitutionCount > 10
+                ? PcreSubstituteCalloutResult.Abort
+                : data.SubstitutionCount % 3 == 0
+                    ? PcreSubstituteCalloutResult.Pass
+                    : PcreSubstituteCalloutResult.Fail
+        ).ShouldBe("ab#de#gh#jklmn");
     }
 
     [Test]
@@ -226,24 +197,21 @@ public class SubstituteTests
     {
         var re = new PcreRegex(@"f(\w+)");
 
-        Assert.That(
-            re.Substitute(
-                "abc foo def foo ghi",
-                @"F\U$1",
-                0,
-                PcreSubstituteOptions.SubstituteGlobal | PcreSubstituteOptions.SubstituteExtended,
-                null,
-                null,
-                (input, targetCase) =>
-                {
-                    Assert.That(input.ToString(), Is.EqualTo("oo"));
-                    Assert.That(targetCase, Is.EqualTo(PcreSubstituteCase.Upper));
-                    return "00";
-                },
-                null
-            ),
-            Is.EqualTo("abc F00 def F00 ghi")
-        );
+        re.Substitute(
+            "abc foo def foo ghi",
+            @"F\U$1",
+            0,
+            PcreSubstituteOptions.SubstituteGlobal | PcreSubstituteOptions.SubstituteExtended,
+            null,
+            null,
+            (input, targetCase) =>
+            {
+                input.ShouldBe("oo");
+                targetCase.ShouldBe(PcreSubstituteCase.Upper);
+                return "00";
+            },
+            null
+        ).ShouldBe("abc F00 def F00 ghi");
     }
 
     [Test]
@@ -252,24 +220,21 @@ public class SubstituteTests
         var re = new PcreRegex(@"f(\w+)");
         var substitution = new string('0', 1024 * 1024);
 
-        Assert.That(
-            re.Substitute(
-                "abc foo def foo ghi",
-                @"F\U$1",
-                0,
-                PcreSubstituteOptions.SubstituteGlobal | PcreSubstituteOptions.SubstituteExtended,
-                null,
-                null,
-                (input, targetCase) =>
-                {
-                    Assert.That(input.ToString(), Is.EqualTo("oo"));
-                    Assert.That(targetCase, Is.EqualTo(PcreSubstituteCase.Upper));
-                    return substitution;
-                },
-                null
-            ),
-            Is.EqualTo($"abc F{substitution} def F{substitution} ghi")
-        );
+        re.Substitute(
+            "abc foo def foo ghi",
+            @"F\U$1",
+            0,
+            PcreSubstituteOptions.SubstituteGlobal | PcreSubstituteOptions.SubstituteExtended,
+            null,
+            null,
+            (input, targetCase) =>
+            {
+                input.ShouldBe("oo");
+                targetCase.ShouldBe(PcreSubstituteCase.Upper);
+                return substitution;
+            },
+            null
+        ).ShouldBe($"abc F{substitution} def F{substitution} ghi");
     }
 
     [Test]
@@ -284,34 +249,34 @@ public class SubstituteTests
             PcreSubstituteOptions.None,
             data =>
             {
-                Assert.That(data.Match.Success, Is.True);
-                Assert.That(data.Match.Index, Is.EqualTo(4));
-                Assert.That(data.Match.Length, Is.EqualTo(9));
-                Assert.That(data.Match.EndIndex, Is.EqualTo(13));
-                Assert.That(data.Match.CaptureCount, Is.EqualTo(2));
-                Assert.That(data.Match.IsPartialMatch, Is.False);
-                Assert.That(data.Match.Value.ToString(), Is.EqualTo("foobarbaz"));
+                data.Match.Success.ShouldBeTrue();
+                data.Match.Index.ShouldBe(4);
+                data.Match.Length.ShouldBe(9);
+                data.Match.EndIndex.ShouldBe(13);
+                data.Match.CaptureCount.ShouldBe(2);
+                data.Match.IsPartialMatch.ShouldBeFalse();
+                data.Match.Value.ShouldBe("foobarbaz");
 
-                Assert.That(data.Match.Groups[0].Success, Is.True);
-                Assert.That(data.Match.Groups[0].Index, Is.EqualTo(4));
-                Assert.That(data.Match.Groups[0].Length, Is.EqualTo(9));
-                Assert.That(data.Match.Groups[0].EndIndex, Is.EqualTo(13));
-                Assert.That(data.Match.Groups[0].Value.ToString(), Is.EqualTo("foobarbaz"));
+                data.Match.Groups[0].Success.ShouldBeTrue();
+                data.Match.Groups[0].Index.ShouldBe(4);
+                data.Match.Groups[0].Length.ShouldBe(9);
+                data.Match.Groups[0].EndIndex.ShouldBe(13);
+                data.Match.Groups[0].Value.ShouldBe("foobarbaz");
 
-                Assert.That(data.Match.Groups[1].Success, Is.True);
-                Assert.That(data.Match.Groups[1].Index, Is.EqualTo(7));
-                Assert.That(data.Match.Groups[1].Length, Is.EqualTo(3));
-                Assert.That(data.Match.Groups[1].EndIndex, Is.EqualTo(10));
-                Assert.That(data.Match.Groups[1].Value.ToString(), Is.EqualTo("bar"));
+                data.Match.Groups[1].Success.ShouldBeTrue();
+                data.Match.Groups[1].Index.ShouldBe(7);
+                data.Match.Groups[1].Length.ShouldBe(3);
+                data.Match.Groups[1].EndIndex.ShouldBe(10);
+                data.Match.Groups[1].Value.ShouldBe("bar");
 
-                Assert.That(data.Match.Groups[2].Success, Is.False);
-                Assert.That(data.Match.Groups[2].Index, Is.EqualTo(-1));
-                Assert.That(data.Match.Groups[2].Length, Is.EqualTo(0));
-                Assert.That(data.Match.Groups[2].EndIndex, Is.EqualTo(-1));
-                Assert.That(data.Match.Groups[2].Value.Length, Is.Zero);
+                data.Match.Groups[2].Success.ShouldBeFalse();
+                data.Match.Groups[2].Index.ShouldBe(-1);
+                data.Match.Groups[2].Length.ShouldBe(0);
+                data.Match.Groups[2].EndIndex.ShouldBe(-1);
+                data.Match.Groups[2].Value.Length.ShouldBe(0);
 
-                Assert.That(data.Number, Is.EqualTo(42));
-                Assert.That(data.CurrentOffset, Is.EqualTo(13));
+                data.Number.ShouldBe(42);
+                data.CurrentOffset.ShouldBe(13);
 
                 return PcreCalloutResult.Pass;
             },
@@ -319,7 +284,7 @@ public class SubstituteTests
             null
         );
 
-        Assert.That(result, Is.EqualTo("abc sub def"));
+        result.ShouldBe("abc sub def");
     }
 
     [Test]
@@ -333,42 +298,42 @@ public class SubstituteTests
             PcreSubstituteOptions.None,
             data =>
             {
-                Assert.That(data.Match.Success, Is.True);
-                Assert.That(data.Match.Index, Is.EqualTo(4));
-                Assert.That(data.Match.Length, Is.EqualTo(9));
-                Assert.That(data.Match.EndIndex, Is.EqualTo(13));
-                Assert.That(data.Match.CaptureCount, Is.EqualTo(2));
-                Assert.That(data.Match.IsPartialMatch, Is.False);
-                Assert.That(data.Match.Value.ToString(), Is.EqualTo("foobarbaz"));
+                data.Match.Success.ShouldBeTrue();
+                data.Match.Index.ShouldBe(4);
+                data.Match.Length.ShouldBe(9);
+                data.Match.EndIndex.ShouldBe(13);
+                data.Match.CaptureCount.ShouldBe(2);
+                data.Match.IsPartialMatch.ShouldBeFalse();
+                data.Match.Value.ShouldBe("foobarbaz");
 
-                Assert.That(data.Match.Groups[0].Success, Is.True);
-                Assert.That(data.Match.Groups[0].Index, Is.EqualTo(4));
-                Assert.That(data.Match.Groups[0].Length, Is.EqualTo(9));
-                Assert.That(data.Match.Groups[0].EndIndex, Is.EqualTo(13));
-                Assert.That(data.Match.Groups[0].Value.ToString(), Is.EqualTo("foobarbaz"));
+                data.Match.Groups[0].Success.ShouldBeTrue();
+                data.Match.Groups[0].Index.ShouldBe(4);
+                data.Match.Groups[0].Length.ShouldBe(9);
+                data.Match.Groups[0].EndIndex.ShouldBe(13);
+                data.Match.Groups[0].Value.ShouldBe("foobarbaz");
 
-                Assert.That(data.Match.Groups[1].Success, Is.True);
-                Assert.That(data.Match.Groups[1].Index, Is.EqualTo(7));
-                Assert.That(data.Match.Groups[1].Length, Is.EqualTo(3));
-                Assert.That(data.Match.Groups[1].EndIndex, Is.EqualTo(10));
-                Assert.That(data.Match.Groups[1].Value.ToString(), Is.EqualTo("bar"));
+                data.Match.Groups[1].Success.ShouldBeTrue();
+                data.Match.Groups[1].Index.ShouldBe(7);
+                data.Match.Groups[1].Length.ShouldBe(3);
+                data.Match.Groups[1].EndIndex.ShouldBe(10);
+                data.Match.Groups[1].Value.ShouldBe("bar");
 
-                Assert.That(data.Match.Groups[2].Success, Is.False);
-                Assert.That(data.Match.Groups[2].Index, Is.EqualTo(-1));
-                Assert.That(data.Match.Groups[2].Length, Is.EqualTo(0));
-                Assert.That(data.Match.Groups[2].EndIndex, Is.EqualTo(-1));
-                Assert.That(data.Match.Groups[2].Value.Length, Is.Zero);
+                data.Match.Groups[2].Success.ShouldBeFalse();
+                data.Match.Groups[2].Index.ShouldBe(-1);
+                data.Match.Groups[2].Length.ShouldBe(0);
+                data.Match.Groups[2].EndIndex.ShouldBe(-1);
+                data.Match.Groups[2].Value.Length.ShouldBe(0);
 
-                Assert.That(data.Subject.ToString(), Is.EqualTo("abc foobarbaz def"));
-                Assert.That(data.Output.ToString(), Is.EqualTo("abc sub"));
-                Assert.That(data.Substitution.ToString(), Is.EqualTo("sub"));
-                Assert.That(data.SubstitutionCount, Is.EqualTo(1));
+                data.Subject.ShouldBe("abc foobarbaz def");
+                data.Output.ShouldBe("abc sub");
+                data.Substitution.ShouldBe("sub");
+                data.SubstitutionCount.ShouldBe(1);
 
                 return PcreSubstituteCalloutResult.Pass;
             }
         );
 
-        Assert.That(result, Is.EqualTo("abc sub def"));
+        result.ShouldBe("abc sub def");
     }
 
     [Test]
@@ -376,10 +341,10 @@ public class SubstituteTests
     {
         var re = new PcreRegex(@"(?C1).");
 
-        var ex = Assert.Throws<PcreCalloutException>(() => _ = re.Substitute("abc", "def", 0, PcreSubstituteOptions.None, _ => throw new DivideByZeroException("test"), null, null))!;
+        var ex = Should.Throw<PcreCalloutException>(() => re.Substitute("abc", "def", 0, PcreSubstituteOptions.None, _ => throw new DivideByZeroException("test"), null, null));
 
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Callout));
-        Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
+        ex.ErrorCode.ShouldBe(PcreErrorCode.Callout);
+        ex.InnerException.ShouldBeAssignableTo<DivideByZeroException>();
     }
 
     [Test]
@@ -387,10 +352,10 @@ public class SubstituteTests
     {
         var re = new PcreRegex(@".");
 
-        var ex = Assert.Throws<PcreCalloutException>(() => _ = re.Substitute("abc", "def", PcreSubstituteOptions.None, _ => throw new DivideByZeroException("test")))!;
+        var ex = Should.Throw<PcreCalloutException>(() => re.Substitute("abc", "def", PcreSubstituteOptions.None, _ => throw new DivideByZeroException("test")));
 
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Callout));
-        Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
+        ex.ErrorCode.ShouldBe(PcreErrorCode.Callout);
+        ex.InnerException.ShouldBeAssignableTo<DivideByZeroException>();
     }
 
     [Test]
@@ -398,10 +363,10 @@ public class SubstituteTests
     {
         var re = new PcreRegex(@".");
 
-        var ex = Assert.Throws<PcreCalloutException>(() => _ = re.Substitute("abc", @"\U$&", 0, PcreSubstituteOptions.SubstituteExtended, null, null, (_, _) => throw new DivideByZeroException("test"), null))!;
+        var ex = Should.Throw<PcreCalloutException>(() => re.Substitute("abc", @"\U$&", 0, PcreSubstituteOptions.SubstituteExtended, null, null, (_, _) => throw new DivideByZeroException("test"), null));
 
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.ReplaceCase));
-        Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
+        ex.ErrorCode.ShouldBe(PcreErrorCode.ReplaceCase);
+        ex.InnerException.ShouldBeAssignableTo<DivideByZeroException>();
     }
 
     [Test]
@@ -422,7 +387,7 @@ public class SubstituteTests
             data =>
             {
                 ++execCount;
-                Assert.That(data.Match.Index, Is.EqualTo(execCount - 1));
+                data.Match.Index.ShouldBe(execCount - 1);
                 return execCount % 3 == 0 ? PcreCalloutResult.Pass : PcreCalloutResult.Fail;
             },
             null,
@@ -430,9 +395,9 @@ public class SubstituteTests
             out var substituteCallCount
         );
 
-        Assert.That(execCount, Is.EqualTo(str.Length));
-        Assert.That(result, Is.EqualTo(str.Replace("aaa", "aa#:#:#:#")));
-        Assert.That(substituteCallCount, Is.EqualTo(2));
+        execCount.ShouldBe(str.Length);
+        result.ShouldBe(str.Replace("aaa", "aa#:#:#:#"));
+        substituteCallCount.ShouldBe(2u);
     }
 
     [Test]
@@ -454,17 +419,17 @@ public class SubstituteTests
             data =>
             {
                 ++execCount;
-                Assert.That(data.SubstitutionCount, Is.EqualTo(execCount));
-                Assert.That(data.Match.Index, Is.EqualTo(execCount - 1));
+                data.SubstitutionCount.ShouldBe(execCount);
+                data.Match.Index.ShouldBe(execCount - 1);
                 return execCount % 3 == 0 ? PcreSubstituteCalloutResult.Pass : PcreSubstituteCalloutResult.Fail;
             },
             null,
             out var substituteCallCount
         );
 
-        Assert.That(execCount, Is.EqualTo(str.Length));
-        Assert.That(result, Is.EqualTo(str.Replace("aaa", "aa#:#:#:#")));
-        Assert.That(substituteCallCount, Is.EqualTo(2));
+        execCount.ShouldBe(str.Length);
+        result.ShouldBe(str.Replace("aaa", "aa#:#:#:#"));
+        substituteCallCount.ShouldBe(2u);
     }
 
     [Test]
@@ -476,10 +441,10 @@ public class SubstituteTests
         var longStr = new string('a', InternalRegex.SubstituteBufferSizeInChars * 2);
 
         re.InternalRegex.Substitute(shortStr.AsSpan(), null, "b".AsSpan(), null, 0, (uint)PcreSubstituteOptions.SubstituteGlobal, null, null, null, out var substituteCallCount);
-        Assert.That(substituteCallCount, Is.EqualTo(1));
+        substituteCallCount.ShouldBe(1u);
 
         re.InternalRegex.Substitute(longStr.AsSpan(), null, "b".AsSpan(), null, 0, (uint)PcreSubstituteOptions.SubstituteGlobal, null, null, null, out substituteCallCount);
-        Assert.That(substituteCallCount, Is.EqualTo(2));
+        substituteCallCount.ShouldBe(2u);
     }
 
     [Test]
@@ -490,14 +455,14 @@ public class SubstituteTests
         var calls = 0;
         var result = re.Substitute("abc", "#", PcreSubstituteOptions.SubstituteGlobal, _ => ++calls == 1 ? PcreSubstituteCalloutResult.Abort : PcreSubstituteCalloutResult.Pass);
 
-        Assert.That(result, Is.EqualTo("abc"));
-        Assert.That(calls, Is.EqualTo(1));
+        result.ShouldBe("abc");
+        calls.ShouldBe(1);
     }
 
     [Test]
     public void readme_replace_example()
     {
         var result = PcreRegex.Substitute("hello, world!!!", @"\p{P}+", "<$0>", PcreOptions.None, PcreSubstituteOptions.SubstituteGlobal);
-        Assert.That(result, Is.EqualTo("hello<,> world<!!!>"));
+        result.ShouldBe("hello<,> world<!!!>");
     }
 }

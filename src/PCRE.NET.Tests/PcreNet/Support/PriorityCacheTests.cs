@@ -2,6 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 using PCRE.Internal;
+using Shouldly;
 
 namespace PCRE.Tests.PcreNet.Support;
 
@@ -19,12 +20,12 @@ public class PriorityCacheTests
     [Test]
     public void should_store_item()
     {
-        Assert.That(_cache.Count, Is.EqualTo(0));
-        Assert.That(_cache.GetOrAdd(42), Is.EqualTo("42"));
-        Assert.That(_cache.Count, Is.EqualTo(1));
+        _cache.Count.ShouldBe(0);
+        _cache.GetOrAdd(42).ShouldBe("42");
+        _cache.Count.ShouldBe(1);
 
-        Assert.That(_cache.Select(i => i.Key), Is.EqualTo([42]));
-        Assert.That(_cache.Select(i => i.Value), Is.EqualTo(["42"]));
+        _cache.Select(i => i.Key).ShouldBe([42]);
+        _cache.Select(i => i.Value).ShouldBe(["42"]);
     }
 
     [Test]
@@ -35,10 +36,10 @@ public class PriorityCacheTests
         _cache.GetOrAdd(3);
         _cache.GetOrAdd(4);
 
-        Assert.That(_cache.Count, Is.EqualTo(3));
+        _cache.Count.ShouldBe(3);
 
-        Assert.That(_cache.Select(i => i.Key), Is.EqualTo([4, 3, 2]));
-        Assert.That(_cache.Select(i => i.Value), Is.EqualTo(["4", "3", "2"]));
+        _cache.Select(i => i.Key).ShouldBe([4, 3, 2]);
+        _cache.Select(i => i.Value).ShouldBe(["4", "3", "2"]);
     }
 
     [Test]
@@ -50,10 +51,10 @@ public class PriorityCacheTests
         _cache.GetOrAdd(4);
         _cache.GetOrAdd(3);
 
-        Assert.That(_cache.Count, Is.EqualTo(3));
+        _cache.Count.ShouldBe(3);
 
-        Assert.That(_cache.Select(i => i.Key), Is.EqualTo([3, 4, 2]));
-        Assert.That(_cache.Select(i => i.Value), Is.EqualTo(["3", "4", "2"]));
+        _cache.Select(i => i.Key).ShouldBe([3, 4, 2]);
+        _cache.Select(i => i.Value).ShouldBe(["3", "4", "2"]);
     }
 
     [Test]
@@ -61,9 +62,9 @@ public class PriorityCacheTests
     {
         _cache.CacheSize = 0;
 
-        Assert.That(_cache.GetOrAdd(42), Is.EqualTo("42"));
-        Assert.That(_cache.Count, Is.EqualTo(0));
-        Assert.That(_cache, Is.Empty);
+        _cache.GetOrAdd(42).ShouldBe("42");
+        _cache.Count.ShouldBe(0);
+        _cache.ShouldBeEmpty();
     }
 
     [Test]
@@ -75,14 +76,14 @@ public class PriorityCacheTests
 
         _cache.CacheSize = 1;
 
-        Assert.That(_cache.Count, Is.EqualTo(1));
-        Assert.That(_cache.Select(i => i.Key), Is.EqualTo([3]));
-        Assert.That(_cache.Select(i => i.Value), Is.EqualTo(["3"]));
+        _cache.Count.ShouldBe(1);
+        _cache.Select(i => i.Key).ShouldBe([3]);
+        _cache.Select(i => i.Value).ShouldBe(["3"]);
 
         _cache.CacheSize = 0;
 
-        Assert.That(_cache.Count, Is.EqualTo(0));
-        Assert.That(_cache, Is.Empty);
+        _cache.Count.ShouldBe(0);
+        _cache.ShouldBeEmpty();
     }
 
     [Test]
@@ -96,10 +97,10 @@ public class PriorityCacheTests
 
         _cache.GetOrAdd(4);
 
-        Assert.That(_cache.Count, Is.EqualTo(4));
+        _cache.Count.ShouldBe(4);
 
-        Assert.That(_cache.Select(i => i.Key), Is.EqualTo([4, 3, 2, 1]));
-        Assert.That(_cache.Select(i => i.Value), Is.EqualTo(["4", "3", "2", "1"]));
+        _cache.Select(i => i.Key).ShouldBe([4, 3, 2, 1]);
+        _cache.Select(i => i.Value).ShouldBe(["4", "3", "2", "1"]);
     }
 
     [Test]
@@ -110,8 +111,8 @@ public class PriorityCacheTests
         ParallelEnumerable.Range(0, 1000000)
                           .WithExecutionMode(ParallelExecutionMode.ForceParallelism)
                           .WithDegreeOfParallelism(20)
-                          .ForAll(i => Assert.That(_cache.GetOrAdd(i), Is.EqualTo(i.ToString(CultureInfo.InvariantCulture))));
+                          .ForAll(i => _cache.GetOrAdd(i).ShouldBe(i.ToString(CultureInfo.InvariantCulture)));
 
-        Assert.That(_cache.Count, Is.EqualTo(10));
+        _cache.Count.ShouldBe(10);
     }
 }

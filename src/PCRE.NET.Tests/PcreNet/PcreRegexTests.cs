@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework;
 using PCRE.Tests.Support;
+using Shouldly;
 
 namespace PCRE.Tests.PcreNet;
 
@@ -12,57 +13,57 @@ public class PcreRegexTests
     [Test]
     public void should_throw_on_null_pattern()
     {
-        Assert.Throws<ArgumentNullException>(() => _ = new PcreRegex(default(string)!));
-        Assert.Throws<ArgumentNullException>(() => _ = new PcreRegex(default(string)!, PcreOptions.None));
-        Assert.Throws<ArgumentNullException>(() => _ = new PcreRegex(default(string)!, new PcreRegexSettings()));
+        Should.Throw<ArgumentNullException>(() => new PcreRegex(default(string)!));
+        Should.Throw<ArgumentNullException>(() => new PcreRegex(default(string)!, PcreOptions.None));
+        Should.Throw<ArgumentNullException>(() => new PcreRegex(default(string)!, new PcreRegexSettings()));
     }
 
     [Test]
     public void should_throw_on_null_pattern_utf8()
     {
-        Assert.Throws<ArgumentNullException>(() => _ = new PcreRegexUtf8(default(string)!));
-        Assert.Throws<ArgumentNullException>(() => _ = new PcreRegexUtf8(default(string)!, PcreOptions.None));
-        Assert.Throws<ArgumentNullException>(() => _ = new PcreRegexUtf8(default(string)!, new PcreRegexSettings()));
+        Should.Throw<ArgumentNullException>(() => new PcreRegexUtf8(default(string)!));
+        Should.Throw<ArgumentNullException>(() => new PcreRegexUtf8(default(string)!, PcreOptions.None));
+        Should.Throw<ArgumentNullException>(() => new PcreRegexUtf8(default(string)!, new PcreRegexSettings()));
     }
 
     [Test]
     public void should_throw_on_null_settings()
     {
-        Assert.Throws<ArgumentNullException>(() => _ = new PcreRegex("a", default(PcreRegexSettings)!));
+        Should.Throw<ArgumentNullException>(() => new PcreRegex("a", default(PcreRegexSettings)!));
     }
 
     [Test]
     public void should_throw_on_null_settings_utf8()
     {
-        Assert.Throws<ArgumentNullException>(() => _ = new PcreRegexUtf8("a"u8, default(PcreRegexSettings)!));
-        Assert.Throws<ArgumentNullException>(() => _ = new PcreRegexUtf8("a", default(PcreRegexSettings)!));
+        Should.Throw<ArgumentNullException>(() => new PcreRegexUtf8("a"u8, default(PcreRegexSettings)!));
+        Should.Throw<ArgumentNullException>(() => new PcreRegexUtf8("a", default(PcreRegexSettings)!));
     }
 
     [Test]
     public void should_throw_on_null_settings_8bit()
     {
-        Assert.Throws<ArgumentNullException>(() => _ = TestSupport.CreatePcreRegex8Bit("a".ToLatin1Bytes(), default(PcreRegexSettings)!));
+        Should.Throw<ArgumentNullException>(() => TestSupport.CreatePcreRegex8Bit("a".ToLatin1Bytes(), default(PcreRegexSettings)!));
     }
 
     [Test]
     public void should_return_pattern_string()
     {
         var re = new PcreRegex("foo|bar");
-        Assert.That(re.ToString(), Is.EqualTo("foo|bar"));
+        re.ToString().ShouldBe("foo|bar");
     }
 
     [Test]
     public void should_return_pattern_string_utf8()
     {
         var re = new PcreRegexUtf8("foo|bar"u8);
-        Assert.That(re.ToString(), Is.EqualTo("foo|bar"));
+        re.ToString().ShouldBe("foo|bar");
     }
 
     [Test]
     public void should_return_pattern_string_8bit()
     {
         var re = TestSupport.CreatePcreRegex8Bit("foo|bar".ToLatin1Bytes());
-        Assert.That(re.ToString(), Is.EqualTo("foo|bar"));
+        re.ToString().ShouldBe("foo|bar");
     }
 
     [Test]
@@ -101,7 +102,7 @@ public class PcreRegexTests
         if (re is null)
             return false;
 
-        Assert.That(re.PatternInfo.PatternSize, Is.LessThanOrEqualTo(maxLength));
+        re.PatternInfo.PatternSize.ShouldBeLessThanOrEqualTo(maxLength);
         return true;
     }
 
@@ -114,7 +115,7 @@ public class PcreRegexTests
         if (re is null)
             return false;
 
-        Assert.That(re.PatternInfo.PatternSize, Is.LessThanOrEqualTo(maxLength));
+        re.PatternInfo.PatternSize.ShouldBeLessThanOrEqualTo(maxLength);
         return true;
     }
 
@@ -127,7 +128,7 @@ public class PcreRegexTests
         if (re is null)
             return false;
 
-        Assert.That(re.PatternInfo.PatternSize, Is.LessThanOrEqualTo(maxLength));
+        re.PatternInfo.PatternSize.ShouldBeLessThanOrEqualTo(maxLength);
         return true;
     }
 
@@ -152,8 +153,8 @@ public class PcreRegexTests
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(name, Is.EqualTo("foo\0bar🙂baz"));
-        Assert.That(matched, Is.EqualTo(name));
+        name.ShouldBe("foo\0bar🙂baz");
+        matched.ShouldBe(name);
     }
 
     [Test]
@@ -170,8 +171,8 @@ public class PcreRegexTests
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(name, Is.EqualTo("foo\0bâr"));
-        Assert.That(matched, Is.EqualTo(name));
+        name.ShouldBe("foo\0bâr");
+        matched.ShouldBe(name);
     }
 
     [Test]
@@ -188,8 +189,8 @@ public class PcreRegexTests
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(name, Is.EqualTo("foo\0bar🙂baz"));
-        Assert.That(matched, Is.EqualTo(name));
+        name.ShouldBe("foo\0bar🙂baz");
+        matched.ShouldBe(name);
     }
 
     private static PcreRegex? TryCompilePattern(string pattern, PcreRegexSettings settings)

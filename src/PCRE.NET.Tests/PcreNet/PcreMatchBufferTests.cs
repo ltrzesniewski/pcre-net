@@ -5,6 +5,7 @@ using System.Text;
 using NUnit.Framework;
 using PCRE.Internal;
 using PCRE.Tests.Support;
+using Shouldly;
 
 namespace PCRE.Tests.PcreNet;
 
@@ -19,7 +20,7 @@ public unsafe class PcreMatchBufferTests
 
         var match = buffer.Match("foo".AsSpan());
 
-        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]), Is.True);
+        Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]).ShouldBeTrue();
     }
 
     [Test]
@@ -30,7 +31,7 @@ public unsafe class PcreMatchBufferTests
 
         var match = buffer.Match("foo"u8);
 
-        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]), Is.True);
+        Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]).ShouldBeTrue();
     }
 
     [Test]
@@ -41,7 +42,7 @@ public unsafe class PcreMatchBufferTests
 
         var match = buffer.Match("bar".AsSpan());
 
-        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]), Is.True);
+        Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]).ShouldBeTrue();
     }
 
     [Test]
@@ -52,7 +53,7 @@ public unsafe class PcreMatchBufferTests
 
         var match = buffer.Match("bar"u8);
 
-        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]), Is.True);
+        Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]).ShouldBeTrue();
     }
 
     [Test]
@@ -63,15 +64,15 @@ public unsafe class PcreMatchBufferTests
 
         var match = buffer.Match("foo".AsSpan(), data =>
         {
-            Assert.That(data.Match.Value.ToString(), Is.EqualTo("fo"));
-            Assert.That(data.Match[1].Value.ToString(), Is.EqualTo("o"));
+            data.Match.Value.ShouldBe("fo");
+            data.Match[1].Value.ShouldBe("o");
 
-            Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(data.OutputVector), ref buffer.CalloutOutputVector[0]), Is.True);
+            Unsafe.AreSame(ref MemoryMarshal.GetReference(data.OutputVector), ref buffer.CalloutOutputVector[0]).ShouldBeTrue();
 
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
     }
 
     [Test]
@@ -82,15 +83,15 @@ public unsafe class PcreMatchBufferTests
 
         var match = buffer.Match("foo"u8, data =>
         {
-            Assert.That(data.Match.Value.SequenceEqual("fo"u8));
-            Assert.That(data.Match[1].Value.SequenceEqual("o"u8));
+            data.Match.Value.SequenceEqual("fo"u8).ShouldBeTrue();
+            data.Match[1].Value.SequenceEqual("o"u8).ShouldBeTrue();
 
-            Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(data.OutputVector), ref buffer.CalloutOutputVector[0]), Is.True);
+            Unsafe.AreSame(ref MemoryMarshal.GetReference(data.OutputVector), ref buffer.CalloutOutputVector[0]).ShouldBeTrue();
 
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
     }
 
 #if NET
@@ -127,7 +128,7 @@ public unsafe class PcreMatchBufferTests
 
         var bytesAfter = GC.GetAllocatedBytesForCurrentThread();
 
-        Assert.That(bytesAfter - bytesBefore, Is.Zero);
+        (bytesAfter - bytesBefore).ShouldBe(0);
 
         void Iteration()
         {
@@ -181,7 +182,7 @@ public unsafe class PcreMatchBufferTests
 
         var bytesAfter = GC.GetAllocatedBytesForCurrentThread();
 
-        Assert.That(bytesAfter - bytesBefore, Is.Zero);
+        (bytesAfter - bytesBefore).ShouldBe(0);
 
         void Iteration()
         {
@@ -235,7 +236,7 @@ public unsafe class PcreMatchBufferTests
 
         var bytesAfter = GC.GetAllocatedBytesForCurrentThread();
 
-        Assert.That(bytesAfter - bytesBefore, Is.Zero);
+        (bytesAfter - bytesBefore).ShouldBe(0);
 
         void Iteration()
         {

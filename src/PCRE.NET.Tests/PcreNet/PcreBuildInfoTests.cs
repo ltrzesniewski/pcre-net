@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
+using Shouldly;
 
 namespace PCRE.Tests.PcreNet;
 
@@ -13,17 +14,17 @@ public class PcreBuildInfoTests
     {
         var value = PcreBuildInfo.Version;
         Console.WriteLine(value);
-        Assert.That(value, Is.Not.Null.Or.Empty);
+        value.ShouldNotBeNullOrEmpty();
     }
 
     [Test]
     public void should_report_jit_target()
     {
-        Assert.That(PcreBuildInfo.Jit, Is.True);
+        PcreBuildInfo.Jit.ShouldBeTrue();
 
         var value = PcreBuildInfo.JitTarget;
         Console.WriteLine(value);
-        Assert.That(value, Is.Not.Null.Or.Empty);
+        value.ShouldNotBeNullOrEmpty();
     }
 
     [Test]

@@ -52,7 +52,8 @@ public abstract class BaseInterceptorTests<TGenerator>
             Console.WriteLine(result.GeneratedTrees.FirstOrDefault()?.GetText());
 #endif
 
-        Assert.That(diagnostics, Is.Empty);
+
+        diagnostics.ShouldBeEmpty();
 
         return result;
     }
