@@ -7,6 +7,7 @@ using System.Text;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using PCRE.Tests.Support;
+using Shouldly;
 
 namespace PCRE.Tests.Pcre;
 
@@ -18,7 +19,7 @@ public class PcreTests
     [Parallelizable(ParallelScope.All)]
     public void should_pass_pcre_test_suite(TestCase testCase)
     {
-        Assert.That(testCase.ExpectedResult.Pattern, Is.EqualTo(testCase.Input.Pattern));
+        testCase.ExpectedResult.Pattern.ShouldBe(testCase.Input.Pattern);
 
         var options = testCase.Jit
             ? PcreOptions.Compiled | PcreOptions.CompiledPartial
@@ -95,7 +96,7 @@ public class PcreTests
                 var subject = testInput.SubjectLines[line];
                 var expected = expectedResult.ExpectedResults[line];
 
-                Assert.That(expected.SubjectLine, Is.EqualTo(subject));
+                expected.SubjectLine.ShouldBe(subject);
 
                 if (!pattern.SubjectLiteral)
                 {
@@ -117,7 +118,7 @@ public class PcreTests
                                            .Take(pattern.AllMatches ? int.MaxValue : 1)
                                            .ToList();
 
-                        Assert.That(matches.Count, Is.EqualTo(expected.Matches.Count));
+                        matches.Count.ShouldBe(expected.Matches.Count);
 
                         for (var matchIndex = 0; matchIndex < matches.Count; ++matchIndex)
                         {
@@ -142,7 +143,7 @@ public class PcreTests
 
                         foreach (var actualMatch in regex.Matches(subject.AsSpan(), 0, PcreMatchOptions.None, null, matchSettings))
                         {
-                            Assert.That(matchCount, Is.LessThan(expected.Matches.Count));
+                            matchCount.ShouldBeLessThan(expected.Matches.Count);
 
                             var expectedMatch = expected.Matches[matchCount];
                             ++matchCount;
@@ -159,7 +160,7 @@ public class PcreTests
                                 break;
                         }
 
-                        Assert.That(matchCount, Is.EqualTo(expected.Matches.Count));
+                        matchCount.ShouldBe(expected.Matches.Count);
                         break;
                     }
 
@@ -170,7 +171,7 @@ public class PcreTests
 
                         foreach (var actualMatch in buffer.Matches(subject.AsSpan()))
                         {
-                            Assert.That(matchCount, Is.LessThan(expected.Matches.Count));
+                            matchCount.ShouldBeLessThan(expected.Matches.Count);
 
                             var expectedMatch = expected.Matches[matchCount];
                             ++matchCount;
@@ -187,7 +188,7 @@ public class PcreTests
                                 break;
                         }
 
-                        Assert.That(matchCount, Is.EqualTo(expected.Matches.Count));
+                        matchCount.ShouldBe(expected.Matches.Count);
                         break;
                     }
 
@@ -197,7 +198,7 @@ public class PcreTests
 
                         foreach (var actualMatch in regexUtf8.Matches(Encoding.UTF8.GetBytes(subject), 0, PcreMatchOptions.None, null, matchSettings))
                         {
-                            Assert.That(matchCount, Is.LessThan(expected.Matches.Count));
+                            matchCount.ShouldBeLessThan(expected.Matches.Count);
 
                             var expectedMatch = expected.Matches[matchCount];
                             ++matchCount;
@@ -214,7 +215,7 @@ public class PcreTests
                                 break;
                         }
 
-                        Assert.That(matchCount, Is.EqualTo(expected.Matches.Count));
+                        matchCount.ShouldBe(expected.Matches.Count);
                         break;
                     }
 
@@ -225,7 +226,7 @@ public class PcreTests
 
                         foreach (var actualMatch in buffer.Matches(Encoding.UTF8.GetBytes(subject)))
                         {
-                            Assert.That(matchCount, Is.LessThan(expected.Matches.Count));
+                            matchCount.ShouldBeLessThan(expected.Matches.Count);
 
                             var expectedMatch = expected.Matches[matchCount];
                             ++matchCount;
@@ -242,7 +243,7 @@ public class PcreTests
                                 break;
                         }
 
-                        Assert.That(matchCount, Is.EqualTo(expected.Matches.Count));
+                        matchCount.ShouldBe(expected.Matches.Count);
                         break;
                     }
 
@@ -252,7 +253,7 @@ public class PcreTests
 
                         foreach (var actualMatch in regex8Bit.Matches(TestSupport.Latin1Encoding.GetBytes(subject), 0, PcreMatchOptions.None, null, matchSettings))
                         {
-                            Assert.That(matchCount, Is.LessThan(expected.Matches.Count));
+                            matchCount.ShouldBeLessThan(expected.Matches.Count);
 
                             var expectedMatch = expected.Matches[matchCount];
                             ++matchCount;
@@ -269,7 +270,7 @@ public class PcreTests
                                 break;
                         }
 
-                        Assert.That(matchCount, Is.EqualTo(expected.Matches.Count));
+                        matchCount.ShouldBe(expected.Matches.Count);
                         break;
                     }
 
@@ -280,7 +281,7 @@ public class PcreTests
 
                         foreach (var actualMatch in buffer.Matches(TestSupport.Latin1Encoding.GetBytes(subject)))
                         {
-                            Assert.That(matchCount, Is.LessThan(expected.Matches.Count));
+                            matchCount.ShouldBeLessThan(expected.Matches.Count);
 
                             var expectedMatch = expected.Matches[matchCount];
                             ++matchCount;
@@ -297,7 +298,7 @@ public class PcreTests
                                 break;
                         }
 
-                        Assert.That(matchCount, Is.EqualTo(expected.Matches.Count));
+                        matchCount.ShouldBe(expected.Matches.Count);
                         break;
                     }
 
@@ -313,7 +314,7 @@ public class PcreTests
         var actualGroups = actualMatch.ToList();
         var expectedGroups = expectedMatch.Groups.ToList();
 
-        Assert.That(actualGroups.Count, Is.GreaterThanOrEqualTo(expectedGroups.Count));
+        actualGroups.Count.ShouldBeGreaterThanOrEqualTo(expectedGroups.Count);
 
         for (var groupIndex = 0; groupIndex < actualGroups.Count; ++groupIndex)
         {
@@ -322,7 +323,7 @@ public class PcreTests
                 ? expectedGroups[groupIndex]
                 : ExpectedGroup.Unset;
 
-            Assert.That(actualGroup.Success, Is.EqualTo(expectedGroup.IsMatch));
+            actualGroup.Success.ShouldBe(expectedGroup.IsMatch);
 
             if (expectedGroup.IsMatch)
             {
@@ -340,7 +341,7 @@ public class PcreTests
     {
         var expectedGroups = expectedMatch.Groups.ToList();
 
-        Assert.That(actualMatch.Groups.Count, Is.GreaterThanOrEqualTo(expectedGroups.Count));
+        actualMatch.Groups.Count.ShouldBeGreaterThanOrEqualTo(expectedGroups.Count);
 
         for (var groupIndex = 0; groupIndex < actualMatch.Groups.Count; ++groupIndex)
         {
@@ -349,7 +350,7 @@ public class PcreTests
                 ? expectedGroups[groupIndex]
                 : ExpectedGroup.Unset;
 
-            Assert.That(actualGroup.Success, Is.EqualTo(expectedGroup.IsMatch));
+            actualGroup.Success.ShouldBe(expectedGroup.IsMatch);
 
             if (expectedGroup.IsMatch)
             {
@@ -366,7 +367,7 @@ public class PcreTests
     {
         var expectedGroups = expectedMatch.Groups.ToList();
 
-        Assert.That(actualMatch.Groups.Count, Is.GreaterThanOrEqualTo(expectedGroups.Count));
+        actualMatch.Groups.Count.ShouldBeGreaterThanOrEqualTo(expectedGroups.Count);
 
         for (var groupIndex = 0; groupIndex < actualMatch.Groups.Count; ++groupIndex)
         {
@@ -375,7 +376,7 @@ public class PcreTests
                 ? expectedGroups[groupIndex]
                 : ExpectedGroup.Unset;
 
-            Assert.That(actualGroup.Success, Is.EqualTo(expectedGroup.IsMatch));
+            actualGroup.Success.ShouldBe(expectedGroup.IsMatch);
 
             if (expectedGroup.IsMatch)
             {
@@ -394,26 +395,26 @@ public class PcreTests
         if (expected == """abcd\t\n\r\f\a\e\071;\^\\\?caxyz""")
             expected = """abcd\t\n\r\f\a\e\071\x3b\^\\\?caxyz""";
 
-        Assert.That(actual, Is.EqualTo(expected));
+        actual.ShouldBe(expected);
     }
 
     private static void CompareMark(PcreMatch actualMatch, ExpectedMatch expectedMatch)
-        => Assert.That(actualMatch.Mark, Is.EqualTo(expectedMatch.Mark?.UnescapeGroup()));
+        => actualMatch.Mark.ShouldBe(expectedMatch.Mark?.UnescapeGroup());
 
     private static void CompareMark(PcreRefMatch actualMatch, ExpectedMatch expectedMatch)
-        => Assert.That(actualMatch.Mark.ToString(), Is.EqualTo(expectedMatch.Mark?.UnescapeGroup() ?? string.Empty));
+        => actualMatch.Mark.ShouldBe(expectedMatch.Mark?.UnescapeGroup());
 
     private static void CompareMark(PcreRefMatch8Bit actualMatch, ExpectedMatch expectedMatch, Encoding encoding)
-        => Assert.That(encoding.GetString(actualMatch.Mark.ToArray()), Is.EqualTo(expectedMatch.Mark?.UnescapeGroup() ?? string.Empty));
+        => encoding.GetString(actualMatch.Mark.ToArray()).ShouldBe(expectedMatch.Mark?.UnescapeGroup() ?? string.Empty);
 
     private static void CompareRemainingString(PcreMatch actualMatch, ExpectedMatch expectedMatch)
-        => Assert.That(actualMatch.Subject.Substring(actualMatch.Index + actualMatch.Length), Is.EqualTo(expectedMatch.RemainingString?.UnescapeGroup()));
+        => actualMatch.Subject.Substring(actualMatch.Index + actualMatch.Length).ShouldBe(expectedMatch.RemainingString?.UnescapeGroup());
 
     private static void CompareRemainingString(PcreRefMatch actualMatch, ExpectedMatch expectedMatch)
-        => Assert.That(actualMatch.Subject.Slice(actualMatch.Index + actualMatch.Length).ToString(), Is.EqualTo(expectedMatch.RemainingString?.UnescapeGroup()));
+        => actualMatch.Subject.Slice(actualMatch.Index + actualMatch.Length).ShouldBe(expectedMatch.RemainingString?.UnescapeGroup());
 
     private static void CompareRemainingString(PcreRefMatch8Bit actualMatch, ExpectedMatch expectedMatch, Encoding encoding)
-        => Assert.That(encoding.GetString(actualMatch.Subject.Slice(actualMatch.Index + actualMatch.Length).ToArray()), Is.EqualTo(expectedMatch.RemainingString?.UnescapeGroup()));
+        => encoding.GetString(actualMatch.Subject.Slice(actualMatch.Index + actualMatch.Length).ToArray()).ShouldBe(expectedMatch.RemainingString?.UnescapeGroup());
 
     private class PcreTestsSource : IEnumerable<ITestCaseData>
     {

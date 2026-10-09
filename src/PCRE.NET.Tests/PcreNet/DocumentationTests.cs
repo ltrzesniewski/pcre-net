@@ -9,6 +9,7 @@ using System.Xml.Linq;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using PCRE.Dfa;
+using Shouldly;
 
 namespace PCRE.Tests.PcreNet;
 
@@ -25,9 +26,9 @@ public class DocumentationTests
 
         var assemblyVersion = typeof(PcreRegex).Assembly.GetName().Version!.ToString();
 
-        Assert.That(match.Success);
-        Assert.That(NormalizeVersion(match.Groups["libVersion"].Value), Is.EqualTo(NormalizeVersion(assemblyVersion)));
-        Assert.That(NormalizeVersion(match.Groups["pcreVersion"].Value), Is.EqualTo(NormalizeVersion(PcreBuildInfo.Version.Split(' ')[0])));
+        match.Success.ShouldBeTrue();
+        NormalizeVersion(match.Groups["libVersion"].Value).ShouldBe(NormalizeVersion(assemblyVersion));
+        NormalizeVersion(match.Groups["pcreVersion"].Value).ShouldBe(NormalizeVersion(PcreBuildInfo.Version.Split(' ')[0]));
 
         static string NormalizeVersion(string version)
         {
@@ -43,8 +44,8 @@ public class DocumentationTests
         var readmeText = File.ReadAllText(Path.Combine(Path.GetDirectoryName(typeof(DocumentationTests).Assembly.Location)!, "README.md"));
         var match = Regex.Match(readmeText, @"https://img\.shields\.io/badge/pcre2-v(?<pcreVersion>[\d.]+(?:--RC\d+)?)-blue\.svg", RegexOptions.CultureInvariant);
 
-        Assert.That(match.Success);
-        Assert.That(NormalizeVersion(match.Groups["pcreVersion"].Value.Replace("--", "-")), Is.EqualTo(NormalizeVersion(PcreBuildInfo.Version.Split(' ')[0])));
+        match.Success.ShouldBeTrue();
+        NormalizeVersion(match.Groups["pcreVersion"].Value.Replace("--", "-")).ShouldBe(NormalizeVersion(PcreBuildInfo.Version.Split(' ')[0]));
 
         static string NormalizeVersion(string version)
             => Regex.Replace(version, @"(?:\.0)+$", string.Empty);
@@ -56,13 +57,13 @@ public class DocumentationTests
     {
         if (member.Element("inheritdoc") != null)
         {
-            Assert.That(member.Elements("inheritdoc").Count(), Is.EqualTo(1));
-            Assert.That(member.Elements().Count(i => i.Name.LocalName is not ("param" or "inheritdoc")), Is.EqualTo(0));
+            member.Elements("inheritdoc").ShouldHaveSingleItem();
+            member.Elements().Where(i => i.Name.LocalName is not ("param" or "inheritdoc")).ShouldBeEmpty();
             return;
         }
 
-        Assert.That(member.Elements("summary").Count(), Is.EqualTo(1));
-        Assert.That(member.Elements("remarks").Count(), Is.LessThanOrEqualTo(1));
+        member.Elements("summary").ShouldHaveSingleItem();
+        member.Elements("remarks").Count().ShouldBeLessThanOrEqualTo(1);
     }
 
     [Test]
@@ -82,22 +83,26 @@ public class DocumentationTests
         AssertXmlContainsIf(method.DeclaringType == typeof(PcreRegex) && method.Name == nameof(PcreRegex.Replace), """<seealso cref="M:PCRE.PcreRegex.Substitute(System.String,System.String)" />""");
         AssertXmlContainsIf(method.DeclaringType == typeof(PcreRegex) && method.Name == nameof(PcreRegex.Substitute), """<seealso cref="M:PCRE.PcreRegex.Replace(System.String,System.String)" />""");
 
+        return;
+
         void AssertContainsIf(bool condition, string expectedString)
-            => Assert.That(
-                doc.Value, condition
-                    ? Does.Contain(expectedString)
-                    : Does.Not.Contain(expectedString)
-            );
+        {
+            if (condition)
+                doc.Value.ShouldContain(expectedString);
+            else
+                doc.Value.ShouldNotContain(expectedString);
+        }
 
         void AssertContainsIfParam(Func<ParameterInfo, bool> param, string expectedString)
             => AssertContainsIf(method.GetParameters().Any(param), expectedString);
 
         void AssertXmlContainsIf(bool condition, string expectedString)
-            => Assert.That(
-                doc.ToString(), condition
-                    ? Does.Contain(expectedString)
-                    : Does.Not.Contain(expectedString)
-            );
+        {
+            if (condition)
+                doc.ToString().ShouldContain(expectedString);
+            else
+                doc.ToString().ShouldNotContain(expectedString);
+        }
     }
 
     private static Dictionary<string, XElement> GetMembers()

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using NUnit.Framework;
+using Shouldly;
 
 namespace PCRE.Tests.PcreNet;
 
@@ -12,7 +13,7 @@ public class SplitTests
         var re = new PcreRegex(@"\s+");
         var result = re.Split("foo bar   baz").ToList();
 
-        Assert.That(result, Is.EqualTo(["foo", "bar", "baz"]));
+        result.ShouldBe(["foo", "bar", "baz"]);
     }
 
     [Test]
@@ -21,7 +22,7 @@ public class SplitTests
         var re = new PcreRegex(@"\s+");
         var result = re.Split("  foo bar   baz ").ToList();
 
-        Assert.That(result, Is.EqualTo([string.Empty, "foo", "bar", "baz", string.Empty]));
+        result.ShouldBe([string.Empty, "foo", "bar", "baz", string.Empty]);
     }
 
     [Test]
@@ -30,7 +31,7 @@ public class SplitTests
         var re = new PcreRegex(@"\s+");
         var result = re.Split("foo bar   baz  abc", 2).ToList();
 
-        Assert.That(result, Is.EqualTo(["foo", "bar", "baz  abc"]));
+        result.ShouldBe(["foo", "bar", "baz  abc"]);
     }
 
     [Test]
@@ -39,7 +40,7 @@ public class SplitTests
         var re = new PcreRegex(@"\s+");
         var result = re.Split("foo bar   baz  abc def", -1, 12).ToList();
 
-        Assert.That(result, Is.EqualTo(["foo bar   baz", "abc", "def"]));
+        result.ShouldBe(["foo bar   baz", "abc", "def"]);
     }
 
     [Test]
@@ -48,7 +49,7 @@ public class SplitTests
         var re = new PcreRegex(@"\s+");
         var result = re.Split("foo bar   baz  abc def", 2, 6).ToList();
 
-        Assert.That(result, Is.EqualTo(["foo bar", "baz", "abc def"]));
+        result.ShouldBe(["foo bar", "baz", "abc def"]);
     }
 
     [Test]
@@ -57,7 +58,7 @@ public class SplitTests
         var re = new PcreRegex(@"\s+");
         var result = re.Split("foo bar baz", 0).ToList();
 
-        Assert.That(result, Is.EqualTo(["foo bar baz"]));
+        result.ShouldBe(["foo bar baz"]);
     }
 
     [Test]
@@ -66,7 +67,7 @@ public class SplitTests
         var re = new PcreRegex(@"<(\d)?(.+?)>");
         var result = re.Split("foo<bar>baz<42>a", PcreSplitOptions.IncludeGroupValues).ToList();
 
-        Assert.That(result, Is.EqualTo(["foo", "bar", "baz", "4", "2", "a"]));
+        result.ShouldBe(["foo", "bar", "baz", "4", "2", "a"]);
     }
 
     [Test]
@@ -75,7 +76,7 @@ public class SplitTests
         var re = new PcreRegex(@"<(\d)?(.+?)>");
         var result = re.Split("foo<bar>baz<42>a", PcreSplitOptions.IncludeGroupValues, 1).ToList();
 
-        Assert.That(result, Is.EqualTo(["foo", "bar", "baz<42>a"]));
+        result.ShouldBe(["foo", "bar", "baz<42>a"]);
     }
 
     [Test]
@@ -84,7 +85,7 @@ public class SplitTests
         var re = new PcreRegex(@"<(\d)?(.+?)>");
         var result = re.Split("foo<bar>baz<42>a").ToList();
 
-        Assert.That(result, Is.EqualTo(["foo", "baz", "a"]));
+        result.ShouldBe(["foo", "baz", "a"]);
     }
 
     [Test]
@@ -93,7 +94,7 @@ public class SplitTests
         var re = new PcreRegex(@"<(\d?)(.+?)>");
         var result = re.Split("foo<bar>baz<42>a", PcreSplitOptions.IncludeGroupValues).ToList();
 
-        Assert.That(result, Is.EqualTo(["foo", "", "bar", "baz", "4", "2", "a"]));
+        result.ShouldBe(["foo", "", "bar", "baz", "4", "2", "a"]);
     }
 
     [Test]
@@ -102,6 +103,6 @@ public class SplitTests
         var re = new PcreRegex(@"");
         var result = re.Split("foo").ToList();
 
-        Assert.That(result, Is.EqualTo(["", "f", "o", "o", ""]));
+        result.ShouldBe(["", "f", "o", "o", ""]);
     }
 }

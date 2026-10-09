@@ -1,4 +1,4 @@
-﻿namespace PCRE.Conversion
+namespace PCRE.Conversion
 {
     public static class PcreConvert
     {

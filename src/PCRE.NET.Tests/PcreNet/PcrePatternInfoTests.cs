@@ -1,6 +1,8 @@
 ﻿using System.Text;
 using NUnit.Framework;
 using PCRE.Tests.Support;
+using Shouldly;
+using Shouldly.ShouldlyExtensionMethods;
 
 namespace PCRE.Tests.PcreNet;
 
@@ -12,8 +14,8 @@ public class PcrePatternInfoTests
     {
         var re = new PcreRegex(@"foo\s+bar", PcreOptions.IgnoreCase);
 
-        Assert.That(re.PatternInfo.PatternString, Is.EqualTo(@"foo\s+bar"));
-        Assert.That(re.PatternInfo.Options, Is.EqualTo(PcreOptions.IgnoreCase | PcreOptions.Utf));
+        re.PatternInfo.PatternString.ShouldBe(@"foo\s+bar");
+        re.PatternInfo.Options.ShouldBe(PcreOptions.IgnoreCase | PcreOptions.Utf);
     }
 
     [Test]
@@ -21,8 +23,8 @@ public class PcrePatternInfoTests
     {
         var re = new PcreRegex8Bit(@"foo\s+bar".ToLatin1Bytes(), TestSupport.Latin1Encoding, PcreOptions.IgnoreCase);
 
-        Assert.That(re.PatternInfo.PatternString, Is.EqualTo(@"foo\s+bar"));
-        Assert.That(re.PatternInfo.Options, Is.EqualTo(PcreOptions.IgnoreCase));
+        re.PatternInfo.PatternString.ShouldBe(@"foo\s+bar");
+        re.PatternInfo.Options.ShouldBe(PcreOptions.IgnoreCase);
     }
 
     [Test]
@@ -30,20 +32,20 @@ public class PcrePatternInfoTests
     {
         var re = new PcreRegexUtf8(@"foo\s+bar"u8, PcreOptions.IgnoreCase);
 
-        Assert.That(re.PatternInfo.PatternString, Is.EqualTo(@"foo\s+bar"));
-        Assert.That(re.PatternInfo.Options, Is.EqualTo(PcreOptions.IgnoreCase | PcreOptions.Utf));
+        re.PatternInfo.PatternString.ShouldBe(@"foo\s+bar");
+        re.PatternInfo.Options.ShouldBe(PcreOptions.IgnoreCase | PcreOptions.Utf);
     }
 
     [Test]
     public void should_return_strings_with_the_given_encoding()
     {
         var re = new PcreRegex8Bit("foo(?<bar>bär)".ToLatin1Bytes(), Encoding.ASCII);
-        Assert.That(re.Encoding, Is.SameAs(Encoding.ASCII));
-        Assert.That(re.PatternInfo.PatternString, Is.EqualTo("foo(?<bar>b?r)"));
+        re.Encoding.ShouldBeSameAs(Encoding.ASCII);
+        re.PatternInfo.PatternString.ShouldBe("foo(?<bar>b?r)");
 
         re = new PcreRegex8Bit("foo(?<bar>bär)".ToLatin1Bytes(), TestSupport.Latin1Encoding);
-        Assert.That(re.Encoding, Is.SameAs(TestSupport.Latin1Encoding));
-        Assert.That(re.PatternInfo.PatternString, Is.EqualTo("foo(?<bar>bär)"));
+        re.Encoding.ShouldBeSameAs(TestSupport.Latin1Encoding);
+        re.PatternInfo.PatternString.ShouldBe("foo(?<bar>bär)");
     }
 
     [Test]
@@ -53,7 +55,7 @@ public class PcrePatternInfoTests
     public void should_return_capture_count(string pattern, int expected)
     {
         var re = new PcreRegex(pattern);
-        Assert.That(re.PatternInfo.CaptureCount, Is.EqualTo(expected));
+        re.PatternInfo.CaptureCount.ShouldBe(expected);
     }
 
     [Test]
@@ -63,7 +65,7 @@ public class PcrePatternInfoTests
     public void should_return_capture_count_utf8(string pattern, int expected)
     {
         var re = new PcreRegexUtf8(pattern);
-        Assert.That(re.PatternInfo.CaptureCount, Is.EqualTo(expected));
+        re.PatternInfo.CaptureCount.ShouldBe(expected);
     }
 
     [Test]
@@ -76,7 +78,7 @@ public class PcrePatternInfoTests
     public void should_return_group_names(string pattern, string[] expected)
     {
         var re = new PcreRegex(pattern);
-        Assert.That(re.PatternInfo.GroupNames, Is.EqualTo(expected));
+        re.PatternInfo.GroupNames.ShouldBe(expected);
     }
 
     [Test]
@@ -89,37 +91,37 @@ public class PcrePatternInfoTests
     public void should_return_group_names_utf8(string pattern, string[] expected)
     {
         var re = new PcreRegexUtf8(pattern);
-        Assert.That(re.PatternInfo.GroupNames, Is.EqualTo(expected));
+        re.PatternInfo.GroupNames.ShouldBe(expected);
     }
 
     [Test]
     public void should_add_utf_mode_for_16bit()
     {
         var re = new PcreRegex("a");
-        Assert.That(re.PatternInfo.Options.HasFlag(PcreOptions.Utf), Is.True);
-        Assert.That(re.PatternInfo.Settings.Options.HasFlag(PcreOptions.Utf), Is.True);
-        Assert.That(re.PatternInfo.ArgOptions.HasFlag(PcreOptions.Utf), Is.True);
-        Assert.That(re.PatternInfo.AllOptions.HasFlag(PcreOptions.Utf), Is.True);
+        re.PatternInfo.Options.ShouldHaveFlag(PcreOptions.Utf);
+        re.PatternInfo.Settings.Options.ShouldHaveFlag(PcreOptions.Utf);
+        re.PatternInfo.ArgOptions.ShouldHaveFlag(PcreOptions.Utf);
+        re.PatternInfo.AllOptions.ShouldHaveFlag(PcreOptions.Utf);
     }
 
     [Test]
     public void should_not_add_utf_mode_for_8bit()
     {
         var re = new PcreRegex8Bit("a".ToLatin1Bytes(), TestSupport.Latin1Encoding);
-        Assert.That(re.PatternInfo.Options.HasFlag(PcreOptions.Utf), Is.False);
-        Assert.That(re.PatternInfo.Settings.Options.HasFlag(PcreOptions.Utf), Is.False);
-        Assert.That(re.PatternInfo.ArgOptions.HasFlag(PcreOptions.Utf), Is.False);
-        Assert.That(re.PatternInfo.AllOptions.HasFlag(PcreOptions.Utf), Is.False);
+        re.PatternInfo.Options.ShouldNotHaveFlag(PcreOptions.Utf);
+        re.PatternInfo.Settings.Options.ShouldNotHaveFlag(PcreOptions.Utf);
+        re.PatternInfo.ArgOptions.ShouldNotHaveFlag(PcreOptions.Utf);
+        re.PatternInfo.AllOptions.ShouldNotHaveFlag(PcreOptions.Utf);
     }
 
     [Test]
     public void should_add_utf_mode_for_utf8()
     {
         var re = new PcreRegexUtf8("a");
-        Assert.That(re.PatternInfo.Options.HasFlag(PcreOptions.Utf), Is.True);
-        Assert.That(re.PatternInfo.Settings.Options.HasFlag(PcreOptions.Utf), Is.True);
-        Assert.That(re.PatternInfo.ArgOptions.HasFlag(PcreOptions.Utf), Is.True);
-        Assert.That(re.PatternInfo.AllOptions.HasFlag(PcreOptions.Utf), Is.True);
+        re.PatternInfo.Options.ShouldHaveFlag(PcreOptions.Utf);
+        re.PatternInfo.Settings.Options.ShouldHaveFlag(PcreOptions.Utf);
+        re.PatternInfo.ArgOptions.ShouldHaveFlag(PcreOptions.Utf);
+        re.PatternInfo.AllOptions.ShouldHaveFlag(PcreOptions.Utf);
     }
 
     [Test]
@@ -129,7 +131,7 @@ public class PcrePatternInfoTests
     public void should_detect_min_subject_length(string pattern, int expected)
     {
         var re = new PcreRegex(pattern);
-        Assert.That(re.PatternInfo.MinSubjectLength, Is.EqualTo(expected));
+        re.PatternInfo.MinSubjectLength.ShouldBe((uint)expected);
     }
 
     [Test]
@@ -139,7 +141,7 @@ public class PcrePatternInfoTests
     public void should_detect_min_subject_length_utf8(string pattern, int expected)
     {
         var re = new PcreRegexUtf8(pattern);
-        Assert.That(re.PatternInfo.MinSubjectLength, Is.EqualTo(expected));
+        re.PatternInfo.MinSubjectLength.ShouldBe((uint)expected);
     }
 
     [Test]
@@ -148,7 +150,7 @@ public class PcrePatternInfoTests
     public void should_compile_pattern(string pattern)
     {
         var re = new PcreRegex(pattern, PcreOptions.Compiled);
-        Assert.That(re.PatternInfo.IsCompiled, Is.True);
+        re.PatternInfo.IsCompiled.ShouldBeTrue();
     }
 
     [Test]
@@ -157,7 +159,7 @@ public class PcrePatternInfoTests
     public void should_compile_pattern_utf8(string pattern)
     {
         var re = new PcreRegexUtf8(pattern, PcreOptions.Compiled);
-        Assert.That(re.PatternInfo.IsCompiled, Is.True);
+        re.PatternInfo.IsCompiled.ShouldBeTrue();
     }
 
     [Test]
@@ -165,19 +167,19 @@ public class PcrePatternInfoTests
     {
         var re = new PcreRegex(@"a(?C42)bb(?C{ foo })(?:ccc)");
 
-        Assert.That(re.PatternInfo.Callouts.Count, Is.EqualTo(2));
+        re.PatternInfo.Callouts.ShouldHaveCount(2);
 
-        Assert.That(re.PatternInfo.Callouts[0].Number, Is.EqualTo(42));
-        Assert.That(re.PatternInfo.Callouts[0].String, Is.Null);
-        Assert.That(re.PatternInfo.Callouts[0].StringOffset, Is.EqualTo(0));
-        Assert.That(re.PatternInfo.Callouts[0].PatternPosition, Is.EqualTo(7));
-        Assert.That(re.PatternInfo.Callouts[0].NextPatternItemLength, Is.EqualTo(1));
+        re.PatternInfo.Callouts[0].Number.ShouldBe(42);
+        re.PatternInfo.Callouts[0].String.ShouldBeNull();
+        re.PatternInfo.Callouts[0].StringOffset.ShouldBe(0);
+        re.PatternInfo.Callouts[0].PatternPosition.ShouldBe(7);
+        re.PatternInfo.Callouts[0].NextPatternItemLength.ShouldBe(1);
 
-        Assert.That(re.PatternInfo.Callouts[1].Number, Is.EqualTo(0));
-        Assert.That(re.PatternInfo.Callouts[1].String, Is.EqualTo(" foo "));
-        Assert.That(re.PatternInfo.Callouts[1].StringOffset, Is.EqualTo(13));
-        Assert.That(re.PatternInfo.Callouts[1].PatternPosition, Is.EqualTo(20));
-        Assert.That(re.PatternInfo.Callouts[1].NextPatternItemLength, Is.EqualTo(3));
+        re.PatternInfo.Callouts[1].Number.ShouldBe(0);
+        re.PatternInfo.Callouts[1].String.ShouldBe(" foo ");
+        re.PatternInfo.Callouts[1].StringOffset.ShouldBe(13);
+        re.PatternInfo.Callouts[1].PatternPosition.ShouldBe(20);
+        re.PatternInfo.Callouts[1].NextPatternItemLength.ShouldBe(3);
     }
 
     [Test]
@@ -185,52 +187,52 @@ public class PcrePatternInfoTests
     {
         var re = new PcreRegexUtf8(@"a(?C42)bb(?C{ foo })(?:ccc)"u8);
 
-        Assert.That(re.PatternInfo.Callouts.Count, Is.EqualTo(2));
+        re.PatternInfo.Callouts.ShouldHaveCount(2);
 
-        Assert.That(re.PatternInfo.Callouts[0].Number, Is.EqualTo(42));
-        Assert.That(re.PatternInfo.Callouts[0].String, Is.Null);
-        Assert.That(re.PatternInfo.Callouts[0].StringOffset, Is.EqualTo(0));
-        Assert.That(re.PatternInfo.Callouts[0].PatternPosition, Is.EqualTo(7));
-        Assert.That(re.PatternInfo.Callouts[0].NextPatternItemLength, Is.EqualTo(1));
+        re.PatternInfo.Callouts[0].Number.ShouldBe(42);
+        re.PatternInfo.Callouts[0].String.ShouldBeNull();
+        re.PatternInfo.Callouts[0].StringOffset.ShouldBe(0);
+        re.PatternInfo.Callouts[0].PatternPosition.ShouldBe(7);
+        re.PatternInfo.Callouts[0].NextPatternItemLength.ShouldBe(1);
 
-        Assert.That(re.PatternInfo.Callouts[1].Number, Is.EqualTo(0));
-        Assert.That(re.PatternInfo.Callouts[1].String, Is.EqualTo(" foo "));
-        Assert.That(re.PatternInfo.Callouts[1].StringOffset, Is.EqualTo(13));
-        Assert.That(re.PatternInfo.Callouts[1].PatternPosition, Is.EqualTo(20));
-        Assert.That(re.PatternInfo.Callouts[1].NextPatternItemLength, Is.EqualTo(3));
+        re.PatternInfo.Callouts[1].Number.ShouldBe(0);
+        re.PatternInfo.Callouts[1].String.ShouldBe(" foo ");
+        re.PatternInfo.Callouts[1].StringOffset.ShouldBe(13);
+        re.PatternInfo.Callouts[1].PatternPosition.ShouldBe(20);
+        re.PatternInfo.Callouts[1].NextPatternItemLength.ShouldBe(3);
     }
 
     [Test]
     public void should_expose_jit_options()
     {
         var re = new PcreRegex(@"foo", new PcreRegexSettings { JitCompileOptions = PcreJitCompileOptions.PartialSoft });
-        Assert.That(re.PatternInfo.JitOptions, Is.EqualTo(PcreJitCompileOptions.PartialSoft));
+        re.PatternInfo.JitOptions.ShouldBe(PcreJitCompileOptions.PartialSoft);
     }
 
     [Test]
     public void should_expose_jit_options_utf8()
     {
         var re = new PcreRegexUtf8(@"foo"u8, new PcreRegexSettings { JitCompileOptions = PcreJitCompileOptions.PartialSoft });
-        Assert.That(re.PatternInfo.JitOptions, Is.EqualTo(PcreJitCompileOptions.PartialSoft));
+        re.PatternInfo.JitOptions.ShouldBe(PcreJitCompileOptions.PartialSoft);
     }
 
     [Test]
     public void should_convert_jit_options()
     {
         var compiled = new PcreRegex(@"foo", PcreOptions.Compiled);
-        Assert.That(compiled.PatternInfo.JitOptions, Is.EqualTo(PcreJitCompileOptions.Complete));
+        compiled.PatternInfo.JitOptions.ShouldBe(PcreJitCompileOptions.Complete);
 
         var partial = new PcreRegex(@"foo", PcreOptions.CompiledPartial);
-        Assert.That(partial.PatternInfo.JitOptions, Is.EqualTo(PcreJitCompileOptions.PartialHard | PcreJitCompileOptions.PartialSoft));
+        partial.PatternInfo.JitOptions.ShouldBe(PcreJitCompileOptions.PartialHard | PcreJitCompileOptions.PartialSoft);
     }
 
     [Test]
     public void should_convert_jit_options_utf8()
     {
         var compiled = new PcreRegexUtf8(@"foo"u8, PcreOptions.Compiled);
-        Assert.That(compiled.PatternInfo.JitOptions, Is.EqualTo(PcreJitCompileOptions.Complete));
+        compiled.PatternInfo.JitOptions.ShouldBe(PcreJitCompileOptions.Complete);
 
         var partial = new PcreRegexUtf8(@"foo"u8, PcreOptions.CompiledPartial);
-        Assert.That(partial.PatternInfo.JitOptions, Is.EqualTo(PcreJitCompileOptions.PartialHard | PcreJitCompileOptions.PartialSoft));
+        partial.PatternInfo.JitOptions.ShouldBe(PcreJitCompileOptions.PartialHard | PcreJitCompileOptions.PartialSoft);
     }
 }

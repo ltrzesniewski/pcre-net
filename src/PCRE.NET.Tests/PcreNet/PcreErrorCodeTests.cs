@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using PCRE.Internal;
+using Shouldly;
 
 namespace PCRE.Tests.PcreNet;
 
@@ -24,7 +25,6 @@ public class PcreErrorCodeTests
                                 .Select(i => i.name)
                                 .ToList();
 
-        if (missingCodes.Count > 0)
-            Assert.Fail($"Missing {missingCodes.Count} error codes:{Environment.NewLine}{string.Join(Environment.NewLine, missingCodes)}");
+        missingCodes.ShouldBeEmpty($"Missing {missingCodes.Count} error codes:{Environment.NewLine}{string.Join(Environment.NewLine, missingCodes)}");
     }
 }

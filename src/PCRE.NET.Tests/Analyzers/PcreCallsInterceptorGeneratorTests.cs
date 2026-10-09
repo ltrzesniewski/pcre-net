@@ -3,9 +3,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using PCRE.Analyzers;
+using Shouldly;
 
 namespace PCRE.Tests.Analyzers;
 
@@ -13,9 +13,9 @@ namespace PCRE.Tests.Analyzers;
 public class PcreCallsInterceptorGeneratorTests : BaseInterceptorTests<PcreCallsInterceptorGenerator>
 {
     [Test]
-    public Task generates_static_intercepts_with_literals()
+    public void generates_static_intercepts_with_literals()
     {
-        return Verify(
+        Verify(
             """
             using PCRE;
 
@@ -59,9 +59,9 @@ public class PcreCallsInterceptorGeneratorTests : BaseInterceptorTests<PcreCalls
     }
 
     [Test]
-    public Task does_not_generate_static_intercepts_with_non_literals()
+    public void does_not_generate_static_intercepts_with_non_literals()
     {
-        return Verify(
+        VerifyNone(
             """
             using PCRE;
 
@@ -90,9 +90,9 @@ public class PcreCallsInterceptorGeneratorTests : BaseInterceptorTests<PcreCalls
     }
 
     [Test]
-    public Task generates_instance_replace_intercepts_with_literals()
+    public void generates_instance_replace_intercepts_with_literals()
     {
-        return Verify(
+        Verify(
             """
             using PCRE;
 
@@ -138,9 +138,9 @@ public class PcreCallsInterceptorGeneratorTests : BaseInterceptorTests<PcreCalls
     }
 
     [Test]
-    public Task intercepts_only_expected_types()
+    public void intercepts_only_expected_types()
     {
-        return Verify(
+        VerifyNone(
             """
             class PcreRegex
             {
@@ -156,7 +156,7 @@ public class PcreCallsInterceptorGeneratorTests : BaseInterceptorTests<PcreCalls
     }
 
     [Test]
-    public async Task covers_full_api()
+    public void covers_full_api()
     {
         var methods = typeof(PcreRegex).GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance)
                                        .Where(
@@ -165,7 +165,7 @@ public class PcreCallsInterceptorGeneratorTests : BaseInterceptorTests<PcreCalls
                                                : m.Name is "Replace" && m.GetParameters().Any(static i => i.Name is "replacement")
                                        )
                                        .OrderBy(static m => m.IsStatic ? 0 : 1)
-                                       .ThenBy(static m => $"{m.Name} {string.Join(", ", m.GetParameters().Select(static p => $"{p.Name} {p.ParameterType.Name}"))}")
+                                       .ThenBy(static m => $"{m.Name} {string.Join(", ", m.GetParameters().Select(static p => $"{p.Name} {p.ParameterType.Name}"))}", StringComparer.Ordinal)
                                        .ToList();
 
         var sb = new StringBuilder();
@@ -215,11 +215,11 @@ public class PcreCallsInterceptorGeneratorTests : BaseInterceptorTests<PcreCalls
 
         var result = Generate(sb.ToString());
 
-        await Verify(result);
+        Verify(result);
 
-        var output = (await result.GeneratedTrees.Single().GetTextAsync()).ToString();
+        var output = result.GeneratedTrees.Single().GetText().ToString();
         var interceptedCount = Regex.Matches(output, @"\bpublic\b").Count - 1; // Subtract InterceptsLocationAttribute
 
-        Assert.That(interceptedCount, Is.EqualTo(methods.Count), "Not all methods were intercepted");
+        interceptedCount.ShouldBe(methods.Count, "Not all methods were intercepted");
     }
 }

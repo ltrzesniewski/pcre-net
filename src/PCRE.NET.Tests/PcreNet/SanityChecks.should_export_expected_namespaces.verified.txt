@@ -1,5 +1,0 @@
-﻿[
-  PCRE,
-  PCRE.Conversion,
-  PCRE.Dfa
-]

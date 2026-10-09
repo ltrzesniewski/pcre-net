@@ -3,12 +3,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
-using VerifyNUnit;
+using Shouldly;
 
 namespace PCRE.Tests.Analyzers;
 
@@ -54,34 +52,45 @@ public abstract class BaseInterceptorTests<TGenerator>
             Console.WriteLine(result.GeneratedTrees.FirstOrDefault()?.GetText());
 #endif
 
-        Assert.That(diagnostics, Is.Empty);
+
+        diagnostics.ShouldBeEmpty();
 
         return result;
     }
 
-    protected static Task Verify([StringSyntax("csharp")] string input)
+    protected static void VerifyNone([StringSyntax("csharp")] string input)
     {
         var result = Generate(input);
-        return Verify(result);
+        result.GeneratedTrees.ShouldBeEmpty();
     }
 
-    [MustUseReturnValue]
-    protected static Task Verify([StringSyntax("csharp")] GeneratorDriverRunResult result)
+    protected static void Verify([StringSyntax("csharp")] string input)
+        => Verify(Generate(input));
+
+    protected static void Verify([StringSyntax("csharp")] GeneratorDriverRunResult result)
     {
-        return Verifier.Verify(result)
-                       .ScrubLinesWithReplace(
-                           i => Regex.Replace(
-                               i,
-                               """
-                               (?x)
-                               (?<before>InterceptsLocationAttribute\()
-                               [0-9]+,[ ]
-                               "[^"]+"
-                               (?<after>\)\])
-                               (?:\s*//.*)? # Only in DEBUG mode
-                               """,
-                               """${before}0, "..."${after}"""
-                           )
-                       );
+        var tree = result.GeneratedTrees.ShouldHaveSingleItem();
+
+        tree.ToString().ShouldMatchApproved(
+            cfg => cfg.WithScrubber(Scrub)
+                      .WithFileExtension(".cs")
+                      .LocateTestMethodUsingAttribute<TestAttribute>()
+        );
+    }
+
+    private static string Scrub(string input)
+    {
+        return Regex.Replace(
+            input,
+            """
+            (?x)
+            (?<before>InterceptsLocationAttribute\()
+            [0-9]+,[ ]
+            "[^"]+"
+            (?<after>\)\])
+            (?:\s*//.*)? # Only in DEBUG mode
+            """,
+            """${before}0, "..."${after}"""
+        );
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Text;
 using PCRE.Internal;
 
@@ -26,7 +27,7 @@ internal static class AllocationTest
         var subject = subjectBuilder.ToString();
         var matchCount = 0;
 
-        for (var i = 0; i < 10; ++i)
+        for (var i = 0; i < 1000; ++i)
             Iteration();
 
         GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true);
@@ -51,6 +52,7 @@ internal static class AllocationTest
 
         return allocatedBytes == 0 && gcCount == 0;
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         void Iteration()
         {
             var matches = buffer.Matches(subject.AsSpan(), 0, PcreMatchOptions.None, static data =>

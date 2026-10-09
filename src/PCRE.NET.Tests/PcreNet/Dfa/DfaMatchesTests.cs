@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using NUnit.Framework;
+using Shouldly;
 
 namespace PCRE.Tests.PcreNet.Dfa;
 
@@ -12,31 +13,31 @@ public class DfaMatchesTests
         var re = new PcreRegex(@"<.*>");
         var matches = re.Dfa.Matches("This is <something> <something else> <something further> no more").ToList();
 
-        Assert.That(matches.Count, Is.EqualTo(3));
+        matches.ShouldHaveCount(3);
 
-        Assert.That(matches[0].Index, Is.EqualTo(8));
-        Assert.That(matches[1].Index, Is.EqualTo(20));
-        Assert.That(matches[2].Index, Is.EqualTo(37));
+        matches[0].Index.ShouldBe(8);
+        matches[1].Index.ShouldBe(20);
+        matches[2].Index.ShouldBe(37);
 
-        Assert.That(matches[0].Count, Is.EqualTo(3));
-        Assert.That(matches[1].Count, Is.EqualTo(2));
-        Assert.That(matches[2].Count, Is.EqualTo(1));
+        matches[0].ShouldHaveCount(3);
+        matches[1].ShouldHaveCount(2);
+        matches[2].ShouldHaveSingleItem();
 
-        Assert.That(matches[0].LongestMatch.Value, Is.EqualTo("<something> <something else> <something further>"));
-        Assert.That(matches[1].LongestMatch.Value, Is.EqualTo("<something else> <something further>"));
-        Assert.That(matches[2].LongestMatch.Value, Is.EqualTo("<something further>"));
+        matches[0].LongestMatch.Value.ShouldBe("<something> <something else> <something further>");
+        matches[1].LongestMatch.Value.ShouldBe("<something else> <something further>");
+        matches[2].LongestMatch.Value.ShouldBe("<something further>");
 
-        Assert.That(matches[0].LongestMatch.ValueSpan.ToString(), Is.EqualTo("<something> <something else> <something further>"));
-        Assert.That(matches[1].LongestMatch.ValueSpan.ToString(), Is.EqualTo("<something else> <something further>"));
-        Assert.That(matches[2].LongestMatch.ValueSpan.ToString(), Is.EqualTo("<something further>"));
+        matches[0].LongestMatch.ValueSpan.ShouldBe("<something> <something else> <something further>");
+        matches[1].LongestMatch.ValueSpan.ShouldBe("<something else> <something further>");
+        matches[2].LongestMatch.ValueSpan.ShouldBe("<something further>");
 
-        Assert.That(matches[0].ShortestMatch.Value, Is.EqualTo("<something>"));
-        Assert.That(matches[1].ShortestMatch.Value, Is.EqualTo("<something else>"));
-        Assert.That(matches[2].ShortestMatch.Value, Is.EqualTo("<something further>"));
+        matches[0].ShortestMatch.Value.ShouldBe("<something>");
+        matches[1].ShortestMatch.Value.ShouldBe("<something else>");
+        matches[2].ShortestMatch.Value.ShouldBe("<something further>");
 
-        Assert.That(matches[0].ShortestMatch.ValueSpan.ToString(), Is.EqualTo("<something>"));
-        Assert.That(matches[1].ShortestMatch.ValueSpan.ToString(), Is.EqualTo("<something else>"));
-        Assert.That(matches[2].ShortestMatch.ValueSpan.ToString(), Is.EqualTo("<something further>"));
+        matches[0].ShortestMatch.ValueSpan.ShouldBe("<something>");
+        matches[1].ShortestMatch.ValueSpan.ShouldBe("<something else>");
+        matches[2].ShortestMatch.ValueSpan.ShouldBe("<something further>");
     }
 
     [Test]
@@ -45,15 +46,15 @@ public class DfaMatchesTests
         var re = new PcreRegex(@".");
         var matches = re.Dfa.Matches("foo\uD83D\uDE0Ebar").ToList();
 
-        Assert.That(matches.Count, Is.EqualTo(7));
+        matches.ShouldHaveCount(7);
 
-        Assert.That(matches[3].ShortestMatch.Index, Is.EqualTo(3));
-        Assert.That(matches[3].ShortestMatch.Length, Is.EqualTo(2));
+        matches[3].ShortestMatch.Index.ShouldBe(3);
+        matches[3].ShortestMatch.Length.ShouldBe(2);
 
-        Assert.That(matches[4].ShortestMatch.Index, Is.EqualTo(5));
-        Assert.That(matches[4].ShortestMatch.Length, Is.EqualTo(1));
-        Assert.That(matches[4].ShortestMatch.Value, Is.EqualTo("b"));
-        Assert.That(matches[4].ShortestMatch.ValueSpan.ToString(), Is.EqualTo("b"));
+        matches[4].ShortestMatch.Index.ShouldBe(5);
+        matches[4].ShortestMatch.Length.ShouldBe(1);
+        matches[4].ShortestMatch.Value.ShouldBe("b");
+        matches[4].ShortestMatch.ValueSpan.ShouldBe("b");
     }
 
     [Test]
@@ -62,7 +63,7 @@ public class DfaMatchesTests
         var re = new PcreRegex(@"");
         var matches = re.Dfa.Matches("foo").ToList();
 
-        Assert.That(matches.Count, Is.EqualTo(4));
-        Assert.That(matches.Select(i => i.LongestMatch.Length), Is.All.Zero);
+        matches.ShouldHaveCount(4);
+        matches.ShouldAllBe(i => i.LongestMatch.Length == 0);
     }
 }

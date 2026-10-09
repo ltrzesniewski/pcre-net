@@ -16,6 +16,7 @@
     <File Path="Version.props" />
   </Folder>
   <Folder Name="/Tools/">
+    <File Path="Tools/ApproveAll.ps1" />
     <File Path="Tools/UpdatePcre2.cs" />
   </Folder>
   <Project Path="PCRE.NET.Analyzers/PCRE.NET.Analyzers.csproj" />

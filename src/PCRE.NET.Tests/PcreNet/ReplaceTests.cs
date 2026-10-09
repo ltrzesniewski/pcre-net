@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using NUnit.Framework;
+using Shouldly;
 
 namespace PCRE.Tests.PcreNet;
 
@@ -16,7 +17,7 @@ public class ReplaceTests
         var re = new PcreRegex(@"a+", PcreOptions.IgnoreCase);
         var result = re.Replace("foo aaa bar aAAa baz", match => match.Length.ToString(CultureInfo.InvariantCulture));
 
-        Assert.That(result, Is.EqualTo("foo 3 b1r 4 b1z"));
+        result.ShouldBe("foo 3 b1r 4 b1z");
     }
 
     [Test]
@@ -25,7 +26,7 @@ public class ReplaceTests
         var re = new PcreRegex(@"a+(b+)", PcreOptions.IgnoreCase);
         var result = re.Replace("foo aabb bar aaabbab baz", "<$0><$1><$&>");
 
-        Assert.That(result, Is.EqualTo("foo <aabb><bb><aabb> bar <aaabb><bb><aaabb><ab><b><ab> baz"));
+        result.ShouldBe("foo <aabb><bb><aabb> bar <aaabb><bb><aaabb><ab><b><ab> baz");
     }
 
     [Test]
@@ -34,7 +35,7 @@ public class ReplaceTests
         var re = new PcreRegex(@"a+(?<grp>b+)", PcreOptions.IgnoreCase);
         var result = re.Replace("foo aabb bar aaabbab baz", "<${1}>");
 
-        Assert.That(result, Is.EqualTo("foo <bb> bar <bb><b> baz"));
+        result.ShouldBe("foo <bb> bar <bb><b> baz");
     }
 
     [Test]
@@ -43,7 +44,7 @@ public class ReplaceTests
         var re = new PcreRegex(@"a+(?<grp>b+)", PcreOptions.IgnoreCase);
         var result = re.Replace("foo aabb bar aaabbab baz", "<$1>");
 
-        Assert.That(result, Is.EqualTo("foo <bb> bar <bb><b> baz"));
+        result.ShouldBe("foo <bb> bar <bb><b> baz");
     }
 
     [Test]
@@ -52,7 +53,7 @@ public class ReplaceTests
         var re = new PcreRegex(@"a+(?<grp>b+)", PcreOptions.IgnoreCase);
         var result = re.Replace("foo aabb bar aaabbab baz", "#${1}");
 
-        Assert.That(result, Is.EqualTo("foo #bb bar #bb#b baz"));
+        result.ShouldBe("foo #bb bar #bb#b baz");
     }
 
     [Test]
@@ -61,7 +62,7 @@ public class ReplaceTests
         var re = new PcreRegex(@"a+(?<grp>b+)", PcreOptions.IgnoreCase);
         var result = re.Replace("foo aabb bar aaabbab baz", "#$1");
 
-        Assert.That(result, Is.EqualTo("foo #bb bar #bb#b baz"));
+        result.ShouldBe("foo #bb bar #bb#b baz");
     }
 
     [Test]
@@ -70,7 +71,7 @@ public class ReplaceTests
         var re = new PcreRegex(@"a+(?<grp>b+)", PcreOptions.IgnoreCase);
         var result = re.Replace("foo aabb bar aaabbab baz", "<${grp}>");
 
-        Assert.That(result, Is.EqualTo("foo <bb> bar <bb><b> baz"));
+        result.ShouldBe("foo <bb> bar <bb><b> baz");
     }
 
     [Test]
@@ -79,7 +80,7 @@ public class ReplaceTests
         var re = new PcreRegex(@"a+(b+)", PcreOptions.IgnoreCase);
         var result = re.Replace("foo aabb bar aaabbab baz", "$$-$");
 
-        Assert.That(result, Is.EqualTo("foo $-$ bar $-$$-$ baz"));
+        result.ShouldBe("foo $-$ bar $-$$-$ baz");
     }
 
     [Test]
@@ -88,7 +89,7 @@ public class ReplaceTests
         var re = new PcreRegex(@"a+(b+)", PcreOptions.IgnoreCase);
         var result = re.Replace("foo aabb bar aaabbab baz", "<$`>");
 
-        Assert.That(result, Is.EqualTo("foo <foo > bar <foo aabb bar ><foo aabb bar aaabb> baz"));
+        result.ShouldBe("foo <foo > bar <foo aabb bar ><foo aabb bar aaabb> baz");
     }
 
     [Test]
@@ -97,7 +98,7 @@ public class ReplaceTests
         var re = new PcreRegex(@"a+(b+)", PcreOptions.IgnoreCase);
         var result = re.Replace("foo aabb bar aaabbab baz", "<$'>");
 
-        Assert.That(result, Is.EqualTo("foo < bar aaabbab baz> bar <ab baz>< baz> baz"));
+        result.ShouldBe("foo < bar aaabbab baz> bar <ab baz>< baz> baz");
     }
 
     [Test]
@@ -106,7 +107,7 @@ public class ReplaceTests
         var re = new PcreRegex(@"a+(b+)", PcreOptions.IgnoreCase);
         var result = re.Replace("foo aabb bar aaabbab baz", "<$_>");
 
-        Assert.That(result, Is.EqualTo("foo <foo aabb bar aaabbab baz> bar <foo aabb bar aaabbab baz><foo aabb bar aaabbab baz> baz"));
+        result.ShouldBe("foo <foo aabb bar aaabbab baz> bar <foo aabb bar aaabbab baz><foo aabb bar aaabbab baz> baz");
     }
 
     [Test]
@@ -115,7 +116,7 @@ public class ReplaceTests
         var re = new PcreRegex(@"a+(b+)(c+)?", PcreOptions.IgnoreCase);
         var result = re.Replace("foo aabb bar aaabbabcc baz", "<$+>");
 
-        Assert.That(result, Is.EqualTo("foo <bb> bar <bb><cc> baz"));
+        result.ShouldBe("foo <bb> bar <bb><cc> baz");
     }
 
     [Test]
@@ -124,7 +125,7 @@ public class ReplaceTests
         var re = new PcreRegex(@"a+(b+)?");
         var result = re.Replace("foo aabb bar baz", "<$+>");
 
-        Assert.That(result, Is.EqualTo("foo <bb> b<>r b<>z"));
+        result.ShouldBe("foo <bb> b<>r b<>z");
     }
 
     [Test]
@@ -133,7 +134,7 @@ public class ReplaceTests
         var re = new PcreRegex(@"a+");
         var result = re.Replace("foo bar", "<$+>");
 
-        Assert.That(result, Is.EqualTo("foo b<>r"));
+        result.ShouldBe("foo b<>r");
     }
 
     [Test]
@@ -158,7 +159,7 @@ public class ReplaceTests
         var re = new PcreRegex(@"a+", PcreOptions.IgnoreCase);
         var result = re.Replace("foo aabb bar aaabbab baz", "X", 2);
 
-        Assert.That(result, Is.EqualTo("foo Xbb bXr aaabbab baz"));
+        result.ShouldBe("foo Xbb bXr aaabbab baz");
     }
 
     [Test]
@@ -167,7 +168,7 @@ public class ReplaceTests
         var re = new PcreRegex(@"a+", PcreOptions.IgnoreCase);
         var result = re.Replace("foo aabb bar aaabbab baz", "X", 0);
 
-        Assert.That(result, Is.EqualTo("foo aabb bar aaabbab baz"));
+        result.ShouldBe("foo aabb bar aaabbab baz");
     }
 
     [Test]
@@ -176,7 +177,7 @@ public class ReplaceTests
         var re = new PcreRegex(@"a+", PcreOptions.IgnoreCase);
         var result = re.Replace("foo aabb bar aaabbab baz", "X", -1, 12);
 
-        Assert.That(result, Is.EqualTo("foo aabb bar XbbXb bXz"));
+        result.ShouldBe("foo aabb bar XbbXb bXz");
     }
 
     [Test]
@@ -185,7 +186,7 @@ public class ReplaceTests
         var re = new PcreRegex(@"a+", PcreOptions.IgnoreCase);
         var result = re.Replace("foo aabb bar aaabbab baz", "X", 2, 8);
 
-        Assert.That(result, Is.EqualTo("foo aabb bXr Xbbab baz"));
+        result.ShouldBe("foo aabb bXr Xbbab baz");
     }
 
     [Test]
@@ -207,7 +208,7 @@ public class ReplaceTests
         var re = new PcreRegex("foo");
         var subject = "bar";
 
-        Assert.That(re.Replace(subject, "baz"), Is.SameAs(subject));
+        re.Replace(subject, "baz").ShouldBeSameAs(subject);
     }
 
     [Test]
@@ -215,7 +216,7 @@ public class ReplaceTests
     {
         var re = new PcreRegex("foo");
 
-        Assert.Throws<ArgumentNullException>(() => re.Replace(default(string)!, "a"));
+        Should.Throw<ArgumentNullException>(() => re.Replace(default(string)!, "a"));
     }
 
     [Test]
@@ -223,7 +224,7 @@ public class ReplaceTests
     {
         var re = new PcreRegex("foo");
 
-        Assert.Throws<ArgumentNullException>(() => re.Replace("a", default(string)!));
+        Should.Throw<ArgumentNullException>(() => re.Replace("a", default(string)!));
     }
 
     [Test]
@@ -231,13 +232,13 @@ public class ReplaceTests
     {
         var re = new PcreRegex("foo");
 
-        Assert.Throws<ArgumentNullException>(() => re.Replace("a", default(Func<PcreMatch, string>)!));
+        Should.Throw<ArgumentNullException>(() => re.Replace("a", default(Func<PcreMatch, string>)!));
     }
 
     [Test]
     public void readme_replace_example()
     {
         var result = PcreRegex.Replace("hello, world!!!", @"\p{P}+", "<$&>");
-        Assert.That(result, Is.EqualTo("hello<,> world<!!!>"));
+        result.ShouldBe("hello<,> world<!!!>");
     }
 }

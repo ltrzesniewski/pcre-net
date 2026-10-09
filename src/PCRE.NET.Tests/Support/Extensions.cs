@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace PCRE.Tests.Support;
 
@@ -23,4 +25,9 @@ internal static class Extensions
 
         return result;
     }
+
+    public static string? GetMetadataValue(this Assembly assembly, string key)
+        => assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
+                   .FirstOrDefault(attr => attr.Key == key)?
+                   .Value;
 }

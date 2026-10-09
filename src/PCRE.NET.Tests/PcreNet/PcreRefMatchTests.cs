@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using PCRE.Tests.Support;
+using Shouldly;
 
 namespace PCRE.Tests.PcreNet;
 
@@ -13,7 +14,7 @@ public class PcreRefMatchTests
         var re = new PcreRegex(".");
         var match = re.Match("ab".AsSpan());
 
-        Assert.That(match.ToString(), Is.EqualTo("a"));
+        match.ToString().ShouldBe("a");
     }
 
     [Test]
@@ -22,7 +23,7 @@ public class PcreRefMatchTests
         var re = new PcreRegexUtf8("."u8);
         var match = re.Match("ab"u8);
 
-        Assert.That(match.ToString(), Is.EqualTo("a"));
+        match.ToString().ShouldBe("a");
     }
 
     [Test]
@@ -31,7 +32,7 @@ public class PcreRefMatchTests
         var re = TestSupport.CreatePcreRegex8Bit(".".ToLatin1Bytes());
         var match = re.Match("ab".ToLatin1Bytes());
 
-        Assert.That(match.ToString(), Is.EqualTo("a"));
+        match.ToString().ShouldBe("a");
     }
 
     [Test]
@@ -40,7 +41,7 @@ public class PcreRefMatchTests
         var re = new PcreRegex(".");
         var match = re.Match("ab".AsSpan());
 
-        Assert.That(match[0].ToString(), Is.EqualTo("a"));
+        match[0].ToString().ShouldBe("a");
     }
 
     [Test]
@@ -49,7 +50,7 @@ public class PcreRefMatchTests
         var re = new PcreRegexUtf8("."u8);
         var match = re.Match("ab"u8);
 
-        Assert.That(match[0].ToString(), Is.EqualTo("a"));
+        match[0].ToString().ShouldBe("a");
     }
 
     [Test]
@@ -58,7 +59,7 @@ public class PcreRefMatchTests
         var re = TestSupport.CreatePcreRegex8Bit(".".ToLatin1Bytes());
         var match = re.Match("ab".ToLatin1Bytes());
 
-        Assert.That(match[0].ToString(), Is.EqualTo("a"));
+        match[0].ToString().ShouldBe("a");
     }
 
     [Test]
@@ -67,7 +68,7 @@ public class PcreRefMatchTests
         var re = new PcreRegex(".");
         var match = re.Match("ab".AsSpan());
 
-        Assert.That((string)match[0], Is.EqualTo("a"));
+        ((string)match[0]).ShouldBe("a");
     }
 
     [Test]
@@ -76,7 +77,7 @@ public class PcreRefMatchTests
         var re = new PcreRegexUtf8("."u8);
         var match = re.Match("ab"u8);
 
-        Assert.That((string)match[0], Is.EqualTo("a"));
+        ((string)match[0]).ShouldBe("a");
     }
 
     [Test]
@@ -85,7 +86,7 @@ public class PcreRefMatchTests
         var re = TestSupport.CreatePcreRegex8Bit(".".ToLatin1Bytes());
         var match = re.Match("ab".ToLatin1Bytes());
 
-        Assert.That((string)match[0], Is.EqualTo("a"));
+        ((string)match[0]).ShouldBe("a");
     }
 
     [Test]
@@ -96,17 +97,17 @@ public class PcreRefMatchTests
 
         var enumerator = match.Groups.GetEnumerator();
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.Current.Value.ToString(), Is.EqualTo("ab"));
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.Current.Value.ShouldBe("ab");
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.Current.Value.ToString(), Is.EqualTo("a"));
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.Current.Value.ShouldBe("a");
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.Current.Value.ToString(), Is.EqualTo("b"));
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.Current.Value.ShouldBe("b");
 
-        Assert.That(enumerator.MoveNext(), Is.False);
-        Assert.That(enumerator.MoveNext(), Is.False);
+        enumerator.MoveNext().ShouldBeFalse();
+        enumerator.MoveNext().ShouldBeFalse();
     }
 
     [Test]
@@ -117,17 +118,17 @@ public class PcreRefMatchTests
 
         var enumerator = match.Groups.GetEnumerator();
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.Current.Value.SequenceEqual("ab"u8));
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.Current.Value.ShouldBe("ab"u8);
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.Current.Value.SequenceEqual("a"u8));
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.Current.Value.ShouldBe("a"u8);
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.Current.Value.SequenceEqual("b"u8));
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.Current.Value.ShouldBe("b"u8);
 
-        Assert.That(enumerator.MoveNext(), Is.False);
-        Assert.That(enumerator.MoveNext(), Is.False);
+        enumerator.MoveNext().ShouldBeFalse();
+        enumerator.MoveNext().ShouldBeFalse();
     }
 
     [Test]
@@ -138,17 +139,17 @@ public class PcreRefMatchTests
 
         var enumerator = match.Groups.GetEnumerator();
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.Current.Value.SequenceEqual("ab".ToLatin1Bytes()));
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.Current.Value.ShouldBe("ab".ToLatin1Bytes());
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.Current.Value.SequenceEqual("a".ToLatin1Bytes()));
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.Current.Value.ShouldBe("a".ToLatin1Bytes());
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.Current.Value.SequenceEqual("b".ToLatin1Bytes()));
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.Current.Value.ShouldBe("b".ToLatin1Bytes());
 
-        Assert.That(enumerator.MoveNext(), Is.False);
-        Assert.That(enumerator.MoveNext(), Is.False);
+        enumerator.MoveNext().ShouldBeFalse();
+        enumerator.MoveNext().ShouldBeFalse();
     }
 
     [Test]
@@ -159,17 +160,17 @@ public class PcreRefMatchTests
 
         var enumerator = match.GetEnumerator();
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.Current.Value.ToString(), Is.EqualTo("ab"));
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.Current.Value.ShouldBe("ab");
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.Current.Value.ToString(), Is.EqualTo("a"));
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.Current.Value.ShouldBe("a");
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.Current.Value.ToString(), Is.EqualTo("b"));
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.Current.Value.ShouldBe("b");
 
-        Assert.That(enumerator.MoveNext(), Is.False);
-        Assert.That(enumerator.MoveNext(), Is.False);
+        enumerator.MoveNext().ShouldBeFalse();
+        enumerator.MoveNext().ShouldBeFalse();
     }
 
     [Test]
@@ -180,17 +181,17 @@ public class PcreRefMatchTests
 
         var enumerator = match.GetEnumerator();
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.Current.Value.SequenceEqual("ab"u8));
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.Current.Value.ShouldBe("ab"u8);
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.Current.Value.SequenceEqual("a"u8));
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.Current.Value.ShouldBe("a"u8);
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.Current.Value.SequenceEqual("b"u8));
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.Current.Value.ShouldBe("b"u8);
 
-        Assert.That(enumerator.MoveNext(), Is.False);
-        Assert.That(enumerator.MoveNext(), Is.False);
+        enumerator.MoveNext().ShouldBeFalse();
+        enumerator.MoveNext().ShouldBeFalse();
     }
 
     [Test]
@@ -201,17 +202,17 @@ public class PcreRefMatchTests
 
         var enumerator = match.GetEnumerator();
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.Current.Value.SequenceEqual("ab".ToLatin1Bytes()));
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.Current.Value.ShouldBe("ab".ToLatin1Bytes());
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.Current.Value.SequenceEqual("a".ToLatin1Bytes()));
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.Current.Value.ShouldBe("a".ToLatin1Bytes());
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.Current.Value.SequenceEqual("b".ToLatin1Bytes()));
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.Current.Value.ShouldBe("b".ToLatin1Bytes());
 
-        Assert.That(enumerator.MoveNext(), Is.False);
-        Assert.That(enumerator.MoveNext(), Is.False);
+        enumerator.MoveNext().ShouldBeFalse();
+        enumerator.MoveNext().ShouldBeFalse();
     }
 
     [Test]
@@ -220,7 +221,7 @@ public class PcreRefMatchTests
         var re = new PcreRegex("(.)(?<name>.)");
         var values = re.Match("ab".AsSpan()).Groups.ToList(i => i.Value.ToString());
 
-        Assert.That(values, Is.EqualTo(["ab", "a", "b"]));
+        values.ShouldBe(["ab", "a", "b"]);
     }
 
     [Test]
@@ -229,7 +230,7 @@ public class PcreRefMatchTests
         var re = new PcreRegexUtf8("(.)(?<name>.)"u8);
         var values = re.Match("ab"u8).Groups.ToList(i => i.ToString());
 
-        Assert.That(values, Is.EqualTo(["ab", "a", "b"]));
+        values.ShouldBe(["ab", "a", "b"]);
     }
 
     [Test]
@@ -238,7 +239,7 @@ public class PcreRefMatchTests
         var re = TestSupport.CreatePcreRegex8Bit("(.)(?<name>.)".ToLatin1Bytes());
         var values = re.Match("ab".ToLatin1Bytes()).Groups.ToList(i => i.ToString());
 
-        Assert.That(values, Is.EqualTo(["ab", "a", "b"]));
+        values.ShouldBe(["ab", "a", "b"]);
     }
 
     [Test]
@@ -246,21 +247,21 @@ public class PcreRefMatchTests
     {
         var match = default(PcreRefMatch);
 
-        Assert.That(match.Success, Is.False);
-        Assert.That(match.CaptureCount, Is.EqualTo(0));
-        Assert.That(match.Value.ToString(), Is.SameAs(string.Empty));
-        Assert.That(match.Index, Is.EqualTo(-1));
-        Assert.That(match.EndIndex, Is.EqualTo(-1));
-        Assert.That(match.Length, Is.EqualTo(0));
-        Assert.That(match.IsPartialMatch, Is.False);
-        Assert.That(match.Mark.Length, Is.EqualTo(0));
+        match.Success.ShouldBeFalse();
+        match.CaptureCount.ShouldBe(0);
+        match.Value.ToString().ShouldBeSameAs(string.Empty);
+        match.Index.ShouldBe(-1);
+        match.EndIndex.ShouldBe(-1);
+        match.Length.ShouldBe(0);
+        match.IsPartialMatch.ShouldBeFalse();
+        match.Mark.IsEmpty.ShouldBeTrue();
 
-        Assert.That(match[0].Success, Is.False);
-        Assert.That(match[0].IsDefined, Is.False);
-        Assert.That(match[0].Value.ToString(), Is.SameAs(string.Empty));
-        Assert.That(match[0].Index, Is.EqualTo(-1));
-        Assert.That(match[0].EndIndex, Is.EqualTo(-1));
-        Assert.That(match[0].Length, Is.EqualTo(0));
+        match[0].Success.ShouldBeFalse();
+        match[0].IsDefined.ShouldBeFalse();
+        match[0].Value.ToString().ShouldBeSameAs(string.Empty);
+        match[0].Index.ShouldBe(-1);
+        match[0].EndIndex.ShouldBe(-1);
+        match[0].Length.ShouldBe(0);
     }
 
     [Test]
@@ -268,21 +269,21 @@ public class PcreRefMatchTests
     {
         var match = default(PcreRefMatch8Bit);
 
-        Assert.That(match.Success, Is.False);
-        Assert.That(match.CaptureCount, Is.EqualTo(0));
-        Assert.That(match.Value.IsEmpty);
-        Assert.That(match.Index, Is.EqualTo(-1));
-        Assert.That(match.EndIndex, Is.EqualTo(-1));
-        Assert.That(match.Length, Is.EqualTo(0));
-        Assert.That(match.IsPartialMatch, Is.False);
-        Assert.That(match.Mark.Length, Is.EqualTo(0));
+        match.Success.ShouldBeFalse();
+        match.CaptureCount.ShouldBe(0);
+        match.Value.IsEmpty.ShouldBeTrue();
+        match.Index.ShouldBe(-1);
+        match.EndIndex.ShouldBe(-1);
+        match.Length.ShouldBe(0);
+        match.IsPartialMatch.ShouldBeFalse();
+        match.Mark.IsEmpty.ShouldBeTrue();
 
-        Assert.That(match[0].Success, Is.False);
-        Assert.That(match[0].IsDefined, Is.False);
-        Assert.That(match[0].Value.IsEmpty);
-        Assert.That(match[0].Index, Is.EqualTo(-1));
-        Assert.That(match[0].EndIndex, Is.EqualTo(-1));
-        Assert.That(match[0].Length, Is.EqualTo(0));
+        match[0].Success.ShouldBeFalse();
+        match[0].IsDefined.ShouldBeFalse();
+        match[0].Value.IsEmpty.ShouldBeTrue();
+        match[0].Index.ShouldBe(-1);
+        match[0].EndIndex.ShouldBe(-1);
+        match[0].Length.ShouldBe(0);
     }
 
     [Test]
@@ -291,17 +292,17 @@ public class PcreRefMatchTests
         var re = new PcreRegex(".");
         var enumerator = re.Matches("ab".AsSpan()).GetEnumerator();
 
-        Assert.That(enumerator.MoveNext(), Is.True);
+        enumerator.MoveNext().ShouldBeTrue();
 
         var copy = enumerator.Current;
 
-        Assert.That(enumerator.Current.Value.ToString(), Is.EqualTo("a"));
-        Assert.That(copy.Value.ToString(), Is.EqualTo("a"));
+        enumerator.Current.Value.ShouldBe("a");
+        copy.Value.ShouldBe("a");
 
-        Assert.That(enumerator.MoveNext(), Is.True);
+        enumerator.MoveNext().ShouldBeTrue();
 
-        Assert.That(enumerator.Current.Value.ToString(), Is.EqualTo("b"));
-        Assert.That(copy.Value.ToString(), Is.EqualTo("a"));
+        enumerator.Current.Value.ShouldBe("b");
+        copy.Value.ShouldBe("a");
     }
 
     [Test]
@@ -310,17 +311,17 @@ public class PcreRefMatchTests
         var re = new PcreRegexUtf8("."u8);
         var enumerator = re.Matches("ab"u8).GetEnumerator();
 
-        Assert.That(enumerator.MoveNext(), Is.True);
+        enumerator.MoveNext().ShouldBeTrue();
 
         var copy = enumerator.Current;
 
-        Assert.That(enumerator.Current.Value.SequenceEqual("a"u8));
-        Assert.That(copy.Value.SequenceEqual("a"u8));
+        enumerator.Current.Value.ShouldBe("a"u8);
+        copy.Value.ShouldBe("a"u8);
 
-        Assert.That(enumerator.MoveNext(), Is.True);
+        enumerator.MoveNext().ShouldBeTrue();
 
-        Assert.That(enumerator.Current.Value.SequenceEqual("b"u8));
-        Assert.That(copy.Value.SequenceEqual("a"u8));
+        enumerator.Current.Value.ShouldBe("b"u8);
+        copy.Value.ShouldBe("a"u8);
     }
 
     [Test]
@@ -329,17 +330,17 @@ public class PcreRefMatchTests
         var re = TestSupport.CreatePcreRegex8Bit(".".ToLatin1Bytes());
         var enumerator = re.Matches("ab".ToLatin1Bytes()).GetEnumerator();
 
-        Assert.That(enumerator.MoveNext(), Is.True);
+        enumerator.MoveNext().ShouldBeTrue();
 
         var copy = enumerator.Current;
 
-        Assert.That(enumerator.Current.Value.SequenceEqual("a".ToLatin1Bytes()));
-        Assert.That(copy.Value.SequenceEqual("a".ToLatin1Bytes()));
+        enumerator.Current.Value.ShouldBe("a".ToLatin1Bytes());
+        copy.Value.ShouldBe("a".ToLatin1Bytes());
 
-        Assert.That(enumerator.MoveNext(), Is.True);
+        enumerator.MoveNext().ShouldBeTrue();
 
-        Assert.That(enumerator.Current.Value.SequenceEqual("b".ToLatin1Bytes()));
-        Assert.That(copy.Value.SequenceEqual("a".ToLatin1Bytes()));
+        enumerator.Current.Value.ShouldBe("b".ToLatin1Bytes());
+        copy.Value.ShouldBe("a".ToLatin1Bytes());
     }
 
     [Test]
@@ -348,10 +349,10 @@ public class PcreRefMatchTests
         var re = new PcreRegex(".");
         var enumerator = re.Matches("ab".AsSpan()).GetEnumerator();
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.MoveNext(), Is.False);
-        Assert.That(enumerator.MoveNext(), Is.False);
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.MoveNext().ShouldBeFalse();
+        enumerator.MoveNext().ShouldBeFalse();
     }
 
     [Test]
@@ -360,10 +361,10 @@ public class PcreRefMatchTests
         var re = new PcreRegexUtf8("."u8);
         var enumerator = re.Matches("ab"u8).GetEnumerator();
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.MoveNext(), Is.False);
-        Assert.That(enumerator.MoveNext(), Is.False);
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.MoveNext().ShouldBeFalse();
+        enumerator.MoveNext().ShouldBeFalse();
     }
 
     [Test]
@@ -372,10 +373,10 @@ public class PcreRefMatchTests
         var re = TestSupport.CreatePcreRegex8Bit(".".ToLatin1Bytes());
         var enumerator = re.Matches("ab".ToLatin1Bytes()).GetEnumerator();
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.MoveNext(), Is.False);
-        Assert.That(enumerator.MoveNext(), Is.False);
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.MoveNext().ShouldBeFalse();
+        enumerator.MoveNext().ShouldBeFalse();
     }
 
     [Test]
@@ -385,8 +386,8 @@ public class PcreRefMatchTests
         var groupA = match[0];
         var groupB = match.Groups[0];
 
-        Assert.That(groupA.IsDefined, Is.False);
-        Assert.That(groupB.IsDefined, Is.False);
+        groupA.IsDefined.ShouldBeFalse();
+        groupB.IsDefined.ShouldBeFalse();
     }
 
     [Test]
@@ -396,8 +397,8 @@ public class PcreRefMatchTests
         var groupA = match[0];
         var groupB = match.Groups[0];
 
-        Assert.That(groupA.IsDefined, Is.False);
-        Assert.That(groupB.IsDefined, Is.False);
+        groupA.IsDefined.ShouldBeFalse();
+        groupB.IsDefined.ShouldBeFalse();
     }
 
     [Test]
@@ -407,8 +408,8 @@ public class PcreRefMatchTests
         var groupA = match["foo"];
         var groupB = match.Groups["foo"];
 
-        Assert.That(groupA.IsDefined, Is.False);
-        Assert.That(groupB.IsDefined, Is.False);
+        groupA.IsDefined.ShouldBeFalse();
+        groupB.IsDefined.ShouldBeFalse();
     }
 
     [Test]
@@ -418,8 +419,8 @@ public class PcreRefMatchTests
         var groupA = match["foo"];
         var groupB = match.Groups["foo"];
 
-        Assert.That(groupA.IsDefined, Is.False);
-        Assert.That(groupB.IsDefined, Is.False);
+        groupA.IsDefined.ShouldBeFalse();
+        groupB.IsDefined.ShouldBeFalse();
     }
 
     [Test]
@@ -428,8 +429,8 @@ public class PcreRefMatchTests
         var match = default(PcreRefMatch);
         var enumerator = match.GetDuplicateNamedGroups("foo").GetEnumerator();
 
-        Assert.That(enumerator.MoveNext(), Is.False);
-        Assert.That(enumerator.MoveNext(), Is.False);
+        enumerator.MoveNext().ShouldBeFalse();
+        enumerator.MoveNext().ShouldBeFalse();
     }
 
     [Test]
@@ -438,8 +439,8 @@ public class PcreRefMatchTests
         var match = default(PcreRefMatch8Bit);
         var enumerator = match.GetDuplicateNamedGroups("foo").GetEnumerator();
 
-        Assert.That(enumerator.MoveNext(), Is.False);
-        Assert.That(enumerator.MoveNext(), Is.False);
+        enumerator.MoveNext().ShouldBeFalse();
+        enumerator.MoveNext().ShouldBeFalse();
     }
 
     [Test]
@@ -448,11 +449,11 @@ public class PcreRefMatchTests
         var match = default(PcreRefMatch);
         var enumerator = match.GetEnumerator();
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.Current.Success, Is.False);
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.Current.Success.ShouldBeFalse();
 
-        Assert.That(enumerator.MoveNext(), Is.False);
-        Assert.That(enumerator.MoveNext(), Is.False);
+        enumerator.MoveNext().ShouldBeFalse();
+        enumerator.MoveNext().ShouldBeFalse();
     }
 
     [Test]
@@ -461,10 +462,10 @@ public class PcreRefMatchTests
         var match = default(PcreRefMatch8Bit);
         var enumerator = match.GetEnumerator();
 
-        Assert.That(enumerator.MoveNext(), Is.True);
-        Assert.That(enumerator.Current.Success, Is.False);
+        enumerator.MoveNext().ShouldBeTrue();
+        enumerator.Current.Success.ShouldBeFalse();
 
-        Assert.That(enumerator.MoveNext(), Is.False);
-        Assert.That(enumerator.MoveNext(), Is.False);
+        enumerator.MoveNext().ShouldBeFalse();
+        enumerator.MoveNext().ShouldBeFalse();
     }
 }

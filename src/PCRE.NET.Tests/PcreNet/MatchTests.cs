@@ -8,6 +8,7 @@ using System.Text;
 using NUnit.Framework;
 using PCRE.Internal;
 using PCRE.Tests.Support;
+using Shouldly;
 
 namespace PCRE.Tests.PcreNet;
 
@@ -22,23 +23,23 @@ public class MatchTests
         var re = new PcreRegex(@"a+(b+)c+");
         var match = re.Match("xxxaaabbccczzz");
 
-        Assert.That(match, Is.Not.Null);
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(1));
-        Assert.That(match.Value, Is.EqualTo("aaabbccc"));
-        Assert.That(match.ValueSpan.ToString(), Is.EqualTo("aaabbccc"));
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.EndIndex, Is.EqualTo(11));
-        Assert.That(match.Length, Is.EqualTo(8));
+        match.ShouldNotBeNull();
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(1);
+        match.Value.ShouldBe("aaabbccc");
+        match.ValueSpan.ShouldBe("aaabbccc");
+        match.Index.ShouldBe(3);
+        match.EndIndex.ShouldBe(11);
+        match.Length.ShouldBe(8);
 
-        Assert.That(match[1], Is.Not.Null);
-        Assert.That(match[1].Success, Is.True);
-        Assert.That(match[1].Value, Is.EqualTo("bb"));
-        Assert.That(match[1].ValueSpan.ToString(), Is.EqualTo("bb"));
-        Assert.That(match[1].Index, Is.EqualTo(6));
-        Assert.That(match[1].Length, Is.EqualTo(2));
+        match[1].ShouldNotBeNull();
+        match[1].Success.ShouldBeTrue();
+        match[1].Value.ShouldBe("bb");
+        match[1].ValueSpan.ShouldBe("bb");
+        match[1].Index.ShouldBe(6);
+        match[1].Length.ShouldBe(2);
 
-        Assert.That(match.Groups[1], Is.SameAs(match[1]));
+        match.Groups[1].ShouldBeSameAs(match[1]);
     }
 
     [Test]
@@ -47,19 +48,19 @@ public class MatchTests
         var re = new PcreRegex(@"a+(b+)c+");
         var match = re.Match("xxxaaabbccczzz".AsSpan());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(1));
-        Assert.That(match.Value.ToString(), Is.EqualTo("aaabbccc"));
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.EndIndex, Is.EqualTo(11));
-        Assert.That(match.Length, Is.EqualTo(8));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(1);
+        match.Value.ShouldBe("aaabbccc");
+        match.Index.ShouldBe(3);
+        match.EndIndex.ShouldBe(11);
+        match.Length.ShouldBe(8);
 
-        Assert.That(match[1].Success, Is.True);
-        Assert.That(match[1].Value.ToString(), Is.EqualTo("bb"));
-        Assert.That(match[1].Index, Is.EqualTo(6));
-        Assert.That(match[1].Length, Is.EqualTo(2));
+        match[1].Success.ShouldBeTrue();
+        match[1].Value.ShouldBe("bb");
+        match[1].Index.ShouldBe(6);
+        match[1].Length.ShouldBe(2);
 
-        Assert.That(match[2].Success, Is.False);
+        match[2].Success.ShouldBeFalse();
     }
 
     [Test]
@@ -68,19 +69,19 @@ public class MatchTests
         var re = new PcreRegex(@"a+(b+)c+");
         var match = re.CreateMatchBuffer().Match("xxxaaabbccczzz".AsSpan());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(1));
-        Assert.That(match.Value.ToString(), Is.EqualTo("aaabbccc"));
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.EndIndex, Is.EqualTo(11));
-        Assert.That(match.Length, Is.EqualTo(8));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(1);
+        match.Value.ShouldBe("aaabbccc");
+        match.Index.ShouldBe(3);
+        match.EndIndex.ShouldBe(11);
+        match.Length.ShouldBe(8);
 
-        Assert.That(match[1].Success, Is.True);
-        Assert.That(match[1].Value.ToString(), Is.EqualTo("bb"));
-        Assert.That(match[1].Index, Is.EqualTo(6));
-        Assert.That(match[1].Length, Is.EqualTo(2));
+        match[1].Success.ShouldBeTrue();
+        match[1].Value.ShouldBe("bb");
+        match[1].Index.ShouldBe(6);
+        match[1].Length.ShouldBe(2);
 
-        Assert.That(match[2].Success, Is.False);
+        match[2].Success.ShouldBeFalse();
     }
 
     [Test]
@@ -89,19 +90,19 @@ public class MatchTests
         var re = new PcreRegexUtf8(@"a+(b+)c+"u8);
         var match = re.Match("xxxaaabbccczzz"u8);
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(1));
-        Assert.That(match.Value.SequenceEqual("aaabbccc"u8));
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.EndIndex, Is.EqualTo(11));
-        Assert.That(match.Length, Is.EqualTo(8));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(1);
+        match.Value.ShouldBe("aaabbccc"u8);
+        match.Index.ShouldBe(3);
+        match.EndIndex.ShouldBe(11);
+        match.Length.ShouldBe(8);
 
-        Assert.That(match[1].Success, Is.True);
-        Assert.That(match[1].Value.SequenceEqual("bb"u8));
-        Assert.That(match[1].Index, Is.EqualTo(6));
-        Assert.That(match[1].Length, Is.EqualTo(2));
+        match[1].Success.ShouldBeTrue();
+        match[1].Value.ShouldBe("bb"u8);
+        match[1].Index.ShouldBe(6);
+        match[1].Length.ShouldBe(2);
 
-        Assert.That(match[2].Success, Is.False);
+        match[2].Success.ShouldBeFalse();
     }
 
     [Test]
@@ -110,19 +111,19 @@ public class MatchTests
         var re = new PcreRegexUtf8(@"a+(b+)c+"u8);
         var match = re.CreateMatchBuffer().Match("xxxaaabbccczzz"u8);
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(1));
-        Assert.That(match.Value.SequenceEqual("aaabbccc"u8));
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.EndIndex, Is.EqualTo(11));
-        Assert.That(match.Length, Is.EqualTo(8));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(1);
+        match.Value.ShouldBe("aaabbccc"u8);
+        match.Index.ShouldBe(3);
+        match.EndIndex.ShouldBe(11);
+        match.Length.ShouldBe(8);
 
-        Assert.That(match[1].Success, Is.True);
-        Assert.That(match[1].Value.SequenceEqual("bb"u8));
-        Assert.That(match[1].Index, Is.EqualTo(6));
-        Assert.That(match[1].Length, Is.EqualTo(2));
+        match[1].Success.ShouldBeTrue();
+        match[1].Value.ShouldBe("bb"u8);
+        match[1].Index.ShouldBe(6);
+        match[1].Length.ShouldBe(2);
 
-        Assert.That(match[2].Success, Is.False);
+        match[2].Success.ShouldBeFalse();
     }
 
     [Test]
@@ -131,19 +132,19 @@ public class MatchTests
         var re = TestSupport.CreatePcreRegex8Bit(@"a+(b+)c+".ToLatin1Bytes());
         var match = re.Match("xxxaaabbccczzz".ToLatin1Bytes());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(1));
-        Assert.That(match.Value.SequenceEqual("aaabbccc".ToLatin1Bytes()));
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.EndIndex, Is.EqualTo(11));
-        Assert.That(match.Length, Is.EqualTo(8));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(1);
+        match.Value.ShouldBe("aaabbccc".ToLatin1Bytes());
+        match.Index.ShouldBe(3);
+        match.EndIndex.ShouldBe(11);
+        match.Length.ShouldBe(8);
 
-        Assert.That(match[1].Success, Is.True);
-        Assert.That(match[1].Value.SequenceEqual("bb".ToLatin1Bytes()));
-        Assert.That(match[1].Index, Is.EqualTo(6));
-        Assert.That(match[1].Length, Is.EqualTo(2));
+        match[1].Success.ShouldBeTrue();
+        match[1].Value.ShouldBe("bb".ToLatin1Bytes());
+        match[1].Index.ShouldBe(6);
+        match[1].Length.ShouldBe(2);
 
-        Assert.That(match[2].Success, Is.False);
+        match[2].Success.ShouldBeFalse();
     }
 
     [Test]
@@ -152,19 +153,19 @@ public class MatchTests
         var re = TestSupport.CreatePcreRegex8Bit(@"a+(b+)c+".ToLatin1Bytes());
         var match = re.CreateMatchBuffer().Match("xxxaaabbccczzz".ToLatin1Bytes());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(1));
-        Assert.That(match.Value.SequenceEqual("aaabbccc".ToLatin1Bytes()));
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.EndIndex, Is.EqualTo(11));
-        Assert.That(match.Length, Is.EqualTo(8));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(1);
+        match.Value.ShouldBe("aaabbccc".ToLatin1Bytes());
+        match.Index.ShouldBe(3);
+        match.EndIndex.ShouldBe(11);
+        match.Length.ShouldBe(8);
 
-        Assert.That(match[1].Success, Is.True);
-        Assert.That(match[1].Value.SequenceEqual("bb".ToLatin1Bytes()));
-        Assert.That(match[1].Index, Is.EqualTo(6));
-        Assert.That(match[1].Length, Is.EqualTo(2));
+        match[1].Success.ShouldBeTrue();
+        match[1].Value.ShouldBe("bb".ToLatin1Bytes());
+        match[1].Index.ShouldBe(6);
+        match[1].Length.ShouldBe(2);
 
-        Assert.That(match[2].Success, Is.False);
+        match[2].Success.ShouldBeFalse();
     }
 
     [Test]
@@ -173,51 +174,51 @@ public class MatchTests
         var re = new PcreRegex(@"a+(b+)(c+)?(d+)e+");
         var match = re.Match("xxxaaabbddeeezzz");
 
-        Assert.That(match, Is.Not.Null);
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(3));
-        Assert.That(match.Value, Is.EqualTo("aaabbddeee"));
-        Assert.That(match.ValueSpan.ToString(), Is.EqualTo("aaabbddeee"));
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.Length, Is.EqualTo(10));
+        match.ShouldNotBeNull();
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(3);
+        match.Value.ShouldBe("aaabbddeee");
+        match.ValueSpan.ShouldBe("aaabbddeee");
+        match.Index.ShouldBe(3);
+        match.Length.ShouldBe(10);
 
-        Assert.That(match[1], Is.Not.Null);
-        Assert.That(match[1].Success, Is.True);
-        Assert.That(match[1].IsDefined, Is.True);
-        Assert.That(match[1].Value, Is.EqualTo("bb"));
-        Assert.That(match[1].ValueSpan.ToString(), Is.EqualTo("bb"));
-        Assert.That(match[1].Index, Is.EqualTo(6));
-        Assert.That(match[1].Length, Is.EqualTo(2));
+        match[1].ShouldNotBeNull();
+        match[1].Success.ShouldBeTrue();
+        match[1].IsDefined.ShouldBeTrue();
+        match[1].Value.ShouldBe("bb");
+        match[1].ValueSpan.ShouldBe("bb");
+        match[1].Index.ShouldBe(6);
+        match[1].Length.ShouldBe(2);
 
-        Assert.That(match[2], Is.Not.Null);
-        Assert.That(match[2].Success, Is.False);
-        Assert.That(match[2].IsDefined, Is.True);
-        Assert.That(match[2].Value, Is.SameAs(string.Empty));
-        Assert.That(match[2].ValueSpan.Length, Is.EqualTo(0));
-        Assert.That(match[2].Index, Is.EqualTo(-1));
-        Assert.That(match[2].Length, Is.EqualTo(0));
+        match[2].ShouldNotBeNull();
+        match[2].Success.ShouldBeFalse();
+        match[2].IsDefined.ShouldBeTrue();
+        match[2].Value.ShouldBeSameAs(string.Empty);
+        match[2].ValueSpan.IsEmpty.ShouldBeTrue();
+        match[2].Index.ShouldBe(-1);
+        match[2].Length.ShouldBe(0);
 
-        Assert.That(match[3], Is.Not.Null);
-        Assert.That(match[3].Success, Is.True);
-        Assert.That(match[3].IsDefined, Is.True);
-        Assert.That(match[3].Value, Is.EqualTo("dd"));
-        Assert.That(match[3].ValueSpan.ToString(), Is.EqualTo("dd"));
-        Assert.That(match[3].Index, Is.EqualTo(8));
-        Assert.That(match[3].Length, Is.EqualTo(2));
+        match[3].ShouldNotBeNull();
+        match[3].Success.ShouldBeTrue();
+        match[3].IsDefined.ShouldBeTrue();
+        match[3].Value.ShouldBe("dd");
+        match[3].ValueSpan.ShouldBe("dd");
+        match[3].Index.ShouldBe(8);
+        match[3].Length.ShouldBe(2);
 
-        Assert.That(match[4], Is.Not.Null);
-        Assert.That(match[4].Success, Is.False);
-        Assert.That(match[4].IsDefined, Is.False);
-        Assert.That(match[4].Value, Is.SameAs(string.Empty));
-        Assert.That(match[4].ValueSpan.Length, Is.EqualTo(0));
-        Assert.That(match[4].Index, Is.EqualTo(-1));
-        Assert.That(match[4].Length, Is.EqualTo(0));
+        match[4].ShouldNotBeNull();
+        match[4].Success.ShouldBeFalse();
+        match[4].IsDefined.ShouldBeFalse();
+        match[4].Value.ShouldBeSameAs(string.Empty);
+        match[4].ValueSpan.IsEmpty.ShouldBeTrue();
+        match[4].Index.ShouldBe(-1);
+        match[4].Length.ShouldBe(0);
 
-        Assert.That(match.TryGetGroup(1, out var group), Is.True);
-        Assert.That(group, Is.SameAs(match[1]));
+        match.TryGetGroup(1, out var group).ShouldBeTrue();
+        group.ShouldBeSameAs(match[1]);
 
-        Assert.That(match.TryGetGroup(4, out group), Is.False);
-        Assert.That(group, Is.Null);
+        match.TryGetGroup(4, out group).ShouldBeFalse();
+        group.ShouldBeNull();
     }
 
     [Test]
@@ -226,49 +227,49 @@ public class MatchTests
         var re = new PcreRegex(@"a+(b+)(c+)?(d+)e+");
         var match = re.Match("xxxaaabbddeeezzz".AsSpan());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(3));
-        Assert.That(match.Value.ToString(), Is.EqualTo("aaabbddeee"));
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.Length, Is.EqualTo(10));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(3);
+        match.Value.ShouldBe("aaabbddeee");
+        match.Index.ShouldBe(3);
+        match.Length.ShouldBe(10);
 
-        Assert.That(match[1].Success, Is.True);
-        Assert.That(match[1].IsDefined, Is.True);
-        Assert.That(match[1].Value.ToString(), Is.EqualTo("bb"));
-        Assert.That(match[1].Index, Is.EqualTo(6));
-        Assert.That(match[1].Length, Is.EqualTo(2));
+        match[1].Success.ShouldBeTrue();
+        match[1].IsDefined.ShouldBeTrue();
+        match[1].Value.ShouldBe("bb");
+        match[1].Index.ShouldBe(6);
+        match[1].Length.ShouldBe(2);
 
-        Assert.That(match[2].Success, Is.False);
-        Assert.That(match[2].IsDefined, Is.True);
-        Assert.That(match[2].Value.ToString(), Is.SameAs(string.Empty));
-        Assert.That(match[2].Index, Is.EqualTo(-1));
-        Assert.That(match[2].Length, Is.EqualTo(0));
+        match[2].Success.ShouldBeFalse();
+        match[2].IsDefined.ShouldBeTrue();
+        match[2].Value.ToString().ShouldBeSameAs(string.Empty);
+        match[2].Index.ShouldBe(-1);
+        match[2].Length.ShouldBe(0);
 
-        Assert.That(match[3].Success, Is.True);
-        Assert.That(match[3].IsDefined, Is.True);
-        Assert.That(match[3].Value.ToString(), Is.EqualTo("dd"));
-        Assert.That(match[3].Index, Is.EqualTo(8));
-        Assert.That(match[3].Length, Is.EqualTo(2));
+        match[3].Success.ShouldBeTrue();
+        match[3].IsDefined.ShouldBeTrue();
+        match[3].Value.ShouldBe("dd");
+        match[3].Index.ShouldBe(8);
+        match[3].Length.ShouldBe(2);
 
-        Assert.That(match[4].Success, Is.False);
-        Assert.That(match[4].IsDefined, Is.False);
-        Assert.That(match[4].Value.ToString(), Is.SameAs(string.Empty));
-        Assert.That(match[4].Index, Is.EqualTo(-1));
-        Assert.That(match[4].Length, Is.EqualTo(0));
+        match[4].Success.ShouldBeFalse();
+        match[4].IsDefined.ShouldBeFalse();
+        match[4].Value.ToString().ShouldBeSameAs(string.Empty);
+        match[4].Index.ShouldBe(-1);
+        match[4].Length.ShouldBe(0);
 
-        Assert.That(match.TryGetGroup(1, out var group), Is.True);
-        Assert.That(group.Success, Is.True);
-        Assert.That(group.IsDefined, Is.True);
-        Assert.That(group.Value.ToString(), Is.EqualTo("bb"));
-        Assert.That(group.Index, Is.EqualTo(6));
-        Assert.That(group.Length, Is.EqualTo(2));
+        match.TryGetGroup(1, out var group).ShouldBeTrue();
+        group.Success.ShouldBeTrue();
+        group.IsDefined.ShouldBeTrue();
+        group.Value.ShouldBe("bb");
+        group.Index.ShouldBe(6);
+        group.Length.ShouldBe(2);
 
-        Assert.That(match.TryGetGroup(4, out group), Is.False);
-        Assert.That(group.Success, Is.False);
-        Assert.That(group.IsDefined, Is.False);
-        Assert.That(group.Value.ToString(), Is.SameAs(string.Empty));
-        Assert.That(group.Index, Is.EqualTo(-1));
-        Assert.That(group.Length, Is.EqualTo(0));
+        match.TryGetGroup(4, out group).ShouldBeFalse();
+        group.Success.ShouldBeFalse();
+        group.IsDefined.ShouldBeFalse();
+        group.Value.ToString().ShouldBeSameAs(string.Empty);
+        group.Index.ShouldBe(-1);
+        group.Length.ShouldBe(0);
     }
 
     [Test]
@@ -277,49 +278,49 @@ public class MatchTests
         var re = new PcreRegex(@"a+(b+)(c+)?(d+)e+");
         var match = re.CreateMatchBuffer().Match("xxxaaabbddeeezzz".AsSpan());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(3));
-        Assert.That(match.Value.ToString(), Is.EqualTo("aaabbddeee"));
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.Length, Is.EqualTo(10));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(3);
+        match.Value.ShouldBe("aaabbddeee");
+        match.Index.ShouldBe(3);
+        match.Length.ShouldBe(10);
 
-        Assert.That(match[1].Success, Is.True);
-        Assert.That(match[1].IsDefined, Is.True);
-        Assert.That(match[1].Value.ToString(), Is.EqualTo("bb"));
-        Assert.That(match[1].Index, Is.EqualTo(6));
-        Assert.That(match[1].Length, Is.EqualTo(2));
+        match[1].Success.ShouldBeTrue();
+        match[1].IsDefined.ShouldBeTrue();
+        match[1].Value.ShouldBe("bb");
+        match[1].Index.ShouldBe(6);
+        match[1].Length.ShouldBe(2);
 
-        Assert.That(match[2].Success, Is.False);
-        Assert.That(match[2].IsDefined, Is.True);
-        Assert.That(match[2].Value.ToString(), Is.SameAs(string.Empty));
-        Assert.That(match[2].Index, Is.EqualTo(-1));
-        Assert.That(match[2].Length, Is.EqualTo(0));
+        match[2].Success.ShouldBeFalse();
+        match[2].IsDefined.ShouldBeTrue();
+        match[2].Value.ToString().ShouldBeSameAs(string.Empty);
+        match[2].Index.ShouldBe(-1);
+        match[2].Length.ShouldBe(0);
 
-        Assert.That(match[3].Success, Is.True);
-        Assert.That(match[3].IsDefined, Is.True);
-        Assert.That(match[3].Value.ToString(), Is.EqualTo("dd"));
-        Assert.That(match[3].Index, Is.EqualTo(8));
-        Assert.That(match[3].Length, Is.EqualTo(2));
+        match[3].Success.ShouldBeTrue();
+        match[3].IsDefined.ShouldBeTrue();
+        match[3].Value.ShouldBe("dd");
+        match[3].Index.ShouldBe(8);
+        match[3].Length.ShouldBe(2);
 
-        Assert.That(match[4].Success, Is.False);
-        Assert.That(match[4].IsDefined, Is.False);
-        Assert.That(match[4].Value.ToString(), Is.SameAs(string.Empty));
-        Assert.That(match[4].Index, Is.EqualTo(-1));
-        Assert.That(match[4].Length, Is.EqualTo(0));
+        match[4].Success.ShouldBeFalse();
+        match[4].IsDefined.ShouldBeFalse();
+        match[4].Value.ToString().ShouldBeSameAs(string.Empty);
+        match[4].Index.ShouldBe(-1);
+        match[4].Length.ShouldBe(0);
 
-        Assert.That(match.TryGetGroup(1, out var group), Is.True);
-        Assert.That(group.Success, Is.True);
-        Assert.That(group.IsDefined, Is.True);
-        Assert.That(group.Value.ToString(), Is.EqualTo("bb"));
-        Assert.That(group.Index, Is.EqualTo(6));
-        Assert.That(group.Length, Is.EqualTo(2));
+        match.TryGetGroup(1, out var group).ShouldBeTrue();
+        group.Success.ShouldBeTrue();
+        group.IsDefined.ShouldBeTrue();
+        group.Value.ShouldBe("bb");
+        group.Index.ShouldBe(6);
+        group.Length.ShouldBe(2);
 
-        Assert.That(match.TryGetGroup(4, out group), Is.False);
-        Assert.That(group.Success, Is.False);
-        Assert.That(group.IsDefined, Is.False);
-        Assert.That(group.Value.ToString(), Is.SameAs(string.Empty));
-        Assert.That(group.Index, Is.EqualTo(-1));
-        Assert.That(group.Length, Is.EqualTo(0));
+        match.TryGetGroup(4, out group).ShouldBeFalse();
+        group.Success.ShouldBeFalse();
+        group.IsDefined.ShouldBeFalse();
+        group.Value.ToString().ShouldBeSameAs(string.Empty);
+        group.Index.ShouldBe(-1);
+        group.Length.ShouldBe(0);
     }
 
     [Test]
@@ -328,49 +329,49 @@ public class MatchTests
         var re = new PcreRegexUtf8(@"a+(b+)(c+)?(d+)e+"u8);
         var match = re.CreateMatchBuffer().Match("xxxaaabbddeeezzz"u8);
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(3));
-        Assert.That(match.Value.SequenceEqual("aaabbddeee"u8));
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.Length, Is.EqualTo(10));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(3);
+        match.Value.ShouldBe("aaabbddeee"u8);
+        match.Index.ShouldBe(3);
+        match.Length.ShouldBe(10);
 
-        Assert.That(match[1].Success, Is.True);
-        Assert.That(match[1].IsDefined, Is.True);
-        Assert.That(match[1].Value.SequenceEqual("bb"u8));
-        Assert.That(match[1].Index, Is.EqualTo(6));
-        Assert.That(match[1].Length, Is.EqualTo(2));
+        match[1].Success.ShouldBeTrue();
+        match[1].IsDefined.ShouldBeTrue();
+        match[1].Value.ShouldBe("bb"u8);
+        match[1].Index.ShouldBe(6);
+        match[1].Length.ShouldBe(2);
 
-        Assert.That(match[2].Success, Is.False);
-        Assert.That(match[2].IsDefined, Is.True);
-        Assert.That(match[2].Value.IsEmpty);
-        Assert.That(match[2].Index, Is.EqualTo(-1));
-        Assert.That(match[2].Length, Is.EqualTo(0));
+        match[2].Success.ShouldBeFalse();
+        match[2].IsDefined.ShouldBeTrue();
+        match[2].Value.IsEmpty.ShouldBeTrue();
+        match[2].Index.ShouldBe(-1);
+        match[2].Length.ShouldBe(0);
 
-        Assert.That(match[3].Success, Is.True);
-        Assert.That(match[3].IsDefined, Is.True);
-        Assert.That(match[3].Value.SequenceEqual("dd"u8));
-        Assert.That(match[3].Index, Is.EqualTo(8));
-        Assert.That(match[3].Length, Is.EqualTo(2));
+        match[3].Success.ShouldBeTrue();
+        match[3].IsDefined.ShouldBeTrue();
+        match[3].Value.ShouldBe("dd"u8);
+        match[3].Index.ShouldBe(8);
+        match[3].Length.ShouldBe(2);
 
-        Assert.That(match[4].Success, Is.False);
-        Assert.That(match[4].IsDefined, Is.False);
-        Assert.That(match[4].Value.IsEmpty);
-        Assert.That(match[4].Index, Is.EqualTo(-1));
-        Assert.That(match[4].Length, Is.EqualTo(0));
+        match[4].Success.ShouldBeFalse();
+        match[4].IsDefined.ShouldBeFalse();
+        match[4].Value.IsEmpty.ShouldBeTrue();
+        match[4].Index.ShouldBe(-1);
+        match[4].Length.ShouldBe(0);
 
-        Assert.That(match.TryGetGroup(1, out var group), Is.True);
-        Assert.That(group.Success, Is.True);
-        Assert.That(group.IsDefined, Is.True);
-        Assert.That(group.Value.SequenceEqual("bb"u8));
-        Assert.That(group.Index, Is.EqualTo(6));
-        Assert.That(group.Length, Is.EqualTo(2));
+        match.TryGetGroup(1, out var group).ShouldBeTrue();
+        group.Success.ShouldBeTrue();
+        group.IsDefined.ShouldBeTrue();
+        group.Value.ShouldBe("bb"u8);
+        group.Index.ShouldBe(6);
+        group.Length.ShouldBe(2);
 
-        Assert.That(match.TryGetGroup(4, out group), Is.False);
-        Assert.That(group.Success, Is.False);
-        Assert.That(group.IsDefined, Is.False);
-        Assert.That(group.Value.IsEmpty);
-        Assert.That(group.Index, Is.EqualTo(-1));
-        Assert.That(group.Length, Is.EqualTo(0));
+        match.TryGetGroup(4, out group).ShouldBeFalse();
+        group.Success.ShouldBeFalse();
+        group.IsDefined.ShouldBeFalse();
+        group.Value.IsEmpty.ShouldBeTrue();
+        group.Index.ShouldBe(-1);
+        group.Length.ShouldBe(0);
     }
 
     [Test]
@@ -379,49 +380,49 @@ public class MatchTests
         var re = new PcreRegexUtf8(@"a+(b+)(c+)?(d+)e+"u8);
         var match = re.Match("xxxaaabbddeeezzz"u8);
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(3));
-        Assert.That(match.Value.SequenceEqual("aaabbddeee"u8));
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.Length, Is.EqualTo(10));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(3);
+        match.Value.ShouldBe("aaabbddeee"u8);
+        match.Index.ShouldBe(3);
+        match.Length.ShouldBe(10);
 
-        Assert.That(match[1].Success, Is.True);
-        Assert.That(match[1].IsDefined, Is.True);
-        Assert.That(match[1].Value.SequenceEqual("bb"u8));
-        Assert.That(match[1].Index, Is.EqualTo(6));
-        Assert.That(match[1].Length, Is.EqualTo(2));
+        match[1].Success.ShouldBeTrue();
+        match[1].IsDefined.ShouldBeTrue();
+        match[1].Value.ShouldBe("bb"u8);
+        match[1].Index.ShouldBe(6);
+        match[1].Length.ShouldBe(2);
 
-        Assert.That(match[2].Success, Is.False);
-        Assert.That(match[2].IsDefined, Is.True);
-        Assert.That(match[2].Value.IsEmpty);
-        Assert.That(match[2].Index, Is.EqualTo(-1));
-        Assert.That(match[2].Length, Is.EqualTo(0));
+        match[2].Success.ShouldBeFalse();
+        match[2].IsDefined.ShouldBeTrue();
+        match[2].Value.IsEmpty.ShouldBeTrue();
+        match[2].Index.ShouldBe(-1);
+        match[2].Length.ShouldBe(0);
 
-        Assert.That(match[3].Success, Is.True);
-        Assert.That(match[3].IsDefined, Is.True);
-        Assert.That(match[3].Value.SequenceEqual("dd"u8));
-        Assert.That(match[3].Index, Is.EqualTo(8));
-        Assert.That(match[3].Length, Is.EqualTo(2));
+        match[3].Success.ShouldBeTrue();
+        match[3].IsDefined.ShouldBeTrue();
+        match[3].Value.ShouldBe("dd"u8);
+        match[3].Index.ShouldBe(8);
+        match[3].Length.ShouldBe(2);
 
-        Assert.That(match[4].Success, Is.False);
-        Assert.That(match[4].IsDefined, Is.False);
-        Assert.That(match[4].Value.IsEmpty);
-        Assert.That(match[4].Index, Is.EqualTo(-1));
-        Assert.That(match[4].Length, Is.EqualTo(0));
+        match[4].Success.ShouldBeFalse();
+        match[4].IsDefined.ShouldBeFalse();
+        match[4].Value.IsEmpty.ShouldBeTrue();
+        match[4].Index.ShouldBe(-1);
+        match[4].Length.ShouldBe(0);
 
-        Assert.That(match.TryGetGroup(1, out var group), Is.True);
-        Assert.That(group.Success, Is.True);
-        Assert.That(group.IsDefined, Is.True);
-        Assert.That(group.Value.SequenceEqual("bb"u8));
-        Assert.That(group.Index, Is.EqualTo(6));
-        Assert.That(group.Length, Is.EqualTo(2));
+        match.TryGetGroup(1, out var group).ShouldBeTrue();
+        group.Success.ShouldBeTrue();
+        group.IsDefined.ShouldBeTrue();
+        group.Value.ShouldBe("bb"u8);
+        group.Index.ShouldBe(6);
+        group.Length.ShouldBe(2);
 
-        Assert.That(match.TryGetGroup(4, out group), Is.False);
-        Assert.That(group.Success, Is.False);
-        Assert.That(group.IsDefined, Is.False);
-        Assert.That(group.Value.IsEmpty);
-        Assert.That(group.Index, Is.EqualTo(-1));
-        Assert.That(group.Length, Is.EqualTo(0));
+        match.TryGetGroup(4, out group).ShouldBeFalse();
+        group.Success.ShouldBeFalse();
+        group.IsDefined.ShouldBeFalse();
+        group.Value.IsEmpty.ShouldBeTrue();
+        group.Index.ShouldBe(-1);
+        group.Length.ShouldBe(0);
     }
 
     [Test]
@@ -430,49 +431,49 @@ public class MatchTests
         var re = TestSupport.CreatePcreRegex8Bit(@"a+(b+)(c+)?(d+)e+".ToLatin1Bytes());
         var match = re.Match("xxxaaabbddeeezzz".ToLatin1Bytes());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(3));
-        Assert.That(match.Value.SequenceEqual("aaabbddeee".ToLatin1Bytes()));
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.Length, Is.EqualTo(10));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(3);
+        match.Value.ShouldBe("aaabbddeee".ToLatin1Bytes());
+        match.Index.ShouldBe(3);
+        match.Length.ShouldBe(10);
 
-        Assert.That(match[1].Success, Is.True);
-        Assert.That(match[1].IsDefined, Is.True);
-        Assert.That(match[1].Value.SequenceEqual("bb".ToLatin1Bytes()));
-        Assert.That(match[1].Index, Is.EqualTo(6));
-        Assert.That(match[1].Length, Is.EqualTo(2));
+        match[1].Success.ShouldBeTrue();
+        match[1].IsDefined.ShouldBeTrue();
+        match[1].Value.ShouldBe("bb".ToLatin1Bytes());
+        match[1].Index.ShouldBe(6);
+        match[1].Length.ShouldBe(2);
 
-        Assert.That(match[2].Success, Is.False);
-        Assert.That(match[2].IsDefined, Is.True);
-        Assert.That(match[2].Value.IsEmpty);
-        Assert.That(match[2].Index, Is.EqualTo(-1));
-        Assert.That(match[2].Length, Is.EqualTo(0));
+        match[2].Success.ShouldBeFalse();
+        match[2].IsDefined.ShouldBeTrue();
+        match[2].Value.IsEmpty.ShouldBeTrue();
+        match[2].Index.ShouldBe(-1);
+        match[2].Length.ShouldBe(0);
 
-        Assert.That(match[3].Success, Is.True);
-        Assert.That(match[3].IsDefined, Is.True);
-        Assert.That(match[3].Value.SequenceEqual("dd".ToLatin1Bytes()));
-        Assert.That(match[3].Index, Is.EqualTo(8));
-        Assert.That(match[3].Length, Is.EqualTo(2));
+        match[3].Success.ShouldBeTrue();
+        match[3].IsDefined.ShouldBeTrue();
+        match[3].Value.ShouldBe("dd".ToLatin1Bytes());
+        match[3].Index.ShouldBe(8);
+        match[3].Length.ShouldBe(2);
 
-        Assert.That(match[4].Success, Is.False);
-        Assert.That(match[4].IsDefined, Is.False);
-        Assert.That(match[4].Value.IsEmpty);
-        Assert.That(match[4].Index, Is.EqualTo(-1));
-        Assert.That(match[4].Length, Is.EqualTo(0));
+        match[4].Success.ShouldBeFalse();
+        match[4].IsDefined.ShouldBeFalse();
+        match[4].Value.IsEmpty.ShouldBeTrue();
+        match[4].Index.ShouldBe(-1);
+        match[4].Length.ShouldBe(0);
 
-        Assert.That(match.TryGetGroup(1, out var group), Is.True);
-        Assert.That(group.Success, Is.True);
-        Assert.That(group.IsDefined, Is.True);
-        Assert.That(group.Value.SequenceEqual("bb".ToLatin1Bytes()));
-        Assert.That(group.Index, Is.EqualTo(6));
-        Assert.That(group.Length, Is.EqualTo(2));
+        match.TryGetGroup(1, out var group).ShouldBeTrue();
+        group.Success.ShouldBeTrue();
+        group.IsDefined.ShouldBeTrue();
+        group.Value.ShouldBe("bb".ToLatin1Bytes());
+        group.Index.ShouldBe(6);
+        group.Length.ShouldBe(2);
 
-        Assert.That(match.TryGetGroup(4, out group), Is.False);
-        Assert.That(group.Success, Is.False);
-        Assert.That(group.IsDefined, Is.False);
-        Assert.That(group.Value.IsEmpty);
-        Assert.That(group.Index, Is.EqualTo(-1));
-        Assert.That(group.Length, Is.EqualTo(0));
+        match.TryGetGroup(4, out group).ShouldBeFalse();
+        group.Success.ShouldBeFalse();
+        group.IsDefined.ShouldBeFalse();
+        group.Value.IsEmpty.ShouldBeTrue();
+        group.Index.ShouldBe(-1);
+        group.Length.ShouldBe(0);
     }
 
     [Test]
@@ -481,49 +482,49 @@ public class MatchTests
         var re = TestSupport.CreatePcreRegex8Bit(@"a+(b+)(c+)?(d+)e+".ToLatin1Bytes());
         var match = re.CreateMatchBuffer().Match("xxxaaabbddeeezzz".ToLatin1Bytes());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(3));
-        Assert.That(match.Value.SequenceEqual("aaabbddeee".ToLatin1Bytes()));
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.Length, Is.EqualTo(10));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(3);
+        match.Value.ShouldBe("aaabbddeee".ToLatin1Bytes());
+        match.Index.ShouldBe(3);
+        match.Length.ShouldBe(10);
 
-        Assert.That(match[1].Success, Is.True);
-        Assert.That(match[1].IsDefined, Is.True);
-        Assert.That(match[1].Value.SequenceEqual("bb".ToLatin1Bytes()));
-        Assert.That(match[1].Index, Is.EqualTo(6));
-        Assert.That(match[1].Length, Is.EqualTo(2));
+        match[1].Success.ShouldBeTrue();
+        match[1].IsDefined.ShouldBeTrue();
+        match[1].Value.ShouldBe("bb".ToLatin1Bytes());
+        match[1].Index.ShouldBe(6);
+        match[1].Length.ShouldBe(2);
 
-        Assert.That(match[2].Success, Is.False);
-        Assert.That(match[2].IsDefined, Is.True);
-        Assert.That(match[2].Value.IsEmpty);
-        Assert.That(match[2].Index, Is.EqualTo(-1));
-        Assert.That(match[2].Length, Is.EqualTo(0));
+        match[2].Success.ShouldBeFalse();
+        match[2].IsDefined.ShouldBeTrue();
+        match[2].Value.IsEmpty.ShouldBeTrue();
+        match[2].Index.ShouldBe(-1);
+        match[2].Length.ShouldBe(0);
 
-        Assert.That(match[3].Success, Is.True);
-        Assert.That(match[3].IsDefined, Is.True);
-        Assert.That(match[3].Value.SequenceEqual("dd".ToLatin1Bytes()));
-        Assert.That(match[3].Index, Is.EqualTo(8));
-        Assert.That(match[3].Length, Is.EqualTo(2));
+        match[3].Success.ShouldBeTrue();
+        match[3].IsDefined.ShouldBeTrue();
+        match[3].Value.ShouldBe("dd".ToLatin1Bytes());
+        match[3].Index.ShouldBe(8);
+        match[3].Length.ShouldBe(2);
 
-        Assert.That(match[4].Success, Is.False);
-        Assert.That(match[4].IsDefined, Is.False);
-        Assert.That(match[4].Value.IsEmpty);
-        Assert.That(match[4].Index, Is.EqualTo(-1));
-        Assert.That(match[4].Length, Is.EqualTo(0));
+        match[4].Success.ShouldBeFalse();
+        match[4].IsDefined.ShouldBeFalse();
+        match[4].Value.IsEmpty.ShouldBeTrue();
+        match[4].Index.ShouldBe(-1);
+        match[4].Length.ShouldBe(0);
 
-        Assert.That(match.TryGetGroup(1, out var group), Is.True);
-        Assert.That(group.Success, Is.True);
-        Assert.That(group.IsDefined, Is.True);
-        Assert.That(group.Value.SequenceEqual("bb".ToLatin1Bytes()));
-        Assert.That(group.Index, Is.EqualTo(6));
-        Assert.That(group.Length, Is.EqualTo(2));
+        match.TryGetGroup(1, out var group).ShouldBeTrue();
+        group.Success.ShouldBeTrue();
+        group.IsDefined.ShouldBeTrue();
+        group.Value.ShouldBe("bb".ToLatin1Bytes());
+        group.Index.ShouldBe(6);
+        group.Length.ShouldBe(2);
 
-        Assert.That(match.TryGetGroup(4, out group), Is.False);
-        Assert.That(group.Success, Is.False);
-        Assert.That(group.IsDefined, Is.False);
-        Assert.That(group.Value.IsEmpty);
-        Assert.That(group.Index, Is.EqualTo(-1));
-        Assert.That(group.Length, Is.EqualTo(0));
+        match.TryGetGroup(4, out group).ShouldBeFalse();
+        group.Success.ShouldBeFalse();
+        group.IsDefined.ShouldBeFalse();
+        group.Value.IsEmpty.ShouldBeTrue();
+        group.Index.ShouldBe(-1);
+        group.Length.ShouldBe(0);
     }
 
     [Test]
@@ -532,26 +533,26 @@ public class MatchTests
         var re = new PcreRegex(@"(a|(z))(bc)");
         var match = re.Match("abc");
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(3));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(3);
 
-        Assert.That(match[1].Success, Is.True);
-        Assert.That(match[1].Index, Is.EqualTo(0));
-        Assert.That(match[1].EndIndex, Is.EqualTo(1));
-        Assert.That(match[1].Value, Is.EqualTo("a"));
-        Assert.That(match[1].ValueSpan.ToString(), Is.EqualTo("a"));
+        match[1].Success.ShouldBeTrue();
+        match[1].Index.ShouldBe(0);
+        match[1].EndIndex.ShouldBe(1);
+        match[1].Value.ShouldBe("a");
+        match[1].ValueSpan.ShouldBe("a");
 
-        Assert.That(match[2].Success, Is.False);
-        Assert.That(match[2].Index, Is.EqualTo(-1));
-        Assert.That(match[2].EndIndex, Is.EqualTo(-1));
-        Assert.That(match[2].Value, Is.SameAs(string.Empty));
-        Assert.That(match[2].ValueSpan.Length, Is.EqualTo(0));
+        match[2].Success.ShouldBeFalse();
+        match[2].Index.ShouldBe(-1);
+        match[2].EndIndex.ShouldBe(-1);
+        match[2].Value.ShouldBeSameAs(string.Empty);
+        match[2].ValueSpan.IsEmpty.ShouldBeTrue();
 
-        Assert.That(match[3].Success, Is.True);
-        Assert.That(match[3].Index, Is.EqualTo(1));
-        Assert.That(match[3].Length, Is.EqualTo(2));
-        Assert.That(match[3].Value, Is.EqualTo("bc"));
-        Assert.That(match[3].ValueSpan.ToString(), Is.EqualTo("bc"));
+        match[3].Success.ShouldBeTrue();
+        match[3].Index.ShouldBe(1);
+        match[3].Length.ShouldBe(2);
+        match[3].Value.ShouldBe("bc");
+        match[3].ValueSpan.ShouldBe("bc");
     }
 
     [Test]
@@ -560,23 +561,23 @@ public class MatchTests
         var re = new PcreRegex(@"(a|(z))(bc)");
         var match = re.Match("abc".AsSpan());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(3));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(3);
 
-        Assert.That(match[1].Success, Is.True);
-        Assert.That(match[1].Index, Is.EqualTo(0));
-        Assert.That(match[1].EndIndex, Is.EqualTo(1));
-        Assert.That(match[1].Value.ToString(), Is.EqualTo("a"));
+        match[1].Success.ShouldBeTrue();
+        match[1].Index.ShouldBe(0);
+        match[1].EndIndex.ShouldBe(1);
+        match[1].Value.ShouldBe("a");
 
-        Assert.That(match[2].Success, Is.False);
-        Assert.That(match[2].Index, Is.EqualTo(-1));
-        Assert.That(match[2].EndIndex, Is.EqualTo(-1));
-        Assert.That(match[2].Value.ToString(), Is.SameAs(string.Empty));
+        match[2].Success.ShouldBeFalse();
+        match[2].Index.ShouldBe(-1);
+        match[2].EndIndex.ShouldBe(-1);
+        match[2].Value.ToString().ShouldBeSameAs(string.Empty);
 
-        Assert.That(match[3].Success, Is.True);
-        Assert.That(match[3].Index, Is.EqualTo(1));
-        Assert.That(match[3].Length, Is.EqualTo(2));
-        Assert.That(match[3].Value.ToString(), Is.EqualTo("bc"));
+        match[3].Success.ShouldBeTrue();
+        match[3].Index.ShouldBe(1);
+        match[3].Length.ShouldBe(2);
+        match[3].Value.ShouldBe("bc");
     }
 
     [Test]
@@ -585,23 +586,23 @@ public class MatchTests
         var re = new PcreRegex(@"(a|(z))(bc)");
         var match = re.CreateMatchBuffer().Match("abc".AsSpan());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(3));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(3);
 
-        Assert.That(match[1].Success, Is.True);
-        Assert.That(match[1].Index, Is.EqualTo(0));
-        Assert.That(match[1].EndIndex, Is.EqualTo(1));
-        Assert.That(match[1].Value.ToString(), Is.EqualTo("a"));
+        match[1].Success.ShouldBeTrue();
+        match[1].Index.ShouldBe(0);
+        match[1].EndIndex.ShouldBe(1);
+        match[1].Value.ShouldBe("a");
 
-        Assert.That(match[2].Success, Is.False);
-        Assert.That(match[2].Index, Is.EqualTo(-1));
-        Assert.That(match[2].EndIndex, Is.EqualTo(-1));
-        Assert.That(match[2].Value.ToString(), Is.SameAs(string.Empty));
+        match[2].Success.ShouldBeFalse();
+        match[2].Index.ShouldBe(-1);
+        match[2].EndIndex.ShouldBe(-1);
+        match[2].Value.ToString().ShouldBeSameAs(string.Empty);
 
-        Assert.That(match[3].Success, Is.True);
-        Assert.That(match[3].Index, Is.EqualTo(1));
-        Assert.That(match[3].Length, Is.EqualTo(2));
-        Assert.That(match[3].Value.ToString(), Is.EqualTo("bc"));
+        match[3].Success.ShouldBeTrue();
+        match[3].Index.ShouldBe(1);
+        match[3].Length.ShouldBe(2);
+        match[3].Value.ShouldBe("bc");
     }
 
     [Test]
@@ -610,23 +611,23 @@ public class MatchTests
         var re = new PcreRegexUtf8(@"(a|(z))(bc)"u8);
         var match = re.Match("abc"u8);
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(3));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(3);
 
-        Assert.That(match[1].Success, Is.True);
-        Assert.That(match[1].Index, Is.EqualTo(0));
-        Assert.That(match[1].EndIndex, Is.EqualTo(1));
-        Assert.That(match[1].Value.SequenceEqual("a"u8));
+        match[1].Success.ShouldBeTrue();
+        match[1].Index.ShouldBe(0);
+        match[1].EndIndex.ShouldBe(1);
+        match[1].Value.ShouldBe("a"u8);
 
-        Assert.That(match[2].Success, Is.False);
-        Assert.That(match[2].Index, Is.EqualTo(-1));
-        Assert.That(match[2].EndIndex, Is.EqualTo(-1));
-        Assert.That(match[2].Value.IsEmpty);
+        match[2].Success.ShouldBeFalse();
+        match[2].Index.ShouldBe(-1);
+        match[2].EndIndex.ShouldBe(-1);
+        match[2].Value.IsEmpty.ShouldBeTrue();
 
-        Assert.That(match[3].Success, Is.True);
-        Assert.That(match[3].Index, Is.EqualTo(1));
-        Assert.That(match[3].Length, Is.EqualTo(2));
-        Assert.That(match[3].Value.SequenceEqual("bc"u8));
+        match[3].Success.ShouldBeTrue();
+        match[3].Index.ShouldBe(1);
+        match[3].Length.ShouldBe(2);
+        match[3].Value.ShouldBe("bc"u8);
     }
 
     [Test]
@@ -635,23 +636,23 @@ public class MatchTests
         var re = new PcreRegexUtf8(@"(a|(z))(bc)"u8);
         var match = re.CreateMatchBuffer().Match("abc"u8);
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(3));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(3);
 
-        Assert.That(match[1].Success, Is.True);
-        Assert.That(match[1].Index, Is.EqualTo(0));
-        Assert.That(match[1].EndIndex, Is.EqualTo(1));
-        Assert.That(match[1].Value.SequenceEqual("a"u8));
+        match[1].Success.ShouldBeTrue();
+        match[1].Index.ShouldBe(0);
+        match[1].EndIndex.ShouldBe(1);
+        match[1].Value.ShouldBe("a"u8);
 
-        Assert.That(match[2].Success, Is.False);
-        Assert.That(match[2].Index, Is.EqualTo(-1));
-        Assert.That(match[2].EndIndex, Is.EqualTo(-1));
-        Assert.That(match[2].Value.IsEmpty);
+        match[2].Success.ShouldBeFalse();
+        match[2].Index.ShouldBe(-1);
+        match[2].EndIndex.ShouldBe(-1);
+        match[2].Value.IsEmpty.ShouldBeTrue();
 
-        Assert.That(match[3].Success, Is.True);
-        Assert.That(match[3].Index, Is.EqualTo(1));
-        Assert.That(match[3].Length, Is.EqualTo(2));
-        Assert.That(match[3].Value.SequenceEqual("bc"u8));
+        match[3].Success.ShouldBeTrue();
+        match[3].Index.ShouldBe(1);
+        match[3].Length.ShouldBe(2);
+        match[3].Value.ShouldBe("bc"u8);
     }
 
     [Test]
@@ -660,23 +661,23 @@ public class MatchTests
         var re = TestSupport.CreatePcreRegex8Bit(@"(a|(z))(bc)".ToLatin1Bytes());
         var match = re.CreateMatchBuffer().Match("abc".ToLatin1Bytes());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(3));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(3);
 
-        Assert.That(match[1].Success, Is.True);
-        Assert.That(match[1].Index, Is.EqualTo(0));
-        Assert.That(match[1].EndIndex, Is.EqualTo(1));
-        Assert.That(match[1].Value.SequenceEqual("a".ToLatin1Bytes()));
+        match[1].Success.ShouldBeTrue();
+        match[1].Index.ShouldBe(0);
+        match[1].EndIndex.ShouldBe(1);
+        match[1].Value.ShouldBe("a".ToLatin1Bytes());
 
-        Assert.That(match[2].Success, Is.False);
-        Assert.That(match[2].Index, Is.EqualTo(-1));
-        Assert.That(match[2].EndIndex, Is.EqualTo(-1));
-        Assert.That(match[2].Value.IsEmpty);
+        match[2].Success.ShouldBeFalse();
+        match[2].Index.ShouldBe(-1);
+        match[2].EndIndex.ShouldBe(-1);
+        match[2].Value.IsEmpty.ShouldBeTrue();
 
-        Assert.That(match[3].Success, Is.True);
-        Assert.That(match[3].Index, Is.EqualTo(1));
-        Assert.That(match[3].Length, Is.EqualTo(2));
-        Assert.That(match[3].Value.SequenceEqual("bc".ToLatin1Bytes()));
+        match[3].Success.ShouldBeTrue();
+        match[3].Index.ShouldBe(1);
+        match[3].Length.ShouldBe(2);
+        match[3].Value.ShouldBe("bc".ToLatin1Bytes());
     }
 
     [Test]
@@ -685,8 +686,8 @@ public class MatchTests
         var re = new PcreRegex(@"(?<=a)");
         var match = re.Match("xxa", 3);
 
-        Assert.That(match, Is.Not.Null);
-        Assert.That(match.Success, Is.True);
+        match.ShouldNotBeNull();
+        match.Success.ShouldBeTrue();
     }
 
     [Test]
@@ -695,7 +696,7 @@ public class MatchTests
         var re = new PcreRegex(@"(?<=a)");
         var match = re.Match("xxa".AsSpan(), 3);
 
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
     }
 
     [Test]
@@ -704,7 +705,7 @@ public class MatchTests
         var re = new PcreRegex(@"(?<=a)");
         var match = re.CreateMatchBuffer().Match("xxa".AsSpan(), 3);
 
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
     }
 
     [Test]
@@ -713,7 +714,7 @@ public class MatchTests
         var re = new PcreRegexUtf8(@"(?<=a)"u8);
         var match = re.Match("xxa"u8, 3);
 
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
     }
 
     [Test]
@@ -722,7 +723,7 @@ public class MatchTests
         var re = new PcreRegexUtf8(@"(?<=a)"u8);
         var match = re.CreateMatchBuffer().Match("xxa"u8, 3);
 
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
     }
 
     [Test]
@@ -731,7 +732,7 @@ public class MatchTests
         var re = TestSupport.CreatePcreRegex8Bit(@"(?<=a)".ToLatin1Bytes());
         var match = re.Match("xxa".ToLatin1Bytes(), 3);
 
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
     }
 
     [Test]
@@ -740,7 +741,7 @@ public class MatchTests
         var re = TestSupport.CreatePcreRegex8Bit(@"(?<=a)".ToLatin1Bytes());
         var match = re.CreateMatchBuffer().Match("xxa".ToLatin1Bytes(), 3);
 
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
     }
 
     [Test]
@@ -750,51 +751,51 @@ public class MatchTests
 
         var match = re.Match("xxxaaabbcccddeeezzz");
 
-        Assert.That(match, Is.Not.Null);
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(3));
-        Assert.That(match.Value, Is.EqualTo("aaabbcccddeee"));
-        Assert.That(match.ValueSpan.ToString(), Is.EqualTo("aaabbcccddeee"));
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.Length, Is.EqualTo(13));
+        match.ShouldNotBeNull();
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(3);
+        match.Value.ShouldBe("aaabbcccddeee");
+        match.ValueSpan.ShouldBe("aaabbcccddeee");
+        match.Index.ShouldBe(3);
+        match.Length.ShouldBe(13);
 
-        Assert.That(match["bees"], Is.Not.Null);
-        Assert.That(match["bees"].Success, Is.True);
-        Assert.That(match["bees"].IsDefined, Is.True);
-        Assert.That(match["bees"].Value, Is.EqualTo("bb"));
-        Assert.That(match["bees"].ValueSpan.ToString(), Is.EqualTo("bb"));
-        Assert.That(match["bees"].Index, Is.EqualTo(6));
-        Assert.That(match["bees"].Length, Is.EqualTo(2));
+        match["bees"].ShouldNotBeNull();
+        match["bees"].Success.ShouldBeTrue();
+        match["bees"].IsDefined.ShouldBeTrue();
+        match["bees"].Value.ShouldBe("bb");
+        match["bees"].ValueSpan.ShouldBe("bb");
+        match["bees"].Index.ShouldBe(6);
+        match["bees"].Length.ShouldBe(2);
 
-        Assert.That(match.Groups["bees"], Is.SameAs(match["bees"]));
+        match.Groups["bees"].ShouldBeSameAs(match["bees"]);
 
-        Assert.That(match[2], Is.Not.Null);
-        Assert.That(match[2].Value, Is.EqualTo("ccc"));
-        Assert.That(match[2].ValueSpan.ToString(), Is.EqualTo("ccc"));
-        Assert.That(match[2].Index, Is.EqualTo(8));
-        Assert.That(match[2].Length, Is.EqualTo(3));
+        match[2].ShouldNotBeNull();
+        match[2].Value.ShouldBe("ccc");
+        match[2].ValueSpan.ShouldBe("ccc");
+        match[2].Index.ShouldBe(8);
+        match[2].Length.ShouldBe(3);
 
-        Assert.That(match["dees"], Is.Not.Null);
-        Assert.That(match["dees"].Success, Is.True);
-        Assert.That(match["dees"].IsDefined, Is.True);
-        Assert.That(match["dees"].Value, Is.EqualTo("dd"));
-        Assert.That(match["dees"].ValueSpan.ToString(), Is.EqualTo("dd"));
-        Assert.That(match["dees"].Index, Is.EqualTo(11));
-        Assert.That(match["dees"].Length, Is.EqualTo(2));
+        match["dees"].ShouldNotBeNull();
+        match["dees"].Success.ShouldBeTrue();
+        match["dees"].IsDefined.ShouldBeTrue();
+        match["dees"].Value.ShouldBe("dd");
+        match["dees"].ValueSpan.ShouldBe("dd");
+        match["dees"].Index.ShouldBe(11);
+        match["dees"].Length.ShouldBe(2);
 
-        Assert.That(match["nope"], Is.Not.Null);
-        Assert.That(match["nope"].Success, Is.False);
-        Assert.That(match["nope"].IsDefined, Is.False);
-        Assert.That(match["nope"].Value, Is.SameAs(string.Empty));
-        Assert.That(match["nope"].ValueSpan.Length, Is.EqualTo(0));
-        Assert.That(match["nope"].Index, Is.EqualTo(-1));
-        Assert.That(match["nope"].Length, Is.EqualTo(0));
+        match["nope"].ShouldNotBeNull();
+        match["nope"].Success.ShouldBeFalse();
+        match["nope"].IsDefined.ShouldBeFalse();
+        match["nope"].Value.ShouldBeSameAs(string.Empty);
+        match["nope"].ValueSpan.IsEmpty.ShouldBeTrue();
+        match["nope"].Index.ShouldBe(-1);
+        match["nope"].Length.ShouldBe(0);
 
-        Assert.That(match.TryGetGroup("bees", out var group), Is.True);
-        Assert.That(group, Is.SameAs(match["bees"]));
+        match.TryGetGroup("bees", out var group).ShouldBeTrue();
+        group.ShouldBeSameAs(match["bees"]);
 
-        Assert.That(match.TryGetGroup("nope", out group), Is.False);
-        Assert.That(group, Is.Null);
+        match.TryGetGroup("nope", out group).ShouldBeFalse();
+        group.ShouldBeNull();
     }
 
     [Test]
@@ -804,47 +805,47 @@ public class MatchTests
 
         var match = re.Match("xxxaaabbcccddeeezzz".AsSpan());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(3));
-        Assert.That(match.Value.ToString(), Is.EqualTo("aaabbcccddeee"));
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.Length, Is.EqualTo(13));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(3);
+        match.Value.ShouldBe("aaabbcccddeee");
+        match.Index.ShouldBe(3);
+        match.Length.ShouldBe(13);
 
-        Assert.That(match["bees"].Success, Is.True);
-        Assert.That(match["bees"].IsDefined, Is.True);
-        Assert.That(match["bees"].Value.ToString(), Is.EqualTo("bb"));
-        Assert.That(match["bees"].Index, Is.EqualTo(6));
-        Assert.That(match["bees"].Length, Is.EqualTo(2));
+        match["bees"].Success.ShouldBeTrue();
+        match["bees"].IsDefined.ShouldBeTrue();
+        match["bees"].Value.ShouldBe("bb");
+        match["bees"].Index.ShouldBe(6);
+        match["bees"].Length.ShouldBe(2);
 
-        Assert.That(match[2].Value.ToString(), Is.EqualTo("ccc"));
-        Assert.That(match[2].Index, Is.EqualTo(8));
-        Assert.That(match[2].Length, Is.EqualTo(3));
+        match[2].Value.ShouldBe("ccc");
+        match[2].Index.ShouldBe(8);
+        match[2].Length.ShouldBe(3);
 
-        Assert.That(match["dees"].Success, Is.True);
-        Assert.That(match["dees"].IsDefined, Is.True);
-        Assert.That(match["dees"].Value.ToString(), Is.EqualTo("dd"));
-        Assert.That(match["dees"].Index, Is.EqualTo(11));
-        Assert.That(match["dees"].Length, Is.EqualTo(2));
+        match["dees"].Success.ShouldBeTrue();
+        match["dees"].IsDefined.ShouldBeTrue();
+        match["dees"].Value.ShouldBe("dd");
+        match["dees"].Index.ShouldBe(11);
+        match["dees"].Length.ShouldBe(2);
 
-        Assert.That(match["nope"].Success, Is.False);
-        Assert.That(match["nope"].IsDefined, Is.False);
-        Assert.That(match["nope"].Value.ToString(), Is.SameAs(string.Empty));
-        Assert.That(match["nope"].Index, Is.EqualTo(-1));
-        Assert.That(match["nope"].Length, Is.EqualTo(0));
+        match["nope"].Success.ShouldBeFalse();
+        match["nope"].IsDefined.ShouldBeFalse();
+        match["nope"].Value.ToString().ShouldBeSameAs(string.Empty);
+        match["nope"].Index.ShouldBe(-1);
+        match["nope"].Length.ShouldBe(0);
 
-        Assert.That(match.TryGetGroup("bees", out var group), Is.True);
-        Assert.That(group.Success, Is.True);
-        Assert.That(group.IsDefined, Is.True);
-        Assert.That(group.Value.ToString(), Is.EqualTo("bb"));
-        Assert.That(group.Index, Is.EqualTo(6));
-        Assert.That(group.Length, Is.EqualTo(2));
+        match.TryGetGroup("bees", out var group).ShouldBeTrue();
+        group.Success.ShouldBeTrue();
+        group.IsDefined.ShouldBeTrue();
+        group.Value.ShouldBe("bb");
+        group.Index.ShouldBe(6);
+        group.Length.ShouldBe(2);
 
-        Assert.That(match.TryGetGroup("nope", out group), Is.False);
-        Assert.That(group.Success, Is.False);
-        Assert.That(group.IsDefined, Is.False);
-        Assert.That(group.Value.ToString(), Is.SameAs(string.Empty));
-        Assert.That(group.Index, Is.EqualTo(-1));
-        Assert.That(group.Length, Is.EqualTo(0));
+        match.TryGetGroup("nope", out group).ShouldBeFalse();
+        group.Success.ShouldBeFalse();
+        group.IsDefined.ShouldBeFalse();
+        group.Value.ToString().ShouldBeSameAs(string.Empty);
+        group.Index.ShouldBe(-1);
+        group.Length.ShouldBe(0);
     }
 
     [Test]
@@ -854,47 +855,47 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("xxxaaabbcccddeeezzz".AsSpan());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(3));
-        Assert.That(match.Value.ToString(), Is.EqualTo("aaabbcccddeee"));
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.Length, Is.EqualTo(13));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(3);
+        match.Value.ShouldBe("aaabbcccddeee");
+        match.Index.ShouldBe(3);
+        match.Length.ShouldBe(13);
 
-        Assert.That(match["bees"].Success, Is.True);
-        Assert.That(match["bees"].IsDefined, Is.True);
-        Assert.That(match["bees"].Value.ToString(), Is.EqualTo("bb"));
-        Assert.That(match["bees"].Index, Is.EqualTo(6));
-        Assert.That(match["bees"].Length, Is.EqualTo(2));
+        match["bees"].Success.ShouldBeTrue();
+        match["bees"].IsDefined.ShouldBeTrue();
+        match["bees"].Value.ShouldBe("bb");
+        match["bees"].Index.ShouldBe(6);
+        match["bees"].Length.ShouldBe(2);
 
-        Assert.That(match[2].Value.ToString(), Is.EqualTo("ccc"));
-        Assert.That(match[2].Index, Is.EqualTo(8));
-        Assert.That(match[2].Length, Is.EqualTo(3));
+        match[2].Value.ShouldBe("ccc");
+        match[2].Index.ShouldBe(8);
+        match[2].Length.ShouldBe(3);
 
-        Assert.That(match["dees"].Success, Is.True);
-        Assert.That(match["dees"].IsDefined, Is.True);
-        Assert.That(match["dees"].Value.ToString(), Is.EqualTo("dd"));
-        Assert.That(match["dees"].Index, Is.EqualTo(11));
-        Assert.That(match["dees"].Length, Is.EqualTo(2));
+        match["dees"].Success.ShouldBeTrue();
+        match["dees"].IsDefined.ShouldBeTrue();
+        match["dees"].Value.ShouldBe("dd");
+        match["dees"].Index.ShouldBe(11);
+        match["dees"].Length.ShouldBe(2);
 
-        Assert.That(match["nope"].Success, Is.False);
-        Assert.That(match["nope"].IsDefined, Is.False);
-        Assert.That(match["nope"].Value.ToString(), Is.SameAs(string.Empty));
-        Assert.That(match["nope"].Index, Is.EqualTo(-1));
-        Assert.That(match["nope"].Length, Is.EqualTo(0));
+        match["nope"].Success.ShouldBeFalse();
+        match["nope"].IsDefined.ShouldBeFalse();
+        match["nope"].Value.ToString().ShouldBeSameAs(string.Empty);
+        match["nope"].Index.ShouldBe(-1);
+        match["nope"].Length.ShouldBe(0);
 
-        Assert.That(match.TryGetGroup("bees", out var group), Is.True);
-        Assert.That(group.Success, Is.True);
-        Assert.That(group.IsDefined, Is.True);
-        Assert.That(group.Value.ToString(), Is.EqualTo("bb"));
-        Assert.That(group.Index, Is.EqualTo(6));
-        Assert.That(group.Length, Is.EqualTo(2));
+        match.TryGetGroup("bees", out var group).ShouldBeTrue();
+        group.Success.ShouldBeTrue();
+        group.IsDefined.ShouldBeTrue();
+        group.Value.ShouldBe("bb");
+        group.Index.ShouldBe(6);
+        group.Length.ShouldBe(2);
 
-        Assert.That(match.TryGetGroup("nope", out group), Is.False);
-        Assert.That(group.Success, Is.False);
-        Assert.That(group.IsDefined, Is.False);
-        Assert.That(group.Value.ToString(), Is.SameAs(string.Empty));
-        Assert.That(group.Index, Is.EqualTo(-1));
-        Assert.That(group.Length, Is.EqualTo(0));
+        match.TryGetGroup("nope", out group).ShouldBeFalse();
+        group.Success.ShouldBeFalse();
+        group.IsDefined.ShouldBeFalse();
+        group.Value.ToString().ShouldBeSameAs(string.Empty);
+        group.Index.ShouldBe(-1);
+        group.Length.ShouldBe(0);
     }
 
     [Test]
@@ -904,47 +905,47 @@ public class MatchTests
 
         var match = re.Match("xxxaaabbcccddeeezzz"u8);
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(3));
-        Assert.That(match.Value.SequenceEqual("aaabbcccddeee"u8));
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.Length, Is.EqualTo(13));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(3);
+        match.Value.ShouldBe("aaabbcccddeee"u8);
+        match.Index.ShouldBe(3);
+        match.Length.ShouldBe(13);
 
-        Assert.That(match["bees"].Success, Is.True);
-        Assert.That(match["bees"].IsDefined, Is.True);
-        Assert.That(match["bees"].Value.SequenceEqual("bb"u8));
-        Assert.That(match["bees"].Index, Is.EqualTo(6));
-        Assert.That(match["bees"].Length, Is.EqualTo(2));
+        match["bees"].Success.ShouldBeTrue();
+        match["bees"].IsDefined.ShouldBeTrue();
+        match["bees"].Value.ShouldBe("bb"u8);
+        match["bees"].Index.ShouldBe(6);
+        match["bees"].Length.ShouldBe(2);
 
-        Assert.That(match[2].Value.SequenceEqual("ccc"u8));
-        Assert.That(match[2].Index, Is.EqualTo(8));
-        Assert.That(match[2].Length, Is.EqualTo(3));
+        match[2].Value.ShouldBe("ccc"u8);
+        match[2].Index.ShouldBe(8);
+        match[2].Length.ShouldBe(3);
 
-        Assert.That(match["dees"].Success, Is.True);
-        Assert.That(match["dees"].IsDefined, Is.True);
-        Assert.That(match["dees"].Value.SequenceEqual("dd"u8));
-        Assert.That(match["dees"].Index, Is.EqualTo(11));
-        Assert.That(match["dees"].Length, Is.EqualTo(2));
+        match["dees"].Success.ShouldBeTrue();
+        match["dees"].IsDefined.ShouldBeTrue();
+        match["dees"].Value.ShouldBe("dd"u8);
+        match["dees"].Index.ShouldBe(11);
+        match["dees"].Length.ShouldBe(2);
 
-        Assert.That(match["nope"].Success, Is.False);
-        Assert.That(match["nope"].IsDefined, Is.False);
-        Assert.That(match["nope"].Value.IsEmpty);
-        Assert.That(match["nope"].Index, Is.EqualTo(-1));
-        Assert.That(match["nope"].Length, Is.EqualTo(0));
+        match["nope"].Success.ShouldBeFalse();
+        match["nope"].IsDefined.ShouldBeFalse();
+        match["nope"].Value.IsEmpty.ShouldBeTrue();
+        match["nope"].Index.ShouldBe(-1);
+        match["nope"].Length.ShouldBe(0);
 
-        Assert.That(match.TryGetGroup("bees", out var group), Is.True);
-        Assert.That(group.Success, Is.True);
-        Assert.That(group.IsDefined, Is.True);
-        Assert.That(group.Value.SequenceEqual("bb"u8));
-        Assert.That(group.Index, Is.EqualTo(6));
-        Assert.That(group.Length, Is.EqualTo(2));
+        match.TryGetGroup("bees", out var group).ShouldBeTrue();
+        group.Success.ShouldBeTrue();
+        group.IsDefined.ShouldBeTrue();
+        group.Value.ShouldBe("bb"u8);
+        group.Index.ShouldBe(6);
+        group.Length.ShouldBe(2);
 
-        Assert.That(match.TryGetGroup("nope", out group), Is.False);
-        Assert.That(group.Success, Is.False);
-        Assert.That(group.IsDefined, Is.False);
-        Assert.That(group.Value.IsEmpty);
-        Assert.That(group.Index, Is.EqualTo(-1));
-        Assert.That(group.Length, Is.EqualTo(0));
+        match.TryGetGroup("nope", out group).ShouldBeFalse();
+        group.Success.ShouldBeFalse();
+        group.IsDefined.ShouldBeFalse();
+        group.Value.IsEmpty.ShouldBeTrue();
+        group.Index.ShouldBe(-1);
+        group.Length.ShouldBe(0);
     }
 
     [Test]
@@ -954,47 +955,47 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("xxxaaabbcccddeeezzz"u8);
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(3));
-        Assert.That(match.Value.SequenceEqual("aaabbcccddeee"u8));
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.Length, Is.EqualTo(13));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(3);
+        match.Value.ShouldBe("aaabbcccddeee"u8);
+        match.Index.ShouldBe(3);
+        match.Length.ShouldBe(13);
 
-        Assert.That(match["bees"].Success, Is.True);
-        Assert.That(match["bees"].IsDefined, Is.True);
-        Assert.That(match["bees"].Value.SequenceEqual("bb"u8));
-        Assert.That(match["bees"].Index, Is.EqualTo(6));
-        Assert.That(match["bees"].Length, Is.EqualTo(2));
+        match["bees"].Success.ShouldBeTrue();
+        match["bees"].IsDefined.ShouldBeTrue();
+        match["bees"].Value.ShouldBe("bb"u8);
+        match["bees"].Index.ShouldBe(6);
+        match["bees"].Length.ShouldBe(2);
 
-        Assert.That(match[2].Value.SequenceEqual("ccc"u8));
-        Assert.That(match[2].Index, Is.EqualTo(8));
-        Assert.That(match[2].Length, Is.EqualTo(3));
+        match[2].Value.ShouldBe("ccc"u8);
+        match[2].Index.ShouldBe(8);
+        match[2].Length.ShouldBe(3);
 
-        Assert.That(match["dees"].Success, Is.True);
-        Assert.That(match["dees"].IsDefined, Is.True);
-        Assert.That(match["dees"].Value.SequenceEqual("dd"u8));
-        Assert.That(match["dees"].Index, Is.EqualTo(11));
-        Assert.That(match["dees"].Length, Is.EqualTo(2));
+        match["dees"].Success.ShouldBeTrue();
+        match["dees"].IsDefined.ShouldBeTrue();
+        match["dees"].Value.ShouldBe("dd"u8);
+        match["dees"].Index.ShouldBe(11);
+        match["dees"].Length.ShouldBe(2);
 
-        Assert.That(match["nope"].Success, Is.False);
-        Assert.That(match["nope"].IsDefined, Is.False);
-        Assert.That(match["nope"].Value.IsEmpty);
-        Assert.That(match["nope"].Index, Is.EqualTo(-1));
-        Assert.That(match["nope"].Length, Is.EqualTo(0));
+        match["nope"].Success.ShouldBeFalse();
+        match["nope"].IsDefined.ShouldBeFalse();
+        match["nope"].Value.IsEmpty.ShouldBeTrue();
+        match["nope"].Index.ShouldBe(-1);
+        match["nope"].Length.ShouldBe(0);
 
-        Assert.That(match.TryGetGroup("bees", out var group), Is.True);
-        Assert.That(group.Success, Is.True);
-        Assert.That(group.IsDefined, Is.True);
-        Assert.That(group.Value.SequenceEqual("bb"u8));
-        Assert.That(group.Index, Is.EqualTo(6));
-        Assert.That(group.Length, Is.EqualTo(2));
+        match.TryGetGroup("bees", out var group).ShouldBeTrue();
+        group.Success.ShouldBeTrue();
+        group.IsDefined.ShouldBeTrue();
+        group.Value.ShouldBe("bb"u8);
+        group.Index.ShouldBe(6);
+        group.Length.ShouldBe(2);
 
-        Assert.That(match.TryGetGroup("nope", out group), Is.False);
-        Assert.That(group.Success, Is.False);
-        Assert.That(group.IsDefined, Is.False);
-        Assert.That(group.Value.IsEmpty);
-        Assert.That(group.Index, Is.EqualTo(-1));
-        Assert.That(group.Length, Is.EqualTo(0));
+        match.TryGetGroup("nope", out group).ShouldBeFalse();
+        group.Success.ShouldBeFalse();
+        group.IsDefined.ShouldBeFalse();
+        group.Value.IsEmpty.ShouldBeTrue();
+        group.Index.ShouldBe(-1);
+        group.Length.ShouldBe(0);
     }
 
     [Test]
@@ -1004,47 +1005,47 @@ public class MatchTests
 
         var match = re.Match("xxxaaabbcccddeeezzz".ToLatin1Bytes());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(3));
-        Assert.That(match.Value.SequenceEqual("aaabbcccddeee".ToLatin1Bytes()));
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.Length, Is.EqualTo(13));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(3);
+        match.Value.ShouldBe("aaabbcccddeee".ToLatin1Bytes());
+        match.Index.ShouldBe(3);
+        match.Length.ShouldBe(13);
 
-        Assert.That(match["bees"].Success, Is.True);
-        Assert.That(match["bees"].IsDefined, Is.True);
-        Assert.That(match["bees"].Value.SequenceEqual("bb".ToLatin1Bytes()));
-        Assert.That(match["bees"].Index, Is.EqualTo(6));
-        Assert.That(match["bees"].Length, Is.EqualTo(2));
+        match["bees"].Success.ShouldBeTrue();
+        match["bees"].IsDefined.ShouldBeTrue();
+        match["bees"].Value.ShouldBe("bb".ToLatin1Bytes());
+        match["bees"].Index.ShouldBe(6);
+        match["bees"].Length.ShouldBe(2);
 
-        Assert.That(match[2].Value.SequenceEqual("ccc".ToLatin1Bytes()));
-        Assert.That(match[2].Index, Is.EqualTo(8));
-        Assert.That(match[2].Length, Is.EqualTo(3));
+        match[2].Value.ShouldBe("ccc".ToLatin1Bytes());
+        match[2].Index.ShouldBe(8);
+        match[2].Length.ShouldBe(3);
 
-        Assert.That(match["dees"].Success, Is.True);
-        Assert.That(match["dees"].IsDefined, Is.True);
-        Assert.That(match["dees"].Value.SequenceEqual("dd".ToLatin1Bytes()));
-        Assert.That(match["dees"].Index, Is.EqualTo(11));
-        Assert.That(match["dees"].Length, Is.EqualTo(2));
+        match["dees"].Success.ShouldBeTrue();
+        match["dees"].IsDefined.ShouldBeTrue();
+        match["dees"].Value.ShouldBe("dd".ToLatin1Bytes());
+        match["dees"].Index.ShouldBe(11);
+        match["dees"].Length.ShouldBe(2);
 
-        Assert.That(match["nope"].Success, Is.False);
-        Assert.That(match["nope"].IsDefined, Is.False);
-        Assert.That(match["nope"].Value.IsEmpty);
-        Assert.That(match["nope"].Index, Is.EqualTo(-1));
-        Assert.That(match["nope"].Length, Is.EqualTo(0));
+        match["nope"].Success.ShouldBeFalse();
+        match["nope"].IsDefined.ShouldBeFalse();
+        match["nope"].Value.IsEmpty.ShouldBeTrue();
+        match["nope"].Index.ShouldBe(-1);
+        match["nope"].Length.ShouldBe(0);
 
-        Assert.That(match.TryGetGroup("bees", out var group), Is.True);
-        Assert.That(group.Success, Is.True);
-        Assert.That(group.IsDefined, Is.True);
-        Assert.That(group.Value.SequenceEqual("bb".ToLatin1Bytes()));
-        Assert.That(group.Index, Is.EqualTo(6));
-        Assert.That(group.Length, Is.EqualTo(2));
+        match.TryGetGroup("bees", out var group).ShouldBeTrue();
+        group.Success.ShouldBeTrue();
+        group.IsDefined.ShouldBeTrue();
+        group.Value.ShouldBe("bb".ToLatin1Bytes());
+        group.Index.ShouldBe(6);
+        group.Length.ShouldBe(2);
 
-        Assert.That(match.TryGetGroup("nope", out group), Is.False);
-        Assert.That(group.Success, Is.False);
-        Assert.That(group.IsDefined, Is.False);
-        Assert.That(group.Value.IsEmpty);
-        Assert.That(group.Index, Is.EqualTo(-1));
-        Assert.That(group.Length, Is.EqualTo(0));
+        match.TryGetGroup("nope", out group).ShouldBeFalse();
+        group.Success.ShouldBeFalse();
+        group.IsDefined.ShouldBeFalse();
+        group.Value.IsEmpty.ShouldBeTrue();
+        group.Index.ShouldBe(-1);
+        group.Length.ShouldBe(0);
     }
 
     [Test]
@@ -1054,47 +1055,47 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("xxxaaabbcccddeeezzz".ToLatin1Bytes());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(3));
-        Assert.That(match.Value.SequenceEqual("aaabbcccddeee".ToLatin1Bytes()));
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.Length, Is.EqualTo(13));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(3);
+        match.Value.ShouldBe("aaabbcccddeee".ToLatin1Bytes());
+        match.Index.ShouldBe(3);
+        match.Length.ShouldBe(13);
 
-        Assert.That(match["bees"].Success, Is.True);
-        Assert.That(match["bees"].IsDefined, Is.True);
-        Assert.That(match["bees"].Value.SequenceEqual("bb".ToLatin1Bytes()));
-        Assert.That(match["bees"].Index, Is.EqualTo(6));
-        Assert.That(match["bees"].Length, Is.EqualTo(2));
+        match["bees"].Success.ShouldBeTrue();
+        match["bees"].IsDefined.ShouldBeTrue();
+        match["bees"].Value.ShouldBe("bb".ToLatin1Bytes());
+        match["bees"].Index.ShouldBe(6);
+        match["bees"].Length.ShouldBe(2);
 
-        Assert.That(match[2].Value.SequenceEqual("ccc".ToLatin1Bytes()));
-        Assert.That(match[2].Index, Is.EqualTo(8));
-        Assert.That(match[2].Length, Is.EqualTo(3));
+        match[2].Value.ShouldBe("ccc".ToLatin1Bytes());
+        match[2].Index.ShouldBe(8);
+        match[2].Length.ShouldBe(3);
 
-        Assert.That(match["dees"].Success, Is.True);
-        Assert.That(match["dees"].IsDefined, Is.True);
-        Assert.That(match["dees"].Value.SequenceEqual("dd".ToLatin1Bytes()));
-        Assert.That(match["dees"].Index, Is.EqualTo(11));
-        Assert.That(match["dees"].Length, Is.EqualTo(2));
+        match["dees"].Success.ShouldBeTrue();
+        match["dees"].IsDefined.ShouldBeTrue();
+        match["dees"].Value.ShouldBe("dd".ToLatin1Bytes());
+        match["dees"].Index.ShouldBe(11);
+        match["dees"].Length.ShouldBe(2);
 
-        Assert.That(match["nope"].Success, Is.False);
-        Assert.That(match["nope"].IsDefined, Is.False);
-        Assert.That(match["nope"].Value.IsEmpty);
-        Assert.That(match["nope"].Index, Is.EqualTo(-1));
-        Assert.That(match["nope"].Length, Is.EqualTo(0));
+        match["nope"].Success.ShouldBeFalse();
+        match["nope"].IsDefined.ShouldBeFalse();
+        match["nope"].Value.IsEmpty.ShouldBeTrue();
+        match["nope"].Index.ShouldBe(-1);
+        match["nope"].Length.ShouldBe(0);
 
-        Assert.That(match.TryGetGroup("bees", out var group), Is.True);
-        Assert.That(group.Success, Is.True);
-        Assert.That(group.IsDefined, Is.True);
-        Assert.That(group.Value.SequenceEqual("bb".ToLatin1Bytes()));
-        Assert.That(group.Index, Is.EqualTo(6));
-        Assert.That(group.Length, Is.EqualTo(2));
+        match.TryGetGroup("bees", out var group).ShouldBeTrue();
+        group.Success.ShouldBeTrue();
+        group.IsDefined.ShouldBeTrue();
+        group.Value.ShouldBe("bb".ToLatin1Bytes());
+        group.Index.ShouldBe(6);
+        group.Length.ShouldBe(2);
 
-        Assert.That(match.TryGetGroup("nope", out group), Is.False);
-        Assert.That(group.Success, Is.False);
-        Assert.That(group.IsDefined, Is.False);
-        Assert.That(group.Value.IsEmpty);
-        Assert.That(group.Index, Is.EqualTo(-1));
-        Assert.That(group.Length, Is.EqualTo(0));
+        match.TryGetGroup("nope", out group).ShouldBeFalse();
+        group.Success.ShouldBeFalse();
+        group.IsDefined.ShouldBeFalse();
+        group.Value.IsEmpty.ShouldBeTrue();
+        group.Index.ShouldBe(-1);
+        group.Length.ShouldBe(0);
     }
 
     [Test]
@@ -1104,23 +1105,23 @@ public class MatchTests
 
         var match = re.Match("xxxaaabbcccddeeezzz");
 
-        Assert.That(match["grp"], Is.Not.Null);
-        Assert.That(match["grp"].Value, Is.EqualTo("bb"));
-        Assert.That(match["grp"].ValueSpan.ToString(), Is.EqualTo("bb"));
-        Assert.That(match["grp"].Index, Is.EqualTo(6));
-        Assert.That(match["grp"].Length, Is.EqualTo(2));
+        match["grp"].ShouldNotBeNull();
+        match["grp"].Value.ShouldBe("bb");
+        match["grp"].ValueSpan.ShouldBe("bb");
+        match["grp"].Index.ShouldBe(6);
+        match["grp"].Length.ShouldBe(2);
 
-        Assert.That(match["GRP"], Is.Not.Null);
-        Assert.That(match["GRP"].Value, Is.EqualTo("ccc"));
-        Assert.That(match["GRP"].ValueSpan.ToString(), Is.EqualTo("ccc"));
-        Assert.That(match["GRP"].Index, Is.EqualTo(8));
-        Assert.That(match["GRP"].Length, Is.EqualTo(3));
+        match["GRP"].ShouldNotBeNull();
+        match["GRP"].Value.ShouldBe("ccc");
+        match["GRP"].ValueSpan.ShouldBe("ccc");
+        match["GRP"].Index.ShouldBe(8);
+        match["GRP"].Length.ShouldBe(3);
 
-        Assert.That(match["GrP"], Is.Not.Null);
-        Assert.That(match["GrP"].Value, Is.EqualTo("dd"));
-        Assert.That(match["GrP"].ValueSpan.ToString(), Is.EqualTo("dd"));
-        Assert.That(match["GrP"].Index, Is.EqualTo(11));
-        Assert.That(match["GrP"].Length, Is.EqualTo(2));
+        match["GrP"].ShouldNotBeNull();
+        match["GrP"].Value.ShouldBe("dd");
+        match["GrP"].ValueSpan.ShouldBe("dd");
+        match["GrP"].Index.ShouldBe(11);
+        match["GrP"].Length.ShouldBe(2);
     }
 
     [Test]
@@ -1130,17 +1131,17 @@ public class MatchTests
 
         var match = re.Match("xxxaaabbcccddeeezzz".AsSpan());
 
-        Assert.That(match["grp"].Value.ToString(), Is.EqualTo("bb"));
-        Assert.That(match["grp"].Index, Is.EqualTo(6));
-        Assert.That(match["grp"].Length, Is.EqualTo(2));
+        match["grp"].Value.ShouldBe("bb");
+        match["grp"].Index.ShouldBe(6);
+        match["grp"].Length.ShouldBe(2);
 
-        Assert.That(match["GRP"].Value.ToString(), Is.EqualTo("ccc"));
-        Assert.That(match["GRP"].Index, Is.EqualTo(8));
-        Assert.That(match["GRP"].Length, Is.EqualTo(3));
+        match["GRP"].Value.ShouldBe("ccc");
+        match["GRP"].Index.ShouldBe(8);
+        match["GRP"].Length.ShouldBe(3);
 
-        Assert.That(match["GrP"].Value.ToString(), Is.EqualTo("dd"));
-        Assert.That(match["GrP"].Index, Is.EqualTo(11));
-        Assert.That(match["GrP"].Length, Is.EqualTo(2));
+        match["GrP"].Value.ShouldBe("dd");
+        match["GrP"].Index.ShouldBe(11);
+        match["GrP"].Length.ShouldBe(2);
     }
 
     [Test]
@@ -1150,17 +1151,17 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("xxxaaabbcccddeeezzz".AsSpan());
 
-        Assert.That(match["grp"].Value.ToString(), Is.EqualTo("bb"));
-        Assert.That(match["grp"].Index, Is.EqualTo(6));
-        Assert.That(match["grp"].Length, Is.EqualTo(2));
+        match["grp"].Value.ShouldBe("bb");
+        match["grp"].Index.ShouldBe(6);
+        match["grp"].Length.ShouldBe(2);
 
-        Assert.That(match["GRP"].Value.ToString(), Is.EqualTo("ccc"));
-        Assert.That(match["GRP"].Index, Is.EqualTo(8));
-        Assert.That(match["GRP"].Length, Is.EqualTo(3));
+        match["GRP"].Value.ShouldBe("ccc");
+        match["GRP"].Index.ShouldBe(8);
+        match["GRP"].Length.ShouldBe(3);
 
-        Assert.That(match["GrP"].Value.ToString(), Is.EqualTo("dd"));
-        Assert.That(match["GrP"].Index, Is.EqualTo(11));
-        Assert.That(match["GrP"].Length, Is.EqualTo(2));
+        match["GrP"].Value.ShouldBe("dd");
+        match["GrP"].Index.ShouldBe(11);
+        match["GrP"].Length.ShouldBe(2);
     }
 
     [Test]
@@ -1170,17 +1171,17 @@ public class MatchTests
 
         var match = re.Match("xxxaaabbcccddeeezzz"u8);
 
-        Assert.That(match["grp"].Value.SequenceEqual("bb"u8));
-        Assert.That(match["grp"].Index, Is.EqualTo(6));
-        Assert.That(match["grp"].Length, Is.EqualTo(2));
+        match["grp"].Value.ShouldBe("bb"u8);
+        match["grp"].Index.ShouldBe(6);
+        match["grp"].Length.ShouldBe(2);
 
-        Assert.That(match["GRP"].Value.SequenceEqual("ccc"u8));
-        Assert.That(match["GRP"].Index, Is.EqualTo(8));
-        Assert.That(match["GRP"].Length, Is.EqualTo(3));
+        match["GRP"].Value.ShouldBe("ccc"u8);
+        match["GRP"].Index.ShouldBe(8);
+        match["GRP"].Length.ShouldBe(3);
 
-        Assert.That(match["GrP"].Value.SequenceEqual("dd"u8));
-        Assert.That(match["GrP"].Index, Is.EqualTo(11));
-        Assert.That(match["GrP"].Length, Is.EqualTo(2));
+        match["GrP"].Value.ShouldBe("dd"u8);
+        match["GrP"].Index.ShouldBe(11);
+        match["GrP"].Length.ShouldBe(2);
     }
 
     [Test]
@@ -1190,17 +1191,17 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("xxxaaabbcccddeeezzz"u8);
 
-        Assert.That(match["grp"].Value.SequenceEqual("bb"u8));
-        Assert.That(match["grp"].Index, Is.EqualTo(6));
-        Assert.That(match["grp"].Length, Is.EqualTo(2));
+        match["grp"].Value.ShouldBe("bb"u8);
+        match["grp"].Index.ShouldBe(6);
+        match["grp"].Length.ShouldBe(2);
 
-        Assert.That(match["GRP"].Value.SequenceEqual("ccc"u8));
-        Assert.That(match["GRP"].Index, Is.EqualTo(8));
-        Assert.That(match["GRP"].Length, Is.EqualTo(3));
+        match["GRP"].Value.ShouldBe("ccc"u8);
+        match["GRP"].Index.ShouldBe(8);
+        match["GRP"].Length.ShouldBe(3);
 
-        Assert.That(match["GrP"].Value.SequenceEqual("dd"u8));
-        Assert.That(match["GrP"].Index, Is.EqualTo(11));
-        Assert.That(match["GrP"].Length, Is.EqualTo(2));
+        match["GrP"].Value.ShouldBe("dd"u8);
+        match["GrP"].Index.ShouldBe(11);
+        match["GrP"].Length.ShouldBe(2);
     }
 
     [Test]
@@ -1210,17 +1211,17 @@ public class MatchTests
 
         var match = re.Match("xxxaaabbcccddeeezzz".ToLatin1Bytes());
 
-        Assert.That(match["grp"].Value.SequenceEqual("bb".ToLatin1Bytes()));
-        Assert.That(match["grp"].Index, Is.EqualTo(6));
-        Assert.That(match["grp"].Length, Is.EqualTo(2));
+        match["grp"].Value.ShouldBe("bb".ToLatin1Bytes());
+        match["grp"].Index.ShouldBe(6);
+        match["grp"].Length.ShouldBe(2);
 
-        Assert.That(match["GRP"].Value.SequenceEqual("ccc".ToLatin1Bytes()));
-        Assert.That(match["GRP"].Index, Is.EqualTo(8));
-        Assert.That(match["GRP"].Length, Is.EqualTo(3));
+        match["GRP"].Value.ShouldBe("ccc".ToLatin1Bytes());
+        match["GRP"].Index.ShouldBe(8);
+        match["GRP"].Length.ShouldBe(3);
 
-        Assert.That(match["GrP"].Value.SequenceEqual("dd".ToLatin1Bytes()));
-        Assert.That(match["GrP"].Index, Is.EqualTo(11));
-        Assert.That(match["GrP"].Length, Is.EqualTo(2));
+        match["GrP"].Value.ShouldBe("dd".ToLatin1Bytes());
+        match["GrP"].Index.ShouldBe(11);
+        match["GrP"].Length.ShouldBe(2);
     }
 
     [Test]
@@ -1230,17 +1231,17 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("xxxaaabbcccddeeezzz".ToLatin1Bytes());
 
-        Assert.That(match["grp"].Value.SequenceEqual("bb".ToLatin1Bytes()));
-        Assert.That(match["grp"].Index, Is.EqualTo(6));
-        Assert.That(match["grp"].Length, Is.EqualTo(2));
+        match["grp"].Value.ShouldBe("bb".ToLatin1Bytes());
+        match["grp"].Index.ShouldBe(6);
+        match["grp"].Length.ShouldBe(2);
 
-        Assert.That(match["GRP"].Value.SequenceEqual("ccc".ToLatin1Bytes()));
-        Assert.That(match["GRP"].Index, Is.EqualTo(8));
-        Assert.That(match["GRP"].Length, Is.EqualTo(3));
+        match["GRP"].Value.ShouldBe("ccc".ToLatin1Bytes());
+        match["GRP"].Index.ShouldBe(8);
+        match["GRP"].Length.ShouldBe(3);
 
-        Assert.That(match["GrP"].Value.SequenceEqual("dd".ToLatin1Bytes()));
-        Assert.That(match["GrP"].Index, Is.EqualTo(11));
-        Assert.That(match["GrP"].Length, Is.EqualTo(2));
+        match["GrP"].Value.ShouldBe("dd".ToLatin1Bytes());
+        match["GrP"].Index.ShouldBe(11);
+        match["GrP"].Length.ShouldBe(2);
     }
 
     [Test]
@@ -1249,20 +1250,20 @@ public class MatchTests
         var re = new PcreRegex(@"(?<g>a)?(?<g>b)?(?<g>c)?", PcreOptions.DupNames);
         var match = re.Match("b");
 
-        Assert.That(match, Is.Not.Null);
-        Assert.That(match.Success, Is.True);
-        Assert.That(match["g"].Value, Is.EqualTo("b"));
-        Assert.That(match["g"].ValueSpan.ToString(), Is.EqualTo("b"));
+        match.ShouldNotBeNull();
+        match.Success.ShouldBeTrue();
+        match["g"].Value.ShouldBe("b");
+        match["g"].ValueSpan.ShouldBe("b");
 
-        Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo([false, true, false]));
+        match.GetDuplicateNamedGroups("g").Select(g => g.Success).ShouldBe([false, true, false]);
 
         match = re.Match("bc");
-        Assert.That(match, Is.Not.Null);
-        Assert.That(match.Success, Is.True);
-        Assert.That(match["g"].Value, Is.EqualTo("b"));
-        Assert.That(match["g"].ValueSpan.ToString(), Is.EqualTo("b"));
+        match.ShouldNotBeNull();
+        match.Success.ShouldBeTrue();
+        match["g"].Value.ShouldBe("b");
+        match["g"].ValueSpan.ShouldBe("b");
 
-        Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo([false, true, true]));
+        match.GetDuplicateNamedGroups("g").Select(g => g.Success).ShouldBe([false, true, true]);
     }
 
     [Test]
@@ -1271,16 +1272,16 @@ public class MatchTests
         var re = new PcreRegex(@"(?<g>a)?(?<g>b)?(?<g>c)?", PcreOptions.DupNames);
         var match = re.Match("b".AsSpan());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match["g"].Value.ToString(), Is.EqualTo("b"));
+        match.Success.ShouldBeTrue();
+        match["g"].Value.ShouldBe("b");
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, false]));
+        GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, false]);
 
         match = re.Match("bc".AsSpan());
-        Assert.That(match.Success, Is.True);
-        Assert.That(match["g"].Value.ToString(), Is.EqualTo("b"));
+        match.Success.ShouldBeTrue();
+        match["g"].Value.ShouldBe("b");
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
+        GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, true]);
     }
 
     [Test]
@@ -1289,16 +1290,16 @@ public class MatchTests
         var re = new PcreRegex(@"(?<g>a)?(?<g>b)?(?<g>c)?", PcreOptions.DupNames);
         var match = re.CreateMatchBuffer().Match("b".AsSpan());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match["g"].Value.ToString(), Is.EqualTo("b"));
+        match.Success.ShouldBeTrue();
+        match["g"].Value.ShouldBe("b");
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, false]));
+        GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, false]);
 
         match = re.Match("bc".AsSpan());
-        Assert.That(match.Success, Is.True);
-        Assert.That(match["g"].Value.ToString(), Is.EqualTo("b"));
+        match.Success.ShouldBeTrue();
+        match["g"].Value.ShouldBe("b");
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
+        GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, true]);
     }
 
     [Test]
@@ -1307,16 +1308,16 @@ public class MatchTests
         var re = new PcreRegexUtf8(@"(?<g>a)?(?<g>b)?(?<g>c)?"u8, PcreOptions.DupNames);
         var match = re.Match("b"u8);
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match["g"].Value.SequenceEqual("b"u8));
+        match.Success.ShouldBeTrue();
+        match["g"].Value.ShouldBe("b"u8);
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, false]));
+        GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, false]);
 
         match = re.Match("bc"u8);
-        Assert.That(match.Success, Is.True);
-        Assert.That(match["g"].Value.SequenceEqual("b"u8));
+        match.Success.ShouldBeTrue();
+        match["g"].Value.ShouldBe("b"u8);
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
+        GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, true]);
     }
 
     [Test]
@@ -1325,16 +1326,16 @@ public class MatchTests
         var re = new PcreRegexUtf8(@"(?<g>a)?(?<g>b)?(?<g>c)?"u8, PcreOptions.DupNames);
         var match = re.CreateMatchBuffer().Match("b"u8);
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match["g"].Value.SequenceEqual("b"u8));
+        match.Success.ShouldBeTrue();
+        match["g"].Value.ShouldBe("b"u8);
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, false]));
+        GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, false]);
 
         match = re.Match("bc"u8);
-        Assert.That(match.Success, Is.True);
-        Assert.That(match["g"].Value.SequenceEqual("b"u8));
+        match.Success.ShouldBeTrue();
+        match["g"].Value.ShouldBe("b"u8);
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
+        GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, true]);
     }
 
     [Test]
@@ -1343,16 +1344,16 @@ public class MatchTests
         var re = TestSupport.CreatePcreRegex8Bit(@"(?<g>a)?(?<g>b)?(?<g>c)?".ToLatin1Bytes(), PcreOptions.DupNames);
         var match = re.Match("b".ToLatin1Bytes());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match["g"].Value.SequenceEqual("b".ToLatin1Bytes()));
+        match.Success.ShouldBeTrue();
+        match["g"].Value.ShouldBe("b".ToLatin1Bytes());
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, false]));
+        GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, false]);
 
         match = re.Match("bc".ToLatin1Bytes());
-        Assert.That(match.Success, Is.True);
-        Assert.That(match["g"].Value.SequenceEqual("b".ToLatin1Bytes()));
+        match.Success.ShouldBeTrue();
+        match["g"].Value.ShouldBe("b".ToLatin1Bytes());
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
+        GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, true]);
     }
 
     [Test]
@@ -1361,16 +1362,16 @@ public class MatchTests
         var re = TestSupport.CreatePcreRegex8Bit(@"(?<g>a)?(?<g>b)?(?<g>c)?".ToLatin1Bytes(), PcreOptions.DupNames);
         var match = re.CreateMatchBuffer().Match("b".ToLatin1Bytes());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match["g"].Value.SequenceEqual("b".ToLatin1Bytes()));
+        match.Success.ShouldBeTrue();
+        match["g"].Value.ShouldBe("b".ToLatin1Bytes());
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, false]));
+        GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, false]);
 
         match = re.Match("bc".ToLatin1Bytes());
-        Assert.That(match.Success, Is.True);
-        Assert.That(match["g"].Value.SequenceEqual("b".ToLatin1Bytes()));
+        match.Success.ShouldBeTrue();
+        match["g"].Value.ShouldBe("b".ToLatin1Bytes());
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
+        GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, true]);
     }
 
     [Test]
@@ -1379,11 +1380,11 @@ public class MatchTests
         var re = new PcreRegex(@"(?J)(?<g>a)?(?<g>b)?(?<g>c)?");
 
         var match = re.Match("bc");
-        Assert.That(match, Is.Not.Null);
-        Assert.That(match.Success, Is.True);
-        Assert.That(match["g"].Value, Is.EqualTo("b"));
+        match.ShouldNotBeNull();
+        match.Success.ShouldBeTrue();
+        match["g"].Value.ShouldBe("b");
 
-        Assert.That(match.GetDuplicateNamedGroups("g").Select(g => g.Success), Is.EqualTo([false, true, true]));
+        match.GetDuplicateNamedGroups("g").Select(g => g.Success).ShouldBe([false, true, true]);
     }
 
     [Test]
@@ -1392,10 +1393,10 @@ public class MatchTests
         var re = new PcreRegex(@"(?J)(?<g>a)?(?<g>b)?(?<g>c)?");
 
         var match = re.Match("bc".AsSpan());
-        Assert.That(match.Success, Is.True);
-        Assert.That(match["g"].Value.ToString(), Is.EqualTo("b"));
+        match.Success.ShouldBeTrue();
+        match["g"].Value.ShouldBe("b");
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
+        GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, true]);
     }
 
     [Test]
@@ -1404,10 +1405,10 @@ public class MatchTests
         var re = new PcreRegex(@"(?J)(?<g>a)?(?<g>b)?(?<g>c)?");
 
         var match = re.CreateMatchBuffer().Match("bc".AsSpan());
-        Assert.That(match.Success, Is.True);
-        Assert.That(match["g"].Value.ToString(), Is.EqualTo("b"));
+        match.Success.ShouldBeTrue();
+        match["g"].Value.ShouldBe("b");
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
+        GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, true]);
     }
 
     [Test]
@@ -1416,10 +1417,10 @@ public class MatchTests
         var re = new PcreRegexUtf8(@"(?J)(?<g>a)?(?<g>b)?(?<g>c)?"u8);
 
         var match = re.Match("bc"u8);
-        Assert.That(match.Success, Is.True);
-        Assert.That(match["g"].Value.SequenceEqual("b"u8));
+        match.Success.ShouldBeTrue();
+        match["g"].Value.ShouldBe("b"u8);
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
+        GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, true]);
     }
 
     [Test]
@@ -1428,10 +1429,10 @@ public class MatchTests
         var re = new PcreRegexUtf8(@"(?J)(?<g>a)?(?<g>b)?(?<g>c)?"u8);
 
         var match = re.CreateMatchBuffer().Match("bc"u8);
-        Assert.That(match.Success, Is.True);
-        Assert.That(match["g"].Value.SequenceEqual("b"u8));
+        match.Success.ShouldBeTrue();
+        match["g"].Value.ShouldBe("b"u8);
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
+        GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, true]);
     }
 
     [Test]
@@ -1440,10 +1441,10 @@ public class MatchTests
         var re = TestSupport.CreatePcreRegex8Bit(@"(?J)(?<g>a)?(?<g>b)?(?<g>c)?".ToLatin1Bytes());
 
         var match = re.Match("bc".ToLatin1Bytes());
-        Assert.That(match.Success, Is.True);
-        Assert.That(match["g"].Value.SequenceEqual("b".ToLatin1Bytes()));
+        match.Success.ShouldBeTrue();
+        match["g"].Value.ShouldBe("b".ToLatin1Bytes());
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
+        GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, true]);
     }
 
     [Test]
@@ -1452,10 +1453,10 @@ public class MatchTests
         var re = TestSupport.CreatePcreRegex8Bit(@"(?J)(?<g>a)?(?<g>b)?(?<g>c)?".ToLatin1Bytes());
 
         var match = re.CreateMatchBuffer().Match("bc".ToLatin1Bytes());
-        Assert.That(match.Success, Is.True);
-        Assert.That(match["g"].Value.SequenceEqual("b".ToLatin1Bytes()));
+        match.Success.ShouldBeTrue();
+        match["g"].Value.ShouldBe("b".ToLatin1Bytes());
 
-        Assert.That(GetDuplicateNamedGroupsSuccesses(match, "g"), Is.EqualTo([false, true, true]));
+        GetDuplicateNamedGroupsSuccesses(match, "g").ShouldBe([false, true, true]);
     }
 
     private static List<bool> GetDuplicateNamedGroupsSuccesses(PcreRefMatch match, string groupName)
@@ -1474,12 +1475,12 @@ public class MatchTests
 
         ref var subjectRef = ref MemoryMarshal.GetReference(subject.AsSpan(3));
         ref var valueRef = ref MemoryMarshal.GetReference(match.ValueSpan);
-        Assert.That(Unsafe.AreSame(ref valueRef, ref subjectRef), Is.True);
+        Unsafe.AreSame(ref valueRef, ref subjectRef).ShouldBeTrue();
 
         _ = match.Value; // Reading the string value shouldn't change the span target
 
         valueRef = ref MemoryMarshal.GetReference(match.ValueSpan);
-        Assert.That(Unsafe.AreSame(ref valueRef, ref subjectRef), Is.True);
+        Unsafe.AreSame(ref valueRef, ref subjectRef).ShouldBeTrue();
     }
 
     [Test]
@@ -1492,7 +1493,7 @@ public class MatchTests
 
         ref var subjectRef = ref MemoryMarshal.GetReference(subject.AsSpan(3));
         ref var valueRef = ref MemoryMarshal.GetReference(match.Value);
-        Assert.That(Unsafe.AreSame(ref valueRef, ref subjectRef), Is.True);
+        Unsafe.AreSame(ref valueRef, ref subjectRef).ShouldBeTrue();
     }
 
     [Test]
@@ -1505,7 +1506,7 @@ public class MatchTests
 
         ref var subjectRef = ref MemoryMarshal.GetReference(subject.AsSpan(3));
         ref var valueRef = ref MemoryMarshal.GetReference(match.Value);
-        Assert.That(Unsafe.AreSame(ref valueRef, ref subjectRef), Is.True);
+        Unsafe.AreSame(ref valueRef, ref subjectRef).ShouldBeTrue();
     }
 
     [Test]
@@ -1514,14 +1515,14 @@ public class MatchTests
         var re = new PcreRegex(@"a(?:(*MARK:foo)b(*MARK:bar)|c)");
         var match = re.Match("ab");
 
-        Assert.That(match, Is.Not.Null);
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Mark, Is.EqualTo("bar"));
+        match.ShouldNotBeNull();
+        match.Success.ShouldBeTrue();
+        match.Mark.ShouldBe("bar");
 
         match = re.Match("ac");
-        Assert.That(match, Is.Not.Null);
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Mark, Is.Null);
+        match.ShouldNotBeNull();
+        match.Success.ShouldBeTrue();
+        match.Mark.ShouldBeNull();
     }
 
     [Test]
@@ -1530,12 +1531,12 @@ public class MatchTests
         var re = new PcreRegex(@"a(?:(*MARK:foo)b(*MARK:bar)|c)");
         var match = re.Match("ab".AsSpan());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Mark.ToString(), Is.EqualTo("bar"));
+        match.Success.ShouldBeTrue();
+        match.Mark.ShouldBe("bar");
 
         match = re.Match("ac".AsSpan());
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Mark.ToString(), Is.EqualTo(string.Empty));
+        match.Success.ShouldBeTrue();
+        match.Mark.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -1544,12 +1545,12 @@ public class MatchTests
         var re = new PcreRegex(@"a(?:(*MARK:foo)b(*MARK:bar)|c)");
         var match = re.CreateMatchBuffer().Match("ab".AsSpan());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Mark.ToString(), Is.EqualTo("bar"));
+        match.Success.ShouldBeTrue();
+        match.Mark.ShouldBe("bar");
 
         match = re.Match("ac".AsSpan());
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Mark.ToString(), Is.EqualTo(string.Empty));
+        match.Success.ShouldBeTrue();
+        match.Mark.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -1558,12 +1559,12 @@ public class MatchTests
         var re = new PcreRegexUtf8(@"a(?:(*MARK:foo)b(*MARK:bar)|c)"u8);
         var match = re.Match("ab"u8);
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Mark.SequenceEqual("bar"u8));
+        match.Success.ShouldBeTrue();
+        match.Mark.ShouldBe("bar"u8);
 
         match = re.Match("ac"u8);
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Mark.IsEmpty);
+        match.Success.ShouldBeTrue();
+        match.Mark.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -1572,12 +1573,12 @@ public class MatchTests
         var re = new PcreRegexUtf8(@"a(?:(*MARK:foo)b(*MARK:bar)|c)"u8);
         var match = re.CreateMatchBuffer().Match("ab"u8);
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Mark.SequenceEqual("bar"u8));
+        match.Success.ShouldBeTrue();
+        match.Mark.ShouldBe("bar"u8);
 
         match = re.Match("ac"u8);
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Mark.IsEmpty);
+        match.Success.ShouldBeTrue();
+        match.Mark.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -1586,12 +1587,12 @@ public class MatchTests
         var re = TestSupport.CreatePcreRegex8Bit(@"a(?:(*MARK:foo)b(*MARK:bar)|c)".ToLatin1Bytes());
         var match = re.Match("ab".ToLatin1Bytes());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Mark.SequenceEqual("bar".ToLatin1Bytes()));
+        match.Success.ShouldBeTrue();
+        match.Mark.ShouldBe("bar".ToLatin1Bytes());
 
         match = re.Match("ac".ToLatin1Bytes());
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Mark.IsEmpty);
+        match.Success.ShouldBeTrue();
+        match.Mark.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -1600,12 +1601,12 @@ public class MatchTests
         var re = TestSupport.CreatePcreRegex8Bit(@"a(?:(*MARK:foo)b(*MARK:bar)|c)".ToLatin1Bytes());
         var match = re.CreateMatchBuffer().Match("ab".ToLatin1Bytes());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Mark.SequenceEqual("bar".ToLatin1Bytes()));
+        match.Success.ShouldBeTrue();
+        match.Mark.ShouldBe("bar".ToLatin1Bytes());
 
         match = re.Match("ac".ToLatin1Bytes());
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Mark.IsEmpty);
+        match.Success.ShouldBeTrue();
+        match.Mark.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -1620,7 +1621,7 @@ public class MatchTests
                 ? PcreCalloutResult.Pass
                 : PcreCalloutResult.Fail);
 
-        Assert.That(match[2].Value, Is.EqualTo("hello"));
+        match[2].Value.ShouldBe("hello");
     }
 
     [Test]
@@ -1635,7 +1636,7 @@ public class MatchTests
                 ? PcreCalloutResult.Pass
                 : PcreCalloutResult.Fail);
 
-        Assert.That(match[2].Value.ToString(), Is.EqualTo("hello"));
+        match[2].Value.ShouldBe("hello");
     }
 
     [Test]
@@ -1650,7 +1651,7 @@ public class MatchTests
                 ? PcreCalloutResult.Pass
                 : PcreCalloutResult.Fail);
 
-        Assert.That(match[2].Value.ToString(), Is.EqualTo("hello"));
+        match[2].Value.ShouldBe("hello");
     }
 
     [Test]
@@ -1665,7 +1666,7 @@ public class MatchTests
                 ? PcreCalloutResult.Pass
                 : PcreCalloutResult.Fail);
 
-        Assert.That(match[2].Value.SequenceEqual("hello"u8));
+        match[2].Value.ShouldBe("hello"u8);
     }
 
     [Test]
@@ -1680,7 +1681,7 @@ public class MatchTests
                 ? PcreCalloutResult.Pass
                 : PcreCalloutResult.Fail);
 
-        Assert.That(match[2].Value.SequenceEqual("hello"u8));
+        match[2].Value.ShouldBe("hello"u8);
     }
 
     [Test]
@@ -1695,7 +1696,7 @@ public class MatchTests
                 ? PcreCalloutResult.Pass
                 : PcreCalloutResult.Fail);
 
-        Assert.That(match[2].Value.SequenceEqual("hello".ToLatin1Bytes()));
+        match[2].Value.ShouldBe("hello".ToLatin1Bytes());
     }
 
     [Test]
@@ -1710,7 +1711,7 @@ public class MatchTests
                 ? PcreCalloutResult.Pass
                 : PcreCalloutResult.Fail);
 
-        Assert.That(match[2].Value.SequenceEqual("hello".ToLatin1Bytes()));
+        match[2].Value.ShouldBe("hello".ToLatin1Bytes());
     }
 
     [Test]
@@ -1723,32 +1724,32 @@ public class MatchTests
 
         var match = re.Match("abc", data =>
         {
-            Assert.That(data.Number, Is.EqualTo(42));
-            Assert.That(data.CurrentOffset, Is.EqualTo(1));
-            Assert.That(data.PatternPosition, Is.EqualTo(pattern.IndexOf("(?C42)", StringComparison.Ordinal) + 6));
-            Assert.That(data.StartOffset, Is.EqualTo(0));
-            Assert.That(data.LastCapture, Is.EqualTo(1));
-            Assert.That(data.MaxCapture, Is.EqualTo(2));
-            Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
-            Assert.That(data.StringOffset, Is.EqualTo(0));
-            Assert.That(data.String, Is.Null);
+            data.Number.ShouldBe(42);
+            data.CurrentOffset.ShouldBe(1);
+            data.PatternPosition.ShouldBe(pattern.IndexOf("(?C42)", StringComparison.Ordinal) + 6);
+            data.StartOffset.ShouldBe(0);
+            data.LastCapture.ShouldBe(1);
+            data.MaxCapture.ShouldBe(2);
+            data.NextPatternItemLength.ShouldBe(1);
+            data.StringOffset.ShouldBe(0);
+            data.String.ShouldBeNull();
 
-            Assert.That(data.Match.Value, Is.EqualTo("a"));
-            Assert.That(data.Match[1].Value, Is.EqualTo("a"));
-            Assert.That(data.Match[2].Success, Is.False);
-            Assert.That(data.Match[2].Value, Is.SameAs(string.Empty));
-            Assert.That(data.Match[3].Success, Is.False);
-            Assert.That(data.Match[3].Value, Is.SameAs(string.Empty));
+            data.Match.Value.ShouldBe("a");
+            data.Match[1].Value.ShouldBe("a");
+            data.Match[2].Success.ShouldBeFalse();
+            data.Match[2].Value.ShouldBeSameAs(string.Empty);
+            data.Match[3].Success.ShouldBeFalse();
+            data.Match[3].Value.ShouldBeSameAs(string.Empty);
 
-            Assert.That(data.Match.Mark, Is.EqualTo("foo"));
+            data.Match.Mark.ShouldBe("foo");
 
             ++calls;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match, Is.Not.Null);
-        Assert.That(match.Success, Is.True);
-        Assert.That(calls, Is.EqualTo(1));
+        match.ShouldNotBeNull();
+        match.Success.ShouldBeTrue();
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -1761,31 +1762,31 @@ public class MatchTests
 
         var match = re.Match("abc".AsSpan(), data =>
         {
-            Assert.That(data.Number, Is.EqualTo(42));
-            Assert.That(data.CurrentOffset, Is.EqualTo(1));
-            Assert.That(data.PatternPosition, Is.EqualTo(pattern.IndexOf("(?C42)", StringComparison.Ordinal) + 6));
-            Assert.That(data.StartOffset, Is.EqualTo(0));
-            Assert.That(data.LastCapture, Is.EqualTo(1));
-            Assert.That(data.MaxCapture, Is.EqualTo(2));
-            Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
-            Assert.That(data.StringOffset, Is.EqualTo(0));
-            Assert.That(data.String, Is.Null);
+            data.Number.ShouldBe(42);
+            data.CurrentOffset.ShouldBe(1);
+            data.PatternPosition.ShouldBe(pattern.IndexOf("(?C42)", StringComparison.Ordinal) + 6);
+            data.StartOffset.ShouldBe(0);
+            data.LastCapture.ShouldBe(1);
+            data.MaxCapture.ShouldBe(2);
+            data.NextPatternItemLength.ShouldBe(1);
+            data.StringOffset.ShouldBe(0);
+            data.String.ShouldBeNull();
 
-            Assert.That(data.Match.Value.ToString(), Is.EqualTo("a"));
-            Assert.That(data.Match[1].Value.ToString(), Is.EqualTo("a"));
-            Assert.That(data.Match[2].Success, Is.False);
-            Assert.That(data.Match[2].Value.ToString(), Is.SameAs(string.Empty));
-            Assert.That(data.Match[3].Success, Is.False);
-            Assert.That(data.Match[3].Value.ToString(), Is.SameAs(string.Empty));
+            data.Match.Value.ShouldBe("a");
+            data.Match[1].Value.ShouldBe("a");
+            data.Match[2].Success.ShouldBeFalse();
+            data.Match[2].Value.ToString().ShouldBeSameAs(string.Empty);
+            data.Match[3].Success.ShouldBeFalse();
+            data.Match[3].Value.ToString().ShouldBeSameAs(string.Empty);
 
-            Assert.That(data.Match.Mark.ToString(), Is.EqualTo("foo"));
+            data.Match.Mark.ShouldBe("foo");
 
             ++calls;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(calls, Is.EqualTo(1));
+        match.Success.ShouldBeTrue();
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -1798,31 +1799,31 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("abc".AsSpan(), data =>
         {
-            Assert.That(data.Number, Is.EqualTo(42));
-            Assert.That(data.CurrentOffset, Is.EqualTo(1));
-            Assert.That(data.PatternPosition, Is.EqualTo(pattern.IndexOf("(?C42)", StringComparison.Ordinal) + 6));
-            Assert.That(data.StartOffset, Is.EqualTo(0));
-            Assert.That(data.LastCapture, Is.EqualTo(1));
-            Assert.That(data.MaxCapture, Is.EqualTo(2));
-            Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
-            Assert.That(data.StringOffset, Is.EqualTo(0));
-            Assert.That(data.String, Is.Null);
+            data.Number.ShouldBe(42);
+            data.CurrentOffset.ShouldBe(1);
+            data.PatternPosition.ShouldBe(pattern.IndexOf("(?C42)", StringComparison.Ordinal) + 6);
+            data.StartOffset.ShouldBe(0);
+            data.LastCapture.ShouldBe(1);
+            data.MaxCapture.ShouldBe(2);
+            data.NextPatternItemLength.ShouldBe(1);
+            data.StringOffset.ShouldBe(0);
+            data.String.ShouldBeNull();
 
-            Assert.That(data.Match.Value.ToString(), Is.EqualTo("a"));
-            Assert.That(data.Match[1].Value.ToString(), Is.EqualTo("a"));
-            Assert.That(data.Match[2].Success, Is.False);
-            Assert.That(data.Match[2].Value.ToString(), Is.SameAs(string.Empty));
-            Assert.That(data.Match[3].Success, Is.False);
-            Assert.That(data.Match[3].Value.ToString(), Is.SameAs(string.Empty));
+            data.Match.Value.ShouldBe("a");
+            data.Match[1].Value.ShouldBe("a");
+            data.Match[2].Success.ShouldBeFalse();
+            data.Match[2].Value.ToString().ShouldBeSameAs(string.Empty);
+            data.Match[3].Success.ShouldBeFalse();
+            data.Match[3].Value.ToString().ShouldBeSameAs(string.Empty);
 
-            Assert.That(data.Match.Mark.ToString(), Is.EqualTo("foo"));
+            data.Match.Mark.ShouldBe("foo");
 
             ++calls;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(calls, Is.EqualTo(1));
+        match.Success.ShouldBeTrue();
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -1837,32 +1838,32 @@ public class MatchTests
             "abc"u8,
             data =>
             {
-                Assert.That(data.Number, Is.EqualTo(42));
-                Assert.That(data.CurrentOffset, Is.EqualTo(1));
-                Assert.That(data.PatternPosition, Is.EqualTo(GetPattern().IndexOf("(?C42)"u8) + 6));
-                Assert.That(data.StartOffset, Is.EqualTo(0));
-                Assert.That(data.LastCapture, Is.EqualTo(1));
-                Assert.That(data.MaxCapture, Is.EqualTo(2));
-                Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
-                Assert.That(data.StringOffset, Is.EqualTo(0));
-                Assert.That(data.String, Is.Null);
+                data.Number.ShouldBe(42);
+                data.CurrentOffset.ShouldBe(1);
+                data.PatternPosition.ShouldBe(GetPattern().IndexOf("(?C42)"u8) + 6);
+                data.StartOffset.ShouldBe(0);
+                data.LastCapture.ShouldBe(1);
+                data.MaxCapture.ShouldBe(2);
+                data.NextPatternItemLength.ShouldBe(1);
+                data.StringOffset.ShouldBe(0);
+                data.String.ShouldBeNull();
 
-                Assert.That(data.Match.Value.SequenceEqual("a"u8));
-                Assert.That(data.Match[1].Value.SequenceEqual("a"u8));
-                Assert.That(data.Match[2].Success, Is.False);
-                Assert.That(data.Match[2].Value.IsEmpty);
-                Assert.That(data.Match[3].Success, Is.False);
-                Assert.That(data.Match[3].Value.IsEmpty);
+                data.Match.Value.ShouldBe("a"u8);
+                data.Match[1].Value.ShouldBe("a"u8);
+                data.Match[2].Success.ShouldBeFalse();
+                data.Match[2].Value.IsEmpty.ShouldBeTrue();
+                data.Match[3].Success.ShouldBeFalse();
+                data.Match[3].Value.IsEmpty.ShouldBeTrue();
 
-                Assert.That(data.Match.Mark.SequenceEqual("foo"u8));
+                data.Match.Mark.ShouldBe("foo"u8);
 
                 ++calls;
                 return PcreCalloutResult.Pass;
             }
         );
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(calls, Is.EqualTo(1));
+        match.Success.ShouldBeTrue();
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -1875,31 +1876,31 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("abc"u8, data =>
         {
-            Assert.That(data.Number, Is.EqualTo(42));
-            Assert.That(data.CurrentOffset, Is.EqualTo(1));
-            Assert.That(data.PatternPosition, Is.EqualTo(GetPattern().IndexOf("(?C42)"u8) + 6));
-            Assert.That(data.StartOffset, Is.EqualTo(0));
-            Assert.That(data.LastCapture, Is.EqualTo(1));
-            Assert.That(data.MaxCapture, Is.EqualTo(2));
-            Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
-            Assert.That(data.StringOffset, Is.EqualTo(0));
-            Assert.That(data.String, Is.Null);
+            data.Number.ShouldBe(42);
+            data.CurrentOffset.ShouldBe(1);
+            data.PatternPosition.ShouldBe(GetPattern().IndexOf("(?C42)"u8) + 6);
+            data.StartOffset.ShouldBe(0);
+            data.LastCapture.ShouldBe(1);
+            data.MaxCapture.ShouldBe(2);
+            data.NextPatternItemLength.ShouldBe(1);
+            data.StringOffset.ShouldBe(0);
+            data.String.ShouldBeNull();
 
-            Assert.That(data.Match.Value.SequenceEqual("a"u8));
-            Assert.That(data.Match[1].Value.SequenceEqual("a"u8));
-            Assert.That(data.Match[2].Success, Is.False);
-            Assert.That(data.Match[2].Value.IsEmpty);
-            Assert.That(data.Match[3].Success, Is.False);
-            Assert.That(data.Match[3].Value.IsEmpty);
+            data.Match.Value.ShouldBe("a"u8);
+            data.Match[1].Value.ShouldBe("a"u8);
+            data.Match[2].Success.ShouldBeFalse();
+            data.Match[2].Value.IsEmpty.ShouldBeTrue();
+            data.Match[3].Success.ShouldBeFalse();
+            data.Match[3].Value.IsEmpty.ShouldBeTrue();
 
-            Assert.That(data.Match.Mark.SequenceEqual("foo"u8));
+            data.Match.Mark.ShouldBe("foo"u8);
 
             ++calls;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(calls, Is.EqualTo(1));
+        match.Success.ShouldBeTrue();
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -1914,32 +1915,32 @@ public class MatchTests
             "abc".ToLatin1Bytes(),
             data =>
             {
-                Assert.That(data.Number, Is.EqualTo(42));
-                Assert.That(data.CurrentOffset, Is.EqualTo(1));
-                Assert.That(data.PatternPosition, Is.EqualTo(GetPattern().IndexOf("(?C42)".ToLatin1Bytes()) + 6));
-                Assert.That(data.StartOffset, Is.EqualTo(0));
-                Assert.That(data.LastCapture, Is.EqualTo(1));
-                Assert.That(data.MaxCapture, Is.EqualTo(2));
-                Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
-                Assert.That(data.StringOffset, Is.EqualTo(0));
-                Assert.That(data.String, Is.Null);
+                data.Number.ShouldBe(42);
+                data.CurrentOffset.ShouldBe(1);
+                data.PatternPosition.ShouldBe(GetPattern().IndexOf("(?C42)".ToLatin1Bytes()) + 6);
+                data.StartOffset.ShouldBe(0);
+                data.LastCapture.ShouldBe(1);
+                data.MaxCapture.ShouldBe(2);
+                data.NextPatternItemLength.ShouldBe(1);
+                data.StringOffset.ShouldBe(0);
+                data.String.ShouldBeNull();
 
-                Assert.That(data.Match.Value.SequenceEqual("a".ToLatin1Bytes()));
-                Assert.That(data.Match[1].Value.SequenceEqual("a".ToLatin1Bytes()));
-                Assert.That(data.Match[2].Success, Is.False);
-                Assert.That(data.Match[2].Value.IsEmpty);
-                Assert.That(data.Match[3].Success, Is.False);
-                Assert.That(data.Match[3].Value.IsEmpty);
+                data.Match.Value.ShouldBe("a".ToLatin1Bytes());
+                data.Match[1].Value.ShouldBe("a".ToLatin1Bytes());
+                data.Match[2].Success.ShouldBeFalse();
+                data.Match[2].Value.IsEmpty.ShouldBeTrue();
+                data.Match[3].Success.ShouldBeFalse();
+                data.Match[3].Value.IsEmpty.ShouldBeTrue();
 
-                Assert.That(data.Match.Mark.SequenceEqual("foo".ToLatin1Bytes()));
+                data.Match.Mark.ShouldBe("foo".ToLatin1Bytes());
 
                 ++calls;
                 return PcreCalloutResult.Pass;
             }
         );
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(calls, Is.EqualTo(1));
+        match.Success.ShouldBeTrue();
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -1952,31 +1953,31 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("abc".ToLatin1Bytes(), data =>
         {
-            Assert.That(data.Number, Is.EqualTo(42));
-            Assert.That(data.CurrentOffset, Is.EqualTo(1));
-            Assert.That(data.PatternPosition, Is.EqualTo(GetPattern().IndexOf("(?C42)".ToLatin1Bytes()) + 6));
-            Assert.That(data.StartOffset, Is.EqualTo(0));
-            Assert.That(data.LastCapture, Is.EqualTo(1));
-            Assert.That(data.MaxCapture, Is.EqualTo(2));
-            Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
-            Assert.That(data.StringOffset, Is.EqualTo(0));
-            Assert.That(data.String, Is.Null);
+            data.Number.ShouldBe(42);
+            data.CurrentOffset.ShouldBe(1);
+            data.PatternPosition.ShouldBe(GetPattern().IndexOf("(?C42)".ToLatin1Bytes()) + 6);
+            data.StartOffset.ShouldBe(0);
+            data.LastCapture.ShouldBe(1);
+            data.MaxCapture.ShouldBe(2);
+            data.NextPatternItemLength.ShouldBe(1);
+            data.StringOffset.ShouldBe(0);
+            data.String.ShouldBeNull();
 
-            Assert.That(data.Match.Value.SequenceEqual("a".ToLatin1Bytes()));
-            Assert.That(data.Match[1].Value.SequenceEqual("a".ToLatin1Bytes()));
-            Assert.That(data.Match[2].Success, Is.False);
-            Assert.That(data.Match[2].Value.IsEmpty);
-            Assert.That(data.Match[3].Success, Is.False);
-            Assert.That(data.Match[3].Value.IsEmpty);
+            data.Match.Value.ShouldBe("a".ToLatin1Bytes());
+            data.Match[1].Value.ShouldBe("a".ToLatin1Bytes());
+            data.Match[2].Success.ShouldBeFalse();
+            data.Match[2].Value.IsEmpty.ShouldBeTrue();
+            data.Match[3].Success.ShouldBeFalse();
+            data.Match[3].Value.IsEmpty.ShouldBeTrue();
 
-            Assert.That(data.Match.Mark.SequenceEqual("foo".ToLatin1Bytes()));
+            data.Match.Mark.ShouldBe("foo".ToLatin1Bytes());
 
             ++calls;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(calls, Is.EqualTo(1));
+        match.Success.ShouldBeTrue();
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -1988,7 +1989,7 @@ public class MatchTests
 
         var match = re.Match("ab", data =>
         {
-            Assert.That(data.Number, Is.EqualTo(42));
+            data.Number.ShouldBe(42);
             if (first)
             {
                 first = false;
@@ -1998,9 +1999,9 @@ public class MatchTests
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match, Is.Not.Null);
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Value, Is.EqualTo("b"));
+        match.ShouldNotBeNull();
+        match.Success.ShouldBeTrue();
+        match.Value.ShouldBe("b");
     }
 
     [Test]
@@ -2012,7 +2013,7 @@ public class MatchTests
 
         var match = re.Match("ab".AsSpan(), data =>
         {
-            Assert.That(data.Number, Is.EqualTo(42));
+            data.Number.ShouldBe(42);
             if (first)
             {
                 first = false;
@@ -2022,8 +2023,8 @@ public class MatchTests
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Value.ToString(), Is.EqualTo("b"));
+        match.Success.ShouldBeTrue();
+        match.Value.ShouldBe("b");
     }
 
     [Test]
@@ -2035,7 +2036,7 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("ab".AsSpan(), data =>
         {
-            Assert.That(data.Number, Is.EqualTo(42));
+            data.Number.ShouldBe(42);
             if (first)
             {
                 first = false;
@@ -2045,8 +2046,8 @@ public class MatchTests
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Value.ToString(), Is.EqualTo("b"));
+        match.Success.ShouldBeTrue();
+        match.Value.ShouldBe("b");
     }
 
     [Test]
@@ -2058,7 +2059,7 @@ public class MatchTests
 
         var match = re.Match("ab"u8, data =>
         {
-            Assert.That(data.Number, Is.EqualTo(42));
+            data.Number.ShouldBe(42);
             if (first)
             {
                 first = false;
@@ -2068,8 +2069,8 @@ public class MatchTests
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Value.SequenceEqual("b"u8));
+        match.Success.ShouldBeTrue();
+        match.Value.ShouldBe("b"u8);
     }
 
     [Test]
@@ -2081,7 +2082,7 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("ab"u8, data =>
         {
-            Assert.That(data.Number, Is.EqualTo(42));
+            data.Number.ShouldBe(42);
             if (first)
             {
                 first = false;
@@ -2091,8 +2092,8 @@ public class MatchTests
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Value.SequenceEqual("b"u8));
+        match.Success.ShouldBeTrue();
+        match.Value.ShouldBe("b"u8);
     }
 
     [Test]
@@ -2104,7 +2105,7 @@ public class MatchTests
 
         var match = re.Match("ab".ToLatin1Bytes(), data =>
         {
-            Assert.That(data.Number, Is.EqualTo(42));
+            data.Number.ShouldBe(42);
             if (first)
             {
                 first = false;
@@ -2114,8 +2115,8 @@ public class MatchTests
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Value.SequenceEqual("b".ToLatin1Bytes()));
+        match.Success.ShouldBeTrue();
+        match.Value.ShouldBe("b".ToLatin1Bytes());
     }
 
     [Test]
@@ -2127,7 +2128,7 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("ab".ToLatin1Bytes(), data =>
         {
-            Assert.That(data.Number, Is.EqualTo(42));
+            data.Number.ShouldBe(42);
             if (first)
             {
                 first = false;
@@ -2137,8 +2138,8 @@ public class MatchTests
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Value.SequenceEqual("b".ToLatin1Bytes()));
+        match.Success.ShouldBeTrue();
+        match.Value.ShouldBe("b".ToLatin1Bytes());
     }
 
     [Test]
@@ -2148,12 +2149,12 @@ public class MatchTests
 
         var match = re.Match("ab", data =>
         {
-            Assert.That(data.Number, Is.EqualTo(42));
+            data.Number.ShouldBe(42);
             return PcreCalloutResult.Abort;
         });
 
-        Assert.That(match, Is.Not.Null);
-        Assert.That(match.Success, Is.False);
+        match.ShouldNotBeNull();
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -2163,11 +2164,11 @@ public class MatchTests
 
         var match = re.Match("ab".AsSpan(), data =>
         {
-            Assert.That(data.Number, Is.EqualTo(42));
+            data.Number.ShouldBe(42);
             return PcreCalloutResult.Abort;
         });
 
-        Assert.That(match.Success, Is.False);
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -2177,11 +2178,11 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("ab".AsSpan(), data =>
         {
-            Assert.That(data.Number, Is.EqualTo(42));
+            data.Number.ShouldBe(42);
             return PcreCalloutResult.Abort;
         });
 
-        Assert.That(match.Success, Is.False);
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -2191,11 +2192,11 @@ public class MatchTests
 
         var match = re.Match("ab"u8, data =>
         {
-            Assert.That(data.Number, Is.EqualTo(42));
+            data.Number.ShouldBe(42);
             return PcreCalloutResult.Abort;
         });
 
-        Assert.That(match.Success, Is.False);
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -2205,11 +2206,11 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("ab"u8, data =>
         {
-            Assert.That(data.Number, Is.EqualTo(42));
+            data.Number.ShouldBe(42);
             return PcreCalloutResult.Abort;
         });
 
-        Assert.That(match.Success, Is.False);
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -2219,11 +2220,11 @@ public class MatchTests
 
         var match = re.Match("ab".ToLatin1Bytes(), data =>
         {
-            Assert.That(data.Number, Is.EqualTo(42));
+            data.Number.ShouldBe(42);
             return PcreCalloutResult.Abort;
         });
 
-        Assert.That(match.Success, Is.False);
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -2233,11 +2234,11 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("ab".ToLatin1Bytes(), data =>
         {
-            Assert.That(data.Number, Is.EqualTo(42));
+            data.Number.ShouldBe(42);
             return PcreCalloutResult.Abort;
         });
 
-        Assert.That(match.Success, Is.False);
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -2245,10 +2246,10 @@ public class MatchTests
     {
         var re = new PcreRegex(@".(?C42)");
 
-        var ex = Assert.Throws<PcreCalloutException>(() => re.Match("ab", _ => throw new DivideByZeroException("test")))!;
+        var ex = Should.Throw<PcreCalloutException>(() => re.Match("ab", _ => throw new DivideByZeroException("test")));
 
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Callout));
-        Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
+        ex.ErrorCode.ShouldBe(PcreErrorCode.Callout);
+        ex.InnerException.ShouldBeOfType<DivideByZeroException>();
     }
 
     [Test]
@@ -2256,10 +2257,10 @@ public class MatchTests
     {
         var re = new PcreRegex(@".(?C42)");
 
-        var ex = Assert.Throws<PcreCalloutException>(() => re.Match("ab".AsSpan(), _ => throw new DivideByZeroException("test")))!;
+        var ex = Should.Throw<PcreCalloutException>(() => re.Match("ab".AsSpan(), _ => throw new DivideByZeroException("test")));
 
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Callout));
-        Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
+        ex.ErrorCode.ShouldBe(PcreErrorCode.Callout);
+        ex.InnerException.ShouldBeOfType<DivideByZeroException>();
     }
 
     [Test]
@@ -2268,10 +2269,10 @@ public class MatchTests
         var re = new PcreRegex(@".(?C42)");
 
         var buffer = re.CreateMatchBuffer();
-        var ex = Assert.Throws<PcreCalloutException>(() => buffer.Match("ab".AsSpan(), _ => throw new DivideByZeroException("test")))!;
+        var ex = Should.Throw<PcreCalloutException>(() => buffer.Match("ab".AsSpan(), _ => throw new DivideByZeroException("test")));
 
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Callout));
-        Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
+        ex.ErrorCode.ShouldBe(PcreErrorCode.Callout);
+        ex.InnerException.ShouldBeOfType<DivideByZeroException>();
     }
 
     [Test]
@@ -2279,10 +2280,10 @@ public class MatchTests
     {
         var re = new PcreRegexUtf8(@".(?C42)"u8);
 
-        var ex = Assert.Throws<PcreCalloutException>(() => re.Match("ab"u8, _ => throw new DivideByZeroException("test")))!;
+        var ex = Should.Throw<PcreCalloutException>(() => re.Match("ab"u8, _ => throw new DivideByZeroException("test")));
 
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Callout));
-        Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
+        ex.ErrorCode.ShouldBe(PcreErrorCode.Callout);
+        ex.InnerException.ShouldBeOfType<DivideByZeroException>();
     }
 
     [Test]
@@ -2291,10 +2292,10 @@ public class MatchTests
         var re = new PcreRegexUtf8(@".(?C42)"u8);
 
         var buffer = re.CreateMatchBuffer();
-        var ex = Assert.Throws<PcreCalloutException>(() => buffer.Match("ab"u8, _ => throw new DivideByZeroException("test")))!;
+        var ex = Should.Throw<PcreCalloutException>(() => buffer.Match("ab"u8, _ => throw new DivideByZeroException("test")));
 
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Callout));
-        Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
+        ex.ErrorCode.ShouldBe(PcreErrorCode.Callout);
+        ex.InnerException.ShouldBeOfType<DivideByZeroException>();
     }
 
     [Test]
@@ -2302,10 +2303,10 @@ public class MatchTests
     {
         var re = TestSupport.CreatePcreRegex8Bit(@".(?C42)".ToLatin1Bytes());
 
-        var ex = Assert.Throws<PcreCalloutException>(() => re.Match("ab".ToLatin1Bytes(), _ => throw new DivideByZeroException("test")))!;
+        var ex = Should.Throw<PcreCalloutException>(() => re.Match("ab".ToLatin1Bytes(), _ => throw new DivideByZeroException("test")));
 
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Callout));
-        Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
+        ex.ErrorCode.ShouldBe(PcreErrorCode.Callout);
+        ex.InnerException.ShouldBeOfType<DivideByZeroException>();
     }
 
     [Test]
@@ -2314,10 +2315,10 @@ public class MatchTests
         var re = TestSupport.CreatePcreRegex8Bit(@".(?C42)".ToLatin1Bytes());
 
         var buffer = re.CreateMatchBuffer();
-        var ex = Assert.Throws<PcreCalloutException>(() => buffer.Match("ab".ToLatin1Bytes(), _ => throw new DivideByZeroException("test")))!;
+        var ex = Should.Throw<PcreCalloutException>(() => buffer.Match("ab".ToLatin1Bytes(), _ => throw new DivideByZeroException("test")));
 
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Callout));
-        Assert.That(ex.InnerException, Is.InstanceOf<DivideByZeroException>());
+        ex.ErrorCode.ShouldBe(PcreErrorCode.Callout);
+        ex.InnerException.ShouldBeOfType<DivideByZeroException>();
     }
 
     [Test]
@@ -2329,14 +2330,14 @@ public class MatchTests
 
         var match = re.Match("abc", data =>
         {
-            Assert.That(data.Number, Is.EqualTo(255));
+            data.Number.ShouldBe(255);
             ++count;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match, Is.Not.Null);
-        Assert.That(match.Success, Is.True);
-        Assert.That(count, Is.EqualTo(4));
+        match.ShouldNotBeNull();
+        match.Success.ShouldBeTrue();
+        count.ShouldBe(4);
     }
 
     [Test]
@@ -2348,13 +2349,13 @@ public class MatchTests
 
         var match = re.Match("abc".AsSpan(), data =>
         {
-            Assert.That(data.Number, Is.EqualTo(255));
+            data.Number.ShouldBe(255);
             ++count;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(count, Is.EqualTo(4));
+        match.Success.ShouldBeTrue();
+        count.ShouldBe(4);
     }
 
     [Test]
@@ -2366,13 +2367,13 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("abc".AsSpan(), data =>
         {
-            Assert.That(data.Number, Is.EqualTo(255));
+            data.Number.ShouldBe(255);
             ++count;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(count, Is.EqualTo(4));
+        match.Success.ShouldBeTrue();
+        count.ShouldBe(4);
     }
 
     [Test]
@@ -2384,13 +2385,13 @@ public class MatchTests
 
         var match = re.Match("abc"u8, data =>
         {
-            Assert.That(data.Number, Is.EqualTo(255));
+            data.Number.ShouldBe(255);
             ++count;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(count, Is.EqualTo(4));
+        match.Success.ShouldBeTrue();
+        count.ShouldBe(4);
     }
 
     [Test]
@@ -2402,13 +2403,13 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("abc"u8, data =>
         {
-            Assert.That(data.Number, Is.EqualTo(255));
+            data.Number.ShouldBe(255);
             ++count;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(count, Is.EqualTo(4));
+        match.Success.ShouldBeTrue();
+        count.ShouldBe(4);
     }
 
     [Test]
@@ -2420,13 +2421,13 @@ public class MatchTests
 
         var match = re.Match("abc".ToLatin1Bytes(), data =>
         {
-            Assert.That(data.Number, Is.EqualTo(255));
+            data.Number.ShouldBe(255);
             ++count;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(count, Is.EqualTo(4));
+        match.Success.ShouldBeTrue();
+        count.ShouldBe(4);
     }
 
     [Test]
@@ -2438,13 +2439,13 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("abc".ToLatin1Bytes(), data =>
         {
-            Assert.That(data.Number, Is.EqualTo(255));
+            data.Number.ShouldBe(255);
             ++count;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(count, Is.EqualTo(4));
+        match.Success.ShouldBeTrue();
+        count.ShouldBe(4);
     }
 
     [Test]
@@ -2457,12 +2458,12 @@ public class MatchTests
         var match = re.Match("abc", data =>
         {
             ++count;
-            Assert.That(data.Info, Is.Not.Null);
+            data.Info.ShouldNotBeNull();
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(count, Is.EqualTo(4));
+        match.Success.ShouldBeTrue();
+        count.ShouldBe(4);
     }
 
     [Test]
@@ -2475,12 +2476,12 @@ public class MatchTests
         var match = re.Match("abc"u8, data =>
         {
             ++count;
-            Assert.That(data.Info, Is.Not.Null);
+            data.Info.ShouldNotBeNull();
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(count, Is.EqualTo(4));
+        match.Success.ShouldBeTrue();
+        count.ShouldBe(4);
     }
 
     [Test]
@@ -2493,12 +2494,12 @@ public class MatchTests
         var match = re.Match("abc".ToLatin1Bytes(), data =>
         {
             ++count;
-            Assert.That(data.Info, Is.Not.Null);
+            data.Info.ShouldNotBeNull();
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(count, Is.EqualTo(4));
+        match.Success.ShouldBeTrue();
+        count.ShouldBe(4);
     }
 
     [Test]
@@ -2516,8 +2517,8 @@ public class MatchTests
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(startMatchList, Is.EqualTo([true, false, false]));
-        Assert.That(backtrackList, Is.EqualTo([false, false, true]));
+        startMatchList.ShouldBe([true, false, false]);
+        backtrackList.ShouldBe([false, false, true]);
     }
 
     [Test]
@@ -2535,8 +2536,8 @@ public class MatchTests
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(startMatchList, Is.EqualTo([true, false, false]));
-        Assert.That(backtrackList, Is.EqualTo([false, false, true]));
+        startMatchList.ShouldBe([true, false, false]);
+        backtrackList.ShouldBe([false, false, true]);
     }
 
     [Test]
@@ -2554,8 +2555,8 @@ public class MatchTests
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(startMatchList, Is.EqualTo([true, false, false]));
-        Assert.That(backtrackList, Is.EqualTo([false, false, true]));
+        startMatchList.ShouldBe([true, false, false]);
+        backtrackList.ShouldBe([false, false, true]);
     }
 
     [Test]
@@ -2573,8 +2574,8 @@ public class MatchTests
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(startMatchList, Is.EqualTo([true, false, false]));
-        Assert.That(backtrackList, Is.EqualTo([false, false, true]));
+        startMatchList.ShouldBe([true, false, false]);
+        backtrackList.ShouldBe([false, false, true]);
     }
 
     [Test]
@@ -2592,8 +2593,8 @@ public class MatchTests
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(startMatchList, Is.EqualTo([true, false, false]));
-        Assert.That(backtrackList, Is.EqualTo([false, false, true]));
+        startMatchList.ShouldBe([true, false, false]);
+        backtrackList.ShouldBe([false, false, true]);
     }
 
     [Test]
@@ -2611,8 +2612,8 @@ public class MatchTests
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(startMatchList, Is.EqualTo([true, false, false]));
-        Assert.That(backtrackList, Is.EqualTo([false, false, true]));
+        startMatchList.ShouldBe([true, false, false]);
+        backtrackList.ShouldBe([false, false, true]);
     }
 
     [Test]
@@ -2630,8 +2631,8 @@ public class MatchTests
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(startMatchList, Is.EqualTo([true, false, false]));
-        Assert.That(backtrackList, Is.EqualTo([false, false, true]));
+        startMatchList.ShouldBe([true, false, false]);
+        backtrackList.ShouldBe([false, false, true]);
     }
 
     [Test]
@@ -2644,32 +2645,32 @@ public class MatchTests
 
         var match = re.Match("abc", data =>
         {
-            Assert.That(data.Number, Is.EqualTo(0));
-            Assert.That(data.CurrentOffset, Is.EqualTo(1));
-            Assert.That(data.PatternPosition, Is.EqualTo(pattern.IndexOf("(?C{bar})", StringComparison.Ordinal) + 9));
-            Assert.That(data.StartOffset, Is.EqualTo(0));
-            Assert.That(data.LastCapture, Is.EqualTo(1));
-            Assert.That(data.MaxCapture, Is.EqualTo(2));
-            Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
-            Assert.That(data.StringOffset, Is.EqualTo(pattern.IndexOf("(?C{bar})", StringComparison.Ordinal) + 4));
-            Assert.That(data.String, Is.EqualTo("bar"));
+            data.Number.ShouldBe(0);
+            data.CurrentOffset.ShouldBe(1);
+            data.PatternPosition.ShouldBe(pattern.IndexOf("(?C{bar})", StringComparison.Ordinal) + 9);
+            data.StartOffset.ShouldBe(0);
+            data.LastCapture.ShouldBe(1);
+            data.MaxCapture.ShouldBe(2);
+            data.NextPatternItemLength.ShouldBe(1);
+            data.StringOffset.ShouldBe(pattern.IndexOf("(?C{bar})", StringComparison.Ordinal) + 4);
+            data.String.ShouldBe("bar");
 
-            Assert.That(data.Match.Value, Is.EqualTo("a"));
-            Assert.That(data.Match[1].Value, Is.EqualTo("a"));
-            Assert.That(data.Match[2].Success, Is.False);
-            Assert.That(data.Match[2].Value, Is.SameAs(string.Empty));
-            Assert.That(data.Match[3].Success, Is.False);
-            Assert.That(data.Match[3].Value, Is.SameAs(string.Empty));
+            data.Match.Value.ShouldBe("a");
+            data.Match[1].Value.ShouldBe("a");
+            data.Match[2].Success.ShouldBeFalse();
+            data.Match[2].Value.ShouldBeSameAs(string.Empty);
+            data.Match[3].Success.ShouldBeFalse();
+            data.Match[3].Value.ShouldBeSameAs(string.Empty);
 
-            Assert.That(data.Match.Mark, Is.EqualTo("foo"));
+            data.Match.Mark.ShouldBe("foo");
 
             ++calls;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match, Is.Not.Null);
-        Assert.That(match.Success, Is.True);
-        Assert.That(calls, Is.EqualTo(1));
+        match.ShouldNotBeNull();
+        match.Success.ShouldBeTrue();
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -2682,31 +2683,31 @@ public class MatchTests
 
         var match = re.Match("abc".AsSpan(), data =>
         {
-            Assert.That(data.Number, Is.EqualTo(0));
-            Assert.That(data.CurrentOffset, Is.EqualTo(1));
-            Assert.That(data.PatternPosition, Is.EqualTo(pattern.IndexOf("(?C{bar})", StringComparison.Ordinal) + 9));
-            Assert.That(data.StartOffset, Is.EqualTo(0));
-            Assert.That(data.LastCapture, Is.EqualTo(1));
-            Assert.That(data.MaxCapture, Is.EqualTo(2));
-            Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
-            Assert.That(data.StringOffset, Is.EqualTo(pattern.IndexOf("(?C{bar})", StringComparison.Ordinal) + 4));
-            Assert.That(data.String, Is.EqualTo("bar"));
+            data.Number.ShouldBe(0);
+            data.CurrentOffset.ShouldBe(1);
+            data.PatternPosition.ShouldBe(pattern.IndexOf("(?C{bar})", StringComparison.Ordinal) + 9);
+            data.StartOffset.ShouldBe(0);
+            data.LastCapture.ShouldBe(1);
+            data.MaxCapture.ShouldBe(2);
+            data.NextPatternItemLength.ShouldBe(1);
+            data.StringOffset.ShouldBe(pattern.IndexOf("(?C{bar})", StringComparison.Ordinal) + 4);
+            data.String.ShouldBe("bar");
 
-            Assert.That(data.Match.Value.ToString(), Is.EqualTo("a"));
-            Assert.That(data.Match[1].Value.ToString(), Is.EqualTo("a"));
-            Assert.That(data.Match[2].Success, Is.False);
-            Assert.That(data.Match[2].Value.ToString(), Is.SameAs(string.Empty));
-            Assert.That(data.Match[3].Success, Is.False);
-            Assert.That(data.Match[3].Value.ToString(), Is.SameAs(string.Empty));
+            data.Match.Value.ShouldBe("a");
+            data.Match[1].Value.ShouldBe("a");
+            data.Match[2].Success.ShouldBeFalse();
+            data.Match[2].Value.ToString().ShouldBeSameAs(string.Empty);
+            data.Match[3].Success.ShouldBeFalse();
+            data.Match[3].Value.ToString().ShouldBeSameAs(string.Empty);
 
-            Assert.That(data.Match.Mark.ToString(), Is.EqualTo("foo"));
+            data.Match.Mark.ShouldBe("foo");
 
             ++calls;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(calls, Is.EqualTo(1));
+        match.Success.ShouldBeTrue();
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -2719,31 +2720,31 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("abc".AsSpan(), data =>
         {
-            Assert.That(data.Number, Is.EqualTo(0));
-            Assert.That(data.CurrentOffset, Is.EqualTo(1));
-            Assert.That(data.PatternPosition, Is.EqualTo(pattern.IndexOf("(?C{bar})", StringComparison.Ordinal) + 9));
-            Assert.That(data.StartOffset, Is.EqualTo(0));
-            Assert.That(data.LastCapture, Is.EqualTo(1));
-            Assert.That(data.MaxCapture, Is.EqualTo(2));
-            Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
-            Assert.That(data.StringOffset, Is.EqualTo(pattern.IndexOf("(?C{bar})", StringComparison.Ordinal) + 4));
-            Assert.That(data.String, Is.EqualTo("bar"));
+            data.Number.ShouldBe(0);
+            data.CurrentOffset.ShouldBe(1);
+            data.PatternPosition.ShouldBe(pattern.IndexOf("(?C{bar})", StringComparison.Ordinal) + 9);
+            data.StartOffset.ShouldBe(0);
+            data.LastCapture.ShouldBe(1);
+            data.MaxCapture.ShouldBe(2);
+            data.NextPatternItemLength.ShouldBe(1);
+            data.StringOffset.ShouldBe(pattern.IndexOf("(?C{bar})", StringComparison.Ordinal) + 4);
+            data.String.ShouldBe("bar");
 
-            Assert.That(data.Match.Value.ToString(), Is.EqualTo("a"));
-            Assert.That(data.Match[1].Value.ToString(), Is.EqualTo("a"));
-            Assert.That(data.Match[2].Success, Is.False);
-            Assert.That(data.Match[2].Value.ToString(), Is.SameAs(string.Empty));
-            Assert.That(data.Match[3].Success, Is.False);
-            Assert.That(data.Match[3].Value.ToString(), Is.SameAs(string.Empty));
+            data.Match.Value.ShouldBe("a");
+            data.Match[1].Value.ShouldBe("a");
+            data.Match[2].Success.ShouldBeFalse();
+            data.Match[2].Value.ToString().ShouldBeSameAs(string.Empty);
+            data.Match[3].Success.ShouldBeFalse();
+            data.Match[3].Value.ToString().ShouldBeSameAs(string.Empty);
 
-            Assert.That(data.Match.Mark.ToString(), Is.EqualTo("foo"));
+            data.Match.Mark.ShouldBe("foo");
 
             ++calls;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(calls, Is.EqualTo(1));
+        match.Success.ShouldBeTrue();
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -2756,31 +2757,31 @@ public class MatchTests
 
         var match = re.Match("abc"u8, data =>
         {
-            Assert.That(data.Number, Is.EqualTo(0));
-            Assert.That(data.CurrentOffset, Is.EqualTo(1));
-            Assert.That(data.PatternPosition, Is.EqualTo(GetPattern().IndexOf("(?C{bar})"u8) + 9));
-            Assert.That(data.StartOffset, Is.EqualTo(0));
-            Assert.That(data.LastCapture, Is.EqualTo(1));
-            Assert.That(data.MaxCapture, Is.EqualTo(2));
-            Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
-            Assert.That(data.StringOffset, Is.EqualTo(GetPattern().IndexOf("(?C{bar})"u8) + 4));
-            Assert.That(data.String, Is.EqualTo("bar"));
+            data.Number.ShouldBe(0);
+            data.CurrentOffset.ShouldBe(1);
+            data.PatternPosition.ShouldBe(GetPattern().IndexOf("(?C{bar})"u8) + 9);
+            data.StartOffset.ShouldBe(0);
+            data.LastCapture.ShouldBe(1);
+            data.MaxCapture.ShouldBe(2);
+            data.NextPatternItemLength.ShouldBe(1);
+            data.StringOffset.ShouldBe(GetPattern().IndexOf("(?C{bar})"u8) + 4);
+            data.String.ShouldBe("bar");
 
-            Assert.That(data.Match.Value.SequenceEqual("a"u8));
-            Assert.That(data.Match[1].Value.SequenceEqual("a"u8));
-            Assert.That(data.Match[2].Success, Is.False);
-            Assert.That(data.Match[2].Value.IsEmpty);
-            Assert.That(data.Match[3].Success, Is.False);
-            Assert.That(data.Match[3].Value.IsEmpty);
+            data.Match.Value.ShouldBe("a"u8);
+            data.Match[1].Value.ShouldBe("a"u8);
+            data.Match[2].Success.ShouldBeFalse();
+            data.Match[2].Value.IsEmpty.ShouldBeTrue();
+            data.Match[3].Success.ShouldBeFalse();
+            data.Match[3].Value.IsEmpty.ShouldBeTrue();
 
-            Assert.That(data.Match.Mark.SequenceEqual("foo"u8));
+            data.Match.Mark.ShouldBe("foo"u8);
 
             ++calls;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(calls, Is.EqualTo(1));
+        match.Success.ShouldBeTrue();
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -2793,31 +2794,31 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("abc"u8, data =>
         {
-            Assert.That(data.Number, Is.EqualTo(0));
-            Assert.That(data.CurrentOffset, Is.EqualTo(1));
-            Assert.That(data.PatternPosition, Is.EqualTo(GetPattern().IndexOf("(?C{bar})"u8) + 9));
-            Assert.That(data.StartOffset, Is.EqualTo(0));
-            Assert.That(data.LastCapture, Is.EqualTo(1));
-            Assert.That(data.MaxCapture, Is.EqualTo(2));
-            Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
-            Assert.That(data.StringOffset, Is.EqualTo(GetPattern().IndexOf("(?C{bar})"u8) + 4));
-            Assert.That(data.String, Is.EqualTo("bar"));
+            data.Number.ShouldBe(0);
+            data.CurrentOffset.ShouldBe(1);
+            data.PatternPosition.ShouldBe(GetPattern().IndexOf("(?C{bar})"u8) + 9);
+            data.StartOffset.ShouldBe(0);
+            data.LastCapture.ShouldBe(1);
+            data.MaxCapture.ShouldBe(2);
+            data.NextPatternItemLength.ShouldBe(1);
+            data.StringOffset.ShouldBe(GetPattern().IndexOf("(?C{bar})"u8) + 4);
+            data.String.ShouldBe("bar");
 
-            Assert.That(data.Match.Value.SequenceEqual("a"u8));
-            Assert.That(data.Match[1].Value.SequenceEqual("a"u8));
-            Assert.That(data.Match[2].Success, Is.False);
-            Assert.That(data.Match[2].Value.IsEmpty);
-            Assert.That(data.Match[3].Success, Is.False);
-            Assert.That(data.Match[3].Value.IsEmpty);
+            data.Match.Value.ShouldBe("a"u8);
+            data.Match[1].Value.ShouldBe("a"u8);
+            data.Match[2].Success.ShouldBeFalse();
+            data.Match[2].Value.IsEmpty.ShouldBeTrue();
+            data.Match[3].Success.ShouldBeFalse();
+            data.Match[3].Value.IsEmpty.ShouldBeTrue();
 
-            Assert.That(data.Match.Mark.SequenceEqual("foo"u8));
+            data.Match.Mark.ShouldBe("foo"u8);
 
             ++calls;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(calls, Is.EqualTo(1));
+        match.Success.ShouldBeTrue();
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -2830,31 +2831,31 @@ public class MatchTests
 
         var match = re.Match("abc".ToLatin1Bytes(), data =>
         {
-            Assert.That(data.Number, Is.EqualTo(0));
-            Assert.That(data.CurrentOffset, Is.EqualTo(1));
-            Assert.That(data.PatternPosition, Is.EqualTo(GetPattern().IndexOf("(?C{bar})".ToLatin1Bytes()) + 9));
-            Assert.That(data.StartOffset, Is.EqualTo(0));
-            Assert.That(data.LastCapture, Is.EqualTo(1));
-            Assert.That(data.MaxCapture, Is.EqualTo(2));
-            Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
-            Assert.That(data.StringOffset, Is.EqualTo(GetPattern().IndexOf("(?C{bar})".ToLatin1Bytes()) + 4));
-            Assert.That(data.String, Is.EqualTo("bar"));
+            data.Number.ShouldBe(0);
+            data.CurrentOffset.ShouldBe(1);
+            data.PatternPosition.ShouldBe(GetPattern().IndexOf("(?C{bar})".ToLatin1Bytes()) + 9);
+            data.StartOffset.ShouldBe(0);
+            data.LastCapture.ShouldBe(1);
+            data.MaxCapture.ShouldBe(2);
+            data.NextPatternItemLength.ShouldBe(1);
+            data.StringOffset.ShouldBe(GetPattern().IndexOf("(?C{bar})".ToLatin1Bytes()) + 4);
+            data.String.ShouldBe("bar");
 
-            Assert.That(data.Match.Value.SequenceEqual("a".ToLatin1Bytes()));
-            Assert.That(data.Match[1].Value.SequenceEqual("a".ToLatin1Bytes()));
-            Assert.That(data.Match[2].Success, Is.False);
-            Assert.That(data.Match[2].Value.IsEmpty);
-            Assert.That(data.Match[3].Success, Is.False);
-            Assert.That(data.Match[3].Value.IsEmpty);
+            data.Match.Value.ShouldBe("a".ToLatin1Bytes());
+            data.Match[1].Value.ShouldBe("a".ToLatin1Bytes());
+            data.Match[2].Success.ShouldBeFalse();
+            data.Match[2].Value.IsEmpty.ShouldBeTrue();
+            data.Match[3].Success.ShouldBeFalse();
+            data.Match[3].Value.IsEmpty.ShouldBeTrue();
 
-            Assert.That(data.Match.Mark.SequenceEqual("foo".ToLatin1Bytes()));
+            data.Match.Mark.ShouldBe("foo".ToLatin1Bytes());
 
             ++calls;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(calls, Is.EqualTo(1));
+        match.Success.ShouldBeTrue();
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -2867,31 +2868,31 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("abc".ToLatin1Bytes(), data =>
         {
-            Assert.That(data.Number, Is.EqualTo(0));
-            Assert.That(data.CurrentOffset, Is.EqualTo(1));
-            Assert.That(data.PatternPosition, Is.EqualTo(GetPattern().IndexOf("(?C{bar})".ToLatin1Bytes()) + 9));
-            Assert.That(data.StartOffset, Is.EqualTo(0));
-            Assert.That(data.LastCapture, Is.EqualTo(1));
-            Assert.That(data.MaxCapture, Is.EqualTo(2));
-            Assert.That(data.NextPatternItemLength, Is.EqualTo(1));
-            Assert.That(data.StringOffset, Is.EqualTo(GetPattern().IndexOf("(?C{bar})".ToLatin1Bytes()) + 4));
-            Assert.That(data.String, Is.EqualTo("bar"));
+            data.Number.ShouldBe(0);
+            data.CurrentOffset.ShouldBe(1);
+            data.PatternPosition.ShouldBe(GetPattern().IndexOf("(?C{bar})".ToLatin1Bytes()) + 9);
+            data.StartOffset.ShouldBe(0);
+            data.LastCapture.ShouldBe(1);
+            data.MaxCapture.ShouldBe(2);
+            data.NextPatternItemLength.ShouldBe(1);
+            data.StringOffset.ShouldBe(GetPattern().IndexOf("(?C{bar})".ToLatin1Bytes()) + 4);
+            data.String.ShouldBe("bar");
 
-            Assert.That(data.Match.Value.SequenceEqual("a".ToLatin1Bytes()));
-            Assert.That(data.Match[1].Value.SequenceEqual("a".ToLatin1Bytes()));
-            Assert.That(data.Match[2].Success, Is.False);
-            Assert.That(data.Match[2].Value.IsEmpty);
-            Assert.That(data.Match[3].Success, Is.False);
-            Assert.That(data.Match[3].Value.IsEmpty);
+            data.Match.Value.ShouldBe("a".ToLatin1Bytes());
+            data.Match[1].Value.ShouldBe("a".ToLatin1Bytes());
+            data.Match[2].Success.ShouldBeFalse();
+            data.Match[2].Value.IsEmpty.ShouldBeTrue();
+            data.Match[3].Success.ShouldBeFalse();
+            data.Match[3].Value.IsEmpty.ShouldBeTrue();
 
-            Assert.That(data.Match.Mark.SequenceEqual("foo".ToLatin1Bytes()));
+            data.Match.Mark.ShouldBe("foo".ToLatin1Bytes());
 
             ++calls;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(calls, Is.EqualTo(1));
+        match.Success.ShouldBeTrue();
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -2902,26 +2903,26 @@ public class MatchTests
 
         re.Match("abc", data =>
         {
-            Assert.That(data.Match[1].Success, Is.True);
-            Assert.That(data.Match[1].Index, Is.EqualTo(0));
-            Assert.That(data.Match[1].Length, Is.EqualTo(1));
-            Assert.That(data.Match[1].Value, Is.EqualTo("a"));
+            data.Match[1].Success.ShouldBeTrue();
+            data.Match[1].Index.ShouldBe(0);
+            data.Match[1].Length.ShouldBe(1);
+            data.Match[1].Value.ShouldBe("a");
 
-            Assert.That(data.Match[2].Success, Is.False);
-            Assert.That(data.Match[2].Index, Is.EqualTo(-1));
-            Assert.That(data.Match[2].EndIndex, Is.EqualTo(-1));
-            Assert.That(data.Match[2].Value, Is.SameAs(string.Empty));
+            data.Match[2].Success.ShouldBeFalse();
+            data.Match[2].Index.ShouldBe(-1);
+            data.Match[2].EndIndex.ShouldBe(-1);
+            data.Match[2].Value.ShouldBeSameAs(string.Empty);
 
-            Assert.That(data.Match[3].Success, Is.True);
-            Assert.That(data.Match[3].Index, Is.EqualTo(1));
-            Assert.That(data.Match[3].Length, Is.EqualTo(2));
-            Assert.That(data.Match[3].Value, Is.EqualTo("bc"));
+            data.Match[3].Success.ShouldBeTrue();
+            data.Match[3].Index.ShouldBe(1);
+            data.Match[3].Length.ShouldBe(2);
+            data.Match[3].Value.ShouldBe("bc");
 
             ++calls;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(calls, Is.EqualTo(1));
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -2932,26 +2933,26 @@ public class MatchTests
 
         re.Match("abc".AsSpan(), data =>
         {
-            Assert.That(data.Match[1].Success, Is.True);
-            Assert.That(data.Match[1].Index, Is.EqualTo(0));
-            Assert.That(data.Match[1].Length, Is.EqualTo(1));
-            Assert.That(data.Match[1].Value.ToString(), Is.EqualTo("a"));
+            data.Match[1].Success.ShouldBeTrue();
+            data.Match[1].Index.ShouldBe(0);
+            data.Match[1].Length.ShouldBe(1);
+            data.Match[1].Value.ShouldBe("a");
 
-            Assert.That(data.Match[2].Success, Is.False);
-            Assert.That(data.Match[2].Index, Is.EqualTo(-1));
-            Assert.That(data.Match[2].EndIndex, Is.EqualTo(-1));
-            Assert.That(data.Match[2].Value.ToString(), Is.SameAs(string.Empty));
+            data.Match[2].Success.ShouldBeFalse();
+            data.Match[2].Index.ShouldBe(-1);
+            data.Match[2].EndIndex.ShouldBe(-1);
+            data.Match[2].Value.ToString().ShouldBeSameAs(string.Empty);
 
-            Assert.That(data.Match[3].Success, Is.True);
-            Assert.That(data.Match[3].Index, Is.EqualTo(1));
-            Assert.That(data.Match[3].Length, Is.EqualTo(2));
-            Assert.That(data.Match[3].Value.ToString(), Is.EqualTo("bc"));
+            data.Match[3].Success.ShouldBeTrue();
+            data.Match[3].Index.ShouldBe(1);
+            data.Match[3].Length.ShouldBe(2);
+            data.Match[3].Value.ShouldBe("bc");
 
             ++calls;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(calls, Is.EqualTo(1));
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -2962,26 +2963,26 @@ public class MatchTests
 
         re.CreateMatchBuffer().Match("abc".AsSpan(), data =>
         {
-            Assert.That(data.Match[1].Success, Is.True);
-            Assert.That(data.Match[1].Index, Is.EqualTo(0));
-            Assert.That(data.Match[1].Length, Is.EqualTo(1));
-            Assert.That(data.Match[1].Value.ToString(), Is.EqualTo("a"));
+            data.Match[1].Success.ShouldBeTrue();
+            data.Match[1].Index.ShouldBe(0);
+            data.Match[1].Length.ShouldBe(1);
+            data.Match[1].Value.ShouldBe("a");
 
-            Assert.That(data.Match[2].Success, Is.False);
-            Assert.That(data.Match[2].Index, Is.EqualTo(-1));
-            Assert.That(data.Match[2].EndIndex, Is.EqualTo(-1));
-            Assert.That(data.Match[2].Value.ToString(), Is.SameAs(string.Empty));
+            data.Match[2].Success.ShouldBeFalse();
+            data.Match[2].Index.ShouldBe(-1);
+            data.Match[2].EndIndex.ShouldBe(-1);
+            data.Match[2].Value.ToString().ShouldBeSameAs(string.Empty);
 
-            Assert.That(data.Match[3].Success, Is.True);
-            Assert.That(data.Match[3].Index, Is.EqualTo(1));
-            Assert.That(data.Match[3].Length, Is.EqualTo(2));
-            Assert.That(data.Match[3].Value.ToString(), Is.EqualTo("bc"));
+            data.Match[3].Success.ShouldBeTrue();
+            data.Match[3].Index.ShouldBe(1);
+            data.Match[3].Length.ShouldBe(2);
+            data.Match[3].Value.ShouldBe("bc");
 
             ++calls;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(calls, Is.EqualTo(1));
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -2992,26 +2993,26 @@ public class MatchTests
 
         re.Match("abc".ToLatin1Bytes(), data =>
         {
-            Assert.That(data.Match[1].Success, Is.True);
-            Assert.That(data.Match[1].Index, Is.EqualTo(0));
-            Assert.That(data.Match[1].Length, Is.EqualTo(1));
-            Assert.That(data.Match[1].Value.SequenceEqual("a".ToLatin1Bytes()));
+            data.Match[1].Success.ShouldBeTrue();
+            data.Match[1].Index.ShouldBe(0);
+            data.Match[1].Length.ShouldBe(1);
+            data.Match[1].Value.ShouldBe("a".ToLatin1Bytes());
 
-            Assert.That(data.Match[2].Success, Is.False);
-            Assert.That(data.Match[2].Index, Is.EqualTo(-1));
-            Assert.That(data.Match[2].EndIndex, Is.EqualTo(-1));
-            Assert.That(data.Match[2].Value.IsEmpty);
+            data.Match[2].Success.ShouldBeFalse();
+            data.Match[2].Index.ShouldBe(-1);
+            data.Match[2].EndIndex.ShouldBe(-1);
+            data.Match[2].Value.IsEmpty.ShouldBeTrue();
 
-            Assert.That(data.Match[3].Success, Is.True);
-            Assert.That(data.Match[3].Index, Is.EqualTo(1));
-            Assert.That(data.Match[3].Length, Is.EqualTo(2));
-            Assert.That(data.Match[3].Value.SequenceEqual("bc".ToLatin1Bytes()));
+            data.Match[3].Success.ShouldBeTrue();
+            data.Match[3].Index.ShouldBe(1);
+            data.Match[3].Length.ShouldBe(2);
+            data.Match[3].Value.ShouldBe("bc".ToLatin1Bytes());
 
             ++calls;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(calls, Is.EqualTo(1));
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -3022,26 +3023,26 @@ public class MatchTests
 
         re.Match("abc"u8, data =>
         {
-            Assert.That(data.Match[1].Success, Is.True);
-            Assert.That(data.Match[1].Index, Is.EqualTo(0));
-            Assert.That(data.Match[1].Length, Is.EqualTo(1));
-            Assert.That(data.Match[1].Value.SequenceEqual("a"u8));
+            data.Match[1].Success.ShouldBeTrue();
+            data.Match[1].Index.ShouldBe(0);
+            data.Match[1].Length.ShouldBe(1);
+            data.Match[1].Value.ShouldBe("a"u8);
 
-            Assert.That(data.Match[2].Success, Is.False);
-            Assert.That(data.Match[2].Index, Is.EqualTo(-1));
-            Assert.That(data.Match[2].EndIndex, Is.EqualTo(-1));
-            Assert.That(data.Match[2].Value.IsEmpty);
+            data.Match[2].Success.ShouldBeFalse();
+            data.Match[2].Index.ShouldBe(-1);
+            data.Match[2].EndIndex.ShouldBe(-1);
+            data.Match[2].Value.IsEmpty.ShouldBeTrue();
 
-            Assert.That(data.Match[3].Success, Is.True);
-            Assert.That(data.Match[3].Index, Is.EqualTo(1));
-            Assert.That(data.Match[3].Length, Is.EqualTo(2));
-            Assert.That(data.Match[3].Value.SequenceEqual("bc"u8));
+            data.Match[3].Success.ShouldBeTrue();
+            data.Match[3].Index.ShouldBe(1);
+            data.Match[3].Length.ShouldBe(2);
+            data.Match[3].Value.ShouldBe("bc"u8);
 
             ++calls;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(calls, Is.EqualTo(1));
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -3052,26 +3053,26 @@ public class MatchTests
 
         re.CreateMatchBuffer().Match("abc"u8, data =>
         {
-            Assert.That(data.Match[1].Success, Is.True);
-            Assert.That(data.Match[1].Index, Is.EqualTo(0));
-            Assert.That(data.Match[1].Length, Is.EqualTo(1));
-            Assert.That(data.Match[1].Value.SequenceEqual("a"u8));
+            data.Match[1].Success.ShouldBeTrue();
+            data.Match[1].Index.ShouldBe(0);
+            data.Match[1].Length.ShouldBe(1);
+            data.Match[1].Value.ShouldBe("a"u8);
 
-            Assert.That(data.Match[2].Success, Is.False);
-            Assert.That(data.Match[2].Index, Is.EqualTo(-1));
-            Assert.That(data.Match[2].EndIndex, Is.EqualTo(-1));
-            Assert.That(data.Match[2].Value.IsEmpty);
+            data.Match[2].Success.ShouldBeFalse();
+            data.Match[2].Index.ShouldBe(-1);
+            data.Match[2].EndIndex.ShouldBe(-1);
+            data.Match[2].Value.IsEmpty.ShouldBeTrue();
 
-            Assert.That(data.Match[3].Success, Is.True);
-            Assert.That(data.Match[3].Index, Is.EqualTo(1));
-            Assert.That(data.Match[3].Length, Is.EqualTo(2));
-            Assert.That(data.Match[3].Value.SequenceEqual("bc"u8));
+            data.Match[3].Success.ShouldBeTrue();
+            data.Match[3].Index.ShouldBe(1);
+            data.Match[3].Length.ShouldBe(2);
+            data.Match[3].Value.ShouldBe("bc"u8);
 
             ++calls;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(calls, Is.EqualTo(1));
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -3082,26 +3083,26 @@ public class MatchTests
 
         re.CreateMatchBuffer().Match("abc".ToLatin1Bytes(), data =>
         {
-            Assert.That(data.Match[1].Success, Is.True);
-            Assert.That(data.Match[1].Index, Is.EqualTo(0));
-            Assert.That(data.Match[1].Length, Is.EqualTo(1));
-            Assert.That(data.Match[1].Value.SequenceEqual("a".ToLatin1Bytes()));
+            data.Match[1].Success.ShouldBeTrue();
+            data.Match[1].Index.ShouldBe(0);
+            data.Match[1].Length.ShouldBe(1);
+            data.Match[1].Value.ShouldBe("a".ToLatin1Bytes());
 
-            Assert.That(data.Match[2].Success, Is.False);
-            Assert.That(data.Match[2].Index, Is.EqualTo(-1));
-            Assert.That(data.Match[2].EndIndex, Is.EqualTo(-1));
-            Assert.That(data.Match[2].Value.IsEmpty);
+            data.Match[2].Success.ShouldBeFalse();
+            data.Match[2].Index.ShouldBe(-1);
+            data.Match[2].EndIndex.ShouldBe(-1);
+            data.Match[2].Value.IsEmpty.ShouldBeTrue();
 
-            Assert.That(data.Match[3].Success, Is.True);
-            Assert.That(data.Match[3].Index, Is.EqualTo(1));
-            Assert.That(data.Match[3].Length, Is.EqualTo(2));
-            Assert.That(data.Match[3].Value.SequenceEqual("bc".ToLatin1Bytes()));
+            data.Match[3].Success.ShouldBeTrue();
+            data.Match[3].Index.ShouldBe(1);
+            data.Match[3].Length.ShouldBe(2);
+            data.Match[3].Value.ShouldBe("bc".ToLatin1Bytes());
 
             ++calls;
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(calls, Is.EqualTo(1));
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -3122,13 +3123,13 @@ public class MatchTests
         re.Match(subject.AsSpan(), data =>
         {
             ++calls;
-            Assert.That(data.Match.Length, Is.EqualTo(length));
-            Assert.That(data.Match.Groups[1].Value.ToString(), Is.EqualTo("a"));
-            Assert.That(data.Match.Groups[length].Value.ToString(), Is.EqualTo("a"));
+            data.Match.Length.ShouldBe(length);
+            data.Match.Groups[1].Value.ShouldBe("a");
+            data.Match.Groups[length].Value.ShouldBe("a");
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(calls, Is.EqualTo(1));
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -3149,13 +3150,13 @@ public class MatchTests
         re.CreateMatchBuffer().Match(subject.AsSpan(), data =>
         {
             ++calls;
-            Assert.That(data.Match.Length, Is.EqualTo(length));
-            Assert.That(data.Match.Groups[1].Value.ToString(), Is.EqualTo("a"));
-            Assert.That(data.Match.Groups[length].Value.ToString(), Is.EqualTo("a"));
+            data.Match.Length.ShouldBe(length);
+            data.Match.Groups[1].Value.ShouldBe("a");
+            data.Match.Groups[length].Value.ShouldBe("a");
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(calls, Is.EqualTo(1));
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -3177,13 +3178,13 @@ public class MatchTests
         re.Match(subject, data =>
         {
             ++calls;
-            Assert.That(data.Match.Length, Is.EqualTo(length));
-            Assert.That(data.Match.Groups[1].Value.SequenceEqual("a"u8));
-            Assert.That(data.Match.Groups[length].Value.SequenceEqual("a"u8));
+            data.Match.Length.ShouldBe(length);
+            data.Match.Groups[1].Value.ShouldBe("a"u8);
+            data.Match.Groups[length].Value.ShouldBe("a"u8);
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(calls, Is.EqualTo(1));
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -3205,13 +3206,13 @@ public class MatchTests
         re.CreateMatchBuffer().Match(subject, data =>
         {
             ++calls;
-            Assert.That(data.Match.Length, Is.EqualTo(length));
-            Assert.That(data.Match.Groups[1].Value.SequenceEqual("a"u8));
-            Assert.That(data.Match.Groups[length].Value.SequenceEqual("a"u8));
+            data.Match.Length.ShouldBe(length);
+            data.Match.Groups[1].Value.ShouldBe("a"u8);
+            data.Match.Groups[length].Value.ShouldBe("a"u8);
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(calls, Is.EqualTo(1));
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -3233,13 +3234,13 @@ public class MatchTests
         re.Match(subject, data =>
         {
             ++calls;
-            Assert.That(data.Match.Length, Is.EqualTo(length));
-            Assert.That(data.Match.Groups[1].Value.SequenceEqual("a".ToLatin1Bytes()));
-            Assert.That(data.Match.Groups[length].Value.SequenceEqual("a".ToLatin1Bytes()));
+            data.Match.Length.ShouldBe(length);
+            data.Match.Groups[1].Value.ShouldBe("a".ToLatin1Bytes());
+            data.Match.Groups[length].Value.ShouldBe("a".ToLatin1Bytes());
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(calls, Is.EqualTo(1));
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -3261,13 +3262,13 @@ public class MatchTests
         re.CreateMatchBuffer().Match(subject, data =>
         {
             ++calls;
-            Assert.That(data.Match.Length, Is.EqualTo(length));
-            Assert.That(data.Match.Groups[1].Value.SequenceEqual("a".ToLatin1Bytes()));
-            Assert.That(data.Match.Groups[length].Value.SequenceEqual("a".ToLatin1Bytes()));
+            data.Match.Length.ShouldBe(length);
+            data.Match.Groups[1].Value.ShouldBe("a".ToLatin1Bytes());
+            data.Match.Groups[length].Value.ShouldBe("a".ToLatin1Bytes());
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(calls, Is.EqualTo(1));
+        calls.ShouldBe(1);
     }
 
     [Test]
@@ -3277,12 +3278,12 @@ public class MatchTests
 
         var match = re.Match("aaa");
 
-        Assert.That(match, Is.Not.Null);
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.EndIndex, Is.EqualTo(0));
-        Assert.That(match.Length, Is.EqualTo(0));
-        Assert.That(match.Value, Is.EqualTo(string.Empty));
+        match.ShouldNotBeNull();
+        match.Success.ShouldBeTrue();
+        match.Index.ShouldBe(3);
+        match.EndIndex.ShouldBe(0);
+        match.Length.ShouldBe(0);
+        match.Value.ShouldBeEmpty();
     }
 
     [Test]
@@ -3292,11 +3293,11 @@ public class MatchTests
 
         var match = re.Match("aaa".AsSpan());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.EndIndex, Is.EqualTo(0));
-        Assert.That(match.Length, Is.EqualTo(0));
-        Assert.That(match.Value.ToString(), Is.EqualTo(string.Empty));
+        match.Success.ShouldBeTrue();
+        match.Index.ShouldBe(3);
+        match.EndIndex.ShouldBe(0);
+        match.Length.ShouldBe(0);
+        match.Value.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -3306,11 +3307,11 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("aaa".AsSpan());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.EndIndex, Is.EqualTo(0));
-        Assert.That(match.Length, Is.EqualTo(0));
-        Assert.That(match.Value.ToString(), Is.EqualTo(string.Empty));
+        match.Success.ShouldBeTrue();
+        match.Index.ShouldBe(3);
+        match.EndIndex.ShouldBe(0);
+        match.Length.ShouldBe(0);
+        match.Value.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -3320,11 +3321,11 @@ public class MatchTests
 
         var match = re.Match("aaa"u8);
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.EndIndex, Is.EqualTo(0));
-        Assert.That(match.Length, Is.EqualTo(0));
-        Assert.That(match.Value.IsEmpty);
+        match.Success.ShouldBeTrue();
+        match.Index.ShouldBe(3);
+        match.EndIndex.ShouldBe(0);
+        match.Length.ShouldBe(0);
+        match.Value.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -3334,11 +3335,11 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("aaa"u8);
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.EndIndex, Is.EqualTo(0));
-        Assert.That(match.Length, Is.EqualTo(0));
-        Assert.That(match.Value.IsEmpty);
+        match.Success.ShouldBeTrue();
+        match.Index.ShouldBe(3);
+        match.EndIndex.ShouldBe(0);
+        match.Length.ShouldBe(0);
+        match.Value.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -3348,11 +3349,11 @@ public class MatchTests
 
         var match = re.Match("aaa".ToLatin1Bytes());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.EndIndex, Is.EqualTo(0));
-        Assert.That(match.Length, Is.EqualTo(0));
-        Assert.That(match.Value.IsEmpty);
+        match.Success.ShouldBeTrue();
+        match.Index.ShouldBe(3);
+        match.EndIndex.ShouldBe(0);
+        match.Length.ShouldBe(0);
+        match.Value.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -3362,11 +3363,11 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("aaa".ToLatin1Bytes());
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Index, Is.EqualTo(3));
-        Assert.That(match.EndIndex, Is.EqualTo(0));
-        Assert.That(match.Length, Is.EqualTo(0));
-        Assert.That(match.Value.IsEmpty);
+        match.Success.ShouldBeTrue();
+        match.Index.ShouldBe(3);
+        match.EndIndex.ShouldBe(0);
+        match.Length.ShouldBe(0);
+        match.Value.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -3376,11 +3377,11 @@ public class MatchTests
 
         var match = re.Match("foobar", PcreMatchOptions.None);
 
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
 
         match = re.Match("foobar", PcreMatchOptions.Anchored);
 
-        Assert.That(match.Success, Is.False);
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -3390,11 +3391,11 @@ public class MatchTests
 
         var match = re.Match("foobar".AsSpan(), PcreMatchOptions.None);
 
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
 
         match = re.Match("foobar".AsSpan(), PcreMatchOptions.Anchored);
 
-        Assert.That(match.Success, Is.False);
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -3405,11 +3406,11 @@ public class MatchTests
 
         var match = buffer.Match("foobar".AsSpan(), PcreMatchOptions.None);
 
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
 
         match = buffer.Match("foobar".AsSpan(), PcreMatchOptions.Anchored);
 
-        Assert.That(match.Success, Is.False);
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -3419,11 +3420,11 @@ public class MatchTests
 
         var match = re.Match("foobar"u8, PcreMatchOptions.None);
 
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
 
         match = re.Match("foobar"u8, PcreMatchOptions.Anchored);
 
-        Assert.That(match.Success, Is.False);
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -3434,11 +3435,11 @@ public class MatchTests
 
         var match = buffer.Match("foobar"u8, PcreMatchOptions.None);
 
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
 
         match = buffer.Match("foobar"u8, PcreMatchOptions.Anchored);
 
-        Assert.That(match.Success, Is.False);
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -3448,11 +3449,11 @@ public class MatchTests
 
         var match = re.Match("foobar".ToLatin1Bytes(), PcreMatchOptions.None);
 
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
 
         match = re.Match("foobar".ToLatin1Bytes(), PcreMatchOptions.Anchored);
 
-        Assert.That(match.Success, Is.False);
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -3463,11 +3464,11 @@ public class MatchTests
 
         var match = buffer.Match("foobar".ToLatin1Bytes(), PcreMatchOptions.None);
 
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
 
         match = buffer.Match("foobar".ToLatin1Bytes(), PcreMatchOptions.Anchored);
 
-        Assert.That(match.Success, Is.False);
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -3478,8 +3479,8 @@ public class MatchTests
             ExtraCompileOptions = PcreExtraCompileOptions.MatchWord
         });
 
-        Assert.That(re.IsMatch("foo bar baz"), Is.True);
-        Assert.That(re.IsMatch("foobar baz"), Is.False);
+        re.IsMatch("foo bar baz").ShouldBeTrue();
+        re.IsMatch("foobar baz").ShouldBeFalse();
     }
 
     [Test]
@@ -3490,8 +3491,8 @@ public class MatchTests
             ExtraCompileOptions = PcreExtraCompileOptions.MatchWord
         });
 
-        Assert.That(re.IsMatch("foo bar baz".AsSpan()), Is.True);
-        Assert.That(re.IsMatch("foobar baz".AsSpan()), Is.False);
+        re.IsMatch("foo bar baz".AsSpan()).ShouldBeTrue();
+        re.IsMatch("foobar baz".AsSpan()).ShouldBeFalse();
     }
 
     [Test]
@@ -3504,8 +3505,8 @@ public class MatchTests
 
         var buffer = re.CreateMatchBuffer();
 
-        Assert.That(buffer.IsMatch("foo bar baz".AsSpan()), Is.True);
-        Assert.That(buffer.IsMatch("foobar baz".AsSpan()), Is.False);
+        buffer.IsMatch("foo bar baz".AsSpan()).ShouldBeTrue();
+        buffer.IsMatch("foobar baz".AsSpan()).ShouldBeFalse();
     }
 
     [Test]
@@ -3516,8 +3517,8 @@ public class MatchTests
             ExtraCompileOptions = PcreExtraCompileOptions.MatchWord
         });
 
-        Assert.That(re.IsMatch("foo bar baz"u8), Is.True);
-        Assert.That(re.IsMatch("foobar baz"u8), Is.False);
+        re.IsMatch("foo bar baz"u8).ShouldBeTrue();
+        re.IsMatch("foobar baz"u8).ShouldBeFalse();
     }
 
     [Test]
@@ -3530,8 +3531,8 @@ public class MatchTests
 
         var buffer = re.CreateMatchBuffer();
 
-        Assert.That(buffer.IsMatch("foo bar baz"u8), Is.True);
-        Assert.That(buffer.IsMatch("foobar baz"u8), Is.False);
+        buffer.IsMatch("foo bar baz"u8).ShouldBeTrue();
+        buffer.IsMatch("foobar baz"u8).ShouldBeFalse();
     }
 
     [Test]
@@ -3542,8 +3543,8 @@ public class MatchTests
             ExtraCompileOptions = PcreExtraCompileOptions.MatchWord
         });
 
-        Assert.That(re.IsMatch("foo bar baz".ToLatin1Bytes()), Is.True);
-        Assert.That(re.IsMatch("foobar baz".ToLatin1Bytes()), Is.False);
+        re.IsMatch("foo bar baz".ToLatin1Bytes()).ShouldBeTrue();
+        re.IsMatch("foobar baz".ToLatin1Bytes()).ShouldBeFalse();
     }
 
     [Test]
@@ -3556,8 +3557,8 @@ public class MatchTests
 
         var buffer = re.CreateMatchBuffer();
 
-        Assert.That(buffer.IsMatch("foo bar baz".ToLatin1Bytes()), Is.True);
-        Assert.That(buffer.IsMatch("foobar baz".ToLatin1Bytes()), Is.False);
+        buffer.IsMatch("foo bar baz".ToLatin1Bytes()).ShouldBeTrue();
+        buffer.IsMatch("foobar baz".ToLatin1Bytes()).ShouldBeFalse();
     }
 
     [Test]
@@ -3569,12 +3570,12 @@ public class MatchTests
 
         var match = re.Match("xyzabc12", options);
 
-        Assert.That(match.Success, Is.False);
-        Assert.That(match.IsPartialMatch, Is.True);
-        Assert.That(match.Index, Is.EqualTo(6));
-        Assert.That(match.EndIndex, Is.EqualTo(8));
-        Assert.That(match.Length, Is.EqualTo(2));
-        Assert.That(match.Value, Is.EqualTo("12"));
+        match.Success.ShouldBeFalse();
+        match.IsPartialMatch.ShouldBeTrue();
+        match.Index.ShouldBe(6);
+        match.EndIndex.ShouldBe(8);
+        match.Length.ShouldBe(2);
+        match.Value.ShouldBe("12");
     }
 
     [Test]
@@ -3586,12 +3587,12 @@ public class MatchTests
 
         var match = re.Match("xyzabc12".AsSpan(), options);
 
-        Assert.That(match.Success, Is.False);
-        Assert.That(match.IsPartialMatch, Is.True);
-        Assert.That(match.Index, Is.EqualTo(6));
-        Assert.That(match.EndIndex, Is.EqualTo(8));
-        Assert.That(match.Length, Is.EqualTo(2));
-        Assert.That(match.Value.ToString(), Is.EqualTo("12"));
+        match.Success.ShouldBeFalse();
+        match.IsPartialMatch.ShouldBeTrue();
+        match.Index.ShouldBe(6);
+        match.EndIndex.ShouldBe(8);
+        match.Length.ShouldBe(2);
+        match.Value.ShouldBe("12");
     }
 
     [Test]
@@ -3603,12 +3604,12 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("xyzabc12".AsSpan(), options);
 
-        Assert.That(match.Success, Is.False);
-        Assert.That(match.IsPartialMatch, Is.True);
-        Assert.That(match.Index, Is.EqualTo(6));
-        Assert.That(match.EndIndex, Is.EqualTo(8));
-        Assert.That(match.Length, Is.EqualTo(2));
-        Assert.That(match.Value.ToString(), Is.EqualTo("12"));
+        match.Success.ShouldBeFalse();
+        match.IsPartialMatch.ShouldBeTrue();
+        match.Index.ShouldBe(6);
+        match.EndIndex.ShouldBe(8);
+        match.Length.ShouldBe(2);
+        match.Value.ShouldBe("12");
     }
 
     [Test]
@@ -3620,12 +3621,12 @@ public class MatchTests
 
         var match = re.Match("xyzabc12"u8, options);
 
-        Assert.That(match.Success, Is.False);
-        Assert.That(match.IsPartialMatch, Is.True);
-        Assert.That(match.Index, Is.EqualTo(6));
-        Assert.That(match.EndIndex, Is.EqualTo(8));
-        Assert.That(match.Length, Is.EqualTo(2));
-        Assert.That(match.Value.SequenceEqual("12"u8));
+        match.Success.ShouldBeFalse();
+        match.IsPartialMatch.ShouldBeTrue();
+        match.Index.ShouldBe(6);
+        match.EndIndex.ShouldBe(8);
+        match.Length.ShouldBe(2);
+        match.Value.ShouldBe("12"u8);
     }
 
     [Test]
@@ -3637,12 +3638,12 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("xyzabc12"u8, options);
 
-        Assert.That(match.Success, Is.False);
-        Assert.That(match.IsPartialMatch, Is.True);
-        Assert.That(match.Index, Is.EqualTo(6));
-        Assert.That(match.EndIndex, Is.EqualTo(8));
-        Assert.That(match.Length, Is.EqualTo(2));
-        Assert.That(match.Value.SequenceEqual("12"u8));
+        match.Success.ShouldBeFalse();
+        match.IsPartialMatch.ShouldBeTrue();
+        match.Index.ShouldBe(6);
+        match.EndIndex.ShouldBe(8);
+        match.Length.ShouldBe(2);
+        match.Value.ShouldBe("12"u8);
     }
 
     [Test]
@@ -3654,12 +3655,12 @@ public class MatchTests
 
         var match = re.Match("xyzabc12".ToLatin1Bytes(), options);
 
-        Assert.That(match.Success, Is.False);
-        Assert.That(match.IsPartialMatch, Is.True);
-        Assert.That(match.Index, Is.EqualTo(6));
-        Assert.That(match.EndIndex, Is.EqualTo(8));
-        Assert.That(match.Length, Is.EqualTo(2));
-        Assert.That(match.Value.SequenceEqual("12".ToLatin1Bytes()));
+        match.Success.ShouldBeFalse();
+        match.IsPartialMatch.ShouldBeTrue();
+        match.Index.ShouldBe(6);
+        match.EndIndex.ShouldBe(8);
+        match.Length.ShouldBe(2);
+        match.Value.ShouldBe("12".ToLatin1Bytes());
     }
 
     [Test]
@@ -3671,12 +3672,12 @@ public class MatchTests
 
         var match = re.CreateMatchBuffer().Match("xyzabc12".ToLatin1Bytes(), options);
 
-        Assert.That(match.Success, Is.False);
-        Assert.That(match.IsPartialMatch, Is.True);
-        Assert.That(match.Index, Is.EqualTo(6));
-        Assert.That(match.EndIndex, Is.EqualTo(8));
-        Assert.That(match.Length, Is.EqualTo(2));
-        Assert.That(match.Value.SequenceEqual("12".ToLatin1Bytes()));
+        match.Success.ShouldBeFalse();
+        match.IsPartialMatch.ShouldBeTrue();
+        match.Index.ShouldBe(6);
+        match.EndIndex.ShouldBe(8);
+        match.Length.ShouldBe(2);
+        match.Value.ShouldBe("12".ToLatin1Bytes());
     }
 
     [Test]
@@ -3687,11 +3688,11 @@ public class MatchTests
         var softMatch = re.Match("dog", PcreMatchOptions.PartialSoft);
         var hardMatch = re.Match("dog", PcreMatchOptions.PartialHard);
 
-        Assert.That(softMatch.Success, Is.True);
-        Assert.That(softMatch.IsPartialMatch, Is.False);
+        softMatch.Success.ShouldBeTrue();
+        softMatch.IsPartialMatch.ShouldBeFalse();
 
-        Assert.That(hardMatch.Success, Is.False);
-        Assert.That(hardMatch.IsPartialMatch, Is.True);
+        hardMatch.Success.ShouldBeFalse();
+        hardMatch.IsPartialMatch.ShouldBeTrue();
     }
 
     [Test]
@@ -3702,11 +3703,11 @@ public class MatchTests
         var softMatch = re.Match("dog".AsSpan(), PcreMatchOptions.PartialSoft);
         var hardMatch = re.Match("dog".AsSpan(), PcreMatchOptions.PartialHard);
 
-        Assert.That(softMatch.Success, Is.True);
-        Assert.That(softMatch.IsPartialMatch, Is.False);
+        softMatch.Success.ShouldBeTrue();
+        softMatch.IsPartialMatch.ShouldBeFalse();
 
-        Assert.That(hardMatch.Success, Is.False);
-        Assert.That(hardMatch.IsPartialMatch, Is.True);
+        hardMatch.Success.ShouldBeFalse();
+        hardMatch.IsPartialMatch.ShouldBeTrue();
     }
 
     [Test]
@@ -3717,13 +3718,13 @@ public class MatchTests
 
         var softMatch = buffer.Match("dog".AsSpan(), PcreMatchOptions.PartialSoft);
 
-        Assert.That(softMatch.Success, Is.True);
-        Assert.That(softMatch.IsPartialMatch, Is.False);
+        softMatch.Success.ShouldBeTrue();
+        softMatch.IsPartialMatch.ShouldBeFalse();
 
         var hardMatch = buffer.Match("dog".AsSpan(), PcreMatchOptions.PartialHard);
 
-        Assert.That(hardMatch.Success, Is.False);
-        Assert.That(hardMatch.IsPartialMatch, Is.True);
+        hardMatch.Success.ShouldBeFalse();
+        hardMatch.IsPartialMatch.ShouldBeTrue();
     }
 
     [Test]
@@ -3734,11 +3735,11 @@ public class MatchTests
         var softMatch = re.Match("dog"u8, PcreMatchOptions.PartialSoft);
         var hardMatch = re.Match("dog"u8, PcreMatchOptions.PartialHard);
 
-        Assert.That(softMatch.Success, Is.True);
-        Assert.That(softMatch.IsPartialMatch, Is.False);
+        softMatch.Success.ShouldBeTrue();
+        softMatch.IsPartialMatch.ShouldBeFalse();
 
-        Assert.That(hardMatch.Success, Is.False);
-        Assert.That(hardMatch.IsPartialMatch, Is.True);
+        hardMatch.Success.ShouldBeFalse();
+        hardMatch.IsPartialMatch.ShouldBeTrue();
     }
 
     [Test]
@@ -3749,13 +3750,13 @@ public class MatchTests
 
         var softMatch = buffer.Match("dog"u8, PcreMatchOptions.PartialSoft);
 
-        Assert.That(softMatch.Success, Is.True);
-        Assert.That(softMatch.IsPartialMatch, Is.False);
+        softMatch.Success.ShouldBeTrue();
+        softMatch.IsPartialMatch.ShouldBeFalse();
 
         var hardMatch = buffer.Match("dog"u8, PcreMatchOptions.PartialHard);
 
-        Assert.That(hardMatch.Success, Is.False);
-        Assert.That(hardMatch.IsPartialMatch, Is.True);
+        hardMatch.Success.ShouldBeFalse();
+        hardMatch.IsPartialMatch.ShouldBeTrue();
     }
 
     [Test]
@@ -3766,11 +3767,11 @@ public class MatchTests
         var softMatch = re.Match("dog".ToLatin1Bytes(), PcreMatchOptions.PartialSoft);
         var hardMatch = re.Match("dog".ToLatin1Bytes(), PcreMatchOptions.PartialHard);
 
-        Assert.That(softMatch.Success, Is.True);
-        Assert.That(softMatch.IsPartialMatch, Is.False);
+        softMatch.Success.ShouldBeTrue();
+        softMatch.IsPartialMatch.ShouldBeFalse();
 
-        Assert.That(hardMatch.Success, Is.False);
-        Assert.That(hardMatch.IsPartialMatch, Is.True);
+        hardMatch.Success.ShouldBeFalse();
+        hardMatch.IsPartialMatch.ShouldBeTrue();
     }
 
     [Test]
@@ -3781,53 +3782,53 @@ public class MatchTests
 
         var softMatch = buffer.Match("dog".ToLatin1Bytes(), PcreMatchOptions.PartialSoft);
 
-        Assert.That(softMatch.Success, Is.True);
-        Assert.That(softMatch.IsPartialMatch, Is.False);
+        softMatch.Success.ShouldBeTrue();
+        softMatch.IsPartialMatch.ShouldBeFalse();
 
         var hardMatch = buffer.Match("dog".ToLatin1Bytes(), PcreMatchOptions.PartialHard);
 
-        Assert.That(hardMatch.Success, Is.False);
-        Assert.That(hardMatch.IsPartialMatch, Is.True);
+        hardMatch.Success.ShouldBeFalse();
+        hardMatch.IsPartialMatch.ShouldBeTrue();
     }
 
     [Test]
     public void should_check_pattern_utf_validity()
     {
-        var ex = Assert.Throws<PcrePatternException>(() => _ = new PcreRegex("A\uD800B"))!;
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Utf16Err2));
-        Assert.That(ex.Message, Contains.Substring("invalid low surrogate"));
+        var ex = Should.Throw<PcrePatternException>(() => new PcreRegex("A\uD800B"));
+        ex.ErrorCode.ShouldBe(PcreErrorCode.Utf16Err2);
+        ex.Message.ShouldContain("invalid low surrogate");
     }
 
     [Test]
     public void should_check_pattern_utf_validity_utf8()
     {
-        var ex = Assert.Throws<PcrePatternException>(() => _ = new PcreRegexUtf8([(byte)'A', (byte)'é', (byte)'B']))!;
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Utf8Err1));
-        Assert.That(ex.Message, Contains.Substring("1 byte missing at end at offset 1"));
+        var ex = Should.Throw<PcrePatternException>(() => new PcreRegexUtf8([(byte)'A', (byte)'é', (byte)'B']));
+        ex.ErrorCode.ShouldBe(PcreErrorCode.Utf8Err1);
+        ex.Message.ShouldContain("1 byte missing at end at offset 1");
     }
 
     [Test]
     public void should_not_check_pattern_utf_validity_8bit()
     {
-        _ = TestSupport.CreatePcreRegex8Bit([(byte)'A', (byte)'é', (byte)'B']);
+        Should.NotThrow(() => TestSupport.CreatePcreRegex8Bit([(byte)'A', (byte)'é', (byte)'B']));
     }
 
     [Test]
     public void should_check_subject_utf_validity()
     {
         var re = new PcreRegex(@"A");
-        var ex = Assert.Throws<PcreMatchException>(() => _ = re.Match("A\uD800B"))!;
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Utf16Err2));
-        Assert.That(ex.Message, Contains.Substring("invalid low surrogate"));
+        var ex = Should.Throw<PcreMatchException>(() => re.Match("A\uD800B"));
+        ex.ErrorCode.ShouldBe(PcreErrorCode.Utf16Err2);
+        ex.Message.ShouldContain("invalid low surrogate");
     }
 
     [Test]
     public void should_check_subject_utf_validity_ref()
     {
         var re = new PcreRegex(@"A");
-        var ex = Assert.Throws<PcreMatchException>(() => _ = re.Match("A\uD800B".AsSpan()))!;
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Utf16Err2));
-        Assert.That(ex.Message, Contains.Substring("invalid low surrogate"));
+        var ex = Should.Throw<PcreMatchException>(() => re.Match("A\uD800B".AsSpan()));
+        ex.ErrorCode.ShouldBe(PcreErrorCode.Utf16Err2);
+        ex.Message.ShouldContain("invalid low surrogate");
     }
 
     [Test]
@@ -3836,18 +3837,18 @@ public class MatchTests
         var re = new PcreRegex(@"A");
         var buffer = re.CreateMatchBuffer();
 
-        var ex = Assert.Throws<PcreMatchException>(() => _ = buffer.Match("A\uD800B".AsSpan()))!;
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Utf16Err2));
-        Assert.That(ex.Message, Contains.Substring("invalid low surrogate"));
+        var ex = Should.Throw<PcreMatchException>(() => buffer.Match("A\uD800B".AsSpan()));
+        ex.ErrorCode.ShouldBe(PcreErrorCode.Utf16Err2);
+        ex.Message.ShouldContain("invalid low surrogate");
     }
 
     [Test]
     public void should_check_subject_utf_validity_utf8()
     {
         var re = new PcreRegexUtf8(@"A"u8);
-        var ex = Assert.Throws<PcreMatchException>(() => _ = re.Match([(byte)'A', (byte)'é', (byte)'B']))!;
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Utf8Err1));
-        Assert.That(ex.Message, Contains.Substring("1 byte missing at end"));
+        var ex = Should.Throw<PcreMatchException>(() => re.Match([(byte)'A', (byte)'é', (byte)'B']));
+        ex.ErrorCode.ShouldBe(PcreErrorCode.Utf8Err1);
+        ex.Message.ShouldContain("1 byte missing at end");
     }
 
     [Test]
@@ -3856,16 +3857,16 @@ public class MatchTests
         var re = new PcreRegexUtf8(@"A"u8);
         var buffer = re.CreateMatchBuffer();
 
-        var ex = Assert.Throws<PcreMatchException>(() => _ = buffer.Match([(byte)'A', (byte)'é', (byte)'B']))!;
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.Utf8Err1));
-        Assert.That(ex.Message, Contains.Substring("1 byte missing at end"));
+        var ex = Should.Throw<PcreMatchException>(() => buffer.Match([(byte)'A', (byte)'é', (byte)'B']));
+        ex.ErrorCode.ShouldBe(PcreErrorCode.Utf8Err1);
+        ex.Message.ShouldContain("1 byte missing at end");
     }
 
     [Test]
     public void should_not_check_subject_utf_validity_8bit()
     {
         var re = TestSupport.CreatePcreRegex8Bit(@"A".ToLatin1Bytes());
-        _ = re.Match([(byte)'A', (byte)'é', (byte)'B']);
+        Should.NotThrow(() => re.Match([(byte)'A', (byte)'é', (byte)'B']));
     }
 
     [Test]
@@ -3873,7 +3874,7 @@ public class MatchTests
     {
         var re = TestSupport.CreatePcreRegex8Bit(@"A".ToLatin1Bytes());
         var buffer = re.CreateMatchBuffer();
-        _ = buffer.Match([(byte)'A', (byte)'é', (byte)'B']);
+        Should.NotThrow(() => buffer.Match([(byte)'A', (byte)'é', (byte)'B']));
     }
 
     [Test]
@@ -3882,19 +3883,19 @@ public class MatchTests
         var re = new PcreRegex(@"bar", PcreOptions.UseOffsetLimit);
 
         var match = re.Match("foobar");
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
 
         match = re.Match("foobar", 0, PcreMatchOptions.None, null, new PcreMatchSettings
         {
             OffsetLimit = 3
         });
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
 
         match = re.Match("foobar", 0, PcreMatchOptions.None, null, new PcreMatchSettings
         {
             OffsetLimit = 2
         });
-        Assert.That(match.Success, Is.False);
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -3903,19 +3904,19 @@ public class MatchTests
         var re = new PcreRegex(@"bar", PcreOptions.UseOffsetLimit);
 
         var match = re.Match("foobar".AsSpan());
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
 
         match = re.Match("foobar".AsSpan(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
         {
             OffsetLimit = 3
         });
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
 
         match = re.Match("foobar".AsSpan(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
         {
             OffsetLimit = 2
         });
-        Assert.That(match.Success, Is.False);
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -3925,15 +3926,15 @@ public class MatchTests
 
         var buffer = re.CreateMatchBuffer();
         var match = buffer.Match("foobar".AsSpan());
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
 
         buffer = re.CreateMatchBuffer(new PcreMatchSettings { OffsetLimit = 3 });
         match = buffer.Match("foobar".AsSpan());
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
 
         buffer = re.CreateMatchBuffer(new PcreMatchSettings { OffsetLimit = 2 });
         match = buffer.Match("foobar".AsSpan());
-        Assert.That(match.Success, Is.False);
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -3942,19 +3943,19 @@ public class MatchTests
         var re = new PcreRegexUtf8(@"bar"u8, PcreOptions.UseOffsetLimit);
 
         var match = re.Match("foobar"u8);
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
 
         match = re.Match("foobar"u8, 0, PcreMatchOptions.None, null, new PcreMatchSettings
         {
             OffsetLimit = 3
         });
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
 
         match = re.Match("foobar"u8, 0, PcreMatchOptions.None, null, new PcreMatchSettings
         {
             OffsetLimit = 2
         });
-        Assert.That(match.Success, Is.False);
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -3964,15 +3965,15 @@ public class MatchTests
 
         var buffer = re.CreateMatchBuffer();
         var match = buffer.Match("foobar"u8);
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
 
         buffer = re.CreateMatchBuffer(new PcreMatchSettings { OffsetLimit = 3 });
         match = buffer.Match("foobar"u8);
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
 
         buffer = re.CreateMatchBuffer(new PcreMatchSettings { OffsetLimit = 2 });
         match = buffer.Match("foobar"u8);
-        Assert.That(match.Success, Is.False);
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -3981,19 +3982,19 @@ public class MatchTests
         var re = TestSupport.CreatePcreRegex8Bit(@"bar".ToLatin1Bytes(), PcreOptions.UseOffsetLimit);
 
         var match = re.Match("foobar".ToLatin1Bytes());
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
 
         match = re.Match("foobar".ToLatin1Bytes(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
         {
             OffsetLimit = 3
         });
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
 
         match = re.Match("foobar".ToLatin1Bytes(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
         {
             OffsetLimit = 2
         });
-        Assert.That(match.Success, Is.False);
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -4003,15 +4004,15 @@ public class MatchTests
 
         var buffer = re.CreateMatchBuffer();
         var match = buffer.Match("foobar".ToLatin1Bytes());
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
 
         buffer = re.CreateMatchBuffer(new PcreMatchSettings { OffsetLimit = 3 });
         match = buffer.Match("foobar".ToLatin1Bytes());
-        Assert.That(match.Success, Is.True);
+        match.Success.ShouldBeTrue();
 
         buffer = re.CreateMatchBuffer(new PcreMatchSettings { OffsetLimit = 2 });
         match = buffer.Match("foobar".ToLatin1Bytes());
-        Assert.That(match.Success, Is.False);
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -4019,12 +4020,12 @@ public class MatchTests
     {
         var re = new PcreRegex(@"bar");
 
-        var ex = Assert.Throws<PcreMatchException>(() => re.Match("foobar", 0, PcreMatchOptions.None, null, new PcreMatchSettings
+        var ex = Should.Throw<PcreMatchException>(() => re.Match("foobar", 0, PcreMatchOptions.None, null, new PcreMatchSettings
         {
             OffsetLimit = 3
-        }))!;
+        }));
 
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.BadOffsetLimit));
+        ex.ErrorCode.ShouldBe(PcreErrorCode.BadOffsetLimit);
     }
 
     [Test]
@@ -4032,12 +4033,12 @@ public class MatchTests
     {
         var re = new PcreRegex(@"bar");
 
-        var ex = Assert.Throws<PcreMatchException>(() => re.Match("foobar".AsSpan(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
+        var ex = Should.Throw<PcreMatchException>(() => re.Match("foobar".AsSpan(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
         {
             OffsetLimit = 3
-        }))!;
+        }));
 
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.BadOffsetLimit));
+        ex.ErrorCode.ShouldBe(PcreErrorCode.BadOffsetLimit);
     }
 
     [Test]
@@ -4049,8 +4050,8 @@ public class MatchTests
             OffsetLimit = 3
         });
 
-        var ex = Assert.Throws<PcreMatchException>(() => buffer.Match("foobar".AsSpan()))!;
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.BadOffsetLimit));
+        var ex = Should.Throw<PcreMatchException>(() => buffer.Match("foobar".AsSpan()));
+        ex.ErrorCode.ShouldBe(PcreErrorCode.BadOffsetLimit);
     }
 
     [Test]
@@ -4058,12 +4059,12 @@ public class MatchTests
     {
         var re = new PcreRegexUtf8(@"bar"u8);
 
-        var ex = Assert.Throws<PcreMatchException>(() => re.Match("foobar"u8, 0, PcreMatchOptions.None, null, new PcreMatchSettings
+        var ex = Should.Throw<PcreMatchException>(() => re.Match("foobar"u8, 0, PcreMatchOptions.None, null, new PcreMatchSettings
         {
             OffsetLimit = 3
-        }))!;
+        }));
 
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.BadOffsetLimit));
+        ex.ErrorCode.ShouldBe(PcreErrorCode.BadOffsetLimit);
     }
 
     [Test]
@@ -4075,8 +4076,8 @@ public class MatchTests
             OffsetLimit = 3
         });
 
-        var ex = Assert.Throws<PcreMatchException>(() => buffer.Match("foobar"u8))!;
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.BadOffsetLimit));
+        var ex = Should.Throw<PcreMatchException>(() => buffer.Match("foobar"u8));
+        ex.ErrorCode.ShouldBe(PcreErrorCode.BadOffsetLimit);
     }
 
     [Test]
@@ -4084,12 +4085,12 @@ public class MatchTests
     {
         var re = TestSupport.CreatePcreRegex8Bit(@"bar".ToLatin1Bytes());
 
-        var ex = Assert.Throws<PcreMatchException>(() => re.Match("foobar".ToLatin1Bytes(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
+        var ex = Should.Throw<PcreMatchException>(() => re.Match("foobar".ToLatin1Bytes(), 0, PcreMatchOptions.None, null, new PcreMatchSettings
         {
             OffsetLimit = 3
-        }))!;
+        }));
 
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.BadOffsetLimit));
+        ex.ErrorCode.ShouldBe(PcreErrorCode.BadOffsetLimit);
     }
 
     [Test]
@@ -4101,8 +4102,8 @@ public class MatchTests
             OffsetLimit = 3
         });
 
-        var ex = Assert.Throws<PcreMatchException>(() => buffer.Match("foobar".ToLatin1Bytes()))!;
-        Assert.That(ex.ErrorCode, Is.EqualTo(PcreErrorCode.BadOffsetLimit));
+        var ex = Should.Throw<PcreMatchException>(() => buffer.Match("foobar".ToLatin1Bytes()));
+        ex.ErrorCode.ShouldBe(PcreErrorCode.BadOffsetLimit);
     }
 
     [Test]
@@ -4111,14 +4112,14 @@ public class MatchTests
         const string subject = "123\U0001D7CF\U0001D7D0\U0001D7D1";
 
         var normal = PcreRegex.Match(subject, @"\d+", PcreOptions.Unicode);
-        Assert.That(normal.Success, Is.True);
-        Assert.That(normal.Index, Is.EqualTo(0));
-        Assert.That(normal.Length, Is.EqualTo(subject.Length));
+        normal.Success.ShouldBeTrue();
+        normal.Index.ShouldBe(0);
+        normal.Length.ShouldBe(subject.Length);
 
         var scriptRun = PcreRegex.Match(subject, @"(*script_run:\d+)", PcreOptions.Unicode);
-        Assert.That(scriptRun.Success, Is.True);
-        Assert.That(scriptRun.Index, Is.EqualTo(0));
-        Assert.That(scriptRun.Length, Is.EqualTo(3));
+        scriptRun.Success.ShouldBeTrue();
+        scriptRun.Index.ShouldBe(0);
+        scriptRun.Length.ShouldBe(3);
     }
 
     [Test]
@@ -4127,14 +4128,14 @@ public class MatchTests
         const string subject = "123\U0001D7CF\U0001D7D0\U0001D7D1";
 
         var normal = new PcreRegex(@"\d+", PcreOptions.Unicode).Match(subject.AsSpan());
-        Assert.That(normal.Success, Is.True);
-        Assert.That(normal.Index, Is.EqualTo(0));
-        Assert.That(normal.Length, Is.EqualTo(subject.Length));
+        normal.Success.ShouldBeTrue();
+        normal.Index.ShouldBe(0);
+        normal.Length.ShouldBe(subject.Length);
 
         var scriptRun = new PcreRegex(@"(*script_run:\d+)", PcreOptions.Unicode).Match(subject.AsSpan());
-        Assert.That(scriptRun.Success, Is.True);
-        Assert.That(scriptRun.Index, Is.EqualTo(0));
-        Assert.That(scriptRun.Length, Is.EqualTo(3));
+        scriptRun.Success.ShouldBeTrue();
+        scriptRun.Index.ShouldBe(0);
+        scriptRun.Length.ShouldBe(3);
     }
 
     [Test]
@@ -4143,14 +4144,14 @@ public class MatchTests
         const string subject = "123\U0001D7CF\U0001D7D0\U0001D7D1";
 
         var normal = new PcreRegex(@"\d+", PcreOptions.Unicode).CreateMatchBuffer().Match(subject.AsSpan());
-        Assert.That(normal.Success, Is.True);
-        Assert.That(normal.Index, Is.EqualTo(0));
-        Assert.That(normal.Length, Is.EqualTo(subject.Length));
+        normal.Success.ShouldBeTrue();
+        normal.Index.ShouldBe(0);
+        normal.Length.ShouldBe(subject.Length);
 
         var scriptRun = new PcreRegex(@"(*script_run:\d+)", PcreOptions.Unicode).CreateMatchBuffer().Match(subject.AsSpan());
-        Assert.That(scriptRun.Success, Is.True);
-        Assert.That(scriptRun.Index, Is.EqualTo(0));
-        Assert.That(scriptRun.Length, Is.EqualTo(3));
+        scriptRun.Success.ShouldBeTrue();
+        scriptRun.Index.ShouldBe(0);
+        scriptRun.Length.ShouldBe(3);
     }
 
     [Test]
@@ -4159,14 +4160,14 @@ public class MatchTests
         var subject = "123\U0001D7CF\U0001D7D0\U0001D7D1"u8;
 
         var normal = new PcreRegexUtf8(@"\d+"u8, PcreOptions.Unicode).Match(subject);
-        Assert.That(normal.Success, Is.True);
-        Assert.That(normal.Index, Is.EqualTo(0));
-        Assert.That(normal.Length, Is.EqualTo(subject.Length));
+        normal.Success.ShouldBeTrue();
+        normal.Index.ShouldBe(0);
+        normal.Length.ShouldBe(subject.Length);
 
         var scriptRun = new PcreRegexUtf8(@"(*script_run:\d+)"u8, PcreOptions.Unicode).Match(subject);
-        Assert.That(scriptRun.Success, Is.True);
-        Assert.That(scriptRun.Index, Is.EqualTo(0));
-        Assert.That(scriptRun.Length, Is.EqualTo(3));
+        scriptRun.Success.ShouldBeTrue();
+        scriptRun.Index.ShouldBe(0);
+        scriptRun.Length.ShouldBe(3);
     }
 
     [Test]
@@ -4175,14 +4176,14 @@ public class MatchTests
         var subject = "123\U0001D7CF\U0001D7D0\U0001D7D1"u8;
 
         var normal = new PcreRegexUtf8(@"\d+"u8, PcreOptions.Unicode).CreateMatchBuffer().Match(subject);
-        Assert.That(normal.Success, Is.True);
-        Assert.That(normal.Index, Is.EqualTo(0));
-        Assert.That(normal.Length, Is.EqualTo(subject.Length));
+        normal.Success.ShouldBeTrue();
+        normal.Index.ShouldBe(0);
+        normal.Length.ShouldBe(subject.Length);
 
         var scriptRun = new PcreRegexUtf8(@"(*script_run:\d+)"u8, PcreOptions.Unicode).CreateMatchBuffer().Match(subject);
-        Assert.That(scriptRun.Success, Is.True);
-        Assert.That(scriptRun.Index, Is.EqualTo(0));
-        Assert.That(scriptRun.Length, Is.EqualTo(3));
+        scriptRun.Success.ShouldBeTrue();
+        scriptRun.Index.ShouldBe(0);
+        scriptRun.Length.ShouldBe(3);
     }
 
     [Test]
@@ -4191,21 +4192,21 @@ public class MatchTests
         var re = new PcreRegex(string.Empty);
         var match = re.Match(string.Empty);
 
-        Assert.That(match, Is.Not.Null);
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(0));
-        Assert.That(match.Value, Is.EqualTo(string.Empty));
-        Assert.That(match.Index, Is.EqualTo(0));
-        Assert.That(match.EndIndex, Is.EqualTo(0));
-        Assert.That(match.Length, Is.EqualTo(0));
+        match.ShouldNotBeNull();
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(0);
+        match.Value.ShouldBeEmpty();
+        match.Index.ShouldBe(0);
+        match.EndIndex.ShouldBe(0);
+        match.Length.ShouldBe(0);
 
-        Assert.That(match[0], Is.Not.Null);
-        Assert.That(match[0].Success, Is.True);
-        Assert.That(match[0].IsDefined, Is.True);
-        Assert.That(match[0].Value, Is.EqualTo(string.Empty));
-        Assert.That(match[0].Index, Is.EqualTo(0));
-        Assert.That(match[0].EndIndex, Is.EqualTo(0));
-        Assert.That(match[0].Length, Is.EqualTo(0));
+        match[0].ShouldNotBeNull();
+        match[0].Success.ShouldBeTrue();
+        match[0].IsDefined.ShouldBeTrue();
+        match[0].Value.ShouldBeEmpty();
+        match[0].Index.ShouldBe(0);
+        match[0].EndIndex.ShouldBe(0);
+        match[0].Length.ShouldBe(0);
     }
 
     [Test]
@@ -4214,19 +4215,19 @@ public class MatchTests
         var re = new PcreRegex(string.Empty);
         var match = re.Match(default(ReadOnlySpan<char>));
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(0));
-        Assert.That(match.Value.ToString(), Is.SameAs(string.Empty));
-        Assert.That(match.Index, Is.EqualTo(0));
-        Assert.That(match.EndIndex, Is.EqualTo(0));
-        Assert.That(match.Length, Is.EqualTo(0));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(0);
+        match.Value.ToString().ShouldBeSameAs(string.Empty);
+        match.Index.ShouldBe(0);
+        match.EndIndex.ShouldBe(0);
+        match.Length.ShouldBe(0);
 
-        Assert.That(match[0].Success, Is.True);
-        Assert.That(match[0].IsDefined, Is.True);
-        Assert.That(match[0].Value.ToString(), Is.SameAs(string.Empty));
-        Assert.That(match[0].Index, Is.EqualTo(0));
-        Assert.That(match[0].EndIndex, Is.EqualTo(0));
-        Assert.That(match[0].Length, Is.EqualTo(0));
+        match[0].Success.ShouldBeTrue();
+        match[0].IsDefined.ShouldBeTrue();
+        match[0].Value.ToString().ShouldBeSameAs(string.Empty);
+        match[0].Index.ShouldBe(0);
+        match[0].EndIndex.ShouldBe(0);
+        match[0].Length.ShouldBe(0);
     }
 
     [Test]
@@ -4235,19 +4236,19 @@ public class MatchTests
         var re = new PcreRegex(string.Empty);
         var match = re.CreateMatchBuffer().Match(default(ReadOnlySpan<char>));
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(0));
-        Assert.That(match.Value.ToString(), Is.SameAs(string.Empty));
-        Assert.That(match.Index, Is.EqualTo(0));
-        Assert.That(match.EndIndex, Is.EqualTo(0));
-        Assert.That(match.Length, Is.EqualTo(0));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(0);
+        match.Value.ToString().ShouldBeSameAs(string.Empty);
+        match.Index.ShouldBe(0);
+        match.EndIndex.ShouldBe(0);
+        match.Length.ShouldBe(0);
 
-        Assert.That(match[0].Success, Is.True);
-        Assert.That(match[0].IsDefined, Is.True);
-        Assert.That(match[0].Value.ToString(), Is.SameAs(string.Empty));
-        Assert.That(match[0].Index, Is.EqualTo(0));
-        Assert.That(match[0].EndIndex, Is.EqualTo(0));
-        Assert.That(match[0].Length, Is.EqualTo(0));
+        match[0].Success.ShouldBeTrue();
+        match[0].IsDefined.ShouldBeTrue();
+        match[0].Value.ToString().ShouldBeSameAs(string.Empty);
+        match[0].Index.ShouldBe(0);
+        match[0].EndIndex.ShouldBe(0);
+        match[0].Length.ShouldBe(0);
     }
 
     [Test]
@@ -4256,19 +4257,19 @@ public class MatchTests
         var re = new PcreRegexUtf8(""u8);
         var match = re.Match(default(ReadOnlySpan<byte>));
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(0));
-        Assert.That(match.Value.IsEmpty);
-        Assert.That(match.Index, Is.EqualTo(0));
-        Assert.That(match.EndIndex, Is.EqualTo(0));
-        Assert.That(match.Length, Is.EqualTo(0));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(0);
+        match.Value.IsEmpty.ShouldBeTrue();
+        match.Index.ShouldBe(0);
+        match.EndIndex.ShouldBe(0);
+        match.Length.ShouldBe(0);
 
-        Assert.That(match[0].Success, Is.True);
-        Assert.That(match[0].IsDefined, Is.True);
-        Assert.That(match[0].Value.IsEmpty);
-        Assert.That(match[0].Index, Is.EqualTo(0));
-        Assert.That(match[0].EndIndex, Is.EqualTo(0));
-        Assert.That(match[0].Length, Is.EqualTo(0));
+        match[0].Success.ShouldBeTrue();
+        match[0].IsDefined.ShouldBeTrue();
+        match[0].Value.IsEmpty.ShouldBeTrue();
+        match[0].Index.ShouldBe(0);
+        match[0].EndIndex.ShouldBe(0);
+        match[0].Length.ShouldBe(0);
     }
 
     [Test]
@@ -4277,19 +4278,19 @@ public class MatchTests
         var re = new PcreRegexUtf8(""u8);
         var match = re.CreateMatchBuffer().Match(default(ReadOnlySpan<byte>));
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(0));
-        Assert.That(match.Value.IsEmpty);
-        Assert.That(match.Index, Is.EqualTo(0));
-        Assert.That(match.EndIndex, Is.EqualTo(0));
-        Assert.That(match.Length, Is.EqualTo(0));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(0);
+        match.Value.IsEmpty.ShouldBeTrue();
+        match.Index.ShouldBe(0);
+        match.EndIndex.ShouldBe(0);
+        match.Length.ShouldBe(0);
 
-        Assert.That(match[0].Success, Is.True);
-        Assert.That(match[0].IsDefined, Is.True);
-        Assert.That(match[0].Value.IsEmpty);
-        Assert.That(match[0].Index, Is.EqualTo(0));
-        Assert.That(match[0].EndIndex, Is.EqualTo(0));
-        Assert.That(match[0].Length, Is.EqualTo(0));
+        match[0].Success.ShouldBeTrue();
+        match[0].IsDefined.ShouldBeTrue();
+        match[0].Value.IsEmpty.ShouldBeTrue();
+        match[0].Index.ShouldBe(0);
+        match[0].EndIndex.ShouldBe(0);
+        match[0].Length.ShouldBe(0);
     }
 
     [Test]
@@ -4298,19 +4299,19 @@ public class MatchTests
         var re = TestSupport.CreatePcreRegex8Bit("".ToLatin1Bytes());
         var match = re.Match(default(ReadOnlySpan<byte>));
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(0));
-        Assert.That(match.Value.IsEmpty);
-        Assert.That(match.Index, Is.EqualTo(0));
-        Assert.That(match.EndIndex, Is.EqualTo(0));
-        Assert.That(match.Length, Is.EqualTo(0));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(0);
+        match.Value.IsEmpty.ShouldBeTrue();
+        match.Index.ShouldBe(0);
+        match.EndIndex.ShouldBe(0);
+        match.Length.ShouldBe(0);
 
-        Assert.That(match[0].Success, Is.True);
-        Assert.That(match[0].IsDefined, Is.True);
-        Assert.That(match[0].Value.IsEmpty);
-        Assert.That(match[0].Index, Is.EqualTo(0));
-        Assert.That(match[0].EndIndex, Is.EqualTo(0));
-        Assert.That(match[0].Length, Is.EqualTo(0));
+        match[0].Success.ShouldBeTrue();
+        match[0].IsDefined.ShouldBeTrue();
+        match[0].Value.IsEmpty.ShouldBeTrue();
+        match[0].Index.ShouldBe(0);
+        match[0].EndIndex.ShouldBe(0);
+        match[0].Length.ShouldBe(0);
     }
 
     [Test]
@@ -4319,19 +4320,19 @@ public class MatchTests
         var re = TestSupport.CreatePcreRegex8Bit("".ToLatin1Bytes());
         var match = re.CreateMatchBuffer().Match(default(ReadOnlySpan<byte>));
 
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.CaptureCount, Is.EqualTo(0));
-        Assert.That(match.Value.IsEmpty);
-        Assert.That(match.Index, Is.EqualTo(0));
-        Assert.That(match.EndIndex, Is.EqualTo(0));
-        Assert.That(match.Length, Is.EqualTo(0));
+        match.Success.ShouldBeTrue();
+        match.CaptureCount.ShouldBe(0);
+        match.Value.IsEmpty.ShouldBeTrue();
+        match.Index.ShouldBe(0);
+        match.EndIndex.ShouldBe(0);
+        match.Length.ShouldBe(0);
 
-        Assert.That(match[0].Success, Is.True);
-        Assert.That(match[0].IsDefined, Is.True);
-        Assert.That(match[0].Value.IsEmpty);
-        Assert.That(match[0].Index, Is.EqualTo(0));
-        Assert.That(match[0].EndIndex, Is.EqualTo(0));
-        Assert.That(match[0].Length, Is.EqualTo(0));
+        match[0].Success.ShouldBeTrue();
+        match[0].IsDefined.ShouldBeTrue();
+        match[0].Value.IsEmpty.ShouldBeTrue();
+        match[0].Index.ShouldBe(0);
+        match[0].EndIndex.ShouldBe(0);
+        match[0].Length.ShouldBe(0);
     }
 
     [Test]
@@ -4339,12 +4340,12 @@ public class MatchTests
     {
         var group = default(PcreRefGroup);
 
-        Assert.That(group.Success, Is.False);
-        Assert.That(group.IsDefined, Is.False);
-        Assert.That(group.Value.ToString(), Is.SameAs(string.Empty));
-        Assert.That(group.Index, Is.EqualTo(-1));
-        Assert.That(group.EndIndex, Is.EqualTo(-1));
-        Assert.That(group.Length, Is.EqualTo(0));
+        group.Success.ShouldBeFalse();
+        group.IsDefined.ShouldBeFalse();
+        group.Value.ToString().ShouldBeSameAs(string.Empty);
+        group.Index.ShouldBe(-1);
+        group.EndIndex.ShouldBe(-1);
+        group.Length.ShouldBe(0);
     }
 
     [Test]
@@ -4352,12 +4353,12 @@ public class MatchTests
     {
         var group = default(PcreRefGroup8Bit);
 
-        Assert.That(group.Success, Is.False);
-        Assert.That(group.IsDefined, Is.False);
-        Assert.That(group.Value.IsEmpty);
-        Assert.That(group.Index, Is.EqualTo(-1));
-        Assert.That(group.EndIndex, Is.EqualTo(-1));
-        Assert.That(group.Length, Is.EqualTo(0));
+        group.Success.ShouldBeFalse();
+        group.IsDefined.ShouldBeFalse();
+        group.Value.IsEmpty.ShouldBeTrue();
+        group.Index.ShouldBe(-1);
+        group.EndIndex.ShouldBe(-1);
+        group.Length.ShouldBe(0);
     }
 
     [Test]
@@ -4367,7 +4368,7 @@ public class MatchTests
         var matchA = re.Match("bar");
         var matchB = re.Match("baz");
 
-        Assert.That(matchB, Is.SameAs(matchA));
+        matchB.ShouldBeSameAs(matchA);
     }
 
     [Test]
@@ -4377,8 +4378,8 @@ public class MatchTests
 
         var match = re.Match("ac");
 
-        Assert.That(match.Success, Is.False);
-        Assert.That(match.Mark, Is.EqualTo("foo"));
+        match.Success.ShouldBeFalse();
+        match.Mark.ShouldBe("foo");
     }
 
     [Test]
@@ -4388,8 +4389,8 @@ public class MatchTests
 
         var match = re.Match("ac".AsSpan());
 
-        Assert.That(match.Success, Is.False);
-        Assert.That(match.Mark.ToString(), Is.EqualTo("foo"));
+        match.Success.ShouldBeFalse();
+        match.Mark.ShouldBe("foo");
     }
 
     [Test]
@@ -4399,8 +4400,8 @@ public class MatchTests
 
         var match = re.Match("ac"u8);
 
-        Assert.That(match.Success, Is.False);
-        Assert.That(match.Mark.SequenceEqual("foo"u8));
+        match.Success.ShouldBeFalse();
+        match.Mark.ShouldBe("foo"u8);
     }
 
     [Test]
@@ -4410,8 +4411,8 @@ public class MatchTests
 
         var match = re.Match("ac".ToLatin1Bytes());
 
-        Assert.That(match.Success, Is.False);
-        Assert.That(match.Mark.SequenceEqual("foo".ToLatin1Bytes()));
+        match.Success.ShouldBeFalse();
+        match.Mark.ShouldBe("foo".ToLatin1Bytes());
     }
 
     [Test]
@@ -4420,7 +4421,7 @@ public class MatchTests
         var re = new PcreRegex("foo");
         var match = re.Match("bar".AsSpan());
 
-        Assert.That(match.OutputVector.Length, Is.Zero);
+        match.OutputVector.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -4429,7 +4430,7 @@ public class MatchTests
         var re = new PcreRegexUtf8("foo"u8);
         var match = re.Match("bar"u8);
 
-        Assert.That(match.OutputVector.Length, Is.Zero);
+        match.OutputVector.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -4438,7 +4439,7 @@ public class MatchTests
         var re = TestSupport.CreatePcreRegex8Bit("foo".ToLatin1Bytes());
         var match = re.Match("bar".ToLatin1Bytes());
 
-        Assert.That(match.OutputVector.Length, Is.Zero);
+        match.OutputVector.IsEmpty.ShouldBeTrue();
     }
 
     [Test]
@@ -4449,7 +4450,7 @@ public class MatchTests
 
         var match = buffer.Match("bar".AsSpan());
 
-        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]), Is.True);
+        Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]).ShouldBeTrue();
     }
 
     [Test]
@@ -4460,7 +4461,7 @@ public class MatchTests
 
         var match = buffer.Match("bar"u8);
 
-        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]), Is.True);
+        Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]).ShouldBeTrue();
     }
 
     [Test]
@@ -4471,56 +4472,56 @@ public class MatchTests
 
         var match = buffer.Match("bar".ToLatin1Bytes());
 
-        Assert.That(Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]), Is.True);
+        Unsafe.AreSame(ref MemoryMarshal.GetReference(match.OutputVector), ref buffer.OutputVector[0]).ShouldBeTrue();
     }
 
     [Test]
     public void should_fix_issue_22()
     {
         var regex = new PcreRegex(@"[\w]*[CA]X*B", PcreOptions.Compiled);
-        Assert.That(regex.IsMatch("ABC"), Is.True);
+        regex.IsMatch("ABC").ShouldBeTrue();
     }
 
     [Test]
     public void should_fix_pcre_issue_21()
     {
         var regex = new PcreRegex(@"(?P<size>\\d+)m|M", PcreOptions.Compiled);
-        Assert.That(regex.Match("4M").Value, Is.EqualTo("M"));
+        regex.Match("4M").Value.ShouldBe("M");
     }
 
     [Test]
     public void should_throw_on_null_subject()
     {
         var re = new PcreRegex("a");
-        Assert.Throws<ArgumentNullException>(() => re.Match(default(string)!));
+        Should.Throw<ArgumentNullException>(() => re.Match(default(string)!));
     }
 
     [Test]
     public void should_throw_on_null_settings()
     {
         var re = new PcreRegex("a");
-        Assert.Throws<ArgumentNullException>(() => re.Match("a", 0, PcreMatchOptions.None, null, default(PcreMatchSettings)!));
+        Should.Throw<ArgumentNullException>(() => re.Match("a", 0, PcreMatchOptions.None, null, default(PcreMatchSettings)!));
     }
 
     [Test]
     public void should_throw_on_null_settings_ref()
     {
         var re = new PcreRegex("a");
-        Assert.Throws<ArgumentNullException>(() => re.Match("a".AsSpan(), 0, PcreMatchOptions.None, null, default(PcreMatchSettings)!));
+        Should.Throw<ArgumentNullException>(() => re.Match("a".AsSpan(), 0, PcreMatchOptions.None, null, default(PcreMatchSettings)!));
     }
 
     [Test]
     public void should_throw_on_null_settings_utf8()
     {
         var re = new PcreRegexUtf8("a"u8);
-        Assert.Throws<ArgumentNullException>(() => re.Match("a"u8, 0, PcreMatchOptions.None, null, default(PcreMatchSettings)!));
+        Should.Throw<ArgumentNullException>(() => re.Match("a"u8, 0, PcreMatchOptions.None, null, default(PcreMatchSettings)!));
     }
 
     [Test]
     public void should_throw_on_null_settings_8bit()
     {
         var re = TestSupport.CreatePcreRegex8Bit("a".ToLatin1Bytes());
-        Assert.Throws<ArgumentNullException>(() => re.Match("a".ToLatin1Bytes(), 0, PcreMatchOptions.None, null, default(PcreMatchSettings)!));
+        Should.Throw<ArgumentNullException>(() => re.Match("a".ToLatin1Bytes(), 0, PcreMatchOptions.None, null, default(PcreMatchSettings)!));
     }
 
     [Test]
@@ -4529,7 +4530,7 @@ public class MatchTests
     public void should_throw_on_invalid_start_index(int startIndex)
     {
         var re = new PcreRegex(@"a");
-        Assert.Throws<ArgumentOutOfRangeException>(() => re.Match("a", startIndex));
+        Should.Throw<ArgumentOutOfRangeException>(() => re.Match("a", startIndex));
     }
 
     [Test]
@@ -4538,7 +4539,7 @@ public class MatchTests
     public void should_throw_on_invalid_start_index_ref(int startIndex)
     {
         var re = new PcreRegex(@"a");
-        Assert.Throws<ArgumentOutOfRangeException>(() => re.Match("a".AsSpan(), startIndex));
+        Should.Throw<ArgumentOutOfRangeException>(() => re.Match("a".AsSpan(), startIndex));
     }
 
     [Test]
@@ -4548,7 +4549,7 @@ public class MatchTests
     {
         var re = new PcreRegex(@"a");
         var buffer = re.CreateMatchBuffer();
-        Assert.Throws<ArgumentOutOfRangeException>(() => buffer.Match("a".AsSpan(), startIndex));
+        Should.Throw<ArgumentOutOfRangeException>(() => buffer.Match("a".AsSpan(), startIndex));
     }
 
     [Test]
@@ -4557,7 +4558,7 @@ public class MatchTests
     public void should_throw_on_invalid_start_index_utf8(int startIndex)
     {
         var re = new PcreRegexUtf8(@"a"u8);
-        Assert.Throws<ArgumentOutOfRangeException>(() => re.Match("a"u8, startIndex));
+        Should.Throw<ArgumentOutOfRangeException>(() => re.Match("a"u8, startIndex));
     }
 
     [Test]
@@ -4567,7 +4568,7 @@ public class MatchTests
     {
         var re = new PcreRegexUtf8(@"a"u8);
         var buffer = re.CreateMatchBuffer();
-        Assert.Throws<ArgumentOutOfRangeException>(() => buffer.Match("a"u8, startIndex));
+        Should.Throw<ArgumentOutOfRangeException>(() => buffer.Match("a"u8, startIndex));
     }
 
     [Test]
@@ -4576,7 +4577,7 @@ public class MatchTests
     public void should_throw_on_invalid_start_index_8bit(int startIndex)
     {
         var re = TestSupport.CreatePcreRegex8Bit(@"a".ToLatin1Bytes());
-        Assert.Throws<ArgumentOutOfRangeException>(() => re.Match("a".ToLatin1Bytes(), startIndex));
+        Should.Throw<ArgumentOutOfRangeException>(() => re.Match("a".ToLatin1Bytes(), startIndex));
     }
 
     [Test]
@@ -4586,7 +4587,7 @@ public class MatchTests
     {
         var re = TestSupport.CreatePcreRegex8Bit(@"a".ToLatin1Bytes());
         var buffer = re.CreateMatchBuffer();
-        Assert.Throws<ArgumentOutOfRangeException>(() => buffer.Match("a".ToLatin1Bytes(), startIndex));
+        Should.Throw<ArgumentOutOfRangeException>(() => buffer.Match("a".ToLatin1Bytes(), startIndex));
     }
 
     [Test]
@@ -4595,7 +4596,7 @@ public class MatchTests
         var re = new PcreRegex(".");
         var match = re.Match("ab");
 
-        Assert.That(match.ToString(), Is.EqualTo("a"));
+        match.ToString().ShouldBe("a");
     }
 
     [Test]
@@ -4604,7 +4605,7 @@ public class MatchTests
         var re = new PcreRegex(".");
         var match = re.Match("ab".AsSpan());
 
-        Assert.That(match.ToString(), Is.EqualTo("a"));
+        match.ToString().ShouldBe("a");
     }
 
     [Test]
@@ -4613,7 +4614,7 @@ public class MatchTests
         var re = new PcreRegexUtf8("."u8);
         var match = re.Match("ab"u8);
 
-        Assert.That(match.ToString(), Is.EqualTo("a"));
+        match.ToString().ShouldBe("a");
     }
 
     [Test]
@@ -4622,7 +4623,7 @@ public class MatchTests
         var re = TestSupport.CreatePcreRegex8Bit(".".ToLatin1Bytes());
         var match = re.Match("ab".ToLatin1Bytes());
 
-        Assert.That(match.ToString(), Is.EqualTo("a"));
+        match.ToString().ShouldBe("a");
     }
 
     [Test]
@@ -4631,7 +4632,7 @@ public class MatchTests
         var re = new PcreRegex(".");
         var match = re.Match("ab");
 
-        Assert.That(match[0].ToString(), Is.EqualTo("a"));
+        match[0].ToString().ShouldBe("a");
     }
 
     [Test]
@@ -4640,7 +4641,7 @@ public class MatchTests
         var re = new PcreRegex(".");
         var match = re.Match("ab".AsSpan());
 
-        Assert.That(match[0].ToString(), Is.EqualTo("a"));
+        match[0].ToString().ShouldBe("a");
     }
 
     [Test]
@@ -4650,7 +4651,7 @@ public class MatchTests
         var buffer = re.CreateMatchBuffer();
         var match = buffer.Match("ab".AsSpan());
 
-        Assert.That(match[0].ToString(), Is.EqualTo("a"));
+        match[0].ToString().ShouldBe("a");
     }
 
     [Test]
@@ -4659,7 +4660,7 @@ public class MatchTests
         var re = new PcreRegexUtf8("."u8);
         var match = re.Match("ab"u8);
 
-        Assert.That(match[0].ToString(), Is.EqualTo("a"));
+        match[0].ToString().ShouldBe("a");
     }
 
     [Test]
@@ -4669,7 +4670,7 @@ public class MatchTests
         var buffer = re.CreateMatchBuffer();
         var match = buffer.Match("ab"u8);
 
-        Assert.That(match[0].ToString(), Is.EqualTo("a"));
+        match[0].ToString().ShouldBe("a");
     }
 
     [Test]
@@ -4678,7 +4679,7 @@ public class MatchTests
         var re = TestSupport.CreatePcreRegex8Bit(".".ToLatin1Bytes());
         var match = re.Match("ab".ToLatin1Bytes());
 
-        Assert.That(match[0].ToString(), Is.EqualTo("a"));
+        match[0].ToString().ShouldBe("a");
     }
 
     [Test]
@@ -4688,7 +4689,7 @@ public class MatchTests
         var buffer = re.CreateMatchBuffer();
         var match = buffer.Match("ab".ToLatin1Bytes());
 
-        Assert.That(match[0].ToString(), Is.EqualTo("a"));
+        match[0].ToString().ShouldBe("a");
     }
 
     [Test]
@@ -4697,7 +4698,7 @@ public class MatchTests
         var re = new PcreRegex(".");
         var match = re.Match("ab");
 
-        Assert.That((string)match[0], Is.EqualTo("a"));
+        ((string)match[0]).ShouldBe("a");
     }
 
     [Test]
@@ -4706,7 +4707,7 @@ public class MatchTests
         var re = new PcreRegex(".");
         var match = re.Match("ab".AsSpan());
 
-        Assert.That((string)match[0], Is.EqualTo("a"));
+        ((string)match[0]).ShouldBe("a");
     }
 
     [Test]
@@ -4716,7 +4717,7 @@ public class MatchTests
         var buffer = re.CreateMatchBuffer();
         var match = buffer.Match("ab".AsSpan());
 
-        Assert.That((string)match[0], Is.EqualTo("a"));
+        ((string)match[0]).ShouldBe("a");
     }
 
     [Test]
@@ -4725,7 +4726,7 @@ public class MatchTests
         var re = new PcreRegexUtf8("."u8);
         var match = re.Match("ab"u8);
 
-        Assert.That((string)match[0], Is.EqualTo("a"));
+        ((string)match[0]).ShouldBe("a");
     }
 
     [Test]
@@ -4735,7 +4736,7 @@ public class MatchTests
         var buffer = re.CreateMatchBuffer();
         var match = buffer.Match("ab"u8);
 
-        Assert.That((string)match[0], Is.EqualTo("a"));
+        ((string)match[0]).ShouldBe("a");
     }
 
     [Test]
@@ -4773,7 +4774,7 @@ public class MatchTests
             _ => throw new InvalidOperationException($"Unexpected callout count: {calloutCount}.")
         };
 
-        Assert.That(autoPossess, Is.EqualTo(expectedAutoPossess));
+        autoPossess.ShouldBe(expectedAutoPossess);
     }
 
     [Test]
@@ -4811,7 +4812,7 @@ public class MatchTests
             _ => throw new InvalidOperationException($"Unexpected callout count: {calloutCount}.")
         };
 
-        Assert.That(autoPossess, Is.EqualTo(expectedAutoPossess));
+        autoPossess.ShouldBe(expectedAutoPossess);
     }
 
     [Test]
@@ -4849,7 +4850,7 @@ public class MatchTests
             _ => throw new InvalidOperationException($"Unexpected callout count: {calloutCount}.")
         };
 
-        Assert.That(autoPossess, Is.EqualTo(expectedAutoPossess));
+        autoPossess.ShouldBe(expectedAutoPossess);
     }
 
     [Test]
@@ -4862,7 +4863,7 @@ public class MatchTests
             OffsetLimit = 0
         });
 
-        Assert.That(match.Success, Is.False);
+        match.Success.ShouldBeFalse();
     }
 
     [Test]
@@ -4880,11 +4881,11 @@ public class MatchTests
             return PcreCalloutResult.Pass;
         });
 
-        Assert.That(callouts, Is.EqualTo([
+        callouts.ShouldBe([
             (255, 255, 0),
             (1, 1, 6),
             (255, 255, 6)
-        ]));
+        ]);
     }
 
     [Test]
@@ -4946,7 +4947,7 @@ public class MatchTests
             }
             """;
 
-        Assert.That(regex.IsMatch(subject), Is.True);
-        Assert.That(regex.IsMatch(subject.AsSpan()), Is.True);
+        regex.IsMatch(subject).ShouldBeTrue();
+        regex.IsMatch(subject.AsSpan()).ShouldBeTrue();
     }
 }
