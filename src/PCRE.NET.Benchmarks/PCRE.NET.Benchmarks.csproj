@@ -26,7 +26,7 @@
 
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
     <!-- Needed for binding redirects -->
-    <PackageReference Include="System.Reflection.Metadata" VersionOverride="10.0.11" />
+    <PackageReference Include="System.Reflection.Metadata" VersionOverride="11.0.0" />
   </ItemGroup>
 
 </Project>
