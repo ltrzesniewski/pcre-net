@@ -88,6 +88,7 @@ public sealed class PcreCallsInterceptorGenerator : IIncrementalGenerator
                     ContainingType:
                     {
                         Name: "PcreRegex",
+                        ContainingType: null,
                         ContainingNamespace: { Name: "PCRE", ContainingNamespace.IsGlobalNamespace: true }
                     }
                 } method

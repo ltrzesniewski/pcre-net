@@ -3,7 +3,7 @@ on: [ push, pull_request ]
 
 env:
   BUILD_CONFIGURATION: Release
-  BUILD_NET_TFM: net10.0
+  BUILD_NET_TFM: net11.0
   BUILD_NET_FRAMEWORK_TFM: net481
   DOTNET_NOLOGO: 1
   NUGET_CERT_REVOCATION_MODE: offline
